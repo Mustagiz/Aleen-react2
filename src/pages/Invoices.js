@@ -422,95 +422,148 @@ const Invoices = () => {
         )}
       </Paper>
 
-      {/* Invoice Table */}
-      <Paper sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.05)' }}>
-        <TableContainer>
-          <Table>
-            <TableHead sx={{ bgcolor: 'rgba(136, 14, 79, 0.02)', borderBottom: '2px solid rgba(136, 14, 79, 0.1)' }}>
-              <TableRow>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Invoice Details</TableCell>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Date</TableCell>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: { xs: 'none', sm: 'table-cell' } }}>Customer</TableCell>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: { xs: 'none', md: 'table-cell' } }}>Payment</TableCell>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Amount</TableCell>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredInvoices.length > 0 ? filteredInvoices
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((inv, idx) => (
-                  <TableRow
-                    key={inv.id}
-                    sx={{
-                      '&:hover': { bgcolor: 'rgba(136, 14, 79, 0.02)' },
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>#{inv.id}</Typography>
-                      <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>{inv.items?.length || 0} Items</Typography>
-                    </TableCell>
-                    <TableCell sx={{ fontSize: '0.875rem', fontWeight: 500 }}>
+      {/* Invoice List (Mobile) or Table (Desktop) */}
+      {isMobile ? (
+        <Box>
+          {filteredInvoices.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(inv => (
+            <Card key={inv.id} sx={{ mb: 2, borderRadius: 3, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+              <CardContent sx={{ p: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                  <Box>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'primary.main' }}>
+                      #{inv.id}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
                       {new Date(inv.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
-                    </TableCell>
-                    <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' }, fontWeight: 700 }}>
-                      {inv.customer || 'Walk-in'}
-                      {inv.phone && <Typography variant="caption" display="block" color="text.secondary">{inv.phone}</Typography>}
-                    </TableCell>
-                    <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                      <Chip
-                        label={inv.paymentMethod}
-                        size="small"
-                        sx={{
-                          bgcolor: 'rgba(136, 14, 79, 0.05)',
-                          color: 'primary.main',
-                          fontWeight: 700,
-                          fontSize: '0.65rem',
-                          textTransform: 'uppercase',
-                          borderRadius: 1
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 800, fontSize: '0.95rem', color: 'primary.main' }}>
-                      ₹{inv.total.toLocaleString('en-IN')}
-                    </TableCell>
-                    <TableCell>
-                      {isMobile ? (
-                        <>
-                          <IconButton
-                            size="small"
-                            onClick={(e) => handleMenuClick(e, inv.id)}
-                          >
-                            <MoreVert />
-                          </IconButton>
-                          <Menu
-                            anchorEl={anchorEl}
-                            open={Boolean(anchorEl) && selectedInvoiceId === inv.id}
-                            onClose={handleMenuClose}
-                            PaperProps={{
-                              sx: { width: 200, borderRadius: 2, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }
-                            }}
-                          >
-                            <MenuItem onClick={() => { setViewInvoice(inv); handleMenuClose(); }}>
-                              <ListItemIcon><Visibility fontSize="small" /></ListItemIcon>
-                              <ListItemText>View</ListItemText>
-                            </MenuItem>
-                            <MenuItem onClick={() => { downloadPDF(inv); handleMenuClose(); }}>
-                              <ListItemIcon><Download fontSize="small" /></ListItemIcon>
-                              <ListItemText>Download</ListItemText>
-                            </MenuItem>
-                            <MenuItem onClick={() => { sendWhatsApp(inv); handleMenuClose(); }}>
-                              <ListItemIcon><WhatsApp fontSize="small" /></ListItemIcon>
-                              <ListItemText>WhatsApp</ListItemText>
-                            </MenuItem>
-                            <MenuItem onClick={() => { deleteInvoice(inv.id); handleMenuClose(); }} sx={{ color: 'error.main' }}>
-                              <ListItemIcon><Delete fontSize="small" color="error" /></ListItemIcon>
-                              <ListItemText>Delete</ListItemText>
-                            </MenuItem>
-                          </Menu>
-                        </>
-                      ) : (
+                    </Typography>
+                  </Box>
+                  <Chip
+                    label={inv.paymentMethod}
+                    size="small"
+                    sx={{
+                      bgcolor: 'rgba(136, 14, 79, 0.05)',
+                      color: 'primary.main',
+                      fontWeight: 700,
+                      fontSize: '0.65rem'
+                    }}
+                  />
+                </Box>
+
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    {inv.customer || 'Walk-in Customer'}
+                  </Typography>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'primary.main' }}>
+                    ₹{inv.total.toLocaleString('en-IN')}
+                  </Typography>
+                </Box>
+
+                <Divider sx={{ my: 1.5 }} />
+
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                    {inv.items?.length || 0} Items
+                  </Typography>
+                  <Box sx={{ display: 'flex' }}>
+                    <IconButton size="small" onClick={(e) => handleMenuClick(e, inv.id)}>
+                      <MoreVert fontSize="small" />
+                    </IconButton>
+                  </Box>
+                </Box>
+
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl) && selectedInvoiceId === inv.id}
+                  onClose={handleMenuClose}
+                  PaperProps={{
+                    sx: { width: 200, borderRadius: 2, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }
+                  }}
+                >
+                  <MenuItem onClick={() => { setViewInvoice(inv); handleMenuClose(); }}>
+                    <ListItemIcon><Visibility fontSize="small" /></ListItemIcon>
+                    <ListItemText>View</ListItemText>
+                  </MenuItem>
+                  <MenuItem onClick={() => { downloadPDF(inv); handleMenuClose(); }}>
+                    <ListItemIcon><Download fontSize="small" /></ListItemIcon>
+                    <ListItemText>Download</ListItemText>
+                  </MenuItem>
+                  <MenuItem onClick={() => { sendWhatsApp(inv); handleMenuClose(); }}>
+                    <ListItemIcon><WhatsApp fontSize="small" /></ListItemIcon>
+                    <ListItemText>WhatsApp</ListItemText>
+                  </MenuItem>
+                  <MenuItem onClick={() => { deleteInvoice(inv.id); handleMenuClose(); }} sx={{ color: 'error.main' }}>
+                    <ListItemIcon><Delete fontSize="small" color="error" /></ListItemIcon>
+                    <ListItemText>Delete</ListItemText>
+                  </MenuItem>
+                </Menu>
+              </CardContent>
+            </Card>
+          ))}
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={filteredInvoices.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            sx={{ borderTop: 'none' }}
+          />
+        </Box>
+      ) : (
+        <Paper sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.05)' }}>
+          <TableContainer>
+            <Table>
+              <TableHead sx={{ bgcolor: 'rgba(136, 14, 79, 0.02)', borderBottom: '2px solid rgba(136, 14, 79, 0.1)' }}>
+                <TableRow>
+                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Invoice Details</TableCell>
+                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Date</TableCell>
+                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: { xs: 'none', sm: 'table-cell' } }}>Customer</TableCell>
+                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: { xs: 'none', md: 'table-cell' } }}>Payment</TableCell>
+                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Amount</TableCell>
+                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredInvoices.length > 0 ? filteredInvoices
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((inv, idx) => (
+                    <TableRow
+                      key={inv.id}
+                      sx={{
+                        '&:hover': { bgcolor: 'rgba(136, 14, 79, 0.02)' },
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      <TableCell>
+                        <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>#{inv.id}</Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>{inv.items?.length || 0} Items</Typography>
+                      </TableCell>
+                      <TableCell sx={{ fontSize: '0.875rem', fontWeight: 500 }}>
+                        {new Date(inv.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                      </TableCell>
+                      <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' }, fontWeight: 700 }}>
+                        {inv.customer || 'Walk-in'}
+                        {inv.phone && <Typography variant="caption" display="block" color="text.secondary">{inv.phone}</Typography>}
+                      </TableCell>
+                      <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                        <Chip
+                          label={inv.paymentMethod}
+                          size="small"
+                          sx={{
+                            bgcolor: 'rgba(136, 14, 79, 0.05)',
+                            color: 'primary.main',
+                            fontWeight: 700,
+                            fontSize: '0.65rem',
+                            textTransform: 'uppercase',
+                            borderRadius: 1
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 800, fontSize: '0.95rem', color: 'primary.main' }}>
+                        ₹{inv.total.toLocaleString('en-IN')}
+                      </TableCell>
+                      <TableCell>
                         <Box sx={{ display: 'flex', gap: 0.5 }}>
                           <IconButton size="small" onClick={() => setViewInvoice(inv)} sx={{ color: 'primary.main', bgcolor: 'rgba(136, 14, 79, 0.05)', '&:hover': { bgcolor: 'rgba(136, 14, 79, 0.1)' } }}>
                             <Visibility fontSize="small" />
@@ -525,31 +578,31 @@ const Invoices = () => {
                             <Delete fontSize="small" />
                           </IconButton>
                         </Box>
-                      )}
+                      </TableCell>
+                    </TableRow>
+                  )) : (
+                  <TableRow>
+                    <TableCell colSpan={6} sx={{ textAlign: 'center', py: 8 }}>
+                      <Receipt sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
+                      <Typography variant="h6" color="text.secondary">No invoices found</Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>Create your first invoice to get started</Typography>
                     </TableCell>
                   </TableRow>
-                )) : (
-                <TableRow>
-                  <TableCell colSpan={6} sx={{ textAlign: 'center', py: 8 }}>
-                    <Receipt sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
-                    <Typography variant="h6" color="text.secondary">No invoices found</Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>Create your first invoice to get started</Typography>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={filteredInvoices.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Paper>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={filteredInvoices.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Paper>
+      )}
 
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md" fullWidth PaperProps={{ sx: { borderRadius: 4, overflow: 'hidden' } }}>
         <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white', fontWeight: 800, fontSize: '1.25rem', py: 3 }}>Create Retail Invoice</DialogTitle>

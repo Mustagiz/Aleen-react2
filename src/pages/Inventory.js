@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Tooltip } from '@mui/material';
+import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Tooltip, useTheme, useMediaQuery, Divider } from '@mui/material';
 import { Edit, Delete, Add, Search, Inventory2, TrendingUp, Warning } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 
@@ -13,6 +13,9 @@ const Inventory = () => {
   const [form, setForm] = useState({
     name: '', category: '', size: '', color: '', price: '', cost: '', quantity: '', supplier: ''
   });
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const totalItems = inventory.length;
   const totalValue = inventory.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -185,117 +188,206 @@ const Inventory = () => {
         </Box>
       </Paper>
 
-      {/* Inventory Table */}
-      <Paper sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.05)' }}>
-        <TableContainer>
-          <Table>
-            <TableHead sx={{ bgcolor: 'rgba(136, 14, 79, 0.02)', borderBottom: '2px solid rgba(136, 14, 79, 0.1)' }}>
-              <TableRow>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Product Details</TableCell>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: { xs: 'none', sm: 'table-cell' } }}>Category</TableCell>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: { xs: 'none', md: 'table-cell' } }}>Variants</TableCell>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cost & Price</TableCell>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Margin</TableCell>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Inventory</TableCell>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredInventory.map((item, idx) => {
-                const profit = (item.price - (item.cost || 0));
-                const profitMargin = item.cost ? ((profit / item.price) * 100).toFixed(1) : 0;
-                return (
-                  <TableRow
-                    key={item.id}
-                    sx={{
-                      '&:hover': { bgcolor: 'rgba(136, 14, 79, 0.02)' },
-                      transition: 'background-color 0.2s'
-                    }}
-                  >
-                    <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>{item.name}</Typography>
-                      <Typography variant="caption" color="text.secondary">{item.supplier || 'No Supplier'}</Typography>
-                    </TableCell>
-                    <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                      <Chip
-                        label={item.category}
-                        size="small"
-                        sx={{
-                          bgcolor: 'rgba(136, 14, 79, 0.05)',
-                          color: 'primary.main',
-                          fontWeight: 700,
-                          fontSize: '0.65rem',
-                          textTransform: 'uppercase',
-                          borderRadius: 1
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="caption" sx={{ fontWeight: 600 }}>{item.size}</Typography>
-                        <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: item.color.toLowerCase(), border: '1px solid rgba(0,0,0,0.1)' }} />
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                        <Typography variant="body2" sx={{ fontWeight: 700 }}>₹{item.price}</Typography>
-                        <Typography variant="caption" color="text.secondary">Cost: ₹{item.cost || 0}</Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 700, color: profit > 0 ? '#1b5e20' : '#c62828' }}>
-                        ₹{profit.toFixed(0)}
+      {/* Inventory List (Mobile) or Table (Desktop) */}
+      {isMobile ? (
+        <Box>
+          {filteredInventory.map((item) => {
+            const profit = (item.price - (item.cost || 0));
+            const profitMargin = item.cost ? ((profit / item.price) * 100).toFixed(1) : 0;
+            return (
+              <Card key={item.id} sx={{ mb: 2, borderRadius: 3, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+                <CardContent sx={{ p: 2 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                    <Box>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.2 }}>
+                        {item.name}
                       </Typography>
-                      <Typography variant="caption" sx={{ color: profit > 0 ? '#1b5e20' : '#c62828', opacity: 0.8 }}>
-                        {profitMargin}% margin
+                      <Typography variant="caption" color="text.secondary">
+                        {item.supplier || 'No Supplier'}
                       </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Box
+                    </Box>
+                    <Chip
+                      label={item.category}
+                      size="small"
+                      sx={{
+                        bgcolor: 'rgba(136, 14, 79, 0.05)',
+                        color: 'primary.main',
+                        fontWeight: 700,
+                        fontSize: '0.65rem',
+                        height: 20
+                      }}
+                    />
+                  </Box>
+
+                  <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                      Size: {item.size || 'N/A'}
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>Color:</Typography>
+                      <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: item.color?.toLowerCase() || 'transparent', border: '1px solid rgba(0,0,0,0.1)' }} />
+                    </Box>
+                  </Box>
+
+                  <Divider sx={{ mb: 1.5 }} />
+
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 800, color: 'primary.main' }}>
+                        ₹{item.price}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: profit > 0 ? '#1b5e20' : '#c62828' }}>
+                        Margin: {profitMargin}%
+                      </Typography>
+                    </Box>
+                    <Box sx={{ textAlign: 'right' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'flex-end' }}>
+                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: item.quantity < 10 ? '#ef4444' : item.quantity < 50 ? '#f59e0b' : '#10b981' }} />
+                        <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.quantity}</Typography>
+                      </Box>
+                      <Typography variant="caption" color="text.secondary">Stock</Typography>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      color="primary"
+                      size="small"
+                      startIcon={<Edit />}
+                      onClick={() => handleOpen(item)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      startIcon={<Delete />}
+                      onClick={() => deleteInventoryItem(item.id)}
+                    >
+                      Delete
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </Box>
+      ) : (
+        <Paper sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.05)' }}>
+          <TableContainer>
+            <Table>
+              <TableHead sx={{ bgcolor: 'rgba(136, 14, 79, 0.02)', borderBottom: '2px solid rgba(136, 14, 79, 0.1)' }}>
+                <TableRow>
+                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Product Details</TableCell>
+                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: { xs: 'none', sm: 'table-cell' } }}>Category</TableCell>
+                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: { xs: 'none', md: 'table-cell' } }}>Variants</TableCell>
+                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cost & Price</TableCell>
+                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Margin</TableCell>
+                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Inventory</TableCell>
+                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredInventory.map((item, idx) => {
+                  const profit = (item.price - (item.cost || 0));
+                  const profitMargin = item.cost ? ((profit / item.price) * 100).toFixed(1) : 0;
+                  return (
+                    <TableRow
+                      key={item.id}
+                      sx={{
+                        '&:hover': { bgcolor: 'rgba(136, 14, 79, 0.02)' },
+                        transition: 'background-color 0.2s'
+                      }}
+                    >
+                      <TableCell>
+                        <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>{item.name}</Typography>
+                        <Typography variant="caption" color="text.secondary">{item.supplier || 'No Supplier'}</Typography>
+                      </TableCell>
+                      <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                        <Chip
+                          label={item.category}
+                          size="small"
                           sx={{
-                            width: 8,
-                            height: 8,
-                            borderRadius: '50%',
-                            bgcolor: item.quantity < 10 ? '#ef4444' : item.quantity < 50 ? '#f59e0b' : '#10b981'
+                            bgcolor: 'rgba(136, 14, 79, 0.05)',
+                            color: 'primary.main',
+                            fontWeight: 700,
+                            fontSize: '0.65rem',
+                            textTransform: 'uppercase',
+                            borderRadius: 1
                           }}
                         />
-                        <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.quantity} Units</Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', gap: 0.5 }}>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleOpen(item)}
-                          sx={{
-                            color: 'primary.main',
-                            bgcolor: 'rgba(136, 14, 79, 0.05)',
-                            '&:hover': { bgcolor: 'rgba(136, 14, 79, 0.1)' }
-                          }}
-                        >
-                          <Edit fontSize="small" />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => deleteInventoryItem(item.id)}
-                          sx={{
-                            color: 'error.main',
-                            bgcolor: 'rgba(198, 40, 40, 0.05)',
-                            '&:hover': { bgcolor: 'rgba(198, 40, 40, 0.1)' }
-                          }}
-                        >
-                          <Delete fontSize="small" />
-                        </IconButton>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
+                      </TableCell>
+                      <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="caption" sx={{ fontWeight: 600 }}>{item.size}</Typography>
+                          <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: item.color.toLowerCase(), border: '1px solid rgba(0,0,0,0.1)' }} />
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 700 }}>₹{item.price}</Typography>
+                          <Typography variant="caption" color="text.secondary">Cost: ₹{item.cost || 0}</Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" sx={{ fontWeight: 700, color: profit > 0 ? '#1b5e20' : '#c62828' }}>
+                          ₹{profit.toFixed(0)}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: profit > 0 ? '#1b5e20' : '#c62828', opacity: 0.8 }}>
+                          {profitMargin}% margin
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Box
+                            sx={{
+                              width: 8,
+                              height: 8,
+                              borderRadius: '50%',
+                              bgcolor: item.quantity < 10 ? '#ef4444' : item.quantity < 50 ? '#f59e0b' : '#10b981'
+                            }}
+                          />
+                          <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.quantity} Units</Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', gap: 0.5 }}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleOpen(item)}
+                            sx={{
+                              color: 'primary.main',
+                              bgcolor: 'rgba(136, 14, 79, 0.05)',
+                              '&:hover': { bgcolor: 'rgba(136, 14, 79, 0.1)' }
+                            }}
+                          >
+                            <Edit fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => deleteInventoryItem(item.id)}
+                            sx={{
+                              color: 'error.main',
+                              bgcolor: 'rgba(198, 40, 40, 0.05)',
+                              '&:hover': { bgcolor: 'rgba(198, 40, 40, 0.1)' }
+                            }}
+                          >
+                            <Delete fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
+      )}
 
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4, overflow: 'hidden' } }}>
         <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white', fontWeight: 800, fontSize: '1.1rem', py: 2.5 }}>
