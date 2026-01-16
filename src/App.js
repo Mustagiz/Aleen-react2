@@ -85,7 +85,7 @@ function App() {
       <CssBaseline />
       <AuthProvider>
         <DataProvider>
-          <Router>
+          <Router basename="/Aleen-react">
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>

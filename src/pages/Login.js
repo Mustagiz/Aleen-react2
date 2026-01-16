@@ -17,7 +17,7 @@ const Login = () => {
       await login(email, password);
       navigate('/');
     } catch (err) {
-      setError('Invalid credentials. Use admin@aleen.com / admin123');
+      setError('Invalid email or password');
     }
   };
 
@@ -55,10 +55,10 @@ const Login = () => {
               margin="normal"
               required
             />
-            <Button 
-              type="submit" 
-              fullWidth 
-              variant="contained" 
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
               size="large"
               startIcon={<LoginIcon />}
               sx={{ mt: 3, py: 1.5 }}

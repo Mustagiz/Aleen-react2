@@ -1,16 +1,61 @@
 import React, { useState } from 'react';
 import { Box, Card, CardContent, Typography, TextField, Button, Grid, Paper } from '@mui/material';
-import { Store, Email, Phone, LocationOn, Edit, Save, Payment } from '@mui/icons-material';
+import { Store, Email, Phone, LocationOn, Edit, Save, Payment, Lock, Visibility, VisibilityOff } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const Settings = () => {
   const { profile, updateProfile } = useData();
+  const { changePassword } = useAuth();
   const [editMode, setEditMode] = useState(false);
   const [localProfile, setLocalProfile] = useState(profile);
+
+  // Password change state
+  const [pwdState, setPwdState] = useState({
+    current: '',
+    new: '',
+    confirm: '',
+    showCurrent: false,
+    showNew: false,
+    showConfirm: false,
+    error: '',
+    success: ''
+  });
 
   const handleSave = () => {
     updateProfile(localProfile);
     setEditMode(false);
+  };
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    setPwdState({ ...pwdState, error: '', success: '' });
+
+    if (pwdState.new !== pwdState.confirm) {
+      setPwdState({ ...pwdState, error: 'New passwords do not match' });
+      return;
+    }
+
+    if (pwdState.new.length < 6) {
+      setPwdState({ ...pwdState, error: 'Password must be at least 6 characters long' });
+      return;
+    }
+
+    try {
+      await changePassword(pwdState.current, pwdState.new);
+      setPwdState({
+        current: '',
+        new: '',
+        confirm: '',
+        showCurrent: false,
+        showNew: false,
+        showConfirm: false,
+        error: '',
+        success: 'Password changed successfully!'
+      });
+    } catch (err) {
+      setPwdState({ ...pwdState, error: err.message, success: '' });
+    }
   };
 
   return (
@@ -158,6 +203,87 @@ const Settings = () => {
                   />
                 </Grid>
               </Grid>
+            </CardContent>
+          </Card>
+
+          <Card sx={{ borderRadius: 3, boxShadow: '0 4px 12px rgba(0,0,0,0.08)', mt: 3 }}>
+            <CardContent sx={{ p: 4 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 3, display: 'flex', alignItems: 'center' }}>
+                <Lock sx={{ mr: 1, color: '#8b5cf6' }} /> Security
+              </Typography>
+
+              {pwdState.error && <Typography color="error" variant="body2" sx={{ mb: 2 }}>{pwdState.error}</Typography>}
+              {pwdState.success && <Typography color="success.main" variant="body2" sx={{ mb: 2 }}>{pwdState.success}</Typography>}
+
+              <Box component="form" onSubmit={handlePasswordChange}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Current Password"
+                      type={pwdState.showCurrent ? 'text' : 'password'}
+                      value={pwdState.current}
+                      onChange={(e) => setPwdState({ ...pwdState, current: e.target.value })}
+                      required
+                      InputProps={{
+                        endAdornment: (
+                          <Button onClick={() => setPwdState({ ...pwdState, showCurrent: !pwdState.showCurrent })}>
+                            {pwdState.showCurrent ? <VisibilityOff /> : <Visibility />}
+                          </Button>
+                        )
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="New Password"
+                      type={pwdState.showNew ? 'text' : 'password'}
+                      value={pwdState.new}
+                      onChange={(e) => setPwdState({ ...pwdState, new: e.target.value })}
+                      required
+                      InputProps={{
+                        endAdornment: (
+                          <Button onClick={() => setPwdState({ ...pwdState, showNew: !pwdState.showNew })}>
+                            {pwdState.showNew ? <VisibilityOff /> : <Visibility />}
+                          </Button>
+                        )
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Confirm New Password"
+                      type={pwdState.showConfirm ? 'text' : 'password'}
+                      value={pwdState.confirm}
+                      onChange={(e) => setPwdState({ ...pwdState, confirm: e.target.value })}
+                      required
+                      InputProps={{
+                        endAdornment: (
+                          <Button onClick={() => setPwdState({ ...pwdState, showConfirm: !pwdState.showConfirm })}>
+                            {pwdState.showConfirm ? <VisibilityOff /> : <Visibility />}
+                          </Button>
+                        )
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      sx={{
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)'
+                      }}
+                    >
+                      Update Password
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Box>
             </CardContent>
           </Card>
 
