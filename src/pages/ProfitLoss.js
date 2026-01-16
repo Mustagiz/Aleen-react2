@@ -4,9 +4,7 @@ import { TrendingUp, TrendingDown, Download } from '@mui/icons-material';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 import { Bar, Line, Doughnut } from 'react-chartjs-2';
 import { useData } from '../contexts/DataContext';
-import { exportToCSV, formatCurrencyForPDF } from '../utils/helpers';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import { exportToCSV, formatCurrencyForPDF, generateReportPDF } from '../utils/helpers';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend);
 
@@ -123,52 +121,35 @@ const ProfitLoss = () => {
   };
 
   const exportPDF = () => {
-    try {
-      console.log('Starting Profit & Loss PDF Export...');
-      const doc = new jsPDF();
+    const summaryLines = [
+      `Total Revenue: ${formatCurrencyForPDF(totalRevenue)}`,
+      `Total Cost: ${formatCurrencyForPDF(totalCost)}`,
+      `Total Profit/Loss: ${formatCurrencyForPDF(totalProfit)}`,
+      `Net Margin: ${profitMargin}%`
+    ];
 
-      doc.setFontSize(20);
-      doc.setTextColor(136, 14, 79);
-      doc.text(`${profile.businessName} - Profit & Loss Report`, 105, 15, { align: 'center' });
-
-      doc.setFontSize(10);
-      doc.setTextColor(40, 40, 40);
-      doc.text(`Report Generated: ${new Date().toLocaleString()}`, 20, 25);
-      if (dateFrom || dateTo) {
-        doc.text(`Period: ${dateFrom || 'Start'} to ${dateTo || 'Today'}`, 20, 31);
-      }
-
-      doc.text(`Total Revenue: ${formatCurrencyForPDF(totalRevenue)}`, 20, 42);
-      doc.text(`Total Cost: ${formatCurrencyForPDF(totalCost)}`, 20, 48);
-      doc.text(`Total Profit/Loss: ${formatCurrencyForPDF(totalProfit)}`, 20, 54);
-      doc.text(`Net Margin: ${profitMargin}%`, 20, 60);
-
-      const tableData = profitData.map(item => [
-        item.invoiceId,
-        new Date(item.date).toLocaleDateString(),
-        `${item.itemName} (${item.category})`,
-        item.quantity,
-        formatCurrencyForPDF(item.cost),
-        formatCurrencyForPDF(item.revenue),
-        formatCurrencyForPDF(item.profit)
-      ]);
-
-      console.log('Generating Table...');
-      autoTable(doc, {
-        startY: 70,
-        head: [['Invoice', 'Date', 'Item', 'Qty', 'Cost', 'Revenue', 'Profit']],
-        body: tableData,
-        headStyles: { fillColor: [136, 14, 79] },
-        styles: { fontSize: 8 }
-      });
-
-      console.log('Saving PDF...');
-      doc.save('profit-loss-report.pdf');
-      console.log('PDF Saved successfully');
-    } catch (error) {
-      console.error('Profit & Loss PDF Export Error:', error);
-      alert('Failed to generate PDF. Please check the console for details.');
+    if (dateFrom || dateTo) {
+      summaryLines.unshift(`Period: ${dateFrom || 'Start'} to ${dateTo || 'Today'}`);
     }
+
+    const tableData = profitData.map(item => [
+      item.invoiceId,
+      new Date(item.date).toLocaleDateString(),
+      `${item.itemName} (${item.category})`,
+      item.quantity,
+      formatCurrencyForPDF(item.cost),
+      formatCurrencyForPDF(item.revenue),
+      formatCurrencyForPDF(item.profit)
+    ]);
+
+    generateReportPDF(
+      'Profit & Loss Report',
+      profile,
+      summaryLines,
+      ['Invoice', 'Date', 'Item', 'Qty', 'Cost', 'Revenue', 'Profit'],
+      tableData,
+      'profit-loss-report'
+    );
   };
 
   return (

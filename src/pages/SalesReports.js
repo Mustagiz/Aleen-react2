@@ -4,9 +4,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, 
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import { useData } from '../contexts/DataContext';
 import { Download, TrendingUp, Receipt, AttachMoney } from '@mui/icons-material';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import { formatCurrencyForPDF } from '../utils/helpers';
+import { formatCurrencyForPDF, generateReportPDF } from '../utils/helpers';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler);
 
@@ -96,51 +94,32 @@ const SalesReports = () => {
   };
 
   const exportPDF = () => {
-    try {
-      console.log('Starting PDF Export...');
-      const doc = new jsPDF();
+    const summaryLines = [
+      `Total Revenue: ${formatCurrencyForPDF(totalRevenue)}`,
+      `Total Invoices: ${totalInvoices}`,
+      `Average Invoice Value: ${formatCurrencyForPDF(avgInvoiceValue)}`
+    ];
 
-      // Header
-      doc.setFontSize(20);
-      doc.setTextColor(136, 14, 79); // Primary color
-      doc.text(`${profile.businessName} - Sales Report`, 105, 15, { align: 'center' });
-
-      doc.setFontSize(10);
-      doc.setTextColor(40, 40, 40);
-      doc.text(`Report Generated: ${new Date().toLocaleString()}`, 20, 25);
-      if (dateFrom || dateTo) {
-        doc.text(`Period: ${dateFrom || 'Start'} to ${dateTo || 'Today'}`, 20, 31);
-      }
-
-      // Summary
-      doc.setFontSize(12);
-      doc.text(`Total Revenue: ${formatCurrencyForPDF(totalRevenue)}`, 20, 42);
-      doc.text(`Total Invoices: ${totalInvoices}`, 20, 48);
-      doc.text(`Average Invoice Value: ${formatCurrencyForPDF(avgInvoiceValue)}`, 20, 54);
-
-      const tableData = filteredInvoices.map(inv => [
-        inv.id,
-        new Date(inv.date).toLocaleDateString(),
-        inv.customer || 'Walk-in',
-        inv.paymentMethod,
-        formatCurrencyForPDF(inv.total)
-      ]);
-
-      console.log('Generating Table...');
-      autoTable(doc, {
-        startY: 65,
-        head: [['Invoice ID', 'Date', 'Customer', 'Payment', 'Total']],
-        body: tableData,
-        headStyles: { fillColor: [136, 14, 79] }
-      });
-
-      console.log('Saving PDF...');
-      doc.save('sales-report.pdf');
-      console.log('PDF Saved successfully');
-    } catch (error) {
-      console.error('PDF Export Error:', error);
-      alert('Failed to generate PDF. Please check the console for details.');
+    if (dateFrom || dateTo) {
+      summaryLines.unshift(`Period: ${dateFrom || 'Start'} to ${dateTo || 'Today'}`);
     }
+
+    const tableData = filteredInvoices.map(inv => [
+      inv.id,
+      new Date(inv.date).toLocaleDateString(),
+      inv.customer || 'Walk-in',
+      inv.paymentMethod,
+      formatCurrencyForPDF(inv.total)
+    ]);
+
+    generateReportPDF(
+      'Sales Report',
+      profile,
+      summaryLines,
+      ['Invoice ID', 'Date', 'Customer', 'Payment', 'Total'],
+      tableData,
+      'sales-report'
+    );
   };
 
   return (

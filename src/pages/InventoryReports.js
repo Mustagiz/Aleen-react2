@@ -2,9 +2,7 @@ import React, { useState } from 'react';
 import { Box, Paper, Typography, TextField, Button, Table, TableBody, TableCell, TableHead, TableRow, MenuItem, TableContainer, Card, CardContent, Grid, Chip, useMediaQuery, useTheme, Divider } from '@mui/material';
 import { useData } from '../contexts/DataContext';
 import { Download, Inventory2, Warning, TrendingUp, AttachMoney } from '@mui/icons-material';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import { formatCurrencyForPDF } from '../utils/helpers';
+import { formatCurrencyForPDF, generateReportPDF } from '../utils/helpers';
 
 const InventoryReports = () => {
   const theme = useTheme();
@@ -41,49 +39,34 @@ const InventoryReports = () => {
   const totalProfit = filteredInventory.reduce((sum, item) => sum + ((item.price - (item.cost || 0)) * item.quantity), 0);
 
   const exportPDF = () => {
-    try {
-      console.log('Starting Inventory PDF Export...');
-      const doc = new jsPDF();
-      doc.setFontSize(20);
-      doc.setTextColor(136, 14, 79);
-      doc.text(`${profile.businessName} - Inventory Report`, 105, 15, { align: 'center' });
+    const summaryLines = [
+      `Total Items: ${filteredInventory.length}`,
+      `Total Value: ${formatCurrencyForPDF(totalValue)}`,
+      `Low Stock Items: ${lowStockCount}`
+    ];
 
-      doc.setFontSize(10);
-      doc.setTextColor(40, 40, 40);
-      doc.text(`Report Generated: ${new Date().toLocaleString()}`, 20, 25);
-      if (startDate || endDate) {
-        doc.text(`Period: ${startDate || 'All Time'} to ${endDate || 'Present'}`, 20, 31);
-      }
-
-      doc.text(`Total Items: ${filteredInventory.length}`, 20, 38);
-      doc.text(`Total Value: ${formatCurrencyForPDF(totalValue)}`, 20, 44);
-      doc.text(`Low Stock Items: ${lowStockCount}`, 20, 50);
-
-      const tableData = filteredInventory.map(item => [
-        item.name,
-        item.category,
-        item.size,
-        item.color,
-        formatCurrencyForPDF(item.price),
-        item.quantity,
-        item.dateAdded ? new Date(item.dateAdded).toLocaleDateString() : 'N/A'
-      ]);
-
-      console.log('Generating Table...');
-      autoTable(doc, {
-        startY: 60,
-        head: [['Name', 'Category', 'Size', 'Color', 'Price', 'Stock', 'Added Date']],
-        body: tableData,
-        headStyles: { fillColor: [136, 14, 79] }
-      });
-
-      console.log('Saving PDF...');
-      doc.save('inventory-report.pdf');
-      console.log('PDF Saved successfully');
-    } catch (error) {
-      console.error('Inventory PDF Export Error:', error);
-      alert('Failed to generate PDF. Please check the console for details.');
+    if (startDate || endDate) {
+      summaryLines.unshift(`Period: ${startDate || 'All Time'} to ${endDate || 'Present'}`);
     }
+
+    const tableData = filteredInventory.map(item => [
+      item.name,
+      item.category,
+      item.size,
+      item.color,
+      formatCurrencyForPDF(item.price),
+      item.quantity,
+      item.dateAdded ? new Date(item.dateAdded).toLocaleDateString() : 'N/A'
+    ]);
+
+    generateReportPDF(
+      'Inventory Report',
+      profile,
+      summaryLines,
+      ['Name', 'Category', 'Size', 'Color', 'Price', 'Stock', 'Added Date'],
+      tableData,
+      'inventory-report'
+    );
   };
 
   const exportCSV = () => {
