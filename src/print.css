@@ -1,0 +1,30 @@
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  
+  #printable-invoice,
+  #printable-invoice * {
+    visibility: visible;
+  }
+  
+  #printable-invoice {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+  
+  button {
+    display: none !important;
+  }
+}
