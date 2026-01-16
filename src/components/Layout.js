@@ -6,13 +6,13 @@ import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
 
 const Layout = () => {
-  const [open, setOpen] = useState(true);
   const { logout } = useAuth();
   const { profile } = useData();
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [open, setOpen] = useState(!isMobile);
 
   const getInitials = (name) => {
     return name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'AC';
@@ -78,22 +78,20 @@ const Layout = () => {
         }}
       >
         <Toolbar sx={{ py: 1.5, px: { sx: 2, md: 4 } }}>
-          {!isMobile && (
-            <IconButton
-              edge="start"
-              onClick={() => setOpen(!open)}
-              sx={{
-                mr: 2,
-                bgcolor: 'primary.main',
-                color: 'white',
-                '&:hover': { bgcolor: 'primary.dark' },
-                width: 40,
-                height: 40
-              }}
-            >
-              <Menu />
-            </IconButton>
-          )}
+          <IconButton
+            edge="start"
+            onClick={() => setOpen(!open)}
+            sx={{
+              mr: 2,
+              bgcolor: 'primary.main',
+              color: 'white',
+              '&:hover': { bgcolor: 'primary.dark' },
+              width: 40,
+              height: 40
+            }}
+          >
+            <Menu />
+          </IconButton>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexGrow: 1 }}>
             <Box sx={{
               bgcolor: 'primary.main',
@@ -141,6 +139,20 @@ const Layout = () => {
           >
             {getInitials(profile.businessName)}
           </Avatar>
+          {isMobile && (
+            <IconButton
+              onClick={handleLogout}
+              sx={{
+                ml: 1,
+                bgcolor: 'rgba(211, 47, 47, 0.1)',
+                color: 'error.main',
+                width: 36,
+                height: 36
+              }}
+            >
+              <Logout fontSize="small" />
+            </IconButton>
+          )}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -148,7 +160,7 @@ const Layout = () => {
         onClose={() => setOpen(false)}
         variant={isMobile ? 'temporary' : 'persistent'}
         sx={{
-          display: isMobile ? 'none' : 'block',
+          display: 'block',
           '& .MuiDrawer-paper': {
             width: 280,
             boxSizing: 'border-box',
