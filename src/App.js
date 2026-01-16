@@ -85,7 +85,7 @@ function App() {
       <CssBaseline />
       <AuthProvider>
         <DataProvider>
-          <Router basename={window.location.hostname.includes('github.io') ? '/Aleen-react' : ''}>
+          <Router basename={process.env.PUBLIC_URL}>
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
@@ -97,6 +97,7 @@ function App() {
                 <Route path="profit-loss" element={<ProfitLoss />} />
                 <Route path="settings" element={<Settings />} />
               </Route>
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Router>
         </DataProvider>

@@ -1,13 +1,11 @@
 // Updated Service Worker for Aleen Clothing PWA
-const CACHE_NAME = 'aleen-clothing-v2';
+const CACHE_NAME = 'aleen-clothing-v3';
 const urlsToCache = [
     '/',
-    '/index.html',
-    '/static/js/bundle.js'
+    '/index.html'
 ];
 
 self.addEventListener('install', (event) => {
-    // Force the waiting service worker to become the active service worker.
     self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
@@ -15,7 +13,6 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-    // Clean up old caches
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
@@ -30,9 +27,19 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+    // For HTML requests, try the network first to ensure we get the latest build
+    if (event.request.mode === 'navigate') {
+        event.respondWith(
+            fetch(event.request).catch(() => {
+                return caches.match('/index.html');
+            })
+        );
+        return;
+    }
+
+    // For other assets, use Cache First
     event.respondWith(
         caches.match(event.request).then((response) => {
-            // Return cached version or fetch from network
             return response || fetch(event.request);
         })
     );

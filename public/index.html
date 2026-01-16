@@ -13,7 +13,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
-  <title>Aleen Clothing v2</title>
+  <title>Aleen Clothing v3</title>
 </head>
 
 <body>
@@ -22,7 +22,8 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js');
+        // Use absolute path for service worker
+        navigator.serviceWorker.register('/service-worker.js');
       });
     }
   </script>
