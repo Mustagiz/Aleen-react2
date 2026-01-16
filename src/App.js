@@ -85,7 +85,7 @@ function App() {
       <CssBaseline />
       <AuthProvider>
         <DataProvider>
-          <Router basename="/Aleen-react">
+          <Router basename={window.location.hostname.includes('github.io') ? '/Aleen-react' : ''}>
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
