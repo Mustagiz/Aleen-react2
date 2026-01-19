@@ -631,10 +631,39 @@ const Invoices = () => {
         </Paper>
       )}
 
-      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md" fullWidth PaperProps={{ sx: { borderRadius: 4, overflow: 'hidden' } }}>
-        <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white', fontWeight: 800, fontSize: '1.25rem', py: 3 }}>Create Retail Invoice</DialogTitle>
-        <DialogContent sx={{ mt: 2 }}>
-          <Paper sx={{ p: 2, mb: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        maxWidth="md"
+        fullWidth
+        fullScreen={isMobile}
+        PaperProps={{
+          sx: {
+            borderRadius: isMobile ? 0 : 4,
+            overflow: 'hidden',
+            maxHeight: isMobile ? '100%' : '90vh'
+          }
+        }}
+      >
+        <DialogTitle sx={{
+          bgcolor: 'primary.main',
+          color: 'white',
+          fontWeight: 800,
+          fontSize: { xs: '1.1rem', sm: '1.25rem' },
+          py: { xs: 2.5, sm: 3 },
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          Create Retail Invoice
+          {isMobile && (
+            <IconButton onClick={() => setOpen(false)} sx={{ color: 'white' }}>
+              <Close />
+            </IconButton>
+          )}
+        </DialogTitle>
+        <DialogContent sx={{ p: { xs: 2, sm: 3 }, mt: 2 }}>
+          <Paper sx={{ p: { xs: 1.5, sm: 2 }, mb: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2 }}>Customer Information</Typography>
             <Box sx={{ mb: 2 }}>
               <Autocomplete
@@ -680,7 +709,7 @@ const Invoices = () => {
             </Box>
           </Paper>
 
-          <Paper sx={{ p: 2, mb: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
+          <Paper sx={{ p: { xs: 1.5, sm: 2 }, mb: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2 }}>Invoice Items</Typography>
             <Box sx={{ mb: 2 }}>
               <TextField
@@ -738,85 +767,106 @@ const Invoices = () => {
                 (inv.productId && inv.productId.toLowerCase().includes(itemSearchTerm.toLowerCase()))
               );
               return (
-                <Box key={index} sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 2, p: 2, bgcolor: 'white', borderRadius: 2 }}>
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <TextField
-                      select
-                      label="Select Item"
-                      value={item.id}
-                      onChange={(e) => handleItemChange(index, 'id', e.target.value)}
-                      fullWidth
-                      error={!item.id && selectedItems.length > 0}
-                    >
-                      {filteredInventory.length > 0 ? (
-                        filteredInventory.map(inv => (
-                          <MenuItem key={inv.id} value={inv.id}>
-                            {inv.productId ? `[${inv.productId}] ` : ''}{inv.name} - ₹{inv.price} ({inv.quantity} in stock)
+                <Box key={index} sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1.5,
+                  mb: 2,
+                  p: { xs: 1.5, sm: 2 },
+                  bgcolor: 'white',
+                  borderRadius: 2,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                  position: 'relative'
+                }}>
+                  <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <TextField
+                        select
+                        label="Select Item"
+                        value={item.id}
+                        onChange={(e) => handleItemChange(index, 'id', e.target.value)}
+                        fullWidth
+                        size="small"
+                        error={!item.id && selectedItems.length > 0}
+                      >
+                        {filteredInventory.length > 0 ? (
+                          filteredInventory.map(inv => (
+                            <MenuItem key={inv.id} value={inv.id}>
+                              {inv.productId ? `[${inv.productId}] ` : ''}{inv.name} - ₹{inv.price}
+                            </MenuItem>
+                          ))
+                        ) : (
+                          <MenuItem disabled value="">
+                            {inventory.length > 0 ? 'No matching items' : 'No items in inventory'}
                           </MenuItem>
-                        ))
-                      ) : (
-                        <MenuItem disabled value="">
-                          {inventory.length > 0 ? 'No matching items' : 'No items in inventory'}
-                        </MenuItem>
-                      )}
-                    </TextField>
-                  </Box>
-                  <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                    <TextField
-                      label="Quantity"
-                      type="number"
-                      value={item.quantity}
-                      onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value))}
-                      sx={{ width: { xs: '100%', sm: 150 } }}
-                    />
+                        )}
+                      </TextField>
+                    </Box>
                     <IconButton
+                      size="small"
                       onClick={() => setSelectedItems(selectedItems.filter((_, i) => i !== index))}
-                      sx={{ color: 'error.main', flexShrink: 0 }}
+                      sx={{ color: 'error.main', mt: 0.5 }}
                     >
-                      <Delete />
+                      <Delete fontSize="small" />
                     </IconButton>
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                    <TextField
+                      label="Qty"
+                      type="number"
+                      size="small"
+                      value={item.quantity}
+                      onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value) || 1)}
+                      sx={{ width: 100 }}
+                    />
+                    {item.id && (
+                      <Typography variant="body2" sx={{ fontWeight: 700, ml: 'auto', color: 'primary.main' }}>
+                        ₹{(inventory.find(i => i.id === item.id)?.price * item.quantity || 0).toLocaleString()}
+                      </Typography>
+                    )}
                   </Box>
                 </Box>
               );
             })}
-            <Button onClick={handleAddItem} startIcon={<Add />} variant="outlined" fullWidth>Add Item</Button>
+            <Button onClick={handleAddItem} startIcon={<Add />} variant="outlined" fullWidth>Add More Item</Button>
           </Paper>
 
-          <Paper sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2 }}>Payment Details</Typography>
-            <TextField select label="Payment Method" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} fullWidth margin="normal">
+          <Paper sx={{ p: { xs: 1.5, sm: 2 }, bgcolor: 'grey.50', borderRadius: 2 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2 }}>Payment & Totals</Typography>
+            <TextField select label="Payment Method" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} fullWidth size="small" margin="normal">
               <MenuItem value="Cash">Cash</MenuItem>
               <MenuItem value="Card">Card</MenuItem>
               <MenuItem value="UPI">UPI</MenuItem>
               <MenuItem value="Net Banking">Net Banking</MenuItem>
             </TextField>
             <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-              <TextField label="GST (%)" type="number" value={tax} onChange={(e) => setTax(parseFloat(e.target.value) || 0)} fullWidth />
-              <TextField label="Discount (%)" type="number" value={discount} onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)} fullWidth />
+              <TextField label="GST (%)" type="number" size="small" value={tax} onChange={(e) => setTax(parseFloat(e.target.value) || 0)} fullWidth />
+              <TextField label="Discount (%)" type="number" size="small" value={discount} onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)} fullWidth />
             </Box>
-            <Box sx={{ mt: 3, p: 2, bgcolor: 'primary.light', borderRadius: 2 }}>
+            <Box sx={{ mt: 3, p: 2, bgcolor: mode === 'light' ? 'rgba(136, 14, 79, 0.05)' : 'rgba(255, 255, 255, 0.05)', borderRadius: 2 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                <Typography>Subtotal:</Typography>
-                <Typography sx={{ fontWeight: 'bold' }}>₹{subtotal.toFixed(2)}</Typography>
+                <Typography variant="body2">Subtotal:</Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>₹{subtotal.toFixed(2).toLocaleString()}</Typography>
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                <Typography>GST:</Typography>
-                <Typography sx={{ fontWeight: 'bold' }}>₹{taxAmount.toFixed(2)}</Typography>
+                <Typography variant="body2">GST ({tax}%):</Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>₹{taxAmount.toFixed(2).toLocaleString()}</Typography>
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                <Typography>Discount ({discount}%):</Typography>
-                <Typography sx={{ fontWeight: 'bold' }}>- ₹{absDiscount.toFixed(2)}</Typography>
+                <Typography variant="body2">Discount ({discount}%):</Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600, color: 'error.main' }}>- ₹{absDiscount.toFixed(2).toLocaleString()}</Typography>
               </Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', pt: 2, borderTop: '2px solid white' }}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Total:</Typography>
-                <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'primary.main' }}>₹{total.toFixed(2)}</Typography>
+              <Divider sx={{ my: 1.5 }} />
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>Total Amount:</Typography>
+                <Typography variant="h5" sx={{ fontWeight: 800, color: 'primary.main' }}>₹{total.toFixed(2).toLocaleString()}</Typography>
               </Box>
             </Box>
           </Paper>
         </DialogContent>
-        <DialogActions sx={{ p: 3, bgcolor: 'grey.50' }}>
-          <Button onClick={() => setOpen(false)} variant="outlined">Cancel</Button>
-          <Button onClick={handleSaveInvoice} variant="contained" size="large" sx={{ px: 4 }}>Save Invoice</Button>
+        <DialogActions sx={{ p: { xs: 2.5, sm: 3 }, bgcolor: 'grey.50', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
+          <Button onClick={() => setOpen(false)} variant="outlined" fullWidth={isMobile}>Cancel</Button>
+          <Button onClick={handleSaveInvoice} variant="contained" size="large" sx={{ px: 4 }} fullWidth={isMobile}>Save Invoice</Button>
         </DialogActions>
       </Dialog>
 
