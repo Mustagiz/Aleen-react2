@@ -14,7 +14,7 @@ const Layout = () => {
   const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [open, setOpen] = useState(!isMobile);
+  const [open, setOpen] = useState(false);
 
   const getInitials = (name) => {
     return name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'AC';
@@ -82,22 +82,20 @@ const Layout = () => {
         }}
       >
         <Toolbar sx={{ py: 1.5, px: { sx: 2, md: 4 } }}>
-          {!isMobile && (
-            <IconButton
-              edge="start"
-              onClick={() => setOpen(!open)}
-              sx={{
-                mr: 2,
-                bgcolor: 'primary.main',
-                color: 'white',
-                '&:hover': { bgcolor: 'primary.dark' },
-                width: 40,
-                height: 40
-              }}
-            >
-              <Menu />
-            </IconButton>
-          )}
+          <IconButton
+            edge="start"
+            onClick={() => setOpen(!open)}
+            sx={{
+              mr: 2,
+              bgcolor: 'primary.main',
+              color: 'white',
+              '&:hover': { bgcolor: 'primary.dark' },
+              width: 40,
+              height: 40
+            }}
+          >
+            <Menu />
+          </IconButton>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexGrow: 1 }}>
             <Box sx={{
               bgcolor: 'primary.main',
@@ -180,7 +178,7 @@ const Layout = () => {
       <Drawer
         open={open}
         onClose={() => setOpen(false)}
-        variant={isMobile ? 'temporary' : 'persistent'}
+        variant="temporary"
         sx={{
           display: 'block',
           '& .MuiDrawer-paper': {
@@ -317,7 +315,7 @@ const Layout = () => {
         p: { xs: 2, sm: 3, md: 4 },
         mt: isMobile ? 0 : 8,
         mb: isMobile ? 10 : 0,
-        ml: { xs: 0, md: open ? '300px' : 0 },
+        width: '100%',
         height: isMobile ? 'auto' : 'calc(100vh - 64px)',
         overflow: isMobile ? 'visible' : 'auto',
         transition: 'margin 0.3s ease'
