@@ -566,20 +566,42 @@ const Invoices = () => {
                         ₹{inv.total.toLocaleString('en-IN')}
                       </TableCell>
                       <TableCell>
-                        <Box sx={{ display: 'flex', gap: 0.5 }}>
-                          <IconButton size="small" onClick={() => setViewInvoice(inv)} sx={{ color: 'primary.main', bgcolor: 'rgba(136, 14, 79, 0.05)', '&:hover': { bgcolor: 'rgba(136, 14, 79, 0.1)' } }}>
-                            <Visibility fontSize="small" />
-                          </IconButton>
-                          <IconButton size="small" onClick={() => downloadPDF(inv)} sx={{ color: '#0284c7', bgcolor: 'rgba(2, 132, 199, 0.05)', '&:hover': { bgcolor: 'rgba(2, 132, 199, 0.1)' } }}>
-                            <Download fontSize="small" />
-                          </IconButton>
-                          <IconButton size="small" onClick={() => sendWhatsApp(inv)} sx={{ color: '#16a34a', bgcolor: 'rgba(22, 163, 74, 0.05)', '&:hover': { bgcolor: 'rgba(22, 163, 74, 0.1)' } }}>
-                            <WhatsApp fontSize="small" />
-                          </IconButton>
-                          <IconButton size="small" onClick={() => deleteInvoice(inv.id)} sx={{ color: 'error.main', bgcolor: 'rgba(220, 38, 38, 0.05)', '&:hover': { bgcolor: 'rgba(220, 38, 38, 0.1)' } }}>
-                            <Delete fontSize="small" />
-                          </IconButton>
-                        </Box>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => handleMenuClick(e, inv.id)}
+                          sx={{
+                            color: 'primary.main',
+                            bgcolor: 'rgba(136, 14, 79, 0.05)',
+                            '&:hover': { bgcolor: 'rgba(136, 14, 79, 0.1)' }
+                          }}
+                        >
+                          <MoreVert fontSize="small" />
+                        </IconButton>
+                        <Menu
+                          anchorEl={anchorEl}
+                          open={Boolean(anchorEl) && selectedInvoiceId === inv.id}
+                          onClose={handleMenuClose}
+                          PaperProps={{
+                            sx: { width: 200, borderRadius: 2, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }
+                          }}
+                        >
+                          <MenuItem onClick={() => { setViewInvoice(inv); handleMenuClose(); }}>
+                            <ListItemIcon><Visibility fontSize="small" /></ListItemIcon>
+                            <ListItemText>View</ListItemText>
+                          </MenuItem>
+                          <MenuItem onClick={() => { downloadPDF(inv); handleMenuClose(); }}>
+                            <ListItemIcon><Download fontSize="small" /></ListItemIcon>
+                            <ListItemText>Download PDF</ListItemText>
+                          </MenuItem>
+                          <MenuItem onClick={() => { sendWhatsApp(inv); handleMenuClose(); }}>
+                            <ListItemIcon><WhatsApp fontSize="small" /></ListItemIcon>
+                            <ListItemText>WhatsApp</ListItemText>
+                          </MenuItem>
+                          <MenuItem onClick={() => { deleteInvoice(inv.id); handleMenuClose(); }} sx={{ color: 'error.main' }}>
+                            <ListItemIcon><Delete fontSize="small" color="error" /></ListItemIcon>
+                            <ListItemText>Delete</ListItemText>
+                          </MenuItem>
+                        </Menu>
                       </TableCell>
                     </TableRow>
                   )) : (
