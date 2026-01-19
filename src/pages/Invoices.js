@@ -41,6 +41,7 @@ const Invoices = () => {
   const [phone, setPhone] = useState('+91');
   const [paymentMethod, setPaymentMethod] = useState('Cash');
   const [searchTerm, setSearchTerm] = useState('');
+  const [itemSearchTerm, setItemSearchTerm] = useState('');
   const [dateFilter, setDateFilter] = useState('');
   const [paymentFilter, setPaymentFilter] = useState('All');
   const [showFilters, setShowFilters] = useState(false);
@@ -618,32 +619,50 @@ const Invoices = () => {
 
           <Paper sx={{ p: 2, mb: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2 }}>Invoice Items</Typography>
-            {selectedItems.map((item, index) => (
-              <Box key={index} sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 2, p: 2, bgcolor: 'white', borderRadius: 2 }}>
-                <TextField
-                  select
-                  label="Select Item"
-                  value={item.id}
-                  onChange={(e) => handleItemChange(index, 'id', e.target.value)}
-                  fullWidth
-                  error={!item.id && selectedItems.length > 0}
-                >
-                  {inventory.length > 0 ? (
-                    inventory.map(inv => (
-                      <MenuItem key={inv.id} value={inv.id}>
-                        {inv.name} - ₹{inv.price} ({inv.quantity} in stock)
+            <Box sx={{ mb: 2 }}>
+              <TextField
+                fullWidth
+                placeholder="Search by Product ID or Name..."
+                value={itemSearchTerm}
+                onChange={(e) => setItemSearchTerm(e.target.value)}
+                size="small"
+                InputProps={{
+                  startAdornment: <Search sx={{ color: 'text.secondary', mr: 1 }} />
+                }}
+              />
+            </Box>
+            {selectedItems.map((item, index) => {
+              const filteredInventory = inventory.filter(inv =>
+                inv.name.toLowerCase().includes(itemSearchTerm.toLowerCase()) ||
+                (inv.productId && inv.productId.toLowerCase().includes(itemSearchTerm.toLowerCase()))
+              );
+              return (
+                <Box key={index} sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 2, p: 2, bgcolor: 'white', borderRadius: 2 }}>
+                  <TextField
+                    select
+                    label="Select Item"
+                    value={item.id}
+                    onChange={(e) => handleItemChange(index, 'id', e.target.value)}
+                    fullWidth
+                    error={!item.id && selectedItems.length > 0}
+                  >
+                    {filteredInventory.length > 0 ? (
+                      filteredInventory.map(inv => (
+                        <MenuItem key={inv.id} value={inv.id}>
+                          {inv.productId ? `[${inv.productId}] ` : ''}{inv.name} - ₹{inv.price} ({inv.quantity} in stock)
+                        </MenuItem>
+                      ))
+                    ) : (
+                      <MenuItem disabled value="">
+                        {inventory.length > 0 ? 'No matching items' : 'No items in inventory'}
                       </MenuItem>
-                    ))
-                  ) : (
-                    <MenuItem disabled value="">
-                      No items in inventory
-                    </MenuItem>
-                  )}
-                </TextField>
-                <TextField label="Quantity" type="number" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value))} sx={{ width: { xs: '100%', sm: 150 } }} />
-                <IconButton onClick={() => setSelectedItems(selectedItems.filter((_, i) => i !== index))} sx={{ color: 'error.main' }}><Delete /></IconButton>
-              </Box>
-            ))}
+                    )}
+                  </TextField>
+                  <TextField label="Quantity" type="number" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value))} sx={{ width: { xs: '100%', sm: 150 } }} />
+                  <IconButton onClick={() => setSelectedItems(selectedItems.filter((_, i) => i !== index))} sx={{ color: 'error.main' }}><Delete /></IconButton>
+                </Box>
+              );
+            })}
             <Button onClick={handleAddItem} startIcon={<Add />} variant="outlined" fullWidth>Add Item</Button>
           </Paper>
 

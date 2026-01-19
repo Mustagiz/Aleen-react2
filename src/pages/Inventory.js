@@ -11,7 +11,7 @@ const Inventory = () => {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [newCategory, setNewCategory] = useState('');
   const [form, setForm] = useState({
-    name: '', category: '', size: '', color: '', price: '', cost: '', quantity: '', supplier: ''
+    productId: '', name: '', category: '', size: '', color: '', price: '', cost: '', quantity: '', supplier: ''
   });
 
   const theme = useTheme();
@@ -39,13 +39,15 @@ const Inventory = () => {
       setForm(item);
     } else {
       setEditItem(null);
-      setForm({ name: '', category: '', size: '', color: '', price: '', cost: '', quantity: '', supplier: '' });
+      setForm({ productId: '', name: '', category: '', size: '', color: '', price: '', cost: '', quantity: '', supplier: '' });
     }
     setOpen(true);
   };
 
   const handleSave = async () => {
-    const data = { ...form, price: parseFloat(form.price), cost: parseFloat(form.cost || 0), quantity: parseInt(form.quantity) };
+    // Auto-generate Product ID if not provided
+    const productId = form.productId.trim() || `PRD-${Date.now()}`;
+    const data = { ...form, productId, price: parseFloat(form.price), cost: parseFloat(form.cost || 0), quantity: parseInt(form.quantity) };
     if (editItem) {
       await updateInventoryItem(editItem.id, data);
     } else {
@@ -203,6 +205,9 @@ const Inventory = () => {
                       <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.2 }}>
                         {item.name}
                       </Typography>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                        ID: {item.productId || 'N/A'}
+                      </Typography>
                       <Typography variant="caption" color="text.secondary">
                         {item.supplier || 'No Supplier'}
                       </Typography>
@@ -283,6 +288,7 @@ const Inventory = () => {
             <Table>
               <TableHead sx={{ bgcolor: 'rgba(136, 14, 79, 0.02)', borderBottom: '2px solid rgba(136, 14, 79, 0.1)' }}>
                 <TableRow>
+                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Product ID</TableCell>
                   <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Product Details</TableCell>
                   <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: { xs: 'none', sm: 'table-cell' } }}>Category</TableCell>
                   <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: { xs: 'none', md: 'table-cell' } }}>Variants</TableCell>
@@ -304,6 +310,9 @@ const Inventory = () => {
                         transition: 'background-color 0.2s'
                       }}
                     >
+                      <TableCell>
+                        <Typography variant="body2" sx={{ fontWeight: 700, color: 'primary.main', fontFamily: 'monospace' }}>{item.productId || 'N/A'}</Typography>
+                      </TableCell>
                       <TableCell>
                         <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>{item.name}</Typography>
                         <Typography variant="caption" color="text.secondary">{item.supplier || 'No Supplier'}</Typography>
@@ -395,6 +404,15 @@ const Inventory = () => {
           {editItem ? 'Edit Product Details' : 'Add New Inventory Item'}
         </DialogTitle>
         <DialogContent sx={{ mt: 2 }}>
+          <TextField
+            fullWidth
+            label="Product ID"
+            value={form.productId}
+            onChange={(e) => setForm({ ...form, productId: e.target.value })}
+            margin="normal"
+            helperText="Leave empty to auto-generate (e.g., PRD-1234567890)"
+            placeholder="e.g., SKU001, SAREE-RED-M"
+          />
           <TextField fullWidth label="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} margin="normal" />
           <TextField select fullWidth label="Category" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} margin="normal">
             {categories.map(cat => <MenuItem key={cat} value={cat}>{cat}</MenuItem>)}
