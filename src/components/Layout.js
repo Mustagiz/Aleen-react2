@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, IconButton, Drawer, List, ListItem, ListItemIcon, ListItemText, Box, useMediaQuery, useTheme, Avatar, Divider, Chip, ListSubheader, BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
-import { Menu, Dashboard, Inventory, Receipt, Assessment, Logout, Store, TrendingUp, Settings } from '@mui/icons-material';
+import { Menu, Dashboard, Inventory, Receipt, Assessment, Logout, Store, TrendingUp, Settings, Brightness4, Brightness7 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
+import { useThemeContext } from '../contexts/ThemeContext';
 
 const Layout = () => {
   const { logout } = useAuth();
   const { profile } = useData();
+  const { mode, toggleTheme } = useThemeContext();
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
@@ -64,16 +66,16 @@ const Layout = () => {
       flexDirection: isMobile ? 'column' : 'row',
       height: '100vh',
       overflow: isMobile ? 'auto' : 'hidden',
-      bgcolor: '#fffdf7'
+      bgcolor: 'background.default'
     }}>
       <AppBar
         position={isMobile ? 'static' : 'fixed'}
         elevation={0}
         sx={{
           zIndex: (theme) => theme.zIndex.drawer + 1,
-          bgcolor: 'rgba(255, 255, 255, 0.8)',
+          bgcolor: 'background.paper',
           backdropFilter: 'blur(8px)',
-          borderBottom: '1px solid rgba(136, 14, 79, 0.08)',
+          borderBottom: mode === 'light' ? '1px solid rgba(136, 14, 79, 0.08)' : '1px solid rgba(255, 255, 255, 0.1)',
           color: 'text.primary'
         }}
       >
@@ -109,7 +111,7 @@ const Layout = () => {
             <Box>
               <Typography variant="h6" sx={{
                 fontWeight: 700,
-                color: '#1a1a1a',
+                color: 'text.primary',
                 lineHeight: 1.2,
                 fontSize: { xs: '1rem', md: '1.25rem' },
                 whiteSpace: 'nowrap',
@@ -142,6 +144,9 @@ const Layout = () => {
               }}
             />
           )}
+          <IconButton onClick={toggleTheme} color="inherit" sx={{ mr: 1 }}>
+            {mode === 'dark' ? <Brightness7 fontSize="small" /> : <Brightness4 fontSize="small" />}
+          </IconButton>
           <Avatar
             sx={{
               bgcolor: 'primary.main',
@@ -326,9 +331,9 @@ const Layout = () => {
             left: 0,
             right: 0,
             zIndex: 1000,
-            bgcolor: 'rgba(255, 255, 255, 0.9)',
+            bgcolor: mode === 'light' ? 'rgba(255, 255, 255, 0.9)' : 'rgba(30, 30, 30, 0.9)',
             backdropFilter: 'blur(10px)',
-            borderTop: '1px solid rgba(136, 14, 79, 0.1)',
+            borderTop: mode === 'light' ? '1px solid rgba(136, 14, 79, 0.1)' : '1px solid rgba(255, 255, 255, 0.1)',
             overflowX: 'auto',
             '&::-webkit-scrollbar': { display: 'none' }, // Hide scrollbar for cleaner look
             msOverflowStyle: 'none',
