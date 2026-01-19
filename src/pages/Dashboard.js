@@ -16,7 +16,7 @@ const Dashboard = () => {
   const todaySales = invoices.filter(inv => new Date(inv.date).toDateString() === today)
     .reduce((sum, inv) => sum + inv.total, 0);
 
-  const lowStock = inventory.filter(item => item.quantity < 10);
+  const lowStock = inventory.filter(item => item.quantity < 2);
   const recentInvoices = invoices.slice(-5).reverse();
   const totalRevenue = invoices.reduce((sum, inv) => sum + inv.total, 0);
   const totalCost = invoices.reduce((sum, inv) => {
@@ -87,7 +87,7 @@ const Dashboard = () => {
     labels: ['Low Stock', 'Medium Stock', 'High Stock'],
     datasets: [{
       data: [
-        inventory.filter(i => i.quantity < 10).length,
+        inventory.filter(i => i.quantity < 2).length,
         inventory.filter(i => i.quantity >= 10 && i.quantity < 50).length,
         inventory.filter(i => i.quantity >= 50).length
       ],

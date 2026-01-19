@@ -29,7 +29,7 @@ const InventoryReports = () => {
   const filteredInventory = inventory.filter(item => {
     const categoryMatch = categoryFilter === '' || item.category === categoryFilter;
     const stockMatch = stockLevel === '' ||
-      (stockLevel === 'low' && item.quantity < 10) ||
+      (stockLevel === 'low' && item.quantity < 2) ||
       (stockLevel === 'medium' && item.quantity >= 10 && item.quantity < 50) ||
       (stockLevel === 'high' && item.quantity >= 50);
 
@@ -45,7 +45,7 @@ const InventoryReports = () => {
   });
 
   const totalValue = filteredInventory.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const lowStockCount = filteredInventory.filter(item => item.quantity < 10).length;
+  const lowStockCount = filteredInventory.filter(item => item.quantity < 2).length;
   const totalItems = filteredInventory.length;
   const totalProfit = filteredInventory.reduce((sum, item) => sum + ((item.price - (item.cost || 0)) * item.quantity), 0);
 
@@ -256,7 +256,7 @@ const InventoryReports = () => {
                   <Box sx={{ textAlign: 'right' }}>
                     <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>Stock Status</Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5, justifyContent: 'flex-end' }}>
-                      <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: item.quantity < 10 ? '#ef4444' : item.quantity < 50 ? '#f59e0b' : '#10b981' }} />
+                      <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: item.quantity < 2 ? '#ef4444' : item.quantity < 50 ? '#f59e0b' : '#10b981' }} />
                       <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.quantity} Units</Typography>
                     </Box>
                   </Box>
@@ -304,7 +304,7 @@ const InventoryReports = () => {
                         <TableCell>
                           <Typography variant="body2" sx={{ fontWeight: 700 }}>₹{item.price}</Typography>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: item.quantity < 10 ? '#ef4444' : item.quantity < 50 ? '#f59e0b' : '#10b981' }} />
+                            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: item.quantity < 2 ? '#ef4444' : item.quantity < 50 ? '#f59e0b' : '#10b981' }} />
                             <Typography variant="caption" sx={{ fontWeight: 600 }}>{item.quantity} Units</Typography>
                           </Box>
                         </TableCell>

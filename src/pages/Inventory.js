@@ -19,7 +19,7 @@ const Inventory = () => {
 
   const totalItems = inventory.length;
   const totalValue = inventory.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const lowStockItems = inventory.filter(item => item.quantity < 10).length;
+  const lowStockItems = inventory.filter(item => item.quantity < 2).length;
   const totalProfit = inventory.reduce((sum, item) => sum + ((item.price - (item.cost || 0)) * item.quantity), 0);
 
 
@@ -248,7 +248,7 @@ const Inventory = () => {
                     </Box>
                     <Box sx={{ textAlign: 'right' }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'flex-end' }}>
-                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: item.quantity < 10 ? '#ef4444' : item.quantity < 50 ? '#f59e0b' : '#10b981' }} />
+                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: item.quantity < 2 ? '#ef4444' : item.quantity < 50 ? '#f59e0b' : '#10b981' }} />
                         <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.quantity}</Typography>
                       </Box>
                       <Typography variant="caption" color="text.secondary">Stock</Typography>
@@ -358,7 +358,7 @@ const Inventory = () => {
                               width: 8,
                               height: 8,
                               borderRadius: '50%',
-                              bgcolor: item.quantity < 10 ? '#ef4444' : item.quantity < 50 ? '#f59e0b' : '#10b981'
+                              bgcolor: item.quantity < 2 ? '#ef4444' : item.quantity < 50 ? '#f59e0b' : '#10b981'
                             }}
                           />
                           <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.quantity} Units</Typography>
