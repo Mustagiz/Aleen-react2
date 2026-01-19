@@ -687,24 +687,41 @@ const Invoices = () => {
                 fullWidth
                 placeholder="Type Product ID and press Enter to add..."
                 value={itemSearchTerm}
-                onChange={(e) => setItemSearchTerm(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    // Find exact match by Product ID
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setItemSearchTerm(val);
+
+                  // Auto-select on exact Product ID match (case-insensitive)
+                  if (val.trim()) {
                     const matchedProduct = inventory.find(inv =>
-                      inv.productId && inv.productId.toLowerCase() === itemSearchTerm.toLowerCase().trim()
+                      inv.productId && inv.productId.toLowerCase() === val.toLowerCase().trim()
                     );
+
                     if (matchedProduct) {
                       // Check if there's an empty item slot
                       const emptyIndex = selectedItems.findIndex(item => !item.id);
                       if (emptyIndex !== -1) {
-                        // Fill the first empty slot
                         handleItemChange(emptyIndex, 'id', matchedProduct.id);
                       } else {
-                        // Add new item
                         setSelectedItems([...selectedItems, { id: matchedProduct.id, quantity: 1 }]);
                       }
-                      setItemSearchTerm(''); // Clear search
+                      setItemSearchTerm(''); // Clear search instantly
+                    }
+                  }
+                }}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    const matchedProduct = inventory.find(inv =>
+                      inv.productId && inv.productId.toLowerCase() === itemSearchTerm.toLowerCase().trim()
+                    );
+                    if (matchedProduct) {
+                      const emptyIndex = selectedItems.findIndex(item => !item.id);
+                      if (emptyIndex !== -1) {
+                        handleItemChange(emptyIndex, 'id', matchedProduct.id);
+                      } else {
+                        setSelectedItems([...selectedItems, { id: matchedProduct.id, quantity: 1 }]);
+                      }
+                      setItemSearchTerm('');
                     }
                   }
                 }}
@@ -712,7 +729,7 @@ const Invoices = () => {
                 InputProps={{
                   startAdornment: <Search sx={{ color: 'text.secondary', mr: 1 }} />
                 }}
-                helperText="Type Product ID or Name to filter, press Enter to add by ID"
+                helperText="Scanning or typing a Product ID adds it automatically"
               />
             </Box>
             {selectedItems.map((item, index) => {
