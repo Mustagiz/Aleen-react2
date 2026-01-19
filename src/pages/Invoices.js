@@ -622,13 +622,34 @@ const Invoices = () => {
             <Box sx={{ mb: 2 }}>
               <TextField
                 fullWidth
-                placeholder="Search by Product ID or Name..."
+                placeholder="Type Product ID and press Enter to add..."
                 value={itemSearchTerm}
                 onChange={(e) => setItemSearchTerm(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    // Find exact match by Product ID
+                    const matchedProduct = inventory.find(inv =>
+                      inv.productId && inv.productId.toLowerCase() === itemSearchTerm.toLowerCase().trim()
+                    );
+                    if (matchedProduct) {
+                      // Check if there's an empty item slot
+                      const emptyIndex = selectedItems.findIndex(item => !item.id);
+                      if (emptyIndex !== -1) {
+                        // Fill the first empty slot
+                        handleItemChange(emptyIndex, 'id', matchedProduct.id);
+                      } else {
+                        // Add new item
+                        setSelectedItems([...selectedItems, { id: matchedProduct.id, quantity: 1 }]);
+                      }
+                      setItemSearchTerm(''); // Clear search
+                    }
+                  }
+                }}
                 size="small"
                 InputProps={{
                   startAdornment: <Search sx={{ color: 'text.secondary', mr: 1 }} />
                 }}
+                helperText="Type Product ID or Name to filter, press Enter to add by ID"
               />
             </Box>
             {selectedItems.map((item, index) => {
