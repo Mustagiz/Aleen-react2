@@ -6,9 +6,11 @@ import { generateInvoiceNumber } from '../utils/helpers';
 import InvoicePrint from '../components/InvoicePrint';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { useThemeContext } from '../contexts/ThemeContext';
 
 const Invoices = () => {
   const { inventory, invoices, addInvoice, deleteInvoice, profile, customers } = useData();
+  const { mode } = useThemeContext();
   const [open, setOpen] = useState(false);
   const [viewInvoice, setViewInvoice] = useState(null);
   const [page, setPage] = useState(0);
