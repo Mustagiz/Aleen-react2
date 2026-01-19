@@ -659,28 +659,43 @@ const Invoices = () => {
               );
               return (
                 <Box key={index} sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 2, p: 2, bgcolor: 'white', borderRadius: 2 }}>
-                  <TextField
-                    select
-                    label="Select Item"
-                    value={item.id}
-                    onChange={(e) => handleItemChange(index, 'id', e.target.value)}
-                    fullWidth
-                    error={!item.id && selectedItems.length > 0}
-                  >
-                    {filteredInventory.length > 0 ? (
-                      filteredInventory.map(inv => (
-                        <MenuItem key={inv.id} value={inv.id}>
-                          {inv.productId ? `[${inv.productId}] ` : ''}{inv.name} - ₹{inv.price} ({inv.quantity} in stock)
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <TextField
+                      select
+                      label="Select Item"
+                      value={item.id}
+                      onChange={(e) => handleItemChange(index, 'id', e.target.value)}
+                      fullWidth
+                      error={!item.id && selectedItems.length > 0}
+                    >
+                      {filteredInventory.length > 0 ? (
+                        filteredInventory.map(inv => (
+                          <MenuItem key={inv.id} value={inv.id}>
+                            {inv.productId ? `[${inv.productId}] ` : ''}{inv.name} - ₹{inv.price} ({inv.quantity} in stock)
+                          </MenuItem>
+                        ))
+                      ) : (
+                        <MenuItem disabled value="">
+                          {inventory.length > 0 ? 'No matching items' : 'No items in inventory'}
                         </MenuItem>
-                      ))
-                    ) : (
-                      <MenuItem disabled value="">
-                        {inventory.length > 0 ? 'No matching items' : 'No items in inventory'}
-                      </MenuItem>
-                    )}
-                  </TextField>
-                  <TextField label="Quantity" type="number" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value))} sx={{ width: { xs: '100%', sm: 150 } }} />
-                  <IconButton onClick={() => setSelectedItems(selectedItems.filter((_, i) => i !== index))} sx={{ color: 'error.main' }}><Delete /></IconButton>
+                      )}
+                    </TextField>
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                    <TextField
+                      label="Quantity"
+                      type="number"
+                      value={item.quantity}
+                      onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value))}
+                      sx={{ width: { xs: '100%', sm: 150 } }}
+                    />
+                    <IconButton
+                      onClick={() => setSelectedItems(selectedItems.filter((_, i) => i !== index))}
+                      sx={{ color: 'error.main', flexShrink: 0 }}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </Box>
                 </Box>
               );
             })}
