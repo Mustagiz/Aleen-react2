@@ -11,6 +11,7 @@ import Invoices from './pages/Invoices';
 import SalesReports from './pages/SalesReports';
 import InventoryReports from './pages/InventoryReports';
 import ProfitLoss from './pages/ProfitLoss';
+import Customers from './pages/Customers';
 import Settings from './pages/Settings';
 import Layout from './components/Layout';
 
@@ -32,6 +33,7 @@ function App() {
                 <Route index element={<Dashboard />} />
                 <Route path="inventory" element={<Inventory />} />
                 <Route path="invoices" element={<Invoices />} />
+                <Route path="customers" element={<Customers />} />
                 <Route path="sales-reports" element={<SalesReports />} />
                 <Route path="inventory-reports" element={<InventoryReports />} />
                 <Route path="profit-loss" element={<ProfitLoss />} />

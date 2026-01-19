@@ -9,6 +9,7 @@ export const useData = () => useContext(DataContext);
 export const DataProvider = ({ children }) => {
   const [inventory, setInventory] = useState([]);
   const [invoices, setInvoices] = useState([]);
+  const [customers, setCustomers] = useState([]);
   const [categories, setCategories] = useState(['Sarees', 'Kurtis', 'Lehenga', 'Salwar Suits', 'Dupattas', 'Blouses']);
   const [profile, setProfile] = useState({
     businessName: 'Aleen Clothing',
@@ -32,6 +33,10 @@ export const DataProvider = ({ children }) => {
       setInvoices(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
 
+    const unsubCustomers = onSnapshot(collection(db, 'customers'), (snapshot) => {
+      setCustomers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+
     const unsubProfile = onSnapshot(doc(db, 'settings', 'profile'), (snapshot) => {
       if (snapshot.exists()) {
         setProfile(snapshot.data());
@@ -47,6 +52,7 @@ export const DataProvider = ({ children }) => {
     return () => {
       unsubInventory();
       unsubInvoices();
+      unsubCustomers();
       unsubProfile();
       unsubCategories();
     };
@@ -104,10 +110,11 @@ export const DataProvider = ({ children }) => {
     const id = Date.now().toString();
     const newInvoice = { ...invoice, id };
 
-    // Use a batch to ensure inventory update and invoice creation are atomic
+    // Use a batch to ensure inventory update, invoice creation, and customer update are atomic
     const batch = writeBatch(db);
     batch.set(doc(db, 'invoices', id), newInvoice);
 
+    // Update Inventory
     for (const item of invoice.items) {
       const invRef = doc(db, 'inventory', item.id);
       const invItem = inventory.find(i => i.id === item.id);
@@ -117,6 +124,19 @@ export const DataProvider = ({ children }) => {
         });
       }
     }
+
+    // Update Customer Stats if linked
+    if (invoice.customerId) {
+      const customerRef = doc(db, 'customers', invoice.customerId);
+      const customer = customers.find(c => c.id === invoice.customerId);
+      if (customer) {
+        batch.update(customerRef, {
+          totalSpent: (customer.totalSpent || 0) + invoice.total,
+          visitCount: (customer.visitCount || 0) + 1
+        });
+      }
+    }
+
     await batch.commit();
   };
 
@@ -130,6 +150,27 @@ export const DataProvider = ({ children }) => {
 
   const updateProfile = async (updates) => {
     await setDoc(doc(db, 'settings', 'profile'), { ...profile, ...updates });
+  };
+
+  const addCustomer = async (customer) => {
+    const id = Date.now().toString();
+    const newCustomer = {
+      ...customer,
+      id,
+      dateAdded: new Date().toISOString(),
+      totalSpent: 0,
+      visitCount: 0
+    };
+    await setDoc(doc(db, 'customers', id), newCustomer);
+    return id;
+  };
+
+  const updateCustomer = async (id, updates) => {
+    await updateDoc(doc(db, 'customers', id), updates);
+  };
+
+  const deleteCustomer = async (id) => {
+    await deleteDoc(doc(db, 'customers', id));
   };
 
   const updateCategories = async (newCategories) => {
@@ -149,7 +190,11 @@ export const DataProvider = ({ children }) => {
       deleteInvoice,
       profile,
       updateProfile,
-      updateCategories
+      updateCategories,
+      customers,
+      addCustomer,
+      updateCustomer,
+      deleteCustomer
     }}>
       {children}
     </DataContext.Provider>

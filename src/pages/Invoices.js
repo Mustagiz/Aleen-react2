@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText } from '@mui/material';
+import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete } from '@mui/material';
 import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, FilterList, Receipt, Share, Close, MoreVert } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import { generateInvoiceNumber } from '../utils/helpers';
@@ -8,7 +8,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 const Invoices = () => {
-  const { inventory, invoices, addInvoice, deleteInvoice, profile } = useData();
+  const { inventory, invoices, addInvoice, deleteInvoice, profile, customers } = useData();
   const [open, setOpen] = useState(false);
   const [viewInvoice, setViewInvoice] = useState(null);
   const [page, setPage] = useState(0);
@@ -39,6 +39,7 @@ const Invoices = () => {
   const [tax, setTax] = useState(18);
   const [customer, setCustomer] = useState('');
   const [phone, setPhone] = useState('+91');
+  const [selectedCustomerId, setSelectedCustomerId] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('Cash');
   const [searchTerm, setSearchTerm] = useState('');
   const [itemSearchTerm, setItemSearchTerm] = useState('');
@@ -99,6 +100,7 @@ const Invoices = () => {
       date: new Date().toISOString(),
       customer,
       phone,
+      customerId: selectedCustomerId,
       paymentMethod,
       items: validItems.map(item => {
         const invItem = inventory.find(i => i.id === item.id);
@@ -122,6 +124,7 @@ const Invoices = () => {
     setDiscount(0);
     setCustomer('');
     setPhone('+91');
+    setSelectedCustomerId(null);
     setPaymentMethod('Cash');
   };
 
@@ -633,8 +636,46 @@ const Invoices = () => {
         <DialogContent sx={{ mt: 2 }}>
           <Paper sx={{ p: 2, mb: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2 }}>Customer Information</Typography>
+            <Box sx={{ mb: 2 }}>
+              <Autocomplete
+                freeSolo
+                options={customers}
+                getOptionLabel={(option) => typeof option === 'string' ? option : `${option.name} (${option.phone})`}
+                value={selectedCustomerId ? customers.find(c => c.id === selectedCustomerId) || customer : customer}
+                onChange={(event, newValue) => {
+                  if (typeof newValue === 'string') {
+                    setCustomer(newValue);
+                    setSelectedCustomerId(null);
+                  } else if (newValue && newValue.id) {
+                    setCustomer(newValue.name);
+                    setPhone(newValue.phone || '+91');
+                    setSelectedCustomerId(newValue.id);
+                  } else {
+                    setSelectedCustomerId(null);
+                  }
+                }}
+                onInputChange={(event, newInputValue) => {
+                  if (!selectedCustomerId) setCustomer(newInputValue);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Customer Search / Name"
+                    fullWidth
+                    helperText="Select existing customer or type for a new one"
+                  />
+                )}
+                renderOption={(props, option) => (
+                  <Box component="li" {...props} key={option.id}>
+                    <Box>
+                      <Typography variant="body1" sx={{ fontWeight: 600 }}>{option.name}</Typography>
+                      <Typography variant="caption" color="text.secondary">{option.phone}</Typography>
+                    </Box>
+                  </Box>
+                )}
+              />
+            </Box>
             <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
-              <TextField label="Customer Name" value={customer} onChange={(e) => setCustomer(e.target.value)} fullWidth />
               <TextField label="Phone (with country code)" value={phone} onChange={(e) => setPhone(e.target.value)} fullWidth placeholder="919876543210" />
             </Box>
           </Paper>

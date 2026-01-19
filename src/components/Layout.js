@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, IconButton, Drawer, List, ListItem, ListItemIcon, ListItemText, Box, useMediaQuery, useTheme, Avatar, Divider, Chip, ListSubheader, BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
-import { Menu, Dashboard, Inventory, Receipt, Assessment, Logout, Store, TrendingUp, Settings, Brightness4, Brightness7 } from '@mui/icons-material';
+import { Menu, Dashboard, Inventory, Receipt, Assessment, Logout, Store, TrendingUp, Settings, Brightness4, Brightness7, People } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
 import { useThemeContext } from '../contexts/ThemeContext';
@@ -26,7 +26,8 @@ const Layout = () => {
       items: [
         { text: 'Dashboard', icon: <Dashboard />, path: '/' },
         { text: 'Inventory', icon: <Inventory />, path: '/inventory' },
-        { text: 'Invoices', icon: <Receipt />, path: '/invoices' }
+        { text: 'Invoices', icon: <Receipt />, path: '/invoices' },
+        { text: 'Customers', icon: <People />, path: '/customers' }
       ]
     },
     {
@@ -54,6 +55,7 @@ const Layout = () => {
     { text: 'Dashboard', icon: <Dashboard />, path: '/' },
     { text: 'Inventory', icon: <Inventory />, path: '/inventory' },
     { text: 'Invoices', icon: <Receipt />, path: '/invoices' },
+    { text: 'Customers', icon: <People />, path: '/customers' },
     { text: 'P&L', icon: <TrendingUp />, path: '/profit-loss' },
     { text: 'Sales', icon: <Assessment />, path: '/sales-reports' },
     { text: 'Stock', icon: <Assessment />, path: '/inventory-reports' },
