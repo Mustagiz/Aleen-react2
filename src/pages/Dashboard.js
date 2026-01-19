@@ -5,17 +5,38 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, 
 import { Bar, Line, Doughnut } from 'react-chartjs-2';
 import { useData } from '../contexts/DataContext';
 import { useNavigate } from 'react-router-dom';
+import { DateRange, CalendarMonth, History, ViewWeek } from '@mui/icons-material';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler);
 
 const Dashboard = () => {
   const { inventory, invoices } = useData();
   const navigate = useNavigate();
+  const [dateRange, setDateRange] = React.useState('7days');
 
-  const today = new Date().toDateString();
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+
+  const getFilteredInvoices = () => {
+    let startDate = new Date();
+    startDate.setHours(0, 0, 0, 0);
+
+    if (dateRange === '7days') {
+      startDate.setDate(today.getDate() - 7);
+    } else if (dateRange === '30days') {
+      startDate.setDate(today.getDate() - 30);
+    } else if (dateRange === 'thisMonth') {
+      startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    } else {
+      return invoices; // 'all'
+    }
+    return invoices.filter(inv => new Date(inv.date) >= startDate);
+  };
+
+  const filteredInvoices = getFilteredInvoices();
   const yesterday = new Date(Date.now() - 86400000).toDateString();
 
-  const todaySales = invoices.filter(inv => new Date(inv.date).toDateString() === today)
+  const todaySales = invoices.filter(inv => new Date(inv.date).toDateString() === today.toDateString())
     .reduce((sum, inv) => sum + inv.total, 0);
 
   const yesterdaySales = invoices.filter(inv => new Date(inv.date).toDateString() === yesterday)
@@ -25,8 +46,8 @@ const Dashboard = () => {
 
   const lowStock = inventory.filter(item => item.quantity < 2);
   const recentInvoices = invoices.slice(-6).reverse();
-  const totalRevenue = invoices.reduce((sum, inv) => sum + inv.total, 0);
-  const totalCost = invoices.reduce((sum, inv) => {
+  const totalRevenue = filteredInvoices.reduce((sum, inv) => sum + inv.total, 0);
+  const totalCost = filteredInvoices.reduce((sum, inv) => {
     return sum + (inv.items?.reduce((itemSum, item) => {
       const invItem = inventory.find(i => i.id === item.id);
       return itemSum + ((invItem?.cost || 0) * item.quantity);
@@ -37,9 +58,11 @@ const Dashboard = () => {
 
   // Top Products Calculation
   const productSales = {};
-  invoices.forEach(inv => {
+  filteredInvoices.forEach(inv => {
     inv.items?.forEach(item => {
-      productSales[item.id] = (productSales[item.id] || 0) + item.quantity;
+      // Use original ID or Name as key
+      const key = item.id || item.name;
+      productSales[key] = (productSales[key] || 0) + item.quantity;
     });
   });
 
@@ -61,24 +84,64 @@ const Dashboard = () => {
     }]
   };
 
-  // Last 7 days sales data
-  const last7Days = Array.from({ length: 7 }, (_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() - (6 - i));
-    return date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
-  });
+  // Date labels and sales grouping based on range
+  const getDateLabels = () => {
+    if (dateRange === '7days') {
+      return Array.from({ length: 7 }, (_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (6 - i));
+        return d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+      });
+    } else if (dateRange === '30days') {
+      return Array.from({ length: 4 }, (_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (21 - i * 7));
+        return `Week ${i + 1}`;
+      });
+    } else {
+      return ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+    }
+  };
 
-  const salesByDay = last7Days.map(day => {
-    return invoices
-      .filter(inv => new Date(inv.date).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) === day)
-      .reduce((sum, inv) => sum + inv.total, 0);
-  });
+  const labels = getDateLabels();
+
+  const getSalesData = () => {
+    if (dateRange === '7days') {
+      return labels.map(dayText => {
+        return filteredInvoices
+          .filter(inv => {
+            const invDate = new Date(inv.date);
+            return invDate.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) === dayText;
+          })
+          .reduce((sum, inv) => sum + inv.total, 0);
+      });
+    } else {
+      // Group by weeks for longer periods
+      const weekStarts = Array.from({ length: 4 }, (_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (28 - i * 7));
+        return d;
+      });
+      return weekStarts.map((start, i) => {
+        const end = new Date(start);
+        end.setDate(end.getDate() + 7);
+        return filteredInvoices
+          .filter(inv => {
+            const d = new Date(inv.date);
+            return d >= start && d < end;
+          })
+          .reduce((sum, inv) => sum + inv.total, 0);
+      });
+    }
+  };
+
+  const salesByPeriod = getSalesData();
 
   const salesChartData = {
-    labels: last7Days,
+    labels: labels,
     datasets: [{
       label: 'Sales (₹)',
-      data: salesByDay,
+      data: salesByPeriod,
       backgroundColor: 'rgba(136, 14, 79, 0.05)',
       borderColor: '#880e4f',
       borderWidth: 3,
@@ -91,9 +154,12 @@ const Dashboard = () => {
     }]
   };
 
-  // Category-wise sales calculation
-  const categorySales = inventory.reduce((acc, item) => {
-    acc[item.category] = (acc[item.category] || 0) + (item.price * (item.quantity < 50 ? 50 - item.quantity : 0));
+  // Category-wise sales calculation from REAL sales data
+  const categorySales = filteredInvoices.reduce((acc, inv) => {
+    inv.items?.forEach(item => {
+      const category = item.category || 'General';
+      acc[category] = (acc[category] || 0) + (item.price * item.quantity);
+    });
     return acc;
   }, {});
 
@@ -174,9 +240,49 @@ const Dashboard = () => {
 
   return (
     <Box>
-      <Box sx={{ mb: 5 }}>
-        <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mb: 1 }}>Overview</Typography>
-        <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>Business analytics for Aleen Clothing.</Typography>
+      <Box sx={{ mb: 5, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'center' }, gap: 3 }}>
+        <Box>
+          <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mb: 1 }}>Overview</Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>Real-time business analytics for Aleen Clothing.</Typography>
+        </Box>
+
+        <Box sx={{
+          display: 'flex',
+          bgcolor: 'background.paper',
+          p: 0.5,
+          borderRadius: 3,
+          border: '1px solid',
+          borderColor: 'divider',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+        }}>
+          {[
+            { id: '7days', label: '7 Days', icon: <ViewWeek fontSize="small" /> },
+            { id: '30days', label: '30 Days', icon: <CalendarMonth fontSize="small" /> },
+            { id: 'thisMonth', label: 'This Month', icon: <DateRange fontSize="small" /> },
+            { id: 'all', label: 'All Time', icon: <History fontSize="small" /> }
+          ].map((item) => (
+            <Button
+              key={item.id}
+              size="small"
+              onClick={() => setDateRange(item.id)}
+              startIcon={item.icon}
+              sx={{
+                px: 2,
+                py: 0.75,
+                borderRadius: 2.5,
+                textTransform: 'none',
+                fontWeight: 700,
+                color: dateRange === item.id ? 'white' : 'text.secondary',
+                background: dateRange === item.id ? 'linear-gradient(135deg, #880e4f 0%, #ad1457 100%)' : 'transparent',
+                '&:hover': {
+                  background: dateRange === item.id ? 'linear-gradient(135deg, #ad1457 0%, #880e4f 100%)' : 'rgba(0,0,0,0.02)'
+                }
+              }}
+            >
+              {item.label}
+            </Button>
+          ))}
+        </Box>
       </Box>
 
       <Grid container spacing={4} sx={{ mb: 5 }}>
@@ -196,8 +302,10 @@ const Dashboard = () => {
 
       <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid item xs={12} lg={8}>
-          <Paper sx={{ p: 4, borderRadius: 5, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', backgroundImage: 'none' }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 4 }}>Weekly Sales Trend</Typography>
+          <Paper sx={{ p: 4, borderRadius: 5, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', backgroundImage: 'none', height: '100%' }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 4 }}>
+              {dateRange === '7days' ? 'Weekly' : dateRange === '30days' ? 'Monthly' : 'Sales'} Trend
+            </Typography>
             <Line data={salesChartData} options={{
               responsive: true,
               plugins: { legend: { display: false } },
