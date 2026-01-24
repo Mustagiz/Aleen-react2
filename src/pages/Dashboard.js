@@ -284,45 +284,46 @@ const Dashboard = () => {
         }
       }}
     >
-      <CardContent sx={{ p: 3.5, position: 'relative', zIndex: 1 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2.5 }}>
+      <CardContent sx={{ p: 2, position: 'relative', zIndex: 1 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
           <Box sx={{
-            p: 2,
-            borderRadius: 3,
+            p: 1.2,
+            borderRadius: 2.5,
             bgcolor: color + '12',
             color: color,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: `0 4px 12px ${color}20, inset 0 1px 0 ${color}30`,
-            border: `1px solid ${color}20`
+            boxShadow: `0 2px 8px ${color}15, inset 0 1px 0 ${color}25`,
+            border: `1px solid ${color}15`
           }}>
-            {React.cloneElement(icon, { sx: { fontSize: 32, filter: `drop-shadow(0 2px 4px ${color}40)` } })}
+            {React.cloneElement(icon, { sx: { fontSize: 24, filter: `drop-shadow(0 1px 2px ${color}30)` } })}
           </Box>
           {trend !== undefined && (
             <Chip
-              icon={trend >= 0 ? <TrendingUp sx={{ fontSize: '14px !important' }} /> : <TrendingDown sx={{ fontSize: '14px !important' }} />}
+              icon={trend >= 0 ? <TrendingUp sx={{ fontSize: '12px !important' }} /> : <TrendingDown sx={{ fontSize: '12px !important' }} />}
               label={`${Math.abs(trend)}%`}
               size="small"
               sx={{
-                bgcolor: trend >= 0 ? 'rgba(67, 160, 71, 0.12)' : 'rgba(229, 57, 53, 0.12)',
+                height: 20,
+                fontSize: '0.65rem',
+                bgcolor: trend >= 0 ? 'rgba(67, 160, 71, 0.1)' : 'rgba(229, 57, 53, 0.1)',
                 color: trend >= 0 ? 'success.main' : 'error.main',
                 fontWeight: 700,
-                borderRadius: 2,
-                border: trend >= 0 ? '1px solid rgba(67, 160, 71, 0.2)' : '1px solid rgba(229, 57, 53, 0.2)',
-                boxShadow: trend >= 0 ? '0 2px 8px rgba(67, 160, 71, 0.15)' : '0 2px 8px rgba(229, 57, 53, 0.15)'
+                borderRadius: 1.5,
+                border: trend >= 0 ? '1px solid rgba(67, 160, 71, 0.15)' : '1px solid rgba(229, 57, 53, 0.15)'
               }}
             />
           )}
         </Box>
-        <Typography variant="h3" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5, letterSpacing: '-0.03em', lineHeight: 1.2 }}>
+        <Typography variant="h5" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.2, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
           {value}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600, fontSize: '0.9rem', letterSpacing: '0.01em' }}>
+        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.75rem', letterSpacing: '0.02em', textTransform: 'uppercase', opacity: 0.8 }}>
           {title}
         </Typography>
         {subtitle && (
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, opacity: 0.7 }}>
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.2, opacity: 0.6, fontSize: '0.65rem' }}>
             {subtitle}
           </Typography>
         )}
