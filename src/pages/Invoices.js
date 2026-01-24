@@ -772,12 +772,16 @@ const Invoices = () => {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="Customer Search / Name"
+                    label="Customer Search / Name / Phone"
                     fullWidth
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
-                        // Search for the typed name in customers
-                        const matched = customers.find(c => c.name.toLowerCase() === customer.toLowerCase().trim());
+                        const searchTerm = customer.toLowerCase().trim();
+                        // Search by name OR phone number
+                        const matched = customers.find(c =>
+                          c.name.toLowerCase() === searchTerm ||
+                          (c.phone && c.phone.includes(searchTerm))
+                        );
                         if (matched) {
                           setCustomer(matched.name);
                           setPhone(matched.phone || '+91');
@@ -785,7 +789,7 @@ const Invoices = () => {
                         }
                       }
                     }}
-                    helperText="Type name and press Enter to fetch existing details"
+                    helperText="Type name or phone and press Enter to fetch existing details"
                   />
                 )}
                 renderOption={(props, option) => (

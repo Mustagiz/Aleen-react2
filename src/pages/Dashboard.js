@@ -249,61 +249,83 @@ const Dashboard = () => {
         position: 'relative',
         overflow: 'hidden',
         border: '1px solid',
-        borderColor: color + '30',
-        background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${color}0D 100%)`,
+        borderColor: color + '25',
+        background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${color}08 100%)`,
+        boxShadow: `0 4px 20px -4px ${color}20, 0 0 0 1px ${color}10`,
+        backdropFilter: 'blur(10px)',
         '&::before': {
           content: '""',
           position: 'absolute',
           top: 0,
           left: 0,
-          width: '4px',
+          width: '5px',
           height: '100%',
-          bgcolor: color,
-          opacity: 0.8
+          background: `linear-gradient(180deg, ${color} 0%, ${color}80 100%)`,
+          boxShadow: `2px 0 8px ${color}40`
+        },
+        '&::after': {
+          content: '""',
+          position: 'absolute',
+          top: -50,
+          right: -50,
+          width: 150,
+          height: 150,
+          borderRadius: '50%',
+          background: `radial-gradient(circle, ${color}08 0%, transparent 70%)`,
+          pointerEvents: 'none'
         },
         '&:hover': onClick ? {
-          transform: 'translateY(-6px)',
-          boxShadow: `0 12px 24px -10px ${color}40, 0 4px 10px -5px ${color}20`,
-          borderColor: color + '60',
-          background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${color}1A 100%)`,
+          transform: 'translateY(-8px) scale(1.02)',
+          boxShadow: `0 20px 40px -8px ${color}35, 0 0 0 1px ${color}30`,
+          borderColor: color + '50',
+          background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${color}12 100%)`,
         } : {
-          boxShadow: `0 8px 20px -10px ${color}20`,
+          boxShadow: `0 8px 24px -6px ${color}25`,
         }
       }}
     >
-      <CardContent sx={{ p: 3 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+      <CardContent sx={{ p: 3.5, position: 'relative', zIndex: 1 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2.5 }}>
           <Box sx={{
-            p: 1.5,
+            p: 2,
             borderRadius: 3,
-            bgcolor: color + '15',
+            bgcolor: color + '12',
             color: color,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            boxShadow: `0 4px 12px ${color}20, inset 0 1px 0 ${color}30`,
+            border: `1px solid ${color}20`
           }}>
-            {React.cloneElement(icon, { sx: { fontSize: 24 } })}
+            {React.cloneElement(icon, { sx: { fontSize: 32, filter: `drop-shadow(0 2px 4px ${color}40)` } })}
           </Box>
           {trend !== undefined && (
             <Chip
               icon={trend >= 0 ? <TrendingUp sx={{ fontSize: '14px !important' }} /> : <TrendingDown sx={{ fontSize: '14px !important' }} />}
-              label={`${Math.abs(trend)}% `}
+              label={`${Math.abs(trend)}%`}
               size="small"
               sx={{
-                bgcolor: trend >= 0 ? 'rgba(67, 160, 71, 0.1)' : 'rgba(229, 57, 53, 0.1)',
+                bgcolor: trend >= 0 ? 'rgba(67, 160, 71, 0.12)' : 'rgba(229, 57, 53, 0.12)',
                 color: trend >= 0 ? 'success.main' : 'error.main',
                 fontWeight: 700,
-                borderRadius: 2
+                borderRadius: 2,
+                border: trend >= 0 ? '1px solid rgba(67, 160, 71, 0.2)' : '1px solid rgba(229, 57, 53, 0.2)',
+                boxShadow: trend >= 0 ? '0 2px 8px rgba(67, 160, 71, 0.15)' : '0 2px 8px rgba(229, 57, 53, 0.15)'
               }}
             />
           )}
         </Box>
-        <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5, letterSpacing: '-0.02em' }}>
+        <Typography variant="h3" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5, letterSpacing: '-0.03em', lineHeight: 1.2 }}>
           {value}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600, fontSize: '0.9rem', letterSpacing: '0.01em' }}>
           {title}
         </Typography>
+        {subtitle && (
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, opacity: 0.7 }}>
+            {subtitle}
+          </Typography>
+        )}
       </CardContent>
     </Card>
   );

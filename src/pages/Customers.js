@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, Avatar, TablePagination } from '@mui/material';
-import { Add, Edit, Delete, Search, People, Phone, Email, ShoppingBag, TrendingUp, FilterList, MoreVert } from '@mui/icons-material';
+import { Add, Edit, Delete, Search, People, Phone, Email, ShoppingBag, TrendingUp, FilterList, MoreVert, Download } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 
 const Customers = () => {
@@ -63,6 +63,34 @@ const Customers = () => {
         setOpen(false);
     };
 
+    const downloadCustomers = () => {
+        const csvData = filteredCustomers.map(cust => {
+            const stats = calculateCustomerStats(cust.id);
+            return {
+                Name: cust.name,
+                Phone: cust.phone,
+                Email: cust.email || '',
+                Address: cust.address || '',
+                'Total Spent': stats.totalSpent,
+                'Visit Count': stats.visitCount,
+                'Last Visit': stats.lastVisit,
+                Notes: cust.notes || ''
+            };
+        });
+
+        const headers = Object.keys(csvData[0] || {});
+        const csvContent = [
+            headers.join(','),
+            ...csvData.map(row => headers.map(header => `"${row[header]}"`).join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `customers_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+    };
+
     const filteredCustomers = customers.filter(c =>
         c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         c.phone.includes(searchTerm)
@@ -86,27 +114,49 @@ const Customers = () => {
                     <Typography variant="h4" sx={{ fontWeight: 800, mb: 0.5 }}>Customers</Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>Manage client relations and purchase history</Typography>
                 </Box>
-                <Button
-                    variant="contained"
-                    startIcon={<Add />}
-                    onClick={() => handleOpen()}
-                    sx={{
-                        px: 4, py: 1.5,
-                        borderRadius: 2,
-                        fontWeight: 700,
-                        textTransform: 'none',
-                        background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)',
-                        boxShadow: `0 4px 12px ${theme.palette.primary.main}33`,
-                        transition: 'all 0.2s ease-in-out',
-                        '&:hover': {
-                            background: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)',
-                            boxShadow: `0 6px 16px ${theme.palette.primary.main}4D`,
-                            transform: 'translateY(-2px)'
-                        }
-                    }}
-                >
-                    Add Customer
-                </Button>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    <Button
+                        variant="outlined"
+                        startIcon={<Download />}
+                        onClick={downloadCustomers}
+                        sx={{
+                            px: 3, py: 1.5,
+                            borderRadius: 2,
+                            fontWeight: 700,
+                            textTransform: 'none',
+                            borderColor: 'primary.main',
+                            color: 'primary.main',
+                            '&:hover': {
+                                borderColor: 'primary.dark',
+                                bgcolor: 'primary.light',
+                                transform: 'translateY(-2px)'
+                            }
+                        }}
+                    >
+                        Export CSV
+                    </Button>
+                    <Button
+                        variant="contained"
+                        startIcon={<Add />}
+                        onClick={() => handleOpen()}
+                        sx={{
+                            px: 4, py: 1.5,
+                            borderRadius: 2,
+                            fontWeight: 700,
+                            textTransform: 'none',
+                            background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)',
+                            boxShadow: `0 4px 12px ${theme.palette.primary.main}33`,
+                            transition: 'all 0.2s ease-in-out',
+                            '&:hover': {
+                                background: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)',
+                                boxShadow: `0 6px 16px ${theme.palette.primary.main}4D`,
+                                transform: 'translateY(-2px)'
+                            }
+                        }}
+                    >
+                        Add Customer
+                    </Button>
+                </Box>
             </Box>
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -179,7 +229,10 @@ const Customers = () => {
                                                 <Phone sx={{ fontSize: 12 }} /> {cust.phone}
                                             </Typography>
                                         </Box>
-                                        <IconButton size="small" onClick={() => handleOpen(cust)}><Edit fontSize="small" /></IconButton>
+                                        <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                            <IconButton size="small" onClick={() => handleOpen(cust)} sx={{ color: 'primary.main' }}><Edit fontSize="small" /></IconButton>
+                                            <IconButton size="small" onClick={() => { if (window.confirm(`Delete customer ${cust.name}?`)) deleteCustomer(cust.id); }} sx={{ color: 'error.main' }}><Delete fontSize="small" /></IconButton>
+                                        </Box>
                                     </Box>
                                     <Divider sx={{ mb: 2 }} />
                                     <Grid container spacing={2}>

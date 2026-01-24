@@ -407,10 +407,10 @@ const Purchases = () => {
                         </IconButton>
                     )}
                 </DialogTitle>
-                <DialogContent sx={{ mt: 2, p: isMobile ? 2 : 3 }}>
-                    <Box sx={{ mb: 3 }}>
-                        <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 800 }}>Vendor & Status</Typography>
-                        <Grid container spacing={2} sx={{ mt: 0.5 }}>
+                <DialogContent sx={{ mt: isMobile ? 1 : 2, p: isMobile ? 2 : 3, pb: isMobile ? 10 : 3 }}>
+                    <Box sx={{ mb: isMobile ? 3 : 3 }}>
+                        <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 800, fontSize: isMobile ? '0.7rem' : '0.75rem', display: 'block', mb: 1.5 }}>Vendor & Status</Typography>
+                        <Grid container spacing={isMobile ? 1.5 : 2} sx={{ mt: 0.5 }}>
                             <Grid item xs={12} sm={6}>
                                 <Autocomplete
                                     options={vendors}
@@ -457,23 +457,26 @@ const Purchases = () => {
                         </Grid>
                     </Box>
 
-                    <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 800 }}>Order Items</Typography>
+                    <Box sx={{ mb: 2, pb: 2, borderBottom: isMobile ? '1px solid' : 'none', borderColor: 'divider' }}>
+                        <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 800, fontSize: isMobile ? '0.7rem' : '0.75rem', display: 'block', mb: 1.5 }}>Order Items</Typography>
+                    </Box>
                     {poItems.map((item, index) => (
                         <Paper
                             key={index}
                             elevation={0}
                             sx={{
-                                p: 2,
-                                mb: 2,
+                                p: isMobile ? 2 : 2,
+                                mb: isMobile ? 2.5 : 2,
                                 border: '1px solid',
                                 borderColor: 'divider',
-                                borderRadius: 2,
-                                bgcolor: 'grey.50'
+                                borderRadius: isMobile ? 3 : 2,
+                                bgcolor: isMobile ? 'background.paper' : 'grey.50',
+                                boxShadow: isMobile ? '0 2px 8px rgba(0,0,0,0.08)' : 'none'
                             }}
                         >
                             <Grid container spacing={2} alignItems="center">
                                 <Grid item xs={12} sm={5}>
-                                    <Box sx={{ display: 'flex', gap: 1 }}>
+                                    <Box sx={{ display: 'flex', gap: isMobile ? 1 : 1, flexDirection: isMobile ? 'column' : 'row' }}>
                                         <Autocomplete
                                             fullWidth
                                             options={inventory}
@@ -481,16 +484,18 @@ const Purchases = () => {
                                             value={inventory.find(i => i.id === item.productId) || null}
                                             isOptionEqualToValue={(option, value) => option.id === (typeof value === 'string' ? value : value?.id)}
                                             onChange={(e, newVal) => handleItemChange(index, 'productId', newVal?.id)}
-                                            renderInput={(params) => <TextField {...params} label="Product" size="small" />}
+                                            renderInput={(params) => <TextField {...params} label="Product" size={isMobile ? 'medium' : 'small'} />}
                                         />
                                         <Button
-                                            sx={{ minWidth: 40, px: 0 }}
+                                            sx={{ minWidth: isMobile ? '100%' : 40, px: isMobile ? 2 : 0, height: isMobile ? 48 : 'auto' }}
                                             variant="contained"
                                             color="secondary"
                                             onClick={() => handleQuickAddOpen(index)}
-                                            size="small"
+                                            size={isMobile ? 'large' : 'small'}
+                                            startIcon={isMobile ? <Add /> : null}
                                         >
-                                            <Add />
+                                            {isMobile ? <Add /> : <Add />}
+                                            {isMobile && <Typography sx={{ ml: 1 }}>Quick Add Product</Typography>}
                                         </Button>
                                     </Box>
                                 </Grid>
@@ -499,9 +504,10 @@ const Purchases = () => {
                                         fullWidth
                                         label="Quantity"
                                         type="number"
-                                        size="small"
+                                        size={isMobile ? 'medium' : 'small'}
                                         value={item.quantity}
                                         onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value))}
+                                        inputProps={{ min: 1, style: { fontSize: isMobile ? '16px' : '14px' } }}
                                     />
                                 </Grid>
                                 <Grid item xs={6} sm={3}>
@@ -509,10 +515,11 @@ const Purchases = () => {
                                         fullWidth
                                         label="Buy Price"
                                         type="number"
-                                        size="small"
+                                        size={isMobile ? 'medium' : 'small'}
                                         value={item.cost}
                                         onChange={(e) => handleItemChange(index, 'cost', parseFloat(e.target.value))}
                                         InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }}
+                                        inputProps={{ min: 0, step: 0.01, style: { fontSize: isMobile ? '16px' : '14px' } }}
                                     />
                                 </Grid>
                                 <Grid item xs={12} sm={1}>
@@ -539,20 +546,21 @@ const Purchases = () => {
                         onClick={handleAddItem}
                         variant="outlined"
                         fullWidth={isMobile}
-                        sx={{ mb: 2 }}
+                        size={isMobile ? 'large' : 'medium'}
+                        sx={{ mb: 2, py: isMobile ? 1.5 : 1 }}
                     >
                         Add Item
                     </Button>
 
-                    <Box sx={{ mt: 3, p: 2, bgcolor: 'primary.main', color: 'white', borderRadius: 2 }}>
-                        <Typography variant="overline" sx={{ fontWeight: 800, opacity: 0.9 }}>Payment Details</Typography>
-                        <Grid container spacing={2} sx={{ mt: 0.5 }}>
+                    <Box sx={{ mt: 3, p: isMobile ? 2.5 : 2, bgcolor: 'primary.main', color: 'white', borderRadius: isMobile ? 3 : 2 }}>
+                        <Typography variant="overline" sx={{ fontWeight: 800, opacity: 0.9, fontSize: isMobile ? '0.7rem' : '0.75rem' }}>Payment Details</Typography>
+                        <Grid container spacing={isMobile ? 2 : 2} sx={{ mt: 0.5 }}>
                             <Grid item xs={12} sm={4}>
                                 <TextField
                                     select
                                     fullWidth
                                     label="Payment Status"
-                                    size="small"
+                                    size={isMobile ? 'medium' : 'small'}
                                     value={paymentStatus}
                                     onChange={(e) => setPaymentStatus(e.target.value)}
                                     sx={{ bgcolor: 'white', borderRadius: 1 }}
@@ -567,28 +575,31 @@ const Purchases = () => {
                                     fullWidth
                                     label="Paid Amount"
                                     type="number"
-                                    size="small"
+                                    size={isMobile ? 'medium' : 'small'}
                                     value={amountPaid}
                                     onChange={(e) => setAmountPaid(e.target.value)}
                                     disabled={paymentStatus === 'Unpaid'}
                                     sx={{ bgcolor: 'white', borderRadius: 1 }}
+                                    inputProps={{ min: 0, step: 0.01, style: { fontSize: isMobile ? '16px' : '14px' } }}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', sm: 'flex-end' } }}>
-                                <Box sx={{ textAlign: { xs: 'left', sm: 'right' } }}>
-                                    <Typography variant="caption" sx={{ display: 'block', opacity: 0.8 }}>Total Order Value</Typography>
-                                    <Typography variant="h5" sx={{ fontWeight: 800 }}>₹{calculateTotal().toLocaleString()}</Typography>
+                                <Box sx={{ textAlign: { xs: 'left', sm: 'right' }, width: '100%', bgcolor: isMobile ? 'rgba(255,255,255,0.15)' : 'transparent', p: isMobile ? 2 : 0, borderRadius: isMobile ? 2 : 0 }}>
+                                    <Typography variant="caption" sx={{ display: 'block', opacity: 0.8, fontWeight: 600 }}>Total Order Value</Typography>
+                                    <Typography variant={isMobile ? 'h4' : 'h5'} sx={{ fontWeight: 800, mt: 0.5 }}>₹{calculateTotal().toLocaleString()}</Typography>
                                 </Box>
                             </Grid>
                         </Grid>
                     </Box>
                 </DialogContent>
-                <DialogActions sx={{ p: 3 }}>
-                    <Button onClick={() => setOpen(false)}>Cancel</Button>
+                <DialogActions sx={{ p: isMobile ? 2 : 3, gap: 1, flexDirection: isMobile ? 'column' : 'row', position: isMobile ? 'fixed' : 'relative', bottom: isMobile ? 0 : 'auto', left: isMobile ? 0 : 'auto', right: isMobile ? 0 : 'auto', bgcolor: 'background.paper', borderTop: isMobile ? '1px solid' : 'none', borderColor: 'divider', zIndex: 1 }}>
+                    <Button onClick={() => setOpen(false)} fullWidth={isMobile} size={isMobile ? 'large' : 'medium'}>Cancel</Button>
                     <Button
                         onClick={handleSave}
                         variant="contained"
                         disabled={!vendorId}
+                        fullWidth={isMobile}
+                        size={isMobile ? 'large' : 'medium'}
                         sx={{ borderRadius: 2, px: 4, fontWeight: 700 }}
                     >
                         Save Order
@@ -625,6 +636,25 @@ const Purchases = () => {
                         margin="normal"
                     >
                         {categories.map(cat => <MenuItem key={cat} value={cat}>{cat}</MenuItem>)}
+                    </TextField>
+
+                    <TextField
+                        select
+                        fullWidth
+                        label="Size"
+                        value={quickForm.size || ''}
+                        onChange={(e) => setQuickForm({ ...quickForm, size: e.target.value })}
+                        margin="normal"
+                        helperText="Select product size if applicable"
+                    >
+                        <MenuItem value="">None</MenuItem>
+                        <MenuItem value="S">S - Small</MenuItem>
+                        <MenuItem value="M">M - Medium</MenuItem>
+                        <MenuItem value="L">L - Large</MenuItem>
+                        <MenuItem value="XL">XL - Extra Large</MenuItem>
+                        <MenuItem value="XXL">XXL - Double XL</MenuItem>
+                        <MenuItem value="XXXL">XXXL - Triple XL</MenuItem>
+                        <MenuItem value="Free Size">Free Size</MenuItem>
                     </TextField>
 
                     <Box sx={{ display: 'flex', gap: 1, mt: 1, mb: 2 }}>
