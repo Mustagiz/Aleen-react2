@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Autocomplete, InputAdornment, TablePagination, useTheme, useMediaQuery } from '@mui/material';
-import { Add, Visibility, Delete, ReceiptLong, Search, Edit, Close, AttachMoney } from '@mui/icons-material';
+import { Add, Visibility, Delete, ReceiptLong, Search, Edit, Close, AttachMoney, Download, MoreVert, ShoppingCart, Warning, TrendingDown, LocalShipping, Payment } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 
 const Purchases = () => {
