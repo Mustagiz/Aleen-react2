@@ -754,7 +754,25 @@ const Invoices = () => {
               />
             </Box>
             <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
-              <TextField label="Phone (with country code)" value={phone} onChange={(e) => setPhone(e.target.value)} fullWidth placeholder="919876543210" />
+              <TextField
+                label="Phone (with country code)"
+                value={phone}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setPhone(val);
+
+                  // Auto-fetch customer logic
+                  if (val.length >= 10) {
+                    const matched = customers.find(c => c.phone === val || c.phone === val.replace('+91', '').trim());
+                    if (matched) {
+                      setCustomer(matched.name);
+                      setSelectedCustomerId(matched.id);
+                    }
+                  }
+                }}
+                fullWidth
+                placeholder="919876543210"
+              />
             </Box>
           </Paper>
 
