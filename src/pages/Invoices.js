@@ -725,6 +725,8 @@ const Invoices = () => {
                     setCustomer(newValue);
                     setSelectedCustomerId(null);
                   } else if (newValue && newValue.id) {
+                    // Option selected from dropdown - we can either populate immediately or wait for Enter.
+                    // Usually, selecting an option implies intent. But to match the "Enter only" request:
                     setCustomer(newValue.name);
                     setPhone(newValue.phone || '+91');
                     setSelectedCustomerId(newValue.id);
@@ -733,14 +735,32 @@ const Invoices = () => {
                   }
                 }}
                 onInputChange={(event, newInputValue) => {
-                  if (!selectedCustomerId) setCustomer(newInputValue);
+                  setCustomer(newInputValue);
+                  // Clear selection if they are typing a new name
+                  if (selectedCustomerId) {
+                    const current = customers.find(c => c.id === selectedCustomerId);
+                    if (current && current.name !== newInputValue) {
+                      setSelectedCustomerId(null);
+                    }
+                  }
                 }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     label="Customer Search / Name"
                     fullWidth
-                    helperText="Select existing customer or type for a new one"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        // Search for the typed name in customers
+                        const matched = customers.find(c => c.name.toLowerCase() === customer.toLowerCase().trim());
+                        if (matched) {
+                          setCustomer(matched.name);
+                          setPhone(matched.phone || '+91');
+                          setSelectedCustomerId(matched.id);
+                        }
+                      }
+                    }}
+                    helperText="Type name and press Enter to fetch existing details"
                   />
                 )}
                 renderOption={(props, option) => (
@@ -757,12 +777,11 @@ const Invoices = () => {
               <TextField
                 label="Phone (with country code)"
                 value={phone}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setPhone(val);
-
-                  // Auto-fetch customer logic
-                  if (val.length >= 10) {
+                onChange={(e) => setPhone(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    // Fetch customer logic only on Enter
+                    const val = phone.trim();
                     const matched = customers.find(c => c.phone === val || c.phone === val.replace('+91', '').trim());
                     if (matched) {
                       setCustomer(matched.name);
@@ -772,6 +791,7 @@ const Invoices = () => {
                 }}
                 fullWidth
                 placeholder="919876543210"
+                helperText="Press Enter to search for existing customer name"
               />
             </Box>
           </Paper>
