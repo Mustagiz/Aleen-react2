@@ -723,16 +723,10 @@ const Invoices = () => {
                 onChange={(event, newValue) => {
                   if (typeof newValue === 'string') {
                     setCustomer(newValue);
-                    setSelectedCustomerId(null);
-                  } else if (newValue && newValue.id) {
-                    // Option selected from dropdown - we can either populate immediately or wait for Enter.
-                    // Usually, selecting an option implies intent. But to match the "Enter only" request:
+                  } else if (newValue && newValue.name) {
                     setCustomer(newValue.name);
-                    setPhone(newValue.phone || '+91');
-                    setSelectedCustomerId(newValue.id);
-                  } else {
-                    setSelectedCustomerId(null);
                   }
+                  setSelectedCustomerId(null); // Clear ID on any change, will re-fetch on Enter
                 }}
                 onInputChange={(event, newInputValue) => {
                   setCustomer(newInputValue);
