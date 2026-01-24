@@ -52,7 +52,7 @@ const Dashboard = () => {
   const recentInvoices = invoices.slice(-6).reverse();
 
   // Financial Calculations
-  const totalRevenue = filteredInvoices.reduce((sum, inv) => sum + inv.total, 0);
+  const totalRevenue = filteredInvoices.reduce((sum, inv) => sum + (Number(inv.total) || 0), 0);
   const totalPurchasesCost = filteredPurchases.reduce((sum, p) => sum + p.total, 0);
   const totalPaidPurchases = filteredPurchases.reduce((sum, p) => sum + (p.amountPaid || 0), 0);
 
@@ -73,7 +73,7 @@ const Dashboard = () => {
   const totalItems = inventory.reduce((sum, item) => sum + item.quantity, 0);
 
   const lowStockCount = inventory.filter(item => item.quantity < 5).length;
-  const customerCount = new Set(invoices.map(inv => inv.customer || 'Walk-in')).size;
+  const customerCount = new Set(filteredInvoices.map(inv => inv.customer || 'Walk-in')).size;
   const atv = filteredInvoices.length > 0 ? (totalRevenue / filteredInvoices.length) : 0;
 
   // Top Products Calculation
@@ -98,7 +98,7 @@ const Dashboard = () => {
     datasets: [{
       label: 'Units Sold',
       data: top5ProductsData.map(p => p.quantity),
-      backgroundColor: 'rgba(173, 20, 87, 0.8)',
+      backgroundColor: '#B76E79', // Rose Gold
       borderRadius: 8,
       barThickness: 30,
     }]
@@ -163,16 +163,16 @@ const Dashboard = () => {
       backgroundColor: (context) => {
         const ctx = context.chart.ctx;
         const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-        gradient.addColorStop(0, 'rgba(136, 14, 79, 0.2)');
-        gradient.addColorStop(1, 'rgba(136, 14, 79, 0.0)');
+        gradient.addColorStop(0, 'rgba(244, 114, 182, 0.2)'); // Light Pink
+        gradient.addColorStop(1, 'rgba(244, 114, 182, 0.0)');
         return gradient;
       },
-      borderColor: '#880e4f',
+      borderColor: '#B76E79', // Rose Gold
       borderWidth: 3,
       tension: 0.4,
       fill: true,
       pointBackgroundColor: '#ffffff',
-      pointBorderColor: '#880e4f',
+      pointBorderColor: '#B76E79',
       pointBorderWidth: 2,
       pointRadius: 6,
       pointHoverRadius: 8,
@@ -192,7 +192,7 @@ const Dashboard = () => {
     datasets: [{
       label: 'Revenue by Category',
       data: Object.values(categorySales),
-      backgroundColor: ['#ad1457', '#d81b60', '#ec407a', '#f06292', '#f48fb1', '#f8bbd0'],
+      backgroundColor: ['#F472B6', '#B76E79', '#FBCFE8', '#E0BFB8', '#DB2777', '#8E5059'],
       borderWidth: 0,
     }]
   };
@@ -245,18 +245,30 @@ const Dashboard = () => {
         height: '100%',
         borderRadius: 4,
         cursor: onClick ? 'pointer' : 'default',
-        transition: 'all 0.3s ease',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        position: 'relative',
+        overflow: 'hidden',
         border: '1px solid',
-        borderColor: 'divider',
-        background: 'linear-gradient(145deg, #ffffff 0%, #fcfcfc 100%)',
-        ...theme.palette.mode === 'dark' && {
-          background: 'linear-gradient(145deg, #1e1e1e 0%, #171717 100%)'
+        borderColor: color + '30',
+        background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${color}0D 100%)`,
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '4px',
+          height: '100%',
+          bgcolor: color,
+          opacity: 0.8
         },
         '&:hover': onClick ? {
-          transform: 'translateY(-4px)',
-          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-          borderColor: color + '40'
-        } : {}
+          transform: 'translateY(-6px)',
+          boxShadow: `0 12px 24px -10px ${color}40, 0 4px 10px -5px ${color}20`,
+          borderColor: color + '60',
+          background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${color}1A 100%)`,
+        } : {
+          boxShadow: `0 8px 20px -10px ${color}20`,
+        }
       }}
     >
       <CardContent sx={{ p: 3 }}>
@@ -330,9 +342,9 @@ const Dashboard = () => {
                 fontWeight: 600,
                 fontSize: '0.875rem',
                 color: dateRange === item.id ? 'white' : 'text.secondary',
-                bgcolor: dateRange === item.id ? '#880e4f' : 'transparent',
+                bgcolor: dateRange === item.id ? 'primary.main' : 'transparent',
                 '&:hover': {
-                  bgcolor: dateRange === item.id ? '#6f0b40' : 'rgba(0,0,0,0.04)'
+                  bgcolor: dateRange === item.id ? 'primary.dark' : 'rgba(0,0,0,0.04)'
                 },
                 transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
               }}
@@ -345,30 +357,30 @@ const Dashboard = () => {
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} lg={3}>
-          <StatCard title="Today's Sales" value={`₹${todaySales.toLocaleString('en-IN')}`} icon={<AttachMoney />} color="#880e4f" trend={salesTrend} onClick={() => navigate('/sales-reports')} />
+          <StatCard title="Today's Sales" value={`₹${todaySales.toLocaleString('en-IN')}`} icon={<AttachMoney />} color="#E11D48" trend={salesTrend} onClick={() => navigate('/sales-reports')} />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard title="Total Purchases" value={`₹${totalPurchasesCost.toLocaleString('en-IN')}`} icon={<Receipt />} color="#1976d2" onClick={() => navigate('/purchases')} />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
-          <StatCard title="Net Cash Available" value={`₹${netCash.toLocaleString('en-IN')}`} icon={<TrendingUp />} color="#2e7d32" onClick={() => navigate('/profit-loss')} />
+          <StatCard title="Net Cash Available" value={`₹${netCash.toLocaleString('en-IN')}`} icon={<TrendingUp />} color="#059669" onClick={() => navigate('/profit-loss')} />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
-          <StatCard title="Vendor Payables" value={`₹${totalVendorPayables.toLocaleString('en-IN')}`} icon={<Warning />} color="#c62828" onClick={() => navigate('/vendors')} />
+          <StatCard title="Vendor Payables" value={`₹${totalVendorPayables.toLocaleString('en-IN')}`} icon={<Warning />} color="#D97706" onClick={() => navigate('/vendors')} />
         </Grid>
 
         {/* Row 2 */}
         <Grid item xs={12} sm={6} lg={3}>
-          <StatCard title="Low Stock Items" value={lowStockCount} icon={<Inventory2 />} color="#ed6c02" onClick={() => navigate('/inventory')} subtitle="Items below threshold" />
+          <StatCard title="Low Stock Items" value={lowStockCount} icon={<Inventory2 />} color="#EA580C" onClick={() => navigate('/inventory')} subtitle="Items below threshold" />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
-          <StatCard title="Gross Profit" value={`₹${grossProfit.toLocaleString('en-IN')}`} icon={<Assessment />} color="#0288d1" onClick={() => navigate('/profit-loss')} />
+          <StatCard title="Gross Profit" value={`₹${grossProfit.toLocaleString('en-IN')}`} icon={<Assessment />} color="#7C3AED" onClick={() => navigate('/profit-loss')} />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
-          <StatCard title="Total Customers" value={customerCount} icon={<People />} color="#7b1fa2" onClick={() => navigate('/customers')} />
+          <StatCard title="Total Customers" value={customerCount} icon={<People />} color="#DB2777" onClick={() => navigate('/customers')} />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
-          <StatCard title="Avg Transaction" value={`₹${Math.round(atv).toLocaleString('en-IN')}`} icon={<ShoppingCart />} color="#455a64" />
+          <StatCard title="Avg Transaction" value={`₹${atv.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} icon={<ShoppingCart />} color="#0891B2" onClick={() => navigate('/sales-reports')} />
         </Grid>
       </Grid>
 
@@ -397,8 +409,8 @@ const Dashboard = () => {
           <Paper elevation={0} sx={{
             p: 4,
             borderRadius: 4,
-            border: '1px solid',
-            borderColor: 'divider',
+            border: '1px solid rgba(183, 110, 121, 0.1)',
+            boxShadow: '0 15px 35px -10px rgba(183, 110, 121, 0.15)',
             height: '100%',
             display: 'flex',
             flexDirection: 'column'
@@ -430,7 +442,12 @@ const Dashboard = () => {
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} lg={7}>
-          <Paper elevation={0} sx={{ p: 4, borderRadius: 4, border: '1px solid', borderColor: 'divider' }}>
+          <Paper elevation={0} sx={{
+            p: 4,
+            borderRadius: 4,
+            border: '1px solid rgba(183, 110, 121, 0.1)',
+            boxShadow: '0 15px 35px -10px rgba(183, 110, 121, 0.15)'
+          }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4, alignItems: 'center' }}>
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>Top Products</Typography>
@@ -442,7 +459,13 @@ const Dashboard = () => {
           </Paper>
         </Grid>
         <Grid item xs={12} lg={5}>
-          <Paper elevation={0} sx={{ p: 0, borderRadius: 4, border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
+          <Paper elevation={0} sx={{
+            p: 0,
+            borderRadius: 4,
+            border: '1px solid rgba(183, 110, 121, 0.1)',
+            boxShadow: '0 15px 35px -10px rgba(183, 110, 121, 0.15)',
+            overflow: 'hidden'
+          }}>
             <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
               <Typography variant="h6" sx={{ fontWeight: 700 }}>Recent Activity</Typography>
             </Box>
@@ -458,7 +481,7 @@ const Dashboard = () => {
                   transition: 'background 0.2s',
                   '&:hover': { bgcolor: 'action.hover' }
                 }}>
-                  <Avatar sx={{ bgcolor: 'rgba(136, 14, 79, 0.1)', color: '#880e4f', borderRadius: 2 }}>
+                  <Avatar sx={{ bgcolor: 'rgba(244, 114, 182, 0.1)', color: '#F472B6', borderRadius: 2 }}>
                     <Receipt fontSize="small" />
                   </Avatar>
                   <Box sx={{ flexGrow: 1 }}>
@@ -467,7 +490,7 @@ const Dashboard = () => {
                       {new Date(inv.date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} • {inv.items?.length || 0} items
                     </Typography>
                   </Box>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#880e4f' }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#F472B6' }}>
                     ₹{inv.total.toLocaleString('en-IN')}
                   </Typography>
                 </Box>

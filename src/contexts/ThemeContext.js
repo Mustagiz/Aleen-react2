@@ -24,28 +24,28 @@ export const ThemeProvider = ({ children }) => {
             palette: {
                 mode,
                 primary: {
-                    main: '#880e4f',
-                    light: '#bc477b',
-                    dark: '#560027',
+                    main: '#d97706', // Warm Amber
+                    light: '#fbbf24',
+                    dark: '#b45309',
                     contrastText: '#ffffff'
                 },
                 secondary: {
-                    main: '#f57f17',
-                    light: '#ffb04c',
-                    dark: '#bc5100',
+                    main: '#f97316', // Warm Coral
+                    light: '#fb923c',
+                    dark: '#ea580c',
                     contrastText: '#ffffff'
                 },
                 background: {
-                    default: mode === 'light' ? '#fffdf7' : '#121212',
+                    default: mode === 'light' ? '#fffbeb' : '#121212', // Warm cream
                     paper: mode === 'light' ? '#ffffff' : '#1e1e1e'
                 },
-                success: { main: '#2e7d32' },
-                error: { main: '#c62828' },
-                warning: { main: '#ff8f00' },
-                info: { main: '#0277bd' },
+                success: { main: '#43a047' },
+                error: { main: '#e53935' },
+                warning: { main: '#fb8c00' },
+                info: { main: '#0288d1' },
                 text: {
-                    primary: mode === 'light' ? '#212121' : '#e0e0e0',
-                    secondary: mode === 'light' ? '#546e7a' : '#90a4ae'
+                    primary: mode === 'light' ? '#4A4A4A' : '#e0e0e0',
+                    secondary: mode === 'light' ? '#8E8E8E' : '#90a4ae'
                 }
             },
             typography: {
@@ -62,15 +62,31 @@ export const ThemeProvider = ({ children }) => {
             components: {
                 MuiButton: {
                     styleOverrides: {
-                        root: { borderRadius: 8, padding: '10px 24px', boxShadow: 'none' },
-                        contained: { '&:hover': { boxShadow: '0 4px 12px rgba(0,0,0,0.15)' } }
+                        root: {
+                            borderRadius: 8,
+                            padding: '10px 24px',
+                            boxShadow: 'none',
+                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                transform: 'translateY(-2px)',
+                                boxShadow: mode === 'light' ? '0 4px 12px rgba(217, 119, 6, 0.2)' : '0 4px 12px rgba(0,0,0,0.4)',
+                            },
+                            '&:active': {
+                                transform: 'translateY(0) scale(0.98)',
+                            }
+                        },
+                        contained: {
+                            '&:hover': {
+                                boxShadow: '0 6px 15px rgba(217, 119, 6, 0.3)'
+                            }
+                        }
                     }
                 },
                 MuiPaper: {
                     styleOverrides: {
                         root: {
                             borderRadius: 12,
-                            boxShadow: mode === 'light' ? '0 1px 3px 0 rgb(0 0 0 / 0.1)' : '0 4px 20px rgba(0,0,0,0.4)',
+                            boxShadow: mode === 'light' ? '0 10px 25px -5px rgba(217, 119, 6, 0.15), 0 8px 10px -6px rgba(217, 119, 6, 0.1)' : '0 4px 20px rgba(0,0,0,0.4)',
                             backgroundImage: 'none'
                         }
                     }
@@ -79,8 +95,9 @@ export const ThemeProvider = ({ children }) => {
                     styleOverrides: {
                         root: {
                             borderRadius: 12,
-                            boxShadow: mode === 'light' ? '0 1px 3px 0 rgb(0 0 0 / 0.1)' : '0 4px 20px rgba(0,0,0,0.4)',
-                            backgroundImage: 'none'
+                            boxShadow: mode === 'light' ? '0 10px 25px -5px rgba(217, 119, 6, 0.15), 0 8px 10px -6px rgba(217, 119, 6, 0.1)' : '0 4px 20px rgba(0,0,0,0.4)',
+                            backgroundImage: 'none',
+                            border: mode === 'light' ? '1px solid rgba(217, 119, 6, 0.1)' : '1px solid rgba(255,255,255,0.05)'
                         }
                     }
                 },

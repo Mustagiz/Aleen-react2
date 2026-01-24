@@ -107,7 +107,7 @@ const InventoryReports = () => {
             startIcon={<Download />}
             onClick={exportPDF}
             sx={{
-              background: 'linear-gradient(135deg, #880e4f 0%, #ad1457 100%)',
+              background: 'linear-gradient(135deg, #F472B6 0%, #B76E79 100%)',
               borderRadius: '8px',
               fontWeight: 700,
               textTransform: 'none'
@@ -128,7 +128,16 @@ const InventoryReports = () => {
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: '#ffffff', borderRadius: 4, border: 'none', position: 'relative', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
+          <Card sx={{
+            borderRadius: 4,
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: '0 10px 25px -5px rgba(183, 110, 121, 0.15)',
+            border: '1px solid rgba(183, 110, 121, 0.15)',
+            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(183, 110, 121, 0.05) 100%)`,
+            transition: 'all 0.3s ease',
+            '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(183, 110, 121, 0.3)' }
+          }}>
             <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: 'primary.main' }} />
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -136,7 +145,7 @@ const InventoryReports = () => {
                   <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Items</Typography>
                   <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>{totalItems}</Typography>
                 </Box>
-                <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(136, 14, 79, 0.05)', color: 'primary.main' }}>
+                <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'primary.light', color: 'primary.main' }}>
                   <Inventory2 />
                 </Box>
               </Box>
@@ -144,7 +153,16 @@ const InventoryReports = () => {
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: '#ffffff', borderRadius: 4, border: 'none', position: 'relative', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
+          <Card sx={{
+            borderRadius: 4,
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: '0 10px 25px -5px rgba(46, 125, 50, 0.15)',
+            border: '1px solid rgba(46, 125, 50, 0.15)',
+            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(46, 125, 50, 0.05) 100%)`,
+            transition: 'all 0.3s ease',
+            '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(46, 125, 50, 0.3)' }
+          }}>
             <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#2e7d32' }} />
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -160,7 +178,16 @@ const InventoryReports = () => {
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: '#ffffff', borderRadius: 4, border: 'none', position: 'relative', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
+          <Card sx={{
+            borderRadius: 4,
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: '0 10px 25px -5px rgba(245, 127, 23, 0.15)',
+            border: '1px solid rgba(245, 127, 23, 0.15)',
+            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(245, 127, 23, 0.05) 100%)`,
+            transition: 'all 0.3s ease',
+            '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(245, 127, 23, 0.3)' }
+          }}>
             <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#f57f17' }} />
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -176,15 +203,24 @@ const InventoryReports = () => {
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: '#ffffff', borderRadius: 4, border: 'none', position: 'relative', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
-            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#ad1457' }} />
+          <Card sx={{
+            borderRadius: 4,
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: '0 10px 25px -5px rgba(219, 39, 119, 0.15)',
+            border: '1px solid rgba(219, 39, 119, 0.15)',
+            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(219, 39, 119, 0.05) 100%)`,
+            transition: 'all 0.3s ease',
+            '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(219, 39, 119, 0.3)' }
+          }}>
+            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#DB2777' }} />
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Box>
                   <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Est. Margin</Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 800, color: '#ad1457', mt: 0.5 }}>₹{totalProfit.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 800, color: '#DB2777', mt: 0.5 }}>₹{totalProfit.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</Typography>
                 </Box>
-                <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(173, 20, 87, 0.05)', color: '#ad1457' }}>
+                <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(219, 39, 119, 0.05)', color: '#DB2777' }}>
                   <TrendingUp />
                 </Box>
               </Box>
@@ -235,7 +271,7 @@ const InventoryReports = () => {
                   <Box>
                     <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.2 }}>{item.name}</Typography>
                     <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 0.5 }}>
-                      <Chip label={item.category} size="small" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700, bgcolor: 'rgba(136, 14, 79, 0.05)', color: 'primary.main' }} />
+                      <Chip label={item.category} size="small" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700, bgcolor: 'primary.light', color: 'primary.main' }} />
                       <Typography variant="caption" color="text.secondary">{item.size} • {item.color}</Typography>
                     </Box>
                   </Box>
@@ -274,7 +310,7 @@ const InventoryReports = () => {
         <Paper sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.05)' }}>
           <TableContainer>
             <Table>
-              <TableHead sx={{ bgcolor: 'rgba(136, 14, 79, 0.02)', borderBottom: '2px solid rgba(136, 14, 79, 0.1)' }}>
+              <TableHead sx={{ bgcolor: 'primary.light', borderBottom: '2px solid rgba(244, 114, 182, 0.1)' }}>
                 <TableRow>
                   <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Product Details</TableCell>
                   <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Added</TableCell>
@@ -292,7 +328,7 @@ const InventoryReports = () => {
                         <TableCell>
                           <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.name}</Typography>
                           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 0.5 }}>
-                            <Chip label={item.category} size="small" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700, bgcolor: 'rgba(136, 14, 79, 0.05)', color: 'primary.main' }} />
+                            <Chip label={item.category} size="small" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700, bgcolor: 'primary.light', color: 'primary.main' }} />
                             <Typography variant="caption" color="text.secondary">{item.size} • {item.color}</Typography>
                           </Box>
                         </TableCell>

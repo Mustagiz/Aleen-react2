@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Paper, Typography, TextField, MenuItem, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Grid, Card, CardContent, Button, TablePagination } from '@mui/material';
+import { Box, Paper, Typography, TextField, MenuItem, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Grid, Card, CardContent, Button, TablePagination, useTheme } from '@mui/material';
 import { TrendingUp, TrendingDown, Download } from '@mui/icons-material';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 import { Bar, Line, Doughnut } from 'react-chartjs-2';
@@ -9,6 +9,7 @@ import { exportToCSV, formatCurrencyForPDF, generateReportPDF } from '../utils/h
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend);
 
 const ProfitLoss = () => {
+  const theme = useTheme();
   const { inventory, invoices, profile } = useData();
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -189,43 +190,68 @@ const ProfitLoss = () => {
 
       {/* Summary Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: '#ffffff', borderRadius: 4, border: 'none', position: 'relative', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
-            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: 'primary.main' }} />
-            <CardContent sx={{ p: 3 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Revenue</Typography>
-              <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>₹{totalRevenue.toLocaleString('en-IN')}</Typography>
-            </CardContent>
+        <Grid item xs={12} sm={6} lg={3}>
+          <Card sx={{
+            p: 3,
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: '0 10px 25px -5px rgba(225, 29, 72, 0.15)',
+            border: '1px solid rgba(225, 29, 72, 0.15)',
+            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(225, 29, 72, 0.05) 100%)`,
+            transition: 'all 0.3s ease',
+            '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(225, 29, 72, 0.3)' }
+          }}>
+            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#E11D48' }} />
+            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>Total Revenue</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 800, mt: 1 }}>₹{totalRevenue.toLocaleString()}</Typography>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: '#ffffff', borderRadius: 4, border: 'none', position: 'relative', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
-            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#f57f17' }} />
-            <CardContent sx={{ p: 3 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Cost</Typography>
-              <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>₹{totalCost.toLocaleString('en-IN')}</Typography>
-            </CardContent>
+        <Grid item xs={12} sm={6} lg={3}>
+          <Card sx={{
+            p: 3,
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: '0 10px 25px -5px rgba(183, 110, 121, 0.15)',
+            border: '1px solid rgba(183, 110, 121, 0.15)',
+            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(183, 110, 121, 0.05) 100%)`,
+            transition: 'all 0.3s ease',
+            '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(183, 110, 121, 0.3)' }
+          }}>
+            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#B76E79' }} />
+            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>Total Cost</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 800, mt: 1 }}>₹{totalCost.toLocaleString()}</Typography>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: '#ffffff', borderRadius: 4, border: 'none', position: 'relative', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
-            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: totalProfit >= 0 ? '#2e7d32' : '#c62828' }} />
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Profit / Loss</Typography>
-                {totalProfit >= 0 ? <TrendingUp sx={{ fontSize: 16, color: '#2e7d32' }} /> : <TrendingDown sx={{ fontSize: 16, color: '#c62828' }} />}
-              </Box>
-              <Typography variant="h4" sx={{ fontWeight: 800, color: totalProfit >= 0 ? '#2e7d32' : '#c62828', mt: 0.5 }}>₹{totalProfit.toLocaleString('en-IN')}</Typography>
-            </CardContent>
+        <Grid item xs={12} sm={6} lg={3}>
+          <Card sx={{
+            p: 3,
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: totalProfit >= 0 ? '0 10px 25px -5px rgba(67, 160, 71, 0.15)' : '0 10px 25px -5px rgba(229, 57, 53, 0.15)',
+            border: totalProfit >= 0 ? '1px solid rgba(67, 160, 71, 0.15)' : '1px solid rgba(229, 57, 53, 0.15)',
+            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${totalProfit >= 0 ? 'rgba(67, 160, 71, 0.05)' : 'rgba(229, 57, 53, 0.05)'} 100%)`,
+            transition: 'all 0.3s ease',
+            '&:hover': { transform: 'translateY(-4px)', boxShadow: totalProfit >= 0 ? '0 12px 24px -10px rgba(67, 160, 71, 0.3)' : '0 12px 24px -10px rgba(229, 57, 53, 0.3)' }
+          }}>
+            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: totalProfit >= 0 ? '#43a047' : '#e53935' }} />
+            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>Net Profit</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 800, mt: 1, color: totalProfit >= 0 ? 'success.main' : 'error.main' }}>₹{totalProfit.toLocaleString()}</Typography>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ bgcolor: '#ffffff', borderRadius: 4, border: 'none', position: 'relative', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
-            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#880e4f' }} />
-            <CardContent sx={{ p: 3 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Net Margin</Typography>
-              <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>{profitMargin}%</Typography>
-            </CardContent>
+        <Grid item xs={12} sm={6} lg={3}>
+          <Card sx={{
+            p: 3,
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: '0 10px 25px -5px rgba(219, 39, 119, 0.15)',
+            border: '1px solid rgba(219, 39, 119, 0.15)',
+            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(219, 39, 119, 0.05) 100%)`,
+            transition: 'all 0.3s ease',
+            '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(219, 39, 119, 0.3)' }
+          }}>
+            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#DB2777' }} />
+            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>Profit Margin</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 800, mt: 1 }}>{profitMargin}%</Typography>
           </Card>
         </Grid>
       </Grid>
@@ -235,8 +261,39 @@ const ProfitLoss = () => {
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Category-wise Profit</Typography>
           <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button startIcon={<Download />} onClick={exportPDF} variant="contained" sx={{ bgcolor: 'primary.main' }}>Export PDF</Button>
-            <Button startIcon={<Download />} onClick={exportReport} variant="outlined">Export CSV</Button>
+            <Button
+              startIcon={<Download />}
+              onClick={exportPDF}
+              variant="contained"
+              sx={{
+                background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)',
+                boxShadow: `0 4px 12px ${theme.palette.primary.main}33`,
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)',
+                  boxShadow: `0 6px 16px ${theme.palette.primary.main}4D`,
+                  transform: 'translateY(-2px)'
+                }
+              }}
+            >
+              Export PDF
+            </Button>
+            <Button
+              startIcon={<Download />}
+              onClick={exportReport}
+              variant="outlined"
+              sx={{
+                borderColor: 'primary.main',
+                color: 'primary.main',
+                '&:hover': {
+                  borderColor: 'primary.dark',
+                  bgcolor: 'primary.light',
+                  transform: 'translateY(-2px)'
+                }
+              }}
+            >
+              Export CSV
+            </Button>
           </Box>
         </Box>
         <Bar data={chartData} options={{ responsive: true, plugins: { legend: { display: false } } }} />

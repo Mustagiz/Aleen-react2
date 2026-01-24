@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Paper, Typography, TableContainer, Card, CardContent, Grid, Chip, TablePagination } from '@mui/material';
+import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Paper, Typography, TableContainer, Card, CardContent, Grid, Chip, TablePagination, useTheme } from '@mui/material';
 import { Add, Edit, Delete, Store } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 
 const Vendors = () => {
+    const theme = useTheme();
     const { vendors, addVendor, updateVendor, deleteVendor } = useData();
     const [open, setOpen] = useState(false);
     const [editItem, setEditItem] = useState(null);
@@ -49,7 +50,21 @@ const Vendors = () => {
                     <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>Vendors</Typography>
                     <Typography variant="body2" color="text.secondary">Manage your suppliers and contacts</Typography>
                 </Box>
-                <Button variant="contained" startIcon={<Add />} onClick={() => handleOpen()} sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700, px: 3, background: 'linear-gradient(135deg, #880e4f 0%, #ad1457 100%)' }}>
+                <Button variant="contained" startIcon={<Add />} onClick={() => handleOpen()} sx={{
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    fontWeight: 700,
+                    px: 3,
+                    py: 1.5,
+                    background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)',
+                    boxShadow: `0 4px 12px ${theme.palette.primary.main}33`,
+                    transition: 'all 0.2s ease-in-out',
+                    '&:hover': {
+                        background: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)',
+                        boxShadow: `0 6px 16px ${theme.palette.primary.main}4D`,
+                        transform: 'translateY(-2px)'
+                    }
+                }}>
                     Add Vendor
                 </Button>
             </Box>
@@ -57,19 +72,44 @@ const Vendors = () => {
             {/* Vendor Stats */}
             <Grid container spacing={3} sx={{ mb: 4 }}>
                 <Grid item xs={12} sm={4}>
-                    <Card sx={{ borderRadius: 4, position: 'relative', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: 'none' }}>
+                    <Card sx={{
+                        borderRadius: 4,
+                        position: 'relative',
+                        overflow: 'hidden',
+                        boxShadow: `0 10px 25px -5px ${theme.palette.primary.main}26`,
+                        border: '1px solid',
+                        borderColor: 'primary.light',
+                        background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${theme.palette.primary.main}0D 100%)`,
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                            transform: 'translateY(-4px)',
+                            boxShadow: `0 12px 24px -10px ${theme.palette.primary.main}40`,
+                        }
+                    }}>
                         <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: 'primary.main' }} />
                         <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Box>
                                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Vendors</Typography>
                                 <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5 }}>{vendors.length}</Typography>
                             </Box>
-                            <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(136, 14, 79, 0.05)', color: 'primary.main' }}><Store /></Box>
+                            <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'primary.light', color: 'primary.main' }}><Store /></Box>
                         </CardContent>
                     </Card>
                 </Grid>
                 <Grid item xs={12} sm={4}>
-                    <Card sx={{ borderRadius: 4, position: 'relative', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: 'none' }}>
+                    <Card sx={{
+                        borderRadius: 4,
+                        position: 'relative',
+                        overflow: 'hidden',
+                        boxShadow: '0 10px 25px -5px rgba(198, 40, 40, 0.15)',
+                        border: '1px solid rgba(198, 40, 40, 0.1)',
+                        background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(198, 40, 40, 0.05) 100%)`,
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                            transform: 'translateY(-4px)',
+                            boxShadow: '0 12px 24px -10px rgba(198, 40, 40, 0.3)',
+                        }
+                    }}>
                         <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#c62828' }} />
                         <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Box>
@@ -87,7 +127,7 @@ const Vendors = () => {
             <Paper sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.05)' }}>
                 <TableContainer>
                     <Table>
-                        <TableHead sx={{ bgcolor: 'rgba(136, 14, 79, 0.02)', borderBottom: '2px solid rgba(136, 14, 79, 0.1)' }}>
+                        <TableHead sx={{ bgcolor: 'primary.light', borderBottom: '2px solid rgba(244, 114, 182, 0.1)' }}>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Vendor Name</TableCell>
                                 <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Contact Person</TableCell>

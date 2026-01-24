@@ -81,7 +81,7 @@ const Layout = () => {
           zIndex: (theme) => theme.zIndex.drawer + 1,
           bgcolor: 'background.paper',
           backdropFilter: 'blur(8px)',
-          borderBottom: mode === 'light' ? '1px solid rgba(136, 14, 79, 0.08)' : '1px solid rgba(255, 255, 255, 0.1)',
+          borderBottom: mode === 'light' ? '1px solid rgba(244, 114, 182, 0.08)' : '1px solid rgba(255, 255, 255, 0.1)',
           color: 'text.primary'
         }}
       >
@@ -103,7 +103,7 @@ const Layout = () => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexGrow: 1 }}>
             <Box sx={{
               bgcolor: 'primary.main',
-              background: 'linear-gradient(135deg, #880e4f 0%, #ad1457 100%)',
+              background: 'linear-gradient(135deg, #B76E79 0%, #F472B6 100%)', // Pink to Rose Gold
               borderRadius: 2,
               p: 1,
               display: 'flex',
@@ -158,7 +158,7 @@ const Layout = () => {
               height: 36,
               fontSize: '0.8rem',
               fontWeight: 700,
-              boxShadow: '0 2px 8px rgba(136, 14, 79, 0.2)'
+              boxShadow: `0 2px 8px ${theme.palette.primary.main}33`
             }}
           >
             {getInitials(profile.businessName)}
@@ -206,7 +206,7 @@ const Layout = () => {
               color: 'white',
               fontSize: '1.5rem',
               fontWeight: 700,
-              boxShadow: '0 8px 16px rgba(136, 14, 79, 0.15)'
+              boxShadow: `0 8px 16px ${theme.palette.primary.main}26`
             }}
           >
             {getInitials(profile.businessName)}
@@ -248,13 +248,17 @@ const Layout = () => {
                       mb: 1,
                       py: 1.25,
                       px: 2,
-                      bgcolor: isActive ? 'rgba(136, 14, 79, 0.04)' : 'transparent',
+                      bgcolor: isActive ? theme.palette.primary.main + '0A' : 'transparent',
                       color: isActive ? 'primary.main' : 'text.secondary',
                       transition: 'all 0.2s ease-in-out',
                       '&:hover': {
-                        bgcolor: isActive ? 'rgba(136, 14, 79, 0.08)' : 'rgba(0, 0, 0, 0.02)',
+                        bgcolor: isActive ? theme.palette.primary.main + '14' : 'rgba(0, 0, 0, 0.02)',
                         color: 'primary.main',
-                        '& .MuiListItemIcon-root': { color: 'primary.main' }
+                        transform: 'translateX(6px)',
+                        '& .MuiListItemIcon-root': { color: 'primary.main', transform: 'scale(1.1)' }
+                      },
+                      '&:active': {
+                        transform: 'scale(0.97)',
                       },
                       position: 'relative',
                       overflow: 'hidden',
@@ -337,7 +341,7 @@ const Layout = () => {
             zIndex: 1000,
             bgcolor: mode === 'light' ? 'rgba(255, 255, 255, 0.9)' : 'rgba(30, 30, 30, 0.9)',
             backdropFilter: 'blur(10px)',
-            borderTop: mode === 'light' ? '1px solid rgba(136, 14, 79, 0.1)' : '1px solid rgba(255, 255, 255, 0.1)',
+            borderTop: mode === 'light' ? '1px solid rgba(244, 114, 182, 0.1)' : '1px solid rgba(255, 255, 255, 0.1)',
             overflowX: 'auto',
             '&::-webkit-scrollbar': { display: 'none' }, // Hide scrollbar for cleaner look
             msOverflowStyle: 'none',

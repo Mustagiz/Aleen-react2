@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Paper, Typography, TextField, Button, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Card, CardContent, Grid, Chip, TablePagination, MenuItem } from '@mui/material';
+import { Box, Paper, Typography, TextField, Button, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Card, CardContent, Grid, Chip, TablePagination, MenuItem, useTheme } from '@mui/material';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import { useData } from '../contexts/DataContext';
@@ -9,6 +9,7 @@ import { formatCurrencyForPDF, generateReportPDF } from '../utils/helpers';
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler);
 
 const SalesReports = () => {
+  const theme = useTheme();
   const { invoices, profile, inventory } = useData();
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -66,12 +67,12 @@ const SalesReports = () => {
     datasets: [{
       label: 'Sales (₹)',
       data: Object.values(salesByDate),
-      backgroundColor: 'rgba(136, 14, 79, 0.05)',
-      borderColor: '#880e4f',
+      backgroundColor: 'rgba(244, 114, 182, 0.05)',
+      borderColor: '#F472B6',
       borderWidth: 3,
       tension: 0.4,
       fill: true,
-      pointBackgroundColor: '#880e4f',
+      pointBackgroundColor: '#F472B6',
       pointBorderColor: '#fff',
       pointBorderWidth: 2,
     }]
@@ -154,41 +155,55 @@ const SalesReports = () => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box sx={{ mb: 4, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, gap: 2 }}>
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>Sales Reports</Typography>
-          <Typography variant="body2" color="text.secondary">Analyze your sales performance</Typography>
+          <Typography variant="h4" sx={{ fontWeight: 800, mb: 0.5 }}>Sales Reports</Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>Detailed analytics of your business performance</Typography>
         </Box>
         <Button
           variant="contained"
           startIcon={<Download />}
           onClick={exportPDF}
           sx={{
-            background: 'linear-gradient(135deg, #880e4f 0%, #ad1457 100%)',
-            boxShadow: '0 4px 12px rgba(136, 14, 79, 0.2)',
-            '&:hover': {
-              background: 'linear-gradient(135deg, #ad1457 0%, #880e4f 100%)',
-            },
-            borderRadius: '8px',
+            background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)',
+            boxShadow: `0 4px 12px ${theme.palette.primary.main}33`,
+            textTransform: 'none',
             fontWeight: 700,
-            textTransform: 'none'
+            borderRadius: 2,
+            px: 4,
+            py: 1.5,
+            transition: 'all 0.2s ease-in-out',
+            '&:hover': {
+              background: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)',
+              boxShadow: `0 6px 16px ${theme.palette.primary.main}4D`,
+              transform: 'translateY(-2px)'
+            }
           }}
         >
-          Export PDF
+          Export Report
         </Button>
       </Box>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={4}>
-          <Card sx={{ bgcolor: '#ffffff', borderRadius: 4, border: 'none', position: 'relative', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
-            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: 'primary.main' }} />
+          <Card sx={{
+            borderRadius: 4,
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: '0 10px 25px -5px rgba(225, 29, 72, 0.15)',
+            border: '1px solid rgba(225, 29, 72, 0.15)',
+            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(225, 29, 72, 0.05) 100%)`,
+            transition: 'all 0.3s ease',
+            '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(225, 29, 72, 0.3)' }
+          }}>
+            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#E11D48' }} />
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Box>
                   <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Revenue</Typography>
                   <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>₹{totalRevenue.toLocaleString('en-IN')}</Typography>
                 </Box>
-                <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(136, 14, 79, 0.05)', color: 'primary.main' }}>
+                <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(225, 29, 72, 0.1)', color: '#E11D48' }}>
                   <AttachMoney />
                 </Box>
               </Box>
@@ -196,15 +211,24 @@ const SalesReports = () => {
           </Card>
         </Grid>
         <Grid item xs={12} sm={4}>
-          <Card sx={{ bgcolor: '#ffffff', borderRadius: 4, border: 'none', position: 'relative', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
-            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#2e7d32' }} />
+          <Card sx={{
+            borderRadius: 4,
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: '0 10px 25px -5px rgba(25, 118, 210, 0.15)',
+            border: '1px solid rgba(25, 118, 210, 0.15)',
+            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(25, 118, 210, 0.05) 100%)`,
+            transition: 'all 0.3s ease',
+            '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(25, 118, 210, 0.3)' }
+          }}>
+            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#1976d2' }} />
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Box>
                   <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Invoices</Typography>
                   <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>{totalInvoices}</Typography>
                 </Box>
-                <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(46, 125, 50, 0.05)', color: '#2e7d32' }}>
+                <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(25, 118, 210, 0.1)', color: '#1976d2' }}>
                   <Receipt />
                 </Box>
               </Box>
@@ -212,15 +236,24 @@ const SalesReports = () => {
           </Card>
         </Grid>
         <Grid item xs={12} sm={4}>
-          <Card sx={{ bgcolor: '#ffffff', borderRadius: 4, border: 'none', position: 'relative', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
-            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#f57f17' }} />
+          <Card sx={{
+            borderRadius: 4,
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: '0 10px 25px -5px rgba(237, 108, 2, 0.15)',
+            border: '1px solid rgba(237, 108, 2, 0.15)',
+            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(237, 108, 2, 0.05) 100%)`,
+            transition: 'all 0.3s ease',
+            '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(237, 108, 2, 0.3)' }
+          }}>
+            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#ed6c02' }} />
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Box>
                   <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Average Value</Typography>
                   <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>₹{avgInvoiceValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</Typography>
                 </Box>
-                <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(245, 127, 23, 0.05)', color: '#f57f17' }}>
+                <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(237, 108, 2, 0.1)', color: '#ed6c02' }}>
                   <TrendingUp />
                 </Box>
               </Box>

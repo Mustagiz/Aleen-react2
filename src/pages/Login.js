@@ -22,12 +22,12 @@ const Login = () => {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+    <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #F472B6 0%, #B76E79 100%)' }}>
       <Container maxWidth="sm">
         <Paper elevation={4} sx={{ p: 5, borderRadius: 3 }}>
           <Box sx={{ textAlign: 'center', mb: 4 }}>
             <Store sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
-            <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, background: 'linear-gradient(135deg, #1e40af 0%, #7c3aed 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, background: 'linear-gradient(135deg, #DB2777 0%, #B76E79 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               Aleen Clothing
             </Typography>
             <Typography variant="body1" color="text.secondary">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Tooltip, useTheme, useMediaQuery, Divider, TablePagination } from '@mui/material';
-import { Edit, Delete, Add, Search, Inventory2, TrendingUp, Warning } from '@mui/icons-material';
+import { Edit, Delete, Add, Search, Inventory2, TrendingUp, Warning, AttachMoney } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 
 const Inventory = () => {
@@ -87,20 +87,21 @@ const Inventory = () => {
             variant="contained"
             startIcon={<Add />}
             onClick={() => handleOpen()}
-            size="large"
             sx={{
               width: { xs: '100%', sm: 'auto' },
               px: { xs: 2, sm: 4 },
-              py: 1.25,
-              background: 'linear-gradient(135deg, #880e4f 0%, #ad1457 100%)',
-              boxShadow: '0 4px 12px rgba(136, 14, 79, 0.2)',
-              '&:hover': {
-                background: 'linear-gradient(135deg, #ad1457 0%, #880e4f 100%)',
-                boxShadow: '0 6px 16px rgba(136, 14, 79, 0.3)',
-              },
-              borderRadius: '8px',
+              py: 1.5,
+              borderRadius: 2,
               fontWeight: 700,
-              textTransform: 'none'
+              textTransform: 'none',
+              background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)',
+              boxShadow: `0 4px 12px ${theme.palette.primary.main}33`,
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)', // Darker Rose Gold to Rose Gold
+                boxShadow: `0 6px 16px ${theme.palette.primary.main}4D`,
+                transform: 'translateY(-2px)'
+              }
             }}
           >
             Add Product
@@ -110,7 +111,16 @@ const Inventory = () => {
         {/* Stats Cards */}
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ bgcolor: '#ffffff', borderRadius: 4, border: 'none', position: 'relative', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
+            <Card sx={{
+              borderRadius: 4,
+              position: 'relative',
+              overflow: 'hidden',
+              boxShadow: '0 10px 25px -5px rgba(183, 110, 121, 0.15)',
+              border: '1px solid rgba(183, 110, 121, 0.15)',
+              background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(183, 110, 121, 0.05) 100%)`,
+              transition: 'all 0.3s ease',
+              '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(183, 110, 121, 0.3)' }
+            }}>
               <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: 'primary.main' }} />
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -118,7 +128,7 @@ const Inventory = () => {
                     <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Items</Typography>
                     <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>{totalItems}</Typography>
                   </Box>
-                  <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(136, 14, 79, 0.05)', color: 'primary.main' }}>
+                  <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'primary.light', color: 'primary.main' }}>
                     <Inventory2 />
                   </Box>
                 </Box>
@@ -126,7 +136,16 @@ const Inventory = () => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ bgcolor: '#ffffff', borderRadius: 4, border: 'none', position: 'relative', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
+            <Card sx={{
+              borderRadius: 4,
+              position: 'relative',
+              overflow: 'hidden',
+              boxShadow: '0 10px 25px -5px rgba(46, 125, 50, 0.15)',
+              border: '1px solid rgba(46, 125, 50, 0.15)',
+              background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(46, 125, 50, 0.05) 100%)`,
+              transition: 'all 0.3s ease',
+              '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(46, 125, 50, 0.3)' }
+            }}>
               <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#2e7d32' }} />
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -135,20 +154,29 @@ const Inventory = () => {
                     <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>₹{totalValue.toLocaleString('en-IN')}</Typography>
                   </Box>
                   <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(46, 125, 50, 0.05)', color: '#2e7d32' }}>
-                    <TrendingUp />
+                    <AttachMoney />
                   </Box>
                 </Box>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ bgcolor: '#ffffff', borderRadius: 4, border: 'none', position: 'relative', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
+            <Card sx={{
+              borderRadius: 4,
+              position: 'relative',
+              overflow: 'hidden',
+              boxShadow: '0 10px 25px -5px rgba(245, 127, 23, 0.15)',
+              border: '1px solid rgba(245, 127, 23, 0.15)',
+              background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(245, 127, 23, 0.05) 100%)`,
+              transition: 'all 0.3s ease',
+              '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(245, 127, 23, 0.3)' }
+            }}>
               <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#f57f17' }} />
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Box>
                     <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Low Stock</Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 800, color: '#c62828', mt: 0.5 }}>{lowStockItems}</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 800, color: '#f57f17', mt: 0.5 }}>{lowStockItems}</Typography>
                   </Box>
                   <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(245, 127, 23, 0.05)', color: '#f57f17' }}>
                     <Warning />
@@ -158,15 +186,24 @@ const Inventory = () => {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ bgcolor: '#ffffff', borderRadius: 4, border: 'none', position: 'relative', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
-              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: 'secondary.main' }} />
+            <Card sx={{
+              borderRadius: 4,
+              position: 'relative',
+              overflow: 'hidden',
+              boxShadow: '0 10px 25px -5px rgba(219, 39, 119, 0.15)',
+              border: '1px solid rgba(219, 39, 119, 0.15)',
+              background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(219, 39, 119, 0.05) 100%)`,
+              transition: 'all 0.3s ease',
+              '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(219, 39, 119, 0.3)' }
+            }}>
+              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#DB2777' }} />
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Box>
                     <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Est. Margin</Typography>
                     <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>₹{totalProfit.toLocaleString('en-IN')}</Typography>
                   </Box>
-                  <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(245, 127, 23, 0.05)', color: 'secondary.main' }}>
+                  <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(219, 39, 119, 0.05)', color: '#DB2777' }}>
                     <TrendingUp />
                   </Box>
                 </Box>
@@ -177,7 +214,7 @@ const Inventory = () => {
       </Box>
 
       {/* Search and Filter */}
-      <Paper sx={{ p: 2, mb: 3, borderRadius: 3 }}>
+      <Paper sx={{ p: 2, mb: 3, borderRadius: 3, boxShadow: '0 4px 20px rgba(183, 110, 121, 0.08)', border: '1px solid rgba(183, 110, 121, 0.1)' }}>
         <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1, bgcolor: 'grey.50', borderRadius: 2, px: 2 }}>
             <Search sx={{ color: 'text.secondary' }} />
@@ -211,7 +248,14 @@ const Inventory = () => {
             const profit = (item.price - (item.cost || 0));
             const profitMargin = item.cost ? ((profit / item.price) * 100).toFixed(1) : 0;
             return (
-              <Card key={item.id} sx={{ mb: 2, borderRadius: 3, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+              <Card key={item.id} sx={{
+                mb: 2,
+                borderRadius: 3,
+                boxShadow: '0 10px 15px -3px rgba(183, 110, 121, 0.1)',
+                border: '1px solid rgba(183, 110, 121, 0.1)',
+                transition: 'all 0.3s ease',
+                '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 20px 25px -5px rgba(183, 110, 121, 0.15)' }
+              }}>
                 <CardContent sx={{ p: 2 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                     <Box>
@@ -299,16 +343,16 @@ const Inventory = () => {
         <Paper sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.05)' }}>
           <TableContainer>
             <Table>
-              <TableHead sx={{ bgcolor: 'rgba(136, 14, 79, 0.02)', borderBottom: '2px solid rgba(136, 14, 79, 0.1)' }}>
+              <TableHead sx={{ bgcolor: 'grey.50' }}>
                 <TableRow>
-                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Product ID</TableCell>
-                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Product Details</TableCell>
-                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: { xs: 'none', sm: 'table-cell' } }}>Category</TableCell>
-                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: { xs: 'none', md: 'table-cell' } }}>Variants</TableCell>
-                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cost & Price</TableCell>
-                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Margin</TableCell>
-                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Inventory</TableCell>
-                  <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Actions</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Product ID</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Product Details</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', display: { xs: 'none', sm: 'table-cell' } }}>Category</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', display: { xs: 'none', md: 'table-cell' } }}>Variant</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Cost & Price</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Margin</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Inventory</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 'bold' }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -319,16 +363,9 @@ const Inventory = () => {
                   const profit = (item.price - (item.cost || 0));
                   const profitMargin = item.cost ? ((profit / item.price) * 100).toFixed(1) : 0;
                   return (
-                    <TableRow
-                      key={item.id}
-                      hover
-                      sx={{
-                        '&:hover': { bgcolor: 'rgba(136, 14, 79, 0.02)' },
-                        transition: 'background-color 0.2s'
-                      }}
-                    >
+                    <TableRow key={item.id} hover>
                       <TableCell>
-                        <Typography variant="body2" sx={{ fontWeight: 700, color: 'primary.main', fontFamily: 'monospace' }}>{item.productId || 'N/A'}</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary', fontFamily: 'monospace' }}>{item.productId || 'N/A'}</Typography>
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>{item.name}</Typography>
@@ -338,9 +375,8 @@ const Inventory = () => {
                         <Chip
                           label={item.category}
                           size="small"
+                          variant="outlined"
                           sx={{
-                            bgcolor: 'rgba(136, 14, 79, 0.05)',
-                            color: 'primary.main',
                             fontWeight: 700,
                             fontSize: '0.65rem',
                             textTransform: 'uppercase',
@@ -381,28 +417,12 @@ const Inventory = () => {
                           <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.quantity} Units</Typography>
                         </Box>
                       </TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', gap: 0.5 }}>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleOpen(item)}
-                            sx={{
-                              color: 'primary.main',
-                              bgcolor: 'rgba(136, 14, 79, 0.05)',
-                              '&:hover': { bgcolor: 'rgba(136, 14, 79, 0.1)' }
-                            }}
-                          >
+                      <TableCell align="right">
+                        <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
+                          <IconButton size="small" onClick={() => handleOpen(item)} sx={{ color: 'primary.main' }}>
                             <Edit fontSize="small" />
                           </IconButton>
-                          <IconButton
-                            size="small"
-                            onClick={() => deleteInventoryItem(item.id)}
-                            sx={{
-                              color: 'error.main',
-                              bgcolor: 'rgba(198, 40, 40, 0.05)',
-                              '&:hover': { bgcolor: 'rgba(198, 40, 40, 0.1)' }
-                            }}
-                          >
+                          <IconButton size="small" onClick={() => deleteInventoryItem(item.id)} sx={{ color: 'error.main' }}>
                             <Delete fontSize="small" />
                           </IconButton>
                         </Box>

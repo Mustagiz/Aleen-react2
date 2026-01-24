@@ -69,13 +69,13 @@ const Customers = () => {
     );
 
     const stats = [
-        { title: 'Total Customers', value: customers.length, icon: <People />, color: '#880e4f' },
-        { title: 'Repeat Clients', value: customers.filter(c => calculateCustomerStats(c.id).visitCount > 1).length, icon: <TrendingUp />, color: '#2e7d32' },
+        { title: 'Total Customers', value: customers.length, icon: <People />, color: '#F472B6' },
+        { title: 'Repeat Clients', value: customers.filter(c => calculateCustomerStats(c.id).visitCount > 1).length, icon: <TrendingUp />, color: '#B76E79' },
         {
             title: 'Active This Month', value: customers.filter(c => {
                 const lastVisit = calculateCustomerStats(c.id).lastVisit;
                 return lastVisit !== 'Never' && new Date(lastVisit).getMonth() === new Date().getMonth();
-            }).length, icon: <ShoppingBag />, color: '#f57f17'
+            }).length, icon: <ShoppingBag />, color: '#DB2777'
         }
     ];
 
@@ -92,11 +92,17 @@ const Customers = () => {
                     onClick={() => handleOpen()}
                     sx={{
                         px: 4, py: 1.5,
-                        borderRadius: 3,
+                        borderRadius: 2,
                         fontWeight: 700,
                         textTransform: 'none',
-                        background: 'linear-gradient(135deg, #880e4f 0%, #ad1457 100%)',
-                        boxShadow: '0 4px 12px rgba(136, 14, 79, 0.2)'
+                        background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)',
+                        boxShadow: `0 4px 12px ${theme.palette.primary.main}33`,
+                        transition: 'all 0.2s ease-in-out',
+                        '&:hover': {
+                            background: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)',
+                            boxShadow: `0 6px 16px ${theme.palette.primary.main}4D`,
+                            transform: 'translateY(-2px)'
+                        }
                     }}
                 >
                     Add Customer
@@ -106,14 +112,36 @@ const Customers = () => {
             <Grid container spacing={3} sx={{ mb: 4 }}>
                 {stats.map((stat, idx) => (
                     <Grid item xs={12} sm={4} key={idx}>
-                        <Card sx={{ borderRadius: 4, position: 'relative', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: 'none' }}>
+                        <Card sx={{
+                            borderRadius: 4,
+                            position: 'relative',
+                            overflow: 'hidden',
+                            boxShadow: `0 10px 25px -5px ${stat.color}26`,
+                            border: '1px solid',
+                            borderColor: `${stat.color}30`,
+                            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${stat.color}0D 100%)`,
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                                transform: 'translateY(-4px)',
+                                boxShadow: `0 12px 24px -10px ${stat.color}40`,
+                                borderColor: `${stat.color}60`,
+                            }
+                        }}>
                             <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: stat.color }} />
                             <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <Box>
                                     <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{stat.title}</Typography>
                                     <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5 }}>{stat.value}</Typography>
                                 </Box>
-                                <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: `${stat.color}10`, color: stat.color }}>
+                                <Box sx={{
+                                    p: 1.5,
+                                    borderRadius: 3,
+                                    bgcolor: `${stat.color}15`,
+                                    color: stat.color,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}>
                                     {stat.icon}
                                 </Box>
                             </CardContent>
