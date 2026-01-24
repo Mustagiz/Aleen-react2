@@ -1,6 +1,6 @@
 import React from 'react';
 import { Grid, Paper, Typography, Box, Card, CardContent, Button, Chip, IconButton, useTheme, Avatar } from '@mui/material';
-import { TrendingUp, TrendingDown, Inventory2, Warning, AttachMoney, Receipt, Assessment, ArrowForward, MoreVert, Circle } from '@mui/icons-material';
+import { TrendingUp, TrendingDown, Inventory2, Warning, AttachMoney, Receipt, Assessment, ArrowForward, MoreVert, Circle, People, ShoppingCart } from '@mui/icons-material';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { Bar, Line, Doughnut } from 'react-chartjs-2';
 import { useData } from '../contexts/DataContext';
@@ -72,6 +72,10 @@ const Dashboard = () => {
   const grossProfit = totalRevenue - totalCostOfGoods;
   const totalItems = inventory.reduce((sum, item) => sum + item.quantity, 0);
 
+  const lowStockCount = inventory.filter(item => item.quantity < 5).length;
+  const customerCount = new Set(invoices.map(inv => inv.customer || 'Walk-in')).size;
+  const atv = filteredInvoices.length > 0 ? (totalRevenue / filteredInvoices.length) : 0;
+
   // Top Products Calculation
   const productSales = {};
   filteredInvoices.forEach(inv => {
@@ -111,7 +115,7 @@ const Dashboard = () => {
       return Array.from({ length: 4 }, (_, i) => {
         const d = new Date();
         d.setDate(d.getDate() - (21 - i * 7));
-        return `Week ${i + 1}`;
+        return `Week ${i + 1} `;
       });
     } else {
       return ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
@@ -271,7 +275,7 @@ const Dashboard = () => {
           {trend !== undefined && (
             <Chip
               icon={trend >= 0 ? <TrendingUp sx={{ fontSize: '14px !important' }} /> : <TrendingDown sx={{ fontSize: '14px !important' }} />}
-              label={`${Math.abs(trend)}%`}
+              label={`${Math.abs(trend)}% `}
               size="small"
               sx={{
                 bgcolor: trend >= 0 ? 'rgba(67, 160, 71, 0.1)' : 'rgba(229, 57, 53, 0.1)',
@@ -351,6 +355,20 @@ const Dashboard = () => {
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard title="Vendor Payables" value={`₹${totalVendorPayables.toLocaleString('en-IN')}`} icon={<Warning />} color="#c62828" onClick={() => navigate('/vendors')} />
+        </Grid>
+
+        {/* Row 2 */}
+        <Grid item xs={12} sm={6} lg={3}>
+          <StatCard title="Low Stock Items" value={lowStockCount} icon={<Inventory2 />} color="#ed6c02" onClick={() => navigate('/inventory')} subtitle="Items below threshold" />
+        </Grid>
+        <Grid item xs={12} sm={6} lg={3}>
+          <StatCard title="Gross Profit" value={`₹${grossProfit.toLocaleString('en-IN')}`} icon={<Assessment />} color="#0288d1" onClick={() => navigate('/profit-loss')} />
+        </Grid>
+        <Grid item xs={12} sm={6} lg={3}>
+          <StatCard title="Total Customers" value={customerCount} icon={<People />} color="#7b1fa2" onClick={() => navigate('/customers')} />
+        </Grid>
+        <Grid item xs={12} sm={6} lg={3}>
+          <StatCard title="Avg Transaction" value={`₹${Math.round(atv).toLocaleString('en-IN')}`} icon={<ShoppingCart />} color="#455a64" />
         </Grid>
       </Grid>
 

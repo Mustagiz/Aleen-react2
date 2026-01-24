@@ -9,7 +9,7 @@ import autoTable from 'jspdf-autotable';
 import { useThemeContext } from '../contexts/ThemeContext';
 
 const Invoices = () => {
-  const { inventory, invoices, addInvoice, deleteInvoice, profile, customers } = useData();
+  const { inventory, invoices, addInvoice, deleteInvoice, profile, customers, addCustomer } = useData();
   const { mode } = useThemeContext();
   const [open, setOpen] = useState(false);
   const [viewInvoice, setViewInvoice] = useState(null);
@@ -38,7 +38,7 @@ const Invoices = () => {
   };
   const [selectedItems, setSelectedItems] = useState([]);
   const [discount, setDiscount] = useState(0);
-  const [tax, setTax] = useState(18);
+  const [tax, setTax] = useState(0);
   const [customer, setCustomer] = useState('');
   const [phone, setPhone] = useState('+91');
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
@@ -117,12 +117,30 @@ const Invoices = () => {
       finalPaymentMethod = `Split: ${paymentMethod} (${splitAmount}) + ${paymentMethod2} (${(total - splitAmount).toFixed(2)})`;
     }
 
+    let finalCustomerId = selectedCustomerId;
+
+    // Auto-Customer logic: If no customer ID but we have name/phone, check if exists or add
+    if (!finalCustomerId && customer && phone) {
+      const existingCustomer = customers.find(c => c.phone === phone);
+      if (existingCustomer) {
+        finalCustomerId = existingCustomer.id;
+      } else {
+        // Add new customer automatically
+        finalCustomerId = await addCustomer({
+          name: customer,
+          phone: phone,
+          email: '', // Default empty
+          address: '' // Default empty
+        });
+      }
+    }
+
     const invoice = {
       id: invoiceNumber,
       date: new Date().toISOString(),
       customer,
       phone,
-      customerId: selectedCustomerId,
+      customerId: finalCustomerId,
       paymentMethod: finalPaymentMethod,
       items: validItems.map(item => {
         const invItem = inventory.find(i => i.id === item.id);
@@ -695,6 +713,12 @@ const Invoices = () => {
                 freeSolo
                 options={customers}
                 getOptionLabel={(option) => typeof option === 'string' ? option : `${option.name} (${option.phone})`}
+                filterOptions={(options, { inputValue }) => {
+                  return options.filter(option =>
+                    option.name.toLowerCase().includes(inputValue.toLowerCase()) ||
+                    (option.phone && option.phone.includes(inputValue))
+                  );
+                }}
                 value={selectedCustomerId ? customers.find(c => c.id === selectedCustomerId) || customer : customer}
                 onChange={(event, newValue) => {
                   if (typeof newValue === 'string') {

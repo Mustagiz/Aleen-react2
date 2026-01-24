@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Autocomplete, InputAdornment, TablePagination } from '@mui/material';
-import { Add, Visibility, Delete, ReceiptLong, Search, Edit } from '@mui/icons-material';
+import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Autocomplete, InputAdornment, TablePagination, useTheme, useMediaQuery } from '@mui/material';
+import { Add, Visibility, Delete, ReceiptLong, Search, Edit, Close } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 
 const Purchases = () => {
@@ -26,6 +26,9 @@ const Purchases = () => {
     const [poItems, setPoItems] = useState([{ productId: '', quantity: 1, cost: 0 }]);
     const [paymentStatus, setPaymentStatus] = useState('Unpaid');
     const [amountPaid, setAmountPaid] = useState(0);
+
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     // Pagination State
     const [page, setPage] = useState(0);
@@ -336,93 +339,170 @@ const Purchases = () => {
             </Paper>
 
             {/* Create/Edit PO Dialog */}
-            <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
-                <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white' }}>{editMode ? 'Edit Purchase Order' : 'Create Purchase Order'}</DialogTitle>
-                <DialogContent sx={{ mt: 2 }}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                            <Autocomplete
-                                options={vendors}
-                                getOptionLabel={(option) => option.name}
-                                value={vendors.find(v => v.id === vendorId) || null}
-                                isOptionEqualToValue={(option, value) => option.id === value.id}
-                                onChange={(event, newValue) => {
-                                    setVendorId(newValue ? newValue.id : '');
-                                }}
-                                disablePortal
-                                autoHighlight
-                                renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                        label="Select Vendor"
-                                        fullWidth
-                                        placeholder="Type to search vendor..."
-                                        helperText="Search by typing vendor name"
-                                    />
-                                )}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                select
-                                fullWidth
-                                label="Status"
-                                value={status}
-                                onChange={(e) => setStatus(e.target.value)}
-                            >
-                                <MenuItem value="Ordered">Ordered (Pending Delivery)</MenuItem>
-                                <MenuItem value="Received">Received (Update Stock)</MenuItem>
-                            </TextField>
-                        </Grid>
-                    </Grid>
-
-                    <Typography variant="subtitle2" sx={{ mt: 3, mb: 1, fontWeight: 'bold' }}>Order Items</Typography>
-                    {poItems.map((item, index) => (
-                        <Box key={index} sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center' }}>
-                            <Box sx={{ flex: 2, display: 'flex', gap: 1 }}>
+            <Dialog
+                open={open}
+                onClose={() => setOpen(false)}
+                maxWidth="md"
+                fullWidth
+                fullScreen={isMobile}
+                PaperProps={{ sx: { borderRadius: isMobile ? 0 : 4 } }}
+            >
+                <DialogTitle sx={{
+                    bgcolor: 'primary.main',
+                    color: 'white',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}>
+                    <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                        {editMode ? 'Edit Purchase Order' : 'Create Purchase Order'}
+                    </Typography>
+                    {isMobile && (
+                        <IconButton onClick={() => setOpen(false)} sx={{ color: 'white' }}>
+                            <Close />
+                        </IconButton>
+                    )}
+                </DialogTitle>
+                <DialogContent sx={{ mt: 2, p: isMobile ? 2 : 3 }}>
+                    <Box sx={{ mb: 3 }}>
+                        <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 800 }}>Vendor & Status</Typography>
+                        <Grid container spacing={2} sx={{ mt: 0.5 }}>
+                            <Grid item xs={12} sm={6}>
                                 <Autocomplete
-                                    fullWidth
-                                    options={inventory}
-                                    getOptionLabel={(option) => `${option.name} (curr: ₹${option.cost || 0})`}
-                                    onChange={(e, newVal) => handleItemChange(index, 'productId', newVal?.id)}
-                                    renderInput={(params) => <TextField {...params} label="Product" size="small" />}
+                                    options={vendors}
+                                    getOptionLabel={(option) => option.name || ''}
+                                    value={vendors.find(v => v.id === vendorId) || null}
+                                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                                    onChange={(event, newValue) => {
+                                        setVendorId(newValue ? newValue.id : '');
+                                    }}
+                                    disablePortal
+                                    autoHighlight
+                                    renderOption={(props, option) => (
+                                        <Box component="li" {...props} key={option.id}>
+                                            <Box>
+                                                <Typography variant="body1" sx={{ fontWeight: 600 }}>{option.name}</Typography>
+                                                <Typography variant="caption" color="text.secondary">{option.phone || 'No Phone'}</Typography>
+                                            </Box>
+                                        </Box>
+                                    )}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Search Vendor"
+                                            fullWidth
+                                            placeholder="Type vendor name..."
+                                            helperText="Search by name or contact"
+                                            variant="outlined"
+                                        />
+                                    )}
                                 />
-                                <Button
-                                    sx={{ minWidth: 40, px: 0 }}
-                                    variant="outlined"
-                                    color="secondary"
-                                    onClick={() => handleQuickAddOpen(index)}
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    select
+                                    fullWidth
+                                    label="Order Status"
+                                    value={status}
+                                    onChange={(e) => setStatus(e.target.value)}
                                 >
-                                    <Add />
-                                </Button>
-                            </Box>
-                            <TextField
-                                label="Qty"
-                                type="number"
-                                size="small"
-                                sx={{ width: 100 }}
-                                value={item.quantity}
-                                onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value))}
-                            />
-                            <TextField
-                                label="Buy Cost"
-                                type="number"
-                                size="small"
-                                sx={{ width: 120 }}
-                                value={item.cost}
-                                onChange={(e) => handleItemChange(index, 'cost', parseFloat(e.target.value))}
-                                InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }}
-                            />
-                            <IconButton color="error" onClick={() => setPoItems(poItems.filter((_, i) => i !== index))}>
-                                <Delete />
-                            </IconButton>
-                        </Box>
-                    ))}
-                    <Button startIcon={<Add />} onClick={handleAddItem}>Add Item</Button>
+                                    <MenuItem value="Ordered">Ordered (Pending)</MenuItem>
+                                    <MenuItem value="Received">Received (Stock Added)</MenuItem>
+                                </TextField>
+                            </Grid>
+                        </Grid>
+                    </Box>
 
-                    <Box sx={{ mt: 3, p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2 }}>Payment Information</Typography>
-                        <Grid container spacing={2}>
+                    <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 800 }}>Order Items</Typography>
+                    {poItems.map((item, index) => (
+                        <Paper
+                            key={index}
+                            elevation={0}
+                            sx={{
+                                p: 2,
+                                mb: 2,
+                                border: '1px solid',
+                                borderColor: 'divider',
+                                borderRadius: 2,
+                                bgcolor: 'grey.50'
+                            }}
+                        >
+                            <Grid container spacing={2} alignItems="center">
+                                <Grid item xs={12} sm={5}>
+                                    <Box sx={{ display: 'flex', gap: 1 }}>
+                                        <Autocomplete
+                                            fullWidth
+                                            options={inventory}
+                                            getOptionLabel={(option) => `${option.name} (Cost: ₹${option.cost || 0})`}
+                                            value={inventory.find(i => i.id === item.productId) || null}
+                                            isOptionEqualToValue={(option, value) => option.id === (typeof value === 'string' ? value : value?.id)}
+                                            onChange={(e, newVal) => handleItemChange(index, 'productId', newVal?.id)}
+                                            renderInput={(params) => <TextField {...params} label="Product" size="small" />}
+                                        />
+                                        <Button
+                                            sx={{ minWidth: 40, px: 0 }}
+                                            variant="contained"
+                                            color="secondary"
+                                            onClick={() => handleQuickAddOpen(index)}
+                                            size="small"
+                                        >
+                                            <Add />
+                                        </Button>
+                                    </Box>
+                                </Grid>
+                                <Grid item xs={6} sm={3}>
+                                    <TextField
+                                        fullWidth
+                                        label="Quantity"
+                                        type="number"
+                                        size="small"
+                                        value={item.quantity}
+                                        onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value))}
+                                    />
+                                </Grid>
+                                <Grid item xs={6} sm={3}>
+                                    <TextField
+                                        fullWidth
+                                        label="Buy Price"
+                                        type="number"
+                                        size="small"
+                                        value={item.cost}
+                                        onChange={(e) => handleItemChange(index, 'cost', parseFloat(e.target.value))}
+                                        InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={1}>
+                                    <IconButton
+                                        color="error"
+                                        onClick={() => setPoItems(poItems.filter((_, i) => i !== index))}
+                                        size={isMobile ? 'medium' : 'small'}
+                                        sx={{
+                                            width: isMobile ? '100%' : 'auto',
+                                            borderRadius: isMobile ? 1 : '50%',
+                                            bgcolor: isMobile ? 'rgba(211, 47, 47, 0.04)' : 'transparent'
+                                        }}
+                                    >
+                                        <Delete />
+                                        {isMobile && <Typography variant="button" sx={{ ml: 1 }}>Remove</Typography>}
+                                    </IconButton>
+                                </Grid>
+                            </Grid>
+                        </Paper>
+                    ))}
+
+                    <Button
+                        startIcon={<Add />}
+                        onClick={handleAddItem}
+                        variant="outlined"
+                        fullWidth={isMobile}
+                        sx={{ mb: 2 }}
+                    >
+                        Add Item
+                    </Button>
+
+                    <Box sx={{ mt: 3, p: 2, bgcolor: 'primary.main', color: 'white', borderRadius: 2 }}>
+                        <Typography variant="overline" sx={{ fontWeight: 800, opacity: 0.9 }}>Payment Details</Typography>
+                        <Grid container spacing={2} sx={{ mt: 0.5 }}>
                             <Grid item xs={12} sm={4}>
                                 <TextField
                                     select
@@ -431,6 +511,7 @@ const Purchases = () => {
                                     size="small"
                                     value={paymentStatus}
                                     onChange={(e) => setPaymentStatus(e.target.value)}
+                                    sx={{ bgcolor: 'white', borderRadius: 1 }}
                                 >
                                     <MenuItem value="Unpaid">Unpaid</MenuItem>
                                     <MenuItem value="Partial">Partial</MenuItem>
@@ -440,23 +521,34 @@ const Purchases = () => {
                             <Grid item xs={12} sm={4}>
                                 <TextField
                                     fullWidth
-                                    label="Amount Paid"
+                                    label="Paid Amount"
                                     type="number"
                                     size="small"
                                     value={amountPaid}
                                     onChange={(e) => setAmountPaid(e.target.value)}
                                     disabled={paymentStatus === 'Unpaid'}
+                                    sx={{ bgcolor: 'white', borderRadius: 1 }}
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                <Typography variant="h6" sx={{ fontWeight: 800 }}>Total: ₹{calculateTotal().toLocaleString()}</Typography>
+                            <Grid item xs={12} sm={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', sm: 'flex-end' } }}>
+                                <Box sx={{ textAlign: { xs: 'left', sm: 'right' } }}>
+                                    <Typography variant="caption" sx={{ display: 'block', opacity: 0.8 }}>Total Order Value</Typography>
+                                    <Typography variant="h5" sx={{ fontWeight: 800 }}>₹{calculateTotal().toLocaleString()}</Typography>
+                                </Box>
                             </Grid>
                         </Grid>
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ p: 3 }}>
                     <Button onClick={() => setOpen(false)}>Cancel</Button>
-                    <Button onClick={handleSave} variant="contained" disabled={!vendorId}>Save Order</Button>
+                    <Button
+                        onClick={handleSave}
+                        variant="contained"
+                        disabled={!vendorId}
+                        sx={{ borderRadius: 2, px: 4, fontWeight: 700 }}
+                    >
+                        Save Order
+                    </Button>
                 </DialogActions>
             </Dialog>
 
@@ -531,7 +623,7 @@ const Purchases = () => {
                     <Button onClick={() => setQuickAddOpen(false)}>Cancel</Button>
                     <Button onClick={handleQuickSave} variant="contained" color="secondary" disabled={!quickForm.name || !quickForm.price}>Save & Add</Button>
                 </DialogActions>
-            </Dialog>
+            </Dialog >
         </Box >
     );
 };
