@@ -1,6 +1,6 @@
 import React from 'react';
-import { Grid, Paper, Typography, Box, Card, CardContent, Button, Chip } from '@mui/material';
-import { TrendingUp, TrendingDown, Inventory2, Warning, AttachMoney, Receipt, Assessment, ArrowForward } from '@mui/icons-material';
+import { Grid, Paper, Typography, Box, Card, CardContent, Button, Chip, IconButton, useTheme, Avatar } from '@mui/material';
+import { TrendingUp, TrendingDown, Inventory2, Warning, AttachMoney, Receipt, Assessment, ArrowForward, MoreVert, Circle } from '@mui/icons-material';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { Bar, Line, Doughnut } from 'react-chartjs-2';
 import { useData } from '../contexts/DataContext';
@@ -10,14 +10,15 @@ import { DateRange, CalendarMonth, History, ViewWeek } from '@mui/icons-material
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler);
 
 const Dashboard = () => {
-  const { inventory, invoices } = useData();
+  const { inventory, invoices, purchases, vendors } = useData();
   const navigate = useNavigate();
+  const theme = useTheme();
   const [dateRange, setDateRange] = React.useState('7days');
 
   const today = new Date();
   today.setHours(23, 59, 59, 999);
 
-  const getFilteredInvoices = () => {
+  const getFilteredData = () => {
     let startDate = new Date();
     startDate.setHours(0, 0, 0, 0);
 
@@ -28,12 +29,15 @@ const Dashboard = () => {
     } else if (dateRange === 'thisMonth') {
       startDate = new Date(today.getFullYear(), today.getMonth(), 1);
     } else {
-      return invoices; // 'all'
+      return { filteredInvoices: invoices, filteredPurchases: purchases };
     }
-    return invoices.filter(inv => new Date(inv.date) >= startDate);
+
+    const fInvoices = invoices.filter(inv => new Date(inv.date) >= startDate);
+    const fPurchases = purchases.filter(p => new Date(p.date) >= startDate);
+    return { filteredInvoices: fInvoices, filteredPurchases: fPurchases };
   };
 
-  const filteredInvoices = getFilteredInvoices();
+  const { filteredInvoices, filteredPurchases } = getFilteredData();
   const yesterday = new Date(Date.now() - 86400000).toDateString();
 
   const todaySales = invoices.filter(inv => new Date(inv.date).toDateString() === today.toDateString())
@@ -46,21 +50,32 @@ const Dashboard = () => {
 
   const lowStock = inventory.filter(item => item.quantity < 2);
   const recentInvoices = invoices.slice(-6).reverse();
+
+  // Financial Calculations
   const totalRevenue = filteredInvoices.reduce((sum, inv) => sum + inv.total, 0);
-  const totalCost = filteredInvoices.reduce((sum, inv) => {
+  const totalPurchasesCost = filteredPurchases.reduce((sum, p) => sum + p.total, 0);
+  const totalPaidPurchases = filteredPurchases.reduce((sum, p) => sum + (p.amountPaid || 0), 0);
+
+  // Net Cash = Sales (Cash In) - Vendor Payments (Cash Out)
+  const netCash = totalRevenue - totalPaidPurchases;
+
+  // Outstanding Vendor Payments (Global, not just filtered)
+  const totalVendorPayables = vendors.reduce((sum, v) => sum + (v.balance || 0), 0);
+
+  const totalCostOfGoods = filteredInvoices.reduce((sum, inv) => {
     return sum + (inv.items?.reduce((itemSum, item) => {
       const invItem = inventory.find(i => i.id === item.id);
       return itemSum + ((invItem?.cost || 0) * item.quantity);
     }, 0) || 0);
   }, 0);
-  const totalProfit = totalRevenue - totalCost;
+
+  const grossProfit = totalRevenue - totalCostOfGoods;
   const totalItems = inventory.reduce((sum, item) => sum + item.quantity, 0);
 
   // Top Products Calculation
   const productSales = {};
   filteredInvoices.forEach(inv => {
     inv.items?.forEach(item => {
-      // Use original ID or Name as key
       const key = item.id || item.name;
       productSales[key] = (productSales[key] || 0) + item.quantity;
     });
@@ -69,7 +84,7 @@ const Dashboard = () => {
   const top5ProductsData = Object.entries(productSales)
     .map(([id, qty]) => {
       const product = inventory.find(p => p.id === id);
-      return { name: product?.name || 'Unknown', quantity: qty };
+      return { name: product?.name || 'Unknown', quantity: qty, price: product?.price || 0 };
     })
     .sort((a, b) => b.quantity - a.quantity)
     .slice(0, 5);
@@ -79,12 +94,12 @@ const Dashboard = () => {
     datasets: [{
       label: 'Units Sold',
       data: top5ProductsData.map(p => p.quantity),
-      backgroundColor: 'rgba(173, 20, 87, 0.7)',
-      borderRadius: 6,
+      backgroundColor: 'rgba(173, 20, 87, 0.8)',
+      borderRadius: 8,
+      barThickness: 30,
     }]
   };
 
-  // Date labels and sales grouping based on range
   const getDateLabels = () => {
     if (dateRange === '7days') {
       return Array.from({ length: 7 }, (_, i) => {
@@ -116,7 +131,6 @@ const Dashboard = () => {
           .reduce((sum, inv) => sum + inv.total, 0);
       });
     } else {
-      // Group by weeks for longer periods
       const weekStarts = Array.from({ length: 4 }, (_, i) => {
         const d = new Date();
         d.setDate(d.getDate() - (28 - i * 7));
@@ -142,19 +156,25 @@ const Dashboard = () => {
     datasets: [{
       label: 'Sales (₹)',
       data: salesByPeriod,
-      backgroundColor: 'rgba(136, 14, 79, 0.05)',
+      backgroundColor: (context) => {
+        const ctx = context.chart.ctx;
+        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(136, 14, 79, 0.2)');
+        gradient.addColorStop(1, 'rgba(136, 14, 79, 0.0)');
+        return gradient;
+      },
       borderColor: '#880e4f',
       borderWidth: 3,
       tension: 0.4,
       fill: true,
-      pointBackgroundColor: '#880e4f',
-      pointBorderColor: '#fff',
+      pointBackgroundColor: '#ffffff',
+      pointBorderColor: '#880e4f',
       pointBorderWidth: 2,
-      pointRadius: 4,
+      pointRadius: 6,
+      pointHoverRadius: 8,
     }]
   };
 
-  // Category-wise sales calculation from REAL sales data
   const categorySales = filteredInvoices.reduce((acc, inv) => {
     inv.items?.forEach(item => {
       const category = item.category || 'General';
@@ -168,8 +188,8 @@ const Dashboard = () => {
     datasets: [{
       label: 'Revenue by Category',
       data: Object.values(categorySales),
-      backgroundColor: ['#880e4f', '#ad1457', '#f57f17', '#bc5100', '#2e7d32', '#c62828'],
-      borderRadius: 4,
+      backgroundColor: ['#ad1457', '#d81b60', '#ec407a', '#f06292', '#f48fb1', '#f8bbd0'],
+      borderWidth: 0,
     }]
   };
 
@@ -181,102 +201,136 @@ const Dashboard = () => {
         inventory.filter(i => i.quantity >= 2 && i.quantity < 50).length,
         inventory.filter(i => i.quantity >= 50).length
       ],
-      backgroundColor: ['#c62828', '#f57f17', '#2e7d32'],
+      backgroundColor: ['#e53935', '#fb8c00', '#43a047'],
       borderWidth: 0,
     }]
   };
 
-  const StatCard = ({ title, value, icon, color, trend, onClick }) => (
+  const commonChartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0,0,0,0.8)',
+        padding: 12,
+        titleFont: { family: "'Inter', sans-serif", size: 14 },
+        bodyFont: { family: "'Inter', sans-serif", size: 13 },
+        cornerRadius: 8,
+        displayColors: false,
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { font: { family: "'Inter', sans-serif" }, color: '#9ca3af' }
+      },
+      y: {
+        grid: { borderDash: [4, 4], color: '#f3f4f6', drawBorder: false },
+        ticks: { font: { family: "'Inter', sans-serif" }, color: '#9ca3af' }
+      }
+    }
+  };
+
+  const StatCard = ({ title, value, icon, color, trend, onClick, subtitle }) => (
     <Card
+      onClick={onClick}
+      elevation={0}
       sx={{
         height: '100%',
-        bgcolor: 'background.paper',
         borderRadius: 4,
-        position: 'relative',
-        overflow: 'hidden',
-        boxShadow: (theme) => theme.palette.mode === 'light' ? '0 4px 20px rgba(0,0,0,0.04)' : '0 4px 20px rgba(0,0,0,0.4)',
         cursor: onClick ? 'pointer' : 'default',
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        backgroundImage: 'none',
+        transition: 'all 0.3s ease',
         border: '1px solid',
-        borderColor: (theme) => theme.palette.mode === 'light' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)',
-        '&:hover': onClick ? { transform: 'translateY(-6px)', boxShadow: (theme) => theme.palette.mode === 'light' ? '0 12px 24px rgba(0,0,0,0.08)' : '0 12px 24px rgba(0,0,0,0.6)' } : {}
+        borderColor: 'divider',
+        background: 'linear-gradient(145deg, #ffffff 0%, #fcfcfc 100%)',
+        ...theme.palette.mode === 'dark' && {
+          background: 'linear-gradient(145deg, #1e1e1e 0%, #171717 100%)'
+        },
+        '&:hover': onClick ? {
+          transform: 'translateY(-4px)',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          borderColor: color + '40'
+        } : {}
       }}
-      onClick={onClick}
     >
-      <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: color }} />
       <CardContent sx={{ p: 3 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-          <Box>
-            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{title}</Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>{value}</Typography>
-          </Box>
-          <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: `${color}08`, color: color }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+          <Box sx={{
+            p: 1.5,
+            borderRadius: 3,
+            bgcolor: color + '15',
+            color: color,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
             {React.cloneElement(icon, { sx: { fontSize: 24 } })}
           </Box>
+          {trend !== undefined && (
+            <Chip
+              icon={trend >= 0 ? <TrendingUp sx={{ fontSize: '14px !important' }} /> : <TrendingDown sx={{ fontSize: '14px !important' }} />}
+              label={`${Math.abs(trend)}%`}
+              size="small"
+              sx={{
+                bgcolor: trend >= 0 ? 'rgba(67, 160, 71, 0.1)' : 'rgba(229, 57, 53, 0.1)',
+                color: trend >= 0 ? 'success.main' : 'error.main',
+                fontWeight: 700,
+                borderRadius: 2
+              }}
+            />
+          )}
         </Box>
-        {trend !== undefined && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Box sx={{
-              display: 'flex',
-              alignItems: 'center',
-              color: trend >= 0 ? '#1b5e20' : '#c62828',
-              bgcolor: trend >= 0 ? 'rgba(27, 94, 32, 0.08)' : 'rgba(198, 40, 40, 0.08)',
-              px: 1,
-              py: 0.25,
-              borderRadius: 1,
-              fontSize: '0.75rem',
-              fontWeight: 700
-            }}>
-              {trend >= 0 ? <TrendingUp sx={{ fontSize: 14, mr: 0.5 }} /> : <TrendingDown sx={{ fontSize: 14, mr: 0.5 }} />}
-              {Math.abs(trend)}%
-            </Box>
-            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>vs yesterday</Typography>
-          </Box>
-        )}
+        <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5, letterSpacing: '-0.02em' }}>
+          {value}
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+          {title}
+        </Typography>
       </CardContent>
     </Card>
   );
 
   return (
-    <Box>
+    <Box sx={{ maxWidth: 1600, mx: 'auto' }}>
       <Box sx={{ mb: 5, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'center' }, gap: 3 }}>
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mb: 1 }}>Overview</Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>Real-time business analytics for Aleen Clothing.</Typography>
+          <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mb: 1, letterSpacing: '-0.03em' }}>Dashboard</Typography>
+          <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 500 }}>Overview of your business performance.</Typography>
         </Box>
 
         <Box sx={{
           display: 'flex',
           bgcolor: 'background.paper',
-          p: 0.5,
-          borderRadius: 3,
+          p: 0.75,
+          borderRadius: 4,
           border: '1px solid',
           borderColor: 'divider',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+          boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
         }}>
           {[
-            { id: '7days', label: '7 Days', icon: <ViewWeek fontSize="small" /> },
-            { id: '30days', label: '30 Days', icon: <CalendarMonth fontSize="small" /> },
-            { id: 'thisMonth', label: 'This Month', icon: <DateRange fontSize="small" /> },
-            { id: 'all', label: 'All Time', icon: <History fontSize="small" /> }
+            { id: '7days', label: '7 Days' },
+            { id: '30days', label: '30 Days' },
+            { id: 'thisMonth', label: 'Month' },
+            { id: 'all', label: 'All' }
           ].map((item) => (
             <Button
               key={item.id}
-              size="small"
               onClick={() => setDateRange(item.id)}
-              startIcon={item.icon}
               sx={{
-                px: 2,
-                py: 0.75,
-                borderRadius: 2.5,
+                px: 3,
+                py: 1,
+                borderRadius: 3,
                 textTransform: 'none',
-                fontWeight: 700,
+                fontWeight: 600,
+                fontSize: '0.875rem',
                 color: dateRange === item.id ? 'white' : 'text.secondary',
-                background: dateRange === item.id ? 'linear-gradient(135deg, #880e4f 0%, #ad1457 100%)' : 'transparent',
+                bgcolor: dateRange === item.id ? '#880e4f' : 'transparent',
                 '&:hover': {
-                  background: dateRange === item.id ? 'linear-gradient(135deg, #ad1457 0%, #880e4f 100%)' : 'rgba(0,0,0,0.02)'
-                }
+                  bgcolor: dateRange === item.id ? '#6f0b40' : 'rgba(0,0,0,0.04)'
+                },
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
               }}
             >
               {item.label}
@@ -285,76 +339,125 @@ const Dashboard = () => {
         </Box>
       </Box>
 
-      <Grid container spacing={4} sx={{ mb: 5 }}>
+      <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard title="Today's Sales" value={`₹${todaySales.toLocaleString('en-IN')}`} icon={<AttachMoney />} color="#880e4f" trend={salesTrend} onClick={() => navigate('/sales-reports')} />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
-          <StatCard title="Net Profit" value={`₹${totalProfit.toLocaleString('en-IN')}`} icon={<TrendingUp />} color="#2e7d32" onClick={() => navigate('/profit-loss')} />
+          <StatCard title="Total Purchases" value={`₹${totalPurchasesCost.toLocaleString('en-IN')}`} icon={<Receipt />} color="#1976d2" onClick={() => navigate('/purchases')} />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
-          <StatCard title="Total Stock" value={totalItems} icon={<Inventory2 />} color="#f57f17" onClick={() => navigate('/inventory')} />
+          <StatCard title="Net Cash Available" value={`₹${netCash.toLocaleString('en-IN')}`} icon={<TrendingUp />} color="#2e7d32" onClick={() => navigate('/profit-loss')} />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
-          <StatCard title="Low Stock" value={lowStock.length} icon={<Warning />} color="#c62828" onClick={() => navigate('/inventory-reports')} />
+          <StatCard title="Vendor Payables" value={`₹${totalVendorPayables.toLocaleString('en-IN')}`} icon={<Warning />} color="#c62828" onClick={() => navigate('/vendors')} />
         </Grid>
       </Grid>
 
-      <Grid container spacing={3} sx={{ mb: 3 }}>
+      <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} lg={8}>
-          <Paper sx={{ p: 4, borderRadius: 5, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', backgroundImage: 'none', height: '100%' }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 4 }}>
-              {dateRange === '7days' ? 'Weekly' : dateRange === '30days' ? 'Monthly' : 'Sales'} Trend
-            </Typography>
-            <Line data={salesChartData} options={{
-              responsive: true,
-              plugins: { legend: { display: false } },
-              scales: {
-                y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#999' } },
-                x: { grid: { display: false }, ticks: { color: '#999' } }
-              }
-            }} />
+          <Paper elevation={0} sx={{
+            p: 4,
+            borderRadius: 4,
+            border: '1px solid',
+            borderColor: 'divider',
+            height: '100%'
+          }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>Revenue Trend</Typography>
+                <Typography variant="body2" color="text.secondary">Sales performance over time</Typography>
+              </Box>
+              <IconButton size="small"><MoreVert /></IconButton>
+            </Box>
+            <Box sx={{ height: 350 }}>
+              <Line data={salesChartData} options={{ ...commonChartOptions, maintainAspectRatio: false }} />
+            </Box>
           </Paper>
         </Grid>
         <Grid item xs={12} lg={4}>
-          <Paper sx={{ p: 4, borderRadius: 5, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', height: '100%', backgroundImage: 'none' }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 4 }}>Stock Health</Typography>
-            <Doughnut data={stockData} options={{ responsive: true, plugins: { legend: { position: 'bottom' } }, cutout: '70%' }} />
-          </Paper>
-        </Grid>
-      </Grid>
-
-      <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid item xs={12} lg={6}>
-          <Paper sx={{ p: 4, borderRadius: 5, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', backgroundImage: 'none' }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 4 }}>Top 5 Best Sellers</Typography>
-            <Bar data={topProductsChartData} options={{ responsive: true, plugins: { legend: { display: false } } }} />
-          </Paper>
-        </Grid>
-        <Grid item xs={12} lg={6}>
-          <Paper sx={{ p: 4, borderRadius: 5, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', backgroundImage: 'none' }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 4 }}>Category Revenue</Typography>
-            <Bar data={categoryChartData} options={{ responsive: true, plugins: { legend: { display: false } } }} />
-          </Paper>
-        </Grid>
-      </Grid>
-
-      <Paper sx={{ p: 4, borderRadius: 5, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', backgroundImage: 'none' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>Recent Transactions</Typography>
-          <Button onClick={() => navigate('/invoices')}>View All</Button>
-        </Box>
-        <Grid container spacing={2}>
-          {recentInvoices.map(inv => (
-            <Grid item xs={12} md={4} key={inv.id}>
-              <Box sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 2, borderLeft: '4px solid #880e4f' }}>
-                <Typography variant="body2" sx={{ fontWeight: 700 }}>Inv #{inv.id}</Typography>
-                <Typography variant="h6">₹{inv.total}</Typography>
+          <Paper elevation={0} sx={{
+            p: 4,
+            borderRadius: 4,
+            border: '1px solid',
+            borderColor: 'divider',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>Inventory Health</Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>Distribution by stock level</Typography>
+            <Box sx={{ flexGrow: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Doughnut data={stockData} options={{
+                responsive: true,
+                cutout: '75%',
+                plugins: { legend: { display: false } }
+              }} />
+              <Box sx={{ position: 'absolute', textAlign: 'center' }}>
+                <Typography variant="h4" sx={{ fontWeight: 800 }}>{totalItems}</Typography>
+                <Typography variant="caption" color="text.secondary">Total Items</Typography>
               </Box>
-            </Grid>
-          ))}
+            </Box>
+            <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', gap: 3 }}>
+              {stockData.labels.map((label, i) => (
+                <Box key={label} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Circle sx={{ fontSize: 10, color: stockData.datasets[0].backgroundColor[i] }} />
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>{label}</Typography>
+                </Box>
+              ))}
+            </Box>
+          </Paper>
         </Grid>
-      </Paper>
+      </Grid>
+
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} lg={7}>
+          <Paper elevation={0} sx={{ p: 4, borderRadius: 4, border: '1px solid', borderColor: 'divider' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4, alignItems: 'center' }}>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>Top Products</Typography>
+                <Typography variant="body2" color="text.secondary">Best selling items by quantity</Typography>
+              </Box>
+              <Button endIcon={<ArrowForward />} onClick={() => navigate('/sales-reports')}>Full Report</Button>
+            </Box>
+            <Bar data={topProductsChartData} options={{ ...commonChartOptions, indexAxis: 'y' }} />
+          </Paper>
+        </Grid>
+        <Grid item xs={12} lg={5}>
+          <Paper elevation={0} sx={{ p: 0, borderRadius: 4, border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
+            <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>Recent Activity</Typography>
+            </Box>
+            <Box sx={{ p: 0 }}>
+              {recentInvoices.map((inv, index) => (
+                <Box key={inv.id} sx={{
+                  p: 2.5,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  borderBottom: index !== recentInvoices.length - 1 ? '1px solid' : 'none',
+                  borderColor: 'divider',
+                  transition: 'background 0.2s',
+                  '&:hover': { bgcolor: 'action.hover' }
+                }}>
+                  <Avatar sx={{ bgcolor: 'rgba(136, 14, 79, 0.1)', color: '#880e4f', borderRadius: 2 }}>
+                    <Receipt fontSize="small" />
+                  </Avatar>
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>Invoice #{inv.id}</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {new Date(inv.date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} • {inv.items?.length || 0} items
+                    </Typography>
+                  </Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#880e4f' }}>
+                    ₹{inv.total.toLocaleString('en-IN')}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          </Paper>
+        </Grid>
+      </Grid>
     </Box>
   );
 };

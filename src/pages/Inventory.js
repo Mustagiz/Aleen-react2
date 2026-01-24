@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Tooltip, useTheme, useMediaQuery, Divider } from '@mui/material';
+import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Tooltip, useTheme, useMediaQuery, Divider, TablePagination } from '@mui/material';
 import { Edit, Delete, Add, Search, Inventory2, TrendingUp, Warning } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 
@@ -13,6 +13,19 @@ const Inventory = () => {
   const [form, setForm] = useState({
     productId: '', name: '', category: '', size: '', color: '', price: '', cost: '', quantity: '', supplier: ''
   });
+
+  // Pagination State
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -299,12 +312,16 @@ const Inventory = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filteredInventory.map((item, idx) => {
+                {(rowsPerPage > 0
+                  ? filteredInventory.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  : filteredInventory
+                ).map((item) => {
                   const profit = (item.price - (item.cost || 0));
                   const profitMargin = item.cost ? ((profit / item.price) * 100).toFixed(1) : 0;
                   return (
                     <TableRow
                       key={item.id}
+                      hover
                       sx={{
                         '&:hover': { bgcolor: 'rgba(136, 14, 79, 0.02)' },
                         transition: 'background-color 0.2s'
@@ -396,6 +413,15 @@ const Inventory = () => {
               </TableBody>
             </Table>
           </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={filteredInventory.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
         </Paper>
       )}
 

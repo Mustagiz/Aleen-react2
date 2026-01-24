@@ -23,6 +23,9 @@ export const DataProvider = ({ children }) => {
     specialization: 'Women\'s Fashion & Accessories'
   });
 
+  const [vendors, setVendors] = useState([]);
+  const [purchases, setPurchases] = useState([]);
+
   // Real-time synchronization
   useEffect(() => {
     const unsubInventory = onSnapshot(collection(db, 'inventory'), (snapshot) => {
@@ -35,6 +38,14 @@ export const DataProvider = ({ children }) => {
 
     const unsubCustomers = onSnapshot(collection(db, 'customers'), (snapshot) => {
       setCustomers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+
+    const unsubVendors = onSnapshot(collection(db, 'vendors'), (snapshot) => {
+      setVendors(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+
+    const unsubPurchases = onSnapshot(collection(db, 'purchases'), (snapshot) => {
+      setPurchases(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
 
     const unsubProfile = onSnapshot(doc(db, 'settings', 'profile'), (snapshot) => {
@@ -53,12 +64,14 @@ export const DataProvider = ({ children }) => {
       unsubInventory();
       unsubInvoices();
       unsubCustomers();
+      unsubVendors();
+      unsubPurchases();
       unsubProfile();
       unsubCategories();
     };
   }, []);
 
-  // One-time migration from LocalStorage to Cloud
+  // One-time migration from LocalStorage to Cloud (Kept as is)
   useEffect(() => {
     const migrateData = async () => {
       const hasMigrated = localStorage.getItem('firebase_migrated');
@@ -104,6 +117,133 @@ export const DataProvider = ({ children }) => {
 
   const deleteInventoryItem = async (id) => {
     await deleteDoc(doc(db, 'inventory', id));
+  };
+
+  // Vendor Functions
+  const addVendor = async (vendor) => {
+    const id = Date.now().toString();
+    const newVendor = { ...vendor, id, dateAdded: new Date().toISOString(), balance: 0 };
+    await setDoc(doc(db, 'vendors', id), newVendor);
+  };
+
+  const updateVendor = async (id, updates) => {
+    await updateDoc(doc(db, 'vendors', id), updates);
+  };
+
+  const deleteVendor = async (id) => {
+    await deleteDoc(doc(db, 'vendors', id));
+  };
+
+  // Purchase Functions
+  const addPurchase = async (purchase) => {
+    const id = Date.now().toString();
+    const newPurchase = { ...purchase, id, dateAdded: new Date().toISOString() };
+    const batch = writeBatch(db);
+
+    batch.set(doc(db, 'purchases', id), newPurchase);
+
+    // If Received, update inventory stock and cost
+    if (purchase.status === 'Received') {
+      for (const item of purchase.items) {
+        const invItem = inventory.find(i => i.id === item.productId);
+        const invRef = doc(db, 'inventory', item.productId);
+
+        if (invItem) {
+          // Weighted Average Cost Calculation
+          const currentQty = invItem.quantity || 0;
+          const currentCost = invItem.cost || 0;
+          const newQty = item.quantity;
+          const newCost = item.cost; // Purchase cost per unit
+
+          const totalValue = (currentQty * currentCost) + (newQty * newCost);
+          const totalQty = currentQty + newQty;
+          const weightedCost = totalQty > 0 ? totalValue / totalQty : newCost;
+
+          batch.update(invRef, {
+            quantity: totalQty,
+            cost: parseFloat(weightedCost.toFixed(2))
+          });
+        }
+      }
+    }
+
+    // Update Vendor Balance (if unpaid/partial)
+    if (purchase.vendorId) {
+      const vendorRef = doc(db, 'vendors', purchase.vendorId);
+      const currentVendor = vendors.find(v => v.id === purchase.vendorId);
+      const pendingAmount = purchase.total - (purchase.amountPaid || 0);
+
+      if (currentVendor && pendingAmount > 0) {
+        batch.update(vendorRef, {
+          balance: (currentVendor.balance || 0) + pendingAmount
+        });
+      }
+    }
+
+    await batch.commit();
+  };
+
+  const updatePurchase = async (id, updates, oldPurchase) => {
+    const batch = writeBatch(db);
+    const purchaseRef = doc(db, 'purchases', id);
+    batch.update(purchaseRef, updates);
+
+    // Handle Status Change: Ordered -> Received
+    if (oldPurchase.status !== 'Received' && updates.status === 'Received') {
+      for (const item of oldPurchase.items) {
+        const invItem = inventory.find(i => i.id === item.productId);
+        const invRef = doc(db, 'inventory', item.productId);
+
+        if (invItem) {
+          const currentQty = invItem.quantity || 0;
+          const currentCost = invItem.cost || 0;
+          const newQty = item.quantity;
+          const newCost = item.cost;
+
+          const totalValue = (currentQty * currentCost) + (newQty * newCost);
+          const totalQty = currentQty + newQty;
+          const weightedCost = totalQty > 0 ? totalValue / totalQty : newCost;
+
+          batch.update(invRef, {
+            quantity: totalQty,
+            cost: parseFloat(weightedCost.toFixed(2))
+          });
+        }
+      }
+    }
+
+    // Handle Vendor Balance Update
+    // Recalculate Vendor Balance by querying all pending POs
+    // Differential updates are fragile. Recalculation is self-correcting.
+    if (oldPurchase.vendorId) {
+      const vendorRef = doc(db, 'vendors', oldPurchase.vendorId);
+
+      // 1. Get all other purchases for this vendor (using current state 'purchases')
+      const otherPurchases = purchases.filter(p => p.vendorId === oldPurchase.vendorId && p.id !== id);
+
+      // 2. Calculate pending for other purchases
+      let totalPending = otherPurchases.reduce((sum, p) => {
+        return sum + (p.total - (p.amountPaid || 0));
+      }, 0);
+
+      // 3. Add pending for THIS updated purchase
+      const newTotal = updates.total !== undefined ? updates.total : (oldPurchase.total || 0);
+      const newPaid = updates.amountPaid !== undefined ? updates.amountPaid : (oldPurchase.amountPaid || 0);
+      const newPending = newTotal - newPaid;
+
+      totalPending += newPending;
+
+      // 4. Update Vendor Balance
+      batch.update(vendorRef, {
+        balance: totalPending > 0 ? totalPending : 0
+      });
+    }
+
+    await batch.commit();
+  };
+
+  const deletePurchase = async (id) => {
+    await deleteDoc(doc(db, 'purchases', id));
   };
 
   const addInvoice = async (invoice) => {
@@ -182,6 +322,8 @@ export const DataProvider = ({ children }) => {
       inventory,
       invoices,
       categories,
+      vendors,
+      purchases,
       addInventoryItem,
       updateInventoryItem,
       deleteInventoryItem,
@@ -194,7 +336,13 @@ export const DataProvider = ({ children }) => {
       customers,
       addCustomer,
       updateCustomer,
-      deleteCustomer
+      deleteCustomer,
+      addVendor,
+      updateVendor,
+      deleteVendor,
+      addPurchase,
+      updatePurchase,
+      deletePurchase
     }}>
       {children}
     </DataContext.Provider>

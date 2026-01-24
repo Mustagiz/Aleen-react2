@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete } from '@mui/material';
+import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel } from '@mui/material';
 import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, FilterList, Receipt, Share, Close, MoreVert } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import { generateInvoiceNumber } from '../utils/helpers';
@@ -48,6 +48,13 @@ const Invoices = () => {
   const [dateFilter, setDateFilter] = useState('');
   const [paymentFilter, setPaymentFilter] = useState('All');
   const [showFilters, setShowFilters] = useState(false);
+  const [globalItemFilter, setGlobalItemFilter] = useState('');
+  // Split Payment State
+  const [isSplitPayment, setIsSplitPayment] = useState(false);
+  const [splitAmount, setSplitAmount] = useState(0);
+  const [paymentMethod2, setPaymentMethod2] = useState('Card');
+  const [discountType, setDiscountType] = useState('percent'); // 'percent' or 'fixed'
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const printRef = useRef();
@@ -83,7 +90,14 @@ const Invoices = () => {
       return sum + (invItem ? invItem.price * item.quantity : 0);
     }, 0);
     const taxAmount = subtotal * (tax / 100);
-    const absDiscount = subtotal * (discount / 100);
+
+    let absDiscount = 0;
+    if (discountType === 'percent') {
+      absDiscount = subtotal * (discount / 100);
+    } else {
+      absDiscount = discount; // Fixed amount
+    }
+
     const total = subtotal + taxAmount - absDiscount;
     return { subtotal, taxAmount, total, absDiscount };
   };
@@ -97,13 +111,19 @@ const Invoices = () => {
 
     const { subtotal, taxAmount, total, absDiscount } = calculateTotal();
     const invoiceNumber = generateInvoiceNumber(invoices.length);
+
+    let finalPaymentMethod = paymentMethod;
+    if (isSplitPayment) {
+      finalPaymentMethod = `Split: ${paymentMethod} (${splitAmount}) + ${paymentMethod2} (${(total - splitAmount).toFixed(2)})`;
+    }
+
     const invoice = {
       id: invoiceNumber,
       date: new Date().toISOString(),
       customer,
       phone,
       customerId: selectedCustomerId,
-      paymentMethod,
+      paymentMethod: finalPaymentMethod,
       items: validItems.map(item => {
         const invItem = inventory.find(i => i.id === item.id);
         return {
@@ -128,6 +148,9 @@ const Invoices = () => {
     setPhone('+91');
     setSelectedCustomerId(null);
     setPaymentMethod('Cash');
+    setIsSplitPayment(false);
+    setSplitAmount(0);
+    setDiscountType('percent');
   };
 
   const generatePDF = (invoice) => {
@@ -713,10 +736,24 @@ const Invoices = () => {
 
           <Paper sx={{ p: { xs: 1.5, sm: 2 }, mb: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2 }}>Invoice Items</Typography>
+
+            <Box sx={{ mb: 2, display: 'flex', gap: 2 }}>
+              <TextField
+                fullWidth
+                placeholder="Filter Products within rows (Name or ID)..."
+                value={globalItemFilter}
+                onChange={(e) => setGlobalItemFilter(e.target.value)}
+                size="small"
+                InputProps={{
+                  startAdornment: <FilterList sx={{ color: 'text.secondary', mr: 1 }} />
+                }}
+              />
+            </Box>
+
             <Box sx={{ mb: 2 }}>
               <TextField
                 fullWidth
-                placeholder="Type Product ID and press Enter to add..."
+                placeholder="Scan Barcode / Product ID to Quick Add..."
                 value={itemSearchTerm}
                 onChange={(e) => {
                   const val = e.target.value;
@@ -764,10 +801,14 @@ const Invoices = () => {
               />
             </Box>
             {selectedItems.map((item, index) => {
-              const filteredInventory = inventory.filter(inv =>
-                inv.name.toLowerCase().includes(itemSearchTerm.toLowerCase()) ||
-                (inv.productId && inv.productId.toLowerCase().includes(itemSearchTerm.toLowerCase()))
-              );
+              // Filter inventory based on globalItemFilter
+              const filteredInventory = globalItemFilter
+                ? inventory.filter(inv =>
+                  inv.name.toLowerCase().includes(globalItemFilter.toLowerCase()) ||
+                  (inv.productId && inv.productId.toLowerCase().includes(globalItemFilter.toLowerCase()))
+                )
+                : inventory;
+
               return (
                 <Box key={index} sx={{
                   display: 'flex',
@@ -782,27 +823,39 @@ const Invoices = () => {
                 }}>
                   <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <TextField
-                        select
-                        label="Select Item"
-                        value={item.id}
-                        onChange={(e) => handleItemChange(index, 'id', e.target.value)}
-                        fullWidth
-                        size="small"
-                        error={!item.id && selectedItems.length > 0}
-                      >
-                        {filteredInventory.length > 0 ? (
-                          filteredInventory.map(inv => (
-                            <MenuItem key={inv.id} value={inv.id}>
-                              {inv.productId ? `[${inv.productId}] ` : ''}{inv.name} - ₹{inv.price}
-                            </MenuItem>
-                          ))
-                        ) : (
-                          <MenuItem disabled value="">
-                            {inventory.length > 0 ? 'No matching items' : 'No items in inventory'}
-                          </MenuItem>
+                      <Autocomplete
+                        value={inventory.find(i => i.id === item.id) || null}
+                        onChange={(event, newValue) => {
+                          handleItemChange(index, 'id', newValue ? newValue.id : '');
+                        }}
+                        options={filteredInventory}
+                        getOptionLabel={(option) => `${option.name} (₹${option.price})`}
+                        filterOptions={(options, { inputValue }) => {
+                          return options.filter(option =>
+                            option.name.toLowerCase().includes(inputValue.toLowerCase()) ||
+                            (option.productId && option.productId.toLowerCase().includes(inputValue.toLowerCase()))
+                          );
+                        }}
+                        renderOption={(props, option) => (
+                          <Box component="li" {...props} key={option.id}>
+                            <Box>
+                              <Typography variant="body2" sx={{ fontWeight: 600 }}>{option.name}</Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                ID: {option.productId || 'N/A'} | Stock: {option.quantity} | ₹{option.price}
+                              </Typography>
+                            </Box>
+                          </Box>
                         )}
-                      </TextField>
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="Search Product (Name or ID)"
+                            size="small"
+                            fullWidth
+                            error={!item.id && selectedItems.length > 0}
+                          />
+                        )}
+                      />
                     </Box>
                     <IconButton
                       size="small"
@@ -834,16 +887,82 @@ const Invoices = () => {
           </Paper>
 
           <Paper sx={{ p: { xs: 1.5, sm: 2 }, bgcolor: 'grey.50', borderRadius: 2 }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2 }}>Payment & Totals</Typography>
-            <TextField select label="Payment Method" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} fullWidth size="small" margin="normal">
-              <MenuItem value="Cash">Cash</MenuItem>
-              <MenuItem value="Card">Card</MenuItem>
-              <MenuItem value="UPI">UPI</MenuItem>
-              <MenuItem value="Net Banking">Net Banking</MenuItem>
-            </TextField>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>Payment & Totals</Typography>
+              <FormControlLabel
+                control={<Switch checked={isSplitPayment} onChange={(e) => {
+                  setIsSplitPayment(e.target.checked);
+                  if (e.target.checked) setSplitAmount(Math.round(total / 2));
+                }} size="small" />}
+                label={<Typography variant="body2" sx={{ fontWeight: 600 }}>Split Payment</Typography>}
+              />
+            </Box>
+
+            {!isSplitPayment ? (
+              <TextField select label="Payment Method" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} fullWidth size="small">
+                <MenuItem value="Cash">Cash</MenuItem>
+                <MenuItem value="Card">Card</MenuItem>
+                <MenuItem value="UPI">UPI</MenuItem>
+                <MenuItem value="Net Banking">Net Banking</MenuItem>
+              </TextField>
+            ) : (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  <TextField select label="Method 1" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} fullWidth size="small">
+                    <MenuItem value="Cash">Cash</MenuItem>
+                    <MenuItem value="Card">Card</MenuItem>
+                    <MenuItem value="UPI">UPI</MenuItem>
+                    <MenuItem value="Net Banking">Net Banking</MenuItem>
+                  </TextField>
+                  <TextField
+                    label="Amount 1"
+                    type="number"
+                    value={splitAmount}
+                    onChange={(e) => setSplitAmount(parseFloat(e.target.value) || 0)}
+                    fullWidth
+                    size="small"
+                  />
+                </Box>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  <TextField select label="Method 2" value={paymentMethod2} onChange={(e) => setPaymentMethod2(e.target.value)} fullWidth size="small">
+                    <MenuItem value="Cash">Cash</MenuItem>
+                    <MenuItem value="Card">Card</MenuItem>
+                    <MenuItem value="UPI">UPI</MenuItem>
+                    <MenuItem value="Net Banking">Net Banking</MenuItem>
+                  </TextField>
+                  <TextField
+                    label="Amount 2"
+                    value={(total - splitAmount).toFixed(2)}
+                    disabled
+                    fullWidth
+                    size="small"
+                    helperText="Auto-calculated remainder"
+                  />
+                </Box>
+              </Box>
+            )}
             <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
               <TextField label="GST (%)" type="number" size="small" value={tax} onChange={(e) => setTax(parseFloat(e.target.value) || 0)} fullWidth />
-              <TextField label="Discount (%)" type="number" size="small" value={discount} onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)} fullWidth />
+              <Box sx={{ display: 'flex', gap: 1, width: '100%' }}>
+                <TextField
+                  label={`Discount (${discountType === 'percent' ? '%' : '₹'})`}
+                  type="number"
+                  size="small"
+                  value={discount}
+                  onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
+                  fullWidth
+                />
+                <TextField
+                  select
+                  value={discountType}
+                  onChange={(e) => setDiscountType(e.target.value)}
+                  size="small"
+                  sx={{ width: 100 }}
+                >
+                  <MenuItem value="percent">%</MenuItem>
+                  <MenuItem value="fixed">₹</MenuItem>
+                </TextField>
+              </Box>
             </Box>
             <Box sx={{ mt: 3, p: 2, bgcolor: mode === 'light' ? 'rgba(136, 14, 79, 0.05)' : 'rgba(255, 255, 255, 0.05)', borderRadius: 2 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
@@ -855,7 +974,7 @@ const Invoices = () => {
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>₹{taxAmount.toFixed(2).toLocaleString()}</Typography>
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                <Typography variant="body2">Discount ({discount}%):</Typography>
+                <Typography variant="body2">Discount ({discount}{discountType === 'percent' ? '%' : '₹'}):</Typography>
                 <Typography variant="body2" sx={{ fontWeight: 600, color: 'error.main' }}>- ₹{absDiscount.toFixed(2).toLocaleString()}</Typography>
               </Box>
               <Divider sx={{ my: 1.5 }} />

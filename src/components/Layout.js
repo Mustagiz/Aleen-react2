@@ -26,6 +26,8 @@ const Layout = () => {
       items: [
         { text: 'Dashboard', icon: <Dashboard />, path: '/' },
         { text: 'Inventory', icon: <Inventory />, path: '/inventory' },
+        { text: 'Purchases', icon: <Receipt />, path: '/purchases' },
+        { text: 'Vendors', icon: <Store />, path: '/vendors' },
         { text: 'Invoices', icon: <Receipt />, path: '/invoices' },
         { text: 'Customers', icon: <People />, path: '/customers' }
       ]
@@ -57,6 +59,8 @@ const Layout = () => {
     { text: 'Invoices', icon: <Receipt />, path: '/invoices' },
     { text: 'Customers', icon: <People />, path: '/customers' },
     { text: 'P&L', icon: <TrendingUp />, path: '/profit-loss' },
+    { text: 'Vendors', icon: <Store />, path: '/vendors' },
+    { text: 'Purchases', icon: <Receipt />, path: '/purchases' },
     { text: 'Sales', icon: <Assessment />, path: '/sales-reports' },
     { text: 'Stock', icon: <Assessment />, path: '/inventory-reports' },
     { text: 'Settings', icon: <Settings />, path: '/settings' }

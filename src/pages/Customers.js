@@ -106,14 +106,15 @@ const Customers = () => {
             <Grid container spacing={3} sx={{ mb: 4 }}>
                 {stats.map((stat, idx) => (
                     <Grid item xs={12} sm={4} key={idx}>
-                        <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
-                            <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Card sx={{ borderRadius: 4, position: 'relative', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: 'none' }}>
+                            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: stat.color }} />
+                            <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <Box>
+                                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{stat.title}</Typography>
+                                    <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5 }}>{stat.value}</Typography>
+                                </Box>
                                 <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: `${stat.color}10`, color: stat.color }}>
                                     {stat.icon}
-                                </Box>
-                                <Box>
-                                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase' }}>{stat.title}</Typography>
-                                    <Typography variant="h5" sx={{ fontWeight: 800 }}>{stat.value}</Typography>
                                 </Box>
                             </CardContent>
                         </Card>
