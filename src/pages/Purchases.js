@@ -188,6 +188,36 @@ const Purchases = () => {
         }
     };
 
+    const downloadPurchases = () => {
+        const csvData = purchases.map(po => ({
+            'PO ID': po.id,
+            'Date': new Date(po.date).toLocaleDateString(),
+            'Vendor': po.vendorName,
+            'Items': po.items.map(i => `${i.productName} (x${i.quantity})`).join('|'),
+            'Total Amount': po.total,
+            'Paid Amount': po.amountPaid || 0,
+            'Payment Status': po.paymentStatus,
+            'Order Status': po.status
+        }));
+
+        if (csvData.length === 0) {
+            alert('No purchase orders to export');
+            return;
+        }
+
+        const headers = Object.keys(csvData[0]);
+        const csvContent = [
+            headers.join(','),
+            ...csvData.map(row => headers.map(h => `"${row[h]}"`).join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `purchases_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+    };
+
     return (
         <Box>
             <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -195,23 +225,33 @@ const Purchases = () => {
                     <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>Purchase Orders</Typography>
                     <Typography variant="body2" color="text.secondary">Track stock orders and vendor expenses</Typography>
                 </Box>
-                <Button variant="contained" startIcon={<Add />} onClick={() => handleOpen()} sx={{
-                    borderRadius: 2,
-                    textTransform: 'none',
-                    fontWeight: 700,
-                    px: 3,
-                    py: 1.5,
-                    background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)',
-                    boxShadow: `0 4px 12px ${theme.palette.primary.main}33`,
-                    transition: 'all 0.2s ease-in-out',
-                    '&:hover': {
-                        background: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)',
-                        boxShadow: `0 6px 16px ${theme.palette.primary.main}4D`,
-                        transform: 'translateY(-2px)'
-                    }
-                }}>
-                    Create Order
-                </Button>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button
+                        variant="outlined"
+                        startIcon={<Download />}
+                        onClick={downloadPurchases}
+                        sx={{ borderRadius: 2, textTransform: 'none' }}
+                    >
+                        Export CSV
+                    </Button>
+                    <Button variant="contained" startIcon={<Add />} onClick={() => handleOpen()} sx={{
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        fontWeight: 700,
+                        px: 3,
+                        py: 1.5,
+                        background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)',
+                        boxShadow: `0 4px 12px ${theme.palette.primary.main}33`,
+                        transition: 'all 0.2s ease-in-out',
+                        '&:hover': {
+                            background: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)',
+                            boxShadow: `0 6px 16px ${theme.palette.primary.main}4D`,
+                            transform: 'translateY(-2px)'
+                        }
+                    }}>
+                        Create Order
+                    </Button>
+                </Box>
             </Box>
 
             <Grid container spacing={3} sx={{ mb: 4 }}>

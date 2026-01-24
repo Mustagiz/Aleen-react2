@@ -172,6 +172,37 @@ const Invoices = () => {
     setDiscountType('percent');
   };
 
+  const downloadInvoices = () => {
+    const csvData = filteredInvoices.map(inv => ({
+      'Invoice #': inv.id,
+      'Date': new Date(inv.date).toLocaleDateString(),
+      'Customer': inv.customer || 'Walk-in',
+      'Phone': inv.phone || '',
+      'Items': inv.items.map(i => `${i.name} (x${i.quantity})`).join('|'),
+      'Subtotal': inv.subtotal,
+      'Discount': inv.discount,
+      'Total': inv.total,
+      'Payment Method': inv.paymentMethod
+    }));
+
+    if (csvData.length === 0) {
+      alert('No invoices to export');
+      return;
+    }
+
+    const headers = Object.keys(csvData[0]);
+    const csvContent = [
+      headers.join(','),
+      ...csvData.map(row => headers.map(h => `"${row[h]}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `invoices_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+  };
+
   const generatePDF = (invoice) => {
     const doc = new jsPDF();
     const primaryColor = '#F472B6'; // Baby Pink
@@ -340,33 +371,43 @@ const Invoices = () => {
             <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>Invoices</Typography>
             <Typography variant="body2" color="text.secondary">Create, manage and track all your invoices</Typography>
           </Box>
-          <Button
-            variant="contained"
-            startIcon={<Add />}
-            onClick={() => {
-              setSelectedItems([{ id: '', quantity: 1 }]);
-              setOpen(true);
-            }}
-            size="large"
-            sx={{
-              width: { xs: '100%', sm: 'auto' },
-              px: { xs: 2, sm: 4 },
-              py: 1.5,
-              borderRadius: 2,
-              fontWeight: 700,
-              textTransform: 'none',
-              background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)',
-              boxShadow: `0 4px 12px ${theme.palette.primary.main}33`,
-              transition: 'all 0.2s ease-in-out',
-              '&:hover': {
-                background: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)',
-                boxShadow: `0 6px 16px ${theme.palette.primary.main}4D`,
-                transform: 'translateY(-2px)'
-              }
-            }}
-          >
-            Create Invoice
-          </Button>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button
+              variant="outlined"
+              startIcon={<Download />}
+              onClick={downloadInvoices}
+              sx={{ px: 3, py: 1.5, borderRadius: 2, fontWeight: 700, textTransform: 'none' }}
+            >
+              Export CSV
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<Add />}
+              onClick={() => {
+                setSelectedItems([{ id: '', quantity: 1 }]);
+                setOpen(true);
+              }}
+              size="large"
+              sx={{
+                width: { xs: '100%', sm: 'auto' },
+                px: { xs: 2, sm: 4 },
+                py: 1.5,
+                borderRadius: 2,
+                fontWeight: 700,
+                textTransform: 'none',
+                background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)',
+                boxShadow: `0 4px 12px ${theme.palette.primary.main}33`,
+                transition: 'all 0.2s ease-in-out',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)',
+                  boxShadow: `0 6px 16px ${theme.palette.primary.main}4D`,
+                  transform: 'translateY(-2px)'
+                }
+              }}
+            >
+              Create Invoice
+            </Button>
+          </Box>
         </Box>
 
         {/* Stats Cards */}
