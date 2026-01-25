@@ -348,6 +348,16 @@ export const DataProvider = ({ children }) => {
     await deleteDoc(doc(db, 'expenses', id));
   };
 
+  const bulkAddExpenses = async (items) => {
+    const batch = writeBatch(db);
+    items.forEach(item => {
+      const id = item.id || Date.now().toString() + Math.random().toString(36).substr(2, 5);
+      const docRef = doc(db, 'expenses', id);
+      batch.set(docRef, { ...item, id, dateAdded: new Date().toISOString() });
+    });
+    await batch.commit();
+  };
+
   return (
     <DataContext.Provider value={{
       inventory,
@@ -378,7 +388,8 @@ export const DataProvider = ({ children }) => {
       expenses,
       addExpense,
       updateExpense,
-      deleteExpense
+      deleteExpense,
+      bulkAddExpenses
     }}>
       {children}
     </DataContext.Provider>

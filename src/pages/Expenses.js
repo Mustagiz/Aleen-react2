@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, useTheme, useMediaQuery, Divider, TablePagination } from '@mui/material';
-import { Edit, Delete, Add, Search, ReceiptLong, AccountBalanceWallet, Warning, Download } from '@mui/icons-material';
+import { Edit, Delete, Add, Search, ReceiptLong, AccountBalanceWallet, Warning, Download, Upload } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 
 const Expenses = () => {
-    const { expenses, addExpense, updateExpense, deleteExpense } = useData();
+    const { expenses, addExpense, updateExpense, deleteExpense, bulkAddExpenses } = useData();
     const [open, setOpen] = useState(false);
     const [editItem, setEditItem] = useState(null);
     const [search, setSearch] = useState('');
@@ -102,6 +102,53 @@ const Expenses = () => {
         link.click();
     };
 
+    const downloadTemplate = () => {
+        const headers = ['date', 'title', 'category', 'amount', 'note'];
+        const csvContent = [
+            headers.join(','),
+            [new Date().toISOString().split('T')[0], 'Office Rent', 'Rent', '5000', 'Monthly rent'].map(v => `"${v}"`).join(',')
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `expense_template.csv`;
+        link.click();
+    };
+
+    const handleBulkUpload = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const text = e.target.result;
+            const lines = text.split('\n').filter(line => line.trim());
+            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+            const items = lines.slice(1).map(line => {
+                const values = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.trim().replace(/"/g, ''));
+                const item = {};
+                headers.forEach((h, i) => {
+                    if (h === 'amount') item[h] = parseFloat(values[i]) || 0;
+                    else item[h] = values[i] || '';
+                });
+                return item;
+            });
+
+            if (items.length > 0) {
+                try {
+                    await bulkAddExpenses(items);
+                    alert(`Successfully uploaded ${items.length} expenses`);
+                } catch (error) {
+                    console.error('Bulk upload error:', error);
+                    alert('Error uploading expenses. Please check the file format.');
+                }
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = null; // Reset input
+    };
+
     return (
         <Box>
             <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -109,8 +156,13 @@ const Expenses = () => {
                     <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>Miscellaneous Expenses</Typography>
                     <Typography variant="body2" color="text.secondary">Track your overheads and business costs</Typography>
                 </Box>
-                <Box sx={{ display: 'flex', gap: 1 }}>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                     <Button variant="outlined" startIcon={<Download />} onClick={downloadExpenses} sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700 }}>Export</Button>
+                    <Button variant="outlined" startIcon={<Download />} onClick={downloadTemplate} color="secondary" sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700 }}>Template</Button>
+                    <Button variant="outlined" component="label" startIcon={<Upload />} sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700 }}>
+                        Bulk Upload
+                        <input type="file" hidden accept=".csv" onChange={handleBulkUpload} />
+                    </Button>
                     <Button variant="contained" startIcon={<Add />} onClick={() => handleOpen()} sx={{
                         borderRadius: 2,
                         textTransform: 'none',
