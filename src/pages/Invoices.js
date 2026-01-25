@@ -78,7 +78,7 @@ const Invoices = () => {
   });
 
   const handleAddItem = () => {
-    setSelectedItems([...selectedItems, { id: '', quantity: 1 }]);
+    setSelectedItems([...selectedItems, { id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0 }]);
   };
 
   const handleItemChange = (index, field, value) => {
@@ -89,6 +89,9 @@ const Invoices = () => {
 
   const calculateTotal = () => {
     const subtotal = selectedItems.reduce((sum, item) => {
+      if (item.isCustom) {
+        return sum + (parseFloat(item.customPrice || 0) * item.quantity);
+      }
       const invItem = inventory.find(i => i.id === item.id);
       return sum + (invItem ? invItem.price * item.quantity : 0);
     }, 0);
@@ -106,7 +109,7 @@ const Invoices = () => {
   };
 
   const handleSaveInvoice = async () => {
-    const validItems = selectedItems.filter(item => item.id);
+    const validItems = selectedItems.filter(item => item.id || (item.isCustom && item.customName && item.customPrice > 0));
     if (validItems.length === 0) {
       alert('Please add at least one item');
       return;
@@ -146,6 +149,15 @@ const Invoices = () => {
       customerId: finalCustomerId,
       paymentMethod: finalPaymentMethod,
       items: validItems.map(item => {
+        if (item.isCustom) {
+          return {
+            id: `custom-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+            name: item.customName || 'Custom Item',
+            price: parseFloat(item.customPrice || 0),
+            quantity: item.quantity,
+            category: 'Custom'
+          };
+        }
         const invItem = inventory.find(i => i.id === item.id);
         return {
           ...item,
@@ -163,7 +175,7 @@ const Invoices = () => {
     };
     await addInvoice(invoice);
     setOpen(false);
-    setSelectedItems([{ id: '', quantity: 1 }]);
+    setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0 }]);
     setDiscount(0);
     setCustomer('');
     setPhone('+91');
@@ -979,47 +991,86 @@ const Invoices = () => {
                 }}>
                   <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Autocomplete
-                        value={inventory.find(i => i.id === item.id) || null}
-                        onChange={(event, newValue) => {
-                          handleItemChange(index, 'id', newValue ? newValue.id : '');
-                        }}
-                        options={filteredInventory}
-                        getOptionLabel={(option) => `${option.name} (₹${option.price})`}
-                        filterOptions={(options, { inputValue }) => {
-                          return options.filter(option =>
-                            option.name.toLowerCase().includes(inputValue.toLowerCase()) ||
-                            (option.productId && option.productId.toLowerCase().includes(inputValue.toLowerCase()))
-                          );
-                        }}
-                        renderOption={(props, option) => (
-                          <Box component="li" {...props} key={option.id}>
-                            <Box>
-                              <Typography variant="body2" sx={{ fontWeight: 600 }}>{option.name}</Typography>
-                              <Typography variant="caption" color="text.secondary">
-                                ID: {option.productId || 'N/A'} | Stock: {option.quantity} | ₹{option.price}
-                              </Typography>
+                      {!item.isCustom ? (
+                        <Autocomplete
+                          value={inventory.find(i => i.id === item.id) || null}
+                          onChange={(event, newValue) => {
+                            handleItemChange(index, 'id', newValue ? newValue.id : '');
+                          }}
+                          options={filteredInventory}
+                          getOptionLabel={(option) => `${option.name} (₹${option.price})`}
+                          filterOptions={(options, { inputValue }) => {
+                            return options.filter(option =>
+                              option.name.toLowerCase().includes(inputValue.toLowerCase()) ||
+                              (option.productId && option.productId.toLowerCase().includes(inputValue.toLowerCase()))
+                            );
+                          }}
+                          renderOption={(props, option) => (
+                            <Box component="li" {...props} key={option.id}>
+                              <Box>
+                                <Typography variant="body2" sx={{ fontWeight: 600 }}>{option.name}</Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  ID: {option.productId || 'N/A'} | Stock: {option.quantity} | ₹{option.price}
+                                </Typography>
+                              </Box>
                             </Box>
-                          </Box>
-                        )}
-                        renderInput={(params) => (
+                          )}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Search Product (Name or ID)"
+                              size="small"
+                              fullWidth
+                              error={!item.id && selectedItems.length > 0}
+                            />
+                          )}
+                        />
+                      ) : (
+                        <Box sx={{ display: 'flex', gap: 1 }}>
                           <TextField
-                            {...params}
-                            label="Search Product (Name or ID)"
+                            label="Custom Product Name"
                             size="small"
                             fullWidth
-                            error={!item.id && selectedItems.length > 0}
+                            value={item.customName}
+                            onChange={(e) => handleItemChange(index, 'customName', e.target.value)}
+                            error={!item.customName && selectedItems.length > 0}
                           />
-                        )}
-                      />
+                          <TextField
+                            label="Price (₹)"
+                            size="small"
+                            type="number"
+                            sx={{ width: 140 }}
+                            value={item.customPrice}
+                            onChange={(e) => handleItemChange(index, 'customPrice', parseFloat(e.target.value) || 0)}
+                          />
+                        </Box>
+                      )}
                     </Box>
-                    <IconButton
-                      size="small"
-                      onClick={() => setSelectedItems(selectedItems.filter((_, i) => i !== index))}
-                      sx={{ color: 'error.main', mt: 0.5 }}
-                    >
-                      <Delete fontSize="small" />
-                    </IconButton>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            size="small"
+                            checked={item.isCustom}
+                            onChange={(e) => {
+                              handleItemChange(index, 'isCustom', e.target.checked);
+                              if (e.target.checked) handleItemChange(index, 'id', 'custom'); // Placeholder ID
+                              else handleItemChange(index, 'id', '');
+                            }}
+                          />
+                        }
+                        label={<Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.65rem' }}>Custom?</Typography>}
+                        labelPlacement="top"
+                        sx={{ m: 0 }}
+                      />
+                      <IconButton
+                        size="small"
+                        onClick={() => setSelectedItems(selectedItems.filter((_, i) => i !== index))}
+                        sx={{ color: 'error.main' }}
+                      >
+                        <Delete fontSize="small" />
+                      </IconButton>
+                    </Box>
                   </Box>
                   <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
                     <TextField
@@ -1030,10 +1081,16 @@ const Invoices = () => {
                       onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value) || 1)}
                       sx={{ width: 100 }}
                     />
-                    {item.id && (
+                    {item.isCustom ? (
                       <Typography variant="body2" sx={{ fontWeight: 700, ml: 'auto', color: 'primary.main' }}>
-                        ₹{(inventory.find(i => i.id === item.id)?.price * item.quantity || 0).toLocaleString()}
+                        ₹{((item.customPrice || 0) * item.quantity).toLocaleString()}
                       </Typography>
+                    ) : (
+                      item.id && (
+                        <Typography variant="body2" sx={{ fontWeight: 700, ml: 'auto', color: 'primary.main' }}>
+                          ₹{(inventory.find(i => i.id === item.id)?.price * item.quantity || 0).toLocaleString()}
+                        </Typography>
+                      )
                     )}
                   </Box>
                 </Box>
