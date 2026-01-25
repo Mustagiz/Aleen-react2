@@ -56,6 +56,7 @@ const Invoices = () => {
   const [splitAmount, setSplitAmount] = useState(0);
   const [paymentMethod2, setPaymentMethod2] = useState('Card');
   const [discountType, setDiscountType] = useState('percent'); // 'percent' or 'fixed'
+  const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().split('T')[0]);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -143,7 +144,7 @@ const Invoices = () => {
 
     const invoice = {
       id: invoiceNumber,
-      date: new Date().toISOString(),
+      date: new Date(invoiceDate).toISOString(),
       customer,
       phone,
       customerId: finalCustomerId,
@@ -179,6 +180,7 @@ const Invoices = () => {
     setDiscount(0);
     setCustomer('');
     setPhone('+91');
+    setInvoiceDate(new Date().toISOString().split('T')[0]);
     setSelectedCustomerId(null);
     setPaymentMethod('Cash');
     setIsSplitPayment(false);
@@ -898,6 +900,14 @@ const Invoices = () => {
                 fullWidth
                 placeholder="919876543210"
                 helperText="Press Enter to search for existing customer name"
+              />
+              <TextField
+                label="Invoice Date"
+                type="date"
+                value={invoiceDate}
+                onChange={(e) => setInvoiceDate(e.target.value)}
+                fullWidth
+                InputLabelProps={{ shrink: true }}
               />
             </Box>
           </Paper>
