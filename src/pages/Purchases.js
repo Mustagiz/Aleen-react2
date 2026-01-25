@@ -29,6 +29,7 @@ const Purchases = () => {
     const [poItems, setPoItems] = useState([{ productId: '', quantity: 1, cost: 0 }]);
     const [paymentStatus, setPaymentStatus] = useState('Unpaid');
     const [amountPaid, setAmountPaid] = useState(0);
+    const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().split('T')[0]);
 
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -63,6 +64,7 @@ const Purchases = () => {
             setPoItems([{ productId: '', quantity: 1, cost: 0 }]);
             setPaymentStatus('Unpaid');
             setAmountPaid(0);
+            setPurchaseDate(new Date().toISOString().split('T')[0]);
         }
         setOpen(true);
     };
@@ -160,9 +162,7 @@ const Purchases = () => {
             amountPaid: parseFloat(amountPaid) || 0,
             items: poItems.filter(i => i.productId),
             total,
-            date: new Date().toISOString() // Or keep original date if editing? Usually date stays.
-            // Simplified: New date for modify or keep old? Let's keep new date for now or we need to access old date.
-            // If editing, we shouldn't change date ideally.
+            date: new Date(purchaseDate).toISOString()
         };
 
         if (editMode && selectedPoId) {
@@ -173,6 +173,7 @@ const Purchases = () => {
             await addPurchase(poData);
         }
         setOpen(false);
+        setPurchaseDate(new Date().toISOString().split('T')[0]);
     };
 
     const handleConfirmDelete = async () => {
@@ -492,7 +493,7 @@ const Purchases = () => {
                                     )}
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={4}>
                                 <TextField
                                     select
                                     fullWidth
@@ -504,92 +505,104 @@ const Purchases = () => {
                                     <MenuItem value="Received">Received (Stock Added)</MenuItem>
                                 </TextField>
                             </Grid>
+                            <Grid item xs={12} sm={4}>
+                                <TextField
+                                    label="Purchase Date"
+                                    type="date"
+                                    fullWidth
+                                    value={purchaseDate}
+                                    onChange={(e) => setPurchaseDate(e.target.value)}
+                                    InputLabelProps={{ shrink: true }}
+                                />
+                            </Grid>
                         </Grid>
                     </Box>
 
                     <Box sx={{ mb: 2, pb: 2, borderBottom: isMobile ? '1px solid' : 'none', borderColor: 'divider' }}>
                         <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 800, fontSize: isMobile ? '0.7rem' : '0.75rem', display: 'block', mb: 1.5 }}>Order Items</Typography>
                     </Box>
-                    {poItems.map((item, index) => (
-                        <Paper
-                            key={index}
-                            elevation={0}
-                            sx={{
-                                p: isMobile ? 2 : 2,
-                                mb: isMobile ? 2.5 : 2,
-                                border: '1px solid',
-                                borderColor: 'divider',
-                                borderRadius: isMobile ? 3 : 2,
-                                bgcolor: isMobile ? 'background.paper' : 'grey.50',
-                                boxShadow: isMobile ? '0 2px 8px rgba(0,0,0,0.08)' : 'none'
-                            }}
-                        >
-                            <Grid container spacing={2} alignItems="center">
-                                <Grid item xs={12} sm={5}>
-                                    <Box sx={{ display: 'flex', gap: isMobile ? 1 : 1, flexDirection: isMobile ? 'column' : 'row' }}>
-                                        <Autocomplete
+                    {
+                        poItems.map((item, index) => (
+                            <Paper
+                                key={index}
+                                elevation={0}
+                                sx={{
+                                    p: isMobile ? 2 : 2,
+                                    mb: isMobile ? 2.5 : 2,
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    borderRadius: isMobile ? 3 : 2,
+                                    bgcolor: isMobile ? 'background.paper' : 'grey.50',
+                                    boxShadow: isMobile ? '0 2px 8px rgba(0,0,0,0.08)' : 'none'
+                                }}
+                            >
+                                <Grid container spacing={2} alignItems="center">
+                                    <Grid item xs={12} sm={5}>
+                                        <Box sx={{ display: 'flex', gap: isMobile ? 1 : 1, flexDirection: isMobile ? 'column' : 'row' }}>
+                                            <Autocomplete
+                                                fullWidth
+                                                options={inventory}
+                                                getOptionLabel={(option) => `${option.name} (Cost: ₹${option.cost || 0})`}
+                                                value={inventory.find(i => i.id === item.productId) || null}
+                                                isOptionEqualToValue={(option, value) => option.id === (typeof value === 'string' ? value : value?.id)}
+                                                onChange={(e, newVal) => handleItemChange(index, 'productId', newVal?.id)}
+                                                renderInput={(params) => <TextField {...params} label="Product" size={isMobile ? 'medium' : 'small'} />}
+                                            />
+                                            <Button
+                                                sx={{ minWidth: isMobile ? '100%' : 40, px: isMobile ? 2 : 0, height: isMobile ? 48 : 'auto' }}
+                                                variant="contained"
+                                                color="secondary"
+                                                onClick={() => handleQuickAddOpen(index)}
+                                                size={isMobile ? 'large' : 'small'}
+                                                startIcon={isMobile ? <Add /> : null}
+                                            >
+                                                {isMobile ? <Add /> : <Add />}
+                                                {isMobile && <Typography sx={{ ml: 1 }}>Quick Add Product</Typography>}
+                                            </Button>
+                                        </Box>
+                                    </Grid>
+                                    <Grid item xs={6} sm={3}>
+                                        <TextField
                                             fullWidth
-                                            options={inventory}
-                                            getOptionLabel={(option) => `${option.name} (Cost: ₹${option.cost || 0})`}
-                                            value={inventory.find(i => i.id === item.productId) || null}
-                                            isOptionEqualToValue={(option, value) => option.id === (typeof value === 'string' ? value : value?.id)}
-                                            onChange={(e, newVal) => handleItemChange(index, 'productId', newVal?.id)}
-                                            renderInput={(params) => <TextField {...params} label="Product" size={isMobile ? 'medium' : 'small'} />}
+                                            label="Quantity"
+                                            type="number"
+                                            size={isMobile ? 'medium' : 'small'}
+                                            value={item.quantity}
+                                            onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value))}
+                                            inputProps={{ min: 1, style: { fontSize: isMobile ? '16px' : '14px' } }}
                                         />
-                                        <Button
-                                            sx={{ minWidth: isMobile ? '100%' : 40, px: isMobile ? 2 : 0, height: isMobile ? 48 : 'auto' }}
-                                            variant="contained"
-                                            color="secondary"
-                                            onClick={() => handleQuickAddOpen(index)}
-                                            size={isMobile ? 'large' : 'small'}
-                                            startIcon={isMobile ? <Add /> : null}
+                                    </Grid>
+                                    <Grid item xs={6} sm={3}>
+                                        <TextField
+                                            fullWidth
+                                            label="Buy Price"
+                                            type="number"
+                                            size={isMobile ? 'medium' : 'small'}
+                                            value={item.cost}
+                                            onChange={(e) => handleItemChange(index, 'cost', parseFloat(e.target.value))}
+                                            InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }}
+                                            inputProps={{ min: 0, step: 0.01, style: { fontSize: isMobile ? '16px' : '14px' } }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={1}>
+                                        <IconButton
+                                            color="error"
+                                            onClick={() => setPoItems(poItems.filter((_, i) => i !== index))}
+                                            size={isMobile ? 'medium' : 'small'}
+                                            sx={{
+                                                width: isMobile ? '100%' : 'auto',
+                                                borderRadius: isMobile ? 1 : '50%',
+                                                bgcolor: isMobile ? 'rgba(211, 47, 47, 0.04)' : 'transparent'
+                                            }}
                                         >
-                                            {isMobile ? <Add /> : <Add />}
-                                            {isMobile && <Typography sx={{ ml: 1 }}>Quick Add Product</Typography>}
-                                        </Button>
-                                    </Box>
+                                            <Delete />
+                                            {isMobile && <Typography variant="button" sx={{ ml: 1 }}>Remove</Typography>}
+                                        </IconButton>
+                                    </Grid>
                                 </Grid>
-                                <Grid item xs={6} sm={3}>
-                                    <TextField
-                                        fullWidth
-                                        label="Quantity"
-                                        type="number"
-                                        size={isMobile ? 'medium' : 'small'}
-                                        value={item.quantity}
-                                        onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value))}
-                                        inputProps={{ min: 1, style: { fontSize: isMobile ? '16px' : '14px' } }}
-                                    />
-                                </Grid>
-                                <Grid item xs={6} sm={3}>
-                                    <TextField
-                                        fullWidth
-                                        label="Buy Price"
-                                        type="number"
-                                        size={isMobile ? 'medium' : 'small'}
-                                        value={item.cost}
-                                        onChange={(e) => handleItemChange(index, 'cost', parseFloat(e.target.value))}
-                                        InputProps={{ startAdornment: <InputAdornment position="start">₹</InputAdornment> }}
-                                        inputProps={{ min: 0, step: 0.01, style: { fontSize: isMobile ? '16px' : '14px' } }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={1}>
-                                    <IconButton
-                                        color="error"
-                                        onClick={() => setPoItems(poItems.filter((_, i) => i !== index))}
-                                        size={isMobile ? 'medium' : 'small'}
-                                        sx={{
-                                            width: isMobile ? '100%' : 'auto',
-                                            borderRadius: isMobile ? 1 : '50%',
-                                            bgcolor: isMobile ? 'rgba(211, 47, 47, 0.04)' : 'transparent'
-                                        }}
-                                    >
-                                        <Delete />
-                                        {isMobile && <Typography variant="button" sx={{ ml: 1 }}>Remove</Typography>}
-                                    </IconButton>
-                                </Grid>
-                            </Grid>
-                        </Paper>
-                    ))}
+                            </Paper>
+                        ))
+                    }
 
                     <Button
                         startIcon={<Add />}
@@ -641,7 +654,7 @@ const Purchases = () => {
                             </Grid>
                         </Grid>
                     </Box>
-                </DialogContent>
+                </DialogContent >
                 <DialogActions sx={{ p: isMobile ? 2 : 3, gap: 1, flexDirection: isMobile ? 'column' : 'row', position: isMobile ? 'fixed' : 'relative', bottom: isMobile ? 0 : 'auto', left: isMobile ? 0 : 'auto', right: isMobile ? 0 : 'auto', bgcolor: 'background.paper', borderTop: isMobile ? '1px solid' : 'none', borderColor: 'divider', zIndex: 1 }}>
                     <Button onClick={() => setOpen(false)} fullWidth={isMobile} size={isMobile ? 'large' : 'medium'}>Cancel</Button>
                     <Button
@@ -655,10 +668,10 @@ const Purchases = () => {
                         Save Order
                     </Button>
                 </DialogActions>
-            </Dialog>
+            </Dialog >
 
             {/* Quick Add Product Dialog */}
-            <Dialog open={quickAddDialog} onClose={() => setQuickAddDialog(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
+            < Dialog open={quickAddDialog} onClose={() => setQuickAddDialog(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
                 <DialogTitle sx={{ bgcolor: 'secondary.main', color: 'white' }}>Quick Add Product</DialogTitle>
                 <DialogContent sx={{ mt: 2 }}>
                     <TextField
