@@ -771,8 +771,8 @@ const Invoices = () => {
       />
 
       <Dialog
-        open={Boolean(viewInvoice)}
-        onClose={() => setViewInvoice(null)}
+        open={open}
+        onClose={() => setOpen(false)}
         maxWidth="md"
         fullWidth
         fullScreen={isMobile}
