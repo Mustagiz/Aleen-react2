@@ -49,7 +49,7 @@ const SalesReports = () => {
     return true;
   });
 
-  const categories = ['All', ...new Set(inventory.map(item => item.category))];
+  const categories = ['All', ...new Set(inventory.map(item => item.category)), 'Custom'];
   const paymentMethods = ['All', 'Cash', 'UPI', 'Card', 'Other'];
 
   const totalRevenue = filteredInvoices.reduce((sum, inv) => sum + inv.total, 0);

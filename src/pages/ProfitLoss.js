@@ -40,7 +40,7 @@ const ProfitLoss = () => {
     inv.items.map(item => {
       const invItem = inventory.find(i => i.id === item.id);
       const revenue = item.price * item.quantity;
-      const cost = (invItem?.cost || 0) * item.quantity;
+      const cost = (item.cost !== undefined ? item.cost : (invItem?.cost || 0)) * item.quantity;
       const profit = revenue - cost;
       return {
         invoiceId: inv.id,
