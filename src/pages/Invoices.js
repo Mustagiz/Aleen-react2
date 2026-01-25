@@ -79,7 +79,7 @@ const Invoices = () => {
   });
 
   const handleAddItem = () => {
-    setSelectedItems([...selectedItems, { id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0 }]);
+    setSelectedItems([...selectedItems, { id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0 }]);
   };
 
   const handleItemChange = (index, field, value) => {
@@ -155,6 +155,7 @@ const Invoices = () => {
             id: `custom-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
             name: item.customName || 'Custom Item',
             price: parseFloat(item.customPrice || 0),
+            cost: parseFloat(item.customCost || 0),
             quantity: item.quantity,
             category: 'Custom'
           };
@@ -176,7 +177,7 @@ const Invoices = () => {
     };
     await addInvoice(invoice);
     setOpen(false);
-    setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0 }]);
+    setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0 }]);
     setDiscount(0);
     setCustomer('');
     setPhone('+91');
@@ -1036,7 +1037,7 @@ const Invoices = () => {
                           )}
                         />
                       ) : (
-                        <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Box sx={{ display: 'flex', gap: 1, flexDirection: { xs: 'column', lg: 'row' } }}>
                           <TextField
                             label="Custom Product Name"
                             size="small"
@@ -1045,14 +1046,24 @@ const Invoices = () => {
                             onChange={(e) => handleItemChange(index, 'customName', e.target.value)}
                             error={!item.customName && selectedItems.length > 0}
                           />
-                          <TextField
-                            label="Price (₹)"
-                            size="small"
-                            type="number"
-                            sx={{ width: 140 }}
-                            value={item.customPrice}
-                            onChange={(e) => handleItemChange(index, 'customPrice', parseFloat(e.target.value) || 0)}
-                          />
+                          <Box sx={{ display: 'flex', gap: 1 }}>
+                            <TextField
+                              label="Sale Price (₹)"
+                              size="small"
+                              type="number"
+                              fullWidth
+                              value={item.customPrice}
+                              onChange={(e) => handleItemChange(index, 'customPrice', parseFloat(e.target.value) || 0)}
+                            />
+                            <TextField
+                              label="Cost Price (₹)"
+                              size="small"
+                              type="number"
+                              fullWidth
+                              value={item.customCost}
+                              onChange={(e) => handleItemChange(index, 'customCost', parseFloat(e.target.value) || 0)}
+                            />
+                          </Box>
                         </Box>
                       )}
                     </Box>
