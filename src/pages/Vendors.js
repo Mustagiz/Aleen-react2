@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Paper, Typography, TableContainer, Card, CardContent, Grid, Chip, TablePagination, useTheme } from '@mui/material';
 import { Add, Edit, Delete, Store } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
+import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 
 const Vendors = () => {
     const theme = useTheme();
@@ -9,6 +10,8 @@ const Vendors = () => {
     const [open, setOpen] = useState(false);
     const [editItem, setEditItem] = useState(null);
     const [form, setForm] = useState({ name: '', phone: '', email: '', person: '', gst: '', terms: '', address: '' });
+    const [deleteId, setDeleteId] = useState(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
     // Pagination State
     const [page, setPage] = useState(0);
@@ -41,6 +44,19 @@ const Vendors = () => {
             await addVendor(form);
         }
         setOpen(false);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (deleteId) {
+            await deleteVendor(deleteId);
+            setDeleteDialogOpen(false);
+            setDeleteId(null);
+        }
+    };
+
+    const openDeleteDialog = (id) => {
+        setDeleteId(id);
+        setDeleteDialogOpen(true);
     };
 
     return (
@@ -165,7 +181,7 @@ const Vendors = () => {
                                         </TableCell>
                                         <TableCell>
                                             <IconButton size="small" onClick={() => handleOpen(vendor)} sx={{ color: 'primary.main' }}><Edit fontSize="small" /></IconButton>
-                                            <IconButton size="small" onClick={() => deleteVendor(vendor.id)} sx={{ color: 'error.main' }}><Delete fontSize="small" /></IconButton>
+                                            <IconButton size="small" onClick={() => openDeleteDialog(vendor.id)} sx={{ color: 'error.main' }}><Delete fontSize="small" /></IconButton>
                                         </TableCell>
                                     </TableRow>
                                 ))

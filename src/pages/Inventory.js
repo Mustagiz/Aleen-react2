@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Tooltip, useTheme, useMediaQuery, Divider, TablePagination } from '@mui/material';
 import { Edit, Delete, Add, Search, Inventory2, TrendingUp, Warning, AttachMoney, Download } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
+import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 
 const Inventory = () => {
   const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, categories, updateCategories } = useData();
@@ -13,6 +14,8 @@ const Inventory = () => {
   const [form, setForm] = useState({
     productId: '', name: '', category: '', size: '', color: '', price: '', cost: '', quantity: '', supplier: ''
   });
+  const [deleteId, setDeleteId] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   // Pagination State
   const [page, setPage] = useState(0);
@@ -89,6 +92,19 @@ const Inventory = () => {
       await addInventoryItem(data);
     }
     setOpen(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleteId) {
+      await deleteInventoryItem(deleteId);
+      setDeleteDialogOpen(false);
+      setDeleteId(null);
+    }
+  };
+
+  const openDeleteDialog = (id) => {
+    setDeleteId(id);
+    setDeleteDialogOpen(true);
   };
 
   const filteredInventory = inventory.filter(item =>
@@ -311,7 +327,7 @@ const Inventory = () => {
                   </Box>
                   <Box sx={{ display: 'flex', gap: 1 }}>
                     <Button fullWidth variant="outlined" color="primary" size="small" startIcon={<Edit />} onClick={() => handleOpen(item)}>Edit</Button>
-                    <Button fullWidth variant="outlined" color="error" size="small" startIcon={<Delete />} onClick={() => deleteInventoryItem(item.id)}>Delete</Button>
+                    <Button fullWidth variant="outlined" color="error" size="small" startIcon={<Delete />} onClick={() => openDeleteDialog(item.id)}>Delete</Button>
                   </Box>
                 </CardContent>
               </Card>
@@ -373,7 +389,7 @@ const Inventory = () => {
                       <TableCell align="right">
                         <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
                           <IconButton size="small" onClick={() => handleOpen(item)} sx={{ color: 'primary.main' }}><Edit fontSize="small" /></IconButton>
-                          <IconButton size="small" onClick={() => deleteInventoryItem(item.id)} sx={{ color: 'error.main' }}><Delete fontSize="small" /></IconButton>
+                          <IconButton size="small" onClick={() => openDeleteDialog(item.id)} sx={{ color: 'error.main' }}><Delete fontSize="small" /></IconButton>
                         </Box>
                       </TableCell>
                     </TableRow>
@@ -418,6 +434,14 @@ const Inventory = () => {
           <Button onClick={handleSave} variant="contained">Save</Button>
         </DialogActions>
       </Dialog>
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Product"
+        content="Are you sure you want to delete this product? This action will remove it from inventory."
+      />
     </Box>
   );
 };

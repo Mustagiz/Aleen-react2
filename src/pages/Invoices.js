@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar } from '@mui/material';
 import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, FilterList, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
+import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 import { generateInvoiceNumber } from '../utils/helpers';
 import InvoicePrint from '../components/InvoicePrint';
 import jsPDF from 'jspdf';
@@ -17,6 +18,7 @@ const Invoices = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const handleMenuClick = (event, invoiceId) => {
     setAnchorEl(event.currentTarget);
@@ -310,30 +312,6 @@ const Invoices = () => {
     doc.save(`invoice-${invoice.id}.pdf`);
   };
 
-  const sendWhatsApp = (invoice) => {
-    const message = `*${profile.businessName}*%0A${profile.address}%0A%0A` +
-      `*Invoice: ${invoice.id}*%0A` +
-      `Date: ${new Date(invoice.date).toLocaleDateString()}%0A` +
-      `Customer: ${invoice.customer || 'Walk-in'}%0A%0A` +
-      `*Items:*%0A` +
-      invoice.items.map(item => `${item.name} x${item.quantity} = ₹${(item.price * item.quantity).toFixed(2)}`).join('%0A') +
-      `%0A%0A` +
-      `Subtotal: ₹${invoice.subtotal.toFixed(2)}%0A` +
-      `GST (${invoice.gst}%): ₹${invoice.tax.toFixed(2)}%0A` +
-      (invoice.discount > 0 ? `Discount: ₹${invoice.discount.toFixed(2)} (${invoice.discountPercentage || 0}%)%0A` : '') +
-      `*Total: ₹${invoice.total.toFixed(2)}*%0A%0A` +
-      `Payment: ${invoice.paymentMethod}%0A%0A` +
-      `Thank you for shopping with us!%0A%0A` +
-      `*${profile.businessName.toUpperCase()} | ${profile.address}*`;
-
-    const phoneNumber = invoice.phone?.replace(/[^0-9]/g, '');
-    const whatsappUrl = phoneNumber
-      ? `https://wa.me/${phoneNumber.startsWith('91') ? '' : '91'}${phoneNumber}?text=${message}`
-      : `https://wa.me/?text=${message}`;
-
-    window.open(whatsappUrl, '_blank');
-  };
-
   const sharePDF = async (invoice) => {
     try {
       const doc = generatePDF(invoice);
@@ -358,6 +336,44 @@ const Invoices = () => {
   const handlePrint = (invoice) => {
     setViewInvoice(invoice);
     setTimeout(() => window.print(), 300);
+  };
+
+  const sendWhatsApp = (invoice) => {
+    const message = `*${profile.businessName}*%0A${profile.address}%0A%0A` +
+      `*Invoice: ${invoice.id}*%0A` +
+      `Date: ${new Date(invoice.date).toLocaleDateString()}%0A` +
+      `Customer: ${invoice.customer || 'Walk-in'}%0A%0A` +
+      `*Items:*%0A` +
+      invoice.items.map(item => `${item.name} x${item.quantity} = ₹${(item.price * item.quantity).toFixed(2)}`).join('%0A') +
+      `%0A%0A` +
+      `Subtotal: ₹${invoice.subtotal.toFixed(2)}%0A` +
+      `GST (${invoice.gst}%): ₹${invoice.tax.toFixed(2)}%0A` +
+      (invoice.discount > 0 ? `Discount: ₹${invoice.discount.toFixed(2)} (${invoice.discountPercentage || 0}%)%0A` : '') +
+      `*Total: ₹${invoice.total.toFixed(2)}*%0A%0A` +
+      `Payment: ${invoice.paymentMethod}%0A%0A` +
+      `Thank you for shopping with us!%0A%0A` +
+      `*${profile.businessName.toUpperCase()} | ${profile.address}*`;
+
+    const phoneNumber = invoice.phone?.replace(/[^0-9]/g, '');
+    const whatsappUrl = phoneNumber
+      ? `https://wa.me/${phoneNumber.startsWith('91') ? '' : '91'}${phoneNumber}?text=${message}`
+      : `https://wa.me/?text=${message}`;
+
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const handleConfirmDelete = async () => {
+    if (selectedInvoiceId) {
+      await deleteInvoice(selectedInvoiceId);
+      setDeleteDialogOpen(false);
+      setSelectedInvoiceId(null);
+      handleMenuClose();
+    }
+  };
+
+  const openDeleteDialog = (id) => {
+    setSelectedInvoiceId(id);
+    setDeleteDialogOpen(true);
   };
 
   const { subtotal, taxAmount, total, absDiscount } = calculateTotal();
@@ -611,7 +627,7 @@ const Invoices = () => {
                     <ListItemIcon><WhatsApp fontSize="small" /></ListItemIcon>
                     <ListItemText>WhatsApp</ListItemText>
                   </MenuItem>
-                  <MenuItem onClick={() => { deleteInvoice(inv.id); handleMenuClose(); }} sx={{ color: 'error.main' }}>
+                  <MenuItem onClick={() => { openDeleteDialog(inv.id); handleMenuClose(); }} sx={{ color: 'error.main' }}>
                     <ListItemIcon><Delete fontSize="small" color="error" /></ListItemIcon>
                     <ListItemText>Delete</ListItemText>
                   </MenuItem>
@@ -715,7 +731,7 @@ const Invoices = () => {
                             <ListItemIcon><WhatsApp fontSize="small" /></ListItemIcon>
                             <ListItemText>WhatsApp</ListItemText>
                           </MenuItem>
-                          <MenuItem onClick={() => { deleteInvoice(inv.id); handleMenuClose(); }} sx={{ color: 'error.main' }}>
+                          <MenuItem onClick={() => { openDeleteDialog(inv.id); handleMenuClose(); }} sx={{ color: 'error.main' }}>
                             <ListItemIcon><Delete fontSize="small" color="error" /></ListItemIcon>
                             <ListItemText>Delete</ListItemText>
                           </MenuItem>
@@ -746,9 +762,17 @@ const Invoices = () => {
         </Paper>
       )}
 
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Invoice"
+        content="Are you sure you want to delete this invoice? This action will remove the record permanently."
+      />
+
       <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
+        open={Boolean(viewInvoice)}
+        onClose={() => setViewInvoice(null)}
         maxWidth="md"
         fullWidth
         fullScreen={isMobile}

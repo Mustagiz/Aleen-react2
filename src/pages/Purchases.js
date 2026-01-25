@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Autocomplete, InputAdornment, TablePagination, useTheme, useMediaQuery } from '@mui/material';
 import { Add, Visibility, Delete, ReceiptLong, Search, Edit, Close, AttachMoney, Download, MoreVert, ShoppingCart, Warning, TrendingDown, LocalShipping, Payment } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
+import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 
 const Purchases = () => {
     const { purchases, vendors, inventory, addPurchase, updatePurchase, deletePurchase, categories, addInventoryItem, updateCategories } = useData();
@@ -13,7 +14,9 @@ const Purchases = () => {
     const [selectedPoId, setSelectedPoId] = useState(null);
 
     // Quick Add Product State
-    const [quickAddOpen, setQuickAddOpen] = useState(false);
+    const [quickAddDialog, setQuickAddDialog] = useState(false);
+    const [deleteId, setDeleteId] = useState(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [activeRowIndex, setActiveRowIndex] = useState(null);
     const [newCategory, setNewCategory] = useState('');
     const [quickForm, setQuickForm] = useState({
@@ -67,7 +70,7 @@ const Purchases = () => {
     const handleQuickAddOpen = (index) => {
         setActiveRowIndex(index);
         setQuickForm({ name: '', category: '', cost: '', price: '', productId: '' });
-        setQuickAddOpen(true);
+        setQuickAddDialog(true);
     };
 
     const handleAddCategory = async () => {
@@ -122,7 +125,7 @@ const Purchases = () => {
             // TRICK: I can pass a preset ID to addInventoryItem if I modify DataContext, but I can't modify DataContext right now comfortably without risking breaking changes.
             // Let's just create it. The `inventory` list will update shortly.
         }
-        setQuickAddOpen(false);
+        setQuickAddDialog(false);
     };
 
     const handleAddItem = () => {
@@ -172,10 +175,17 @@ const Purchases = () => {
         setOpen(false);
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this Purchase Order?')) {
-            await deletePurchase(id);
+    const handleConfirmDelete = async () => {
+        if (deleteId) {
+            await deletePurchase(deleteId);
+            setDeleteDialogOpen(false);
+            setDeleteId(null);
         }
+    };
+
+    const openDeleteDialog = (id) => {
+        setDeleteId(id);
+        setDeleteDialogOpen(true);
     };
 
     const handleReceiveStock = async (po) => {
@@ -396,7 +406,7 @@ const Purchases = () => {
                                             <IconButton size="small" onClick={() => handleOpen(po)} sx={{ color: 'primary.main' }}>
                                                 <Edit fontSize="small" />
                                             </IconButton>
-                                            <IconButton size="small" onClick={() => handleDelete(po.id)} sx={{ color: 'error.main' }}>
+                                            <IconButton size="small" onClick={() => openDeleteDialog(po.id)} sx={{ color: 'error.main' }}>
                                                 <Delete fontSize="small" />
                                             </IconButton>
                                         </Box>
@@ -648,7 +658,7 @@ const Purchases = () => {
             </Dialog>
 
             {/* Quick Add Product Dialog */}
-            <Dialog open={quickAddOpen} onClose={() => setQuickAddOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
+            <Dialog open={quickAddDialog} onClose={() => setQuickAddDialog(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
                 <DialogTitle sx={{ bgcolor: 'secondary.main', color: 'white' }}>Quick Add Product</DialogTitle>
                 <DialogContent sx={{ mt: 2 }}>
                     <TextField
@@ -734,10 +744,18 @@ const Purchases = () => {
                     </Grid>
                 </DialogContent>
                 <DialogActions sx={{ p: 3 }}>
-                    <Button onClick={() => setQuickAddOpen(false)}>Cancel</Button>
+                    <Button onClick={() => setQuickAddDialog(false)}>Cancel</Button>
                     <Button onClick={handleQuickSave} variant="contained" color="secondary" disabled={!quickForm.name || !quickForm.price}>Save & Add</Button>
                 </DialogActions>
             </Dialog >
+
+            <DeleteConfirmDialog
+                open={deleteDialogOpen}
+                onClose={() => setDeleteDialogOpen(false)}
+                onConfirm={handleConfirmDelete}
+                title="Delete Purchase Order"
+                content="Are you sure you want to delete this purchase order? This action cannot be undone."
+            />
         </Box >
     );
 };
