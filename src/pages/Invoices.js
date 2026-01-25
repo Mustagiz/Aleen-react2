@@ -18,6 +18,7 @@ const Invoices = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const handleMenuClick = (event, invoiceId) => {
@@ -378,16 +379,15 @@ const Invoices = () => {
   };
 
   const handleConfirmDelete = async () => {
-    if (selectedInvoiceId) {
-      await deleteInvoice(selectedInvoiceId);
+    if (deleteId) {
+      await deleteInvoice(deleteId);
       setDeleteDialogOpen(false);
-      setSelectedInvoiceId(null);
-      handleMenuClose();
+      setDeleteId(null);
     }
   };
 
   const openDeleteDialog = (id) => {
-    setSelectedInvoiceId(id);
+    setDeleteId(id);
     setDeleteDialogOpen(true);
   };
 
@@ -1266,6 +1266,17 @@ const Invoices = () => {
           {!isMobile && <Button onClick={() => handlePrint(viewInvoice)} variant="contained" startIcon={<Print />}>Print</Button>}
         </DialogActions>
       </Dialog>
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onClose={() => {
+          setDeleteDialogOpen(false);
+          setDeleteId(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Delete Invoice"
+        content="Are you sure you want to delete this invoice? This action cannot be undone."
+      />
     </Box >
   );
 };
