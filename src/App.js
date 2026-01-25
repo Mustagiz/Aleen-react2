@@ -15,6 +15,7 @@ import Customers from './pages/Customers';
 import Settings from './pages/Settings';
 import Vendors from './pages/Vendors';
 import Purchases from './pages/Purchases';
+import Expenses from './pages/Expenses';
 import Layout from './components/Layout';
 
 const PrivateRoute = ({ children }) => {
@@ -39,7 +40,7 @@ function App() {
                 <Route path="sales-reports" element={<SalesReports />} />
                 <Route path="inventory-reports" element={<InventoryReports />} />
                 <Route path="profit-loss" element={<ProfitLoss />} />
-                <Route path="profit-loss" element={<ProfitLoss />} />
+                <Route path="expenses" element={<Expenses />} />
                 <Route path="vendors" element={<Vendors />} />
                 <Route path="purchases" element={<Purchases />} />
                 <Route path="settings" element={<Settings />} />

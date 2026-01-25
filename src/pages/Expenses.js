@@ -1,0 +1,223 @@
+import React, { useState } from 'react';
+import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, useTheme, useMediaQuery, Divider, TablePagination } from '@mui/material';
+import { Edit, Delete, Add, Search, ReceiptLong, AccountBalanceWallet, Warning, Download } from '@mui/icons-material';
+import { useData } from '../contexts/DataContext';
+import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
+
+const Expenses = () => {
+    const { expenses, addExpense, updateExpense, deleteExpense } = useData();
+    const [open, setOpen] = useState(false);
+    const [editItem, setEditItem] = useState(null);
+    const [search, setSearch] = useState('');
+    const [categoryFilter, setCategoryFilter] = useState('All');
+    const [form, setForm] = useState({
+        title: '', amount: '', category: 'General', date: new Date().toISOString().split('T')[0], note: ''
+    });
+    const [deleteId, setDeleteId] = useState(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+    // Pagination State
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+    const expenseCategories = ['General', 'Rent', 'Electricity', 'Water', 'Repairs', 'Staff Welfare', 'Marketing', 'Courier', 'Stationery', 'Others'];
+
+    const filteredExpenses = expenses.filter(exp =>
+        (exp.title?.toLowerCase().includes(search.toLowerCase()) || exp.note?.toLowerCase().includes(search.toLowerCase())) &&
+        (categoryFilter === 'All' || exp.category === categoryFilter)
+    ).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    const totalExpense = filteredExpenses.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+    const thisMonthExpense = expenses.filter(exp => {
+        const expDate = new Date(exp.date);
+        const today = new Date();
+        return expDate.getMonth() === today.getMonth() && expDate.getFullYear() === today.getFullYear();
+    }).reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+
+    const handleOpen = (item = null) => {
+        if (item) {
+            setEditItem(item);
+            setForm(item);
+        } else {
+            setEditItem(null);
+            setForm({ title: '', amount: '', category: 'General', date: new Date().toISOString().split('T')[0], note: '' });
+        }
+        setOpen(true);
+    };
+
+    const handleSave = async () => {
+        const data = { ...form, amount: parseFloat(form.amount) };
+        if (editItem) {
+            await updateExpense(editItem.id, data);
+        } else {
+            await addExpense(data);
+        }
+        setOpen(false);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (deleteId) {
+            await deleteExpense(deleteId);
+            setDeleteDialogOpen(false);
+            setDeleteId(null);
+        }
+    };
+
+    const openDeleteDialog = (id) => {
+        setDeleteId(id);
+        setDeleteDialogOpen(true);
+    };
+
+    const downloadExpenses = () => {
+        const csvData = filteredExpenses.map(item => ({
+            'Date': item.date,
+            'Title': item.title,
+            'Category': item.category,
+            'Amount': item.amount,
+            'Note': item.note || ''
+        }));
+
+        const headers = ['Date', 'Title', 'Category', 'Amount', 'Note'];
+        const csvContent = [
+            headers.join(','),
+            ...csvData.map(row => headers.map(h => `"${row[h]}"`).join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `expenses_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+    };
+
+    return (
+        <Box>
+            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box>
+                    <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>Miscellaneous Expenses</Typography>
+                    <Typography variant="body2" color="text.secondary">Track your overheads and business costs</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button variant="outlined" startIcon={<Download />} onClick={downloadExpenses} sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700 }}>Export</Button>
+                    <Button variant="contained" startIcon={<Add />} onClick={() => handleOpen()} sx={{
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        fontWeight: 700,
+                        background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)',
+                        boxShadow: `0 4px 12px ${theme.palette.primary.main}33`,
+                        '&:hover': { background: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)', transform: 'translateY(-2px)' }
+                    }}>
+                        Add Expense
+                    </Button>
+                </Box>
+            </Box>
+
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+                <Grid item xs={12} sm={6} md={4}>
+                    <Card sx={{ borderRadius: 4, position: 'relative', overflow: 'hidden', boxShadow: '0 10px 25px -5px rgba(219, 39, 119, 0.15)', border: '1px solid rgba(219, 39, 119, 0.1)', background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(219, 39, 119, 0.05) 100%)` }}>
+                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#DB2777' }} />
+                        <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Box>
+                                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase' }}>This Month</Typography>
+                                <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5 }}>₹{thisMonthExpense.toLocaleString()}</Typography>
+                            </Box>
+                            <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(219, 39, 119, 0.1)', color: '#DB2777' }}><AccountBalanceWallet /></Box>
+                        </CardContent>
+                    </Card>
+                </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                    <Card sx={{ borderRadius: 4, position: 'relative', overflow: 'hidden', boxShadow: '0 10px 25px -5px rgba(183, 110, 121, 0.15)', border: '1px solid rgba(183, 110, 121, 0.1)', background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(183, 110, 121, 0.05) 100%)` }}>
+                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#B76E79' }} />
+                        <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Box>
+                                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase' }}>Total Expenses</Typography>
+                                <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5 }}>₹{totalExpense.toLocaleString()}</Typography>
+                            </Box>
+                            <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(183, 110, 121, 0.1)', color: '#B76E79' }}><ReceiptLong /></Box>
+                        </CardContent>
+                    </Card>
+                </Grid>
+            </Grid>
+
+            <Paper sx={{ p: 2, mb: 3, borderRadius: 3, display: 'flex', gap: 2, alignItems: 'center' }}>
+                <Search sx={{ color: 'text.secondary' }} />
+                <TextField placeholder="Search expenses..." value={search} onChange={(e) => setSearch(e.target.value)} variant="standard" fullWidth InputProps={{ disableUnderline: true }} />
+                <TextField select size="small" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} sx={{ minWidth: 150 }}>
+                    <MenuItem value="All">All Categories</MenuItem>
+                    {expenseCategories.map(cat => <MenuItem key={cat} value={cat}>{cat}</MenuItem>)}
+                </TextField>
+            </Paper>
+
+            <Paper sx={{ borderRadius: 4, overflow: 'hidden' }}>
+                <TableContainer>
+                    <Table>
+                        <TableHead sx={{ bgcolor: 'grey.50' }}>
+                            <TableRow>
+                                <TableCell sx={{ fontWeight: 800 }}>Date</TableCell>
+                                <TableCell sx={{ fontWeight: 800 }}>Expense Title</TableCell>
+                                <TableCell sx={{ fontWeight: 800 }}>Category</TableCell>
+                                <TableCell sx={{ fontWeight: 800 }}>Amount</TableCell>
+                                <TableCell sx={{ fontWeight: 800 }}>Note</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 800 }}>Actions</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {filteredExpenses.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((exp) => (
+                                <TableRow key={exp.id} hover>
+                                    <TableCell>{new Date(exp.date).toLocaleDateString()}</TableCell>
+                                    <TableCell sx={{ fontWeight: 700 }}>{exp.title}</TableCell>
+                                    <TableCell><Chip label={exp.category} size="small" variant="outlined" /></TableCell>
+                                    <TableCell sx={{ fontWeight: 800, color: 'error.main' }}>₹{exp.amount.toLocaleString()}</TableCell>
+                                    <TableCell sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>{exp.note || '-'}</TableCell>
+                                    <TableCell align="right">
+                                        <IconButton size="small" onClick={() => handleOpen(exp)} sx={{ color: 'primary.main' }}><Edit fontSize="small" /></IconButton>
+                                        <IconButton size="small" onClick={() => openDeleteDialog(exp.id)} sx={{ color: 'error.main' }}><Delete fontSize="small" /></IconButton>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                            {filteredExpenses.length === 0 && (
+                                <TableRow><TableCell colSpan={6} align="center" sx={{ py: 4 }}>No expenses found</TableCell></TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                <TablePagination rowsPerPageOptions={[5, 10, 25]} component="div" count={filteredExpenses.length} rowsPerPage={rowsPerPage} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} />
+            </Paper>
+
+            <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
+                <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white', fontWeight: 800 }}>{editItem ? 'Edit Expense' : 'Add New Expense'}</DialogTitle>
+                <DialogContent sx={{ mt: 2 }}>
+                    <TextField fullWidth label="Expense Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} margin="normal" placeholder="e.g. Office Rent" />
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                        <TextField fullWidth label="Amount (₹)" type="number" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} margin="normal" />
+                        <TextField select fullWidth label="Category" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} margin="normal">
+                            {expenseCategories.map(cat => <MenuItem key={cat} value={cat}>{cat}</MenuItem>)}
+                        </TextField>
+                    </Box>
+                    <TextField fullWidth label="Date" type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} margin="normal" InputLabelProps={{ shrink: true }} />
+                    <TextField fullWidth label="Note" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} margin="normal" multiline rows={2} />
+                </DialogContent>
+                <DialogActions sx={{ p: 3 }}>
+                    <Button onClick={() => setOpen(false)}>Cancel</Button>
+                    <Button onClick={handleSave} variant="contained" disabled={!form.title || !form.amount}>Save Expense</Button>
+                </DialogActions>
+            </Dialog>
+
+            <DeleteConfirmDialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} onConfirm={handleConfirmDelete} title="Delete Expense" content="Are you sure you want to delete this expense record?" />
+        </Box>
+    );
+};
+
+export default Expenses;

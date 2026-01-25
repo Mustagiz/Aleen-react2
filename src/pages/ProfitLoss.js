@@ -10,7 +10,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointEleme
 
 const ProfitLoss = () => {
   const theme = useTheme();
-  const { inventory, invoices, profile } = useData();
+  const { inventory, invoices, expenses, profile } = useData();
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -62,7 +62,16 @@ const ProfitLoss = () => {
 
   const totalRevenue = profitData.reduce((sum, item) => sum + item.revenue, 0);
   const totalCost = profitData.reduce((sum, item) => sum + item.cost, 0);
-  const totalProfit = totalRevenue - totalCost;
+
+  // Deduced Expenses calculation
+  const expenseTotal = expenses.filter(exp => {
+    const expDate = new Date(exp.date);
+    const from = dateFrom ? new Date(dateFrom) : new Date(0);
+    const to = dateTo ? new Date(dateTo) : new Date();
+    return expDate >= from && expDate <= to;
+  }).reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+
+  const totalProfit = totalRevenue - totalCost - expenseTotal;
   const profitMargin = totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100).toFixed(1) : 0;
 
   // Category-wise profit
@@ -135,8 +144,9 @@ const ProfitLoss = () => {
   const exportPDF = () => {
     const summaryLines = [
       `Total Revenue: ${formatCurrencyForPDF(totalRevenue)}`,
-      `Total Cost: ${formatCurrencyForPDF(totalCost)}`,
-      `Total Profit/Loss: ${formatCurrencyForPDF(totalProfit)}`,
+      `Gross Profit: ${formatCurrencyForPDF(totalRevenue - totalCost)}`,
+      `Miscellaneous Expenses: ${formatCurrencyForPDF(expenseTotal)}`,
+      `Net Profit/Loss: ${formatCurrencyForPDF(totalProfit)}`,
       `Net Margin: ${profitMargin}%`
     ];
 
@@ -190,9 +200,9 @@ const ProfitLoss = () => {
 
       {/* Summary Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid item xs={12} sm={6} lg={2.4}>
           <Card sx={{
-            p: 3,
+            p: 2.5,
             position: 'relative',
             overflow: 'hidden',
             boxShadow: '0 10px 25px -5px rgba(225, 29, 72, 0.15)',
@@ -202,13 +212,13 @@ const ProfitLoss = () => {
             '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(225, 29, 72, 0.3)' }
           }}>
             <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#E11D48' }} />
-            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>Total Revenue</Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, mt: 1 }}>₹{totalRevenue.toLocaleString()}</Typography>
+            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.65rem' }}>Revenue</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 800, mt: 0.5 }}>₹{totalRevenue.toLocaleString()}</Typography>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid item xs={12} sm={6} lg={2.4}>
           <Card sx={{
-            p: 3,
+            p: 2.5,
             position: 'relative',
             overflow: 'hidden',
             boxShadow: '0 10px 25px -5px rgba(183, 110, 121, 0.15)',
@@ -218,13 +228,29 @@ const ProfitLoss = () => {
             '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(183, 110, 121, 0.3)' }
           }}>
             <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#B76E79' }} />
-            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>Total Cost</Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, mt: 1 }}>₹{totalCost.toLocaleString()}</Typography>
+            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.65rem' }}>COGS</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 800, mt: 0.5 }}>₹{totalCost.toLocaleString()}</Typography>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid item xs={12} sm={6} lg={2.4}>
           <Card sx={{
-            p: 3,
+            p: 2.5,
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: '0 10px 25px -5px rgba(245, 158, 11, 0.15)',
+            border: '1px solid rgba(245, 158, 11, 0.15)',
+            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(245, 158, 11, 0.05) 100%)`,
+            transition: 'all 0.3s ease',
+            '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(245, 158, 11, 0.3)' }
+          }}>
+            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#f59e0b' }} />
+            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.65rem' }}>Expenses</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 800, mt: 0.5, color: 'error.main' }}>- ₹{expenseTotal.toLocaleString()}</Typography>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} lg={2.4}>
+          <Card sx={{
+            p: 2.5,
             position: 'relative',
             overflow: 'hidden',
             boxShadow: totalProfit >= 0 ? '0 10px 25px -5px rgba(67, 160, 71, 0.15)' : '0 10px 25px -5px rgba(229, 57, 53, 0.15)',
@@ -234,13 +260,13 @@ const ProfitLoss = () => {
             '&:hover': { transform: 'translateY(-4px)', boxShadow: totalProfit >= 0 ? '0 12px 24px -10px rgba(67, 160, 71, 0.3)' : '0 12px 24px -10px rgba(229, 57, 53, 0.3)' }
           }}>
             <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: totalProfit >= 0 ? '#43a047' : '#e53935' }} />
-            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>Net Profit</Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, mt: 1, color: totalProfit >= 0 ? 'success.main' : 'error.main' }}>₹{totalProfit.toLocaleString()}</Typography>
+            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.65rem' }}>Net Profit</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 800, mt: 0.5, color: totalProfit >= 0 ? 'success.main' : 'error.main' }}>₹{totalProfit.toLocaleString()}</Typography>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid item xs={12} sm={6} lg={2.4}>
           <Card sx={{
-            p: 3,
+            p: 2.5,
             position: 'relative',
             overflow: 'hidden',
             boxShadow: '0 10px 25px -5px rgba(219, 39, 119, 0.15)',
@@ -250,8 +276,8 @@ const ProfitLoss = () => {
             '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(219, 39, 119, 0.3)' }
           }}>
             <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#DB2777' }} />
-            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>Profit Margin</Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, mt: 1 }}>{profitMargin}%</Typography>
+            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.65rem' }}>Margin</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 800, mt: 0.5 }}>{profitMargin}%</Typography>
           </Card>
         </Grid>
       </Grid>

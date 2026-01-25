@@ -25,6 +25,7 @@ export const DataProvider = ({ children }) => {
 
   const [vendors, setVendors] = useState([]);
   const [purchases, setPurchases] = useState([]);
+  const [expenses, setExpenses] = useState([]);
 
   // Real-time synchronization
   useEffect(() => {
@@ -48,6 +49,10 @@ export const DataProvider = ({ children }) => {
       setPurchases(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
 
+    const unsubExpenses = onSnapshot(collection(db, 'expenses'), (snapshot) => {
+      setExpenses(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+
     const unsubProfile = onSnapshot(doc(db, 'settings', 'profile'), (snapshot) => {
       if (snapshot.exists()) {
         setProfile(snapshot.data());
@@ -66,6 +71,7 @@ export const DataProvider = ({ children }) => {
       unsubCustomers();
       unsubVendors();
       unsubPurchases();
+      unsubExpenses();
       unsubProfile();
       unsubCategories();
     };
@@ -327,6 +333,21 @@ export const DataProvider = ({ children }) => {
     await setDoc(doc(db, 'settings', 'inventory'), { categories: newCategories });
   };
 
+  // Expense Functions
+  const addExpense = async (expense) => {
+    const id = Date.now().toString();
+    const newExpense = { ...expense, id, dateAdded: new Date().toISOString() };
+    await setDoc(doc(db, 'expenses', id), newExpense);
+  };
+
+  const updateExpense = async (id, updates) => {
+    await updateDoc(doc(db, 'expenses', id), updates);
+  };
+
+  const deleteExpense = async (id) => {
+    await deleteDoc(doc(db, 'expenses', id));
+  };
+
   return (
     <DataContext.Provider value={{
       inventory,
@@ -353,7 +374,11 @@ export const DataProvider = ({ children }) => {
       deleteVendor,
       addPurchase,
       updatePurchase,
-      deletePurchase
+      deletePurchase,
+      expenses,
+      addExpense,
+      updateExpense,
+      deleteExpense
     }}>
       {children}
     </DataContext.Provider>
