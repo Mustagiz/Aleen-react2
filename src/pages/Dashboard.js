@@ -1,6 +1,6 @@
 import React from 'react';
 import { Grid, Paper, Typography, Box, Card, CardContent, Button, Chip, IconButton, useTheme, Avatar } from '@mui/material';
-import { TrendingUp, TrendingDown, Inventory2, Warning, AttachMoney, Receipt, Assessment, ArrowForward, MoreVert, Circle, People, ShoppingCart } from '@mui/icons-material';
+import { TrendingUp, TrendingDown, Inventory2, Warning, AttachMoney, Receipt, Assessment, ArrowForward, MoreVert, Circle, People, ShoppingCart, AccountBalanceWallet } from '@mui/icons-material';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { Bar, Line, Doughnut } from 'react-chartjs-2';
 import { useData } from '../contexts/DataContext';
@@ -48,7 +48,7 @@ const Dashboard = () => {
 
   const salesTrend = yesterdaySales === 0 ? 100 : Math.round(((todaySales - yesterdaySales) / yesterdaySales) * 100);
 
-  const lowStock = inventory.filter(item => item.quantity < 2);
+  const lowStock = inventory.filter(item => item.quantity <= 1);
   const recentInvoices = invoices.slice(-6).reverse();
 
   // Financial Calculations
@@ -72,8 +72,8 @@ const Dashboard = () => {
   const grossProfit = totalRevenue - totalCostOfGoods;
   const totalItems = inventory.reduce((sum, item) => sum + item.quantity, 0);
 
-  const lowStockCount = inventory.filter(item => item.quantity < 5).length;
-  const customerCount = new Set(filteredInvoices.map(inv => inv.customer || 'Walk-in')).size;
+  const lowStockCount = inventory.filter(item => item.quantity <= 1).length;
+  const totalInventoryValue = inventory.reduce((sum, item) => sum + (Number(item.quantity) || 0) * (Number(item.cost) || 0), 0);
   const atv = filteredInvoices.length > 0 ? (totalRevenue / filteredInvoices.length) : 0;
 
   // Top Products Calculation
@@ -201,8 +201,8 @@ const Dashboard = () => {
     labels: ['Low', 'Medium', 'High'],
     datasets: [{
       data: [
-        inventory.filter(i => i.quantity < 2).length,
-        inventory.filter(i => i.quantity >= 2 && i.quantity < 50).length,
+        inventory.filter(i => i.quantity <= 1).length,
+        inventory.filter(i => i.quantity > 1 && i.quantity < 50).length,
         inventory.filter(i => i.quantity >= 50).length
       ],
       backgroundColor: ['#e53935', '#fb8c00', '#43a047'],
@@ -389,18 +389,18 @@ const Dashboard = () => {
           <StatCard title="Net Cash Available" value={`₹${netCash.toLocaleString('en-IN')}`} icon={<TrendingUp />} color="#059669" onClick={() => navigate('/profit-loss')} />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
-          <StatCard title="Vendor Payables" value={`₹${totalVendorPayables.toLocaleString('en-IN')}`} icon={<Warning />} color="#D97706" onClick={() => navigate('/vendors')} />
+          <StatCard title="Total Stock" value={totalItems.toLocaleString('en-IN')} icon={<Inventory2 />} color="#D97706" onClick={() => navigate('/inventory')} />
         </Grid>
 
         {/* Row 2 */}
         <Grid item xs={12} sm={6} lg={3}>
-          <StatCard title="Low Stock Items" value={lowStockCount} icon={<Inventory2 />} color="#EA580C" onClick={() => navigate('/inventory')} subtitle="Items below threshold" />
+          <StatCard title="Low Stock Items" value={lowStockCount} icon={<Warning />} color="#EA580C" onClick={() => navigate('/inventory')} subtitle="Items below threshold" />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard title="Gross Profit" value={`₹${grossProfit.toLocaleString('en-IN')}`} icon={<Assessment />} color="#7C3AED" onClick={() => navigate('/profit-loss')} />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
-          <StatCard title="Total Customers" value={customerCount} icon={<People />} color="#DB2777" onClick={() => navigate('/customers')} />
+          <StatCard title="Total Inventory Value" value={`₹${totalInventoryValue.toLocaleString('en-IN')}`} icon={<AccountBalanceWallet />} color="#DB2777" onClick={() => navigate('/inventory')} />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard title="Avg Transaction" value={`₹${atv.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} icon={<ShoppingCart />} color="#0891B2" onClick={() => navigate('/sales-reports')} />
