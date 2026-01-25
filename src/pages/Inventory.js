@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Tooltip, useTheme, useMediaQuery, Divider, TablePagination } from '@mui/material';
-import { Edit, Delete, Add, Search, Inventory2, TrendingUp, Warning, AttachMoney, Download } from '@mui/icons-material';
+import { Edit, Delete, Add, Search, Inventory2, TrendingUp, Warning, AttachMoney, Download, Upload } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 
 const Inventory = () => {
-  const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, categories, updateCategories } = useData();
+  const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, bulkAddInventory, categories, updateCategories } = useData();
   const [open, setOpen] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [search, setSearch] = useState('');
@@ -107,6 +107,54 @@ const Inventory = () => {
     setDeleteDialogOpen(true);
   };
 
+  const downloadTemplate = () => {
+    const headers = ['productId', 'name', 'category', 'size', 'color', 'price', 'cost', 'quantity', 'supplier'];
+    const csvContent = [
+      headers.join(','),
+      ['PRD-101', 'Floral Saree', 'Sarees', 'Free Size', 'Red', '1500', '1000', '10', 'Vendor A'].map(v => `"${v}"`).join(',')
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `inventory_template.csv`;
+    link.click();
+  };
+
+  const handleBulkUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const text = e.target.result;
+      const lines = text.split('\n').filter(line => line.trim());
+      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+      const items = lines.slice(1).map(line => {
+        const values = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.trim().replace(/"/g, ''));
+        const item = {};
+        headers.forEach((h, i) => {
+          if (h === 'price' || h === 'cost') item[h] = parseFloat(values[i]) || 0;
+          else if (h === 'quantity') item[h] = parseInt(values[i]) || 0;
+          else item[h] = values[i] || '';
+        });
+        return item;
+      });
+
+      if (items.length > 0) {
+        try {
+          await bulkAddInventory(items);
+          alert(`Successfully uploaded ${items.length} items`);
+        } catch (error) {
+          console.error('Bulk upload error:', error);
+          alert('Error uploading inventory. Please check the file format.');
+        }
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = null; // Reset input
+  };
+
   const filteredInventory = inventory.filter(item =>
     item.name.toLowerCase().includes(search.toLowerCase()) &&
     (categoryFilter === '' || item.category === categoryFilter)
@@ -129,6 +177,24 @@ const Inventory = () => {
               sx={{ px: 3, py: 1.5, borderRadius: 2, fontWeight: 700, textTransform: 'none' }}
             >
               Export CSV
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<Download />}
+              onClick={downloadTemplate}
+              color="secondary"
+              sx={{ px: 3, py: 1.5, borderRadius: 2, fontWeight: 700, textTransform: 'none' }}
+            >
+              Template
+            </Button>
+            <Button
+              variant="outlined"
+              component="label"
+              startIcon={<Upload />}
+              sx={{ px: 3, py: 1.5, borderRadius: 2, fontWeight: 700, textTransform: 'none' }}
+            >
+              Bulk Upload
+              <input type="file" hidden accept=".csv" onChange={handleBulkUpload} />
             </Button>
             <Button
               variant="contained"
