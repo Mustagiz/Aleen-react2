@@ -26,6 +26,7 @@ export const DataProvider = ({ children }) => {
   const [vendors, setVendors] = useState([]);
   const [purchases, setPurchases] = useState([]);
   const [expenses, setExpenses] = useState([]);
+  const [expenseCategories, setExpenseCategories] = useState(['General', 'Rent', 'Electricity', 'Water', 'Repairs', 'Staff Welfare', 'Marketing', 'Courier', 'Stationery', 'Others']);
 
   // Real-time synchronization
   useEffect(() => {
@@ -65,6 +66,12 @@ export const DataProvider = ({ children }) => {
       }
     });
 
+    const unsubExpenseCategories = onSnapshot(doc(db, 'settings', 'expenses'), (snapshot) => {
+      if (snapshot.exists() && snapshot.data().categories) {
+        setExpenseCategories(snapshot.data().categories);
+      }
+    });
+
     return () => {
       unsubInventory();
       unsubInvoices();
@@ -74,6 +81,7 @@ export const DataProvider = ({ children }) => {
       unsubExpenses();
       unsubProfile();
       unsubCategories();
+      unsubExpenseCategories();
     };
   }, []);
 
@@ -358,11 +366,16 @@ export const DataProvider = ({ children }) => {
     await batch.commit();
   };
 
+  const updateExpenseCategories = async (newCategories) => {
+    await setDoc(doc(db, 'settings', 'expenses'), { categories: newCategories });
+  };
+
   return (
     <DataContext.Provider value={{
       inventory,
       invoices,
       categories,
+      expenseCategories,
       vendors,
       purchases,
       addInventoryItem,
@@ -375,6 +388,7 @@ export const DataProvider = ({ children }) => {
       profile,
       updateProfile,
       updateCategories,
+      updateExpenseCategories,
       customers,
       addCustomer,
       updateCustomer,

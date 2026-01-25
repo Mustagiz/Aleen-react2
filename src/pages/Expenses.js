@@ -5,11 +5,12 @@ import { useData } from '../contexts/DataContext';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 
 const Expenses = () => {
-    const { expenses, addExpense, updateExpense, deleteExpense, bulkAddExpenses } = useData();
+    const { expenses, addExpense, updateExpense, deleteExpense, bulkAddExpenses, expenseCategories, updateExpenseCategories } = useData();
     const [open, setOpen] = useState(false);
     const [editItem, setEditItem] = useState(null);
     const [search, setSearch] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('All');
+    const [newCategory, setNewCategory] = useState('');
     const [form, setForm] = useState({
         title: '', amount: '', category: 'General', date: new Date().toISOString().split('T')[0], note: ''
     });
@@ -32,7 +33,12 @@ const Expenses = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-    const expenseCategories = ['General', 'Rent', 'Electricity', 'Water', 'Repairs', 'Staff Welfare', 'Marketing', 'Courier', 'Stationery', 'Others'];
+    const handleAddCategory = () => {
+        if (newCategory.trim() && !expenseCategories.includes(newCategory.trim())) {
+            updateExpenseCategories([...expenseCategories, newCategory.trim()]);
+            setNewCategory('');
+        }
+    };
 
     const filteredExpenses = expenses.filter(exp =>
         (exp.title?.toLowerCase().includes(search.toLowerCase()) || exp.note?.toLowerCase().includes(search.toLowerCase())) &&
@@ -257,6 +263,10 @@ const Expenses = () => {
                         <TextField select fullWidth label="Category" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} margin="normal">
                             {expenseCategories.map(cat => <MenuItem key={cat} value={cat}>{cat}</MenuItem>)}
                         </TextField>
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                        <TextField size="small" label="Add New Category" value={newCategory} onChange={(e) => setNewCategory(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleAddCategory()} fullWidth />
+                        <Button onClick={handleAddCategory} variant="outlined" size="small">Add</Button>
                     </Box>
                     <TextField fullWidth label="Date" type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} margin="normal" InputLabelProps={{ shrink: true }} />
                     <TextField fullWidth label="Note" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} margin="normal" multiline rows={2} />
