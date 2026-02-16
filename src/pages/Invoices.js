@@ -23,6 +23,27 @@ const Invoices = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [successInvoice, setSuccessInvoice] = useState(null);
 
+  const playBeep = () => {
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+      gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.1);
+    } catch (e) {
+      console.warn("Audio beep failed", e);
+    }
+  };
+
   React.useEffect(() => {
     const handleKeyDown = (e) => {
       // Alt + N: New Invoice
@@ -103,6 +124,7 @@ const Invoices = () => {
             );
 
             if (matchedProduct) {
+              playBeep();
               const emptyIndex = selectedItems.findIndex(item => !item.id);
               if (emptyIndex !== -1) {
                 handleItemChange(emptyIndex, 'id', matchedProduct.id);
@@ -122,6 +144,7 @@ const Invoices = () => {
             );
 
             if (matchedProduct) {
+              playBeep();
               const emptyIndex = selectedItems.findIndex(item => !item.id);
               if (emptyIndex !== -1) {
                 handleItemChange(emptyIndex, 'id', matchedProduct.id);
