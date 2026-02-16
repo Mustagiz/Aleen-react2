@@ -277,37 +277,49 @@ const Invoices = () => {
     const primaryColor = '#F472B6'; // Baby Pink
     const accentColor = '#B76E79'; // Rose Gold
 
-    // Header
+    // Header Layout: Left (Business Info) | Right (Invoice Status)
     doc.setTextColor(primaryColor);
-    doc.setFontSize(24);
+    doc.setFontSize(28);
     doc.setFont(undefined, 'bold');
-    doc.text(profile.businessName, 105, 20, { align: 'center' });
+    doc.text(profile.businessName, 20, 25);
+
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
+    doc.setFont(undefined, 'normal');
+    doc.text(profile.address, 20, 32);
+    doc.text(`Phone: ${profile.phone} | GSTIN: ${profile.gstin}`, 20, 37);
 
     doc.setTextColor(40, 40, 40);
+    doc.setFontSize(22);
+    doc.setFont(undefined, 'bold');
+    doc.text('INVOICE', 190, 25, { align: 'right' });
+
+    doc.setTextColor(primaryColor);
+    doc.setFontSize(14);
+    doc.text(invoice.id, 190, 33, { align: 'right' });
+
+    doc.setTextColor(80, 80, 80);
     doc.setFontSize(10);
     doc.setFont(undefined, 'normal');
-    doc.text(profile.address, 105, 27, { align: 'center' });
-    doc.text(`Phone: ${profile.phone} | GSTIN: ${profile.gstin}`, 105, 33, { align: 'center' });
+    doc.text(`Date: ${new Date(invoice.date).toLocaleDateString('en-IN')}`, 190, 40, { align: 'right' });
 
-    // Horizontal Line
-    doc.setDrawColor(accentColor);
-    doc.setLineWidth(1);
-    doc.line(20, 38, 190, 38);
+    // Thick Primary Border Line
+    doc.setDrawColor(primaryColor);
+    doc.setLineWidth(1.5);
+    doc.line(20, 46, 190, 46);
 
-    // Invoice Info
+    // Bill To Section
     doc.setFontSize(11);
     doc.setFont(undefined, 'bold');
-    doc.text('BILL TO:', 20, 50);
-    doc.setFont(undefined, 'normal');
-    doc.text(invoice.customer || 'Walk-in Customer', 20, 56);
-    if (invoice.phone) doc.text(`Phone: ${invoice.phone}`, 20, 62);
-
-    doc.setFont(undefined, 'bold');
-    doc.text('INVOICE DETAILS:', 140, 50);
-    doc.setFont(undefined, 'normal');
-    doc.text(`Invoice #: ${invoice.id}`, 140, 56);
-    doc.text(`Date: ${new Date(invoice.date).toLocaleDateString('en-IN')}`, 140, 62);
-    doc.text(`Payment: ${invoice.paymentMethod}`, 140, 68);
+    doc.setTextColor(40, 40, 40);
+    doc.text('Bill To:', 20, 58);
+    doc.setFontSize(12);
+    doc.text(invoice.customer || 'Walk-in Customer', 20, 65);
+    if (invoice.phone) {
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      doc.text(`Phone: ${invoice.phone}`, 20, 71);
+    }
 
     // Items Table
     const tableData = invoice.items.map(item => [
@@ -319,7 +331,7 @@ const Invoices = () => {
     ]);
 
     autoTable(doc, {
-      startY: 75,
+      startY: 80,
       head: [['Item', 'Category', 'Qty', 'Price', 'Amount']],
       body: tableData,
       headStyles: { fillColor: primaryColor, textColor: 255, fontSize: 10, halign: 'center' },
@@ -339,6 +351,7 @@ const Invoices = () => {
     const rightAlignX = 190;
 
     doc.setFontSize(10);
+    doc.setTextColor(80, 80, 80);
     doc.text('Subtotal:', 140, finalY);
     doc.text(`₹${invoice.subtotal.toFixed(2)}`, rightAlignX, finalY, { align: 'right' });
 
@@ -346,13 +359,14 @@ const Invoices = () => {
       doc.setTextColor(accentColor);
       doc.text(`Discount (${invoice.discountPercentage || 0}%):`, 140, finalY + 7);
       doc.text(`-₹${invoice.discount.toFixed(2)}`, rightAlignX, finalY + 7, { align: 'right' });
-      doc.setTextColor(40, 40, 40);
+      doc.setTextColor(80, 80, 80);
     }
 
     doc.text(`GST (${invoice.gst || 18}%):`, 140, finalY + 14);
     doc.text(`₹${invoice.tax.toFixed(2)}`, rightAlignX, finalY + 14, { align: 'right' });
 
     doc.setDrawColor(200);
+    doc.setLineWidth(0.5);
     doc.line(140, finalY + 18, 190, finalY + 18);
 
     doc.setFontSize(12);
@@ -361,15 +375,26 @@ const Invoices = () => {
     doc.text('Total Amount:', 140, finalY + 25);
     doc.text(`₹${invoice.total.toFixed(2)}`, rightAlignX, finalY + 25, { align: 'right' });
 
-    // Footer
-    doc.setTextColor(100);
-    doc.setFontSize(8);
-    doc.setFont(undefined, 'normal');
-    doc.text(`Thank you for shopping with ${profile.businessName}!`, 105, 270, { align: 'center' });
+    // Footer - Simplified to avoid auto-linking and match print style
+    const pageHeight = doc.internal.pageSize.height;
+    doc.setDrawColor(200);
+    doc.setLineWidth(0.5);
+    doc.line(20, pageHeight - 30, 190, pageHeight - 30);
+
     doc.setFontSize(9);
+    doc.setTextColor(120);
+    doc.setFont(undefined, 'normal');
+    doc.text(`Thank you for shopping with ${profile.businessName}!`, 105, pageHeight - 20, { align: 'center' });
+
+    doc.setFontSize(10);
     doc.setFont(undefined, 'bold');
     doc.setTextColor(primaryColor);
-    doc.text(`${profile.businessName.toUpperCase()} | ${profile.address}`, 105, 277, { align: 'center' });
+    doc.text(`${profile.businessName.toUpperCase()}`, 105, pageHeight - 14, { align: 'center' });
+
+    doc.setFontSize(8);
+    doc.setTextColor(140);
+    doc.setFont(undefined, 'normal');
+    doc.text(profile.address, 105, pageHeight - 9, { align: 'center' });
 
     return doc;
   };

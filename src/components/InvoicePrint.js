@@ -16,7 +16,8 @@ const InvoicePrint = forwardRef(({ invoice }, ref) => {
         mx: 'auto',
         '@media print': {
           p: 0,
-          maxWidth: 'none'
+          maxWidth: 'none',
+          '@page': { size: 'auto', margin: '0mm' }
         }
       }}
     >
