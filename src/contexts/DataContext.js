@@ -15,6 +15,7 @@ export const DataProvider = ({ children }) => {
   const [invoices, setInvoices] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [inventoryLogs, setInventoryLogs] = useState([]);
+  const [marketingTemplates, setMarketingTemplates] = useState([]);
   const [categories, setCategories] = useState(['Sarees', 'Kurtis', 'Lehenga', 'Salwar Suits', 'Dupattas', 'Blouses']);
   const [profile, setProfile] = useState({
     businessName: 'Aleen Clothing',
@@ -75,6 +76,10 @@ export const DataProvider = ({ children }) => {
       }
     });
 
+    const unsubMarketingTemplates = onSnapshot(collection(db, 'marketing_templates'), (snapshot) => {
+      setMarketingTemplates(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+
     const unsubExpenseCategories = onSnapshot(doc(db, 'settings', 'expenses'), (snapshot) => {
       if (snapshot.exists() && snapshot.data().categories) {
         setExpenseCategories(snapshot.data().categories);
@@ -92,6 +97,7 @@ export const DataProvider = ({ children }) => {
       unsubProfile();
       unsubCategories();
       unsubExpenseCategories();
+      unsubMarketingTemplates();
     };
   }, []);
 
@@ -445,6 +451,20 @@ export const DataProvider = ({ children }) => {
     await deleteDoc(doc(db, 'customers', id));
   };
 
+  const addMarketingTemplate = async (template) => {
+    const id = Date.now().toString();
+    await setDoc(doc(db, 'marketing_templates', id), { ...template, id });
+    return id;
+  };
+
+  const updateMarketingTemplate = async (id, updates) => {
+    await updateDoc(doc(db, 'marketing_templates', id), updates);
+  };
+
+  const deleteMarketingTemplate = async (id) => {
+    await deleteDoc(doc(db, 'marketing_templates', id));
+  };
+
   const updateCategories = async (newCategories) => {
     await setDoc(doc(db, 'settings', 'inventory'), { categories: newCategories });
   };
@@ -502,6 +522,10 @@ export const DataProvider = ({ children }) => {
       addCustomer,
       updateCustomer,
       deleteCustomer,
+      marketingTemplates,
+      addMarketingTemplate,
+      updateMarketingTemplate,
+      deleteMarketingTemplate,
       addVendor,
       updateVendor,
       deleteVendor,

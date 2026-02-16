@@ -1,15 +1,66 @@
 import React, { useState } from 'react';
-import { Box, Typography, Grid, Card, CardContent, Button, Chip, TextField, Paper, IconButton, Avatar, useTheme, Divider, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions, List, ListItem, ListItemAvatar, ListItemText, InputAdornment, useMediaQuery } from '@mui/material';
-import { WhatsApp, ShoppingBag, Event, Search, MoreVert, TrendingUp, Group, Warning, Celebration, Send } from '@mui/icons-material';
+import { Box, Typography, Grid, Card, CardContent, Button, Chip, TextField, Paper, IconButton, Avatar, useTheme, Divider, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions, List, ListItem, ListItemAvatar, ListItemText, InputAdornment, useMediaQuery, Checkbox, FormControlLabel, Stack } from '@mui/material';
+import { WhatsApp, ShoppingBag, Event, Search, MoreVert, TrendingUp, Group, Warning, Celebration, Send, CheckCircle, RadioButtonUnchecked, Edit, Delete, Add } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 
 const Marketing = () => {
-    const { customers, invoices, profile, updateCustomer } = useData();
+    const { customers, invoices, profile, updateCustomer, marketingTemplates, addMarketingTemplate, updateMarketingTemplate, deleteMarketingTemplate } = useData();
     const theme = useTheme();
     const [search, setSearch] = useState('');
     const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
     const [selectedTemplate, setSelectedTemplate] = useState(null);
     const [customerFilter, setCustomerFilter] = useState('');
+    const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
+    const [bulkSendDialogOpen, setBulkSendDialogOpen] = useState(false);
+    const [bulkTemplate, setBulkTemplate] = useState(null);
+
+    const [editTemplateDialogOpen, setEditTemplateDialogOpen] = useState(false);
+    const [editingTemplate, setEditingTemplate] = useState(null);
+    const [templateFormData, setTemplateFormData] = useState({ title: '', message: '', color: '#d97706' });
+
+    // Initialize default templates if none exist
+    React.useEffect(() => {
+        if (marketingTemplates.length === 0) {
+            const defaults = [
+                {
+                    title: 'Festival Greeting',
+                    message: `Celebrate the season with style! Get 20% off on all Sarees at ${profile.businessName}. Visit us today!`,
+                    color: '#d97706',
+                    type: 'festival'
+                },
+                {
+                    title: 'New Arrivals',
+                    message: `Our new collection is here! 🌸 Explore the latest trends at ${profile.businessName}. Early birds get a special surprise!`,
+                    color: '#10b981',
+                    type: 'arrivals'
+                },
+                {
+                    title: 'Season Sale',
+                    message: `End of season sale starting now! Up to 50% off on selected items at ${profile.businessName}. Don't miss out!`,
+                    color: '#ef4444',
+                    type: 'sale'
+                }
+            ];
+            defaults.forEach(async (t) => await addMarketingTemplate(t));
+        }
+    }, [marketingTemplates.length, profile.businessName]);
+
+    const handleSaveTemplate = async () => {
+        if (editingTemplate) {
+            await updateMarketingTemplate(editingTemplate.id, templateFormData);
+        } else {
+            await addMarketingTemplate(templateFormData);
+        }
+        setEditTemplateDialogOpen(false);
+        setEditingTemplate(null);
+        setTemplateFormData({ title: '', message: '', color: '#d97706' });
+    };
+
+    const handleDeleteTemplate = async (id) => {
+        if (window.confirm('Are you sure you want to delete this template?')) {
+            await deleteMarketingTemplate(id);
+        }
+    };
 
     const today = new Date();
 
@@ -48,7 +99,7 @@ const Marketing = () => {
     const sendWhatsApp = (customer, type) => {
         let message = '';
         if (type === 'dormant') {
-            message = `Hello ${customer.name}! We've missed you at ${profile.businessName}. We have some exciting new arrivals. Visit us soon!`;
+            message = `Hello ${customer.name} !We've missed you at ${profile.businessName}. We have some exciting new arrivals. Visit us soon!`;
         } else if (type === 'anniversary') {
             message = `Happy Birthday ${customer.name}! 🎉 Wishing you a wonderful day. As a special treat, enjoy a 10% discount on your next visit to ${profile.businessName}!`;
         }
@@ -64,29 +115,7 @@ const Marketing = () => {
         }
     };
 
-    const templates = [
-        {
-            id: 'festival',
-            title: 'Festival Greeting',
-            message: `Celebrate the season with style! Get 20% off on all Sarees at ${profile.businessName}. Visit us today!`,
-            color: 'primary.main',
-            icon: <Celebration />
-        },
-        {
-            id: 'arrivals',
-            title: 'New Arrivals',
-            message: `Our new collection is here! 🌸 Explore the latest trends at ${profile.businessName}. Early birds get a special surprise!`,
-            color: '#10b981',
-            icon: <ShoppingBag />
-        },
-        {
-            id: 'sale',
-            title: 'Season Sale',
-            message: `End of season sale starting now! Up to 50% off on selected items at ${profile.businessName}. Don't miss out!`,
-            color: '#ef4444',
-            icon: <TrendingUp />
-        }
-    ];
+    const templates = marketingTemplates;
 
     const handleOpenTemplate = (template) => {
         setSelectedTemplate(template);
@@ -166,7 +195,24 @@ const Marketing = () => {
                                 <Typography variant="h6" sx={{ fontWeight: 700 }}>Dormant Customers</Typography>
                                 <Typography variant="caption" color="text.secondary">Customers who haven't visited in 30+ days</Typography>
                             </Box>
-                            <Box sx={{ display: 'flex', gap: 1 }}>
+                            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            size="small"
+                                            checked={selectedCustomerIds.length === dormantCustomers.length && dormantCustomers.length > 0}
+                                            indeterminate={selectedCustomerIds.length > 0 && selectedCustomerIds.length < dormantCustomers.length}
+                                            onChange={(e) => {
+                                                if (e.target.checked) {
+                                                    setSelectedCustomerIds(dormantCustomers.map(c => c.id));
+                                                } else {
+                                                    setSelectedCustomerIds([]);
+                                                }
+                                            }}
+                                        />
+                                    }
+                                    label={<Typography variant="caption" sx={{ fontWeight: 700 }}>Select All</Typography>}
+                                />
                                 <TextField
                                     size="small"
                                     placeholder="Search..."
@@ -191,7 +237,18 @@ const Marketing = () => {
                                         '&:hover': { bgcolor: 'white', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }
                                     }}>
                                         <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1.5 } }}>
+                                                <Checkbox
+                                                    size="small"
+                                                    checked={selectedCustomerIds.includes(customer.id)}
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) {
+                                                            setSelectedCustomerIds([...selectedCustomerIds, customer.id]);
+                                                        } else {
+                                                            setSelectedCustomerIds(selectedCustomerIds.filter(id => id !== customer.id));
+                                                        }
+                                                    }}
+                                                />
                                                 <Avatar sx={{
                                                     bgcolor: theme.palette.primary.main,
                                                     fontWeight: 700,
@@ -249,16 +306,50 @@ const Marketing = () => {
                 {/* Side Panels */}
                 <Grid item xs={12} md={4}>
                     <Paper sx={{ p: 3, borderRadius: 4, mb: 3 }}>
-                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>Today's Celebrations</Typography>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                            <Typography variant="h6" sx={{ fontWeight: 700 }}>Today's Celebrations</Typography>
+                            {anniversaries.length > 0 && (
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            size="small"
+                                            checked={anniversaries.every(a => selectedCustomerIds.includes(a.id))}
+                                            onChange={(e) => {
+                                                if (e.target.checked) {
+                                                    const newSelection = [...new Set([...selectedCustomerIds, ...anniversaries.map(a => a.id)])];
+                                                    setSelectedCustomerIds(newSelection);
+                                                } else {
+                                                    const filtered = selectedCustomerIds.filter(id => !anniversaries.some(a => a.id === id));
+                                                    setSelectedCustomerIds(filtered);
+                                                }
+                                            }}
+                                        />
+                                    }
+                                    label={<Typography variant="caption" sx={{ fontWeight: 700 }}>Select All</Typography>}
+                                    sx={{ m: 0 }}
+                                />
+                            )}
+                        </Box>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                             {anniversaries.map((customer) => (
-                                <Box key={customer.id} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                    <Avatar sx={{ bgcolor: '#f59e0b' }}><Celebration fontSize="small" /></Avatar>
+                                <Box key={customer.id} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Checkbox
+                                        size="small"
+                                        checked={selectedCustomerIds.includes(customer.id)}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setSelectedCustomerIds([...selectedCustomerIds, customer.id]);
+                                            } else {
+                                                setSelectedCustomerIds(selectedCustomerIds.filter(id => id !== customer.id));
+                                            }
+                                        }}
+                                    />
+                                    <Avatar sx={{ bgcolor: '#f59e0b', width: 32, height: 32 }}><Celebration fontSize="small" /></Avatar>
                                     <Box sx={{ flexGrow: 1 }}>
-                                        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{customer.name}</Typography>
-                                        <Typography variant="caption" color="text.secondary">Birthday Today</Typography>
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.8rem' }}>{customer.name}</Typography>
+                                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>Birthday Today</Typography>
                                     </Box>
-                                    <IconButton color="primary" onClick={() => sendWhatsApp(customer, 'anniversary')}>
+                                    <IconButton size="small" color="primary" onClick={() => sendWhatsApp(customer, 'anniversary')}>
                                         <Send fontSize="small" />
                                     </IconButton>
                                 </Box>
@@ -277,34 +368,62 @@ const Marketing = () => {
                             {templates.map((template) => (
                                 <Box
                                     key={template.id}
-                                    onClick={() => handleOpenTemplate(template)}
                                     sx={{
                                         p: 2,
                                         borderRadius: 2,
-                                        bgcolor: template.id === 'festival' ? 'primary.light' : 'grey.50',
+                                        bgcolor: template.color + '10',
                                         border: '1px solid',
-                                        borderColor: template.id === 'festival' ? 'primary.main' : 'divider',
+                                        borderColor: template.color,
                                         cursor: 'pointer',
                                         transition: 'all 0.2s',
+                                        position: 'relative',
                                         '&:hover': {
                                             transform: 'translateX(4px)',
-                                            bgcolor: template.id === 'festival' ? 'primary.light' : 'white',
                                             boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
                                         }
                                     }}
                                 >
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                                        <Box sx={{ color: template.color, display: 'flex' }}>
-                                            {React.cloneElement(template.icon, { fontSize: 'small' })}
+                                    <Box onClick={() => handleOpenTemplate(template)}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                                            <Box sx={{ color: template.color, display: 'flex' }}>
+                                                {template.type === 'festival' ? <Celebration fontSize="small" /> :
+                                                    template.type === 'arrivals' ? <ShoppingBag fontSize="small" /> :
+                                                        template.type === 'sale' ? <TrendingUp fontSize="small" /> :
+                                                            <Event fontSize="small" />}
+                                            </Box>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{template.title}</Typography>
                                         </Box>
-                                        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{template.title}</Typography>
+                                        <Typography variant="caption" display="block" color="text.secondary" sx={{ fontStyle: 'italic', pr: 6 }}>
+                                            "{template.message.substring(0, 60)}..."
+                                        </Typography>
                                     </Box>
-                                    <Typography variant="caption" display="block" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                                        "{template.message.substring(0, 60)}..."
-                                    </Typography>
+                                    <Box sx={{ position: 'absolute', right: 8, top: 4, display: 'flex' }}>
+                                        <IconButton size="small" onClick={() => {
+                                            setEditingTemplate(template);
+                                            setTemplateFormData({ title: template.title, message: template.message, color: template.color });
+                                            setEditTemplateDialogOpen(true);
+                                        }}>
+                                            <Edit fontSize="inherit" />
+                                        </IconButton>
+                                        <IconButton size="small" color="error" onClick={() => handleDeleteTemplate(template.id)}>
+                                            <Delete fontSize="inherit" />
+                                        </IconButton>
+                                    </Box>
                                 </Box>
                             ))}
-                            <Button fullWidth variant="outlined" sx={{ borderRadius: 2, mt: 1 }}>Create Custom</Button>
+                            <Button
+                                fullWidth
+                                variant="outlined"
+                                startIcon={<Add />}
+                                sx={{ borderRadius: 2, mt: 1 }}
+                                onClick={() => {
+                                    setEditingTemplate(null);
+                                    setTemplateFormData({ title: '', message: '', color: '#d97706' });
+                                    setEditTemplateDialogOpen(true);
+                                }}
+                            >
+                                Create Custom
+                            </Button>
                         </Box>
                     </Paper>
                 </Grid>
@@ -395,6 +514,222 @@ const Marketing = () => {
                 </DialogContent>
                 <DialogActions sx={{ p: 3, pt: 0 }}>
                     <Button onClick={() => setTemplateDialogOpen(false)} sx={{ fontWeight: 700 }}>Close</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Bulk Actions Header / Bar */}
+            {selectedCustomerIds.length > 0 && (
+                <Paper
+                    sx={{
+                        position: 'fixed',
+                        bottom: 24,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        zIndex: theme.zIndex.appBar,
+                        px: 3,
+                        py: 1.5,
+                        borderRadius: 10,
+                        boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+                        bgcolor: 'primary.main',
+                        color: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 3,
+                        width: 'auto',
+                        minWidth: { xs: '90%', sm: 400 },
+                        justifyContent: 'space-between'
+                    }}
+                >
+                    <Typography variant="body2" sx={{ fontWeight: 800 }}>
+                        {selectedCustomerIds.length} Customers Selected
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Button
+                            size="small"
+                            onClick={() => setSelectedCustomerIds([])}
+                            sx={{ color: 'white', fontWeight: 700, textTransform: 'none' }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="contained"
+                            size="small"
+                            startIcon={<WhatsApp />}
+                            onClick={() => {
+                                setBulkTemplate(templates[0]);
+                                setBulkSendDialogOpen(true);
+                            }}
+                            sx={{
+                                bgcolor: 'white',
+                                color: 'primary.main',
+                                fontWeight: 800,
+                                px: 3,
+                                borderRadius: 5,
+                                textTransform: 'none',
+                                '&:hover': { bgcolor: 'grey.100' }
+                            }}
+                        >
+                            Bulk Send
+                        </Button>
+                    </Box>
+                </Paper>
+            )}
+
+            {/* Bulk Send Managed Dialog */}
+            <Dialog
+                open={bulkSendDialogOpen}
+                onClose={() => setBulkSendDialogOpen(false)}
+                maxWidth="md"
+                fullWidth
+                PaperProps={{ sx: { borderRadius: 4 } }}
+            >
+                <DialogTitle sx={{ fontWeight: 800 }}>
+                    Bulk Send Messages
+                </DialogTitle>
+                <DialogContent>
+                    <Grid container spacing={3}>
+                        <Grid item xs={12} md={5}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 2 }}>1. Choose Template</Typography>
+                            <Stack spacing={2}>
+                                {templates.map((t) => (
+                                    <Box
+                                        key={t.id}
+                                        onClick={() => setBulkTemplate(t)}
+                                        sx={{
+                                            p: 2,
+                                            borderRadius: 2,
+                                            border: '2px solid',
+                                            borderColor: bulkTemplate?.id === t.id ? 'primary.main' : 'divider',
+                                            bgcolor: bulkTemplate?.id === t.id ? 'primary.light' : 'white',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s',
+                                            '&:hover': { borderColor: 'primary.main' }
+                                        }}
+                                    >
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>{t.title}</Typography>
+                                        <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic', display: 'block', mt: 0.5 }}>
+                                            "{t.message.substring(0, 60)}..."
+                                        </Typography>
+                                    </Box>
+                                ))}
+                            </Stack>
+                        </Grid>
+                        <Grid item xs={12} md={7}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 2 }}>2. Recipient List ({selectedCustomerIds.length})</Typography>
+                            <Paper sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, maxHeight: 400, overflow: 'auto' }}>
+                                <List disablePadding>
+                                    {selectedCustomerIds.map((id, idx) => {
+                                        const customer = customers.find(c => c.id === id);
+                                        if (!customer) return null;
+                                        return (
+                                            <ListItem
+                                                key={id}
+                                                divider={idx < selectedCustomerIds.length - 1}
+                                                secondaryAction={
+                                                    <IconButton
+                                                        edge="end"
+                                                        color="primary"
+                                                        size="small"
+                                                        onClick={() => {
+                                                            const phone = customer.phone.replace(/\D/g, '');
+                                                            const cleanPhone = phone.startsWith('91') ? phone : `91${phone}`;
+                                                            const url = `https://wa.me/${cleanPhone}/?text=${encodeURIComponent(bulkTemplate?.message || '')}`;
+                                                            window.open(url, '_blank');
+                                                            updateCustomer(customer.id, { lastReminderSent: new Date().toISOString() });
+                                                        }}
+                                                    >
+                                                        <WhatsApp />
+                                                    </IconButton>
+                                                }
+                                            >
+                                                <ListItemAvatar>
+                                                    <Avatar sx={{ width: 32, height: 32, fontSize: '0.8rem', bgcolor: 'primary.main' }}>
+                                                        {customer.name[0]}
+                                                    </Avatar>
+                                                </ListItemAvatar>
+                                                <ListItemText
+                                                    primary={<Typography variant="body2" sx={{ fontWeight: 700 }}>{customer.name}</Typography>}
+                                                    secondary={<Typography variant="caption">{customer.phone}</Typography>}
+                                                />
+                                            </ListItem>
+                                        );
+                                    })}
+                                </List>
+                            </Paper>
+                            <Typography variant="caption" sx={{ display: 'block', mt: 2, color: 'text.secondary', textAlign: 'center' }}>
+                                For security and anti-spam, click the icon next to each customer to send.
+                            </Typography>
+                        </Grid>
+                    </Grid>
+                </DialogContent>
+                <DialogActions sx={{ p: 3 }}>
+                    <Button onClick={() => setBulkSendDialogOpen(false)} sx={{ fontWeight: 700 }}>Finish</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Create/Edit Template Dialog */}
+            <Dialog
+                open={editTemplateDialogOpen}
+                onClose={() => setEditTemplateDialogOpen(false)}
+                maxWidth="sm"
+                fullWidth
+                PaperProps={{ sx: { borderRadius: 4 } }}
+            >
+                <DialogTitle sx={{ fontWeight: 800 }}>
+                    {editingTemplate ? 'Edit Template' : 'Create Custom Template'}
+                </DialogTitle>
+                <DialogContent>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
+                        <TextField
+                            fullWidth
+                            label="Template Title"
+                            placeholder="e.g. Diwali Special"
+                            value={templateFormData.title}
+                            onChange={(e) => setTemplateFormData({ ...templateFormData, title: e.target.value })}
+                        />
+                        <TextField
+                            fullWidth
+                            label="Message"
+                            multiline
+                            rows={4}
+                            placeholder="Type your WhatsApp message here..."
+                            value={templateFormData.message}
+                            onChange={(e) => setTemplateFormData({ ...templateFormData, message: e.target.value })}
+                            helperText="Tip: You can use emojis to make it more engaging!"
+                        />
+                        <Box>
+                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, mb: 1, display: 'block' }}>Theme Color</Typography>
+                            <Box sx={{ display: 'flex', gap: 1 }}>
+                                {['#d97706', '#10b981', '#ef4444', '#3b82f6', '#8b5cf6'].map((c) => (
+                                    <Box
+                                        key={c}
+                                        onClick={() => setTemplateFormData({ ...templateFormData, color: c })}
+                                        sx={{
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: '50%',
+                                            bgcolor: c,
+                                            cursor: 'pointer',
+                                            border: templateFormData.color === c ? '3px solid black' : 'none',
+                                            transition: 'transform 0.2s',
+                                            '&:hover': { transform: 'scale(1.1)' }
+                                        }}
+                                    />
+                                ))}
+                            </Box>
+                        </Box>
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ p: 3 }}>
+                    <Button onClick={() => setEditTemplateDialogOpen(false)} sx={{ fontWeight: 700 }}>Cancel</Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleSaveTemplate}
+                        disabled={!templateFormData.title || !templateFormData.message}
+                        sx={{ fontWeight: 800, px: 4, borderRadius: 3 }}
+                    >
+                        Save Template
+                    </Button>
                 </DialogActions>
             </Dialog>
         </Box>
