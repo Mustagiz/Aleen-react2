@@ -57,7 +57,17 @@ const Invoices = () => {
   const [splitAmount, setSplitAmount] = useState(0);
   const [paymentMethod2, setPaymentMethod2] = useState('Card');
 
-  const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().split('T')[0]);
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
+  const [invoiceDate, setInvoiceDate] = useState(getCurrentDateTime());
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -208,7 +218,7 @@ const Invoices = () => {
     setTax('');
     setCustomer('');
     setPhone('+91');
-    setInvoiceDate(new Date().toISOString().split('T')[0]);
+    setInvoiceDate(getCurrentDateTime());
     setSelectedCustomerId(null);
     setPaymentMethod('Cash');
     setIsSplitPayment(false);
@@ -963,8 +973,8 @@ const Invoices = () => {
                 helperText="Press Enter to search for existing customer name"
               />
               <TextField
-                label="Invoice Date"
-                type="date"
+                label="Invoice Date & Time"
+                type="datetime-local"
                 value={invoiceDate}
                 onChange={(e) => setInvoiceDate(e.target.value)}
                 fullWidth
