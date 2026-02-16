@@ -78,7 +78,7 @@ export const exportToPDF = ({ title, profile, probData, columns, filename }, typ
   try {
     console.log('Starting PDF Export...');
     const doc = new jsPDF();
-    const primaryColor = '#F472B6'; // Baby Pink
+    const primaryColor = '#d97706'; // Warm Amber
 
     // Set Font to Helvetica to avoid encoding issues
     doc.setFont('helvetica', 'bold');
@@ -114,11 +114,11 @@ export const exportToPDF = ({ title, profile, probData, columns, filename }, typ
 export const generateReportPDF = (title, profile, summaryLines, tableHeaders, tableData, filename) => {
   try {
     const doc = new jsPDF();
-    const pinkRGB = [244, 114, 182]; // RGB for #F472B6
+    const amberRGB = [217, 119, 6]; // RGB for #d97706
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(20);
-    doc.setTextColor(pinkRGB[0], pinkRGB[1], pinkRGB[2]);
+    doc.setTextColor(amberRGB[0], amberRGB[1], amberRGB[2]);
     doc.text(`${profile.businessName} - ${title}`, 105, 15, { align: 'center' });
 
     doc.setFont('helvetica', 'normal');
@@ -136,7 +136,7 @@ export const generateReportPDF = (title, profile, summaryLines, tableHeaders, ta
       startY: yPos + 5,
       head: [tableHeaders],
       body: tableData,
-      headStyles: { fillColor: pinkRGB, font: 'helvetica', fontStyle: 'bold' },
+      headStyles: { fillColor: amberRGB, font: 'helvetica', fontStyle: 'bold' },
       styles: { font: 'helvetica', fontSize: 9 },
       theme: 'striped'
     });

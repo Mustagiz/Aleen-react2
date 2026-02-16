@@ -274,8 +274,8 @@ const Invoices = () => {
 
   const generatePDF = (invoice) => {
     const doc = new jsPDF();
-    const primaryColor = '#F472B6'; // Baby Pink
-    const accentColor = '#B76E79'; // Rose Gold
+    const primaryColor = '#d97706'; // Warm Amber (Matches Application Primary)
+    const accentColor = '#f97316'; // Warm Coral (Matches Application Secondary)
 
     // Header Layout: Left (Business Info) | Right (Invoice Status)
     doc.setTextColor(primaryColor);
