@@ -158,6 +158,20 @@ const ProfitLoss = () => {
     ]
   };
 
+  // Profit vs Loss distribution
+  const profitItems = profitData.filter(item => item.profit > 0).length;
+  const lossItems = profitData.filter(item => item.profit < 0).length;
+
+  const distributionData = {
+    labels: ['Profit Items', 'Loss Items'],
+    datasets: [{
+      data: [profitItems, lossItems],
+      backgroundColor: ['#1b5e20', '#c62828'],
+      borderWidth: 0,
+      hoverOffset: 15
+    }]
+  };
+
   const exportReport = () => {
     const data = profitData.map(item => ({
       'Invoice': item.invoiceId,
