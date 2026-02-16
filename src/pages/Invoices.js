@@ -1000,7 +1000,7 @@ const Invoices = () => {
                   // Auto-select on exact Product ID match (case-insensitive)
                   if (val.trim()) {
                     const matchedProduct = inventory.find(inv =>
-                      inv.productId && inv.productId.toLowerCase() === val.toLowerCase().trim()
+                      inv.productId && inv.productId.toLowerCase() === val.toLowerCase().trim() && (parseInt(inv.quantity) || 0) > 0
                     );
 
                     if (matchedProduct) {
@@ -1018,7 +1018,7 @@ const Invoices = () => {
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
                     const matchedProduct = inventory.find(inv =>
-                      inv.productId && inv.productId.toLowerCase() === itemSearchTerm.toLowerCase().trim()
+                      inv.productId && inv.productId.toLowerCase() === itemSearchTerm.toLowerCase().trim() && (parseInt(inv.quantity) || 0) > 0
                     );
                     if (matchedProduct) {
                       const emptyIndex = selectedItems.findIndex(item => !item.id);
@@ -1040,12 +1040,14 @@ const Invoices = () => {
             </Box>
             {selectedItems.map((item, index) => {
               // Filter inventory based on globalItemFilter
-              const filteredInventory = globalItemFilter
-                ? inventory.filter(inv =>
+              // Filter inventory based on globalItemFilter AND quantity > 0
+              const filteredInventory = inventory.filter(inv =>
+                ((parseInt(inv.currentQty || inv.quantity) || 0) > 0) &&
+                (!globalItemFilter ||
                   inv.name.toLowerCase().includes(globalItemFilter.toLowerCase()) ||
                   (inv.productId && inv.productId.toLowerCase().includes(globalItemFilter.toLowerCase()))
                 )
-                : inventory;
+              );
 
               return (
                 <Box key={index} sx={{

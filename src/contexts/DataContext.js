@@ -309,7 +309,42 @@ export const DataProvider = ({ children }) => {
   };
 
   const deleteInvoice = async (id) => {
-    await deleteDoc(doc(db, 'invoices', id));
+    const invoice = invoices.find(inv => inv.id === id);
+    if (!invoice) return;
+
+    const batch = writeBatch(db);
+
+    // 1. Restore Inventory
+    for (const item of invoice.items) {
+      // Skip custom items that don't track inventory by ID (or check if they have a valid inventory ID)
+      if (item.category === 'Custom' || item.id.startsWith('custom-')) continue;
+
+      const invItem = inventory.find(i => i.id === item.id);
+      if (invItem) {
+        const invRef = doc(db, 'inventory', item.id);
+        batch.update(invRef, {
+          quantity: (invItem.quantity || 0) + item.quantity
+        });
+      }
+    }
+
+    // 2. Revert Customer Stats
+    if (invoice.customerId) {
+      const customer = customers.find(c => c.id === invoice.customerId);
+      if (customer) {
+        const customerRef = doc(db, 'customers', invoice.customerId);
+        batch.update(customerRef, {
+          totalSpent: Math.max(0, (customer.totalSpent || 0) - invoice.total),
+          visitCount: Math.max(0, (customer.visitCount || 0) - 1)
+        });
+      }
+    }
+
+    // 3. Delete the Invoice
+    const invoiceRef = doc(db, 'invoices', id);
+    batch.delete(invoiceRef);
+
+    await batch.commit();
   };
 
   const updateProfile = async (updates) => {
