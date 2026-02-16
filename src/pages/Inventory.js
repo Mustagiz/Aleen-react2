@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Tooltip, useTheme, useMediaQuery, Divider, TablePagination, TableSortLabel } from '@mui/material';
-import { Edit, Delete, Add, Search, Inventory2, TrendingUp, Warning, AttachMoney, Download, Upload } from '@mui/icons-material';
+import { Edit, Delete, Add, Search, Inventory2, TrendingUp, Warning, AttachMoney, Download, Upload, QrCode } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
+import { useNavigate } from 'react-router-dom';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 
 const Inventory = () => {
   const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, bulkAddInventory, categories, updateCategories } = useData();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [search, setSearch] = useState('');
@@ -228,11 +230,11 @@ const Inventory = () => {
                 fontWeight: 700,
                 textTransform: 'none',
                 background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)',
-                boxShadow: `0 4px 12px ${theme.palette.primary.main}33`,
+                boxShadow: `0 4px 12px ${theme.palette.primary.main} 33`,
                 transition: 'all 0.2s ease-in-out',
                 '&:hover': {
                   background: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)',
-                  boxShadow: `0 6px 16px ${theme.palette.primary.main}4D`,
+                  boxShadow: `0 6px 16px ${theme.palette.primary.main} 4D`,
                   transform: 'translateY(-2px)'
                 }
               }}
@@ -249,7 +251,7 @@ const Inventory = () => {
               borderRadius: 4, position: 'relative', overflow: 'hidden',
               boxShadow: '0 10px 25px -5px rgba(183, 110, 121, 0.15)',
               border: '1px solid rgba(183, 110, 121, 0.15)',
-              background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(183, 110, 121, 0.05) 100%)`,
+              background: `linear - gradient(135deg, ${theme.palette.background.paper} 0 %, rgba(183, 110, 121, 0.05) 100 %)`,
               transition: 'all 0.3s ease',
               '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(183, 110, 121, 0.3)' }
             }}>
@@ -272,7 +274,7 @@ const Inventory = () => {
               borderRadius: 4, position: 'relative', overflow: 'hidden',
               boxShadow: '0 10px 25px -5px rgba(46, 125, 50, 0.15)',
               border: '1px solid rgba(46, 125, 50, 0.15)',
-              background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(46, 125, 50, 0.05) 100%)`,
+              background: `linear - gradient(135deg, ${theme.palette.background.paper} 0 %, rgba(46, 125, 50, 0.05) 100 %)`,
               transition: 'all 0.3s ease',
               '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(46, 125, 50, 0.3)' }
             }}>
@@ -295,7 +297,7 @@ const Inventory = () => {
               borderRadius: 4, position: 'relative', overflow: 'hidden',
               boxShadow: '0 10px 25px -5px rgba(245, 127, 23, 0.15)',
               border: '1px solid rgba(245, 127, 23, 0.15)',
-              background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(245, 127, 23, 0.05) 100%)`,
+              background: `linear - gradient(135deg, ${theme.palette.background.paper} 0 %, rgba(245, 127, 23, 0.05) 100 %)`,
               transition: 'all 0.3s ease',
               '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(245, 127, 23, 0.3)' }
             }}>
@@ -318,7 +320,7 @@ const Inventory = () => {
               borderRadius: 4, position: 'relative', overflow: 'hidden',
               boxShadow: '0 10px 25px -5px rgba(219, 39, 119, 0.15)',
               border: '1px solid rgba(219, 39, 119, 0.15)',
-              background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(219, 39, 119, 0.05) 100%)`,
+              background: `linear - gradient(135deg, ${theme.palette.background.paper} 0 %, rgba(219, 39, 119, 0.05) 100 %)`,
               transition: 'all 0.3s ease',
               '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(219, 39, 119, 0.3)' }
             }}>
@@ -518,6 +520,7 @@ const Inventory = () => {
                       </TableCell>
                       <TableCell align="right">
                         <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
+                          <Tooltip title="Print Label"><IconButton size="small" onClick={() => navigate('/barcodes')} sx={{ color: 'secondary.main' }}><QrCode fontSize="small" /></IconButton></Tooltip>
                           <IconButton size="small" onClick={() => handleOpen(item)} sx={{ color: 'primary.main' }}><Edit fontSize="small" /></IconButton>
                           <IconButton size="small" onClick={() => openDeleteDialog(item.id)} sx={{ color: 'error.main' }}><Delete fontSize="small" /></IconButton>
                         </Box>

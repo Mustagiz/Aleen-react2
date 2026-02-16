@@ -20,6 +20,20 @@ const Invoices = () => {
   const [selectedInvoiceId, setSelectedInvoiceId] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [successInvoice, setSuccessInvoice] = useState(null);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Alt + N: New Invoice
+      if (e.altKey && e.key.toLowerCase() === 'n') {
+        e.preventDefault();
+        setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0 }]);
+        setOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleMenuClick = (event, invoiceId) => {
     setAnchorEl(event.currentTarget);
@@ -212,6 +226,7 @@ const Invoices = () => {
     };
     await addInvoice(invoice);
     setOpen(false);
+    setSuccessInvoice(invoice); // Show success dialog instead of just closing
     setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0 }]);
     setDiscountPercent('');
     setDiscountAmount('');
@@ -1334,6 +1349,55 @@ const Invoices = () => {
         title="Delete Invoice"
         content="Are you sure you want to delete this invoice? This action cannot be undone."
       />
+
+      {/* Invoice Success Dialog */}
+      <Dialog
+        open={!!successInvoice}
+        onClose={() => setSuccessInvoice(null)}
+        PaperProps={{ sx: { borderRadius: 4, maxWidth: 400 } }}
+      >
+        <DialogContent sx={{ textAlign: 'center', p: 4 }}>
+          <Box sx={{
+            width: 60, height: 60, borderRadius: '50%', bgcolor: 'success.light',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            mx: 'auto', mb: 2, color: 'white'
+          }}>
+            <TrendingUp fontSize="large" />
+          </Box>
+          <Typography variant="h5" sx={{ fontWeight: 800, mb: 1 }}>Invoice Saved!</Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Invoice #{successInvoice?.id} has been successfully created and saved to your records.
+          </Typography>
+
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            <Button
+              variant="contained"
+              fullWidth
+              startIcon={<WhatsApp />}
+              onClick={() => { sendWhatsApp(successInvoice); setSuccessInvoice(null); }}
+              sx={{ py: 1.5, bgcolor: '#25D366', '&:hover': { bgcolor: '#128C7E' }, borderRadius: 2, fontWeight: 700 }}
+            >
+              Share on WhatsApp
+            </Button>
+            <Button
+              variant="outlined"
+              fullWidth
+              startIcon={<Print />}
+              onClick={() => { handlePrint(successInvoice); setSuccessInvoice(null); }}
+              sx={{ py: 1.5, borderRadius: 2, fontWeight: 700 }}
+            >
+              Print Invoice
+            </Button>
+            <Button
+              fullWidth
+              onClick={() => setSuccessInvoice(null)}
+              sx={{ py: 1.5, borderRadius: 2, fontWeight: 600, color: 'text.secondary' }}
+            >
+              Done
+            </Button>
+          </Box>
+        </DialogContent>
+      </Dialog>
     </Box >
   );
 };

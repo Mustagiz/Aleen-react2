@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, Avatar, TablePagination } from '@mui/material';
-import { Add, Edit, Delete, Search, People, Phone, Email, ShoppingBag, TrendingUp, FilterList, MoreVert, Download } from '@mui/icons-material';
+import { Add, Edit, Delete, Search, People, Phone, Email, ShoppingBag, TrendingUp, FilterList, MoreVert, Download, WhatsApp } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 
 const Customers = () => {
-    const { customers, addCustomer, updateCustomer, deleteCustomer, invoices } = useData();
+    const { customers, addCustomer, updateCustomer, deleteCustomer, invoices, profile } = useData();
     const [open, setOpen] = useState(false);
     const [editCustomer, setEditCustomer] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -61,6 +61,13 @@ const Customers = () => {
             await addCustomer(formData);
         }
         setOpen(false);
+    };
+
+    const sendWhatsAppMessage = (cust) => {
+        const message = `Hello ${cust.name}, this is ${profile?.businessName || 'Aleen Clothing'}. We're reaching out regarding your recent inquiry.`;
+        const phone = cust.phone.replace(/[^0-9]/g, '');
+        const url = `https://wa.me/${phone.startsWith('91') ? '' : '91'}${phone}?text=${encodeURIComponent(message)}`;
+        window.open(url, '_blank');
     };
 
     const downloadCustomers = () => {
@@ -230,6 +237,7 @@ const Customers = () => {
                                             </Typography>
                                         </Box>
                                         <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                            <IconButton size="small" onClick={() => sendWhatsAppMessage(cust)} sx={{ color: '#25D366' }}><WhatsApp fontSize="small" /></IconButton>
                                             <IconButton size="small" onClick={() => handleOpen(cust)} sx={{ color: 'primary.main' }}><Edit fontSize="small" /></IconButton>
                                             <IconButton size="small" onClick={() => { if (window.confirm(`Delete customer ${cust.name}?`)) deleteCustomer(cust.id); }} sx={{ color: 'error.main' }}><Delete fontSize="small" /></IconButton>
                                         </Box>
@@ -289,6 +297,7 @@ const Customers = () => {
                                             <Typography variant="body2" sx={{ fontWeight: 500 }}>{customerStat.lastVisit}</Typography>
                                         </TableCell>
                                         <TableCell align="right">
+                                            <Tooltip title="WhatsApp"><IconButton size="small" sx={{ color: '#25D366' }} onClick={() => sendWhatsAppMessage(cust)}><WhatsApp fontSize="small" /></IconButton></Tooltip>
                                             <Tooltip title="Edit"><IconButton size="small" onClick={() => handleOpen(cust)}><Edit fontSize="small" /></IconButton></Tooltip>
                                             <Tooltip title="Delete"><IconButton size="small" sx={{ color: 'error.main' }} onClick={() => deleteCustomer(cust.id)}><Delete fontSize="small" /></IconButton></Tooltip>
                                         </TableCell>

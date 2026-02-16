@@ -16,6 +16,7 @@ import Settings from './pages/Settings';
 import Vendors from './pages/Vendors';
 import Purchases from './pages/Purchases';
 import Expenses from './pages/Expenses';
+import Barcodes from './pages/Barcodes';
 import Layout from './components/Layout';
 
 const PrivateRoute = ({ children }) => {
@@ -43,6 +44,7 @@ function App() {
                 <Route path="expenses" element={<Expenses />} />
                 <Route path="vendors" element={<Vendors />} />
                 <Route path="purchases" element={<Purchases />} />
+                <Route path="barcodes" element={<Barcodes />} />
                 <Route path="settings" element={<Settings />} />
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />

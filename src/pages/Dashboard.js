@@ -10,7 +10,7 @@ import { DateRange, CalendarMonth, History, ViewWeek } from '@mui/icons-material
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler);
 
 const Dashboard = () => {
-  const { inventory, invoices, purchases, vendors } = useData();
+  const { inventory, invoices, purchases, vendors, expenses } = useData();
   const navigate = useNavigate();
   const theme = useTheme();
   const [dateRange, setDateRange] = React.useState('7days');
@@ -34,10 +34,11 @@ const Dashboard = () => {
 
     const fInvoices = invoices.filter(inv => new Date(inv.date) >= startDate);
     const fPurchases = purchases.filter(p => new Date(p.date) >= startDate);
-    return { filteredInvoices: fInvoices, filteredPurchases: fPurchases };
+    const fExpenses = (expenses || []).filter(e => new Date(e.date) >= startDate);
+    return { filteredInvoices: fInvoices, filteredPurchases: fPurchases, filteredExpenses: fExpenses };
   };
 
-  const { filteredInvoices, filteredPurchases } = getFilteredData();
+  const { filteredInvoices, filteredPurchases, filteredExpenses } = getFilteredData();
   const yesterday = new Date(Date.now() - 86400000).toDateString();
 
   const todaySales = invoices.filter(inv => new Date(inv.date).toDateString() === today.toDateString())
@@ -155,28 +156,54 @@ const Dashboard = () => {
 
   const salesByPeriod = getSalesData();
 
+  // Financial Trends Data (Daily/Monthly)
+  const getTrendData = () => {
+    const dailySales = {};
+    const dailyExpenses = {};
+
+    filteredInvoices.forEach(inv => {
+      const d = new Date(inv.date).toLocaleDateString();
+      dailySales[d] = (dailySales[d] || 0) + inv.total;
+    });
+
+    filteredExpenses.forEach(exp => {
+      const d = new Date(exp.date).toLocaleDateString();
+      dailyExpenses[d] = (dailyExpenses[d] || 0) + exp.amount;
+    });
+
+    // Merge dates and sort
+    const allDates = [...new Set([...Object.keys(dailySales), ...Object.keys(dailyExpenses)])]
+      .sort((a, b) => new Date(a) - new Date(b));
+
+    return {
+      labels: allDates,
+      sales: allDates.map(d => dailySales[d] || 0),
+      expenses: allDates.map(d => dailyExpenses[d] || 0)
+    };
+  };
+
+  const trend = getTrendData();
+
   const salesChartData = {
-    labels: labels,
-    datasets: [{
-      label: 'Sales (₹)',
-      data: salesByPeriod,
-      backgroundColor: (context) => {
-        const ctx = context.chart.ctx;
-        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-        gradient.addColorStop(0, 'rgba(244, 114, 182, 0.2)'); // Light Pink
-        gradient.addColorStop(1, 'rgba(244, 114, 182, 0.0)');
-        return gradient;
+    labels: trend.labels,
+    datasets: [
+      {
+        label: 'Revenue',
+        data: trend.sales,
+        borderColor: '#E11D48',
+        backgroundColor: 'rgba(225, 29, 72, 0.1)',
+        fill: true,
+        tension: 0.4,
       },
-      borderColor: '#B76E79', // Rose Gold
-      borderWidth: 3,
-      tension: 0.4,
-      fill: true,
-      pointBackgroundColor: '#ffffff',
-      pointBorderColor: '#B76E79',
-      pointBorderWidth: 2,
-      pointRadius: 6,
-      pointHoverRadius: 8,
-    }]
+      {
+        label: 'Expenses',
+        data: trend.expenses,
+        borderColor: '#F59E0B',
+        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+        fill: true,
+        tension: 0.4,
+      }
+    ]
   };
 
   const categorySales = filteredInvoices.reduce((acc, inv) => {
@@ -418,8 +445,8 @@ const Dashboard = () => {
           }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>Revenue Trend</Typography>
-                <Typography variant="body2" color="text.secondary">Sales performance over time</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>Revenue vs Expenses</Typography>
+                <Typography variant="body2" color="text.secondary">Financial performance tracking</Typography>
               </Box>
               <IconButton size="small"><MoreVert /></IconButton>
             </Box>

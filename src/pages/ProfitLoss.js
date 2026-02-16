@@ -112,18 +112,50 @@ const ProfitLoss = () => {
     }]
   };
 
-  // Profit vs Loss distribution
-  const profitItems = profitData.filter(item => item.profit > 0).length;
-  const lossItems = profitData.filter(item => item.profit < 0).length;
+  // Profit Forecasting Logic
+  const calculateForecast = () => {
+    const sortedDates = Object.keys(profitByDate).sort((a, b) => new Date(a) - new Date(b));
+    if (sortedDates.length < 2) return null;
 
-  const distributionData = {
-    labels: ['Profit Items', 'Loss Items'],
-    datasets: [{
-      data: [profitItems, lossItems],
-      backgroundColor: ['#1b5e20', '#c62828'],
-      borderWidth: 0,
-      hoverOffset: 15
-    }]
+    const firstDate = new Date(sortedDates[0]);
+    const lastDate = new Date(sortedDates[sortedDates.length - 1]);
+    const daysDiff = Math.max(1, Math.round((lastDate - firstDate) / (1000 * 60 * 60 * 24)));
+
+    const avgDailyProfit = totalProfit / daysDiff;
+    const projected30Days = avgDailyProfit * 30;
+
+    return {
+      daily: avgDailyProfit,
+      monthly: projected30Days,
+      forecastData: Array.from({ length: 7 }, (_, i) => ({
+        date: new Date(lastDate.getTime() + (i + 1) * 24 * 60 * 60 * 1000).toLocaleDateString(),
+        profit: avgDailyProfit
+      }))
+    };
+  };
+
+  const forecast = calculateForecast();
+
+  const forecastChartData = {
+    labels: [
+      ...Object.keys(profitByDate).slice(-7),
+      ...(forecast?.forecastData.map(d => d.date) || [])
+    ],
+    datasets: [
+      {
+        label: 'Historical Profit',
+        data: [...Object.values(profitByDate).slice(-7), ...Array(7).fill(null)],
+        borderColor: '#880e4f',
+        tension: 0.4,
+      },
+      {
+        label: 'Forecasted Profit',
+        data: [...Array(7).fill(null), ...Array(7).fill(forecast?.daily || 0)],
+        borderColor: '#43a047',
+        borderDash: [5, 5],
+        tension: 0,
+      }
+    ]
   };
 
   const exportReport = () => {
@@ -264,7 +296,7 @@ const ProfitLoss = () => {
             <Typography variant="h5" sx={{ fontWeight: 800, mt: 0.5, color: totalProfit >= 0 ? 'success.main' : 'error.main' }}>₹{totalProfit.toLocaleString()}</Typography>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} lg={2.4}>
+        <Grid item xs={12} sm={6} lg={2}>
           <Card sx={{
             p: 2.5,
             position: 'relative',
@@ -273,11 +305,26 @@ const ProfitLoss = () => {
             border: '1px solid rgba(219, 39, 119, 0.15)',
             background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(219, 39, 119, 0.05) 100%)`,
             transition: 'all 0.3s ease',
-            '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(219, 39, 119, 0.3)' }
+            '&:hover': { transform: 'translateY(-4px)' }
           }}>
             <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#DB2777' }} />
             <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.65rem' }}>Margin</Typography>
             <Typography variant="h5" sx={{ fontWeight: 800, mt: 0.5 }}>{profitMargin}%</Typography>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={12} lg={2.4}>
+          <Card sx={{
+            p: 2.5,
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: '0 10px 25px -5px rgba(67, 160, 71, 0.15)',
+            border: '1px solid rgba(67, 160, 71, 0.15)',
+            background: 'linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%)',
+            color: 'white'
+          }}>
+            <Typography variant="overline" sx={{ fontWeight: 700, fontSize: '0.65rem', opacity: 0.8 }}>30-Day Forecast</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 800, mt: 0.5 }}>+₹{forecast?.monthly.toLocaleString(undefined, { maximumFractionDigits: 0 }) || '0'}</Typography>
+            <Typography variant="caption" sx={{ opacity: 0.7 }}>Based on daily avg of ₹{forecast?.daily.toFixed(0) || '0'}</Typography>
           </Card>
         </Grid>
       </Grid>
@@ -328,13 +375,17 @@ const ProfitLoss = () => {
       <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid item xs={12} md={8}>
           <Paper sx={{ p: 3, borderRadius: 3 }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>Profit Trend Over Time</Typography>
-            <Line data={trendChartData} options={{ responsive: true, plugins: { legend: { display: false } } }} />
+            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>Profit Trend & Forecast</Typography>
+            <Line data={forecastChartData} options={{
+              responsive: true,
+              plugins: { legend: { position: 'top' } },
+              scales: { y: { beginAtZero: false } }
+            }} />
           </Paper>
         </Grid>
         <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, borderRadius: 3 }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>Profit vs Loss</Typography>
+          <Paper sx={{ p: 3, borderRadius: 3, height: '100%' }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>Profit Distribution</Typography>
             <Doughnut data={distributionData} options={{ responsive: true, plugins: { legend: { position: 'bottom' } } }} />
           </Paper>
         </Grid>

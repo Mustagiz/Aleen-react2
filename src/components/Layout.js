@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, IconButton, Drawer, List, ListItem, ListItemIcon, ListItemText, Box, useMediaQuery, useTheme, Avatar, Divider, Chip, ListSubheader, BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
-import { Menu, Dashboard, Inventory, Receipt, Assessment, Logout, Store, TrendingUp, Settings, Brightness4, Brightness7, People, AccountBalanceWallet } from '@mui/icons-material';
+import { Menu, Dashboard, Inventory, Receipt, Assessment, Logout, Store, TrendingUp, Settings, Brightness4, Brightness7, People, AccountBalanceWallet, QrCode } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
 import { useThemeContext } from '../contexts/ThemeContext';
+import NotificationCenter from './NotificationCenter';
 
 const Layout = () => {
   const { logout } = useAuth();
@@ -30,7 +31,8 @@ const Layout = () => {
         { text: 'Vendors', icon: <Store />, path: '/vendors' },
         { text: 'Invoices', icon: <Receipt />, path: '/invoices' },
         { text: 'Expenses', icon: <AccountBalanceWallet />, path: '/expenses' },
-        { text: 'Customers', icon: <People />, path: '/customers' }
+        { text: 'Customers', icon: <People />, path: '/customers' },
+        { text: 'Barcodes', icon: <QrCode />, path: '/barcodes' }
       ]
     },
     {
@@ -150,7 +152,8 @@ const Layout = () => {
               }}
             />
           )}
-          <IconButton onClick={toggleTheme} color="inherit" sx={{ mr: 1 }}>
+          <NotificationCenter />
+          <IconButton onClick={toggleTheme} color="inherit" sx={{ mx: 1 }}>
             {mode === 'dark' ? <Brightness7 fontSize="small" /> : <Brightness4 fontSize="small" />}
           </IconButton>
           <Avatar
