@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Box, Typography, Grid, Card, CardContent, Button, Chip, TextField, Paper, IconButton, Avatar, useTheme, Divider, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions, List, ListItem, ListItemAvatar, ListItemText, InputAdornment } from '@mui/material';
+import { Box, Typography, Grid, Card, CardContent, Button, Chip, TextField, Paper, IconButton, Avatar, useTheme, Divider, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions, List, ListItem, ListItemAvatar, ListItemText, InputAdornment, useMediaQuery } from '@mui/material';
 import { WhatsApp, ShoppingBag, Event, Search, MoreVert, TrendingUp, Group, Warning, Celebration, Send } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 
 const Marketing = () => {
-    const { customers, invoices, profile } = useData();
+    const { customers, invoices, profile, updateCustomer } = useData();
     const theme = useTheme();
     const [search, setSearch] = useState('');
     const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
@@ -57,6 +57,11 @@ const Marketing = () => {
         const cleanPhone = phone.startsWith('91') ? phone : `91${phone}`;
         const url = `https://wa.me/${cleanPhone}/?text=${encodeURIComponent(message)}`;
         window.open(url, '_blank');
+
+        // Track reminder
+        if (customer.id) {
+            updateCustomer(customer.id, { lastReminderSent: new Date().toISOString() });
+        }
     };
 
     const templates = [
@@ -93,6 +98,11 @@ const Marketing = () => {
         const cleanPhone = phone.startsWith('91') ? phone : `91${phone}`;
         const url = `https://wa.me/${cleanPhone}/?text=${encodeURIComponent(selectedTemplate.message)}`;
         window.open(url, '_blank');
+
+        // Track reminder
+        if (customer.id) {
+            updateCustomer(customer.id, { lastReminderSent: new Date().toISOString() });
+        }
     };
 
     const StatCard = ({ title, value, icon, color }) => (
@@ -108,8 +118,12 @@ const Marketing = () => {
             <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Box>
-                        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase' }}>{title}</Typography>
-                        <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5 }}>{value}</Typography>
+                        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', fontSize: { xs: '0.6rem', sm: '0.75rem' } }}>{title}</Typography>
+                        <Typography variant="h4" sx={{
+                            fontWeight: 800,
+                            mt: 0.5,
+                            fontSize: { xs: '1.5rem', sm: '2.125rem' }
+                        }}>{value}</Typography>
                     </Box>
                     <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: `${color}15`, color: color }}>
                         {icon}
@@ -177,13 +191,24 @@ const Marketing = () => {
                                         '&:hover': { bgcolor: 'white', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }
                                     }}>
                                         <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                                <Avatar sx={{ bgcolor: theme.palette.primary.main, fontWeight: 700 }}>{customer.name[0]}</Avatar>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
+                                                <Avatar sx={{
+                                                    bgcolor: theme.palette.primary.main,
+                                                    fontWeight: 700,
+                                                    width: { xs: 32, sm: 40 },
+                                                    height: { xs: 32, sm: 40 },
+                                                    fontSize: { xs: '0.9rem', sm: '1rem' }
+                                                }}>{customer.name[0]}</Avatar>
                                                 <Box sx={{ flexGrow: 1 }}>
-                                                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{customer.name}</Typography>
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>{customer.name}</Typography>
                                                     <Typography variant="caption" color="text.secondary">{customer.phone}</Typography>
+                                                    {customer.lastReminderSent && (
+                                                        <Typography variant="caption" display="block" sx={{ color: 'success.main', fontWeight: 600, fontSize: '0.6rem' }}>
+                                                            Last: {new Date(customer.lastReminderSent).toLocaleDateString()}
+                                                        </Typography>
+                                                    )}
                                                 </Box>
-                                                <Box sx={{ textAlign: 'right', mr: 2 }}>
+                                                <Box sx={{ textAlign: 'right', mr: { xs: 0, sm: 2 }, display: { xs: 'none', sm: 'block' } }}>
                                                     <Chip
                                                         label="Dormant"
                                                         size="small"
@@ -201,10 +226,12 @@ const Marketing = () => {
                                                         bgcolor: '#25D366',
                                                         '&:hover': { bgcolor: '#128C7E' },
                                                         fontWeight: 700,
-                                                        borderRadius: 2
+                                                        borderRadius: 2,
+                                                        minWidth: { xs: 80, sm: 100 },
+                                                        fontSize: { xs: '0.7rem', sm: '0.8125rem' }
                                                     }}
                                                 >
-                                                    Remind
+                                                    {customer.lastReminderSent ? 'Resend' : 'Remind'}
                                                 </Button>
                                             </Box>
                                         </CardContent>
@@ -289,10 +316,16 @@ const Marketing = () => {
                 onClose={() => setTemplateDialogOpen(false)}
                 maxWidth="sm"
                 fullWidth
-                PaperProps={{ sx: { borderRadius: 4 } }}
+                fullScreen={useMediaQuery(theme.breakpoints.down('sm'))}
+                PaperProps={{ sx: { borderRadius: { xs: 0, sm: 4 } } }}
             >
-                <DialogTitle sx={{ fontWeight: 800, pb: 1 }}>
+                <DialogTitle sx={{ fontWeight: 800, pb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     Send "{selectedTemplate?.title}"
+                    {useMediaQuery(theme.breakpoints.down('sm')) && (
+                        <IconButton size="small" onClick={() => setTemplateDialogOpen(false)}>
+                            <MoreVert />
+                        </IconButton>
+                    )}
                 </DialogTitle>
                 <DialogContent>
                     <Typography variant="body2" sx={{
