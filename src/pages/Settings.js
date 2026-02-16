@@ -6,9 +6,13 @@ import { useAuth } from '../contexts/AuthContext';
 
 const Settings = () => {
   const { profile, updateProfile, inventory, invoices } = useData();
-  const { changePassword } = useAuth();
+  const { changePassword, changeCashierPassword, user } = useAuth();
   const [editMode, setEditMode] = useState(false);
   const [localProfile, setLocalProfile] = useState(profile);
+
+  // Cashier password state
+  const [cashierPwd, setCashierPwd] = useState('');
+  const [cashierStatus, setCashierStatus] = useState({ error: '', success: '' });
 
   // Password change state
   const [pwdState, setPwdState] = useState({
@@ -57,6 +61,37 @@ const Settings = () => {
       setPwdState({ ...pwdState, error: err.message, success: '' });
     }
   };
+
+  const handleCashierPasswordChange = async (e) => {
+    e.preventDefault();
+    setCashierStatus({ error: '', success: '' });
+
+    if (cashierPwd.length < 4) {
+      setCashierStatus({ error: 'Cashier password must be at least 4 characters long', success: '' });
+      return;
+    }
+
+    try {
+      await changeCashierPassword(cashierPwd);
+      setCashierStatus({ error: '', success: 'Cashier password updated successfully!' });
+      setCashierPwd('');
+    } catch (err) {
+      setCashierStatus({ error: err.message, success: '' });
+    }
+  };
+
+  if (user?.role === 'cashier') {
+    return (
+      <Box sx={{ p: 3, textAlign: 'center' }}>
+        <Typography variant="h5" color="text.secondary">
+          Access Restricted
+        </Typography>
+        <Typography variant="body1" sx={{ mt: 2 }}>
+          Only administrators can access the Settings page.
+        </Typography>
+      </Box>
+    );
+  }
 
   const totalYears = new Date().getFullYear() - (parseInt(profile.established) || 2020);
   const totalProducts = inventory.length;
@@ -186,15 +221,6 @@ const Settings = () => {
                     disabled={!editMode}
                   />
                 </Grid>
-                <Grid item xs={12} sm={12}>
-                  <TextField
-                    fullWidth
-                    label="Specialization"
-                    value={localProfile.specialization}
-                    onChange={(e) => setLocalProfile({ ...localProfile, specialization: e.target.value })}
-                    disabled={!editMode}
-                  />
-                </Grid>
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
@@ -213,7 +239,7 @@ const Settings = () => {
           <Card sx={{ borderRadius: 3, boxShadow: '0 4px 12px rgba(0,0,0,0.08)', mt: 3 }}>
             <CardContent sx={{ p: 4 }}>
               <Typography variant="h6" sx={{ fontWeight: 700, mb: 3, display: 'flex', alignItems: 'center' }}>
-                <Lock sx={{ mr: 1, color: '#8b5cf6' }} /> Security
+                <Lock sx={{ mr: 1, color: '#8b5cf6' }} /> Admin Security
               </Typography>
 
               {pwdState.error && <Typography color="error" variant="body2" sx={{ mb: 2 }}>{pwdState.error}</Typography>}
@@ -283,7 +309,54 @@ const Settings = () => {
                         background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)'
                       }}
                     >
-                      Update Password
+                      Update Admin Password
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Box>
+            </CardContent>
+          </Card>
+
+          <Card sx={{ borderRadius: 3, boxShadow: '0 4px 12px rgba(0,0,0,0.08)', mt: 3 }}>
+            <CardContent sx={{ p: 4 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 3, display: 'flex', alignItems: 'center' }}>
+                <Lock sx={{ mr: 1, color: '#f59e0b' }} /> Staff Security (Cashier Access)
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                Set the password used for cashier-level access to the store.
+              </Typography>
+
+              {cashierStatus.error && <Typography color="error" variant="body2" sx={{ mb: 2 }}>{cashierStatus.error}</Typography>}
+              {cashierStatus.success && <Typography color="success.main" variant="body2" sx={{ mb: 2 }}>{cashierStatus.success}</Typography>}
+
+              <Box component="form" onSubmit={handleCashierPasswordChange}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={8}>
+                    <TextField
+                      fullWidth
+                      label="New Cashier Password"
+                      type="text"
+                      value={cashierPwd}
+                      onChange={(e) => setCashierPwd(e.target.value)}
+                      placeholder="e.g., 1234"
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Button
+                      type="submit"
+                      fullWidth
+                      variant="contained"
+                      sx={{
+                        height: '56px',
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        background: '#f59e0b',
+                        '&:hover': { background: '#d97706' }
+                      }}
+                    >
+                      Set Staff Password
                     </Button>
                   </Grid>
                 </Grid>

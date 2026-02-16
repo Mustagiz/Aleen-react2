@@ -8,7 +8,7 @@ import { useThemeContext } from '../contexts/ThemeContext';
 import NotificationCenter from './NotificationCenter';
 
 const Layout = () => {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const { profile } = useData();
   const { mode, toggleTheme } = useThemeContext();
   const navigate = useNavigate();
@@ -27,10 +27,10 @@ const Layout = () => {
       items: [
         { text: 'Dashboard', icon: <Dashboard />, path: '/' },
         { text: 'Inventory', icon: <Inventory />, path: '/inventory' },
-        { text: 'Purchases', icon: <Receipt />, path: '/purchases' },
-        { text: 'Vendors', icon: <Store />, path: '/vendors' },
+        { text: 'Purchases', icon: <Receipt />, path: '/purchases', adminOnly: true },
+        { text: 'Vendors', icon: <Store />, path: '/vendors', adminOnly: true },
         { text: 'Invoices', icon: <Receipt />, path: '/invoices' },
-        { text: 'Expenses', icon: <AccountBalanceWallet />, path: '/expenses' },
+        { text: 'Expenses', icon: <AccountBalanceWallet />, path: '/expenses', adminOnly: true },
         { text: 'Customers', icon: <People />, path: '/customers' },
         { text: 'Barcodes', icon: <QrCode />, path: '/barcodes' }
       ]
@@ -38,7 +38,7 @@ const Layout = () => {
     {
       title: 'Reports',
       items: [
-        { text: 'Profit & Loss', icon: <TrendingUp />, path: '/profit-loss' },
+        { text: 'Profit & Loss', icon: <TrendingUp />, path: '/profit-loss', adminOnly: true },
         { text: 'Sales Reports', icon: <Assessment />, path: '/sales-reports' },
         { text: 'Inventory Reports', icon: <Assessment />, path: '/inventory-reports' }
       ]
@@ -46,10 +46,13 @@ const Layout = () => {
     {
       title: 'System',
       items: [
-        { text: 'Settings', icon: <Settings />, path: '/settings' }
+        { text: 'Settings', icon: <Settings />, path: '/settings', adminOnly: true }
       ]
     }
-  ];
+  ].map(section => ({
+    ...section,
+    items: section.items.filter(item => !item.adminOnly || user?.role === 'admin')
+  }));
 
   const handleLogout = async () => {
     await logout();
@@ -60,15 +63,15 @@ const Layout = () => {
     { text: 'Dashboard', icon: <Dashboard />, path: '/' },
     { text: 'Inventory', icon: <Inventory />, path: '/inventory' },
     { text: 'Invoices', icon: <Receipt />, path: '/invoices' },
-    { text: 'Expenses', icon: <AccountBalanceWallet />, path: '/expenses' },
+    { text: 'Expenses', icon: <AccountBalanceWallet />, path: '/expenses', adminOnly: true },
     { text: 'Customers', icon: <People />, path: '/customers' },
-    { text: 'P&L', icon: <TrendingUp />, path: '/profit-loss' },
-    { text: 'Vendors', icon: <Store />, path: '/vendors' },
-    { text: 'Purchases', icon: <Receipt />, path: '/purchases' },
+    { text: 'P&L', icon: <TrendingUp />, path: '/profit-loss', adminOnly: true },
+    { text: 'Vendors', icon: <Store />, path: '/vendors', adminOnly: true },
+    { text: 'Purchases', icon: <Receipt />, path: '/purchases', adminOnly: true },
     { text: 'Sales', icon: <Assessment />, path: '/sales-reports' },
     { text: 'Stock', icon: <Assessment />, path: '/inventory-reports' },
-    { text: 'Settings', icon: <Settings />, path: '/settings' }
-  ];
+    { text: 'Settings', icon: <Settings />, path: '/settings', adminOnly: true }
+  ].filter(item => !item.adminOnly || user?.role === 'admin');
 
   return (
     <Box sx={{
@@ -138,12 +141,12 @@ const Layout = () => {
           </Box>
           {!isMobile && (
             <Chip
-              label="Administrator"
+              label={user?.role === 'admin' ? 'Administrator' : 'Staff / Cashier'}
               size="small"
               sx={{
                 mr: 2,
-                bgcolor: 'rgba(245, 127, 23, 0.1)',
-                color: 'secondary.dark',
+                bgcolor: user?.role === 'admin' ? 'rgba(245, 127, 23, 0.1)' : 'rgba(139, 92, 246, 0.1)',
+                color: user?.role === 'admin' ? 'secondary.dark' : 'primary.dark',
                 fontWeight: 700,
                 fontSize: '0.65rem',
                 textTransform: 'uppercase',

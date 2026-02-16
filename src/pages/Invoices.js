@@ -3,6 +3,7 @@ import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, 
 import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, FilterList, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt } from '@mui/icons-material';
 import { Html5Qrcode } from 'html5-qrcode';
 import { useData } from '../contexts/DataContext';
+import { useAuth } from '../contexts/AuthContext';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 import { generateInvoiceNumber } from '../utils/helpers';
 import InvoicePrint from '../components/InvoicePrint';
@@ -11,6 +12,7 @@ import autoTable from 'jspdf-autotable';
 import { useThemeContext } from '../contexts/ThemeContext';
 
 const Invoices = () => {
+  const { user } = useAuth();
   const { inventory, invoices, addInvoice, deleteInvoice, profile, customers, addCustomer } = useData();
   const { mode } = useThemeContext();
   const [open, setOpen] = useState(false);
@@ -975,10 +977,12 @@ const Invoices = () => {
                               <ListItemIcon><WhatsApp fontSize="small" /></ListItemIcon>
                               <ListItemText>WhatsApp</ListItemText>
                             </MenuItem>
-                            <MenuItem onClick={() => { openDeleteDialog(inv.id); handleMenuClose(); }} sx={{ color: 'error.main' }}>
-                              <ListItemIcon><Delete fontSize="small" color="error" /></ListItemIcon>
-                              <ListItemText>Delete</ListItemText>
-                            </MenuItem>
+                            {user?.role === 'admin' && (
+                              <MenuItem onClick={() => { openDeleteDialog(inv.id); handleMenuClose(); }} sx={{ color: 'error.main' }}>
+                                <ListItemIcon><Delete fontSize="small" color="error" /></ListItemIcon>
+                                <ListItemText>Delete</ListItemText>
+                              </MenuItem>
+                            )}
                           </Menu>
                         </TableCell>
                       </TableRow>
@@ -1360,13 +1364,15 @@ const Invoices = () => {
                         labelPlacement="top"
                         sx={{ m: 0 }}
                       />
-                      <IconButton
-                        size="small"
-                        onClick={() => setSelectedItems(selectedItems.filter((_, i) => i !== index))}
-                        sx={{ color: 'error.main' }}
-                      >
-                        <Delete fontSize="small" />
-                      </IconButton>
+                      {user?.role === 'admin' && (
+                        <IconButton
+                          size="small"
+                          onClick={() => setSelectedItems(selectedItems.filter((_, i) => i !== index))}
+                          sx={{ color: 'error.main' }}
+                        >
+                          <Delete fontSize="small" />
+                        </IconButton>
+                      )}
                     </Box>
                   </Box>
                   <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>

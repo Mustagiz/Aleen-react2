@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Tooltip, useTheme, useMediaQuery, Divider, TablePagination, TableSortLabel } from '@mui/material';
 import { Edit, Delete, Add, Search, Inventory2, TrendingUp, Warning, AttachMoney, Download, Upload, QrCode } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
+import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
+import Papa from 'papaparse';
 
 const Inventory = () => {
+  const { user } = useAuth();
   const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, bulkAddInventory, categories, updateCategories } = useData();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -58,18 +61,23 @@ const Inventory = () => {
   };
 
   const downloadInventory = () => {
-    const csvData = filteredInventory.map(item => ({
-      'Product ID': item.productId || '',
-      'Name': item.name,
-      'Category': item.category,
-      'Size': item.size || '',
-      'Color': item.color || '',
-      'Cost Price': item.cost || 0,
-      'Selling Price': item.price,
-      'Quantity': item.quantity,
-      'Supplier': item.supplier || '',
-      'Profit Margin': item.cost ? (((item.price - item.cost) / item.price) * 100).toFixed(1) + '%' : '0%'
-    }));
+    const csvData = filteredInventory.map(item => {
+      const row = {
+        'Product ID': item.productId || '',
+        'Name': item.name,
+        'Category': item.category,
+        'Size': item.size || '',
+        'Color': item.color || '',
+        'Selling Price': item.price,
+        'Quantity': item.quantity,
+        'Supplier': item.supplier || '',
+      };
+      if (user?.role === 'admin') {
+        row['Cost Price'] = item.cost || 0;
+        row['Profit Margin'] = item.cost ? (((item.price - item.cost) / item.price) * 100).toFixed(1) + '%' : '0%';
+      }
+      return row;
+    });
 
     const headers = Object.keys(csvData[0] || {});
     const csvContent = [
@@ -133,37 +141,46 @@ const Inventory = () => {
     link.click();
   };
 
-  const handleBulkUpload = async (event) => {
+  const handleBulkUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const text = e.target.result;
-      const lines = text.split('\n').filter(line => line.trim());
-      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-      const items = lines.slice(1).map(line => {
-        const values = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.trim().replace(/"/g, ''));
-        const item = {};
-        headers.forEach((h, i) => {
-          if (h === 'price' || h === 'cost') item[h] = parseFloat(values[i]) || 0;
-          else if (h === 'quantity') item[h] = parseInt(values[i]) || 0;
-          else item[h] = values[i] || '';
-        });
-        return item;
-      });
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      dynamicTyping: true,
+      complete: async (results) => {
+        const items = results.data.map(row => ({
+          productId: (row.productId || row['Product ID'] || `PRD-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`).toString().trim(),
+          name: (row.name || row['Name'] || 'Unnamed Product').toString().trim(),
+          category: (row.category || row['Category'] || 'General').toString().trim(),
+          size: (row.size || row['Size'] || 'Free Size').toString().trim(),
+          color: (row.color || row['Color'] || 'Standard').toString().trim(),
+          price: parseFloat(row.price || row['Selling Price']) || 0,
+          cost: parseFloat(row.cost || row['Cost Price']) || 0,
+          quantity: parseInt(row.quantity || row['Quantity']) || 0,
+          supplier: (row.supplier || row['Supplier'] || '').toString().trim(),
+          dateAdded: new Date().toISOString()
+        }));
 
-      if (items.length > 0) {
-        try {
-          await bulkAddInventory(items);
-          alert(`Successfully uploaded ${items.length} items`);
-        } catch (error) {
-          console.error('Bulk upload error:', error);
-          alert('Error uploading inventory. Please check the file format.');
+        if (items.length > 0) {
+          try {
+            await bulkAddInventory(items);
+            alert(`Successfully uploaded ${items.length} items`);
+          } catch (error) {
+            console.error('Bulk upload error:', error);
+            alert('Error uploading inventory. Please check the file format.');
+          }
+        } else {
+          alert('No valid items found in the CSV file.');
         }
+      },
+      error: (error) => {
+        console.error('Parsing error:', error);
+        alert('Failed to parse the CSV file.');
       }
-    };
-    reader.readAsText(file);
+    });
+
     event.target.value = null; // Reset input
   };
 
@@ -315,29 +332,31 @@ const Inventory = () => {
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{
-              borderRadius: 4, position: 'relative', overflow: 'hidden',
-              boxShadow: '0 10px 25px -5px rgba(219, 39, 119, 0.15)',
-              border: '1px solid rgba(219, 39, 119, 0.15)',
-              background: `linear - gradient(135deg, ${theme.palette.background.paper} 0 %, rgba(219, 39, 119, 0.05) 100 %)`,
-              transition: 'all 0.3s ease',
-              '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(219, 39, 119, 0.3)' }
-            }}>
-              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#DB2777' }} />
-              <CardContent sx={{ p: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Est. Margin</Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>₹{totalProfit.toLocaleString('en-IN')}</Typography>
+          {user?.role === 'admin' && (
+            <Grid item xs={12} sm={6} md={3}>
+              <Card sx={{
+                borderRadius: 4, position: 'relative', overflow: 'hidden',
+                boxShadow: '0 10px 25px -5px rgba(219, 39, 119, 0.15)',
+                border: '1px solid rgba(219, 39, 119, 0.15)',
+                background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(219, 39, 119, 0.05) 100%)`,
+                transition: 'all 0.3s ease',
+                '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(219, 39, 119, 0.3)' }
+              }}>
+                <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#DB2777' }} />
+                <CardContent sx={{ p: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box>
+                      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Est. Margin</Typography>
+                      <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>₹{totalProfit.toLocaleString('en-IN')}</Typography>
+                    </Box>
+                    <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(219, 39, 119, 0.05)', color: '#DB2777' }}>
+                      <TrendingUp />
+                    </Box>
                   </Box>
-                  <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(219, 39, 119, 0.05)', color: '#DB2777' }}>
-                    <TrendingUp />
-                  </Box>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
+          )}
         </Grid>
       </Box>
 
@@ -438,8 +457,8 @@ const Inventory = () => {
                     </Box>
                   </Box>
                   <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Button fullWidth variant="outlined" color="primary" size="small" startIcon={<Edit />} onClick={() => handleOpen(item)}>Edit</Button>
-                    <Button fullWidth variant="outlined" color="error" size="small" startIcon={<Delete />} onClick={() => openDeleteDialog(item.id)}>Delete</Button>
+                    <Button fullWidth variant="outlined" color="primary" size="small" startIcon={<Edit />} onClick={() => handleOpen(item)} disabled={user?.role !== 'admin'}>Edit</Button>
+                    <Button fullWidth variant="outlined" color="error" size="small" startIcon={<Delete />} onClick={() => openDeleteDialog(item.id)} disabled={user?.role !== 'admin'}>Delete</Button>
                   </Box>
                 </CardContent>
               </Card>
@@ -470,10 +489,10 @@ const Inventory = () => {
                   <TableCell sx={{ fontWeight: 'bold', display: { xs: 'none', md: 'table-cell' } }}>Variant</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>
                     <TableSortLabel active={orderBy === 'price'} direction={orderBy === 'price' ? order : 'asc'} onClick={() => handleRequestSort('price')}>
-                      Cost & Price
+                      {user?.role === 'admin' ? 'Cost & Price' : 'Price'}
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Margin</TableCell>
+                  {user?.role === 'admin' && <TableCell sx={{ fontWeight: 'bold' }}>Margin</TableCell>}
                   <TableCell sx={{ fontWeight: 'bold' }}>
                     <TableSortLabel active={orderBy === 'quantity'} direction={orderBy === 'quantity' ? order : 'asc'} onClick={() => handleRequestSort('quantity')}>
                       Inventory
@@ -505,13 +524,15 @@ const Inventory = () => {
                       <TableCell>
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                           <Typography variant="body2" sx={{ fontWeight: 700 }}>₹{item.price}</Typography>
-                          <Typography variant="caption" color="text.secondary">Cost: ₹{item.cost || 0}</Typography>
+                          {user?.role === 'admin' && <Typography variant="caption" color="text.secondary">Cost: ₹{item.cost || 0}</Typography>}
                         </Box>
                       </TableCell>
-                      <TableCell>
-                        <Typography variant="body2" sx={{ fontWeight: 700, color: profit > 0 ? '#1b5e20' : '#c62828' }}>₹{profit.toFixed(0)}</Typography>
-                        <Typography variant="caption" sx={{ color: profit > 0 ? '#1b5e20' : '#c62828', opacity: 0.8 }}>{profitMargin}% margin</Typography>
-                      </TableCell>
+                      {user?.role === 'admin' && (
+                        <TableCell>
+                          <Typography variant="body2" sx={{ fontWeight: 700, color: profit > 0 ? '#1b5e20' : '#c62828' }}>₹{profit.toFixed(0)}</Typography>
+                          <Typography variant="caption" sx={{ color: profit > 0 ? '#1b5e20' : '#c62828', opacity: 0.8 }}>{profitMargin}% margin</Typography>
+                        </TableCell>
+                      )}
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: item.quantity < 2 ? '#ef4444' : item.quantity < 50 ? '#f59e0b' : '#10b981' }} />
@@ -521,8 +542,12 @@ const Inventory = () => {
                       <TableCell align="right">
                         <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
                           <Tooltip title="Print Label"><IconButton size="small" onClick={() => navigate('/barcodes', { state: { product: item } })} sx={{ color: 'secondary.main' }}><QrCode fontSize="small" /></IconButton></Tooltip>
-                          <IconButton size="small" onClick={() => handleOpen(item)} sx={{ color: 'primary.main' }}><Edit fontSize="small" /></IconButton>
-                          <IconButton size="small" onClick={() => openDeleteDialog(item.id)} sx={{ color: 'error.main' }}><Delete fontSize="small" /></IconButton>
+                          {user?.role === 'admin' && (
+                            <>
+                              <IconButton size="small" onClick={() => handleOpen(item)} sx={{ color: 'primary.main' }}><Edit fontSize="small" /></IconButton>
+                              <IconButton size="small" onClick={() => openDeleteDialog(item.id)} sx={{ color: 'error.main' }}><Delete fontSize="small" /></IconButton>
+                            </>
+                          )}
                         </Box>
                       </TableCell>
                     </TableRow>
@@ -552,12 +577,19 @@ const Inventory = () => {
           </Box>
           <TextField fullWidth label="Size" value={form.size} onChange={(e) => setForm({ ...form, size: e.target.value })} margin="normal" />
           <TextField fullWidth label="Color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} margin="normal" />
-          <TextField fullWidth label="Cost Price (₹)" type="number" value={form.cost} onChange={(e) => setForm({ ...form, cost: e.target.value })} margin="normal" />
-          <TextField fullWidth label="Selling Price (₹)" type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} margin="normal" />
-          {form.price && form.cost && (
-            <Typography variant="body2" color="success.main" sx={{ mt: 1, fontWeight: 'bold' }}>
-              Profit: ₹{(parseFloat(form.price) - parseFloat(form.cost)).toFixed(2)} ({(((parseFloat(form.price) - parseFloat(form.cost)) / parseFloat(form.price)) * 100).toFixed(1)}%)
-            </Typography>
+          {user?.role === 'admin' && (
+            <>
+              <TextField fullWidth label="Cost Price (₹)" type="number" value={form.cost} onChange={(e) => setForm({ ...form, cost: e.target.value })} margin="normal" />
+              <TextField fullWidth label="Selling Price (₹)" type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} margin="normal" />
+              {form.price && form.cost && (
+                <Typography variant="body2" color="success.main" sx={{ mt: 1, fontWeight: 'bold' }}>
+                  Profit: ₹{(parseFloat(form.price) - parseFloat(form.cost)).toFixed(2)} ({(((parseFloat(form.price) - parseFloat(form.cost)) / parseFloat(form.price)) * 100).toFixed(1)}%)
+                </Typography>
+              )}
+            </>
+          )}
+          {user?.role !== 'admin' && (
+            <TextField fullWidth label="Selling Price (₹)" type="number" value={form.price} disabled margin="normal" />
           )}
           <TextField fullWidth label="Quantity" type="number" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} margin="normal" />
           <TextField fullWidth label="Supplier" value={form.supplier} onChange={(e) => setForm({ ...form, supplier: e.target.value })} margin="normal" />

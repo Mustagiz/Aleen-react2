@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db } from '../firebase';
-import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
 
 const AuthContext = createContext();
 
@@ -12,16 +12,22 @@ export const AuthProvider = ({ children }) => {
     return savedUser ? JSON.parse(savedUser) : null;
   });
   const [adminPassword, setAdminPassword] = useState('admin123');
+  const [cashierPassword, setCashierPassword] = useState('cashier123');
   const [loading, setLoading] = useState(true);
 
-  // Sync admin password from Firestore
+  // Sync passwords from Firestore
   useEffect(() => {
     const unsub = onSnapshot(doc(db, 'settings', 'auth'), (snapshot) => {
       if (snapshot.exists()) {
-        setAdminPassword(snapshot.data().password);
+        const data = snapshot.data();
+        setAdminPassword(data.password || 'admin123');
+        setCashierPassword(data.cashierPassword || 'cashier123');
       } else {
         // Initialize if not exists
-        setDoc(doc(db, 'settings', 'auth'), { password: 'admin123' });
+        setDoc(doc(db, 'settings', 'auth'), {
+          password: 'admin123',
+          cashierPassword: 'cashier123'
+        });
       }
       setLoading(false);
     });
@@ -31,7 +37,13 @@ export const AuthProvider = ({ children }) => {
 
   const login = (email, password) => {
     if (email === 'admin@aleen.com' && password === adminPassword) {
-      const userData = { email };
+      const userData = { email, role: 'admin' };
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+      return Promise.resolve();
+    }
+    if (email === 'cashier@aleen.com' && password === cashierPassword) {
+      const userData = { email, role: 'cashier' };
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
       return Promise.resolve();
@@ -43,7 +55,11 @@ export const AuthProvider = ({ children }) => {
     if (currentPassword !== adminPassword) {
       return Promise.reject(new Error('Current password is incorrect'));
     }
-    return setDoc(doc(db, 'settings', 'auth'), { password: newPassword });
+    return updateDoc(doc(db, 'settings', 'auth'), { password: newPassword });
+  };
+
+  const changeCashierPassword = (newPassword) => {
+    return updateDoc(doc(db, 'settings', 'auth'), { cashierPassword: newPassword });
   };
 
   const logout = () => {
@@ -53,7 +69,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, changePassword, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, changePassword, changeCashierPassword, loading }}>
       {children}
     </AuthContext.Provider>
   );

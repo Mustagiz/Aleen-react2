@@ -4,12 +4,14 @@ import { TrendingUp, TrendingDown, Inventory2, Warning, AttachMoney, Receipt, As
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { Bar, Line, Doughnut } from 'react-chartjs-2';
 import { useData } from '../contexts/DataContext';
+import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { DateRange, CalendarMonth, History, ViewWeek } from '@mui/icons-material';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler);
 
 const Dashboard = () => {
+  const { user } = useAuth();
   const { inventory, invoices, purchases, vendors, expenses } = useData();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -409,12 +411,16 @@ const Dashboard = () => {
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard title="Today's Sales" value={`₹${todaySales.toLocaleString('en-IN')}`} icon={<AttachMoney />} color="#E11D48" trend={salesTrend} onClick={() => navigate('/sales-reports')} />
         </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
-          <StatCard title="Total Purchases" value={`₹${totalPurchasesCost.toLocaleString('en-IN')}`} icon={<Receipt />} color="#1976d2" onClick={() => navigate('/purchases')} />
-        </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
-          <StatCard title="Net Cash Available" value={`₹${netCash.toLocaleString('en-IN')}`} icon={<TrendingUp />} color="#059669" onClick={() => navigate('/profit-loss')} />
-        </Grid>
+        {user?.role === 'admin' && (
+          <Grid item xs={12} sm={6} lg={3}>
+            <StatCard title="Total Purchases" value={`₹${totalPurchasesCost.toLocaleString('en-IN')}`} icon={<Receipt />} color="#1976d2" onClick={() => navigate('/purchases')} />
+          </Grid>
+        )}
+        {user?.role === 'admin' && (
+          <Grid item xs={12} sm={6} lg={3}>
+            <StatCard title="Net Cash Available" value={`₹${netCash.toLocaleString('en-IN')}`} icon={<TrendingUp />} color="#059669" onClick={() => navigate('/profit-loss')} />
+          </Grid>
+        )}
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard title="Total Stock" value={totalItems.toLocaleString('en-IN')} icon={<Inventory2 />} color="#D97706" onClick={() => navigate('/inventory')} />
         </Grid>
@@ -423,72 +429,108 @@ const Dashboard = () => {
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard title="Low Stock Items" value={lowStockCount} icon={<Warning />} color="#EA580C" onClick={() => navigate('/inventory')} subtitle="Items below threshold" />
         </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
-          <StatCard title="Gross Profit" value={`₹${grossProfit.toLocaleString('en-IN')}`} icon={<Assessment />} color="#7C3AED" onClick={() => navigate('/profit-loss')} />
-        </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
-          <StatCard title="Total Inventory Value" value={`₹${totalInventoryValue.toLocaleString('en-IN')}`} icon={<AccountBalanceWallet />} color="#DB2777" onClick={() => navigate('/inventory')} />
-        </Grid>
+        {user?.role === 'admin' && (
+          <Grid item xs={12} sm={6} lg={3}>
+            <StatCard title="Gross Profit" value={`₹${grossProfit.toLocaleString('en-IN')}`} icon={<Assessment />} color="#7C3AED" onClick={() => navigate('/profit-loss')} />
+          </Grid>
+        )}
+        {user?.role === 'admin' && (
+          <Grid item xs={12} sm={6} lg={3}>
+            <StatCard title="Total Inventory Value" value={`₹${totalInventoryValue.toLocaleString('en-IN')}`} icon={<AccountBalanceWallet />} color="#DB2777" onClick={() => navigate('/inventory')} />
+          </Grid>
+        )}
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard title="Avg Transaction" value={`₹${atv.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} icon={<ShoppingCart />} color="#0891B2" onClick={() => navigate('/sales-reports')} />
         </Grid>
       </Grid>
 
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} lg={8}>
-          <Paper elevation={0} sx={{
-            p: 4,
-            borderRadius: 4,
-            border: '1px solid',
-            borderColor: 'divider',
-            height: '100%'
-          }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>Revenue vs Expenses</Typography>
-                <Typography variant="body2" color="text.secondary">Financial performance tracking</Typography>
-              </Box>
-              <IconButton size="small"><MoreVert /></IconButton>
-            </Box>
-            <Box sx={{ height: 350 }}>
-              <Line data={salesChartData} options={{ ...commonChartOptions, maintainAspectRatio: false }} />
-            </Box>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} lg={4}>
-          <Paper elevation={0} sx={{
-            p: 4,
-            borderRadius: 4,
-            border: '1px solid rgba(217, 119, 6, 0.1)',
-            boxShadow: '0 15px 35px -10px rgba(217, 119, 6, 0.15)',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column'
-          }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>Inventory Health</Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>Distribution by stock level</Typography>
-            <Box sx={{ flexGrow: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Doughnut data={stockData} options={{
-                responsive: true,
-                cutout: '75%',
-                plugins: { legend: { display: false } }
-              }} />
-              <Box sx={{ position: 'absolute', textAlign: 'center' }}>
-                <Typography variant="h4" sx={{ fontWeight: 800 }}>{totalItems}</Typography>
-                <Typography variant="caption" color="text.secondary">Total Items</Typography>
-              </Box>
-            </Box>
-            <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', gap: 3 }}>
-              {stockData.labels.map((label, i) => (
-                <Box key={label} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Circle sx={{ fontSize: 10, color: stockData.datasets[0].backgroundColor[i] }} />
-                  <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>{label}</Typography>
+      {user?.role === 'admin' && (
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid item xs={12} lg={8}>
+            <Paper elevation={0} sx={{
+              p: 4,
+              borderRadius: 4,
+              border: '1px solid',
+              borderColor: 'divider',
+              height: '100%'
+            }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
+                <Box>
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>Revenue vs Expenses</Typography>
+                  <Typography variant="body2" color="text.secondary">Financial performance tracking</Typography>
                 </Box>
-              ))}
-            </Box>
-          </Paper>
+                <IconButton size="small"><MoreVert /></IconButton>
+              </Box>
+              <Box sx={{ height: 350 }}>
+                <Line data={salesChartData} options={{ ...commonChartOptions, maintainAspectRatio: false }} />
+              </Box>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} lg={4}>
+            <Paper elevation={0} sx={{
+              p: 4,
+              borderRadius: 4,
+              border: '1px solid rgba(217, 119, 6, 0.1)',
+              boxShadow: '0 15px 35px -10px rgba(217, 119, 6, 0.15)',
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column'
+            }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>Inventory Health</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>Distribution by stock level</Typography>
+              <Box sx={{ flexGrow: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Doughnut data={stockData} options={{
+                  responsive: true,
+                  cutout: '75%',
+                  plugins: { legend: { display: false } }
+                }} />
+                <Box sx={{ position: 'absolute', textAlign: 'center' }}>
+                  <Typography variant="h4" sx={{ fontWeight: 800 }}>{totalItems}</Typography>
+                  <Typography variant="caption" color="text.secondary">Total Items</Typography>
+                </Box>
+              </Box>
+              <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', gap: 3 }}>
+                {stockData.labels.map((label, i) => (
+                  <Box key={label} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Circle sx={{ fontSize: 10, color: stockData.datasets[0].backgroundColor[i] }} />
+                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>{label}</Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
+      )}
+
+      {user?.role !== 'admin' && (
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid item xs={12}>
+            <Paper elevation={0} sx={{
+              p: 4,
+              borderRadius: 4,
+              border: '1px solid rgba(217, 119, 6, 0.1)',
+              boxShadow: '0 15px 35px -10px rgba(217, 119, 6, 0.15)',
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column'
+            }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>Inventory Health</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>Distribution by stock level</Typography>
+              <Box sx={{ height: 300, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Doughnut data={stockData} options={{
+                  responsive: true,
+                  cutout: '75%',
+                  plugins: { legend: { display: false } }
+                }} />
+                <Box sx={{ position: 'absolute', textAlign: 'center' }}>
+                  <Typography variant="h4" sx={{ fontWeight: 800 }}>{totalItems}</Typography>
+                  <Typography variant="caption" color="text.secondary">Total Items</Typography>
+                </Box>
+              </Box>
+            </Paper>
+          </Grid>
+        </Grid>
+      )}
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} lg={7}>
