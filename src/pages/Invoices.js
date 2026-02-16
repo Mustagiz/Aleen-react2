@@ -916,7 +916,14 @@ const Invoices = () => {
               <TextField
                 label="Phone (with country code)"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val.startsWith('+91')) {
+                    setPhone(val);
+                  } else if (val.length < 3) {
+                    setPhone('+91');
+                  }
+                }}
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
                     // Fetch customer logic only on Enter
