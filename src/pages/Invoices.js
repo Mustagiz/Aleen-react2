@@ -40,9 +40,9 @@ const Invoices = () => {
     setPage(0);
   };
   const [selectedItems, setSelectedItems] = useState([]);
-  const [discountPercent, setDiscountPercent] = useState(0);
-  const [discountAmount, setDiscountAmount] = useState(0);
-  const [tax, setTax] = useState(0);
+  const [discountPercent, setDiscountPercent] = useState('');
+  const [discountAmount, setDiscountAmount] = useState('');
+  const [tax, setTax] = useState('');
   const [customer, setCustomer] = useState('');
   const [phone, setPhone] = useState('+91');
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
@@ -121,11 +121,13 @@ const Invoices = () => {
       }
       const invItem = inventory.find(i => i.id === item.id);
       return sum + (invItem ? invItem.price * item.quantity : 0);
+      return sum + (invItem ? invItem.price * item.quantity : 0);
     }, 0);
-    const taxAmount = subtotal * (tax / 100);
+    const taxValue = parseFloat(tax) || 0;
+    const taxAmount = subtotal * (taxValue / 100);
 
-    const percentDisc = subtotal * (discountPercent / 100);
-    const absDiscount = percentDisc + discountAmount;
+    const percentDisc = subtotal * ((parseFloat(discountPercent) || 0) / 100);
+    const absDiscount = percentDisc + (parseFloat(discountAmount) || 0);
 
     const total = subtotal + taxAmount - absDiscount;
     return { subtotal, taxAmount, total, absDiscount };
@@ -192,17 +194,18 @@ const Invoices = () => {
       }),
       subtotal,
       tax: taxAmount,
-      gst: tax,
+      gst: parseFloat(tax) || 0,
       discount: absDiscount,
-      discountPercent: discountPercent,
-      discountAmount: discountAmount,
+      discountPercent: parseFloat(discountPercent) || 0,
+      discountAmount: parseFloat(discountAmount) || 0,
       total
     };
     await addInvoice(invoice);
     setOpen(false);
     setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0 }]);
-    setDiscountPercent(0);
-    setDiscountAmount(0);
+    setDiscountPercent('');
+    setDiscountAmount('');
+    setTax('');
     setCustomer('');
     setPhone('+91');
     setInvoiceDate(new Date().toISOString().split('T')[0]);
@@ -1217,14 +1220,14 @@ const Invoices = () => {
               </Box>
             )}
             <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-              <TextField label="GST (%)" type="number" size="small" value={tax} onChange={(e) => setTax(parseFloat(e.target.value) || 0)} fullWidth />
+              <TextField label="GST (%)" type="number" size="small" value={tax} onChange={(e) => setTax(e.target.value)} fullWidth />
               <Box sx={{ display: 'flex', gap: 1, width: '100%' }}>
                 <TextField
                   label="Discount (%)"
                   type="number"
                   size="small"
                   value={discountPercent}
-                  onChange={(e) => setDiscountPercent(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setDiscountPercent(e.target.value)}
                   fullWidth
                 />
                 <TextField
@@ -1232,7 +1235,7 @@ const Invoices = () => {
                   type="number"
                   size="small"
                   value={discountAmount}
-                  onChange={(e) => setDiscountAmount(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setDiscountAmount(e.target.value)}
                   fullWidth
                 />
               </Box>
@@ -1243,7 +1246,7 @@ const Invoices = () => {
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>₹{subtotal.toFixed(2).toLocaleString()}</Typography>
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                <Typography variant="body2">GST ({tax}%):</Typography>
+                <Typography variant="body2">GST ({(parseFloat(tax) || 0)}%):</Typography>
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>₹{taxAmount.toFixed(2).toLocaleString()}</Typography>
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
