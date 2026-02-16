@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Autocomplete, InputAdornment, TablePagination, useTheme, useMediaQuery } from '@mui/material';
+import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Autocomplete, InputAdornment, TablePagination, useTheme, useMediaQuery, TableSortLabel } from '@mui/material';
 import { Add, Visibility, Delete, ReceiptLong, Search, Edit, Close, AttachMoney, Download, MoreVert, ShoppingCart, Warning, TrendingDown, LocalShipping, Payment } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
@@ -46,6 +46,31 @@ const Purchases = () => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
+
+    // Sorting State
+    const [orderBy, setOrderBy] = useState('date');
+    const [order, setOrder] = useState('desc');
+
+    const handleRequestSort = (property) => {
+        const isAsc = orderBy === property && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
+    };
+
+    const sortedPurchases = [...purchases].sort((a, b) => {
+        if (orderBy === 'total' || orderBy === 'amountPaid') {
+            return order === 'asc' ? (a[orderBy] - b[orderBy]) : (b[orderBy] - a[orderBy]);
+        }
+        if (orderBy === 'date') {
+            return order === 'asc' ? new Date(a.date) - new Date(b.date) : new Date(b.date) - new Date(a.date);
+        }
+        // Handle string sorting (case-insensitive)
+        const valA = (a[orderBy] || '').toString().toLowerCase();
+        const valB = (b[orderBy] || '').toString().toLowerCase();
+        if (valA < valB) return order === 'asc' ? -1 : 1;
+        if (valA > valB) return order === 'asc' ? 1 : -1;
+        return 0;
+    });
 
     const handleOpen = (po = null) => {
         if (po) {
@@ -236,7 +261,31 @@ const Purchases = () => {
                     <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>Purchase Orders</Typography>
                     <Typography variant="body2" color="text.secondary">Track stock orders and vendor expenses</Typography>
                 </Box>
-                <Box sx={{ display: 'flex', gap: 1 }}>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                    <TextField
+                        select
+                        label="Sort By"
+                        value={orderBy}
+                        onChange={(e) => setOrderBy(e.target.value)}
+                        sx={{ minWidth: 120, bgcolor: 'background.paper' }}
+                        size="small"
+                    >
+                        <MenuItem value="date">Date</MenuItem>
+                        <MenuItem value="vendorName">Vendor</MenuItem>
+                        <MenuItem value="total">Total Cost</MenuItem>
+                        <MenuItem value="status">Status</MenuItem>
+                    </TextField>
+                    <TextField
+                        select
+                        label="Order"
+                        value={order}
+                        onChange={(e) => setOrder(e.target.value)}
+                        sx={{ minWidth: 100, bgcolor: 'background.paper' }}
+                        size="small"
+                    >
+                        <MenuItem value="asc">Asc</MenuItem>
+                        <MenuItem value="desc">Desc</MenuItem>
+                    </TextField>
                     <Button
                         variant="outlined"
                         startIcon={<Download />}
@@ -340,19 +389,39 @@ const Purchases = () => {
                     <Table>
                         <TableHead sx={{ bgcolor: 'primary.light', borderBottom: '2px solid rgba(183, 110, 121, 0.1)' }}>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Date</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Vendor</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>
+                                    <TableSortLabel active={orderBy === 'date'} direction={orderBy === 'date' ? order : 'asc'} onClick={() => handleRequestSort('date')}>
+                                        Date
+                                    </TableSortLabel>
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>
+                                    <TableSortLabel active={orderBy === 'vendorName'} direction={orderBy === 'vendorName' ? order : 'asc'} onClick={() => handleRequestSort('vendorName')}>
+                                        Vendor
+                                    </TableSortLabel>
+                                </TableCell>
                                 <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Items</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Total Cost</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Order Status</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Payment</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>
+                                    <TableSortLabel active={orderBy === 'total'} direction={orderBy === 'total' ? order : 'asc'} onClick={() => handleRequestSort('total')}>
+                                        Total Cost
+                                    </TableSortLabel>
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>
+                                    <TableSortLabel active={orderBy === 'status'} direction={orderBy === 'status' ? order : 'asc'} onClick={() => handleRequestSort('status')}>
+                                        Order Status
+                                    </TableSortLabel>
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>
+                                    <TableSortLabel active={orderBy === 'paymentStatus'} direction={orderBy === 'paymentStatus' ? order : 'asc'} onClick={() => handleRequestSort('paymentStatus')}>
+                                        Payment
+                                    </TableSortLabel>
+                                </TableCell>
                                 <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {(rowsPerPage > 0
-                                ? purchases.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                : purchases
+                                ? sortedPurchases.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                : sortedPurchases
                             ).map((po) => (
                                 <TableRow key={po.id} hover>
                                     <TableCell>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Tooltip, useTheme, useMediaQuery, Divider, TablePagination } from '@mui/material';
+import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Tooltip, useTheme, useMediaQuery, Divider, TablePagination, TableSortLabel } from '@mui/material';
 import { Edit, Delete, Add, Search, Inventory2, TrendingUp, Warning, AttachMoney, Download, Upload } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
@@ -20,6 +20,16 @@ const Inventory = () => {
   // Pagination State
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  // Sorting State
+  const [orderBy, setOrderBy] = useState('name');
+  const [order, setOrder] = useState('asc');
+
+  const handleRequestSort = (property) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -158,7 +168,17 @@ const Inventory = () => {
   const filteredInventory = inventory.filter(item =>
     item.name.toLowerCase().includes(search.toLowerCase()) &&
     (categoryFilter === '' || item.category === categoryFilter)
-  );
+  ).sort((a, b) => {
+    if (orderBy === 'price' || orderBy === 'quantity' || orderBy === 'cost') {
+      return order === 'asc' ? (a[orderBy] - b[orderBy]) : (b[orderBy] - a[orderBy]);
+    }
+    // Handle string sorting (case-insensitive)
+    const valA = (a[orderBy] || '').toString().toLowerCase();
+    const valB = (b[orderBy] || '').toString().toLowerCase();
+    if (valA < valB) return order === 'asc' ? -1 : 1;
+    if (valA > valB) return order === 'asc' ? 1 : -1;
+    return 0;
+  });
 
   return (
     <Box>
@@ -344,6 +364,30 @@ const Inventory = () => {
             <MenuItem value="">All Categories</MenuItem>
             {categories.map(cat => <MenuItem key={cat} value={cat}>{cat}</MenuItem>)}
           </TextField>
+          <TextField
+            select
+            label="Sort By"
+            value={orderBy}
+            onChange={(e) => setOrderBy(e.target.value)}
+            sx={{ minWidth: 150 }}
+            size="small"
+          >
+            <MenuItem value="name">Name</MenuItem>
+            <MenuItem value="price">Price</MenuItem>
+            <MenuItem value="quantity">Quantity</MenuItem>
+            <MenuItem value="category">Category</MenuItem>
+          </TextField>
+          <TextField
+            select
+            label="Order"
+            value={order}
+            onChange={(e) => setOrder(e.target.value)}
+            sx={{ minWidth: 100 }}
+            size="small"
+          >
+            <MenuItem value="asc">Ascending</MenuItem>
+            <MenuItem value="desc">Descending</MenuItem>
+          </TextField>
         </Box>
       </Paper>
 
@@ -406,13 +450,33 @@ const Inventory = () => {
             <Table>
               <TableHead sx={{ bgcolor: 'grey.50' }}>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Product ID</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Product Details</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', display: { xs: 'none', sm: 'table-cell' } }}>Category</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>
+                    <TableSortLabel active={orderBy === 'productId'} direction={orderBy === 'productId' ? order : 'asc'} onClick={() => handleRequestSort('productId')}>
+                      Product ID
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>
+                    <TableSortLabel active={orderBy === 'name'} direction={orderBy === 'name' ? order : 'asc'} onClick={() => handleRequestSort('name')}>
+                      Product Details
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', display: { xs: 'none', sm: 'table-cell' } }}>
+                    <TableSortLabel active={orderBy === 'category'} direction={orderBy === 'category' ? order : 'asc'} onClick={() => handleRequestSort('category')}>
+                      Category
+                    </TableSortLabel>
+                  </TableCell>
                   <TableCell sx={{ fontWeight: 'bold', display: { xs: 'none', md: 'table-cell' } }}>Variant</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Cost & Price</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>
+                    <TableSortLabel active={orderBy === 'price'} direction={orderBy === 'price' ? order : 'asc'} onClick={() => handleRequestSort('price')}>
+                      Cost & Price
+                    </TableSortLabel>
+                  </TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Margin</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Inventory</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>
+                    <TableSortLabel active={orderBy === 'quantity'} direction={orderBy === 'quantity' ? order : 'asc'} onClick={() => handleRequestSort('quantity')}>
+                      Inventory
+                    </TableSortLabel>
+                  </TableCell>
                   <TableCell align="right" sx={{ fontWeight: 'bold' }}>Actions</TableCell>
                 </TableRow>
               </TableHead>

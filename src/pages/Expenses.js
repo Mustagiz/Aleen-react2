@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, useTheme, useMediaQuery, Divider, TablePagination } from '@mui/material';
+import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, useTheme, useMediaQuery, Divider, TablePagination, TableSortLabel } from '@mui/material';
 import { Edit, Delete, Add, Search, ReceiptLong, AccountBalanceWallet, Warning, Download, Upload } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
@@ -40,12 +40,35 @@ const Expenses = () => {
         }
     };
 
-    const filteredExpenses = expenses.filter(exp =>
+    // Sorting State
+    const [orderBy, setOrderBy] = useState('date');
+    const [order, setOrder] = useState('desc');
+
+    const handleRequestSort = (property) => {
+        const isAsc = orderBy === property && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
+    };
+
+    const sortedExpenses = expenses.filter(exp =>
         (exp.title?.toLowerCase().includes(search.toLowerCase()) || exp.note?.toLowerCase().includes(search.toLowerCase())) &&
         (categoryFilter === 'All' || exp.category === categoryFilter)
-    ).sort((a, b) => new Date(b.date) - new Date(a.date));
+    ).sort((a, b) => {
+        if (orderBy === 'amount') {
+            return order === 'asc' ? (a[orderBy] - b[orderBy]) : (b[orderBy] - a[orderBy]);
+        }
+        if (orderBy === 'date') {
+            return order === 'asc' ? new Date(a.date) - new Date(b.date) : new Date(b.date) - new Date(a.date);
+        }
+        // Handle string sorting (case-insensitive)
+        const valA = (a[orderBy] || '').toString().toLowerCase();
+        const valB = (b[orderBy] || '').toString().toLowerCase();
+        if (valA < valB) return order === 'asc' ? -1 : 1;
+        if (valA > valB) return order === 'asc' ? 1 : -1;
+        return 0;
+    });
 
-    const totalExpense = filteredExpenses.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+    const totalExpense = sortedExpenses.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
     const thisMonthExpense = expenses.filter(exp => {
         const expDate = new Date(exp.date);
         const today = new Date();
@@ -87,7 +110,7 @@ const Expenses = () => {
     };
 
     const downloadExpenses = () => {
-        const csvData = filteredExpenses.map(item => ({
+        const csvData = sortedExpenses.map(item => ({
             'Date': item.date,
             'Title': item.title,
             'Category': item.category,
@@ -216,6 +239,16 @@ const Expenses = () => {
                     <MenuItem value="All">All Categories</MenuItem>
                     {expenseCategories.map(cat => <MenuItem key={cat} value={cat}>{cat}</MenuItem>)}
                 </TextField>
+                <TextField select size="small" label="Sort By" value={orderBy} onChange={(e) => setOrderBy(e.target.value)} sx={{ minWidth: 120 }}>
+                    <MenuItem value="date">Date</MenuItem>
+                    <MenuItem value="amount">Amount</MenuItem>
+                    <MenuItem value="category">Category</MenuItem>
+                    <MenuItem value="title">Title</MenuItem>
+                </TextField>
+                <TextField select size="small" label="Order" value={order} onChange={(e) => setOrder(e.target.value)} sx={{ minWidth: 100 }}>
+                    <MenuItem value="asc">Asc</MenuItem>
+                    <MenuItem value="desc">Desc</MenuItem>
+                </TextField>
             </Paper>
 
             <Paper sx={{ borderRadius: 4, overflow: 'hidden' }}>
@@ -223,16 +256,32 @@ const Expenses = () => {
                     <Table>
                         <TableHead sx={{ bgcolor: 'grey.50' }}>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 800 }}>Date</TableCell>
-                                <TableCell sx={{ fontWeight: 800 }}>Expense Title</TableCell>
-                                <TableCell sx={{ fontWeight: 800 }}>Category</TableCell>
-                                <TableCell sx={{ fontWeight: 800 }}>Amount</TableCell>
+                                <TableCell sx={{ fontWeight: 800 }}>
+                                    <TableSortLabel active={orderBy === 'date'} direction={orderBy === 'date' ? order : 'asc'} onClick={() => handleRequestSort('date')}>
+                                        Date
+                                    </TableSortLabel>
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 800 }}>
+                                    <TableSortLabel active={orderBy === 'title'} direction={orderBy === 'title' ? order : 'asc'} onClick={() => handleRequestSort('title')}>
+                                        Expense Title
+                                    </TableSortLabel>
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 800 }}>
+                                    <TableSortLabel active={orderBy === 'category'} direction={orderBy === 'category' ? order : 'asc'} onClick={() => handleRequestSort('category')}>
+                                        Category
+                                    </TableSortLabel>
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 800 }}>
+                                    <TableSortLabel active={orderBy === 'amount'} direction={orderBy === 'amount' ? order : 'asc'} onClick={() => handleRequestSort('amount')}>
+                                        Amount
+                                    </TableSortLabel>
+                                </TableCell>
                                 <TableCell sx={{ fontWeight: 800 }}>Note</TableCell>
                                 <TableCell align="right" sx={{ fontWeight: 800 }}>Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {filteredExpenses.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((exp) => (
+                            {sortedExpenses.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((exp) => (
                                 <TableRow key={exp.id} hover>
                                     <TableCell>{new Date(exp.date).toLocaleDateString()}</TableCell>
                                     <TableCell sx={{ fontWeight: 700 }}>{exp.title}</TableCell>
@@ -245,13 +294,13 @@ const Expenses = () => {
                                     </TableCell>
                                 </TableRow>
                             ))}
-                            {filteredExpenses.length === 0 && (
+                            {sortedExpenses.length === 0 && (
                                 <TableRow><TableCell colSpan={6} align="center" sx={{ py: 4 }}>No expenses found</TableCell></TableRow>
                             )}
                         </TableBody>
                     </Table>
                 </TableContainer>
-                <TablePagination rowsPerPageOptions={[5, 10, 25]} component="div" count={filteredExpenses.length} rowsPerPage={rowsPerPage} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} />
+                <TablePagination rowsPerPageOptions={[5, 10, 25]} component="div" count={sortedExpenses.length} rowsPerPage={rowsPerPage} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} />
             </Paper>
 
             <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
