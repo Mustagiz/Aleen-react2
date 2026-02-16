@@ -645,7 +645,11 @@ const Marketing = () => {
                                                         onClick={() => {
                                                             const phone = customer.phone.replace(/\D/g, '');
                                                             const cleanPhone = phone.startsWith('91') ? phone : `91${phone}`;
-                                                            const url = `https://wa.me/${cleanPhone}/?text=${encodeURIComponent(bulkTemplate?.message || '')}`;
+                                                            let message = bulkTemplate?.message || '';
+                                                            if (bulkTemplate?.imageUrl) {
+                                                                message += `\n\n${bulkTemplate.imageUrl}`;
+                                                            }
+                                                            const url = `https://wa.me/${cleanPhone}/?text=${encodeURIComponent(message)}`;
                                                             window.open(url, '_blank');
                                                             updateCustomer(customer.id, { lastReminderSent: new Date().toISOString() });
                                                         }}
