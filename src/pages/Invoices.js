@@ -929,15 +929,23 @@ const Invoices = () => {
                 value={phone}
                 onChange={(e) => {
                   const val = e.target.value;
-                  let newPhone = val;
-                  if (!val.startsWith('+91')) {
-                    newPhone = val.length < 3 ? '+91' : val;
+                  // Always start with +91
+                  let suffix = val;
+                  if (val.startsWith('+91')) {
+                    suffix = val.slice(3);
+                  } else if (val.length < 3) {
+                    setPhone('+91');
+                    return;
                   }
+
+                  // Only allow digits in suffix and max 10 digits
+                  const cleanedSuffix = suffix.replace(/[^0-9]/g, '').slice(0, 10);
+                  const newPhone = `+91${cleanedSuffix}`;
                   setPhone(newPhone);
 
                   // Auto-fetch if full number (13 chars: +91 + 10 digits)
-                  if (newPhone.trim().length === 13) {
-                    const matched = customers.find(c => c.phone === newPhone.trim() || c.phone === newPhone.trim().replace('+91', '').trim());
+                  if (newPhone.length === 13) {
+                    const matched = customers.find(c => c.phone === newPhone || c.phone === cleanedSuffix);
                     if (matched) {
                       setCustomer(matched.name);
                       setSelectedCustomerId(matched.id);
