@@ -337,7 +337,10 @@ const Customers = () => {
                     <TextField
                         fullWidth label="Full Name" margin="normal"
                         value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        onChange={(e) => {
+                            const val = e.target.value.replace(/\b\w/g, (l) => l.toUpperCase());
+                            setFormData({ ...formData, name: val });
+                        }}
                     />
                     <TextField
                         fullWidth label="Phone Number" margin="normal"

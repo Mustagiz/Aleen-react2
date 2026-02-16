@@ -1059,7 +1059,8 @@ const Invoices = () => {
                 fullWidth
                 value={customer}
                 onChange={(e) => {
-                  setCustomer(e.target.value);
+                  const val = e.target.value.replace(/\b\w/g, (l) => l.toUpperCase());
+                  setCustomer(val);
                   if (selectedCustomerId) setSelectedCustomerId(null);
                 }}
                 onBlur={() => {

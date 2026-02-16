@@ -1,8 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db } from '../firebase';
-import { collection, onSnapshot, doc, setDoc, addDoc, updateDoc, deleteDoc, getDocs, writeBatch } from 'firebase/firestore';
+import { collection, query, onSnapshot, doc, setDoc, updateDoc, deleteDoc, writeBatch, getDoc, where, getDocs } from 'firebase/firestore';
 
-const DataContext = createContext();
+const capitalizeName = (name) => {
+  return name.replace(/\b\w/g, (l) => l.toUpperCase());
+};
+
+const DataContext = React.createContext();
 
 export const useData = () => useContext(DataContext);
 
@@ -418,6 +422,7 @@ export const DataProvider = ({ children }) => {
     const id = Date.now().toString();
     const newCustomer = {
       ...customer,
+      name: capitalizeName(customer.name),
       id,
       dateAdded: new Date().toISOString(),
       totalSpent: 0,
@@ -429,7 +434,11 @@ export const DataProvider = ({ children }) => {
   };
 
   const updateCustomer = async (id, updates) => {
-    await updateDoc(doc(db, 'customers', id), updates);
+    const finalUpdates = { ...updates };
+    if (updates.name) {
+      finalUpdates.name = capitalizeName(updates.name);
+    }
+    await updateDoc(doc(db, 'customers', id), finalUpdates);
   };
 
   const deleteCustomer = async (id) => {
