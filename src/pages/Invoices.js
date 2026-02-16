@@ -898,6 +898,17 @@ const Invoices = () => {
                   setCustomer(e.target.value);
                   if (selectedCustomerId) setSelectedCustomerId(null);
                 }}
+                onBlur={() => {
+                  const searchTerm = customer.toLowerCase().trim();
+                  if (searchTerm) {
+                    const matched = customers.find(c => c.name.toLowerCase() === searchTerm);
+                    if (matched) {
+                      setCustomer(matched.name);
+                      setPhone(matched.phone || '+91');
+                      setSelectedCustomerId(matched.id);
+                    }
+                  }
+                }}
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
                     const searchTerm = customer.toLowerCase().trim();
@@ -909,7 +920,7 @@ const Invoices = () => {
                     }
                   }
                 }}
-                helperText="Press Enter to search for existing customer phone"
+                helperText="Search by name. Triggers on Enter or when you tap away."
               />
             </Box>
             <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
@@ -918,10 +929,29 @@ const Invoices = () => {
                 value={phone}
                 onChange={(e) => {
                   const val = e.target.value;
-                  if (val.startsWith('+91')) {
-                    setPhone(val);
-                  } else if (val.length < 3) {
-                    setPhone('+91');
+                  let newPhone = val;
+                  if (!val.startsWith('+91')) {
+                    newPhone = val.length < 3 ? '+91' : val;
+                  }
+                  setPhone(newPhone);
+
+                  // Auto-fetch if full number (13 chars: +91 + 10 digits)
+                  if (newPhone.trim().length === 13) {
+                    const matched = customers.find(c => c.phone === newPhone.trim() || c.phone === newPhone.trim().replace('+91', '').trim());
+                    if (matched) {
+                      setCustomer(matched.name);
+                      setSelectedCustomerId(matched.id);
+                    }
+                  }
+                }}
+                onBlur={() => {
+                  const val = phone.trim();
+                  if (val.length > 3) {
+                    const matched = customers.find(c => c.phone === val || c.phone === val.replace('+91', '').trim());
+                    if (matched) {
+                      setCustomer(matched.name);
+                      setSelectedCustomerId(matched.id);
+                    }
                   }
                 }}
                 onKeyPress={(e) => {
