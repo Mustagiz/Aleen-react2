@@ -7,6 +7,11 @@ import { formatCurrencyForPDF, generateReportPDF } from '../utils/helpers';
 const InventoryReports = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [stockLevel, setStockLevel] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [activeTab, setActiveTab] = useState(0);
   const { inventory, profile, inventoryLogs } = useData();
