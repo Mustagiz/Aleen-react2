@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Box,
     Typography,
@@ -20,6 +20,51 @@ import {
     QrCode
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
+import JsBarcode from 'jsbarcode';
+
+const BarcodeItem = ({ value, businessName, productName, price }) => {
+    const barcodeRef = useRef(null);
+
+    useEffect(() => {
+        if (barcodeRef.current && value) {
+            try {
+                JsBarcode(barcodeRef.current, value, {
+                    format: "CODE128",
+                    width: 1.2,
+                    height: 40,
+                    displayValue: true,
+                    fontSize: 10,
+                    margin: 2,
+                    background: "#ffffff"
+                });
+            } catch (e) {
+                console.error("Barcode generation failed", e);
+            }
+        }
+    }, [value]);
+
+    return (
+        <Box sx={{
+            border: '1px solid #eee',
+            p: 1.5,
+            textAlign: 'center',
+            borderRadius: '4px',
+            height: '160px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            breakInside: 'avoid',
+            bgcolor: 'white',
+            mb: 1
+        }}>
+            <Typography sx={{ fontSize: '9px', fontWeight: 800, mb: 0.5, color: 'text.primary', textTransform: 'uppercase' }}>{businessName}</Typography>
+            <Typography sx={{ fontSize: '11px', fontWeight: 700, mb: 0, width: '100%', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{productName}</Typography>
+            <svg ref={barcodeRef} style={{ maxWidth: '100%' }}></svg>
+            <Typography sx={{ fontSize: '13px', fontWeight: 900 }}>₹{price}</Typography>
+        </Box>
+    );
+};
 
 const BarcodeGenerator = () => {
     const { inventory, profile } = useData();
@@ -108,44 +153,19 @@ const BarcodeGenerator = () => {
             <Box className="print-only" sx={{ display: 'none', '@media print': { display: 'block' } }}>
                 <Box sx={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gridTemplateColumns: 'repeat(4, 1fr)',
                     gap: '10px',
                     p: '10px'
                 }}>
                     {selectedProducts.flatMap(product =>
                         Array.from({ length: product.labelCount }).map((_, i) => (
-                            <Box key={`${product.id}-${i}`} sx={{
-                                border: '1px solid #eee',
-                                p: 2,
-                                textAlign: 'center',
-                                borderRadius: '4px',
-                                height: '140px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                justifyContent: 'center',
-                                breakInside: 'avoid'
-                            }}>
-                                <Typography sx={{ fontSize: '10px', fontWeight: 800, mb: 0.5 }}>{profile.businessName}</Typography>
-                                <Typography sx={{ fontSize: '12px', fontWeight: 700, mb: 1 }}>{product.name}</Typography>
-
-                                {/* Visual Barcode Representation */}
-                                <Box sx={{
-                                    height: '40px',
-                                    bgcolor: '#000',
-                                    mb: 0.5,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    color: 'white',
-                                    letterSpacing: '4px',
-                                    fontSize: '10px'
-                                }}>
-                                    ||||||||||||||||||
-                                </Box>
-
-                                <Typography sx={{ fontSize: '9px', mb: 1 }}>{product.productId}</Typography>
-                                <Typography sx={{ fontSize: '14px', fontWeight: 900 }}>₹{product.price}</Typography>
-                            </Box>
+                            <BarcodeItem
+                                key={`${product.id}-${i}`}
+                                value={product.productId || product.id}
+                                businessName={profile?.businessName || "Aleen Clothing"}
+                                productName={product.name}
+                                price={product.price}
+                            />
                         ))
                     )}
                 </Box>
@@ -172,3 +192,4 @@ const BarcodeGenerator = () => {
 };
 
 export default BarcodeGenerator;
+
