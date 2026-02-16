@@ -76,7 +76,7 @@ const BarcodeGenerator = () => {
         setSelectedProducts(prev => {
             const exists = prev.find(p => p.id === product.id);
             if (!exists) {
-                return [...prev, { ...product, labelCount: 1 }];
+                return [...prev, { ...product, labelCount: Math.max(1, product.quantity || 1) }];
             }
             return prev;
         });
