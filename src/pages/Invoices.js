@@ -890,66 +890,26 @@ const Invoices = () => {
           <Paper sx={{ p: { xs: 1.5, sm: 2 }, mb: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2 }}>Customer Information</Typography>
             <Box sx={{ mb: 2 }}>
-              <Autocomplete
-                freeSolo
-                options={customers}
-                getOptionLabel={(option) => typeof option === 'string' ? option : `${option.name} (${option.phone})`}
-                filterOptions={(options, { inputValue }) => {
-                  return options.filter(option =>
-                    option.name.toLowerCase().includes(inputValue.toLowerCase()) ||
-                    (option.phone && option.phone.includes(inputValue))
-                  );
+              <TextField
+                label="Customer Name"
+                fullWidth
+                value={customer}
+                onChange={(e) => {
+                  setCustomer(e.target.value);
+                  if (selectedCustomerId) setSelectedCustomerId(null);
                 }}
-                value={selectedCustomerId ? customers.find(c => c.id === selectedCustomerId) || customer : customer}
-                onChange={(event, newValue) => {
-                  if (typeof newValue === 'string') {
-                    setCustomer(newValue);
-                  } else if (newValue && newValue.name) {
-                    setCustomer(newValue.name);
-                  }
-                  setSelectedCustomerId(null); // Clear ID on any change, will re-fetch on Enter
-                }}
-                onInputChange={(event, newInputValue) => {
-                  setCustomer(newInputValue);
-                  // Clear selection if they are typing a new name
-                  if (selectedCustomerId) {
-                    const current = customers.find(c => c.id === selectedCustomerId);
-                    if (current && current.name !== newInputValue) {
-                      setSelectedCustomerId(null);
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    const searchTerm = customer.toLowerCase().trim();
+                    const matched = customers.find(c => c.name.toLowerCase() === searchTerm);
+                    if (matched) {
+                      setCustomer(matched.name);
+                      setPhone(matched.phone || '+91');
+                      setSelectedCustomerId(matched.id);
                     }
                   }
                 }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Customer Search / Name / Phone"
-                    fullWidth
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        const searchTerm = customer.toLowerCase().trim();
-                        // Search by name OR phone number
-                        const matched = customers.find(c =>
-                          c.name.toLowerCase() === searchTerm ||
-                          (c.phone && c.phone.includes(searchTerm))
-                        );
-                        if (matched) {
-                          setCustomer(matched.name);
-                          setPhone(matched.phone || '+91');
-                          setSelectedCustomerId(matched.id);
-                        }
-                      }
-                    }}
-                    helperText="Type name or phone and press Enter to fetch existing details"
-                  />
-                )}
-                renderOption={(props, option) => (
-                  <Box component="li" {...props} key={option.id}>
-                    <Box>
-                      <Typography variant="body1" sx={{ fontWeight: 600 }}>{option.name}</Typography>
-                      <Typography variant="caption" color="text.secondary">{option.phone}</Typography>
-                    </Box>
-                  </Box>
-                )}
+                helperText="Press Enter to search for existing customer phone"
               />
             </Box>
             <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
