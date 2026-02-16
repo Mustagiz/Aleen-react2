@@ -16,7 +16,7 @@ const Marketing = () => {
 
     const [editTemplateDialogOpen, setEditTemplateDialogOpen] = useState(false);
     const [editingTemplate, setEditingTemplate] = useState(null);
-    const [templateFormData, setTemplateFormData] = useState({ title: '', message: '', color: '#d97706' });
+    const [templateFormData, setTemplateFormData] = useState({ title: '', message: '', color: '#d97706', imageUrl: '' });
 
     // Initialize default templates if none exist
     React.useEffect(() => {
@@ -26,19 +26,22 @@ const Marketing = () => {
                     title: 'Festival Greeting',
                     message: `Celebrate the season with style! Get 20% off on all Sarees at ${profile.businessName}. Visit us today!`,
                     color: '#d97706',
-                    type: 'festival'
+                    type: 'festival',
+                    imageUrl: ''
                 },
                 {
                     title: 'New Arrivals',
                     message: `Our new collection is here! 🌸 Explore the latest trends at ${profile.businessName}. Early birds get a special surprise!`,
                     color: '#10b981',
-                    type: 'arrivals'
+                    type: 'arrivals',
+                    imageUrl: ''
                 },
                 {
                     title: 'Season Sale',
                     message: `End of season sale starting now! Up to 50% off on selected items at ${profile.businessName}. Don't miss out!`,
                     color: '#ef4444',
-                    type: 'sale'
+                    type: 'sale',
+                    imageUrl: ''
                 }
             ];
             defaults.forEach(async (t) => await addMarketingTemplate(t));
@@ -53,7 +56,7 @@ const Marketing = () => {
         }
         setEditTemplateDialogOpen(false);
         setEditingTemplate(null);
-        setTemplateFormData({ title: '', message: '', color: '#d97706' });
+        setTemplateFormData({ title: '', message: '', color: '#d97706', imageUrl: '' });
     };
 
     const handleDeleteTemplate = async (id) => {
@@ -125,7 +128,11 @@ const Marketing = () => {
     const handleSendTemplate = (customer) => {
         const phone = customer.phone.replace(/\D/g, '');
         const cleanPhone = phone.startsWith('91') ? phone : `91${phone}`;
-        const url = `https://wa.me/${cleanPhone}/?text=${encodeURIComponent(selectedTemplate.message)}`;
+        let message = selectedTemplate.message;
+        if (selectedTemplate.imageUrl) {
+            message += `\n\n${selectedTemplate.imageUrl}`;
+        }
+        const url = `https://wa.me/${cleanPhone}/?text=${encodeURIComponent(message)}`;
         window.open(url, '_blank');
 
         // Track reminder
@@ -400,7 +407,12 @@ const Marketing = () => {
                                     <Box sx={{ position: 'absolute', right: 8, top: 4, display: 'flex' }}>
                                         <IconButton size="small" onClick={() => {
                                             setEditingTemplate(template);
-                                            setTemplateFormData({ title: template.title, message: template.message, color: template.color });
+                                            setTemplateFormData({
+                                                title: template.title,
+                                                message: template.message,
+                                                color: template.color,
+                                                imageUrl: template.imageUrl || ''
+                                            });
                                             setEditTemplateDialogOpen(true);
                                         }}>
                                             <Edit fontSize="inherit" />
@@ -418,7 +430,7 @@ const Marketing = () => {
                                 sx={{ borderRadius: 2, mt: 1 }}
                                 onClick={() => {
                                     setEditingTemplate(null);
-                                    setTemplateFormData({ title: '', message: '', color: '#d97706' });
+                                    setTemplateFormData({ title: '', message: '', color: '#d97706', imageUrl: '' });
                                     setEditTemplateDialogOpen(true);
                                 }}
                             >
@@ -697,6 +709,43 @@ const Marketing = () => {
                             onChange={(e) => setTemplateFormData({ ...templateFormData, message: e.target.value })}
                             helperText="Tip: You can use emojis to make it more engaging!"
                         />
+                        <TextField
+                            fullWidth
+                            label="Image URL (Optional)"
+                            placeholder="https://example.com/image.jpg"
+                            value={templateFormData.imageUrl}
+                            onChange={(e) => setTemplateFormData({ ...templateFormData, imageUrl: e.target.value })}
+                            helperText="Paste a link to an image to include it in WhatsApp messages"
+                        />
+                        {templateFormData.imageUrl && (
+                            <Box sx={{
+                                border: '1px solid',
+                                borderColor: 'divider',
+                                borderRadius: 2,
+                                p: 2,
+                                textAlign: 'center',
+                                bgcolor: 'grey.50'
+                            }}>
+                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1, fontWeight: 700 }}>Image Preview</Typography>
+                                <img
+                                    src={templateFormData.imageUrl}
+                                    alt="Template preview"
+                                    style={{
+                                        maxWidth: '100%',
+                                        maxHeight: '200px',
+                                        borderRadius: '8px',
+                                        objectFit: 'contain'
+                                    }}
+                                    onError={(e) => {
+                                        e.target.style.display = 'none';
+                                        e.target.nextSibling.style.display = 'block';
+                                    }}
+                                />
+                                <Typography variant="caption" color="error" sx={{ display: 'none' }}>
+                                    Unable to load image. Please check the URL.
+                                </Typography>
+                            </Box>
+                        )}
                         <Box>
                             <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, mb: 1, display: 'block' }}>Theme Color</Typography>
                             <Box sx={{ display: 'flex', gap: 1 }}>
