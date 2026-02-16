@@ -1091,7 +1091,7 @@ const Invoices = () => {
                           )}
                         />
                       ) : (
-                        <Box sx={{ display: 'flex', gap: 1, flexDirection: { xs: 'column', lg: 'row' } }}>
+                        <Box sx={{ display: 'flex', gap: 1.5, flexDirection: 'column' }}>
                           <TextField
                             label="Custom Product Name"
                             size="small"
@@ -1102,7 +1102,7 @@ const Invoices = () => {
                           />
                           <Box sx={{ display: 'flex', gap: 1 }}>
                             <TextField
-                              label="Sale Price (₹)"
+                              label="Sale (₹)"
                               size="small"
                               type="number"
                               fullWidth
@@ -1110,7 +1110,7 @@ const Invoices = () => {
                               onChange={(e) => handleItemChange(index, 'customPrice', parseFloat(e.target.value) || 0)}
                             />
                             <TextField
-                              label="Cost Price (₹)"
+                              label="Cost (₹)"
                               size="small"
                               type="number"
                               fullWidth
@@ -1195,7 +1195,7 @@ const Invoices = () => {
               </TextField>
             ) : (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Box sx={{ display: 'flex', gap: 2 }}>
+                <Box sx={{ display: 'flex', gap: 1.5, flexDirection: { xs: 'column', sm: 'row' } }}>
                   <TextField select label="Method 1" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} fullWidth size="small">
                     <MenuItem value="Cash">Cash</MenuItem>
                     <MenuItem value="Card">Card</MenuItem>
@@ -1211,7 +1211,7 @@ const Invoices = () => {
                     size="small"
                   />
                 </Box>
-                <Box sx={{ display: 'flex', gap: 2 }}>
+                <Box sx={{ display: 'flex', gap: 1.5, flexDirection: { xs: 'column', sm: 'row' } }}>
                   <TextField select label="Method 2" value={paymentMethod2} onChange={(e) => setPaymentMethod2(e.target.value)} fullWidth size="small">
                     <MenuItem value="Cash">Cash</MenuItem>
                     <MenuItem value="Card">Card</MenuItem>
@@ -1229,9 +1229,9 @@ const Invoices = () => {
                 </Box>
               </Box>
             )}
-            <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+            <Box sx={{ display: 'flex', gap: 2, mt: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
               <TextField label="GST (%)" type="number" size="small" value={tax} onChange={(e) => setTax(e.target.value)} fullWidth />
-              <Box sx={{ display: 'flex', gap: 1, width: '100%' }}>
+              <Box sx={{ display: 'flex', gap: 1.5, width: '100%', flexDirection: { xs: 'column', sm: 'row' } }}>
                 <TextField
                   label="Discount (%)"
                   type="number"
