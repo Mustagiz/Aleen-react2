@@ -13,6 +13,7 @@ import {
     Divider,
     Chip
 } from '@mui/material';
+import { useLocation } from 'react-router-dom';
 import {
     Print,
     Delete,
@@ -68,15 +69,26 @@ const BarcodeItem = ({ value, businessName, productName, price }) => {
 
 const BarcodeGenerator = () => {
     const { inventory, profile } = useData();
+    const location = useLocation();
     const [selectedProducts, setSelectedProducts] = useState([]);
-
     const handleAddProduct = (product) => {
         if (!product) return;
-        const exists = selectedProducts.find(p => p.id === product.id);
-        if (!exists) {
-            setSelectedProducts([...selectedProducts, { ...product, labelCount: 1 }]);
-        }
+        setSelectedProducts(prev => {
+            const exists = prev.find(p => p.id === product.id);
+            if (!exists) {
+                return [...prev, { ...product, labelCount: 1 }];
+            }
+            return prev;
+        });
     };
+
+    useEffect(() => {
+        if (location.state?.product) {
+            handleAddProduct(location.state.product);
+            // Clear location state to prevent re-adding on refresh
+            window.history.replaceState({}, document.title);
+        }
+    }, [location.state]);
 
     const handleUpdateCount = (productId, count) => {
         setSelectedProducts(selectedProducts.map(p =>

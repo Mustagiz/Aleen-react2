@@ -520,7 +520,7 @@ const Inventory = () => {
                       </TableCell>
                       <TableCell align="right">
                         <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
-                          <Tooltip title="Print Label"><IconButton size="small" onClick={() => navigate('/barcodes')} sx={{ color: 'secondary.main' }}><QrCode fontSize="small" /></IconButton></Tooltip>
+                          <Tooltip title="Print Label"><IconButton size="small" onClick={() => navigate('/barcodes', { state: { product: item } })} sx={{ color: 'secondary.main' }}><QrCode fontSize="small" /></IconButton></Tooltip>
                           <IconButton size="small" onClick={() => handleOpen(item)} sx={{ color: 'primary.main' }}><Edit fontSize="small" /></IconButton>
                           <IconButton size="small" onClick={() => openDeleteDialog(item.id)} sx={{ color: 'error.main' }}><Delete fontSize="small" /></IconButton>
                         </Box>
