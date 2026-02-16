@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Box, Typography, Grid, Card, CardContent, Button, Chip, TextField, Paper, IconButton, Avatar, useTheme, Divider, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions, List, ListItem, ListItemAvatar, ListItemText, InputAdornment, useMediaQuery, Checkbox, FormControlLabel, Stack } from '@mui/material';
 import { WhatsApp, ShoppingBag, Event, Search, MoreVert, TrendingUp, Group, Warning, Celebration, Send, CheckCircle, RadioButtonUnchecked, Edit, Delete, Add } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
+import { storage } from '../firebase';
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 
 const Marketing = () => {
     const { customers, invoices, profile, updateCustomer, marketingTemplates, addMarketingTemplate, updateMarketingTemplate, deleteMarketingTemplate } = useData();
@@ -17,6 +19,8 @@ const Marketing = () => {
     const [editTemplateDialogOpen, setEditTemplateDialogOpen] = useState(false);
     const [editingTemplate, setEditingTemplate] = useState(null);
     const [templateFormData, setTemplateFormData] = useState({ title: '', message: '', color: '#d97706', imageUrl: '' });
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [isUploading, setIsUploading] = useState(false);
 
     // Initialize default templates if none exist
     React.useEffect(() => {
@@ -57,12 +61,69 @@ const Marketing = () => {
         setEditTemplateDialogOpen(false);
         setEditingTemplate(null);
         setTemplateFormData({ title: '', message: '', color: '#d97706', imageUrl: '' });
+        setUploadProgress(0);
+        setIsUploading(false);
     };
 
     const handleDeleteTemplate = async (id) => {
         if (window.confirm('Are you sure you want to delete this template?')) {
+            const template = marketingTemplates.find(t => t.id === id);
+            // Delete image from storage if exists
+            if (template?.imageUrl && template.imageUrl.includes('firebase')) {
+                try {
+                    const imageRef = ref(storage, template.imageUrl);
+                    await deleteObject(imageRef);
+                } catch (error) {
+                    console.error('Error deleting image:', error);
+                }
+            }
             await deleteMarketingTemplate(id);
         }
+    };
+
+    const handleImageUpload = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            alert('Please upload an image file');
+            return;
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Image size should be less than 5MB');
+            return;
+        }
+
+        setIsUploading(true);
+        const storageRef = ref(storage, `marketing_templates/${Date.now()}_${file.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+
+        uploadTask.on(
+            'state_changed',
+            (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                setUploadProgress(progress);
+            },
+            (error) => {
+                console.error('Upload error:', error);
+                alert('Failed to upload image. Please try again.');
+                setIsUploading(false);
+                setUploadProgress(0);
+            },
+            async () => {
+                const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                setTemplateFormData({ ...templateFormData, imageUrl: downloadURL });
+                setIsUploading(false);
+                setUploadProgress(0);
+            }
+        );
+    };
+
+    const handleRemoveImage = () => {
+        setTemplateFormData({ ...templateFormData, imageUrl: '' });
     };
 
     const today = new Date();
@@ -713,43 +774,92 @@ const Marketing = () => {
                             onChange={(e) => setTemplateFormData({ ...templateFormData, message: e.target.value })}
                             helperText="Tip: You can use emojis to make it more engaging!"
                         />
-                        <TextField
-                            fullWidth
-                            label="Image URL (Optional)"
-                            placeholder="https://example.com/image.jpg"
-                            value={templateFormData.imageUrl}
-                            onChange={(e) => setTemplateFormData({ ...templateFormData, imageUrl: e.target.value })}
-                            helperText="Paste a link to an image to include it in WhatsApp messages"
-                        />
-                        {templateFormData.imageUrl && (
-                            <Box sx={{
-                                border: '1px solid',
-                                borderColor: 'divider',
-                                borderRadius: 2,
-                                p: 2,
-                                textAlign: 'center',
-                                bgcolor: 'grey.50'
-                            }}>
-                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1, fontWeight: 700 }}>Image Preview</Typography>
-                                <img
-                                    src={templateFormData.imageUrl}
-                                    alt="Template preview"
-                                    style={{
-                                        maxWidth: '100%',
-                                        maxHeight: '200px',
-                                        borderRadius: '8px',
-                                        objectFit: 'contain'
-                                    }}
-                                    onError={(e) => {
-                                        e.target.style.display = 'none';
-                                        e.target.nextSibling.style.display = 'block';
-                                    }}
-                                />
-                                <Typography variant="caption" color="error" sx={{ display: 'none' }}>
-                                    Unable to load image. Please check the URL.
-                                </Typography>
-                            </Box>
-                        )}
+
+                        <Box>
+                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, mb: 1, display: 'block' }}>Template Image (Optional)</Typography>
+
+                            {!templateFormData.imageUrl ? (
+                                <Box>
+                                    <input
+                                        accept="image/*"
+                                        style={{ display: 'none' }}
+                                        id="template-image-upload"
+                                        type="file"
+                                        onChange={handleImageUpload}
+                                        disabled={isUploading}
+                                    />
+                                    <label htmlFor="template-image-upload">
+                                        <Button
+                                            variant="outlined"
+                                            component="span"
+                                            fullWidth
+                                            disabled={isUploading}
+                                            sx={{ py: 2, borderStyle: 'dashed', borderWidth: 2 }}
+                                        >
+                                            {isUploading ? `Uploading... ${Math.round(uploadProgress)}%` : 'Click to Upload Image'}
+                                        </Button>
+                                    </label>
+                                    {isUploading && (
+                                        <Box sx={{ width: '100%', mt: 1 }}>
+                                            <Box sx={{
+                                                width: '100%',
+                                                height: 4,
+                                                bgcolor: 'grey.200',
+                                                borderRadius: 2,
+                                                overflow: 'hidden'
+                                            }}>
+                                                <Box sx={{
+                                                    width: `${uploadProgress}%`,
+                                                    height: '100%',
+                                                    bgcolor: 'primary.main',
+                                                    transition: 'width 0.3s'
+                                                }} />
+                                            </Box>
+                                        </Box>
+                                    )}
+                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                                        Max size: 5MB. Supported formats: JPG, PNG, GIF
+                                    </Typography>
+                                </Box>
+                            ) : (
+                                <Box sx={{
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    borderRadius: 2,
+                                    p: 2,
+                                    textAlign: 'center',
+                                    bgcolor: 'grey.50',
+                                    position: 'relative'
+                                }}>
+                                    <IconButton
+                                        size="small"
+                                        onClick={handleRemoveImage}
+                                        sx={{
+                                            position: 'absolute',
+                                            top: 8,
+                                            right: 8,
+                                            bgcolor: 'background.paper',
+                                            '&:hover': { bgcolor: 'error.light', color: 'error.main' }
+                                        }}
+                                    >
+                                        <Delete fontSize="small" />
+                                    </IconButton>
+                                    <img
+                                        src={templateFormData.imageUrl}
+                                        alt="Template preview"
+                                        style={{
+                                            maxWidth: '100%',
+                                            maxHeight: '200px',
+                                            borderRadius: '8px',
+                                            objectFit: 'contain'
+                                        }}
+                                    />
+                                    <Typography variant="caption" color="success.main" sx={{ display: 'block', mt: 1, fontWeight: 700 }}>
+                                        ✓ Image uploaded successfully
+                                    </Typography>
+                                </Box>
+                            )}
+                        </Box>
                         <Box>
                             <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, mb: 1, display: 'block' }}>Theme Color</Typography>
                             <Box sx={{ display: 'flex', gap: 1 }}>
