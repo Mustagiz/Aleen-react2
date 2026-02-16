@@ -99,7 +99,7 @@ const Dashboard = () => {
     datasets: [{
       label: 'Units Sold',
       data: top5ProductsData.map(p => p.quantity),
-      backgroundColor: '#B76E79', // Rose Gold
+      backgroundColor: '#d97706', // Warm Amber
       borderRadius: 8,
       barThickness: 30,
     }]
@@ -219,7 +219,7 @@ const Dashboard = () => {
     datasets: [{
       label: 'Revenue by Category',
       data: Object.values(categorySales),
-      backgroundColor: ['#F472B6', '#B76E79', '#FBCFE8', '#E0BFB8', '#DB2777', '#8E5059'],
+      backgroundColor: ['#d97706', '#f59e0b', '#fbbf24', '#fcd34d', '#78350f', '#92400e'],
       borderWidth: 0,
     }]
   };
@@ -459,8 +459,8 @@ const Dashboard = () => {
           <Paper elevation={0} sx={{
             p: 4,
             borderRadius: 4,
-            border: '1px solid rgba(183, 110, 121, 0.1)',
-            boxShadow: '0 15px 35px -10px rgba(183, 110, 121, 0.15)',
+            border: '1px solid rgba(217, 119, 6, 0.1)',
+            boxShadow: '0 15px 35px -10px rgba(217, 119, 6, 0.15)',
             height: '100%',
             display: 'flex',
             flexDirection: 'column'
@@ -495,8 +495,8 @@ const Dashboard = () => {
           <Paper elevation={0} sx={{
             p: 4,
             borderRadius: 4,
-            border: '1px solid rgba(183, 110, 121, 0.1)',
-            boxShadow: '0 15px 35px -10px rgba(183, 110, 121, 0.15)'
+            border: '1px solid rgba(217, 119, 6, 0.1)',
+            boxShadow: '0 15px 35px -10px rgba(217, 119, 6, 0.15)'
           }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4, alignItems: 'center' }}>
               <Box>
@@ -512,8 +512,8 @@ const Dashboard = () => {
           <Paper elevation={0} sx={{
             p: 0,
             borderRadius: 4,
-            border: '1px solid rgba(183, 110, 121, 0.1)',
-            boxShadow: '0 15px 35px -10px rgba(183, 110, 121, 0.15)',
+            border: '1px solid rgba(217, 119, 6, 0.1)',
+            boxShadow: '0 15px 35px -10px rgba(217, 119, 6, 0.15)',
             overflow: 'hidden'
           }}>
             <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
@@ -531,7 +531,7 @@ const Dashboard = () => {
                   transition: 'background 0.2s',
                   '&:hover': { bgcolor: 'action.hover' }
                 }}>
-                  <Avatar sx={{ bgcolor: 'rgba(244, 114, 182, 0.1)', color: '#F472B6', borderRadius: 2 }}>
+                  <Avatar sx={{ bgcolor: 'rgba(217, 119, 6, 0.1)', color: '#d97706', borderRadius: 2 }}>
                     <Receipt fontSize="small" />
                   </Avatar>
                   <Box sx={{ flexGrow: 1 }}>
@@ -540,7 +540,7 @@ const Dashboard = () => {
                       {new Date(inv.date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} • {inv.items?.length || 0} items
                     </Typography>
                   </Box>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#F472B6' }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#d97706' }}>
                     ₹{inv.total.toLocaleString('en-IN')}
                   </Typography>
                 </Box>

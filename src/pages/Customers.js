@@ -248,11 +248,15 @@ const Customers = () => {
                                             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>Total Spent</Typography>
                                             <Typography variant="body2" sx={{ fontWeight: 700 }}>₹{customerStat.totalSpent}</Typography>
                                         </Grid>
-                                        <Grid item xs={4}>
+                                        <Grid item xs={3}>
                                             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>Visits</Typography>
                                             <Typography variant="body2" sx={{ fontWeight: 700 }}>{customerStat.visitCount}</Typography>
                                         </Grid>
-                                        <Grid item xs={4}>
+                                        <Grid item xs={3}>
+                                            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>Points</Typography>
+                                            <Typography variant="body2" sx={{ fontWeight: 700, color: 'primary.main' }}>{cust.loyaltyPoints || 0}</Typography>
+                                        </Grid>
+                                        <Grid item xs={6}>
                                             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>Last Visit</Typography>
                                             <Typography variant="body2" sx={{ fontWeight: 700 }}>{customerStat.lastVisit}</Typography>
                                         </Grid>
@@ -270,6 +274,7 @@ const Customers = () => {
                                 <TableCell sx={{ fontWeight: 800 }}>Customer Name</TableCell>
                                 <TableCell sx={{ fontWeight: 800 }}>Contact Info</TableCell>
                                 <TableCell sx={{ fontWeight: 800 }}>Stats</TableCell>
+                                <TableCell sx={{ fontWeight: 800 }}>Points</TableCell>
                                 <TableCell sx={{ fontWeight: 800 }}>Last Purchase</TableCell>
                                 <TableCell sx={{ fontWeight: 800 }} align="right">Actions</TableCell>
                             </TableRow>
@@ -292,6 +297,14 @@ const Customers = () => {
                                         <TableCell>
                                             <Typography variant="body2" sx={{ fontWeight: 600 }}>₹{customerStat.totalSpent.toLocaleString()}</Typography>
                                             <Typography variant="caption" color="text.secondary">{customerStat.visitCount} orders</Typography>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Chip
+                                                label={cust.loyaltyPoints || 0}
+                                                size="small"
+                                                color="primary"
+                                                sx={{ fontWeight: 800, borderRadius: 1.5, background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)' }}
+                                            />
                                         </TableCell>
                                         <TableCell>
                                             <Typography variant="body2" sx={{ fontWeight: 500 }}>{customerStat.lastVisit}</Typography>

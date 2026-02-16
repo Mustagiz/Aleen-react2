@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel } from '@mui/material';
-import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, FilterList, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp } from '@mui/icons-material';
+import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, FilterList, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt } from '@mui/icons-material';
+import { Html5QrcodeScanner } from 'html5-qrcode';
 import { useData } from '../contexts/DataContext';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 import { generateInvoiceNumber } from '../utils/helpers';
@@ -70,6 +71,39 @@ const Invoices = () => {
   const [isSplitPayment, setIsSplitPayment] = useState(false);
   const [splitAmount, setSplitAmount] = useState(0);
   const [paymentMethod2, setPaymentMethod2] = useState('Card');
+  const [scannerOpen, setScannerOpen] = useState(false);
+
+  React.useEffect(() => {
+    if (scannerOpen) {
+      const scanner = new Html5QrcodeScanner('reader', {
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+        rememberLastUsedCamera: true,
+        showTorchButtonIfSupported: true
+      });
+
+      scanner.render((decodedText) => {
+        const matchedProduct = inventory.find(inv =>
+          inv.productId && inv.productId.toLowerCase() === decodedText.toLowerCase().trim() && (parseInt(inv.quantity) || 0) > 0
+        );
+
+        if (matchedProduct) {
+          const emptyIndex = selectedItems.findIndex(item => !item.id);
+          if (emptyIndex !== -1) {
+            handleItemChange(emptyIndex, 'id', matchedProduct.id);
+          } else {
+            setSelectedItems([...selectedItems, { id: matchedProduct.id, quantity: 1 }]);
+          }
+          scanner.clear();
+          setScannerOpen(false);
+        }
+      }, (error) => {
+        // Ignore errors
+      });
+
+      return () => scanner.clear();
+    }
+  }, [scannerOpen, inventory, selectedItems]); // Added dependencies for safety
 
   const getCurrentDateTime = () => {
     const now = new Date();
@@ -963,60 +997,69 @@ const Invoices = () => {
                 helperText="Search by name. Triggers on Enter or when you tap away."
               />
             </Box>
-            <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
-              <TextField
-                label="Phone (with country code)"
-                value={phone}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  // Always start with +91
-                  let suffix = val;
-                  if (val.startsWith('+91')) {
-                    suffix = val.slice(3);
-                  } else if (val.length < 3) {
-                    setPhone('+91');
-                    return;
-                  }
-
-                  // Only allow digits in suffix and max 10 digits
-                  const cleanedSuffix = suffix.replace(/[^0-9]/g, '').slice(0, 10);
-                  const newPhone = `+91${cleanedSuffix}`;
-                  setPhone(newPhone);
-
-                  // Auto-fetch if full number (13 chars: +91 + 10 digits)
-                  if (newPhone.length === 13) {
-                    const matched = customers.find(c => c.phone === newPhone || c.phone === cleanedSuffix);
-                    if (matched) {
-                      setCustomer(matched.name);
-                      setSelectedCustomerId(matched.id);
+            <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'flex-start' }}>
+              <Box sx={{ flex: 1, width: '100%' }}>
+                <TextField
+                  label="Phone (with country code)"
+                  value={phone}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Always start with +91
+                    let suffix = val;
+                    if (val.startsWith('+91')) {
+                      suffix = val.slice(3);
+                    } else if (val.length < 3) {
+                      setPhone('+91');
+                      return;
                     }
-                  }
-                }}
-                onBlur={() => {
-                  const val = phone.trim();
-                  if (val.length > 3) {
-                    const matched = customers.find(c => c.phone === val || c.phone === val.replace('+91', '').trim());
-                    if (matched) {
-                      setCustomer(matched.name);
-                      setSelectedCustomerId(matched.id);
+
+                    // Only allow digits in suffix and max 10 digits
+                    const cleanedSuffix = suffix.replace(/[^0-9]/g, '').slice(0, 10);
+                    const newPhone = `+91${cleanedSuffix}`;
+                    setPhone(newPhone);
+
+                    // Auto-fetch if full number (13 chars: +91 + 10 digits)
+                    if (newPhone.length === 13) {
+                      const matched = customers.find(c => c.phone === newPhone || c.phone === cleanedSuffix);
+                      if (matched) {
+                        setCustomer(matched.name);
+                        setSelectedCustomerId(matched.id);
+                      }
                     }
-                  }
-                }}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    // Fetch customer logic only on Enter
+                  }}
+                  onBlur={() => {
                     const val = phone.trim();
-                    const matched = customers.find(c => c.phone === val || c.phone === val.replace('+91', '').trim());
-                    if (matched) {
-                      setCustomer(matched.name);
-                      setSelectedCustomerId(matched.id);
+                    if (val.length > 3) {
+                      const matched = customers.find(c => c.phone === val || c.phone === val.replace('+91', '').trim());
+                      if (matched) {
+                        setCustomer(matched.name);
+                        setSelectedCustomerId(matched.id);
+                      }
                     }
-                  }
-                }}
-                fullWidth
-                placeholder="919876543210"
-                helperText="Press Enter to search for existing customer name"
-              />
+                  }}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      // Fetch customer logic only on Enter
+                      const val = phone.trim();
+                      const matched = customers.find(c => c.phone === val || c.phone === val.replace('+91', '').trim());
+                      if (matched) {
+                        setCustomer(matched.name);
+                        setSelectedCustomerId(matched.id);
+                      }
+                    }
+                  }}
+                  fullWidth
+                  placeholder="919876543210"
+                  helperText="Press Enter to search for existing customer name"
+                />
+                {selectedCustomerId && (
+                  <Chip
+                    size="small"
+                    label={`Points: ${customers.find(c => c.id === selectedCustomerId)?.loyaltyPoints || 0}`}
+                    sx={{ mt: 1, bgcolor: 'primary.light', color: 'primary.main', fontWeight: 800 }}
+                  />
+                )}
+              </Box>
               <TextField
                 label="Invoice Date & Time"
                 type="datetime-local"
@@ -1076,13 +1119,32 @@ const Invoices = () => {
                     }
                   }
                 }}
-                size="small"
                 InputProps={{
-                  startAdornment: <Search sx={{ color: 'text.secondary', mr: 1 }} />
+                  startAdornment: <Search sx={{ color: 'text.secondary', mr: 1 }} />,
+                  endAdornment: (
+                    <IconButton size="small" onClick={() => setScannerOpen(true)} sx={{ color: 'primary.main' }}>
+                      <CameraAlt />
+                    </IconButton>
+                  )
                 }}
-                helperText="Scanning or typing a Product ID adds it automatically"
+                helperText="Scanning, typing a Product ID, or using Camera adds it automatically"
               />
             </Box>
+
+            {/* Scanner Dialog */}
+            <Dialog open={scannerOpen} onClose={() => setScannerOpen(false)} maxWidth="xs" fullWidth>
+              <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                Scan Product Barcode
+                <IconButton onClick={() => setScannerOpen(false)} size="small"><Close /></IconButton>
+              </DialogTitle>
+              <DialogContent>
+                <Box id="reader" sx={{ width: '100%' }} />
+                <Typography variant="caption" sx={{ mt: 2, display: 'block', textAlign: 'center', color: 'text.secondary' }}>
+                  Point your camera at a product barcode to add it automatically.
+                </Typography>
+              </DialogContent>
+            </Dialog>
+
             {selectedItems.map((item, index) => {
               // Filter inventory based quantity > 0
               const filteredInventory = inventory.filter(inv => (parseInt(inv.currentQty || inv.quantity) || 0) > 0);

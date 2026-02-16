@@ -10,6 +10,7 @@ export const DataProvider = ({ children }) => {
   const [inventory, setInventory] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [customers, setCustomers] = useState([]);
+  const [inventoryLogs, setInventoryLogs] = useState([]);
   const [categories, setCategories] = useState(['Sarees', 'Kurtis', 'Lehenga', 'Salwar Suits', 'Dupattas', 'Blouses']);
   const [profile, setProfile] = useState({
     businessName: 'Aleen Clothing',
@@ -40,6 +41,10 @@ export const DataProvider = ({ children }) => {
 
     const unsubCustomers = onSnapshot(collection(db, 'customers'), (snapshot) => {
       setCustomers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+
+    const unsubLogs = onSnapshot(collection(db, 'inventory_logs'), (snapshot) => {
+      setInventoryLogs(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
 
     const unsubVendors = onSnapshot(collection(db, 'vendors'), (snapshot) => {
@@ -76,6 +81,7 @@ export const DataProvider = ({ children }) => {
       unsubInventory();
       unsubInvoices();
       unsubCustomers();
+      unsubLogs();
       unsubVendors();
       unsubPurchases();
       unsubExpenses();
@@ -119,18 +125,64 @@ export const DataProvider = ({ children }) => {
     migrateData();
   }, []);
 
+  // Helper: Log Inventory Movement
+  const logInventoryMovement = async (batch, productId, change, reason, metadata = {}) => {
+    const logId = Date.now().toString() + Math.random().toString(36).substr(2, 5);
+    const logRef = doc(db, 'inventory_logs', logId);
+    const product = inventory.find(i => i.id === productId);
+
+    const logEntry = {
+      id: logId,
+      productId,
+      productName: product?.name || 'Unknown Product',
+      change,
+      newQuantity: (product?.quantity || 0) + change,
+      reason,
+      timestamp: new Date().toISOString(),
+      ...metadata
+    };
+
+    if (batch) {
+      batch.set(logRef, logEntry);
+    } else {
+      await setDoc(logRef, logEntry);
+    }
+  };
+
   const addInventoryItem = async (item) => {
     const id = Date.now().toString();
     const newItem = { ...item, id, dateAdded: new Date().toISOString() };
-    await setDoc(doc(db, 'inventory', id), newItem);
+    const batch = writeBatch(db);
+    batch.set(doc(db, 'inventory', id), newItem);
+
+    // Initial Stock Log
+    logInventoryMovement(batch, id, item.quantity, 'Initial Stock Added');
+
+    await batch.commit();
   };
 
   const updateInventoryItem = async (id, updates) => {
-    await updateDoc(doc(db, 'inventory', id), updates);
+    const product = inventory.find(i => i.id === id);
+    const batch = writeBatch(db);
+    batch.update(doc(db, 'inventory', id), updates);
+
+    if (updates.quantity !== undefined && updates.quantity !== product.quantity) {
+      logInventoryMovement(batch, id, updates.quantity - product.quantity, 'Manual Update');
+    }
+
+    await batch.commit();
   };
 
   const deleteInventoryItem = async (id) => {
-    await deleteDoc(doc(db, 'inventory', id));
+    const product = inventory.find(i => i.id === id);
+    const batch = writeBatch(db);
+    batch.delete(doc(db, 'inventory', id));
+
+    if (product) {
+      logInventoryMovement(batch, id, -product.quantity, 'Product Deleted');
+    }
+
+    await batch.commit();
   };
 
   const bulkAddInventory = async (items) => {
@@ -139,6 +191,7 @@ export const DataProvider = ({ children }) => {
       const id = item.id || Date.now().toString() + Math.random().toString(36).substr(2, 5);
       const docRef = doc(db, 'inventory', id);
       batch.set(docRef, { ...item, id, dateAdded: new Date().toISOString() });
+      logInventoryMovement(batch, id, item.quantity, 'Bulk Import');
     });
     await batch.commit();
   };
@@ -187,6 +240,8 @@ export const DataProvider = ({ children }) => {
             quantity: totalQty,
             cost: parseFloat(weightedCost.toFixed(2))
           });
+
+          logInventoryMovement(batch, item.productId, newQty, `Purchase Received (#${id})`);
         }
       }
     }
@@ -232,6 +287,8 @@ export const DataProvider = ({ children }) => {
             quantity: totalQty,
             cost: parseFloat(weightedCost.toFixed(2))
           });
+
+          logInventoryMovement(batch, item.productId, newQty, `Purchase Status Updated (#${id})`);
         }
       }
     }
@@ -278,7 +335,7 @@ export const DataProvider = ({ children }) => {
     const batch = writeBatch(db);
     batch.set(doc(db, 'invoices', id), newInvoice);
 
-    // Update Inventory
+    // Update Inventory & Log Movement
     for (const item of invoice.items) {
       const invRef = doc(db, 'inventory', item.id);
       const invItem = inventory.find(i => i.id === item.id);
@@ -286,17 +343,20 @@ export const DataProvider = ({ children }) => {
         batch.update(invRef, {
           quantity: invItem.quantity - item.quantity
         });
+        logInventoryMovement(batch, item.id, -item.quantity, `Sale (#${id})`);
       }
     }
 
-    // Update Customer Stats if linked
+    // Update Customer Stats & Loyalty Points (₹100 = 1 Point)
     if (invoice.customerId) {
       const customerRef = doc(db, 'customers', invoice.customerId);
       const customer = customers.find(c => c.id === invoice.customerId);
       if (customer) {
+        const pointsEarned = Math.floor(invoice.total / 100);
         batch.update(customerRef, {
           totalSpent: (customer.totalSpent || 0) + invoice.total,
-          visitCount: (customer.visitCount || 0) + 1
+          visitCount: (customer.visitCount || 0) + 1,
+          loyaltyPoints: (customer.loyaltyPoints || 0) + pointsEarned
         });
       }
     }
@@ -314,7 +374,7 @@ export const DataProvider = ({ children }) => {
 
     const batch = writeBatch(db);
 
-    // 1. Restore Inventory
+    // 1. Restore Inventory & Log
     for (const item of invoice.items) {
       // Skip custom items that don't track inventory by ID (or check if they have a valid inventory ID)
       if (item.category === 'Custom' || item.id.startsWith('custom-')) continue;
@@ -325,17 +385,20 @@ export const DataProvider = ({ children }) => {
         batch.update(invRef, {
           quantity: (invItem.quantity || 0) + item.quantity
         });
+        logInventoryMovement(batch, item.id, item.quantity, `Invoice Deleted (#${id})`);
       }
     }
 
-    // 2. Revert Customer Stats
+    // 2. Revert Customer Stats & Points
     if (invoice.customerId) {
       const customer = customers.find(c => c.id === invoice.customerId);
       if (customer) {
         const customerRef = doc(db, 'customers', invoice.customerId);
+        const pointsToRevert = Math.floor(invoice.total / 100);
         batch.update(customerRef, {
           totalSpent: Math.max(0, (customer.totalSpent || 0) - invoice.total),
-          visitCount: Math.max(0, (customer.visitCount || 0) - 1)
+          visitCount: Math.max(0, (customer.visitCount || 0) - 1),
+          loyaltyPoints: Math.max(0, (customer.loyaltyPoints || 0) - pointsToRevert)
         });
       }
     }
@@ -358,7 +421,8 @@ export const DataProvider = ({ children }) => {
       id,
       dateAdded: new Date().toISOString(),
       totalSpent: 0,
-      visitCount: 0
+      visitCount: 0,
+      loyaltyPoints: 0
     };
     await setDoc(doc(db, 'customers', id), newCustomer);
     return id;
@@ -410,6 +474,7 @@ export const DataProvider = ({ children }) => {
       inventory,
       invoices,
       categories,
+      inventoryLogs,
       expenseCategories,
       vendors,
       purchases,
