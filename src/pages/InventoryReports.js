@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Paper, Typography, TextField, Button, Table, TableBody, TableCell, TableHead, TableRow, MenuItem, TableContainer, Card, CardContent, Grid, Chip, useMediaQuery, useTheme, Divider, TablePagination } from '@mui/material';
 import { useData } from '../contexts/DataContext';
-import { Download, Inventory2, Warning, TrendingUp, AttachMoney, History, ListAlt } from '@mui/icons-material';
+import { Download, Inventory2, Warning, TrendingUp, History, ListAlt, TrendingDown } from '@mui/icons-material';
 import { formatCurrencyForPDF, generateReportPDF } from '../utils/helpers';
 
 const InventoryReports = () => {
@@ -14,7 +14,7 @@ const InventoryReports = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [activeTab, setActiveTab] = useState(0);
-  const { inventory, profile, inventoryLogs } = useData();
+  const { inventory, profile, inventoryLogs, invoices } = useData();
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -95,6 +95,26 @@ const InventoryReports = () => {
     a.click();
   };
 
+  const getSlowMovingItems = () => {
+    const ninetyDaysAgo = new Date();
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+
+    return inventory.filter(item => {
+      // Find all sales for this item in the last 90 days
+      const itemSales = invoices.filter(inv => {
+        const invDate = new Date(inv.date);
+        return invDate >= ninetyDaysAgo && inv.items?.some(i => i.id === item.id);
+      });
+
+      // Special Case: New items added in the last 90 days shouldn't be "slow moving" yet
+      const itemDate = item.dateAdded ? new Date(item.dateAdded) : (isNaN(item.id) ? new Date() : new Date(parseInt(item.id)));
+      if (itemDate >= ninetyDaysAgo) return false;
+
+      return itemSales.length === 0;
+    });
+  };
+
+  const slowMovingItems = getSlowMovingItems();
   const sortedLogs = [...inventoryLogs].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
   return (
@@ -158,6 +178,20 @@ const InventoryReports = () => {
             }}
           >
             Movement History
+          </Button>
+          <Button
+            onClick={() => setActiveTab(2)}
+            startIcon={<TrendingDown />}
+            sx={{
+              pb: 1.5,
+              borderRadius: 0,
+              borderBottom: activeTab === 2 ? '3px solid' : 'none',
+              borderColor: 'primary.main',
+              color: activeTab === 2 ? 'primary.main' : 'text.secondary',
+              fontWeight: activeTab === 2 ? 800 : 500
+            }}
+          >
+            Slow Moving Items
           </Button>
         </Box>
       </Box>
@@ -404,7 +438,7 @@ const InventoryReports = () => {
             </Paper>
           )}
         </>
-      ) : (
+      ) : activeTab === 1 ? (
         <Paper sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
           <TableContainer>
             <Table>
@@ -460,6 +494,50 @@ const InventoryReports = () => {
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
+        </Paper>
+      ) : (
+        <Paper sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
+          <Box sx={{ p: 2, bgcolor: 'error.light', color: 'error.main' }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+              ⚠️ These items have had ZERO sales in the last 90 days.
+            </Typography>
+          </Box>
+          <TableContainer>
+            <Table>
+              <TableHead sx={{ bgcolor: 'grey.50' }}>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 800 }}>Product Details</TableCell>
+                  <TableCell sx={{ fontWeight: 800 }}>Category</TableCell>
+                  <TableCell sx={{ fontWeight: 800 }}>Current Stock</TableCell>
+                  <TableCell sx={{ fontWeight: 800 }}>Price</TableCell>
+                  <TableCell sx={{ fontWeight: 800 }}>Stock Value</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {slowMovingItems.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.name}</Typography>
+                      <Typography variant="caption" color="text.secondary">ID: {item.productId || 'N/A'}</Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Chip label={item.category} size="small" variant="outlined" sx={{ fontWeight: 700, fontSize: '0.65rem' }} />
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700, color: 'error.main' }}>{item.quantity} Units</TableCell>
+                    <TableCell>₹{item.price}</TableCell>
+                    <TableCell sx={{ fontWeight: 800 }}>₹{(item.price * item.quantity).toLocaleString('en-IN')}</TableCell>
+                  </TableRow>
+                ))}
+                {slowMovingItems.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
+                      <Typography variant="body2" color="text.secondary">Fantastic! No slow-moving items found.</Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Paper>
       )}
     </Box>

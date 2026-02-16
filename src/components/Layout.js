@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, IconButton, Drawer, List, ListItem, ListItemIcon, ListItemText, Box, useMediaQuery, useTheme, Avatar, Divider, Chip, ListSubheader, BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
-import { Menu, Dashboard, Inventory, Receipt, Assessment, Logout, Store, TrendingUp, Settings, Brightness4, Brightness7, People, AccountBalanceWallet, QrCode } from '@mui/icons-material';
+import { Menu, Dashboard, Inventory, Receipt, Assessment, Logout, Store, TrendingUp, Settings, Brightness4, Brightness7, People, AccountBalanceWallet, QrCode, Campaign } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
 import { useThemeContext } from '../contexts/ThemeContext';
@@ -32,7 +32,8 @@ const Layout = () => {
         { text: 'Invoices', icon: <Receipt />, path: '/invoices' },
         { text: 'Expenses', icon: <AccountBalanceWallet />, path: '/expenses', adminOnly: true },
         { text: 'Customers', icon: <People />, path: '/customers' },
-        { text: 'Barcodes', icon: <QrCode />, path: '/barcodes' }
+        { text: 'Barcodes', icon: <QrCode />, path: '/barcodes' },
+        { text: 'Marketing', icon: <Campaign />, path: '/marketing' }
       ]
     },
     {
@@ -70,6 +71,7 @@ const Layout = () => {
     { text: 'Purchases', icon: <Receipt />, path: '/purchases', adminOnly: true },
     { text: 'Sales', icon: <Assessment />, path: '/sales-reports' },
     { text: 'Stock', icon: <Assessment />, path: '/inventory-reports' },
+    { text: 'Marketing', icon: <Campaign />, path: '/marketing' },
     { text: 'Settings', icon: <Settings />, path: '/settings', adminOnly: true }
   ].filter(item => !item.adminOnly || user?.role === 'admin');
 
