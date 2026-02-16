@@ -370,20 +370,27 @@ const BarcodeGenerator = () => {
                 {`
           @media print {
             @page { 
-                margin: 10mm; 
-                size: portrait;
+                margin: 0 !important; 
+                size: auto;
             }
             body { 
-                margin: 0; 
-                padding: 0; 
+                margin: 0 !important; 
+                padding: 0 !important;
+                background: white !important;
             }
-            body * { visibility: hidden; }
-            .print-only, .print-only * { visibility: visible; }
+            body * { 
+                visibility: hidden !important; 
+            }
+            .print-only, .print-only * { 
+                visibility: visible !important; 
+            }
             .print-only {
-              position: absolute;
-              left: 0;
-              top: 0;
-              width: 100%;
+              position: absolute !important;
+              left: 0 !important;
+              top: 0 !important;
+              width: 100% !important;
+              padding: 10mm !important;
+              box-sizing: border-box !important;
             }
           }
         `}
