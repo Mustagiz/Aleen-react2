@@ -11,14 +11,29 @@ import {
     Card,
     CardContent,
     Divider,
-    Chip
+    Chip,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Checkbox,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    TableContainer,
+    TableSortLabel
 } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import {
     Print,
     Delete,
     Add,
-    QrCode
+    QrCode,
+    Search,
+    FilterList,
+    Close
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import JsBarcode from 'jsbarcode';
@@ -71,6 +86,13 @@ const BarcodeGenerator = () => {
     const { inventory, profile } = useData();
     const location = useLocation();
     const [selectedProducts, setSelectedProducts] = useState([]);
+    const [isBulkSelectOpen, setIsBulkSelectOpen] = useState(false);
+    const [tempSelectedIds, setTempSelectedIds] = useState([]);
+    const [dialogSearch, setDialogSearch] = useState('');
+    const [dialogCategory, setDialogCategory] = useState('');
+    const [dialogOrderBy, setDialogOrderBy] = useState('name');
+    const [dialogOrder, setDialogOrder] = useState('asc');
+
     const handleAddProduct = (product) => {
         if (!product) return;
         setSelectedProducts(prev => {
@@ -85,7 +107,6 @@ const BarcodeGenerator = () => {
     useEffect(() => {
         if (location.state?.product) {
             handleAddProduct(location.state.product);
-            // Clear location state to prevent re-adding on refresh
             window.history.replaceState({}, document.title);
         }
     }, [location.state]);
@@ -100,6 +121,48 @@ const BarcodeGenerator = () => {
         setSelectedProducts(selectedProducts.filter(p => p.id !== productId));
     };
 
+    const handleBulkSelectAdd = () => {
+        const productsToAdd = inventory.filter(item => tempSelectedIds.includes(item.id));
+        productsToAdd.forEach(item => handleAddProduct(item));
+        setIsBulkSelectOpen(false);
+        setTempSelectedIds([]);
+    };
+
+    const toggleSelectAll = (filteredItems) => {
+        if (tempSelectedIds.length === filteredItems.length) {
+            setTempSelectedIds([]);
+        } else {
+            setTempSelectedIds(filteredItems.map(item => item.id));
+        }
+    };
+
+    const handleDialogSort = (property) => {
+        const isAsc = dialogOrderBy === property && dialogOrder === 'asc';
+        setDialogOrder(isAsc ? 'desc' : 'asc');
+        setDialogOrderBy(property);
+    };
+
+    const filteredInventory = inventory.filter(item => {
+        const matchesSearch = item.name.toLowerCase().includes(dialogSearch.toLowerCase()) ||
+            (item.productId || '').toLowerCase().includes(dialogSearch.toLowerCase());
+        const matchesCategory = !dialogCategory || item.category === dialogCategory;
+        return matchesSearch && matchesCategory;
+    }).sort((a, b) => {
+        const isAsc = dialogOrder === 'asc';
+        const valA = (a[dialogOrderBy] || '').toString().toLowerCase();
+        const valB = (b[dialogOrderBy] || '').toString().toLowerCase();
+
+        if (dialogOrderBy === 'quantity' || dialogOrderBy === 'price') {
+            return isAsc ? (a[dialogOrderBy] - b[dialogOrderBy]) : (b[dialogOrderBy] - a[dialogOrderBy]);
+        }
+
+        if (valA < valB) return isAsc ? -1 : 1;
+        if (valA > valB) return isAsc ? 1 : -1;
+        return 0;
+    });
+
+    const categories = Array.from(new Set(inventory.map(item => item.category)));
+
     const handlePrint = () => {
         window.print();
     };
@@ -111,15 +174,25 @@ const BarcodeGenerator = () => {
                     <Typography variant="h4" sx={{ fontWeight: 800 }}>Barcode Labels</Typography>
                     <Typography variant="body2" color="text.secondary">Generate and print professional price tags</Typography>
                 </Box>
-                <Button
-                    variant="contained"
-                    startIcon={<Print />}
-                    onClick={handlePrint}
-                    disabled={selectedProducts.length === 0}
-                    sx={{ px: 4, py: 1.5, borderRadius: 2, fontWeight: 700 }}
-                >
-                    Print Labels
-                </Button>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button
+                        variant="outlined"
+                        startIcon={<Add />}
+                        onClick={() => setIsBulkSelectOpen(true)}
+                        sx={{ px: 3, py: 1.5, borderRadius: 2, fontWeight: 700 }}
+                    >
+                        Bulk Select
+                    </Button>
+                    <Button
+                        variant="contained"
+                        startIcon={<Print />}
+                        onClick={handlePrint}
+                        disabled={selectedProducts.length === 0}
+                        sx={{ px: 4, py: 1.5, borderRadius: 2, fontWeight: 700 }}
+                    >
+                        Print Labels
+                    </Button>
+                </Box>
             </Box>
 
             <Paper sx={{ p: 3, mb: 4, borderRadius: 3 }}>
@@ -160,6 +233,110 @@ const BarcodeGenerator = () => {
                     ))}
                 </Grid>
             </Paper>
+
+            {/* Bulk Select Dialog */}
+            <Dialog open={isBulkSelectOpen} onClose={() => setIsBulkSelectOpen(false)} maxWidth="md" fullWidth>
+                <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    Bulk Select Products
+                    <IconButton onClick={() => setIsBulkSelectOpen(false)} size="small"><Close /></IconButton>
+                </DialogTitle>
+                <DialogContent>
+                    <Box sx={{ mb: 3, mt: 1, display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+                        <TextField
+                            size="small"
+                            placeholder="Search by Name or ID..."
+                            value={dialogSearch}
+                            onChange={(e) => setDialogSearch(e.target.value)}
+                            InputProps={{ startAdornment: <Search size={20} sx={{ mr: 1, color: 'text.secondary' }} /> }}
+                            sx={{ flexGrow: 1 }}
+                        />
+                        <TextField
+                            select
+                            size="small"
+                            label="Category"
+                            value={dialogCategory}
+                            onChange={(e) => setDialogCategory(e.target.value)}
+                            sx={{ minWidth: 150 }}
+                            SelectProps={{ native: true }}
+                        >
+                            <option value="">All Categories</option>
+                            {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                        </TextField>
+                    </Box>
+
+                    <TableContainer sx={{ maxHeight: 400 }}>
+                        <Table stickyHeader size="small">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell padding="checkbox">
+                                        <Checkbox
+                                            indeterminate={tempSelectedIds.length > 0 && tempSelectedIds.length < filteredInventory.length}
+                                            checked={filteredInventory.length > 0 && tempSelectedIds.length === filteredInventory.length}
+                                            onChange={() => toggleSelectAll(filteredInventory)}
+                                        />
+                                    </TableCell>
+                                    <TableCell>
+                                        <TableSortLabel
+                                            active={dialogOrderBy === 'name'}
+                                            direction={dialogOrderBy === 'name' ? dialogOrder : 'asc'}
+                                            onClick={() => handleDialogSort('name')}
+                                        >
+                                            Product Name
+                                        </TableSortLabel>
+                                    </TableCell>
+                                    <TableCell>
+                                        <TableSortLabel
+                                            active={dialogOrderBy === 'productId'}
+                                            direction={dialogOrderBy === 'productId' ? dialogOrder : 'asc'}
+                                            onClick={() => handleDialogSort('productId')}
+                                        >
+                                            Product ID
+                                        </TableSortLabel>
+                                    </TableCell>
+                                    <TableCell>Category</TableCell>
+                                    <TableCell align="right">
+                                        <TableSortLabel
+                                            active={dialogOrderBy === 'quantity'}
+                                            direction={dialogOrderBy === 'quantity' ? dialogOrder : 'asc'}
+                                            onClick={() => handleDialogSort('quantity')}
+                                        >
+                                            Stock
+                                        </TableSortLabel>
+                                    </TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {filteredInventory.map((item) => (
+                                    <TableRow key={item.id} hover onClick={() => {
+                                        setTempSelectedIds(prev =>
+                                            prev.includes(item.id) ? prev.filter(id => id !== item.id) : [...prev, item.id]
+                                        );
+                                    }} sx={{ cursor: 'pointer' }}>
+                                        <TableCell padding="checkbox">
+                                            <Checkbox checked={tempSelectedIds.includes(item.id)} />
+                                        </TableCell>
+                                        <TableCell sx={{ fontWeight: 600 }}>{item.name}</TableCell>
+                                        <TableCell>{item.productId}</TableCell>
+                                        <TableCell>
+                                            <Chip label={item.category} size="small" variant="outlined" />
+                                        </TableCell>
+                                        <TableCell align="right" sx={{ fontWeight: 700 }}>{item.quantity}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </DialogContent>
+                <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
+                    <Typography variant="body2" sx={{ flexGrow: 1, ml: 1 }}>
+                        {tempSelectedIds.length} items selected
+                    </Typography>
+                    <Button onClick={() => setIsBulkSelectOpen(false)}>Cancel</Button>
+                    <Button variant="contained" onClick={handleBulkSelectAdd} disabled={tempSelectedIds.length === 0}>
+                        Add Selected
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
             {/* Print Preview Area (Hidden on Screen, Visible on Print) */}
             <Box className="print-only" sx={{ display: 'none', '@media print': { display: 'block' } }}>

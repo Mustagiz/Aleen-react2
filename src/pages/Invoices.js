@@ -44,6 +44,12 @@ const Invoices = () => {
     }
   };
 
+  const playVibration = () => {
+    if ("vibrate" in navigator) {
+      navigator.vibrate(50); // Short 50ms vibration
+    }
+  };
+
   React.useEffect(() => {
     const handleKeyDown = (e) => {
       // Alt + N: New Invoice
@@ -125,6 +131,7 @@ const Invoices = () => {
 
             if (matchedProduct) {
               playBeep();
+              playVibration();
               const emptyIndex = selectedItems.findIndex(item => !item.id);
               if (emptyIndex !== -1) {
                 handleItemChange(emptyIndex, 'id', matchedProduct.id);
@@ -145,6 +152,7 @@ const Invoices = () => {
 
             if (matchedProduct) {
               playBeep();
+              playVibration();
               const emptyIndex = selectedItems.findIndex(item => !item.id);
               if (emptyIndex !== -1) {
                 handleItemChange(emptyIndex, 'id', matchedProduct.id);
