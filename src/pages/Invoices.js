@@ -40,7 +40,8 @@ const Invoices = () => {
     setPage(0);
   };
   const [selectedItems, setSelectedItems] = useState([]);
-  const [discount, setDiscount] = useState(0);
+  const [discountPercent, setDiscountPercent] = useState(0);
+  const [discountAmount, setDiscountAmount] = useState(0);
   const [tax, setTax] = useState(0);
   const [customer, setCustomer] = useState('');
   const [phone, setPhone] = useState('+91');
@@ -51,12 +52,11 @@ const Invoices = () => {
   const [dateFilter, setDateFilter] = useState('');
   const [paymentFilter, setPaymentFilter] = useState('All');
   const [showFilters, setShowFilters] = useState(false);
-  const [globalItemFilter, setGlobalItemFilter] = useState('');
   // Split Payment State
   const [isSplitPayment, setIsSplitPayment] = useState(false);
   const [splitAmount, setSplitAmount] = useState(0);
   const [paymentMethod2, setPaymentMethod2] = useState('Card');
-  const [discountType, setDiscountType] = useState('percent'); // 'percent' or 'fixed'
+
   const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().split('T')[0]);
 
   const theme = useTheme();
@@ -124,12 +124,8 @@ const Invoices = () => {
     }, 0);
     const taxAmount = subtotal * (tax / 100);
 
-    let absDiscount = 0;
-    if (discountType === 'percent') {
-      absDiscount = subtotal * (discount / 100);
-    } else {
-      absDiscount = discount; // Fixed amount
-    }
+    const percentDisc = subtotal * (discountPercent / 100);
+    const absDiscount = percentDisc + discountAmount;
 
     const total = subtotal + taxAmount - absDiscount;
     return { subtotal, taxAmount, total, absDiscount };
@@ -198,13 +194,15 @@ const Invoices = () => {
       tax: taxAmount,
       gst: tax,
       discount: absDiscount,
-      discountPercentage: discount,
+      discountPercent: discountPercent,
+      discountAmount: discountAmount,
       total
     };
     await addInvoice(invoice);
     setOpen(false);
     setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0 }]);
-    setDiscount(0);
+    setDiscountPercent(0);
+    setDiscountAmount(0);
     setCustomer('');
     setPhone('+91');
     setInvoiceDate(new Date().toISOString().split('T')[0]);
@@ -212,7 +210,7 @@ const Invoices = () => {
     setPaymentMethod('Cash');
     setIsSplitPayment(false);
     setSplitAmount(0);
-    setDiscountType('percent');
+
   };
 
   const downloadInvoices = () => {
@@ -975,18 +973,7 @@ const Invoices = () => {
           <Paper sx={{ p: { xs: 1.5, sm: 2 }, mb: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2 }}>Invoice Items</Typography>
 
-            <Box sx={{ mb: 2, display: 'flex', gap: 2 }}>
-              <TextField
-                fullWidth
-                placeholder="Filter Products within rows (Name or ID)..."
-                value={globalItemFilter}
-                onChange={(e) => setGlobalItemFilter(e.target.value)}
-                size="small"
-                InputProps={{
-                  startAdornment: <FilterList sx={{ color: 'text.secondary', mr: 1 }} />
-                }}
-              />
-            </Box>
+
 
             <Box sx={{ mb: 2 }}>
               <TextField
@@ -1039,15 +1026,8 @@ const Invoices = () => {
               />
             </Box>
             {selectedItems.map((item, index) => {
-              // Filter inventory based on globalItemFilter
-              // Filter inventory based on globalItemFilter AND quantity > 0
-              const filteredInventory = inventory.filter(inv =>
-                ((parseInt(inv.currentQty || inv.quantity) || 0) > 0) &&
-                (!globalItemFilter ||
-                  inv.name.toLowerCase().includes(globalItemFilter.toLowerCase()) ||
-                  (inv.productId && inv.productId.toLowerCase().includes(globalItemFilter.toLowerCase()))
-                )
-              );
+              // Filter inventory based quantity > 0
+              const filteredInventory = inventory.filter(inv => (parseInt(inv.currentQty || inv.quantity) || 0) > 0);
 
               return (
                 <Box key={index} sx={{
@@ -1240,23 +1220,21 @@ const Invoices = () => {
               <TextField label="GST (%)" type="number" size="small" value={tax} onChange={(e) => setTax(parseFloat(e.target.value) || 0)} fullWidth />
               <Box sx={{ display: 'flex', gap: 1, width: '100%' }}>
                 <TextField
-                  label={`Discount (${discountType === 'percent' ? '%' : '₹'})`}
+                  label="Discount (%)"
                   type="number"
                   size="small"
-                  value={discount}
-                  onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
+                  value={discountPercent}
+                  onChange={(e) => setDiscountPercent(parseFloat(e.target.value) || 0)}
                   fullWidth
                 />
                 <TextField
-                  select
-                  value={discountType}
-                  onChange={(e) => setDiscountType(e.target.value)}
+                  label="Discount (₹)"
+                  type="number"
                   size="small"
-                  sx={{ width: 100 }}
-                >
-                  <MenuItem value="percent">%</MenuItem>
-                  <MenuItem value="fixed">₹</MenuItem>
-                </TextField>
+                  value={discountAmount}
+                  onChange={(e) => setDiscountAmount(parseFloat(e.target.value) || 0)}
+                  fullWidth
+                />
               </Box>
             </Box>
             <Box sx={{ mt: 3, p: 2, bgcolor: mode === 'light' ? 'primary.light' : 'rgba(255, 255, 255, 0.05)', borderRadius: 2 }}>
@@ -1269,7 +1247,7 @@ const Invoices = () => {
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>₹{taxAmount.toFixed(2).toLocaleString()}</Typography>
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                <Typography variant="body2">Discount ({discount}{discountType === 'percent' ? '%' : '₹'}):</Typography>
+                <Typography variant="body2">Discount (Total):</Typography>
                 <Typography variant="body2" sx={{ fontWeight: 600, color: 'error.main' }}>- ₹{absDiscount.toFixed(2).toLocaleString()}</Typography>
               </Box>
               <Divider sx={{ my: 1.5 }} />
