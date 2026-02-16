@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Grid, Card, CardContent, Button, Chip, TextField, Paper, IconButton, Avatar, useTheme, Divider, Tooltip } from '@mui/material';
+import { Box, Typography, Grid, Card, CardContent, Button, Chip, TextField, Paper, IconButton, Avatar, useTheme, Divider, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions, List, ListItem, ListItemAvatar, ListItemText, InputAdornment } from '@mui/material';
 import { WhatsApp, ShoppingBag, Event, Search, MoreVert, TrendingUp, Group, Warning, Celebration, Send } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 
@@ -7,6 +7,9 @@ const Marketing = () => {
     const { customers, invoices, profile } = useData();
     const theme = useTheme();
     const [search, setSearch] = useState('');
+    const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
+    const [selectedTemplate, setSelectedTemplate] = useState(null);
+    const [customerFilter, setCustomerFilter] = useState('');
 
     const today = new Date();
 
@@ -53,6 +56,42 @@ const Marketing = () => {
         const phone = customer.phone.replace(/\D/g, '');
         const cleanPhone = phone.startsWith('91') ? phone : `91${phone}`;
         const url = `https://wa.me/${cleanPhone}/?text=${encodeURIComponent(message)}`;
+        window.open(url, '_blank');
+    };
+
+    const templates = [
+        {
+            id: 'festival',
+            title: 'Festival Greeting',
+            message: `Celebrate the season with style! Get 20% off on all Sarees at ${profile.businessName}. Visit us today!`,
+            color: 'primary.main',
+            icon: <Celebration />
+        },
+        {
+            id: 'arrivals',
+            title: 'New Arrivals',
+            message: `Our new collection is here! 🌸 Explore the latest trends at ${profile.businessName}. Early birds get a special surprise!`,
+            color: '#10b981',
+            icon: <ShoppingBag />
+        },
+        {
+            id: 'sale',
+            title: 'Season Sale',
+            message: `End of season sale starting now! Up to 50% off on selected items at ${profile.businessName}. Don't miss out!`,
+            color: '#ef4444',
+            icon: <TrendingUp />
+        }
+    ];
+
+    const handleOpenTemplate = (template) => {
+        setSelectedTemplate(template);
+        setTemplateDialogOpen(true);
+    };
+
+    const handleSendTemplate = (customer) => {
+        const phone = customer.phone.replace(/\D/g, '');
+        const cleanPhone = phone.startsWith('91') ? phone : `91${phone}`;
+        const url = `https://wa.me/${cleanPhone}/?text=${encodeURIComponent(selectedTemplate.message)}`;
         window.open(url, '_blank');
     };
 
@@ -208,23 +247,123 @@ const Marketing = () => {
                     <Paper sx={{ p: 3, borderRadius: 4 }}>
                         <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>Campaign Templates</Typography>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            <Box sx={{ p: 2, borderRadius: 2, bgcolor: 'primary.light', border: '1px solid', borderColor: 'primary.main' }}>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>Festival Greeting</Typography>
-                                <Typography variant="caption" display="block" color="text.secondary">
-                                    "Special 20% off for the festive season..."
-                                </Typography>
-                            </Box>
-                            <Box sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50', border: '1px solid', borderColor: 'divider' }}>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>New Arrivals</Typography>
-                                <Typography variant="caption" display="block" color="text.secondary">
-                                    "Checkout our new collection of Kurtis..."
-                                </Typography>
-                            </Box>
+                            {templates.map((template) => (
+                                <Box
+                                    key={template.id}
+                                    onClick={() => handleOpenTemplate(template)}
+                                    sx={{
+                                        p: 2,
+                                        borderRadius: 2,
+                                        bgcolor: template.id === 'festival' ? 'primary.light' : 'grey.50',
+                                        border: '1px solid',
+                                        borderColor: template.id === 'festival' ? 'primary.main' : 'divider',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                        '&:hover': {
+                                            transform: 'translateX(4px)',
+                                            bgcolor: template.id === 'festival' ? 'primary.light' : 'white',
+                                            boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+                                        }
+                                    }}
+                                >
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                                        <Box sx={{ color: template.color, display: 'flex' }}>
+                                            {React.cloneElement(template.icon, { fontSize: 'small' })}
+                                        </Box>
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{template.title}</Typography>
+                                    </Box>
+                                    <Typography variant="caption" display="block" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                                        "{template.message.substring(0, 60)}..."
+                                    </Typography>
+                                </Box>
+                            ))}
                             <Button fullWidth variant="outlined" sx={{ borderRadius: 2, mt: 1 }}>Create Custom</Button>
                         </Box>
                     </Paper>
                 </Grid>
             </Grid>
+
+            {/* Template Send Dialog */}
+            <Dialog
+                open={templateDialogOpen}
+                onClose={() => setTemplateDialogOpen(false)}
+                maxWidth="sm"
+                fullWidth
+                PaperProps={{ sx: { borderRadius: 4 } }}
+            >
+                <DialogTitle sx={{ fontWeight: 800, pb: 1 }}>
+                    Send "{selectedTemplate?.title}"
+                </DialogTitle>
+                <DialogContent>
+                    <Typography variant="body2" sx={{
+                        p: 2,
+                        bgcolor: 'grey.50',
+                        borderRadius: 2,
+                        mb: 3,
+                        border: '1px dashed',
+                        borderColor: 'divider',
+                        fontStyle: 'italic',
+                        color: 'text.secondary'
+                    }}>
+                        "{selectedTemplate?.message}"
+                    </Typography>
+
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 2 }}>Select Customer to Send</Typography>
+
+                    <TextField
+                        fullWidth
+                        size="small"
+                        placeholder="Search customer by name or phone..."
+                        value={customerFilter}
+                        onChange={(e) => setCustomerFilter(e.target.value)}
+                        sx={{ mb: 2 }}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <Search fontSize="small" />
+                                </InputAdornment>
+                            )
+                        }}
+                    />
+
+                    <List sx={{ maxHeight: 300, overflow: 'auto' }}>
+                        {customers
+                            .filter(c =>
+                                c.name.toLowerCase().includes(customerFilter.toLowerCase()) ||
+                                c.phone.includes(customerFilter)
+                            )
+                            .slice(0, 50)
+                            .map((customer) => (
+                                <ListItem
+                                    key={customer.id}
+                                    secondaryAction={
+                                        <IconButton edge="end" color="primary" onClick={() => handleSendTemplate(customer)}>
+                                            <WhatsApp />
+                                        </IconButton>
+                                    }
+                                    sx={{
+                                        borderRadius: 2,
+                                        mb: 1,
+                                        '&:hover': { bgcolor: 'primary.light' }
+                                    }}
+                                >
+                                    <ListItemAvatar>
+                                        <Avatar sx={{ bgcolor: theme.palette.primary.main, fontSize: '0.8rem' }}>
+                                            {customer.name[0]}
+                                        </Avatar>
+                                    </ListItemAvatar>
+                                    <ListItemText
+                                        primary={<Typography sx={{ fontWeight: 700 }}>{customer.name}</Typography>}
+                                        secondary={customer.phone}
+                                    />
+                                </ListItem>
+                            ))}
+                    </List>
+                </DialogContent>
+                <DialogActions sx={{ p: 3, pt: 0 }}>
+                    <Button onClick={() => setTemplateDialogOpen(false)} sx={{ fontWeight: 700 }}>Close</Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 };
