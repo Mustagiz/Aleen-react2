@@ -65,18 +65,22 @@ const BarcodeItem = ({ value, businessName, productName, price }) => {
             p: 1.5,
             textAlign: 'center',
             borderRadius: '4px',
-            height: '160px',
+            height: '140px',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
             breakInside: 'avoid',
             bgcolor: 'white',
-            mb: 1
+            mb: 0,
+            '@media print': {
+                border: 'none',
+                width: '100%'
+            }
         }}>
             <Typography sx={{ fontSize: '9px', fontWeight: 800, mb: 0.5, color: 'text.primary', textTransform: 'uppercase' }}>{businessName}</Typography>
             <Typography sx={{ fontSize: '11px', fontWeight: 700, mb: 0, width: '100%', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{productName}</Typography>
-            <svg ref={barcodeRef} style={{ maxWidth: '100%' }}></svg>
+            <svg ref={barcodeRef} style={{ maxWidth: '100%', height: 'auto' }}></svg>
             <Typography sx={{ fontSize: '13px', fontWeight: 900 }}>₹{price}</Typography>
         </Box>
     );
@@ -342,9 +346,10 @@ const BarcodeGenerator = () => {
             <Box className="print-only" sx={{ display: 'none', '@media print': { display: 'block' } }}>
                 <Box sx={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(4, 1fr)',
-                    gap: '10px',
-                    p: '10px'
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: '5px',
+                    p: 0,
+                    width: '100%'
                 }}>
                     {selectedProducts.flatMap(product =>
                         Array.from({ length: product.labelCount }).map((_, i) => (
@@ -364,7 +369,14 @@ const BarcodeGenerator = () => {
             <style>
                 {`
           @media print {
-            @page { margin: 0; }
+            @page { 
+                margin: 10mm; 
+                size: portrait;
+            }
+            body { 
+                margin: 0; 
+                padding: 0; 
+            }
             body * { visibility: hidden; }
             .print-only, .print-only * { visibility: visible; }
             .print-only {
