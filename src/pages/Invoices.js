@@ -1,7 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel } from '@mui/material';
 import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, FilterList, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt } from '@mui/icons-material';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
 import { useData } from '../contexts/DataContext';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 import { generateInvoiceNumber } from '../utils/helpers';
@@ -72,38 +72,93 @@ const Invoices = () => {
   const [splitAmount, setSplitAmount] = useState(0);
   const [paymentMethod2, setPaymentMethod2] = useState('Card');
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [scannerError, setScannerError] = useState('');
+  const [scannerStatus, setScannerStatus] = useState('Initializing...');
 
-  React.useEffect(() => {
-    if (scannerOpen) {
-      const scanner = new Html5QrcodeScanner('reader', {
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
-        rememberLastUsedCamera: true,
-        showTorchButtonIfSupported: true
-      });
+  useEffect(() => {
+    let html5QrCode;
 
-      scanner.render((decodedText) => {
-        const matchedProduct = inventory.find(inv =>
-          inv.productId && inv.productId.toLowerCase() === decodedText.toLowerCase().trim() && (parseInt(inv.quantity) || 0) > 0
-        );
+    const startScanner = async () => {
+      setScannerError('');
+      setScannerStatus('Checking permissions...');
 
-        if (matchedProduct) {
-          const emptyIndex = selectedItems.findIndex(item => !item.id);
-          if (emptyIndex !== -1) {
-            handleItemChange(emptyIndex, 'id', matchedProduct.id);
-          } else {
-            setSelectedItems([...selectedItems, { id: matchedProduct.id, quantity: 1 }]);
-          }
-          scanner.clear();
-          setScannerOpen(false);
+      try {
+        const cameras = await Html5Qrcode.getCameras();
+        if (!cameras || cameras.length === 0) {
+          setScannerError('No cameras found on this device.');
+          return;
         }
-      }, (error) => {
-        // Ignore errors
-      });
 
-      return () => scanner.clear();
+        html5QrCode = new Html5Qrcode("reader");
+        setScannerStatus('Starting camera...');
+
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+        await html5QrCode.start(
+          { facingMode: "environment" },
+          config,
+          (decodedText) => {
+            const matchedProduct = inventory.find(inv =>
+              inv.productId && inv.productId.toLowerCase() === decodedText.toLowerCase().trim() && (parseInt(inv.quantity) || 0) > 0
+            );
+
+            if (matchedProduct) {
+              const emptyIndex = selectedItems.findIndex(item => !item.id);
+              if (emptyIndex !== -1) {
+                handleItemChange(emptyIndex, 'id', matchedProduct.id);
+              } else {
+                setSelectedItems([...selectedItems, { id: matchedProduct.id, quantity: 1 }]);
+              }
+              stopScanner();
+              setScannerOpen(false);
+            }
+          }
+        ).catch(err => {
+          // Fallback if environment camera fails
+          console.warn("Environment camera failed, trying user camera:", err);
+          return html5QrCode.start({ facingMode: "user" }, config, (decodedText) => {
+            const matchedProduct = inventory.find(inv =>
+              inv.productId && inv.productId.toLowerCase() === decodedText.toLowerCase().trim() && (parseInt(inv.quantity) || 0) > 0
+            );
+
+            if (matchedProduct) {
+              const emptyIndex = selectedItems.findIndex(item => !item.id);
+              if (emptyIndex !== -1) {
+                handleItemChange(emptyIndex, 'id', matchedProduct.id);
+              } else {
+                setSelectedItems([...selectedItems, { id: matchedProduct.id, quantity: 1 }]);
+              }
+              stopScanner();
+              setScannerOpen(false);
+            }
+          });
+        });
+        setScannerStatus('Scanning...');
+      } catch (err) {
+        console.error("Scanner error:", err);
+        setScannerError(`Camera failed: ${err.message || 'Check permissions'}`);
+      }
+    };
+
+    const stopScanner = async () => {
+      if (html5QrCode && html5QrCode.isScanning) {
+        try {
+          await html5QrCode.stop();
+          html5QrCode.clear();
+        } catch (err) {
+          console.error("Failed to stop scanner:", err);
+        }
+      }
+    };
+
+    if (scannerOpen) {
+      const timer = setTimeout(() => startScanner(), 500);
+      return () => {
+        clearTimeout(timer);
+        stopScanner();
+      };
     }
-  }, [scannerOpen, inventory, selectedItems]); // Added dependencies for safety
+  }, [scannerOpen, inventory, selectedItems]);
 
   const getCurrentDateTime = () => {
     const now = new Date();
@@ -1137,10 +1192,39 @@ const Invoices = () => {
                 Scan Product Barcode
                 <IconButton onClick={() => setScannerOpen(false)} size="small"><Close /></IconButton>
               </DialogTitle>
-              <DialogContent>
-                <Box id="reader" sx={{ width: '100%' }} />
-                <Typography variant="caption" sx={{ mt: 2, display: 'block', textAlign: 'center', color: 'text.secondary' }}>
-                  Point your camera at a product barcode to add it automatically.
+              <DialogContent sx={{ textAlign: 'center' }}>
+                <Box id="reader" sx={{ width: '100%', minHeight: '250px', bgcolor: '#000', borderRadius: 2, overflow: 'hidden', mb: 2 }} />
+
+                {scannerError ? (
+                  <Box sx={{ color: 'error.main', mb: 2 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{scannerError}</Typography>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      color="error"
+                      onClick={() => setScannerOpen(false)}
+                      sx={{ mt: 1, mr: 1 }}
+                    >
+                      Close
+                    </Button>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      color="primary"
+                      onClick={() => { setScannerOpen(false); setTimeout(() => setScannerOpen(true), 500); }}
+                      sx={{ mt: 1 }}
+                    >
+                      Retry
+                    </Button>
+                  </Box>
+                ) : (
+                  <Typography variant="body2" color="primary" sx={{ fontWeight: 600, mb: 1 }}>
+                    {scannerStatus}
+                  </Typography>
+                )}
+
+                <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary' }}>
+                  Point your camera at a product barcode.
                 </Typography>
               </DialogContent>
             </Dialog>
