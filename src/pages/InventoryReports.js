@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Paper, Typography, TextField, Button, Table, TableBody, TableCell, TableHead, TableRow, MenuItem, TableContainer, Card, CardContent, Grid, Chip, useMediaQuery, useTheme, Divider, TablePagination } from '@mui/material';
 import { useData } from '../contexts/DataContext';
-import { Download, Inventory2, Warning, TrendingUp, History, ListAlt, TrendingDown } from '@mui/icons-material';
+import { Download, Inventory2, Warning, TrendingUp, History, ListAlt, TrendingDown, AttachMoney } from '@mui/icons-material';
 import { formatCurrencyForPDF, generateReportPDF } from '../utils/helpers';
 
 const InventoryReports = () => {
