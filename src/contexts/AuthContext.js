@@ -14,25 +14,35 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        // Fetch user role from Firestore
-        const userDocRef = doc(db, 'users', firebaseUser.uid);
-        const userDoc = await getDoc(userDocRef);
+        try {
+          // Fetch user role from Firestore
+          const userDocRef = doc(db, 'users', firebaseUser.uid);
+          const userDoc = await getDoc(userDocRef);
 
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          setUser({ ...firebaseUser, ...userData, role: userData.role || 'cashier' }); // Default to cashier if no role
-        } else {
-          // If no firestore doc exists yet (manual console creation), treat as admin for now or handle gracefully
-          // For safety in this migration phase, if email is 'admin@aleen.com', give admin role
-          const role = firebaseUser.email === 'admin@aleen.com' ? 'admin' : 'cashier';
-          setUser({ ...firebaseUser, role });
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setUser({ ...firebaseUser, ...userData, role: userData.role || 'cashier' }); // Default to cashier if no role
+          } else {
+            // If no firestore doc exists yet (manual console creation), treat as admin for now or handle gracefully
+            // For safety in this migration phase, if email is 'admin@aleen.com', give admin role
+            const role = firebaseUser.email === 'admin@aleen.com' ? 'admin' : 'cashier';
+            setUser({ ...firebaseUser, role });
 
-          // Create the doc so it exists next time
-          await setDoc(userDocRef, {
-            email: firebaseUser.email,
-            role,
-            createdAt: new Date().toISOString()
-          });
+            // Create the doc so it exists next time
+            try {
+              await setDoc(userDocRef, {
+                email: firebaseUser.email,
+                role,
+                createdAt: new Date().toISOString()
+              });
+            } catch (docError) {
+              console.error("Error creating user profile:", docError);
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          // Fallback to allow login even if Firestore fails
+          setUser({ ...firebaseUser, role: 'cashier' });
         }
       } else {
         setUser(null);
