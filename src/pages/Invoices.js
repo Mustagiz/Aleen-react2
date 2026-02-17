@@ -100,6 +100,9 @@ const Invoices = () => {
   const [isSplitPayment, setIsSplitPayment] = useState(false);
   const [splitAmount, setSplitAmount] = useState(0);
   const [paymentMethod2, setPaymentMethod2] = useState('Card');
+  const [upiTransactionId, setUpiTransactionId] = useState('');
+  const [upiTransactionId2, setUpiTransactionId2] = useState('');
+  const [paymentStatus, setPaymentStatus] = useState('paid');
   const [scannerOpen, setScannerOpen] = useState(false);
   const [scannerError, setScannerError] = useState('');
   const [scannerStatus, setScannerStatus] = useState('Initializing...');
@@ -344,7 +347,29 @@ const Invoices = () => {
       discount: absDiscount,
       discountPercent: parseFloat(discountPercent) || 0,
       discountAmount: parseFloat(discountAmount) || 0,
-      total
+      total,
+      paymentStatus,
+      payments: isSplitPayment ? [
+        {
+          method: paymentMethod,
+          amount: total - splitAmount,
+          transactionId: (paymentMethod === 'UPI' || paymentMethod === 'Card') ? upiTransactionId : '',
+          timestamp: new Date().toISOString()
+        },
+        {
+          method: paymentMethod2,
+          amount: splitAmount,
+          transactionId: (paymentMethod2 === 'UPI' || paymentMethod2 === 'Card') ? upiTransactionId2 : '',
+          timestamp: new Date().toISOString()
+        }
+      ] : [
+        {
+          method: paymentMethod,
+          amount: total,
+          transactionId: (paymentMethod === 'UPI' || paymentMethod === 'Card') ? upiTransactionId : '',
+          timestamp: new Date().toISOString()
+        }
+      ]
     };
     await addInvoice(invoice);
     setOpen(false);
@@ -360,6 +385,10 @@ const Invoices = () => {
     setPaymentMethod('Cash');
     setIsSplitPayment(false);
     setSplitAmount(0);
+    setPaymentMethod2('Card');
+    setUpiTransactionId('');
+    setUpiTransactionId2('');
+    setPaymentStatus('paid');
 
   };
 
@@ -1416,12 +1445,38 @@ const Invoices = () => {
             </Box>
 
             {!isSplitPayment ? (
-              <TextField select label="Payment Method" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} fullWidth size="small">
-                <MenuItem value="Cash">Cash</MenuItem>
-                <MenuItem value="Card">Card</MenuItem>
-                <MenuItem value="UPI">UPI</MenuItem>
-                <MenuItem value="Net Banking">Net Banking</MenuItem>
-              </TextField>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <TextField select label="Payment Method" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} fullWidth size="small">
+                  <MenuItem value="Cash">Cash</MenuItem>
+                  <MenuItem value="Card">Card</MenuItem>
+                  <MenuItem value="UPI">UPI</MenuItem>
+                  <MenuItem value="Net Banking">Net Banking</MenuItem>
+                  <MenuItem value="Credit">Credit (Pay Later)</MenuItem>
+                </TextField>
+                {(paymentMethod === 'UPI' || paymentMethod === 'Card') && (
+                  <TextField
+                    label={`${paymentMethod} Transaction ID`}
+                    placeholder="Enter transaction/reference ID"
+                    value={upiTransactionId}
+                    onChange={(e) => setUpiTransactionId(e.target.value)}
+                    fullWidth
+                    size="small"
+                    helperText="Optional: For record keeping"
+                  />
+                )}
+                <TextField
+                  select
+                  label="Payment Status"
+                  value={paymentStatus}
+                  onChange={(e) => setPaymentStatus(e.target.value)}
+                  fullWidth
+                  size="small"
+                >
+                  <MenuItem value="paid">Paid</MenuItem>
+                  <MenuItem value="partial">Partially Paid</MenuItem>
+                  <MenuItem value="pending">Pending</MenuItem>
+                </TextField>
+              </Box>
             ) : (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <Box sx={{ display: 'flex', gap: 1.5, flexDirection: { xs: 'column', sm: 'row' } }}>
@@ -1430,6 +1485,7 @@ const Invoices = () => {
                     <MenuItem value="Card">Card</MenuItem>
                     <MenuItem value="UPI">UPI</MenuItem>
                     <MenuItem value="Net Banking">Net Banking</MenuItem>
+                    <MenuItem value="Credit">Credit</MenuItem>
                   </TextField>
                   <TextField
                     label="Amount 1"
@@ -1440,12 +1496,23 @@ const Invoices = () => {
                     size="small"
                   />
                 </Box>
+                {(paymentMethod === 'UPI' || paymentMethod === 'Card') && (
+                  <TextField
+                    label={`${paymentMethod} Transaction ID`}
+                    placeholder="Transaction ID for Method 1"
+                    value={upiTransactionId}
+                    onChange={(e) => setUpiTransactionId(e.target.value)}
+                    fullWidth
+                    size="small"
+                  />
+                )}
                 <Box sx={{ display: 'flex', gap: 1.5, flexDirection: { xs: 'column', sm: 'row' } }}>
                   <TextField select label="Method 2" value={paymentMethod2} onChange={(e) => setPaymentMethod2(e.target.value)} fullWidth size="small">
                     <MenuItem value="Cash">Cash</MenuItem>
                     <MenuItem value="Card">Card</MenuItem>
                     <MenuItem value="UPI">UPI</MenuItem>
                     <MenuItem value="Net Banking">Net Banking</MenuItem>
+                    <MenuItem value="Credit">Credit</MenuItem>
                   </TextField>
                   <TextField
                     label="Amount 2"
@@ -1456,6 +1523,16 @@ const Invoices = () => {
                     helperText="Auto-calculated remainder"
                   />
                 </Box>
+                {(paymentMethod2 === 'UPI' || paymentMethod2 === 'Card') && (
+                  <TextField
+                    label={`${paymentMethod2} Transaction ID`}
+                    placeholder="Transaction ID for Method 2"
+                    value={upiTransactionId2}
+                    onChange={(e) => setUpiTransactionId2(e.target.value)}
+                    fullWidth
+                    size="small"
+                  />
+                )}
               </Box>
             )}
             <Box sx={{ display: 'flex', gap: 2, mt: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
