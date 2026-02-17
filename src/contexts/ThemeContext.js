@@ -24,28 +24,28 @@ export const ThemeProvider = ({ children }) => {
             palette: {
                 mode,
                 primary: {
-                    main: '#d97706', // Warm Amber
-                    light: '#fbbf24',
-                    dark: '#b45309',
+                    main: '#B76E79', // Rose Gold
+                    light: '#D4A5A9',
+                    dark: '#8E5059',
                     contrastText: '#ffffff'
                 },
                 secondary: {
-                    main: '#f97316', // Warm Coral
-                    light: '#fb923c',
-                    dark: '#ea580c',
+                    main: '#F472B6', // Pink highlight
+                    light: '#F9A8D4',
+                    dark: '#BE185D',
                     contrastText: '#ffffff'
                 },
                 background: {
-                    default: mode === 'light' ? '#fffbeb' : '#121212', // Warm cream
-                    paper: mode === 'light' ? '#ffffff' : '#1e1e1e'
+                    default: mode === 'light' ? '#FFF5F6' : '#0B0B14', // Very light pink vs Deep Midnight
+                    paper: mode === 'light' ? '#ffffff' : '#151521'
                 },
-                success: { main: '#43a047' },
-                error: { main: '#e53935' },
-                warning: { main: '#fb8c00' },
-                info: { main: '#0288d1' },
+                success: { main: '#10B981' },
+                error: { main: '#EF4444' },
+                warning: { main: '#F59E0B' },
+                info: { main: '#3B82F6' },
                 text: {
-                    primary: mode === 'light' ? '#4A4A4A' : '#e0e0e0',
-                    secondary: mode === 'light' ? '#8E8E8E' : '#90a4ae'
+                    primary: mode === 'light' ? '#374151' : '#F3F4F6',
+                    secondary: mode === 'light' ? '#6B7280' : '#9CA3AF'
                 }
             },
             typography: {
@@ -69,7 +69,7 @@ export const ThemeProvider = ({ children }) => {
                             transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                             '&:hover': {
                                 transform: 'translateY(-2px)',
-                                boxShadow: mode === 'light' ? '0 4px 12px rgba(217, 119, 6, 0.2)' : '0 4px 12px rgba(0,0,0,0.4)',
+                                boxShadow: mode === 'light' ? '0 4px 12px rgba(183, 110, 121, 0.2)' : '0 4px 12px rgba(0,0,0,0.4)',
                             },
                             '&:active': {
                                 transform: 'translateY(0) scale(0.98)',
@@ -77,7 +77,7 @@ export const ThemeProvider = ({ children }) => {
                         },
                         contained: {
                             '&:hover': {
-                                boxShadow: '0 6px 15px rgba(217, 119, 6, 0.3)'
+                                boxShadow: '0 6px 15px rgba(183, 110, 121, 0.3)'
                             }
                         }
                     }
@@ -86,7 +86,7 @@ export const ThemeProvider = ({ children }) => {
                     styleOverrides: {
                         root: {
                             borderRadius: 12,
-                            boxShadow: mode === 'light' ? '0 10px 25px -5px rgba(217, 119, 6, 0.15), 0 8px 10px -6px rgba(217, 119, 6, 0.1)' : '0 4px 20px rgba(0,0,0,0.4)',
+                            boxShadow: mode === 'light' ? '0 10px 25px -5px rgba(183, 110, 121, 0.1), 0 8px 10px -6px rgba(183, 110, 121, 0.05)' : '0 4px 20px rgba(0,0,0,0.4)',
                             backgroundImage: 'none'
                         }
                     }
@@ -95,9 +95,9 @@ export const ThemeProvider = ({ children }) => {
                     styleOverrides: {
                         root: {
                             borderRadius: 12,
-                            boxShadow: mode === 'light' ? '0 10px 25px -5px rgba(217, 119, 6, 0.15), 0 8px 10px -6px rgba(217, 119, 6, 0.1)' : '0 4px 20px rgba(0,0,0,0.4)',
+                            boxShadow: mode === 'light' ? '0 10px 25px -5px rgba(183, 110, 121, 0.1), 0 8px 10px -6px rgba(183, 110, 121, 0.05)' : '0 4px 20px rgba(0,0,0,0.4)',
                             backgroundImage: 'none',
-                            border: mode === 'light' ? '1px solid rgba(217, 119, 6, 0.1)' : '1px solid rgba(255,255,255,0.05)'
+                            border: mode === 'light' ? '1px solid rgba(183, 110, 121, 0.1)' : '1px solid rgba(255,255,255,0.05)'
                         }
                     }
                 },

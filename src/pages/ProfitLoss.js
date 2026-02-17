@@ -5,6 +5,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, 
 import { Bar, Line, Doughnut } from 'react-chartjs-2';
 import { useData } from '../contexts/DataContext';
 import { exportToCSV, formatCurrencyForPDF, generateReportPDF } from '../utils/helpers';
+import GlassCard from '../components/GlassCard';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend);
 
@@ -225,7 +226,7 @@ const ProfitLoss = () => {
       <Typography variant="h4" gutterBottom sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>Profit & Loss Report</Typography>
 
       {/* Filters */}
-      <Paper sx={{ p: 3, mb: 3, borderRadius: 3 }}>
+      <GlassCard sx={{ p: 3, mb: 3 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6} md={3}>
             <TextField label="From Date" type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} InputLabelProps={{ shrink: true }} fullWidth />
@@ -242,117 +243,79 @@ const ProfitLoss = () => {
             <TextField label="Search Item" value={itemFilter} onChange={(e) => setItemFilter(e.target.value)} fullWidth />
           </Grid>
         </Grid>
-      </Paper>
+      </GlassCard>
 
       {/* Summary Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} lg={2.4}>
-          <Card sx={{
-            p: 2.5,
-            position: 'relative',
-            overflow: 'hidden',
-            boxShadow: '0 10px 25px -5px rgba(225, 29, 72, 0.15)',
-            border: '1px solid rgba(225, 29, 72, 0.15)',
-            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(225, 29, 72, 0.05) 100%)`,
-            transition: 'all 0.3s ease',
-            '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(225, 29, 72, 0.3)' }
-          }}>
-            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#E11D48' }} />
-            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.65rem' }}>Revenue</Typography>
-            <Typography variant="h5" sx={{ fontWeight: 800, mt: 0.5 }}>₹{totalRevenue.toLocaleString()}</Typography>
-          </Card>
+          <GlassCard sx={{ height: '100%', p: 0 }}>
+            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#E11D48' }} />
+            <CardContent sx={{ p: 2.5 }}>
+              <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Revenue</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 900, mt: 0.5 }}>₹{totalRevenue.toLocaleString()}</Typography>
+            </CardContent>
+          </GlassCard>
         </Grid>
         <Grid item xs={12} sm={6} lg={2.4}>
-          <Card sx={{
-            p: 2.5,
-            position: 'relative',
-            overflow: 'hidden',
-            boxShadow: '0 10px 25px -5px rgba(183, 110, 121, 0.15)',
-            border: '1px solid rgba(183, 110, 121, 0.15)',
-            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(183, 110, 121, 0.05) 100%)`,
-            transition: 'all 0.3s ease',
-            '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(183, 110, 121, 0.3)' }
-          }}>
-            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#B76E79' }} />
-            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.65rem' }}>COGS</Typography>
-            <Typography variant="h5" sx={{ fontWeight: 800, mt: 0.5 }}>₹{totalCost.toLocaleString()}</Typography>
-          </Card>
+          <GlassCard sx={{ height: '100%', p: 0 }}>
+            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#B76E79' }} />
+            <CardContent sx={{ p: 2.5 }}>
+              <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>COGS</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 900, mt: 0.5 }}>₹{totalCost.toLocaleString()}</Typography>
+            </CardContent>
+          </GlassCard>
         </Grid>
         <Grid item xs={12} sm={6} lg={2.4}>
-          <Card sx={{
-            p: 2.5,
-            position: 'relative',
-            overflow: 'hidden',
-            boxShadow: '0 10px 25px -5px rgba(245, 158, 11, 0.15)',
-            border: '1px solid rgba(245, 158, 11, 0.15)',
-            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(245, 158, 11, 0.05) 100%)`,
-            transition: 'all 0.3s ease',
-            '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(245, 158, 11, 0.3)' }
-          }}>
-            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#f59e0b' }} />
-            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.65rem' }}>Expenses</Typography>
-            <Typography variant="h5" sx={{ fontWeight: 800, mt: 0.5, color: 'error.main' }}>- ₹{expenseTotal.toLocaleString()}</Typography>
-          </Card>
+          <GlassCard sx={{ height: '100%', p: 0 }}>
+            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#f59e0b' }} />
+            <CardContent sx={{ p: 2.5 }}>
+              <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Expenses</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 900, mt: 0.5, color: 'error.main' }}>- ₹{expenseTotal.toLocaleString()}</Typography>
+            </CardContent>
+          </GlassCard>
         </Grid>
         <Grid item xs={12} sm={6} lg={2.4}>
-          <Card sx={{
-            p: 2.5,
-            position: 'relative',
-            overflow: 'hidden',
-            boxShadow: totalProfit >= 0 ? '0 10px 25px -5px rgba(67, 160, 71, 0.15)' : '0 10px 25px -5px rgba(229, 57, 53, 0.15)',
-            border: totalProfit >= 0 ? '1px solid rgba(67, 160, 71, 0.15)' : '1px solid rgba(229, 57, 53, 0.15)',
-            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${totalProfit >= 0 ? 'rgba(67, 160, 71, 0.05)' : 'rgba(229, 57, 53, 0.05)'} 100%)`,
-            transition: 'all 0.3s ease',
-            '&:hover': { transform: 'translateY(-4px)', boxShadow: totalProfit >= 0 ? '0 12px 24px -10px rgba(67, 160, 71, 0.3)' : '0 12px 24px -10px rgba(229, 57, 53, 0.3)' }
-          }}>
-            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: totalProfit >= 0 ? '#43a047' : '#e53935' }} />
-            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.65rem' }}>Net Profit</Typography>
-            <Typography variant="h5" sx={{ fontWeight: 800, mt: 0.5, color: totalProfit >= 0 ? 'success.main' : 'error.main' }}>₹{totalProfit.toLocaleString()}</Typography>
-          </Card>
+          <GlassCard sx={{ height: '100%', p: 0 }}>
+            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: totalProfit >= 0 ? '#43a047' : '#e53935' }} />
+            <CardContent sx={{ p: 2.5 }}>
+              <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Net Profit</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 900, mt: 0.5, color: totalProfit >= 0 ? 'success.main' : 'error.main' }}>₹{totalProfit.toLocaleString()}</Typography>
+            </CardContent>
+          </GlassCard>
         </Grid>
         <Grid item xs={12} sm={6} lg={2}>
-          <Card sx={{
-            p: 2.5,
-            position: 'relative',
-            overflow: 'hidden',
-            boxShadow: '0 10px 25px -5px rgba(219, 39, 119, 0.15)',
-            border: '1px solid rgba(219, 39, 119, 0.15)',
-            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(219, 39, 119, 0.05) 100%)`,
-            transition: 'all 0.3s ease',
-            '&:hover': { transform: 'translateY(-4px)' }
-          }}>
-            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#DB2777' }} />
-            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.65rem' }}>Margin</Typography>
-            <Typography variant="h5" sx={{ fontWeight: 800, mt: 0.5 }}>{profitMargin}%</Typography>
-          </Card>
+          <GlassCard sx={{ height: '100%', p: 0 }}>
+            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#DB2777' }} />
+            <CardContent sx={{ p: 2.5 }}>
+              <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Margin</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 900, mt: 0.5 }}>{profitMargin}%</Typography>
+            </CardContent>
+          </GlassCard>
         </Grid>
         <Grid item xs={12} sm={12} lg={2.4}>
-          <Card sx={{
-            p: 2.5,
-            position: 'relative',
-            overflow: 'hidden',
-            boxShadow: '0 10px 25px -5px rgba(67, 160, 71, 0.15)',
-            border: '1px solid rgba(67, 160, 71, 0.15)',
-            background: 'linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%)',
-            color: 'white'
-          }}>
-            <Typography variant="overline" sx={{ fontWeight: 700, fontSize: '0.65rem', opacity: 0.8 }}>30-Day Forecast</Typography>
-            <Typography variant="h5" sx={{ fontWeight: 800, mt: 0.5 }}>+₹{forecast?.monthly.toLocaleString(undefined, { maximumFractionDigits: 0 }) || '0'}</Typography>
-            <Typography variant="caption" sx={{ opacity: 0.7 }}>Based on daily avg of ₹{forecast?.daily.toFixed(0) || '0'}</Typography>
-          </Card>
+          <GlassCard sx={{ height: '100%', p: 0, background: 'linear-gradient(135deg, rgba(27, 94, 32, 0.9) 0%, rgba(46, 125, 50, 0.9) 100%)', color: 'white' }}>
+            <CardContent sx={{ p: 2.5 }}>
+              <Typography variant="overline" sx={{ fontWeight: 700, letterSpacing: '0.1em', opacity: 0.8 }}>30-Day Forecast</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 900, mt: 0.5 }}>+₹{forecast?.monthly.toLocaleString(undefined, { maximumFractionDigits: 0 }) || '0'}</Typography>
+              <Typography variant="caption" sx={{ opacity: 0.7, fontWeight: 500 }}>Based on daily avg of ₹{forecast?.daily.toFixed(0) || '0'}</Typography>
+            </CardContent>
+          </GlassCard>
         </Grid>
       </Grid>
 
       {/* Charts */}
-      <Paper sx={{ p: 3, mb: 3, borderRadius: 3 }}>
+      <GlassCard sx={{ p: 3, mb: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Category-wise Profit</Typography>
+          <Typography variant="h6" sx={{ fontWeight: 900 }}>Category-wise Profit</Typography>
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button
               startIcon={<Download />}
               onClick={exportPDF}
               variant="contained"
               sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 700,
                 background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)',
                 boxShadow: `0 4px 12px ${theme.palette.primary.main}33`,
                 transition: 'all 0.2s ease',
@@ -370,6 +333,9 @@ const ProfitLoss = () => {
               onClick={exportReport}
               variant="outlined"
               sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 700,
                 borderColor: 'primary.main',
                 color: 'primary.main',
                 '&:hover': {
@@ -384,60 +350,60 @@ const ProfitLoss = () => {
           </Box>
         </Box>
         <Bar data={chartData} options={{ responsive: true, plugins: { legend: { display: false } } }} />
-      </Paper>
+      </GlassCard>
 
       <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 3, borderRadius: 3 }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>Profit Trend & Forecast</Typography>
+          <GlassCard sx={{ p: 3 }}>
+            <Typography variant="h6" sx={{ fontWeight: 900, mb: 3 }}>Profit Trend & Forecast</Typography>
             <Line data={forecastChartData} options={{
               responsive: true,
               plugins: { legend: { position: 'top' } },
               scales: { y: { beginAtZero: false } }
             }} />
-          </Paper>
+          </GlassCard>
         </Grid>
         <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, borderRadius: 3, height: '100%' }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>Profit Distribution</Typography>
+          <GlassCard sx={{ p: 3, height: '100%' }}>
+            <Typography variant="h6" sx={{ fontWeight: 900, mb: 3 }}>Profit Distribution</Typography>
             <Doughnut data={distributionData} options={{ responsive: true, plugins: { legend: { position: 'bottom' } } }} />
-          </Paper>
+          </GlassCard>
         </Grid>
       </Grid>
 
       {/* Detailed Table */}
-      <Paper sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.05)' }}>
+      <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
         <TableContainer>
           <Table size="small">
-            <TableHead sx={{ bgcolor: 'rgba(136, 14, 79, 0.02)', borderBottom: '2px solid rgba(136, 14, 79, 0.1)' }}>
+            <TableHead sx={{ bgcolor: 'action.hover' }}>
               <TableRow>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Invoice</TableCell>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Date</TableCell>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Item Details</TableCell>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Financials</TableCell>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Profit/Loss</TableCell>
+                <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Invoice</TableCell>
+                <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Date</TableCell>
+                <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Item Details</TableCell>
+                <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Financials</TableCell>
+                <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Profit/Loss</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {profitData
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((item, idx) => (
-                  <TableRow key={idx} sx={{ '&:hover': { bgcolor: 'rgba(136, 14, 79, 0.01)' } }}>
-                    <TableCell sx={{ fontWeight: 700 }}>#{item.invoiceId}</TableCell>
-                    <TableCell sx={{ fontSize: '0.8rem' }}>{new Date(item.date).toLocaleDateString()}</TableCell>
+                  <TableRow key={idx} hover>
+                    <TableCell sx={{ fontWeight: 800 }}>#{item.invoiceId}</TableCell>
+                    <TableCell sx={{ fontSize: '0.8rem', fontWeight: 500 }}>{new Date(item.date).toLocaleDateString()}</TableCell>
                     <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.itemName}</Typography>
-                      <Typography variant="caption" color="text.secondary">{item.category} • Qty: {item.quantity}</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 800 }}>{item.itemName}</Typography>
+                      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>{item.category} • Qty: {item.quantity}</Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 700 }}>₹{item.revenue.toLocaleString('en-IN')}</Typography>
-                      <Typography variant="caption" color="text.secondary">Cost: ₹{item.cost.toLocaleString('en-IN')}</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 800 }}>₹{item.revenue.toLocaleString('en-IN')}</Typography>
+                      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>Cost: ₹{item.cost.toLocaleString('en-IN')}</Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 700, color: item.profit >= 0 ? '#1b5e20' : '#c62828' }}>
+                      <Typography variant="body2" sx={{ fontWeight: 800, color: item.profit >= 0 ? '#1b5e20' : '#c62828' }}>
                         ₹{item.profit.toLocaleString('en-IN')}
                       </Typography>
-                      <Typography variant="caption" sx={{ color: item.profit >= 0 ? '#1b5e20' : '#c62828', opacity: 0.8 }}>
+                      <Typography variant="caption" sx={{ color: item.profit >= 0 ? '#1b5e20' : '#c62828', opacity: 0.8, fontWeight: 700 }}>
                         {item.margin}% margin
                       </Typography>
                     </TableCell>
@@ -455,7 +421,7 @@ const ProfitLoss = () => {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-      </Paper>
+      </GlassCard>
     </Box >
   );
 };

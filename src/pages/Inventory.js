@@ -5,6 +5,7 @@ import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
+import GlassCard from '../components/GlassCard';
 import Papa from 'papaparse';
 
 const Inventory = () => {
@@ -320,105 +321,77 @@ const Inventory = () => {
         {/* Stats Cards */}
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{
-              borderRadius: 4, position: 'relative', overflow: 'hidden',
-              boxShadow: '0 10px 25px -5px rgba(183, 110, 121, 0.15)',
-              border: '1px solid rgba(183, 110, 121, 0.15)',
-              background: `linear - gradient(135deg, ${theme.palette.background.paper} 0 %, rgba(183, 110, 121, 0.05) 100 %)`,
-              transition: 'all 0.3s ease',
-              '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(183, 110, 121, 0.3)' }
-            }}>
-              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: 'primary.main' }} />
+            <GlassCard sx={{ height: '100%', p: 0 }}>
+              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: 'primary.main' }} />
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Items</Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>{totalItems}</Typography>
+                    <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Total Items</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', mt: 0.5 }}>{totalItems}</Typography>
                   </Box>
-                  <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'primary.light', color: 'primary.main' }}>
+                  <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'primary.light', color: 'primary.contrastText' }}>
                     <Inventory2 />
                   </Box>
                 </Box>
               </CardContent>
-            </Card>
+            </GlassCard>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{
-              borderRadius: 4, position: 'relative', overflow: 'hidden',
-              boxShadow: '0 10px 25px -5px rgba(46, 125, 50, 0.15)',
-              border: '1px solid rgba(46, 125, 50, 0.15)',
-              background: `linear - gradient(135deg, ${theme.palette.background.paper} 0 %, rgba(46, 125, 50, 0.05) 100 %)`,
-              transition: 'all 0.3s ease',
-              '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(46, 125, 50, 0.3)' }
-            }}>
-              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#2e7d32' }} />
+            <GlassCard sx={{ height: '100%', p: 0 }}>
+              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#2e7d32' }} />
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Inventory Value</Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>₹{totalValue.toLocaleString('en-IN')}</Typography>
+                    <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Inventory Value</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', mt: 0.5 }}>₹{totalValue.toLocaleString('en-IN')}</Typography>
                   </Box>
-                  <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(46, 125, 50, 0.05)', color: '#2e7d32' }}>
+                  <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(46, 125, 50, 0.1)', color: '#2e7d32' }}>
                     <AttachMoney />
                   </Box>
                 </Box>
               </CardContent>
-            </Card>
+            </GlassCard>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{
-              borderRadius: 4, position: 'relative', overflow: 'hidden',
-              boxShadow: '0 10px 25px -5px rgba(245, 127, 23, 0.15)',
-              border: '1px solid rgba(245, 127, 23, 0.15)',
-              background: `linear - gradient(135deg, ${theme.palette.background.paper} 0 %, rgba(245, 127, 23, 0.05) 100 %)`,
-              transition: 'all 0.3s ease',
-              '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(245, 127, 23, 0.3)' }
-            }}>
-              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#f57f17' }} />
+            <GlassCard sx={{ height: '100%', p: 0 }}>
+              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#f57f17' }} />
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Low Stock</Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 800, color: '#f57f17', mt: 0.5 }}>{lowStockItems}</Typography>
+                    <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Low Stock</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 900, color: '#f57f17', mt: 0.5 }}>{lowStockItems}</Typography>
                   </Box>
-                  <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(245, 127, 23, 0.05)', color: '#f57f17' }}>
+                  <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(245, 127, 23, 0.1)', color: '#f57f17' }}>
                     <Warning />
                   </Box>
                 </Box>
               </CardContent>
-            </Card>
+            </GlassCard>
           </Grid>
           {user?.role === 'admin' && (
             <Grid item xs={12} sm={6} md={3}>
-              <Card sx={{
-                borderRadius: 4, position: 'relative', overflow: 'hidden',
-                boxShadow: '0 10px 25px -5px rgba(219, 39, 119, 0.15)',
-                border: '1px solid rgba(219, 39, 119, 0.15)',
-                background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(219, 39, 119, 0.05) 100%)`,
-                transition: 'all 0.3s ease',
-                '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(219, 39, 119, 0.3)' }
-              }}>
-                <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#DB2777' }} />
+              <GlassCard sx={{ height: '100%', p: 0 }}>
+                <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#DB2777' }} />
                 <CardContent sx={{ p: 3 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Box>
-                      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Est. Margin</Typography>
-                      <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>₹{totalProfit.toLocaleString('en-IN')}</Typography>
+                      <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Est. Margin</Typography>
+                      <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', mt: 0.5 }}>₹{totalProfit.toLocaleString('en-IN')}</Typography>
                     </Box>
-                    <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(219, 39, 119, 0.05)', color: '#DB2777' }}>
+                    <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(219, 39, 119, 0.1)', color: '#DB2777' }}>
                       <TrendingUp />
                     </Box>
                   </Box>
                 </CardContent>
-              </Card>
+              </GlassCard>
             </Grid>
           )}
         </Grid>
       </Box>
 
       {/* Search and Filter */}
-      <Paper sx={{ p: 2, mb: 3, borderRadius: 3, boxShadow: '0 4px 20px rgba(183, 110, 121, 0.08)', border: '1px solid rgba(183, 110, 121, 0.1)' }}>
-        <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+      <GlassCard sx={{ p: 3, mb: 4 }}>
+        <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', sm: 'row' } }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1, bgcolor: 'grey.50', borderRadius: 2, px: 2 }}>
             <Search sx={{ color: 'text.secondary' }} />
             <TextField
@@ -466,7 +439,7 @@ const Inventory = () => {
             <MenuItem value="desc">Descending</MenuItem>
           </TextField>
         </Box>
-      </Paper>
+      </GlassCard>
 
       {/* Inventory List */}
       {isMobile ? (
@@ -475,14 +448,8 @@ const Inventory = () => {
             const profit = (item.price - (item.cost || 0));
             const profitMargin = item.cost ? ((profit / item.price) * 100).toFixed(1) : 0;
             return (
-              <Card key={item.id} sx={{
-                mb: 2, borderRadius: 3,
-                boxShadow: '0 10px 15px -3px rgba(183, 110, 121, 0.1)',
-                border: '1px solid rgba(183, 110, 121, 0.1)',
-                transition: 'all 0.3s ease',
-                '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 20px 25px -5px rgba(183, 110, 121, 0.15)' }
-              }}>
-                <CardContent sx={{ p: 2 }}>
+              <GlassCard key={item.id} sx={{ mb: 2, p: 0 }}>
+                <CardContent sx={{ p: 2.5 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                     <Box>
                       <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.2 }}>{item.name}</Typography>
@@ -517,12 +484,12 @@ const Inventory = () => {
                     <Button fullWidth variant="outlined" color="error" size="small" startIcon={<Delete />} onClick={() => openDeleteDialog(item.id)} disabled={user?.role !== 'admin'}>Delete</Button>
                   </Box>
                 </CardContent>
-              </Card>
+              </GlassCard>
             );
           })}
         </Box>
       ) : (
-        <Paper sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.05)' }}>
+        <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
           <TableContainer>
             <Table>
               <TableHead sx={{ bgcolor: 'grey.50' }}>
@@ -620,7 +587,7 @@ const Inventory = () => {
             </Table>
           </TableContainer>
           <TablePagination rowsPerPageOptions={[5, 10, 25]} component="div" count={filteredInventory.length} rowsPerPage={rowsPerPage} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} />
-        </Paper>
+        </GlassCard>
       )}
 
       {/* Add/Edit Dialog */}

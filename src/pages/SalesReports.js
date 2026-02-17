@@ -5,6 +5,7 @@ import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import { useData } from '../contexts/DataContext';
 import { Download, TrendingUp, Receipt, AttachMoney } from '@mui/icons-material';
 import { formatCurrencyForPDF, generateReportPDF } from '../utils/helpers';
+import GlassCard from '../components/GlassCard';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler);
 
@@ -184,87 +185,60 @@ const SalesReports = () => {
         </Button>
       </Box>
 
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Grid container spacing={3} sx={{ mb: 6 }}>
         <Grid item xs={12} sm={4}>
-          <Card sx={{
-            borderRadius: 4,
-            position: 'relative',
-            overflow: 'hidden',
-            boxShadow: '0 10px 25px -5px rgba(225, 29, 72, 0.15)',
-            border: '1px solid rgba(225, 29, 72, 0.15)',
-            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(225, 29, 72, 0.05) 100%)`,
-            transition: 'all 0.3s ease',
-            '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(225, 29, 72, 0.3)' }
-          }}>
-            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#E11D48' }} />
+          <GlassCard sx={{ height: '100%', p: 0 }}>
+            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#E11D48' }} />
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Box>
-                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Revenue</Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>₹{totalRevenue.toLocaleString('en-IN')}</Typography>
+                  <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Total Revenue</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', mt: 0.5 }}>₹{totalRevenue.toLocaleString('en-IN')}</Typography>
                 </Box>
                 <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(225, 29, 72, 0.1)', color: '#E11D48' }}>
                   <AttachMoney />
                 </Box>
               </Box>
             </CardContent>
-          </Card>
+          </GlassCard>
         </Grid>
         <Grid item xs={12} sm={4}>
-          <Card sx={{
-            borderRadius: 4,
-            position: 'relative',
-            overflow: 'hidden',
-            boxShadow: '0 10px 25px -5px rgba(25, 118, 210, 0.15)',
-            border: '1px solid rgba(25, 118, 210, 0.15)',
-            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(25, 118, 210, 0.05) 100%)`,
-            transition: 'all 0.3s ease',
-            '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(25, 118, 210, 0.3)' }
-          }}>
-            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#1976d2' }} />
+          <GlassCard sx={{ height: '100%', p: 0 }}>
+            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#1976d2' }} />
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Box>
-                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Invoices</Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>{totalInvoices}</Typography>
+                  <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Total Invoices</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', mt: 0.5 }}>{totalInvoices}</Typography>
                 </Box>
                 <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(25, 118, 210, 0.1)', color: '#1976d2' }}>
                   <Receipt />
                 </Box>
               </Box>
             </CardContent>
-          </Card>
+          </GlassCard>
         </Grid>
         <Grid item xs={12} sm={4}>
-          <Card sx={{
-            borderRadius: 4,
-            position: 'relative',
-            overflow: 'hidden',
-            boxShadow: '0 10px 25px -5px rgba(237, 108, 2, 0.15)',
-            border: '1px solid rgba(237, 108, 2, 0.15)',
-            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(237, 108, 2, 0.05) 100%)`,
-            transition: 'all 0.3s ease',
-            '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(237, 108, 2, 0.3)' }
-          }}>
-            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#ed6c02' }} />
+          <GlassCard sx={{ height: '100%', p: 0 }}>
+            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#ed6c02' }} />
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Box>
-                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Average Value</Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>₹{avgInvoiceValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</Typography>
+                  <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Average Value</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', mt: 0.5 }}>₹{avgInvoiceValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</Typography>
                 </Box>
                 <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(237, 108, 2, 0.1)', color: '#ed6c02' }}>
                   <TrendingUp />
                 </Box>
               </Box>
             </CardContent>
-          </Card>
+          </GlassCard>
         </Grid>
       </Grid>
 
-      <Paper sx={{ p: 3, mb: 3, borderRadius: 3 }}>
-        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2 }}>Filter Sales</Typography>
-        <Grid container spacing={2} sx={{ mb: 4 }}>
+      <GlassCard sx={{ p: 3, mb: 4 }}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 2, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'primary.main' }}>Filter Reports</Typography>
+        <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={6} md={3}>
             <TextField
               label="From Date"
@@ -273,6 +247,7 @@ const SalesReports = () => {
               InputLabelProps={{ shrink: true }}
               value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
+              size="small"
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
@@ -283,6 +258,7 @@ const SalesReports = () => {
               InputLabelProps={{ shrink: true }}
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
+              size="small"
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
@@ -292,6 +268,7 @@ const SalesReports = () => {
               fullWidth
               value={paymentFilter}
               onChange={(e) => setPaymentFilter(e.target.value)}
+              size="small"
             >
               <MenuItem value="">All Payment Methods</MenuItem>
               <MenuItem value="Cash">Cash</MenuItem>
@@ -306,6 +283,7 @@ const SalesReports = () => {
               fullWidth
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
+              size="small"
             >
               <MenuItem value="">All Categories</MenuItem>
               {categories.slice(1).map((cat) => (
@@ -314,49 +292,49 @@ const SalesReports = () => {
             </TextField>
           </Grid>
         </Grid>
-        <Button variant="outlined" onClick={() => { setDateFrom(''); setDateTo(''); setPaymentFilter(''); setCategoryFilter(''); }}>Clear Filters</Button>
-      </Paper>
+        <Button variant="outlined" size="small" onClick={() => { setDateFrom(''); setDateTo(''); setPaymentFilter(''); setCategoryFilter(''); }}>Clear Filters</Button>
+      </GlassCard>
 
-      <Paper sx={{ p: 3, mb: 3, borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
-        <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>Sales Trend</Typography>
+      <GlassCard sx={{ p: 3, mb: 3 }}>
+        <Typography variant="h6" sx={{ fontWeight: 800, mb: 3, color: 'text.primary' }}>Sales Trend</Typography>
         <Line data={chartData} options={{ responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } } }} />
-      </Paper>
+      </GlassCard>
 
       <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 3, borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>Sales by Category</Typography>
+          <GlassCard sx={{ p: 3 }}>
+            <Typography variant="h6" sx={{ fontWeight: 800, mb: 3, color: 'text.primary' }}>Sales by Category</Typography>
             <Bar data={categoryChartData} options={{ responsive: true, plugins: { legend: { display: false } } }} />
-          </Paper>
+          </GlassCard>
         </Grid>
         <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>Payment Methods</Typography>
+          <GlassCard sx={{ p: 3 }}>
+            <Typography variant="h6" sx={{ fontWeight: 800, mb: 3, color: 'text.primary' }}>Payment Methods</Typography>
             <Doughnut data={paymentChartData} options={{ responsive: true, plugins: { legend: { position: 'bottom' } } }} />
-          </Paper>
+          </GlassCard>
         </Grid>
       </Grid>
 
-      <Paper sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.05)' }}>
+      <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
         <TableContainer>
           <Table>
-            <TableHead sx={{ bgcolor: 'rgba(136, 14, 79, 0.02)', borderBottom: '2px solid rgba(136, 14, 79, 0.1)' }}>
+            <TableHead sx={{ bgcolor: 'action.hover' }}>
               <TableRow>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Invoice ID</TableCell>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Date</TableCell>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: { xs: 'none', sm: 'table-cell' } }}>Items Count</TableCell>
-                <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Amount</TableCell>
+                <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Invoice ID</TableCell>
+                <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Date</TableCell>
+                <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: { xs: 'none', sm: 'table-cell' } }}>Items Count</TableCell>
+                <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Amount</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {filteredInvoices
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((inv, idx) => (
-                  <TableRow key={inv.id} sx={{ '&:hover': { bgcolor: 'rgba(136, 14, 79, 0.02)' } }}>
+                  <TableRow key={inv.id} sx={{ '&:hover': { bgcolor: 'action.hover' } }}>
                     <TableCell sx={{ fontWeight: 700 }}>#{inv.id}</TableCell>
                     <TableCell sx={{ fontSize: '0.875rem' }}>{new Date(inv.date).toLocaleDateString()}</TableCell>
                     <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>{inv.items?.length || 0} Products</TableCell>
-                    <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>₹{inv.total.toLocaleString('en-IN')}</TableCell>
+                    <TableCell sx={{ fontWeight: 900, color: 'primary.main' }}>₹{inv.total.toLocaleString('en-IN')}</TableCell>
                   </TableRow>
                 ))}
             </TableBody>
@@ -370,7 +348,7 @@ const SalesReports = () => {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-      </Paper>
+      </GlassCard>
     </Box >
   );
 };

@@ -3,6 +3,7 @@ import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActio
 import { Edit, Delete, Add, Search, ReceiptLong, AccountBalanceWallet, Warning, Download, Upload } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
+import GlassCard from '../components/GlassCard';
 
 const Expenses = () => {
     const { expenses, addExpense, updateExpense, deleteExpense, bulkAddExpenses, expenseCategories, updateExpenseCategories } = useData();
@@ -207,32 +208,32 @@ const Expenses = () => {
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
                 <Grid item xs={12} sm={6} md={4}>
-                    <Card sx={{ borderRadius: 4, position: 'relative', overflow: 'hidden', boxShadow: '0 10px 25px -5px rgba(219, 39, 119, 0.15)', border: '1px solid rgba(219, 39, 119, 0.1)', background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(219, 39, 119, 0.05) 100%)` }}>
-                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#DB2777' }} />
+                    <GlassCard sx={{ height: '100%', p: 0 }}>
+                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#DB2777' }} />
                         <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Box>
-                                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase' }}>This Month</Typography>
-                                <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5 }}>₹{thisMonthExpense.toLocaleString()}</Typography>
+                                <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: '0.1em' }}>This Month</Typography>
+                                <Typography variant="h4" sx={{ fontWeight: 900, mt: 0.5 }}>₹{thisMonthExpense.toLocaleString()}</Typography>
                             </Box>
                             <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(219, 39, 119, 0.1)', color: '#DB2777' }}><AccountBalanceWallet /></Box>
                         </CardContent>
-                    </Card>
+                    </GlassCard>
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
-                    <Card sx={{ borderRadius: 4, position: 'relative', overflow: 'hidden', boxShadow: '0 10px 25px -5px rgba(183, 110, 121, 0.15)', border: '1px solid rgba(183, 110, 121, 0.1)', background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(183, 110, 121, 0.05) 100%)` }}>
-                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#B76E79' }} />
+                    <GlassCard sx={{ height: '100%', p: 0 }}>
+                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#B76E79' }} />
                         <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Box>
-                                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase' }}>Total Expenses</Typography>
-                                <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5 }}>₹{totalExpense.toLocaleString()}</Typography>
+                                <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: '0.1em' }}>Total Expenses</Typography>
+                                <Typography variant="h4" sx={{ fontWeight: 900, mt: 0.5 }}>₹{totalExpense.toLocaleString()}</Typography>
                             </Box>
                             <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(183, 110, 121, 0.1)', color: '#B76E79' }}><ReceiptLong /></Box>
                         </CardContent>
-                    </Card>
+                    </GlassCard>
                 </Grid>
             </Grid>
 
-            <Paper sx={{ p: 2, mb: 3, borderRadius: 3, display: 'flex', gap: 2, alignItems: 'center' }}>
+            <GlassCard sx={{ p: 2, mb: 3, display: 'flex', gap: 2, alignItems: 'center' }}>
                 <Search sx={{ color: 'text.secondary' }} />
                 <TextField placeholder="Search expenses..." value={search} onChange={(e) => setSearch(e.target.value)} variant="standard" fullWidth InputProps={{ disableUnderline: true }} />
                 <TextField select size="small" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} sx={{ minWidth: 150 }}>
@@ -249,35 +250,35 @@ const Expenses = () => {
                     <MenuItem value="asc">Asc</MenuItem>
                     <MenuItem value="desc">Desc</MenuItem>
                 </TextField>
-            </Paper>
+            </GlassCard>
 
-            <Paper sx={{ borderRadius: 4, overflow: 'hidden' }}>
+            <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
                 <TableContainer>
                     <Table>
-                        <TableHead sx={{ bgcolor: 'grey.50' }}>
+                        <TableHead sx={{ bgcolor: 'action.hover' }}>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 800 }}>
+                                <TableCell sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                                     <TableSortLabel active={orderBy === 'date'} direction={orderBy === 'date' ? order : 'asc'} onClick={() => handleRequestSort('date')}>
                                         Date
                                     </TableSortLabel>
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 800 }}>
+                                <TableCell sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                                     <TableSortLabel active={orderBy === 'title'} direction={orderBy === 'title' ? order : 'asc'} onClick={() => handleRequestSort('title')}>
                                         Expense Title
                                     </TableSortLabel>
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 800 }}>
+                                <TableCell sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                                     <TableSortLabel active={orderBy === 'category'} direction={orderBy === 'category' ? order : 'asc'} onClick={() => handleRequestSort('category')}>
                                         Category
                                     </TableSortLabel>
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 800 }}>
+                                <TableCell sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                                     <TableSortLabel active={orderBy === 'amount'} direction={orderBy === 'amount' ? order : 'asc'} onClick={() => handleRequestSort('amount')}>
                                         Amount
                                     </TableSortLabel>
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 800 }}>Note</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 800 }}>Actions</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Note</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -301,7 +302,7 @@ const Expenses = () => {
                     </Table>
                 </TableContainer>
                 <TablePagination rowsPerPageOptions={[5, 10, 25]} component="div" count={sortedExpenses.length} rowsPerPage={rowsPerPage} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} />
-            </Paper>
+            </GlassCard>
 
             <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
                 <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white', fontWeight: 800 }}>{editItem ? 'Edit Expense' : 'Add New Expense'}</DialogTitle>

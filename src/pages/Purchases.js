@@ -4,6 +4,8 @@ import { Add, Visibility, Delete, ReceiptLong, Search, Edit, Close, AttachMoney,
 import { useData } from '../contexts/DataContext';
 import { useNavigate } from 'react-router-dom';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
+import GlassCard from '../components/GlassCard';
+import { useAuth } from '../contexts/AuthContext';
 
 const Purchases = () => {
     const navigate = useNavigate();
@@ -329,80 +331,53 @@ const Purchases = () => {
                     <>
                         <Grid container spacing={3} sx={{ mb: 4 }}>
                             <Grid item xs={12} sm={4}>
-                                <Card sx={{
-                                    borderRadius: 4,
-                                    position: 'relative',
-                                    overflow: 'hidden',
-                                    boxShadow: '0 10px 25px -5px rgba(25, 118, 210, 0.15)',
-                                    border: '1px solid rgba(25, 118, 210, 0.1)',
-                                    background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(25, 118, 210, 0.05) 100%)`,
-                                    transition: 'all 0.3s ease',
-                                    '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(25, 118, 210, 0.3)' }
-                                }}>
-                                    <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#1976d2' }} />
+                                <GlassCard sx={{ height: '100%', p: 0 }}>
+                                    <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#1976d2' }} />
                                     <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                         <Box>
-                                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>Total Orders</Typography>
-                                            <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5 }}>{purchases.length}</Typography>
+                                            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Total Orders</Typography>
+                                            <Typography variant="h4" sx={{ fontWeight: 900, mt: 0.5 }}>{purchases.length}</Typography>
                                         </Box>
                                         <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(25, 118, 210, 0.1)', color: '#1976d2' }}><ReceiptLong /></Box>
                                     </CardContent>
-                                </Card>
+                                </GlassCard>
                             </Grid>
                             <Grid item xs={12} sm={4}>
-                                <Card sx={{
-                                    borderRadius: 4,
-                                    position: 'relative',
-                                    overflow: 'hidden',
-                                    boxShadow: '0 10px 25px -5px rgba(237, 108, 2, 0.15)',
-                                    border: '1px solid rgba(237, 108, 2, 0.1)',
-                                    background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(237, 108, 2, 0.05) 100%)`,
-                                    transition: 'all 0.3s ease',
-                                    '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(237, 108, 2, 0.3)' }
-                                }}>
-                                    <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#ed6c02' }} />
+                                <GlassCard sx={{ height: '100%', p: 0 }}>
+                                    <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#ed6c02' }} />
                                     <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                         <Box>
-                                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>Pending Delivery</Typography>
-                                            <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#ed6c02' }}>
+                                            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Pending Delivery</Typography>
+                                            <Typography variant="h4" sx={{ fontWeight: 900, mt: 0.5, color: '#ed6c02' }}>
                                                 {purchases.filter(p => p.status === 'Ordered').length}
                                             </Typography>
                                         </Box>
                                         <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(237, 108, 2, 0.1)', color: '#ed6c02' }}><ReceiptLong /></Box>
                                     </CardContent>
-                                </Card>
+                                </GlassCard>
                             </Grid>
                             <Grid item xs={12} sm={4}>
-                                <Card sx={{
-                                    borderRadius: 4,
-                                    position: 'relative',
-                                    overflow: 'hidden',
-                                    boxShadow: '0 10px 25px -5px rgba(46, 125, 50, 0.15)',
-                                    border: '1px solid rgba(46, 125, 50, 0.1)',
-                                    background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(46, 125, 50, 0.05) 100%)`,
-                                    transition: 'all 0.3s ease',
-                                    '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(46, 125, 50, 0.3)' }
-                                }}>
-                                    <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#2e7d32' }} />
+                                <GlassCard sx={{ height: '100%', p: 0 }}>
+                                    <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#2e7d32' }} />
                                     <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                         <Box>
-                                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>Total Spent</Typography>
-                                            <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#2e7d32' }}>
+                                            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Total Spent</Typography>
+                                            <Typography variant="h4" sx={{ fontWeight: 900, mt: 0.5, color: '#2e7d32' }}>
                                                 ₹{purchases.reduce((sum, p) => sum + p.total, 0).toLocaleString()}
                                             </Typography>
                                         </Box>
                                         <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(46, 125, 50, 0.1)', color: '#2e7d32' }}><AttachMoney /></Box>
                                     </CardContent>
-                                </Card>
+                                </GlassCard>
                             </Grid>
                         </Grid>
 
-                        <Paper sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.05)' }}>
+                        <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
                             <TableContainer>
                                 <Table>
-                                    <TableHead sx={{ bgcolor: 'primary.light', borderBottom: '2px solid rgba(183, 110, 121, 0.1)' }}>
+                                    <TableHead sx={{ bgcolor: 'action.hover' }}>
                                         <TableRow>
-                                            <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>
+                                            <TableCell sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                                                 <TableSortLabel active={orderBy === 'date'} direction={orderBy === 'date' ? order : 'asc'} onClick={() => handleRequestSort('date')}>
                                                     Date
                                                 </TableSortLabel>
@@ -521,7 +496,7 @@ const Purchases = () => {
                                 onPageChange={handleChangePage}
                                 onRowsPerPageChange={handleChangeRowsPerPage}
                             />
-                        </Paper>
+                        </GlassCard>
                     </>
                 )
             }

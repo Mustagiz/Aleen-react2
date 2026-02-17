@@ -38,6 +38,7 @@ import {
     LocalOffer
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
+import GlassCard from '../components/GlassCard';
 
 const Loyalty = () => {
     const { customers, redeemLoyaltyPoints, addBirthdayBonus } = useData();
@@ -141,85 +142,89 @@ const Loyalty = () => {
             </Box>
 
             {/* Summary Cards */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid container spacing={3} sx={{ mb: 6 }}>
                 <Grid item xs={12} sm={6} md={3}>
-                    <Card elevation={0} sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-                        <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                                <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'rgba(136, 14, 79, 0.1)' }}>
-                                    <Stars sx={{ color: 'primary.main' }} />
-                                </Box>
-                                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
+                    <GlassCard sx={{ height: '100%', p: 0 }}>
+                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: 'primary.main' }} />
+                        <CardContent sx={{ p: 3 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                                <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>
                                     Total Points
                                 </Typography>
+                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(136, 14, 79, 0.1)' }}>
+                                    <Stars sx={{ color: 'primary.main', fontSize: 20 }} />
+                                </Box>
                             </Box>
-                            <Typography variant="h4" sx={{ fontWeight: 800 }}>
+                            <Typography variant="h4" sx={{ fontWeight: 900 }}>
                                 {totalPoints.toLocaleString()}
                             </Typography>
                         </CardContent>
-                    </Card>
+                    </GlassCard>
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={3}>
-                    <Card elevation={0} sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-                        <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                                <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'rgba(5, 150, 105, 0.1)' }}>
-                                    <TrendingUp sx={{ color: '#059669' }} />
-                                </Box>
-                                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
+                    <GlassCard sx={{ height: '100%', p: 0 }}>
+                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#059669' }} />
+                        <CardContent sx={{ p: 3 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                                <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>
                                     Active Members
                                 </Typography>
+                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(5, 150, 105, 0.1)' }}>
+                                    <TrendingUp sx={{ color: '#059669', fontSize: 20 }} />
+                                </Box>
                             </Box>
-                            <Typography variant="h4" sx={{ fontWeight: 800 }}>
+                            <Typography variant="h4" sx={{ fontWeight: 900 }}>
                                 {activeMembers}
                             </Typography>
                         </CardContent>
-                    </Card>
+                    </GlassCard>
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={3}>
-                    <Card elevation={0} sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-                        <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                                <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'rgba(217, 119, 6, 0.1)' }}>
-                                    <EmojiEvents sx={{ color: '#D97706' }} />
-                                </Box>
-                                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
+                    <GlassCard sx={{ height: '100%', p: 0 }}>
+                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#D97706' }} />
+                        <CardContent sx={{ p: 3 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                                <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>
                                     Platinum Members
                                 </Typography>
+                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(217, 119, 6, 0.1)' }}>
+                                    <EmojiEvents sx={{ color: '#D97706', fontSize: 20 }} />
+                                </Box>
                             </Box>
-                            <Typography variant="h4" sx={{ fontWeight: 800 }}>
+                            <Typography variant="h4" sx={{ fontWeight: 900 }}>
                                 {tierStats.Platinum}
                             </Typography>
                         </CardContent>
-                    </Card>
+                    </GlassCard>
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={3}>
-                    <Card elevation={0} sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-                        <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                                <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'rgba(124, 58, 237, 0.1)' }}>
-                                    <CardGiftcard sx={{ color: '#7C3AED' }} />
-                                </Box>
-                                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
+                    <GlassCard sx={{ height: '100%', p: 0 }}>
+                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#7C3AED' }} />
+                        <CardContent sx={{ p: 3 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                                <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>
                                     Gold Members
                                 </Typography>
+                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(124, 58, 237, 0.1)' }}>
+                                    <CardGiftcard sx={{ color: '#7C3AED', fontSize: 20 }} />
+                                </Box>
                             </Box>
-                            <Typography variant="h4" sx={{ fontWeight: 800 }}>
+                            <Typography variant="h4" sx={{ fontWeight: 900 }}>
                                 {tierStats.Gold}
                             </Typography>
                         </CardContent>
-                    </Card>
+                    </GlassCard>
                 </Grid>
             </Grid>
 
             {/* Tier Distribution */}
             <Grid container spacing={3} sx={{ mb: 4 }}>
                 <Grid item xs={12} md={6}>
-                    <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>
+                    <GlassCard sx={{ p: 3, height: '100%' }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 3, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'primary.main' }}>
                             Tier Distribution
                         </Typography>
                         {['Platinum', 'Gold', 'Silver', 'Bronze'].map((tier) => (
@@ -227,11 +232,11 @@ const Loyalty = () => {
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                         <EmojiEvents sx={{ fontSize: 20, color: getTierColor(tier) }} />
-                                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                        <Typography variant="body2" sx={{ fontWeight: 700 }}>
                                             {tier}
                                         </Typography>
                                     </Box>
-                                    <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 800, color: 'primary.main' }}>
                                         {tierStats[tier]} members
                                     </Typography>
                                 </Box>
@@ -248,90 +253,98 @@ const Loyalty = () => {
                                         }
                                     }}
                                 />
-                                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block', fontWeight: 500 }}>
                                     {getTierBenefits(tier)}
                                 </Typography>
                             </Box>
                         ))}
-                    </Paper>
+                    </GlassCard>
                 </Grid>
 
                 <Grid item xs={12} md={6}>
-                    <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>
+                    <GlassCard sx={{ p: 3, height: '100%' }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 3, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'primary.main' }}>
                             Program Rules
                         </Typography>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            <Box sx={{ display: 'flex', gap: 2 }}>
-                                <LocalOffer sx={{ color: 'primary.main' }} />
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(136, 14, 79, 0.05)' }}>
+                                    <LocalOffer sx={{ color: 'primary.main', fontSize: 20 }} />
+                                </Box>
                                 <Box>
-                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 700 }}>
                                         Earning Points
                                     </Typography>
-                                    <Typography variant="caption" color="text.secondary">
+                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
                                         ₹100 spent = 1 point
                                     </Typography>
                                 </Box>
                             </Box>
-                            <Box sx={{ display: 'flex', gap: 2 }}>
-                                <Redeem sx={{ color: 'primary.main' }} />
+                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(136, 14, 79, 0.05)' }}>
+                                    <Redeem sx={{ color: 'primary.main', fontSize: 20 }} />
+                                </Box>
                                 <Box>
-                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 700 }}>
                                         Redeeming Points
                                     </Typography>
-                                    <Typography variant="caption" color="text.secondary">
+                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
                                         100 points = ₹100 discount
                                     </Typography>
                                 </Box>
                             </Box>
-                            <Box sx={{ display: 'flex', gap: 2 }}>
-                                <Cake sx={{ color: 'primary.main' }} />
+                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(136, 14, 79, 0.05)' }}>
+                                    <Cake sx={{ color: 'primary.main', fontSize: 20 }} />
+                                </Box>
                                 <Box>
-                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 700 }}>
                                         Birthday Bonus
                                     </Typography>
-                                    <Typography variant="caption" color="text.secondary">
+                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
                                         100 bonus points on birthday
                                     </Typography>
                                 </Box>
                             </Box>
-                            <Box sx={{ display: 'flex', gap: 2 }}>
-                                <History sx={{ color: 'primary.main' }} />
+                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(136, 14, 79, 0.05)' }}>
+                                    <History sx={{ color: 'primary.main', fontSize: 20 }} />
+                                </Box>
                                 <Box>
-                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 700 }}>
                                         Points Expiry
                                     </Typography>
-                                    <Typography variant="caption" color="text.secondary">
+                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
                                         Points expire after 1 year
                                     </Typography>
                                 </Box>
                             </Box>
                         </Box>
-                    </Paper>
+                    </GlassCard>
                 </Grid>
             </Grid>
 
             {/* Top Loyalty Members */}
-            <Paper elevation={0} sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
+            <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
                 <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
-                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 800 }}>
                         Top Loyalty Members
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
                         Customers with the highest loyalty points
                     </Typography>
                 </Box>
                 <TableContainer>
                     <Table>
-                        <TableHead sx={{ bgcolor: 'rgba(136, 14, 79, 0.02)' }}>
+                        <TableHead sx={{ bgcolor: 'action.hover' }}>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 700 }}>Rank</TableCell>
-                                <TableCell sx={{ fontWeight: 700 }}>Customer</TableCell>
-                                <TableCell sx={{ fontWeight: 700 }}>Tier</TableCell>
-                                <TableCell sx={{ fontWeight: 700 }}>Points</TableCell>
-                                <TableCell sx={{ fontWeight: 700 }}>Total Spent</TableCell>
-                                <TableCell sx={{ fontWeight: 700 }}>Progress</TableCell>
-                                <TableCell sx={{ fontWeight: 700 }} align="right">Actions</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Rank</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Customer</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tier</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Points</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Spent</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Progress</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }} align="right">Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -422,7 +435,7 @@ const Loyalty = () => {
                         </TableBody>
                     </Table>
                 </TableContainer>
-            </Paper>
+            </GlassCard>
 
             {/* Redeem Points Dialog */}
             <Dialog open={redeemDialog} onClose={() => setRedeemDialog(false)} maxWidth="sm" fullWidth>

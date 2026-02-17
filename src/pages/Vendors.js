@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Paper, Typography, TableContainer, Card, CardContent, Grid, Chip, TablePagination, useTheme } from '@mui/material';
 import { Add, Edit, Delete, Store, LocalShipping } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
+import GlassCard from '../components/GlassCard';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 
 const Vendors = () => {
@@ -88,96 +89,59 @@ const Vendors = () => {
             {/* Vendor Stats */}
             <Grid container spacing={3} sx={{ mb: 4 }}>
                 <Grid item xs={12} sm={4}>
-                    <Card sx={{
-                        borderRadius: 4,
-                        position: 'relative',
-                        overflow: 'hidden',
-                        boxShadow: `0 10px 25px -5px ${theme.palette.primary.main}26`,
-                        border: '1px solid',
-                        borderColor: 'primary.light',
-                        background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${theme.palette.primary.main}0D 100%)`,
-                        transition: 'all 0.3s ease',
-                        '&:hover': {
-                            transform: 'translateY(-4px)',
-                            boxShadow: `0 12px 24px -10px ${theme.palette.primary.main}40`,
-                        }
-                    }}>
-                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: 'primary.main' }} />
+                    <GlassCard sx={{ height: '100%', p: 0 }}>
+                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: 'primary.main' }} />
                         <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Box>
-                                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Vendors</Typography>
-                                <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5 }}>{vendors.length}</Typography>
+                                <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: '0.1em' }}>Total Vendors</Typography>
+                                <Typography variant="h4" sx={{ fontWeight: 900, mt: 0.5 }}>{vendors.length}</Typography>
                             </Box>
                             <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'primary.light', color: 'primary.main' }}><Store /></Box>
                         </CardContent>
-                    </Card>
+                    </GlassCard>
                 </Grid>
                 <Grid item xs={12} sm={4}>
-                    <Card sx={{
-                        borderRadius: 4,
-                        position: 'relative',
-                        overflow: 'hidden',
-                        boxShadow: '0 10px 25px -5px rgba(198, 40, 40, 0.15)',
-                        border: '1px solid rgba(198, 40, 40, 0.1)',
-                        background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(198, 40, 40, 0.05) 100%)`,
-                        transition: 'all 0.3s ease',
-                        '&:hover': {
-                            transform: 'translateY(-4px)',
-                            boxShadow: '0 12px 24px -10px rgba(198, 40, 40, 0.3)',
-                        }
-                    }}>
-                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#c62828' }} />
+                    <GlassCard sx={{ height: '100%', p: 0 }}>
+                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#c62828' }} />
                         <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Box>
-                                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Payable</Typography>
-                                <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#c62828' }}>
+                                <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: '0.1em' }}>Total Payable</Typography>
+                                <Typography variant="h4" sx={{ fontWeight: 900, mt: 0.5, color: '#c62828' }}>
                                     ₹{vendors.reduce((sum, v) => sum + (v.balance || 0), 0).toLocaleString()}
                                 </Typography>
                             </Box>
                             <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(198, 40, 40, 0.05)', color: '#c62828' }}><Store /></Box>
                         </CardContent>
-                    </Card>
+                    </GlassCard>
                 </Grid>
 
                 <Grid item xs={12} sm={4}>
-                    <Card sx={{
-                        borderRadius: 4,
-                        position: 'relative',
-                        overflow: 'hidden',
-                        boxShadow: '0 10px 25px -5px rgba(2, 136, 209, 0.15)',
-                        border: '1px solid rgba(2, 136, 209, 0.1)',
-                        background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(2, 136, 209, 0.05) 100%)`,
-                        transition: 'all 0.3s ease',
-                        '&:hover': {
-                            transform: 'translateY(-4px)',
-                            boxShadow: '0 12px 24px -10px rgba(2, 136, 209, 0.3)',
-                        }
-                    }}>
-                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#0288d1' }} />
+                    <GlassCard sx={{ height: '100%', p: 0 }}>
+                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#0288d1' }} />
                         <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Box>
-                                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Avg Lead Time</Typography>
-                                <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#0288d1' }}>
+                                <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: '0.1em' }}>Avg Lead Time</Typography>
+                                <Typography variant="h4" sx={{ fontWeight: 900, mt: 0.5, color: '#0288d1' }}>
                                     {Math.round(vendors.reduce((sum, v) => sum + (v.performance?.avgLeadTime || 0), 0) / Math.max(1, vendors.filter(v => v.performance?.avgLeadTime).length))} days
                                 </Typography>
                             </Box>
                             <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(2, 136, 209, 0.05)', color: '#0288d1' }}><LocalShipping /></Box>
                         </CardContent>
-                    </Card>
+                    </GlassCard>
                 </Grid>
             </Grid>
 
-            <Paper sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.05)' }}>
+            <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
                 <TableContainer>
                     <Table>
-                        <TableHead sx={{ bgcolor: 'primary.light', borderBottom: '2px solid rgba(244, 114, 182, 0.1)' }}>
+                        <TableHead sx={{ bgcolor: 'action.hover' }}>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Vendor Name</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Contact Person</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Phone / Email</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Performance</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Balance Due</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Actions</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Vendor Name</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Contact Person</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Phone / Email</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Performance</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Balance Due</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -188,31 +152,31 @@ const Vendors = () => {
                                 ).map((vendor) => (
                                     <TableRow key={vendor.id} hover>
                                         <TableCell>
-                                            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{vendor.name}</Typography>
-                                            {vendor.gst && <Typography variant="caption" color="text.secondary">GST: {vendor.gst}</Typography>}
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>{vendor.name}</Typography>
+                                            {vendor.gst && <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>GST: {vendor.gst}</Typography>}
                                         </TableCell>
-                                        <TableCell>{vendor.person || '-'}</TableCell>
+                                        <TableCell sx={{ fontWeight: 500 }}>{vendor.person || '-'}</TableCell>
                                         <TableCell>
-                                            <Typography variant="caption" display="block">{vendor.phone}</Typography>
-                                            <Typography variant="caption" color="text.secondary">{vendor.email}</Typography>
+                                            <Typography variant="caption" display="block" sx={{ fontWeight: 600 }}>{vendor.phone}</Typography>
+                                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>{vendor.email}</Typography>
                                         </TableCell>
                                         <TableCell>
                                             {vendor.performance ? (
                                                 <Box>
-                                                    <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                                                    <Typography variant="body2" sx={{ fontWeight: 800 }}>
                                                         {vendor.performance.avgLeadTime} days
                                                     </Typography>
-                                                    <Typography variant="caption" color="text.secondary" display="block">
+                                                    <Typography variant="caption" color="text.secondary" display="block" sx={{ fontWeight: 500 }}>
                                                         {vendor.performance.totalOrders} Orders
                                                     </Typography>
                                                     {vendor.qualityRating > 0 && (
-                                                        <Typography variant="caption" sx={{ color: 'warning.main', fontWeight: 'bold' }}>
+                                                        <Typography variant="caption" sx={{ color: 'warning.main', fontWeight: 800 }}>
                                                             {'★'.repeat(Math.round(vendor.qualityRating))} ({vendor.qualityRating})
                                                         </Typography>
                                                     )}
                                                 </Box>
                                             ) : (
-                                                <Typography variant="caption" color="text.secondary">No Data</Typography>
+                                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>No Data</Typography>
                                             )}
                                         </TableCell>
                                         <TableCell>
@@ -222,7 +186,8 @@ const Vendors = () => {
                                                 sx={{
                                                     bgcolor: (vendor.balance || 0) > 0 ? 'rgba(198, 40, 40, 0.1)' : 'rgba(46, 125, 50, 0.1)',
                                                     color: (vendor.balance || 0) > 0 ? 'error.main' : 'success.main',
-                                                    fontWeight: 700
+                                                    fontWeight: 800,
+                                                    borderRadius: 1.5
                                                 }}
                                             />
                                         </TableCell>
@@ -234,7 +199,7 @@ const Vendors = () => {
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={5} align="center" sx={{ py: 8, color: 'text.secondary' }}>No vendors found. Add one to get started.</TableCell>
+                                    <TableCell colSpan={6} align="center" sx={{ py: 8, color: 'text.secondary', fontWeight: 500 }}>No vendors found. Add one to get started.</TableCell>
                                 </TableRow>
                             )}
                         </TableBody>
@@ -249,7 +214,7 @@ const Vendors = () => {
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
-            </Paper>
+            </GlassCard>
 
             <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
                 <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white' }}>{editItem ? 'Edit Vendor' : 'Add Vendor'}</DialogTitle>

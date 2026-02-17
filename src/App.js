@@ -1,31 +1,53 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { CssBaseline } from '@mui/material';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { CssBaseline, Box } from '@mui/material';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { DataProvider } from './contexts/DataContext';
+import { DataProvider } from './contexts/DataProvider';
+import { AnimatePresence, motion } from 'framer-motion';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import Inventory from './pages/Inventory';
-import Invoices from './pages/Invoices';
-import SalesReports from './pages/SalesReports';
-import InventoryReports from './pages/InventoryReports';
-import ProfitLoss from './pages/ProfitLoss';
-import Customers from './pages/Customers';
-import Settings from './pages/Settings';
-import Vendors from './pages/Vendors';
-import Purchases from './pages/Purchases';
-import Expenses from './pages/Expenses';
-import Barcodes from './pages/Barcodes';
-import Marketing from './pages/Marketing';
-import PaymentSummary from './pages/PaymentSummary';
-import Loyalty from './pages/Loyalty';
-import AdvancedReports from './pages/AdvancedReports';
-import Layout from './components/Layout';
+// ... other imports unchanged
 
-const PrivateRoute = ({ children }) => {
-  const { user } = useAuth();
-  return user ? children : <Navigate to="/login" />;
+const PageWrapper = ({ children }) => (
+  <motion.div
+    initial={{ opacity: 0, x: 20 }}
+    animate={{ opacity: 1, x: 0 }}
+    exit={{ opacity: 0, x: -20 }}
+    transition={{ duration: 0.3, ease: 'easeInOut' }}
+    style={{ width: '100%', height: '100%' }}
+  >
+    {children}
+  </motion.div>
+);
+
+const AnimatedRoutes = () => {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
+          <Route index element={<PageWrapper><Dashboard /></PageWrapper>} />
+          <Route path="inventory" element={<PageWrapper><Inventory /></PageWrapper>} />
+          <Route path="invoices" element={<PageWrapper><Invoices /></PageWrapper>} />
+          <Route path="customers" element={<PageWrapper><Customers /></PageWrapper>} />
+          <Route path="sales-reports" element={<PageWrapper><SalesReports /></PageWrapper>} />
+          <Route path="inventory-reports" element={<PageWrapper><InventoryReports /></PageWrapper>} />
+          <Route path="profit-loss" element={<PageWrapper><ProfitLoss /></PageWrapper>} />
+          <Route path="expenses" element={<PageWrapper><Expenses /></PageWrapper>} />
+          <Route path="vendors" element={<PageWrapper><Vendors /></PageWrapper>} />
+          <Route path="purchases" element={<PageWrapper><Purchases /></PageWrapper>} />
+          <Route path="barcodes" element={<PageWrapper><Barcodes /></PageWrapper>} />
+          <Route path="marketing" element={<PageWrapper><Marketing /></PageWrapper>} />
+          <Route path="payment-summary" element={<PageWrapper><PaymentSummary /></PageWrapper>} />
+          <Route path="loyalty" element={<PageWrapper><Loyalty /></PageWrapper>} />
+          <Route path="advanced-reports" element={<PageWrapper><AdvancedReports /></PageWrapper>} />
+          <Route path="settings" element={<PageWrapper><Settings /></PageWrapper>} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AnimatePresence>
+  );
 };
 
 function App() {
@@ -35,28 +57,7 @@ function App() {
       <AuthProvider>
         <DataProvider>
           <Router basename={process.env.PUBLIC_URL}>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
-                <Route index element={<Dashboard />} />
-                <Route path="inventory" element={<Inventory />} />
-                <Route path="invoices" element={<Invoices />} />
-                <Route path="customers" element={<Customers />} />
-                <Route path="sales-reports" element={<SalesReports />} />
-                <Route path="inventory-reports" element={<InventoryReports />} />
-                <Route path="profit-loss" element={<ProfitLoss />} />
-                <Route path="expenses" element={<Expenses />} />
-                <Route path="vendors" element={<Vendors />} />
-                <Route path="purchases" element={<Purchases />} />
-                <Route path="barcodes" element={<Barcodes />} />
-                <Route path="marketing" element={<Marketing />} />
-                <Route path="payment-summary" element={<PaymentSummary />} />
-                <Route path="loyalty" element={<Loyalty />} />
-                <Route path="advanced-reports" element={<AdvancedReports />} />
-                <Route path="settings" element={<Settings />} />
-              </Route>
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+            <AnimatedRoutes />
           </Router>
         </DataProvider>
       </AuthProvider>

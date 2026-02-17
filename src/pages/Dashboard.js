@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Paper, Typography, Box, Card, CardContent, Button, Chip, IconButton, useTheme, Avatar } from '@mui/material';
+import { Grid, Typography, Box, CardContent, Button, Chip, IconButton, useTheme, Avatar } from '@mui/material';
 import { TrendingUp, TrendingDown, Inventory2, Warning, AttachMoney, Receipt, Assessment, ArrowForward, MoreVert, Circle, People, ShoppingCart, AccountBalanceWallet } from '@mui/icons-material';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { Bar, Line, Doughnut } from 'react-chartjs-2';
@@ -7,10 +7,12 @@ import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { DateRange, CalendarMonth, History, ViewWeek } from '@mui/icons-material';
+import GlassCard from '../components/GlassCard';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler);
 
 const Dashboard = () => {
+  // ... logic remains same ...
   const { user } = useAuth();
   const { inventory, invoices, purchases, vendors, expenses, getLowStockItems } = useData();
   const navigate = useNavigate();
@@ -267,116 +269,83 @@ const Dashboard = () => {
   };
 
   const StatCard = ({ title, value, icon, color, trend, onClick, subtitle }) => (
-    <Card
+    <GlassCard
       onClick={onClick}
-      elevation={0}
       sx={{
         height: '100%',
-        borderRadius: 4,
-        cursor: onClick ? 'pointer' : 'default',
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        position: 'relative',
-        overflow: 'hidden',
-        border: '1px solid',
-        borderColor: color + '25',
-        background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${color}08 100%)`,
-        boxShadow: `0 4px 20px -4px ${color}20, 0 0 0 1px ${color}10`,
-        backdropFilter: 'blur(10px)',
+        p: 0,
+        '&:hover': onClick ? {
+          transform: 'translateY(-8px)',
+          boxShadow: `0 20px 40px -8px ${color}35`,
+        } : {},
+        // Enhanced indicator
         '&::before': {
           content: '""',
           position: 'absolute',
           top: 0,
           left: 0,
-          width: '5px',
+          width: '4px',
           height: '100%',
           background: `linear-gradient(180deg, ${color} 0%, ${color}80 100%)`,
-          boxShadow: `2px 0 8px ${color}40`
-        },
-        '&::after': {
-          content: '""',
-          position: 'absolute',
-          top: -50,
-          right: -50,
-          width: 150,
-          height: 150,
-          borderRadius: '50%',
-          background: `radial-gradient(circle, ${color}08 0%, transparent 70%)`,
-          pointerEvents: 'none'
-        },
-        '&:hover': onClick ? {
-          transform: 'translateY(-8px) scale(1.02)',
-          boxShadow: `0 20px 40px -8px ${color}35, 0 0 0 1px ${color}30`,
-          borderColor: color + '50',
-          background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${color}12 100%)`,
-        } : {
-          boxShadow: `0 8px 24px -6px ${color}25`,
         }
       }}
     >
-      <CardContent sx={{ p: 2, position: 'relative', zIndex: 1 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+      <CardContent sx={{ p: 2.5 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
           <Box sx={{
-            p: 1.2,
-            borderRadius: 2.5,
-            bgcolor: color + '12',
+            p: 1.5,
+            borderRadius: 3,
+            bgcolor: color + '15',
             color: color,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: `0 2px 8px ${color}15, inset 0 1px 0 ${color}25`,
-            border: `1px solid ${color}15`
           }}>
-            {React.cloneElement(icon, { sx: { fontSize: 24, filter: `drop-shadow(0 1px 2px ${color}30)` } })}
+            {React.cloneElement(icon, { sx: { fontSize: 28 } })}
           </Box>
           {trend !== undefined && (
             <Chip
-              icon={trend >= 0 ? <TrendingUp sx={{ fontSize: '12px !important' }} /> : <TrendingDown sx={{ fontSize: '12px !important' }} />}
+              icon={trend >= 0 ? <TrendingUp sx={{ fontSize: '14px !important' }} /> : <TrendingDown sx={{ fontSize: '14px !important' }} />}
               label={`${Math.abs(trend)}%`}
               size="small"
               sx={{
-                height: 20,
-                fontSize: '0.65rem',
-                bgcolor: trend >= 0 ? 'rgba(67, 160, 71, 0.1)' : 'rgba(229, 57, 53, 0.1)',
-                color: trend >= 0 ? 'success.main' : 'error.main',
+                height: 24,
+                bgcolor: trend >= 0 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                color: trend >= 0 ? '#10B981' : '#EF4444',
                 fontWeight: 700,
                 borderRadius: 1.5,
-                border: trend >= 0 ? '1px solid rgba(67, 160, 71, 0.15)' : '1px solid rgba(229, 57, 53, 0.15)'
               }}
             />
           )}
         </Box>
-        <Typography variant="h5" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.2, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+        <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5, letterSpacing: '-0.02em' }}>
           {value}
         </Typography>
-        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, fontSize: '0.75rem', letterSpacing: '0.02em', textTransform: 'uppercase', opacity: 0.8 }}>
+        <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>
           {title}
         </Typography>
         {subtitle && (
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.2, opacity: 0.6, fontSize: '0.65rem' }}>
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, opacity: 0.7 }}>
             {subtitle}
           </Typography>
         )}
       </CardContent>
-    </Card>
+    </GlassCard>
   );
 
   return (
     <Box sx={{ maxWidth: 1600, mx: 'auto' }}>
-      <Box sx={{ mb: 5, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'center' }, gap: 3 }}>
+      <Box sx={{ mb: 6, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'center' }, gap: 3 }}>
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mb: 1, letterSpacing: '-0.03em' }}>Dashboard</Typography>
-          <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 500 }}>Overview of your business performance.</Typography>
+          <Typography variant="h3" sx={{ fontWeight: 900, color: 'text.primary', mb: 1, letterSpacing: '-0.04em' }}>
+            Dashboard
+          </Typography>
+          <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 500, opacity: 0.8 }}>
+            Overview of your business performance.
+          </Typography>
         </Box>
 
-        <Box sx={{
-          display: 'flex',
-          bgcolor: 'background.paper',
-          p: 0.75,
-          borderRadius: 4,
-          border: '1px solid',
-          borderColor: 'divider',
-          boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
-        }}>
+        <GlassCard sx={{ p: 0.75, borderRadius: 5, display: 'flex', gap: 1 }}>
           {[
             { id: '7days', label: '7 Days' },
             { id: '30days', label: '30 Days' },
@@ -386,28 +355,22 @@ const Dashboard = () => {
             <Button
               key={item.id}
               onClick={() => setDateRange(item.id)}
+              variant={dateRange === item.id ? 'contained' : 'text'}
               sx={{
                 px: 3,
                 py: 1,
-                borderRadius: 3,
-                textTransform: 'none',
-                fontWeight: 600,
-                fontSize: '0.875rem',
-                color: dateRange === item.id ? 'white' : 'text.secondary',
-                bgcolor: dateRange === item.id ? 'primary.main' : 'transparent',
-                '&:hover': {
-                  bgcolor: dateRange === item.id ? 'primary.dark' : 'rgba(0,0,0,0.04)'
-                },
-                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                borderRadius: 4,
+                boxShadow: dateRange === item.id ? theme.shadows[2] : 'none',
               }}
             >
               {item.label}
             </Button>
           ))}
-        </Box>
+        </GlassCard>
       </Box>
 
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Grid container spacing={3} sx={{ mb: 6 }}>
+        {/* StatCards use the updated component below */}
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard title="Today's Sales" value={`₹${todaySales.toLocaleString('en-IN')}`} icon={<AttachMoney />} color="#E11D48" trend={salesTrend} onClick={() => navigate('/sales-reports')} />
         </Grid>
@@ -445,18 +408,12 @@ const Dashboard = () => {
       </Grid>
 
       {user?.role === 'admin' && (
-        <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid container spacing={3} sx={{ mb: 6 }}>
           <Grid item xs={12} lg={8}>
-            <Paper elevation={0} sx={{
-              p: 4,
-              borderRadius: 4,
-              border: '1px solid',
-              borderColor: 'divider',
-              height: '100%'
-            }}>
+            <GlassCard sx={{ p: 4, height: '100%' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
                 <Box>
-                  <Typography variant="h6" sx={{ fontWeight: 700 }}>Revenue vs Expenses</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 800 }}>Revenue vs Expenses</Typography>
                   <Typography variant="body2" color="text.secondary">Financial performance tracking</Typography>
                 </Box>
                 <IconButton size="small"><MoreVert /></IconButton>
@@ -464,19 +421,16 @@ const Dashboard = () => {
               <Box sx={{ height: 350 }}>
                 <Line data={salesChartData} options={{ ...commonChartOptions, maintainAspectRatio: false }} />
               </Box>
-            </Paper>
+            </GlassCard>
           </Grid>
           <Grid item xs={12} lg={4}>
-            <Paper elevation={0} sx={{
+            <GlassCard sx={{
               p: 4,
-              borderRadius: 4,
-              border: '1px solid rgba(217, 119, 6, 0.1)',
-              boxShadow: '0 15px 35px -10px rgba(217, 119, 6, 0.15)',
               height: '100%',
               display: 'flex',
               flexDirection: 'column'
             }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>Inventory Health</Typography>
+              <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>Inventory Health</Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>Distribution by stock level</Typography>
               <Box sx={{ flexGrow: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Doughnut data={stockData} options={{
@@ -485,7 +439,7 @@ const Dashboard = () => {
                   plugins: { legend: { display: false } }
                 }} />
                 <Box sx={{ position: 'absolute', textAlign: 'center' }}>
-                  <Typography variant="h4" sx={{ fontWeight: 800 }}>{totalItems}</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 900 }}>{totalItems}</Typography>
                   <Typography variant="caption" color="text.secondary">Total Items</Typography>
                 </Box>
               </Box>
@@ -493,28 +447,25 @@ const Dashboard = () => {
                 {stockData.labels.map((label, i) => (
                   <Box key={label} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Circle sx={{ fontSize: 10, color: stockData.datasets[0].backgroundColor[i] }} />
-                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>{label}</Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>{label}</Typography>
                   </Box>
                 ))}
               </Box>
-            </Paper>
+            </GlassCard>
           </Grid>
         </Grid>
       )}
 
       {user?.role !== 'admin' && (
-        <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid container spacing={3} sx={{ mb: 6 }}>
           <Grid item xs={12}>
-            <Paper elevation={0} sx={{
+            <GlassCard sx={{
               p: 4,
-              borderRadius: 4,
-              border: '1px solid rgba(217, 119, 6, 0.1)',
-              boxShadow: '0 15px 35px -10px rgba(217, 119, 6, 0.15)',
               height: '100%',
               display: 'flex',
               flexDirection: 'column'
             }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>Inventory Health</Typography>
+              <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>Inventory Health</Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>Distribution by stock level</Typography>
               <Box sx={{ height: 300, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Doughnut data={stockData} options={{
@@ -523,43 +474,32 @@ const Dashboard = () => {
                   plugins: { legend: { display: false } }
                 }} />
                 <Box sx={{ position: 'absolute', textAlign: 'center' }}>
-                  <Typography variant="h4" sx={{ fontWeight: 800 }}>{totalItems}</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 900 }}>{totalItems}</Typography>
                   <Typography variant="caption" color="text.secondary">Total Items</Typography>
                 </Box>
               </Box>
-            </Paper>
+            </GlassCard>
           </Grid>
         </Grid>
       )}
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} lg={7}>
-          <Paper elevation={0} sx={{
-            p: 4,
-            borderRadius: 4,
-            border: '1px solid rgba(217, 119, 6, 0.1)',
-            boxShadow: '0 15px 35px -10px rgba(217, 119, 6, 0.15)'
-          }}>
+          <GlassCard sx={{ p: 4 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4, alignItems: 'center' }}>
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>Top Products</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 800 }}>Top Products</Typography>
                 <Typography variant="body2" color="text.secondary">Best selling items by quantity</Typography>
               </Box>
               <Button endIcon={<ArrowForward />} onClick={() => navigate('/sales-reports')}>Full Report</Button>
             </Box>
             <Bar data={topProductsChartData} options={{ ...commonChartOptions, indexAxis: 'y' }} />
-          </Paper>
+          </GlassCard>
         </Grid>
         <Grid item xs={12} lg={5}>
-          <Paper elevation={0} sx={{
-            p: 0,
-            borderRadius: 4,
-            border: '1px solid rgba(217, 119, 6, 0.1)',
-            boxShadow: '0 15px 35px -10px rgba(217, 119, 6, 0.15)',
-            overflow: 'hidden'
-          }}>
+          <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
             <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>Recent Activity</Typography>
+              <Typography variant="h6" sx={{ fontWeight: 800 }}>Recent Activity</Typography>
             </Box>
             <Box sx={{ p: 0 }}>
               {recentInvoices.map((inv, index) => (
@@ -573,22 +513,22 @@ const Dashboard = () => {
                   transition: 'background 0.2s',
                   '&:hover': { bgcolor: 'action.hover' }
                 }}>
-                  <Avatar sx={{ bgcolor: 'rgba(217, 119, 6, 0.1)', color: '#d97706', borderRadius: 2 }}>
+                  <Avatar sx={{ bgcolor: 'primary.light', color: 'primary.contrastText', borderRadius: 2 }}>
                     <Receipt fontSize="small" />
                   </Avatar>
                   <Box sx={{ flexGrow: 1 }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>Invoice #{inv.id}</Typography>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Invoice #{inv.id}</Typography>
                     <Typography variant="caption" color="text.secondary">
                       {new Date(inv.date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} • {inv.items?.length || 0} items
                     </Typography>
                   </Box>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#d97706' }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 900, color: 'primary.main' }}>
                     ₹{inv.total.toLocaleString('en-IN')}
                   </Typography>
                 </Box>
               ))}
             </Box>
-          </Paper>
+          </GlassCard>
         </Grid>
       </Grid>
     </Box>

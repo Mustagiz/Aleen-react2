@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, Avatar, TablePagination } from '@mui/material';
 import { Add, Edit, Delete, Search, People, Phone, Email, ShoppingBag, TrendingUp, FilterList, MoreVert, Download, WhatsApp } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
+import GlassCard from '../components/GlassCard';
 
 const Customers = () => {
     const { customers, addCustomer, updateCustomer, deleteCustomer, invoices, profile } = useData();
@@ -169,26 +170,12 @@ const Customers = () => {
             <Grid container spacing={3} sx={{ mb: 4 }}>
                 {stats.map((stat, idx) => (
                     <Grid item xs={12} sm={4} key={idx}>
-                        <Card sx={{
-                            borderRadius: 4,
-                            position: 'relative',
-                            overflow: 'hidden',
-                            boxShadow: `0 10px 25px -5px ${stat.color}26`,
-                            border: '1px solid',
-                            borderColor: `${stat.color}30`,
-                            background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${stat.color}0D 100%)`,
-                            transition: 'all 0.3s ease',
-                            '&:hover': {
-                                transform: 'translateY(-4px)',
-                                boxShadow: `0 12px 24px -10px ${stat.color}40`,
-                                borderColor: `${stat.color}60`,
-                            }
-                        }}>
-                            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: stat.color }} />
+                        <GlassCard sx={{ height: '100%', p: 0 }}>
+                            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: stat.color }} />
                             <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <Box>
-                                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{stat.title}</Typography>
-                                    <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5 }}>{stat.value}</Typography>
+                                    <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: '0.1em' }}>{stat.title}</Typography>
+                                    <Typography variant="h4" sx={{ fontWeight: 900, mt: 0.5 }}>{stat.value}</Typography>
                                 </Box>
                                 <Box sx={{
                                     p: 1.5,
@@ -202,12 +189,12 @@ const Customers = () => {
                                     {stat.icon}
                                 </Box>
                             </CardContent>
-                        </Card>
+                        </GlassCard>
                     </Grid>
                 ))}
             </Grid>
 
-            <Paper sx={{ p: 2, mb: 3, borderRadius: 3 }}>
+            <GlassCard sx={{ p: 2, mb: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Search sx={{ color: 'text.secondary' }} />
                     <TextField
@@ -219,14 +206,14 @@ const Customers = () => {
                         InputProps={{ disableUnderline: true }}
                     />
                 </Box>
-            </Paper>
+            </GlassCard>
 
             {isMobile ? (
                 <Box>
                     {filteredCustomers.map(cust => {
                         const customerStat = calculateCustomerStats(cust.id);
                         return (
-                            <Card key={cust.id} sx={{ mb: 2, borderRadius: 4, bgcolor: 'background.paper', position: 'relative' }}>
+                            <GlassCard key={cust.id} sx={{ mb: 2 }}>
                                 <CardContent sx={{ p: 2.5 }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                                         <Avatar sx={{ bgcolor: 'primary.light', width: 48, height: 48, fontWeight: 700 }}>{getInitials(cust.name)}</Avatar>
@@ -262,63 +249,65 @@ const Customers = () => {
                                         </Grid>
                                     </Grid>
                                 </CardContent>
-                            </Card>
+                            </GlassCard>
                         );
                     })}
                 </Box>
             ) : (
-                <TableContainer component={Paper} sx={{ borderRadius: 4, overflow: 'hidden' }}>
-                    <Table>
-                        <TableHead sx={{ bgcolor: 'action.hover' }}>
-                            <TableRow>
-                                <TableCell sx={{ fontWeight: 800 }}>Customer Name</TableCell>
-                                <TableCell sx={{ fontWeight: 800 }}>Contact Info</TableCell>
-                                <TableCell sx={{ fontWeight: 800 }}>Stats</TableCell>
-                                <TableCell sx={{ fontWeight: 800 }}>Points</TableCell>
-                                <TableCell sx={{ fontWeight: 800 }}>Last Purchase</TableCell>
-                                <TableCell sx={{ fontWeight: 800 }} align="right">Actions</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {filteredCustomers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(cust => {
-                                const customerStat = calculateCustomerStats(cust.id);
-                                return (
-                                    <TableRow key={cust.id} hover>
-                                        <TableCell>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                <Avatar sx={{ bgcolor: 'secondary.light', width: 36, height: 36, fontSize: '0.875rem' }}>{getInitials(cust.name)}</Avatar>
-                                                <Typography sx={{ fontWeight: 600 }}>{cust.name}</Typography>
-                                            </Box>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Typography variant="body2">{cust.phone}</Typography>
-                                            <Typography variant="caption" color="text.secondary">{cust.email || 'No email'}</Typography>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Typography variant="body2" sx={{ fontWeight: 600 }}>₹{customerStat.totalSpent.toLocaleString()}</Typography>
-                                            <Typography variant="caption" color="text.secondary">{customerStat.visitCount} orders</Typography>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Chip
-                                                label={cust.loyaltyPoints || 0}
-                                                size="small"
-                                                color="primary"
-                                                sx={{ fontWeight: 800, borderRadius: 1.5, background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)' }}
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Typography variant="body2" sx={{ fontWeight: 500 }}>{customerStat.lastVisit}</Typography>
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            <Tooltip title="WhatsApp"><IconButton size="small" sx={{ color: '#25D366' }} onClick={() => sendWhatsAppMessage(cust)}><WhatsApp fontSize="small" /></IconButton></Tooltip>
-                                            <Tooltip title="Edit"><IconButton size="small" onClick={() => handleOpen(cust)}><Edit fontSize="small" /></IconButton></Tooltip>
-                                            <Tooltip title="Delete"><IconButton size="small" sx={{ color: 'error.main' }} onClick={() => deleteCustomer(cust.id)}><Delete fontSize="small" /></IconButton></Tooltip>
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
+                <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
+                    <TableContainer>
+                        <Table>
+                            <TableHead sx={{ bgcolor: 'action.hover' }}>
+                                <TableRow>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Customer Name</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Contact Info</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Stats</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Points</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Last Purchase</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }} align="right">Actions</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {filteredCustomers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(cust => {
+                                    const customerStat = calculateCustomerStats(cust.id);
+                                    return (
+                                        <TableRow key={cust.id} hover>
+                                            <TableCell>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                    <Avatar sx={{ bgcolor: 'secondary.light', width: 36, height: 36, fontSize: '0.875rem' }}>{getInitials(cust.name)}</Avatar>
+                                                    <Typography sx={{ fontWeight: 700 }}>{cust.name}</Typography>
+                                                </Box>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Typography variant="body2" sx={{ fontWeight: 500 }}>{cust.phone}</Typography>
+                                                <Typography variant="caption" color="text.secondary">{cust.email || 'No email'}</Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Typography variant="body2" sx={{ fontWeight: 750 }}>₹{customerStat.totalSpent.toLocaleString()}</Typography>
+                                                <Typography variant="caption" color="text.secondary">{customerStat.visitCount} visits</Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Chip
+                                                    label={cust.loyaltyPoints || 0}
+                                                    size="small"
+                                                    color="primary"
+                                                    sx={{ fontWeight: 800, borderRadius: 1.5, background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)' }}
+                                                />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Typography variant="body2" sx={{ fontWeight: 500 }}>{customerStat.lastVisit}</Typography>
+                                            </TableCell>
+                                            <TableCell align="right">
+                                                <Tooltip title="WhatsApp"><IconButton size="small" sx={{ color: '#25D366' }} onClick={() => sendWhatsAppMessage(cust)}><WhatsApp fontSize="small" /></IconButton></Tooltip>
+                                                <Tooltip title="Edit"><IconButton size="small" onClick={() => handleOpen(cust)} sx={{ color: 'primary.main' }}><Edit fontSize="small" /></IconButton></Tooltip>
+                                                <Tooltip title="Delete"><IconButton size="small" sx={{ color: 'error.main' }} onClick={() => { if (window.confirm(`Delete customer ${cust.name}?`)) deleteCustomer(cust.id); }}><Delete fontSize="small" /></IconButton></Tooltip>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
@@ -328,7 +317,7 @@ const Customers = () => {
                         onPageChange={(e, newPage) => setPage(newPage)}
                         onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0); }}
                     />
-                </TableContainer>
+                </GlassCard>
             )}
 
             <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>

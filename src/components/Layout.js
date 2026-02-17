@@ -7,6 +7,7 @@ import { useData } from '../contexts/DataContext';
 import { useThemeContext } from '../contexts/ThemeContext';
 import NotificationCenter from './NotificationCenter';
 import GlobalSearch from './GlobalSearch';
+import NetworkStatus from './NetworkStatus';
 
 const Layout = () => {
   const { logout, user } = useAuth();
@@ -427,6 +428,7 @@ const Layout = () => {
         </Paper>
       )}
       <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <NetworkStatus />
     </Box>
   );
 };

@@ -10,6 +10,7 @@ import InvoicePrint from '../components/InvoicePrint';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useThemeContext } from '../contexts/ThemeContext';
+import GlassCard from '../components/GlassCard';
 
 const Invoices = () => {
   const { user } = useAuth();
@@ -705,87 +706,60 @@ const Invoices = () => {
         </Box>
 
         {/* Stats Cards */}
-        <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid container spacing={3} sx={{ mb: 6 }}>
           <Grid item xs={12} sm={4}>
-            <Card sx={{
-              borderRadius: 4,
-              position: 'relative',
-              overflow: 'hidden',
-              boxShadow: '0 10px 25px -5px rgba(25, 118, 210, 0.15)',
-              border: '1px solid rgba(25, 118, 210, 0.2)',
-              background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(25, 118, 210, 0.05) 100%)`,
-              transition: 'all 0.3s ease',
-              '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(25, 118, 210, 0.3)' }
-            }}>
-              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#1976d2' }} />
+            <GlassCard sx={{ height: '100%', p: 0 }}>
+              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#1976d2' }} />
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Invoices</Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>{totalInvoices}</Typography>
+                    <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Total Invoices</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', mt: 0.5 }}>{totalInvoices}</Typography>
                   </Box>
-                  <Avatar sx={{ bgcolor: 'rgba(25, 118, 210, 0.1)', color: '#1976d2', borderRadius: 2 }}>
+                  <Avatar sx={{ bgcolor: 'rgba(25, 118, 210, 0.1)', color: '#1976d2', borderRadius: 2.5 }}>
                     <Receipt fontSize="small" />
                   </Avatar>
                 </Box>
               </CardContent>
-            </Card>
+            </GlassCard>
           </Grid>
           <Grid item xs={12} sm={4}>
-            <Card sx={{
-              borderRadius: 4,
-              position: 'relative',
-              overflow: 'hidden',
-              boxShadow: '0 10px 25px -5px rgba(46, 125, 50, 0.15)',
-              border: '1px solid rgba(46, 125, 50, 0.2)',
-              background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(46, 125, 50, 0.05) 100%)`,
-              transition: 'all 0.3s ease',
-              '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(46, 125, 50, 0.3)' }
-            }}>
-              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#2e7d32' }} />
+            <GlassCard sx={{ height: '100%', p: 0 }}>
+              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#2e7d32' }} />
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Revenue</Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>₹{totalAmount.toLocaleString('en-IN')}</Typography>
+                    <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Revenue</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', mt: 0.5 }}>₹{totalAmount.toLocaleString('en-IN')}</Typography>
                   </Box>
-                  <Avatar sx={{ bgcolor: 'rgba(46, 125, 50, 0.1)', color: '#2e7d32', borderRadius: 2 }}>
+                  <Avatar sx={{ bgcolor: 'rgba(46, 125, 50, 0.1)', color: '#2e7d32', borderRadius: 2.5 }}>
                     <AttachMoney fontSize="small" />
                   </Avatar>
                 </Box>
               </CardContent>
-            </Card>
+            </GlassCard>
           </Grid>
           <Grid item xs={12} sm={4}>
-            <Card sx={{
-              borderRadius: 4,
-              position: 'relative',
-              overflow: 'hidden',
-              boxShadow: '0 10px 25px -5px rgba(237, 108, 2, 0.15)',
-              border: '1px solid rgba(237, 108, 2, 0.2)',
-              background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(237, 108, 2, 0.05) 100%)`,
-              transition: 'all 0.3s ease',
-              '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(237, 108, 2, 0.3)' }
-            }}>
-              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#ed6c02' }} />
+            <GlassCard sx={{ height: '100%', p: 0 }}>
+              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#ed6c02' }} />
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Avg Invoice</Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>₹{avgAmount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</Typography>
+                    <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Avg Invoice</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', mt: 0.5 }}>₹{avgAmount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</Typography>
                   </Box>
-                  <Avatar sx={{ bgcolor: 'rgba(237, 108, 2, 0.1)', color: '#ed6c02', borderRadius: 2 }}>
+                  <Avatar sx={{ bgcolor: 'rgba(237, 108, 2, 0.1)', color: '#ed6c02', borderRadius: 2.5 }}>
                     <TrendingUp fontSize="small" />
                   </Avatar>
                 </Box>
               </CardContent>
-            </Card>
+            </GlassCard>
           </Grid>
         </Grid>
       </Box>
 
       {/* Search and Filter Bar */}
-      <Paper sx={{ p: 2, mb: 3, borderRadius: 3 }}>
+      <GlassCard sx={{ p: 3, mb: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: showFilters ? 2 : 0 }}>
           <Search sx={{ color: 'text.secondary' }} />
           <TextField
@@ -796,7 +770,7 @@ const Invoices = () => {
             fullWidth
             InputProps={{ disableUnderline: true }}
           />
-          <IconButton onClick={() => setShowFilters(!showFilters)} sx={{ bgcolor: showFilters ? 'primary.main' : 'grey.100', color: showFilters ? 'white' : 'text.secondary' }}>
+          <IconButton onClick={() => setShowFilters(!showFilters)} sx={{ bgcolor: showFilters ? 'primary.main' : 'action.hover', color: showFilters ? 'white' : 'text.secondary' }}>
             <FilterList />
           </IconButton>
         </Box>
@@ -846,15 +820,15 @@ const Invoices = () => {
             <MenuItem value="desc">Desc</MenuItem>
           </TextField>
         </Box>
-      </Paper>
+      </GlassCard>
 
       {/* Invoice List (Mobile) or Table (Desktop) */}
       {
         isMobile ? (
           <Box>
             {sortedInvoices.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(inv => (
-              <Card key={inv.id} sx={{ mb: 2, borderRadius: 3, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
-                <CardContent sx={{ p: 2 }}>
+              <GlassCard key={inv.id} sx={{ mb: 2, p: 0 }}>
+                <CardContent sx={{ p: 2.5 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                     <Box>
                       <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'primary.main' }}>
@@ -869,7 +843,7 @@ const Invoices = () => {
                       size="small"
                       sx={{
                         bgcolor: 'primary.light',
-                        color: 'primary.main',
+                        color: 'primary.contrastText',
                         fontWeight: 700,
                         fontSize: '0.65rem'
                       }}
@@ -880,7 +854,7 @@ const Invoices = () => {
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                       {inv.customer || 'Walk-in Customer'}
                     </Typography>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'primary.main' }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 900, color: 'primary.main' }}>
                       ₹{inv.total.toLocaleString('en-IN')}
                     </Typography>
                   </Box>
@@ -888,7 +862,7 @@ const Invoices = () => {
                   <Divider sx={{ my: 1.5 }} />
 
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>
                       {inv.items?.length || 0} Items
                     </Typography>
                     <Box sx={{ display: 'flex' }}>
@@ -924,7 +898,7 @@ const Invoices = () => {
                     </MenuItem>
                   </Menu>
                 </CardContent>
-              </Card>
+              </GlassCard>
             ))}
             <TablePagination
               rowsPerPageOptions={[5, 10, 25]}
@@ -938,37 +912,37 @@ const Invoices = () => {
             />
           </Box>
         ) : (
-          <Paper sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.05)' }}>
+          <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
             <TableContainer>
               <Table>
-                <TableHead sx={{ bgcolor: 'rgba(136, 14, 79, 0.02)', borderBottom: '2px solid rgba(136, 14, 79, 0.1)' }}>
+                <TableHead sx={{ bgcolor: 'action.hover' }}>
                   <TableRow>
-                    <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                       <TableSortLabel active={orderBy === 'id'} direction={orderBy === 'id' ? order : 'asc'} onClick={() => handleRequestSort('id')}>
                         Invoice Details
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                       <TableSortLabel active={orderBy === 'date'} direction={orderBy === 'date' ? order : 'asc'} onClick={() => handleRequestSort('date')}>
                         Date
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: { xs: 'none', sm: 'table-cell' } }}>
+                    <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: { xs: 'none', sm: 'table-cell' } }}>
                       <TableSortLabel active={orderBy === 'customer'} direction={orderBy === 'customer' ? order : 'asc'} onClick={() => handleRequestSort('customer')}>
                         Customer
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: { xs: 'none', md: 'table-cell' } }}>
+                    <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: { xs: 'none', md: 'table-cell' } }}>
                       <TableSortLabel active={orderBy === 'paymentMethod'} direction={orderBy === 'paymentMethod' ? order : 'asc'} onClick={() => handleRequestSort('paymentMethod')}>
                         Payment
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                       <TableSortLabel active={orderBy === 'total'} direction={orderBy === 'total' ? order : 'asc'} onClick={() => handleRequestSort('total')}>
                         Amount
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Actions</TableCell>
+                    <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -978,7 +952,7 @@ const Invoices = () => {
                       <TableRow
                         key={inv.id}
                         sx={{
-                          '&:hover': { bgcolor: 'rgba(136, 14, 79, 0.02)' },
+                          '&:hover': { bgcolor: 'action.hover' },
                           transition: 'all 0.2s'
                         }}
                       >
@@ -998,8 +972,8 @@ const Invoices = () => {
                             label={inv.paymentMethod}
                             size="small"
                             sx={{
-                              bgcolor: 'rgba(136, 14, 79, 0.05)',
-                              color: 'primary.main',
+                              bgcolor: 'primary.light',
+                              color: 'primary.contrastText',
                               fontWeight: 700,
                               fontSize: '0.65rem',
                               textTransform: 'uppercase',
@@ -1007,7 +981,7 @@ const Invoices = () => {
                             }}
                           />
                         </TableCell>
-                        <TableCell sx={{ fontWeight: 800, fontSize: '0.95rem', color: 'primary.main' }}>
+                        <TableCell sx={{ fontWeight: 900, fontSize: '0.95rem', color: 'primary.main' }}>
                           ₹{inv.total.toLocaleString('en-IN')}
                         </TableCell>
                         <TableCell>
@@ -1016,8 +990,8 @@ const Invoices = () => {
                             onClick={(e) => handleMenuClick(e, inv.id)}
                             sx={{
                               color: 'primary.main',
-                              bgcolor: 'rgba(136, 14, 79, 0.05)',
-                              '&:hover': { bgcolor: 'rgba(136, 14, 79, 0.1)' }
+                              bgcolor: 'action.hover',
+                              '&:hover': { bgcolor: 'primary.light', color: 'primary.contrastText' }
                             }}
                           >
                             <MoreVert fontSize="small" />
@@ -1072,7 +1046,7 @@ const Invoices = () => {
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
             />
-          </Paper>
+          </GlassCard>
         )
       }
 
