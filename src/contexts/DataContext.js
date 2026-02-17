@@ -425,7 +425,19 @@ export const DataProvider = ({ children }) => {
 
   const addInvoice = async (invoice) => {
     const id = Date.now().toString();
-    const newInvoice = { ...invoice, id };
+
+    // Calculate total paid across all payment methods provided
+    const totalPaid = invoice.payments?.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0) || 0;
+    const balanceDue = Math.max(0, invoice.total - totalPaid);
+    const calculatedStatus = balanceDue === 0 ? 'paid' : (totalPaid > 0 ? 'partial' : 'pending');
+
+    const newInvoice = {
+      ...invoice,
+      id,
+      totalPaid,
+      balanceDue,
+      paymentStatus: invoice.paymentStatus || calculatedStatus
+    };
 
     // Use a batch to ensure inventory update, invoice creation, and customer update are atomic
     const batch = writeBatch(db);
@@ -458,18 +470,20 @@ export const DataProvider = ({ children }) => {
       }
     }
 
-    // Update Customer Stats & Loyalty Points (₹100 = 1 Point)
+    // Update Customer Stats, Loyalty Points & Credit Balance
     if (invoice.customerId) {
       const customerRef = doc(db, 'customers', invoice.customerId);
       const customer = customers.find(c => c.id === invoice.customerId);
       if (customer) {
         const pointsEarned = Math.floor(invoice.total / 100);
         const newTotalSpent = (customer.totalSpent || 0) + invoice.total;
+        const newTotalDue = (customer.totalDue || 0) + balanceDue;
         const newTier = calculateLoyaltyTier(newTotalSpent);
         const pointsHistory = customer.pointsHistory || [];
 
         batch.update(customerRef, {
           totalSpent: newTotalSpent,
+          totalDue: newTotalDue,
           visitCount: (customer.visitCount || 0) + 1,
           loyaltyPoints: (customer.loyaltyPoints || 0) + pointsEarned,
           loyaltyTier: newTier,
@@ -484,6 +498,36 @@ export const DataProvider = ({ children }) => {
               invoiceTotal: invoice.total
             }
           ]
+        });
+      }
+    }
+
+    await batch.commit();
+  };
+
+  const addPaymentRecord = async (invoiceId, paymentData) => {
+    const invoiceRef = doc(db, 'invoices', invoiceId);
+    const invoice = invoices.find(inv => inv.id === invoiceId);
+    if (!invoice) return;
+
+    const newTotalPaid = (parseFloat(invoice.totalPaid) || 0) + (parseFloat(paymentData.amount) || 0);
+    const newBalanceDue = Math.max(0, invoice.total - newTotalPaid);
+    const newPayments = [...(invoice.payments || []), { ...paymentData, timestamp: new Date().toISOString() }];
+
+    const batch = writeBatch(db);
+    batch.update(invoiceRef, {
+      totalPaid: newTotalPaid,
+      balanceDue: newBalanceDue,
+      paymentStatus: newBalanceDue === 0 ? 'paid' : 'partial',
+      payments: newPayments
+    });
+
+    if (invoice.customerId) {
+      const customerRef = doc(db, 'customers', invoice.customerId);
+      const customer = customers.find(c => c.id === invoice.customerId);
+      if (customer) {
+        batch.update(customerRef, {
+          totalDue: Math.max(0, (parseFloat(customer.totalDue) || 0) - (parseFloat(paymentData.amount) || 0))
         });
       }
     }
@@ -724,6 +768,7 @@ export const DataProvider = ({ children }) => {
       deleteInventoryItem,
       bulkAddInventory,
       addInvoice,
+      addPaymentRecord,
       updateInvoice,
       deleteInvoice,
       profile,

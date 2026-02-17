@@ -78,7 +78,7 @@ const PaymentSummary = () => {
     const calculatePaymentSummary = () => {
         const summary = {
             Cash: { total: 0, count: 0, transactions: [] },
-            UPI: { total: 0, count: 0, transactions: [] },
+            UPI: { total: 0, count: 0, transactions: [], providers: {} },
             Card: { total: 0, count: 0, transactions: [] },
             Credit: { total: 0, count: 0, transactions: [] },
             'Net Banking': { total: 0, count: 0, transactions: [] }
@@ -92,12 +92,16 @@ const PaymentSummary = () => {
                     if (summary[method]) {
                         summary[method].total += payment.amount || 0;
                         summary[method].count += 1;
+                        if (method === 'UPI' && payment.upiProvider) {
+                            summary.UPI.providers[payment.upiProvider] = (summary.UPI.providers[payment.upiProvider] || 0) + payment.amount;
+                        }
                         summary[method].transactions.push({
                             id: inv.id,
                             amount: payment.amount,
                             time: inv.date,
                             customer: inv.customer || 'Walk-in',
-                            transactionId: payment.transactionId
+                            transactionId: payment.transactionId,
+                            upiProvider: payment.upiProvider
                         });
                     }
                 });
@@ -428,6 +432,16 @@ const PaymentSummary = () => {
                                             {data.count}
                                         </Typography>
                                     </Box>
+                                    {method === 'UPI' && data.providers && Object.keys(data.providers).length > 0 && (
+                                        <Box sx={{ mt: 1 }}>
+                                            {Object.entries(data.providers).map(([provider, amount]) => (
+                                                <Box key={provider} sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                                                    <Typography variant="caption" color="text.secondary">{provider}</Typography>
+                                                    <Typography variant="caption" sx={{ fontWeight: 600 }}>₹{amount.toLocaleString()}</Typography>
+                                                </Box>
+                                            ))}
+                                        </Box>
+                                    )}
                                     <Divider sx={{ my: 1.5 }} />
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                         <Typography variant="caption" color="text.secondary">Average</Typography>
@@ -476,7 +490,7 @@ const PaymentSummary = () => {
                                         <TableCell>{txn.customer}</TableCell>
                                         <TableCell>
                                             <Chip
-                                                label={txn.method}
+                                                label={txn.method === 'UPI' && txn.upiProvider ? `${txn.method} (${txn.upiProvider})` : txn.method}
                                                 size="small"
                                                 sx={{
                                                     bgcolor: `${getPaymentColor(txn.method)}15`,

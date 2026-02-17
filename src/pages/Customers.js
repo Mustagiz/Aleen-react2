@@ -1,16 +1,24 @@
 import React, { useState } from 'react';
-import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, Avatar, TablePagination } from '@mui/material';
-import { Add, Edit, Delete, Search, People, Phone, Email, ShoppingBag, TrendingUp, FilterList, MoreVert, Download, WhatsApp } from '@mui/icons-material';
+import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, Avatar, TablePagination, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import { Add, Edit, Delete, Search, People, Phone, Email, ShoppingBag, TrendingUp, FilterList, MoreVert, Download, WhatsApp, Payments, CurrencyRupee } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import GlassCard from '../components/GlassCard';
 
 const Customers = () => {
-    const { customers, addCustomer, updateCustomer, deleteCustomer, invoices, profile } = useData();
+    const { customers, addCustomer, updateCustomer, deleteCustomer, invoices, profile, addPaymentRecord } = useData();
     const [open, setOpen] = useState(false);
     const [editCustomer, setEditCustomer] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+    const [selectedCustomerForPayment, setSelectedCustomerForPayment] = useState(null);
+    const [paymentData, setPaymentData] = useState({
+        amount: '',
+        method: 'Cash',
+        transactionId: '',
+        note: ''
+    });
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -62,6 +70,54 @@ const Customers = () => {
             await addCustomer(formData);
         }
         setOpen(false);
+    };
+
+    const handleRecordPayment = async () => {
+        if (!paymentData.amount || parseFloat(paymentData.amount) <= 0) {
+            alert('Please enter a valid amount');
+            return;
+        }
+
+        const customer = customers.find(c => c.id === selectedCustomerForPayment);
+        if (!customer) return;
+
+        const outstandingInvoices = invoices
+            .filter(inv => inv.customerId === selectedCustomerForPayment && (inv.balanceDue || 0) > 0)
+            .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        if (outstandingInvoices.length === 0) {
+            alert('This customer has no outstanding invoices.');
+            setPaymentDialogOpen(false);
+            return;
+        }
+
+        let remainingPayment = parseFloat(paymentData.amount);
+        for (const inv of outstandingInvoices) {
+            if (remainingPayment <= 0) break;
+            const amountToPay = Math.min(remainingPayment, inv.balanceDue);
+            await addPaymentRecord(inv.id, {
+                amount: amountToPay,
+                method: paymentData.method,
+                transactionId: paymentData.transactionId,
+                note: paymentData.note
+            });
+            remainingPayment -= amountToPay;
+        }
+
+        setPaymentDialogOpen(false);
+        setPaymentData({ amount: '', method: 'Cash', transactionId: '', note: '' });
+    };
+
+    const handleOpenPaymentDialog = (customerId) => {
+        setSelectedCustomerForPayment(customerId);
+        const customer = customers.find(c => c.id === customerId);
+        setPaymentData({
+            amount: customer?.totalDue || '',
+            method: 'Cash',
+            transactionId: '',
+            note: ''
+        });
+        setPaymentDialogOpen(true);
     };
 
     const sendWhatsAppMessage = (cust) => {
@@ -224,6 +280,11 @@ const Customers = () => {
                                             </Typography>
                                         </Box>
                                         <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                            {(cust.totalDue || 0) > 0 && (
+                                                <IconButton size="small" onClick={() => handleOpenPaymentDialog(cust.id)} sx={{ color: 'success.main' }}>
+                                                    <Payments fontSize="small" />
+                                                </IconButton>
+                                            )}
                                             <IconButton size="small" onClick={() => sendWhatsAppMessage(cust)} sx={{ color: '#25D366' }}><WhatsApp fontSize="small" /></IconButton>
                                             <IconButton size="small" onClick={() => handleOpen(cust)} sx={{ color: 'primary.main' }}><Edit fontSize="small" /></IconButton>
                                             <IconButton size="small" onClick={() => { if (window.confirm(`Delete customer ${cust.name}?`)) deleteCustomer(cust.id); }} sx={{ color: 'error.main' }}><Delete fontSize="small" /></IconButton>
@@ -242,6 +303,12 @@ const Customers = () => {
                                         <Grid item xs={3}>
                                             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>Points</Typography>
                                             <Typography variant="body2" sx={{ fontWeight: 700, color: 'primary.main' }}>{cust.loyaltyPoints || 0}</Typography>
+                                        </Grid>
+                                        <Grid item xs={3}>
+                                            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>Due</Typography>
+                                            <Typography variant="body2" sx={{ fontWeight: 800, color: (cust.totalDue || 0) > 0 ? 'error.main' : 'success.main' }}>
+                                                ₹{(cust.totalDue || 0).toLocaleString()}
+                                            </Typography>
                                         </Grid>
                                         <Grid item xs={6}>
                                             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>Last Visit</Typography>
@@ -263,6 +330,7 @@ const Customers = () => {
                                     <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Contact Info</TableCell>
                                     <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Stats</TableCell>
                                     <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Points</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Balance Due</TableCell>
                                     <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Last Purchase</TableCell>
                                     <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }} align="right">Actions</TableCell>
                                 </TableRow>
@@ -295,9 +363,24 @@ const Customers = () => {
                                                 />
                                             </TableCell>
                                             <TableCell>
+                                                <Typography variant="body2" sx={{
+                                                    fontWeight: 800,
+                                                    color: (cust.totalDue || 0) > 0 ? 'error.main' : 'success.main'
+                                                }}>
+                                                    ₹{(cust.totalDue || 0).toLocaleString()}
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell>
                                                 <Typography variant="body2" sx={{ fontWeight: 500 }}>{customerStat.lastVisit}</Typography>
                                             </TableCell>
                                             <TableCell align="right">
+                                                {(cust.totalDue || 0) > 0 && (
+                                                    <Tooltip title="Record Payment">
+                                                        <IconButton size="small" sx={{ color: 'success.main' }} onClick={() => handleOpenPaymentDialog(cust.id)}>
+                                                            <Payments fontSize="small" />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                )}
                                                 <Tooltip title="WhatsApp"><IconButton size="small" sx={{ color: '#25D366' }} onClick={() => sendWhatsAppMessage(cust)}><WhatsApp fontSize="small" /></IconButton></Tooltip>
                                                 <Tooltip title="Edit"><IconButton size="small" onClick={() => handleOpen(cust)} sx={{ color: 'primary.main' }}><Edit fontSize="small" /></IconButton></Tooltip>
                                                 <Tooltip title="Delete"><IconButton size="small" sx={{ color: 'error.main' }} onClick={() => { if (window.confirm(`Delete customer ${cust.name}?`)) deleteCustomer(cust.id); }}><Delete fontSize="small" /></IconButton></Tooltip>
@@ -355,6 +438,53 @@ const Customers = () => {
                 <DialogActions sx={{ p: 3 }}>
                     <Button onClick={() => setOpen(false)} sx={{ fontWeight: 600 }}>Cancel</Button>
                     <Button variant="contained" onClick={handleSave} sx={{ px: 4, borderRadius: 2, fontWeight: 700 }}>Save Customer</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={paymentDialogOpen} onClose={() => setPaymentDialogOpen(false)} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
+                <DialogTitle sx={{ fontWeight: 800, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Payments color="success" /> Record Payment
+                </DialogTitle>
+                <DialogContent>
+                    <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+                        Collect outstanding balance from <strong>{customers.find(c => c.id === selectedCustomerForPayment)?.name}</strong>
+                    </Typography>
+                    <TextField
+                        fullWidth label="Amount Received" margin="normal" type="number"
+                        value={paymentData.amount}
+                        onChange={(e) => setPaymentData({ ...paymentData, amount: e.target.value })}
+                        InputProps={{ startAdornment: <CurrencyRupee sx={{ fontSize: 16, mr: 0.5, color: 'text.secondary' }} /> }}
+                    />
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel>Payment Method</InputLabel>
+                        <Select
+                            value={paymentData.method}
+                            label="Payment Method"
+                            onChange={(e) => setPaymentData({ ...paymentData, method: e.target.value })}
+                        >
+                            <MenuItem value="Cash">Cash</MenuItem>
+                            <MenuItem value="Bank Transfer">Bank Transfer</MenuItem>
+                            <MenuItem value="UPI">UPI</MenuItem>
+                            <MenuItem value="Cheque">Cheque</MenuItem>
+                        </Select>
+                    </FormControl>
+                    {(paymentData.method === 'UPI' || paymentData.method === 'Bank Transfer') && (
+                        <TextField
+                            fullWidth label="Transaction ID" margin="normal"
+                            value={paymentData.transactionId}
+                            onChange={(e) => setPaymentData({ ...paymentData, transactionId: e.target.value })}
+                        />
+                    )}
+                    <TextField
+                        fullWidth label="Notes" margin="normal" multiline rows={2}
+                        value={paymentData.note}
+                        onChange={(e) => setPaymentData({ ...paymentData, note: e.target.value })}
+                        placeholder="e.g. Paid via PhonePe"
+                    />
+                </DialogContent>
+                <DialogActions sx={{ p: 3 }}>
+                    <Button onClick={() => setPaymentDialogOpen(false)} sx={{ fontWeight: 600 }}>Cancel</Button>
+                    <Button variant="contained" color="success" onClick={handleRecordPayment} sx={{ px: 4, borderRadius: 2, fontWeight: 700 }}>Confirm Payment</Button>
                 </DialogActions>
             </Dialog>
         </Box>
