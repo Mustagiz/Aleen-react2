@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, IconButton, Drawer, List, ListItem, ListItemIcon, ListItemText, Box, useMediaQuery, useTheme, Avatar, Divider, Chip, ListSubheader, BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
-import { Menu, Dashboard, Inventory, Receipt, Assessment, Logout, Store, TrendingUp, Settings, Brightness4, Brightness7, People, AccountBalanceWallet, QrCode, Campaign, Stars } from '@mui/icons-material';
+import { Menu, Dashboard, Inventory, Receipt, Assessment, Logout, Store, TrendingUp, Settings, Brightness4, Brightness7, People, AccountBalanceWallet, QrCode, Campaign, Stars, Search } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
 import { useThemeContext } from '../contexts/ThemeContext';
 import NotificationCenter from './NotificationCenter';
+import GlobalSearch from './GlobalSearch';
 
 const Layout = () => {
   const { logout, user } = useAuth();
@@ -16,6 +17,20 @@ const Layout = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [open, setOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  // Global search keyboard shortcut (Ctrl+K or Cmd+K)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const getInitials = (name) => {
     return name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'AC';
@@ -160,6 +175,19 @@ const Layout = () => {
               }}
             />
           )}
+          <IconButton
+            onClick={() => setSearchOpen(true)}
+            sx={{
+              mr: 1,
+              bgcolor: 'rgba(0,0,0,0.04)',
+              display: { xs: 'none', sm: 'inline-flex' }
+            }}
+          >
+            <Search fontSize="small" />
+            <Typography variant="caption" sx={{ ml: 1, fontWeight: 700, color: 'text.secondary', display: { xs: 'none', lg: 'block' } }}>
+              Ctrl+K
+            </Typography>
+          </IconButton>
           <NotificationCenter />
           <IconButton onClick={toggleTheme} color="inherit" sx={{ mx: 1 }}>
             {mode === 'dark' ? <Brightness7 fontSize="small" /> : <Brightness4 fontSize="small" />}
@@ -398,6 +426,7 @@ const Layout = () => {
           </BottomNavigation>
         </Paper>
       )}
+      <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
     </Box>
   );
 };
