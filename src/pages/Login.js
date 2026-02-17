@@ -15,9 +15,11 @@ const Login = () => {
     e.preventDefault();
     try {
       await login(email, password);
+      // Auth state listener in App.js or AuthContext will redirect, but we can also do it here
       navigate('/');
     } catch (err) {
-      setError('Invalid email or password');
+      console.error(err);
+      setError('Failed to log in. Please check your email and password.');
     }
   };
 
@@ -68,8 +70,7 @@ const Login = () => {
           </Box>
           <Box sx={{ mt: 3, p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'center' }}>
-              Demo Credentials:<br />
-              <strong>admin@aleen.com</strong> / <strong>admin123</strong>
+              Authentication is now secured via Firebase.
             </Typography>
           </Box>
         </Paper>

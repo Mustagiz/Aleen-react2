@@ -24,8 +24,15 @@ import AdvancedReports from './pages/AdvancedReports';
 import Layout from './components/Layout';
 
 const PrivateRoute = ({ children }) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  if (loading) return <div>Loading...</div>; // Or a nice centered spinner
   return user ? children : <Navigate to="/login" />;
+};
+
+const AdminRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return <div>Loading...</div>;
+  return user && user.role === 'admin' ? children : <Navigate to="/" />;
 };
 
 function App() {
@@ -44,16 +51,16 @@ function App() {
                 <Route path="customers" element={<Customers />} />
                 <Route path="sales-reports" element={<SalesReports />} />
                 <Route path="inventory-reports" element={<InventoryReports />} />
-                <Route path="profit-loss" element={<ProfitLoss />} />
-                <Route path="expenses" element={<Expenses />} />
-                <Route path="vendors" element={<Vendors />} />
-                <Route path="purchases" element={<Purchases />} />
+                <Route path="profit-loss" element={<AdminRoute><ProfitLoss /></AdminRoute>} />
+                <Route path="expenses" element={<AdminRoute><Expenses /></AdminRoute>} />
+                <Route path="vendors" element={<AdminRoute><Vendors /></AdminRoute>} />
+                <Route path="purchases" element={<AdminRoute><Purchases /></AdminRoute>} />
                 <Route path="barcodes" element={<Barcodes />} />
                 <Route path="marketing" element={<Marketing />} />
-                <Route path="payment-summary" element={<PaymentSummary />} />
+                <Route path="payment-summary" element={<AdminRoute><PaymentSummary /></AdminRoute>} />
                 <Route path="loyalty" element={<Loyalty />} />
-                <Route path="advanced-reports" element={<AdvancedReports />} />
-                <Route path="settings" element={<Settings />} />
+                <Route path="advanced-reports" element={<AdminRoute><AdvancedReports /></AdminRoute>} />
+                <Route path="settings" element={<AdminRoute><Settings /></AdminRoute>} />
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
