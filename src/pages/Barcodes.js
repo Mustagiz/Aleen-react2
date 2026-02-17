@@ -124,52 +124,7 @@ const BarcodeItem = ({ value, businessName, productName, price, settings, varian
         </Box>
     );
 };
-const barcodeRef = useRef(null);
 
-useEffect(() => {
-    if (barcodeRef.current && value) {
-        try {
-            JsBarcode(barcodeRef.current, value, {
-                format: "CODE128",
-                width: 1.2,
-                height: 40,
-                displayValue: true,
-                fontSize: 10,
-                margin: 2,
-                background: "#ffffff"
-            });
-        } catch (e) {
-            console.error("Barcode generation failed", e);
-        }
-    }
-}, [value]);
-
-return (
-    <Box sx={{
-        border: '1px solid #eee',
-        p: 1.5,
-        textAlign: 'center',
-        borderRadius: '4px',
-        height: '140px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        breakInside: 'avoid',
-        bgcolor: 'white',
-        mb: 0,
-        '@media print': {
-            border: 'none',
-            width: '100%'
-        }
-    }}>
-        <Typography sx={{ fontSize: '9px', fontWeight: 800, mb: 0.5, color: 'text.primary', textTransform: 'uppercase' }}>{businessName}</Typography>
-        <Typography sx={{ fontSize: '11px', fontWeight: 700, mb: 0, width: '100%', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{productName}</Typography>
-        <svg ref={barcodeRef} style={{ maxWidth: '100%', height: 'auto' }}></svg>
-        <Typography sx={{ fontSize: '13px', fontWeight: 900 }}>₹{price}</Typography>
-    </Box>
-);
-};
 
 const BarcodeGenerator = () => {
     const { inventory, profile } = useData();

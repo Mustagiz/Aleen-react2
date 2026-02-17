@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Paper, Typography, TableContainer, Card, CardContent, Grid, Chip, TablePagination, useTheme } from '@mui/material';
-import { Add, Edit, Delete, Store } from '@mui/icons-material';
+import { Add, Edit, Delete, Store, LocalShipping } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 
@@ -9,7 +9,7 @@ const Vendors = () => {
     const { vendors, addVendor, updateVendor, deleteVendor } = useData();
     const [open, setOpen] = useState(false);
     const [editItem, setEditItem] = useState(null);
-    const [form, setForm] = useState({ name: '', phone: '', email: '', person: '', gst: '', terms: '', address: '' });
+    const [form, setForm] = useState({ name: '', phone: '', email: '', person: '', gst: '', terms: '', address: '', qualityRating: 5 });
     const [deleteId, setDeleteId] = useState(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
@@ -32,7 +32,7 @@ const Vendors = () => {
             setForm(item);
         } else {
             setEditItem(null);
-            setForm({ name: '', phone: '', email: '', person: '', gst: '', terms: '', address: '' });
+            setForm({ name: '', phone: '', email: '', person: '', gst: '', terms: '', address: '', qualityRating: 5 });
         }
         setOpen(true);
     };
@@ -138,6 +138,33 @@ const Vendors = () => {
                         </CardContent>
                     </Card>
                 </Grid>
+
+                <Grid item xs={12} sm={4}>
+                    <Card sx={{
+                        borderRadius: 4,
+                        position: 'relative',
+                        overflow: 'hidden',
+                        boxShadow: '0 10px 25px -5px rgba(2, 136, 209, 0.15)',
+                        border: '1px solid rgba(2, 136, 209, 0.1)',
+                        background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(2, 136, 209, 0.05) 100%)`,
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                            transform: 'translateY(-4px)',
+                            boxShadow: '0 12px 24px -10px rgba(2, 136, 209, 0.3)',
+                        }
+                    }}>
+                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#0288d1' }} />
+                        <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Box>
+                                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Avg Lead Time</Typography>
+                                <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#0288d1' }}>
+                                    {Math.round(vendors.reduce((sum, v) => sum + (v.performance?.avgLeadTime || 0), 0) / Math.max(1, vendors.filter(v => v.performance?.avgLeadTime).length))} days
+                                </Typography>
+                            </Box>
+                            <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(2, 136, 209, 0.05)', color: '#0288d1' }}><LocalShipping /></Box>
+                        </CardContent>
+                    </Card>
+                </Grid>
             </Grid>
 
             <Paper sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.05)' }}>
@@ -148,6 +175,7 @@ const Vendors = () => {
                                 <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Vendor Name</TableCell>
                                 <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Contact Person</TableCell>
                                 <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Phone / Email</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Performance</TableCell>
                                 <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Balance Due</TableCell>
                                 <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Actions</TableCell>
                             </TableRow>
@@ -167,6 +195,25 @@ const Vendors = () => {
                                         <TableCell>
                                             <Typography variant="caption" display="block">{vendor.phone}</Typography>
                                             <Typography variant="caption" color="text.secondary">{vendor.email}</Typography>
+                                        </TableCell>
+                                        <TableCell>
+                                            {vendor.performance ? (
+                                                <Box>
+                                                    <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                                                        {vendor.performance.avgLeadTime} days
+                                                    </Typography>
+                                                    <Typography variant="caption" color="text.secondary" display="block">
+                                                        {vendor.performance.totalOrders} Orders
+                                                    </Typography>
+                                                    {vendor.qualityRating > 0 && (
+                                                        <Typography variant="caption" sx={{ color: 'warning.main', fontWeight: 'bold' }}>
+                                                            {'★'.repeat(Math.round(vendor.qualityRating))} ({vendor.qualityRating})
+                                                        </Typography>
+                                                    )}
+                                                </Box>
+                                            ) : (
+                                                <Typography variant="caption" color="text.secondary">No Data</Typography>
+                                            )}
                                         </TableCell>
                                         <TableCell>
                                             <Chip
@@ -215,14 +262,25 @@ const Vendors = () => {
                     </Box>
                     <TextField fullWidth label="GSTIN" value={form.gst} onChange={(e) => setForm({ ...form, gst: e.target.value })} margin="normal" />
                     <TextField fullWidth label="Address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} margin="normal" multiline rows={2} />
-                    <TextField fullWidth label="Payment Terms" value={form.terms} onChange={(e) => setForm({ ...form, terms: e.target.value })} margin="normal" placeholder="e.g. Net 30, Cash on Delivery" />
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                        <TextField fullWidth label="Payment Terms" value={form.terms} onChange={(e) => setForm({ ...form, terms: e.target.value })} margin="normal" placeholder="e.g. Net 30" />
+                        <TextField
+                            fullWidth
+                            label="Quality Rating (1-5)"
+                            type="number"
+                            inputProps={{ min: 1, max: 5, step: 0.5 }}
+                            value={form.qualityRating || 5}
+                            onChange={(e) => setForm({ ...form, qualityRating: parseFloat(e.target.value) })}
+                            margin="normal"
+                        />
+                    </Box>
                 </DialogContent>
                 <DialogActions sx={{ p: 3 }}>
                     <Button onClick={() => setOpen(false)}>Cancel</Button>
                     <Button onClick={handleSave} variant="contained" disabled={!form.name}>Save Vendor</Button>
                 </DialogActions>
             </Dialog>
-        </Box>
+        </Box >
     );
 };
 

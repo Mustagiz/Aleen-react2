@@ -335,6 +335,14 @@ export const DataProvider = ({ children }) => {
 
     // Handle Status Change: Ordered -> Received
     if (oldPurchase.status !== 'Received' && updates.status === 'Received') {
+      const receivedDate = new Date();
+      const orderDate = new Date(oldPurchase.purchaseDate);
+      const leadTimePayload = Math.max(0, Math.ceil((receivedDate - orderDate) / (1000 * 60 * 60 * 24)));
+
+      // Update Purchase with Lead Time
+      batch.update(purchaseRef, { leadTime: leadTimePayload, receivedDate: receivedDate.toISOString() });
+
+      // Update Inventory
       for (const item of oldPurchase.items) {
         const invItem = inventory.find(i => i.id === item.productId);
         const invRef = doc(db, 'inventory', item.productId);
@@ -349,13 +357,13 @@ export const DataProvider = ({ children }) => {
           const totalQty = currentQty + newQty;
           const weightedCost = totalQty > 0 ? totalValue / totalQty : newCost;
 
-          let updates = {
+          let invUpdates = {
             quantity: totalQty,
             cost: parseFloat(weightedCost.toFixed(2))
           };
 
           if (invItem.hasVariants && item.variantSku) {
-            updates.variants = (invItem.variants || []).map(v => {
+            invUpdates.variants = (invItem.variants || []).map(v => {
               if (v.sku === item.variantSku) {
                 return { ...v, quantity: (parseInt(v.quantity) || 0) + newQty };
               }
@@ -363,37 +371,46 @@ export const DataProvider = ({ children }) => {
             });
           }
 
-          batch.update(invRef, updates);
-
+          batch.update(invRef, invUpdates);
           logInventoryMovement(batch, item.productId, newQty, `Purchase Status Updated (#${id})`, {
             variantSku: item.variantSku || null
+          });
+        }
+      }
+
+      // Update Vendor Performance
+      if (oldPurchase.vendorId) {
+        const vendor = vendors.find(v => v.id === oldPurchase.vendorId);
+        if (vendor) {
+          const currentPerf = vendor.performance || { totalOrders: 0, avgLeadTime: 0 };
+          const newTotalOrders = (currentPerf.totalOrders || 0) + 1;
+          const oldTotalLeadTime = (currentPerf.avgLeadTime || 0) * (currentPerf.totalOrders || 0);
+          const newAvgLeadTime = (oldTotalLeadTime + leadTimePayload) / newTotalOrders;
+
+          batch.update(doc(db, 'vendors', oldPurchase.vendorId), {
+            performance: {
+              ...currentPerf,
+              totalOrders: newTotalOrders,
+              avgLeadTime: parseFloat(newAvgLeadTime.toFixed(1))
+            }
           });
         }
       }
     }
 
     // Handle Vendor Balance Update
-    // Recalculate Vendor Balance by querying all pending POs
-    // Differential updates are fragile. Recalculation is self-correcting.
     if (oldPurchase.vendorId) {
       const vendorRef = doc(db, 'vendors', oldPurchase.vendorId);
 
-      // 1. Get all other purchases for this vendor (using current state 'purchases')
       const otherPurchases = purchases.filter(p => p.vendorId === oldPurchase.vendorId && p.id !== id);
+      let totalPending = otherPurchases.reduce((sum, p) => sum + (p.total - (p.amountPaid || 0)), 0);
 
-      // 2. Calculate pending for other purchases
-      let totalPending = otherPurchases.reduce((sum, p) => {
-        return sum + (p.total - (p.amountPaid || 0));
-      }, 0);
-
-      // 3. Add pending for THIS updated purchase
       const newTotal = updates.total !== undefined ? updates.total : (oldPurchase.total || 0);
       const newPaid = updates.amountPaid !== undefined ? updates.amountPaid : (oldPurchase.amountPaid || 0);
       const newPending = newTotal - newPaid;
 
       totalPending += newPending;
 
-      // 4. Update Vendor Balance
       batch.update(vendorRef, {
         balance: totalPending > 0 ? totalPending : 0
       });

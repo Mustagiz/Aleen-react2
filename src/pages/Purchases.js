@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Autocomplete, InputAdornment, TablePagination, useTheme, useMediaQuery, TableSortLabel, Tabs, Tab, Checkbox, FormControlLabel, Divider, Collapse } from '@mui/material';
-import { Add, Visibility, Delete, ReceiptLong, Search, Edit, Close, AttachMoney, Download, MoreVert, ShoppingCart, Warning, TrendingDown, LocalShipping, Payment, AutoAwesome, ExpandMore, ExpandLess } from '@mui/icons-material';
+import { Add, Visibility, Delete, ReceiptLong, Search, Edit, Close, AttachMoney, Download, MoreVert, ShoppingCart, Warning, TrendingDown, LocalShipping, Payment, AutoAwesome, ExpandMore, ExpandLess, Print } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
+import { useNavigate } from 'react-router-dom';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 
 const Purchases = () => {
+    const navigate = useNavigate();
     const { purchases, vendors, inventory, addPurchase, updatePurchase, deletePurchase, categories, addInventoryItem, updateCategories, getLowStockItems } = useData();
     const [open, setOpen] = useState(false);
     const [tabValue, setTabValue] = useState(0);
