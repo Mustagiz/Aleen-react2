@@ -12,7 +12,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointEleme
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { inventory, invoices, purchases, vendors, expenses } = useData();
+  const { inventory, invoices, purchases, vendors, expenses, getLowStockItems } = useData();
   const navigate = useNavigate();
   const theme = useTheme();
   const [dateRange, setDateRange] = React.useState('7days');
@@ -51,7 +51,8 @@ const Dashboard = () => {
 
   const salesTrend = yesterdaySales === 0 ? 100 : Math.round(((todaySales - yesterdaySales) / yesterdaySales) * 100);
 
-  const lowStock = inventory.filter(item => item.quantity <= 1);
+  const lowStockItemsList = getLowStockItems ? getLowStockItems() : [];
+  const lowStockCount = lowStockItemsList.length;
   const recentInvoices = invoices.slice(-6).reverse();
 
   // Financial Calculations
@@ -75,7 +76,6 @@ const Dashboard = () => {
   const grossProfit = totalRevenue - totalCostOfGoods;
   const totalItems = inventory.reduce((sum, item) => sum + item.quantity, 0);
 
-  const lowStockCount = inventory.filter(item => item.quantity <= 1).length;
   const totalInventoryValue = inventory.reduce((sum, item) => sum + (Number(item.quantity) || 0) * (Number(item.cost) || 0), 0);
   const atv = filteredInvoices.length > 0 ? (totalRevenue / filteredInvoices.length) : 0;
 

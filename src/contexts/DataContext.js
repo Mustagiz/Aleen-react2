@@ -145,9 +145,10 @@ export const DataProvider = ({ children }) => {
       id: logId,
       productId,
       productName: product?.name || 'Unknown Product',
+      variantSku: metadata.variantSku || null,
       change,
       newQuantity: (product?.quantity || 0) + change,
-      reason,
+      reason: metadata.variantSku ? `${reason} (Variant: ${metadata.variantSku})` : reason,
       timestamp: new Date().toISOString(),
       ...metadata
     };
@@ -161,23 +162,65 @@ export const DataProvider = ({ children }) => {
 
   const addInventoryItem = async (item) => {
     const id = Date.now().toString();
-    const newItem = { ...item, id, dateAdded: new Date().toISOString() };
+    const quantity = item.hasVariants
+      ? item.variants.reduce((sum, v) => sum + (parseInt(v.quantity) || 0), 0)
+      : parseInt(item.quantity) || 0;
+
+    const newItem = {
+      ...item,
+      id,
+      quantity,
+      dateAdded: new Date().toISOString()
+    };
     const batch = writeBatch(db);
     batch.set(doc(db, 'inventory', id), newItem);
 
     // Initial Stock Log
-    logInventoryMovement(batch, id, item.quantity, 'Initial Stock Added');
+    if (item.hasVariants) {
+      item.variants.forEach(variant => {
+        if (variant.quantity > 0) {
+          logInventoryMovement(batch, id, variant.quantity, 'Initial Stock Added', { variantSku: variant.sku });
+        }
+      });
+    } else {
+      logInventoryMovement(batch, id, quantity, 'Initial Stock Added');
+    }
 
     await batch.commit();
   };
 
   const updateInventoryItem = async (id, updates) => {
     const product = inventory.find(i => i.id === id);
-    const batch = writeBatch(db);
-    batch.update(doc(db, 'inventory', id), updates);
+    if (!product) return;
 
-    if (updates.quantity !== undefined && updates.quantity !== product.quantity) {
-      logInventoryMovement(batch, id, updates.quantity - product.quantity, 'Manual Update');
+    const batch = writeBatch(db);
+
+    // Sync total quantity if variants are modified or if it's a variant product
+    let finalUpdates = { ...updates };
+    const hasVariants = updates.hasVariants !== undefined ? updates.hasVariants : product.hasVariants;
+
+    if (hasVariants && updates.variants) {
+      finalUpdates.quantity = updates.variants.reduce((sum, v) => sum + (parseInt(v.quantity) || 0), 0);
+    }
+
+    batch.update(doc(db, 'inventory', id), finalUpdates);
+
+    // Log movements for non-variant products
+    if (!hasVariants && finalUpdates.quantity !== undefined && finalUpdates.quantity !== product.quantity) {
+      logInventoryMovement(batch, id, finalUpdates.quantity - product.quantity, 'Manual Update');
+    }
+
+    // Log movements for variants if they changed
+    if (hasVariants && updates.variants && product.variants) {
+      updates.variants.forEach(newV => {
+        const oldV = product.variants.find(v => v.sku === newV.sku);
+        const newQty = parseInt(newV.quantity) || 0;
+        const oldQty = oldV ? (parseInt(oldV.quantity) || 0) : 0;
+
+        if (newQty !== oldQty) {
+          logInventoryMovement(batch, id, newQty - oldQty, 'Manual Update', { variantSku: newV.sku });
+        }
+      });
     }
 
     await batch.commit();
@@ -246,12 +289,25 @@ export const DataProvider = ({ children }) => {
           const totalQty = currentQty + newQty;
           const weightedCost = totalQty > 0 ? totalValue / totalQty : newCost;
 
-          batch.update(invRef, {
+          let updates = {
             quantity: totalQty,
             cost: parseFloat(weightedCost.toFixed(2))
-          });
+          };
 
-          logInventoryMovement(batch, item.productId, newQty, `Purchase Received (#${id})`);
+          if (invItem.hasVariants && item.variantSku) {
+            updates.variants = (invItem.variants || []).map(v => {
+              if (v.sku === item.variantSku) {
+                return { ...v, quantity: (parseInt(v.quantity) || 0) + newQty };
+              }
+              return v;
+            });
+          }
+
+          batch.update(invRef, updates);
+
+          logInventoryMovement(batch, item.productId, newQty, `Purchase Received (#${id})`, {
+            variantSku: item.variantSku || null
+          });
         }
       }
     }
@@ -293,12 +349,25 @@ export const DataProvider = ({ children }) => {
           const totalQty = currentQty + newQty;
           const weightedCost = totalQty > 0 ? totalValue / totalQty : newCost;
 
-          batch.update(invRef, {
+          let updates = {
             quantity: totalQty,
             cost: parseFloat(weightedCost.toFixed(2))
-          });
+          };
 
-          logInventoryMovement(batch, item.productId, newQty, `Purchase Status Updated (#${id})`);
+          if (invItem.hasVariants && item.variantSku) {
+            updates.variants = (invItem.variants || []).map(v => {
+              if (v.sku === item.variantSku) {
+                return { ...v, quantity: (parseInt(v.quantity) || 0) + newQty };
+              }
+              return v;
+            });
+          }
+
+          batch.update(invRef, updates);
+
+          logInventoryMovement(batch, item.productId, newQty, `Purchase Status Updated (#${id})`, {
+            variantSku: item.variantSku || null
+          });
         }
       }
     }
@@ -347,13 +416,28 @@ export const DataProvider = ({ children }) => {
 
     // Update Inventory & Log Movement
     for (const item of invoice.items) {
+      if (item.id === 'custom' || item.id.startsWith('custom-')) continue;
+
       const invRef = doc(db, 'inventory', item.id);
       const invItem = inventory.find(i => i.id === item.id);
       if (invItem) {
-        batch.update(invRef, {
+        let updates = {
           quantity: invItem.quantity - item.quantity
+        };
+
+        if (invItem.hasVariants && item.variantSku) {
+          updates.variants = invItem.variants.map(v => {
+            if (v.sku === item.variantSku) {
+              return { ...v, quantity: (parseInt(v.quantity) || 0) - item.quantity };
+            }
+            return v;
+          });
+        }
+
+        batch.update(invRef, updates);
+        logInventoryMovement(batch, item.id, -item.quantity, `Sale (#${id})`, {
+          variantSku: item.variantSku || null
         });
-        logInventoryMovement(batch, item.id, -item.quantity, `Sale (#${id})`);
       }
     }
 
@@ -573,6 +657,41 @@ export const DataProvider = ({ children }) => {
     await setDoc(doc(db, 'settings', 'expenses'), { categories: newCategories });
   };
 
+  const getLowStockItems = (threshold = 5) => {
+    let lowStock = [];
+    inventory.forEach(item => {
+      // Check variants
+      if (item.hasVariants && item.variants) {
+        item.variants.forEach(variant => {
+          const minLevel = parseInt(variant.minStockLevel) || threshold;
+          if ((parseInt(variant.quantity) || 0) <= minLevel) {
+            lowStock.push({
+              ...item, // Parent details
+              id: item.id,
+              name: `${item.name} (${variant.size || ''} ${variant.color || ''})`,
+              quantity: parseInt(variant.quantity) || 0,
+              minStockLevel: minLevel,
+              variantSku: variant.sku,
+              isVariant: true
+            });
+          }
+        });
+      }
+      // Check main product if no variants
+      else if (!item.hasVariants) {
+        const minLevel = parseInt(item.minStockLevel) || threshold;
+        if ((parseInt(item.quantity) || 0) <= minLevel) {
+          lowStock.push({
+            ...item,
+            minStockLevel: minLevel,
+            isVariant: false
+          });
+        }
+      }
+    });
+    return lowStock;
+  };
+
   return (
     <DataContext.Provider value={{
       inventory,
@@ -581,6 +700,7 @@ export const DataProvider = ({ children }) => {
       inventoryLogs,
       expenseCategories,
       vendors,
+      getLowStockItems,
       purchases,
       addInventoryItem,
       updateInventoryItem,

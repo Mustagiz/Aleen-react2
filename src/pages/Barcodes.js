@@ -38,52 +38,137 @@ import {
 import { useData } from '../contexts/DataContext';
 import JsBarcode from 'jsbarcode';
 
-const BarcodeItem = ({ value, businessName, productName, price }) => {
+const BarcodeItem = ({ value, businessName, productName, price, settings, variantName }) => {
     const barcodeRef = useRef(null);
+    const { template, showPrice, showName, showBusiness } = settings;
+
+    // Dimensions based on template (in mm, converted to px roughly for preview)
+    // standard: 50x25mm, small: 30x20mm
+    const isSmall = template === 'small';
 
     useEffect(() => {
         if (barcodeRef.current && value) {
             try {
                 JsBarcode(barcodeRef.current, value, {
                     format: "CODE128",
-                    width: 1.2,
-                    height: 40,
+                    width: isSmall ? 1 : 1.3,
+                    height: isSmall ? 25 : 35,
                     displayValue: true,
-                    fontSize: 10,
-                    margin: 2,
+                    fontSize: isSmall ? 9 : 11,
+                    margin: 1,
                     background: "#ffffff"
                 });
             } catch (e) {
                 console.error("Barcode generation failed", e);
             }
         }
-    }, [value]);
+    }, [value, isSmall]);
 
     return (
         <Box sx={{
-            border: '1px solid #eee',
-            p: 1.5,
+            border: '1px solid #ddd',
+            p: 0.5,
             textAlign: 'center',
-            borderRadius: '4px',
-            height: '140px',
+            borderRadius: 0,
+            overflow: 'hidden',
+            height: isSmall ? '20mm' : '25mm',
+            width: isSmall ? '38mm' : '50mm', // Adjusted for typical rolls
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
             breakInside: 'avoid',
             bgcolor: 'white',
-            mb: 0,
+            mx: 'auto',
             '@media print': {
                 border: 'none',
-                width: '100%'
+                pageBreakInside: 'avoid'
             }
         }}>
-            <Typography sx={{ fontSize: '9px', fontWeight: 800, mb: 0.5, color: 'text.primary', textTransform: 'uppercase' }}>{businessName}</Typography>
-            <Typography sx={{ fontSize: '11px', fontWeight: 700, mb: 0, width: '100%', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{productName}</Typography>
-            <svg ref={barcodeRef} style={{ maxWidth: '100%', height: 'auto' }}></svg>
-            <Typography sx={{ fontSize: '13px', fontWeight: 900 }}>₹{price}</Typography>
+            {showBusiness && (
+                <Typography sx={{
+                    fontSize: isSmall ? '7px' : '9px',
+                    fontWeight: 800,
+                    lineHeight: 1,
+                    color: 'text.primary',
+                    textTransform: 'uppercase',
+                    mb: 0.2
+                }}>
+                    {businessName}
+                </Typography>
+            )}
+
+            {showName && (
+                <Typography sx={{
+                    fontSize: isSmall ? '8px' : '10px',
+                    fontWeight: 700,
+                    lineHeight: 1.1,
+                    mb: 0.2,
+                    width: '100%',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis'
+                }}>
+                    {productName}
+                    {variantName && <span style={{ fontWeight: 400 }}> ({variantName})</span>}
+                </Typography>
+            )}
+
+            <svg ref={barcodeRef} style={{ maxWidth: '100%', height: 'auto', display: 'block' }}></svg>
+
+            {showPrice && (
+                <Typography sx={{ fontSize: isSmall ? '10px' : '12px', fontWeight: 900, lineHeight: 1 }}>
+                    ₹{price}
+                </Typography>
+            )}
         </Box>
     );
+};
+const barcodeRef = useRef(null);
+
+useEffect(() => {
+    if (barcodeRef.current && value) {
+        try {
+            JsBarcode(barcodeRef.current, value, {
+                format: "CODE128",
+                width: 1.2,
+                height: 40,
+                displayValue: true,
+                fontSize: 10,
+                margin: 2,
+                background: "#ffffff"
+            });
+        } catch (e) {
+            console.error("Barcode generation failed", e);
+        }
+    }
+}, [value]);
+
+return (
+    <Box sx={{
+        border: '1px solid #eee',
+        p: 1.5,
+        textAlign: 'center',
+        borderRadius: '4px',
+        height: '140px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        breakInside: 'avoid',
+        bgcolor: 'white',
+        mb: 0,
+        '@media print': {
+            border: 'none',
+            width: '100%'
+        }
+    }}>
+        <Typography sx={{ fontSize: '9px', fontWeight: 800, mb: 0.5, color: 'text.primary', textTransform: 'uppercase' }}>{businessName}</Typography>
+        <Typography sx={{ fontSize: '11px', fontWeight: 700, mb: 0, width: '100%', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{productName}</Typography>
+        <svg ref={barcodeRef} style={{ maxWidth: '100%', height: 'auto' }}></svg>
+        <Typography sx={{ fontSize: '13px', fontWeight: 900 }}>₹{price}</Typography>
+    </Box>
+);
 };
 
 const BarcodeGenerator = () => {
@@ -96,6 +181,14 @@ const BarcodeGenerator = () => {
     const [dialogCategory, setDialogCategory] = useState('');
     const [dialogOrderBy, setDialogOrderBy] = useState('name');
     const [dialogOrder, setDialogOrder] = useState('asc');
+
+    // Print Settings
+    const [settings, setSettings] = useState({
+        template: 'standard', // standard (50x25), small (30x20)
+        showPrice: true,
+        showName: true,
+        showBusiness: true
+    });
 
     const handleAddProduct = (product) => {
         if (!product) return;
@@ -112,8 +205,44 @@ const BarcodeGenerator = () => {
         if (location.state?.product) {
             handleAddProduct(location.state.product);
             window.history.replaceState({}, document.title);
+        } else if (location.state?.purchaseOrder) {
+            const po = location.state.purchaseOrder;
+            const newProducts = [];
+
+            po.items.forEach(item => {
+                const product = inventory.find(p => p.id === item.productId);
+                if (product) {
+                    // Check if it's a specific variant
+                    if (item.variantSku) {
+                        const variant = product.variants?.find(v => v.sku === item.variantSku);
+                        if (variant) {
+                            newProducts.push({
+                                ...product,
+                                id: `${product.id}-${variant.sku}`, // Unique ID for list
+                                productId: variant.sku, // Barcode value
+                                name: product.name,
+                                variantName: `${variant.size || ''} ${variant.color || ''}`.trim(),
+                                price: variant.price || product.price,
+                                labelCount: item.quantity
+                            });
+                            return;
+                        }
+                    }
+
+                    // Fallback to main product or if no variant specified
+                    newProducts.push({
+                        ...product,
+                        labelCount: item.quantity
+                    });
+                }
+            });
+
+            if (newProducts.length > 0) {
+                setSelectedProducts(newProducts);
+            }
+            window.history.replaceState({}, document.title);
         }
-    }, [location.state]);
+    }, [location.state, inventory]);
 
     const handleUpdateCount = (productId, count) => {
         setSelectedProducts(selectedProducts.map(p =>
@@ -146,11 +275,28 @@ const BarcodeGenerator = () => {
         setDialogOrderBy(property);
     };
 
-    const filteredInventory = inventory.filter(item => {
+    const filteredInventory = inventory.flatMap(item => {
+        // If search is active, we filter first
         const matchesSearch = item.name.toLowerCase().includes(dialogSearch.toLowerCase()) ||
             (item.productId || '').toLowerCase().includes(dialogSearch.toLowerCase());
         const matchesCategory = !dialogCategory || item.category === dialogCategory;
-        return matchesSearch && matchesCategory;
+
+        if (!matchesSearch || !matchesCategory) return [];
+
+        if (item.hasVariants && item.variants) {
+            return item.variants.map(v => ({
+                ...item,
+                id: `${item.id}-${v.sku}`,
+                name: `${item.name} (${v.size || ''} ${v.color || ''})`.trim(),
+                productId: v.sku,
+                price: v.price || item.price,
+                quantity: v.quantity,
+                category: item.category,
+                variantName: `${v.size || ''} ${v.color || ''}`.trim(),
+                isVariant: true
+            }));
+        }
+        return [item];
     }).sort((a, b) => {
         const isAsc = dialogOrder === 'asc';
         const valA = (a[dialogOrderBy] || '').toString().toLowerCase();
@@ -198,6 +344,40 @@ const BarcodeGenerator = () => {
                     </Button>
                 </Box>
             </Box>
+
+
+            {/* Settings Toolbar */}
+            <Paper sx={{ p: 2, mb: 3, display: 'flex', gap: 3, alignItems: 'center', flexWrap: 'wrap', bgcolor: 'grey.50' }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Print Settings:</Typography>
+
+                <TextField
+                    select
+                    label="Label Size"
+                    size="small"
+                    value={settings.template}
+                    onChange={(e) => setSettings({ ...settings, template: e.target.value })}
+                    SelectProps={{ native: true }}
+                    sx={{ minWidth: 150 }}
+                >
+                    <option value="standard">Standard (50x25mm)</option>
+                    <option value="small">Small (38x20mm)</option>
+                </TextField>
+
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                    <Box component="label" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }}>
+                        <Checkbox size="small" checked={settings.showBusiness} onChange={(e) => setSettings({ ...settings, showBusiness: e.target.checked })} />
+                        <Typography variant="body2">Business Name</Typography>
+                    </Box>
+                    <Box component="label" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }}>
+                        <Checkbox size="small" checked={settings.showName} onChange={(e) => setSettings({ ...settings, showName: e.target.checked })} />
+                        <Typography variant="body2">Product Name</Typography>
+                    </Box>
+                    <Box component="label" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }}>
+                        <Checkbox size="small" checked={settings.showPrice} onChange={(e) => setSettings({ ...settings, showPrice: e.target.checked })} />
+                        <Typography variant="body2">Price</Typography>
+                    </Box>
+                </Box>
+            </Paper>
 
             <Paper sx={{ p: 3, mb: 4, borderRadius: 3 }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>Select Products to Label</Typography>
@@ -346,8 +526,8 @@ const BarcodeGenerator = () => {
             <Box className="print-only" sx={{ display: 'none', '@media print': { display: 'block' } }}>
                 <Box sx={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
-                    gap: '5px',
+                    gridTemplateColumns: settings.template === 'small' ? 'repeat(4, 1fr)' : 'repeat(3, 1fr)',
+                    gap: '2mm',
                     p: 0,
                     width: '100%'
                 }}>
@@ -355,10 +535,12 @@ const BarcodeGenerator = () => {
                         Array.from({ length: product.labelCount }).map((_, i) => (
                             <BarcodeItem
                                 key={`${product.id}-${i}`}
-                                value={product.productId || product.id}
+                                value={product.variantSku || product.productId || product.id}
                                 businessName={profile?.businessName || "Aleen Clothing"}
                                 productName={product.name}
+                                variantName={product.variantName}
                                 price={product.price}
+                                settings={settings}
                             />
                         ))
                     )}

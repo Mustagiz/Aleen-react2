@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Tooltip, useTheme, useMediaQuery, Divider, TablePagination, TableSortLabel } from '@mui/material';
-import { Edit, Delete, Add, Search, Inventory2, TrendingUp, Warning, AttachMoney, Download, Upload, QrCode } from '@mui/icons-material';
+import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Tooltip, useTheme, useMediaQuery, Divider, TablePagination, TableSortLabel, FormControlLabel, Switch } from '@mui/material';
+import { Edit, Delete, Add, Search, Inventory2, TrendingUp, Warning, AttachMoney, Download, Upload, QrCode, Layers } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -17,7 +17,9 @@ const Inventory = () => {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [newCategory, setNewCategory] = useState('');
   const [form, setForm] = useState({
-    productId: '', name: '', category: '', size: '', color: '', price: '', cost: '', quantity: '', supplier: ''
+    productId: '', name: '', category: '', size: '', color: '', price: '', cost: '', quantity: '', minStockLevel: '', supplier: '',
+    hasVariants: false,
+    variants: []
   });
   const [deleteId, setDeleteId] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -95,23 +97,77 @@ const Inventory = () => {
   const handleOpen = (item = null) => {
     if (item) {
       setEditItem(item);
-      setForm(item);
+      setForm({
+        ...item,
+        productId: item.productId || '',
+        name: item.name || '',
+        category: item.category || '',
+        size: item.size || '',
+        color: item.color || '',
+        price: item.price || '',
+        cost: item.cost || '',
+        quantity: item.quantity || '',
+        minStockLevel: item.minStockLevel || '',
+        supplier: item.supplier || '',
+        hasVariants: item.hasVariants || false,
+        variants: item.variants || []
+      });
     } else {
       setEditItem(null);
-      setForm({ productId: '', name: '', category: '', size: '', color: '', price: '', cost: '', quantity: '', supplier: '' });
+      setForm({
+        productId: '', name: '', category: '', size: '', color: '', price: '', cost: '', quantity: '', minStockLevel: '', supplier: '',
+        hasVariants: false,
+        variants: []
+      });
     }
     setOpen(true);
   };
 
   const handleSave = async () => {
     const productId = form.productId.trim() || `PRD-${Date.now()}`;
-    const data = { ...form, productId, price: parseFloat(form.price), cost: parseFloat(form.cost || 0), quantity: parseInt(form.quantity) };
+
+    // Validate variants if enabled
+    if (form.hasVariants && form.variants.length === 0) {
+      alert("Please add at least one variant");
+      return;
+    }
+
+    const data = {
+      ...form,
+      productId,
+      price: parseFloat(form.price) || 0,
+      cost: parseFloat(form.cost || 0),
+      quantity: form.hasVariants
+        ? form.variants.reduce((sum, v) => sum + (parseInt(v.quantity) || 0), 0)
+        : parseInt(form.quantity) || 0
+    };
+
     if (editItem) {
       await updateInventoryItem(editItem.id, data);
     } else {
       await addInventoryItem(data);
     }
     setOpen(false);
+  };
+
+  const addVariant = () => {
+    const sku = `${form.productId || 'PRD'}-${form.variants.length + 1}`;
+    setForm({
+      ...form,
+      variants: [...form.variants, { sku, size: '', color: '', quantity: 0, minStockLevel: 5, price: form.price || 0 }]
+    });
+  };
+
+  const removeVariant = (index) => {
+    const newVariants = [...form.variants];
+    newVariants.splice(index, 1);
+    setForm({ ...form, variants: newVariants });
+  };
+
+  const updateVariant = (index, field, value) => {
+    const newVariants = [...form.variants];
+    newVariants[index] = { ...newVariants[index], [field]: value };
+    setForm({ ...form, variants: newVariants });
   };
 
   const handleConfirmDelete = async () => {
@@ -509,7 +565,14 @@ const Inventory = () => {
                     <TableRow key={item.id} hover>
                       <TableCell><Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary', fontFamily: 'monospace' }}>{item.productId || 'N/A'}</Typography></TableCell>
                       <TableCell>
-                        <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>{item.name}</Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>{item.name}</Typography>
+                          {item.hasVariants && (
+                            <Tooltip title={`${item.variants?.length || 0} Variants`}>
+                              <Layers sx={{ fontSize: 16, color: 'primary.main' }} />
+                            </Tooltip>
+                          )}
+                        </Box>
                         <Typography variant="caption" color="text.secondary">{item.supplier || 'No Supplier'}</Typography>
                       </TableCell>
                       <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
@@ -575,24 +638,73 @@ const Inventory = () => {
             <TextField size="small" label="Add New Category" value={newCategory} onChange={(e) => setNewCategory(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleAddCategory()} fullWidth />
             <Button onClick={handleAddCategory} variant="outlined" size="small">Add</Button>
           </Box>
-          <TextField fullWidth label="Size" value={form.size} onChange={(e) => setForm({ ...form, size: e.target.value })} margin="normal" />
-          <TextField fullWidth label="Color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} margin="normal" />
-          {user?.role === 'admin' && (
-            <>
-              <TextField fullWidth label="Cost Price (₹)" type="number" value={form.cost} onChange={(e) => setForm({ ...form, cost: e.target.value })} margin="normal" />
-              <TextField fullWidth label="Selling Price (₹)" type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} margin="normal" />
-              {form.price && form.cost && (
-                <Typography variant="body2" color="success.main" sx={{ mt: 1, fontWeight: 'bold' }}>
-                  Profit: ₹{(parseFloat(form.price) - parseFloat(form.cost)).toFixed(2)} ({(((parseFloat(form.price) - parseFloat(form.cost)) / parseFloat(form.price)) * 100).toFixed(1)}%)
-                </Typography>
-              )}
-            </>
-          )}
-          {user?.role !== 'admin' && (
-            <TextField fullWidth label="Selling Price (₹)" type="number" value={form.price} disabled margin="normal" />
-          )}
-          <TextField fullWidth label="Quantity" type="number" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} margin="normal" />
           <TextField fullWidth label="Supplier" value={form.supplier} onChange={(e) => setForm({ ...form, supplier: e.target.value })} margin="normal" />
+
+          <Divider sx={{ my: 2 }} />
+
+          <FormControlLabel
+            control={<Switch checked={form.hasVariants} onChange={(e) => setForm({ ...form, hasVariants: e.target.checked })} />}
+            label="This product has variants (Size, Color, etc.)"
+          />
+
+          {!form.hasVariants ? (
+            <>
+              <TextField fullWidth label="Size" value={form.size} onChange={(e) => setForm({ ...form, size: e.target.value })} margin="normal" />
+              <TextField fullWidth label="Color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} margin="normal" />
+              {user?.role === 'admin' && (
+                <>
+                  <TextField fullWidth label="Cost Price (₹)" type="number" value={form.cost} onChange={(e) => setForm({ ...form, cost: e.target.value })} margin="normal" />
+                  <TextField fullWidth label="Selling Price (₹)" type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} margin="normal" />
+                  {form.price && form.cost && (
+                    <Typography variant="body2" color="success.main" sx={{ mt: 1, fontWeight: 'bold' }}>
+                      Profit: ₹{(parseFloat(form.price) - parseFloat(form.cost)).toFixed(2)} ({(((parseFloat(form.price) - parseFloat(form.cost)) / parseFloat(form.price)) * 100).toFixed(1)}%)
+                    </Typography>
+                  )}
+                </>
+              )}
+              {user?.role !== 'admin' && (
+                <TextField fullWidth label="Selling Price (₹)" type="number" value={form.price} disabled margin="normal" />
+              )}
+              <TextField fullWidth label="Quantity" type="number" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} margin="normal" />
+              <TextField fullWidth label="Min Stock Level (Alert Threshold)" type="number" value={form.minStockLevel} onChange={(e) => setForm({ ...form, minStockLevel: e.target.value })} margin="normal" helperText="System will alert when stock falls below this level" />
+            </>
+          ) : (
+            <Box sx={{ mt: 2 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>Variants List</Typography>
+                <Button startIcon={<Add />} size="small" onClick={addVariant}>Add Variant</Button>
+              </Box>
+              <TableContainer component={Paper} variant="outlined">
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Size</TableCell>
+                      <TableCell>Color</TableCell>
+                      <TableCell>Qty</TableCell>
+                      <TableCell>Min Stock</TableCell>
+                      <TableCell>Price</TableCell>
+                      <TableCell></TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {form.variants.map((v, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell><TextField size="small" sx={{ width: 80 }} value={v.size} onChange={(e) => updateVariant(idx, 'size', e.target.value)} /></TableCell>
+                        <TableCell><TextField size="small" sx={{ width: 80 }} value={v.color} onChange={(e) => updateVariant(idx, 'color', e.target.value)} /></TableCell>
+                        <TableCell><TextField size="small" type="number" sx={{ width: 60 }} value={v.quantity} onChange={(e) => updateVariant(idx, 'quantity', e.target.value)} /></TableCell>
+                        <TableCell><TextField size="small" type="number" sx={{ width: 60 }} value={v.minStockLevel || ''} placeholder="5" onChange={(e) => updateVariant(idx, 'minStockLevel', e.target.value)} /></TableCell>
+                        <TableCell><TextField size="small" type="number" sx={{ width: 80 }} value={v.price} onChange={(e) => updateVariant(idx, 'price', e.target.value)} /></TableCell>
+                        <TableCell><IconButton size="small" color="error" onClick={() => removeVariant(idx)}><Delete fontSize="small" /></IconButton></TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                Total Quantity: {form.variants.reduce((sum, v) => sum + (parseInt(v.quantity) || 0), 0)}
+              </Typography>
+            </Box>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Cancel</Button>

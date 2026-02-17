@@ -130,9 +130,26 @@ const Invoices = () => {
           { facingMode: "environment" },
           config,
           (decodedText) => {
-            const matchedProduct = inventory.find(inv =>
-              inv.productId && inv.productId.toLowerCase() === decodedText.toLowerCase().trim() && (parseInt(inv.quantity) || 0) > 0
+            const trimmedCode = decodedText.toLowerCase().trim();
+            // Try matching Product ID first
+            let matchedProduct = inventory.find(inv =>
+              inv.productId && inv.productId.toLowerCase() === trimmedCode && (parseInt(inv.quantity) || 0) > 0
             );
+            let matchedVariantSku = null;
+
+            // If not found, try matching Variant SKU
+            if (!matchedProduct) {
+              for (const inv of inventory) {
+                if (inv.hasVariants && inv.variants) {
+                  const variant = inv.variants.find(v => v.sku && v.sku.toLowerCase() === trimmedCode);
+                  if (variant) {
+                    matchedProduct = inv;
+                    matchedVariantSku = variant.sku;
+                    break;
+                  }
+                }
+              }
+            }
 
             if (matchedProduct) {
               playBeep();
@@ -140,8 +157,17 @@ const Invoices = () => {
               const emptyIndex = selectedItems.findIndex(item => !item.id);
               if (emptyIndex !== -1) {
                 handleItemChange(emptyIndex, 'id', matchedProduct.id);
+                if (matchedVariantSku) handleItemChange(emptyIndex, 'variantSku', matchedVariantSku);
               } else {
-                setSelectedItems([...selectedItems, { id: matchedProduct.id, quantity: 1 }]);
+                setSelectedItems([...selectedItems, {
+                  id: matchedProduct.id,
+                  quantity: 1,
+                  variantSku: matchedVariantSku || '',
+                  isCustom: false,
+                  customName: '',
+                  customPrice: 0,
+                  customCost: 0
+                }]);
               }
               stopScanner();
               setScannerOpen(false);
@@ -254,7 +280,7 @@ const Invoices = () => {
   });
 
   const handleAddItem = () => {
-    setSelectedItems([...selectedItems, { id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0 }]);
+    setSelectedItems([...selectedItems, { id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0, variantSku: '' }]);
   };
 
   const handleItemChange = (index, field, value) => {
@@ -269,6 +295,10 @@ const Invoices = () => {
         return sum + (parseFloat(item.customPrice || 0) * item.quantity);
       }
       const invItem = inventory.find(i => i.id === item.id);
+      if (invItem && invItem.hasVariants && item.variantSku) {
+        const variant = invItem.variants.find(v => v.sku === item.variantSku);
+        return sum + (variant ? (parseFloat(variant.price) || invItem.price) * item.quantity : invItem.price * item.quantity);
+      }
       return sum + (invItem ? invItem.price * item.quantity : 0);
       return sum + (invItem ? invItem.price * item.quantity : 0);
     }, 0);
@@ -334,11 +364,17 @@ const Invoices = () => {
           };
         }
         const invItem = inventory.find(i => i.id === item.id);
+        const variant = (invItem && invItem.hasVariants && item.variantSku)
+          ? invItem.variants.find(v => v.sku === item.variantSku)
+          : null;
+
         return {
           ...item,
           name: invItem?.name || 'Unknown Item',
-          price: invItem?.price || 0,
-          category: invItem?.category || 'General'
+          price: variant ? (parseFloat(variant.price) || invItem?.price || 0) : (invItem?.price || 0),
+          category: invItem?.category || 'General',
+          variantSku: item.variantSku || null,
+          variantDetails: variant ? `${variant.size} / ${variant.color}` : null
         };
       }),
       subtotal,
@@ -1199,35 +1235,83 @@ const Invoices = () => {
                   const val = e.target.value;
                   setItemSearchTerm(val);
 
-                  // Auto-select on exact Product ID match (case-insensitive)
+                  // Auto-select on exact Product ID or Variant SKU match
                   if (val.trim()) {
-                    const matchedProduct = inventory.find(inv =>
-                      inv.productId && inv.productId.toLowerCase() === val.toLowerCase().trim() && (parseInt(inv.quantity) || 0) > 0
+                    const trimmed = val.toLowerCase().trim();
+                    let matchedProduct = inventory.find(inv =>
+                      inv.productId && inv.productId.toLowerCase() === trimmed && (parseInt(inv.quantity) || 0) > 0
                     );
+                    let matchedVariantSku = null;
+
+                    if (!matchedProduct) {
+                      for (const inv of inventory) {
+                        if (inv.hasVariants && inv.variants) {
+                          const variant = inv.variants.find(v => v.sku && v.sku.toLowerCase() === trimmed);
+                          if (variant) {
+                            matchedProduct = inv;
+                            matchedVariantSku = variant.sku;
+                            break;
+                          }
+                        }
+                      }
+                    }
 
                     if (matchedProduct) {
-                      // Check if there's an empty item slot
                       const emptyIndex = selectedItems.findIndex(item => !item.id);
                       if (emptyIndex !== -1) {
                         handleItemChange(emptyIndex, 'id', matchedProduct.id);
+                        if (matchedVariantSku) handleItemChange(emptyIndex, 'variantSku', matchedVariantSku);
                       } else {
-                        setSelectedItems([...selectedItems, { id: matchedProduct.id, quantity: 1 }]);
+                        setSelectedItems([...selectedItems, {
+                          id: matchedProduct.id,
+                          quantity: 1,
+                          variantSku: matchedVariantSku || '',
+                          isCustom: false,
+                          customName: '',
+                          customPrice: 0,
+                          customCost: 0
+                        }]);
                       }
-                      setItemSearchTerm(''); // Clear search instantly
+                      setItemSearchTerm('');
                     }
                   }
                 }}
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
-                    const matchedProduct = inventory.find(inv =>
-                      inv.productId && inv.productId.toLowerCase() === itemSearchTerm.toLowerCase().trim() && (parseInt(inv.quantity) || 0) > 0
+                    const trimmed = itemSearchTerm.toLowerCase().trim();
+                    let matchedProduct = inventory.find(inv =>
+                      inv.productId && inv.productId.toLowerCase() === trimmed && (parseInt(inv.quantity) || 0) > 0
                     );
+                    let matchedVariantSku = null;
+
+                    if (!matchedProduct) {
+                      for (const inv of inventory) {
+                        if (inv.hasVariants && inv.variants) {
+                          const variant = inv.variants.find(v => v.sku && v.sku.toLowerCase() === trimmed);
+                          if (variant) {
+                            matchedProduct = inv;
+                            matchedVariantSku = variant.sku;
+                            break;
+                          }
+                        }
+                      }
+                    }
+
                     if (matchedProduct) {
                       const emptyIndex = selectedItems.findIndex(item => !item.id);
                       if (emptyIndex !== -1) {
                         handleItemChange(emptyIndex, 'id', matchedProduct.id);
+                        if (matchedVariantSku) handleItemChange(emptyIndex, 'variantSku', matchedVariantSku);
                       } else {
-                        setSelectedItems([...selectedItems, { id: matchedProduct.id, quantity: 1 }]);
+                        setSelectedItems([...selectedItems, {
+                          id: matchedProduct.id,
+                          quantity: 1,
+                          variantSku: matchedVariantSku || '',
+                          isCustom: false,
+                          customName: '',
+                          customPrice: 0,
+                          customCost: 0
+                        }]);
                       }
                       setItemSearchTerm('');
                     }
@@ -1399,6 +1483,26 @@ const Invoices = () => {
                       )}
                     </Box>
                   </Box>
+
+                  {!item.isCustom && item.id && inventory.find(i => i.id === item.id)?.hasVariants && (
+                    <Box sx={{ mt: 1 }}>
+                      <TextField
+                        select
+                        fullWidth
+                        size="small"
+                        label="Select Variant (Size / Color)"
+                        value={item.variantSku || ''}
+                        onChange={(e) => handleItemChange(index, 'variantSku', e.target.value)}
+                        error={!item.variantSku && selectedItems.length > 0}
+                      >
+                        {inventory.find(i => i.id === item.id).variants.map((v) => (
+                          <MenuItem key={v.sku} value={v.sku} disabled={(parseInt(v.quantity) || 0) <= 0}>
+                            {v.size} / {v.color} (Stock: {v.quantity}) - ₹{v.price}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Box>
+                  )}
                   <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
                     <TextField
                       label="Qty"

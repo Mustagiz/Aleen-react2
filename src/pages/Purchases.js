@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Autocomplete, InputAdornment, TablePagination, useTheme, useMediaQuery, TableSortLabel } from '@mui/material';
-import { Add, Visibility, Delete, ReceiptLong, Search, Edit, Close, AttachMoney, Download, MoreVert, ShoppingCart, Warning, TrendingDown, LocalShipping, Payment } from '@mui/icons-material';
+import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Autocomplete, InputAdornment, TablePagination, useTheme, useMediaQuery, TableSortLabel, Tabs, Tab, Checkbox, FormControlLabel, Divider, Collapse } from '@mui/material';
+import { Add, Visibility, Delete, ReceiptLong, Search, Edit, Close, AttachMoney, Download, MoreVert, ShoppingCart, Warning, TrendingDown, LocalShipping, Payment, AutoAwesome, ExpandMore, ExpandLess } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 
 const Purchases = () => {
-    const { purchases, vendors, inventory, addPurchase, updatePurchase, deletePurchase, categories, addInventoryItem, updateCategories } = useData();
+    const { purchases, vendors, inventory, addPurchase, updatePurchase, deletePurchase, categories, addInventoryItem, updateCategories, getLowStockItems } = useData();
     const [open, setOpen] = useState(false);
+    const [tabValue, setTabValue] = useState(0);
     const [viewPO, setViewPO] = useState(null);
 
     // Edit Mode State
@@ -156,7 +157,7 @@ const Purchases = () => {
     };
 
     const handleAddItem = () => {
-        setPoItems([...poItems, { productId: '', quantity: 1, cost: 0 }]);
+        setPoItems([...poItems, { productId: '', quantity: 1, cost: 0, variantSku: '' }]);
     };
 
     const handleItemChange = (index, field, value) => {
@@ -314,193 +315,216 @@ const Purchases = () => {
                 </Box>
             </Box>
 
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-                <Grid item xs={12} sm={4}>
-                    <Card sx={{
-                        borderRadius: 4,
-                        position: 'relative',
-                        overflow: 'hidden',
-                        boxShadow: '0 10px 25px -5px rgba(25, 118, 210, 0.15)',
-                        border: '1px solid rgba(25, 118, 210, 0.1)',
-                        background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(25, 118, 210, 0.05) 100%)`,
-                        transition: 'all 0.3s ease',
-                        '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(25, 118, 210, 0.3)' }
-                    }}>
-                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#1976d2' }} />
-                        <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Box>
-                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>Total Orders</Typography>
-                                <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5 }}>{purchases.length}</Typography>
-                            </Box>
-                            <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(25, 118, 210, 0.1)', color: '#1976d2' }}><ReceiptLong /></Box>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                    <Card sx={{
-                        borderRadius: 4,
-                        position: 'relative',
-                        overflow: 'hidden',
-                        boxShadow: '0 10px 25px -5px rgba(237, 108, 2, 0.15)',
-                        border: '1px solid rgba(237, 108, 2, 0.1)',
-                        background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(237, 108, 2, 0.05) 100%)`,
-                        transition: 'all 0.3s ease',
-                        '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(237, 108, 2, 0.3)' }
-                    }}>
-                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#ed6c02' }} />
-                        <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Box>
-                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>Pending Delivery</Typography>
-                                <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#ed6c02' }}>
-                                    {purchases.filter(p => p.status === 'Ordered').length}
-                                </Typography>
-                            </Box>
-                            <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(237, 108, 2, 0.1)', color: '#ed6c02' }}><ReceiptLong /></Box>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                    <Card sx={{
-                        borderRadius: 4,
-                        position: 'relative',
-                        overflow: 'hidden',
-                        boxShadow: '0 10px 25px -5px rgba(46, 125, 50, 0.15)',
-                        border: '1px solid rgba(46, 125, 50, 0.1)',
-                        background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(46, 125, 50, 0.05) 100%)`,
-                        transition: 'all 0.3s ease',
-                        '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(46, 125, 50, 0.3)' }
-                    }}>
-                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#2e7d32' }} />
-                        <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Box>
-                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>Total Spent</Typography>
-                                <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#2e7d32' }}>
-                                    ₹{purchases.reduce((sum, p) => sum + p.total, 0).toLocaleString()}
-                                </Typography>
-                            </Box>
-                            <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(46, 125, 50, 0.1)', color: '#2e7d32' }}><AttachMoney /></Box>
-                        </CardContent>
-                    </Card>
-                </Grid>
-            </Grid>
 
-            <Paper sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.05)' }}>
-                <TableContainer>
-                    <Table>
-                        <TableHead sx={{ bgcolor: 'primary.light', borderBottom: '2px solid rgba(183, 110, 121, 0.1)' }}>
-                            <TableRow>
-                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>
-                                    <TableSortLabel active={orderBy === 'date'} direction={orderBy === 'date' ? order : 'asc'} onClick={() => handleRequestSort('date')}>
-                                        Date
-                                    </TableSortLabel>
-                                </TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>
-                                    <TableSortLabel active={orderBy === 'vendorName'} direction={orderBy === 'vendorName' ? order : 'asc'} onClick={() => handleRequestSort('vendorName')}>
-                                        Vendor
-                                    </TableSortLabel>
-                                </TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Items</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>
-                                    <TableSortLabel active={orderBy === 'total'} direction={orderBy === 'total' ? order : 'asc'} onClick={() => handleRequestSort('total')}>
-                                        Total Cost
-                                    </TableSortLabel>
-                                </TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>
-                                    <TableSortLabel active={orderBy === 'status'} direction={orderBy === 'status' ? order : 'asc'} onClick={() => handleRequestSort('status')}>
-                                        Order Status
-                                    </TableSortLabel>
-                                </TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>
-                                    <TableSortLabel active={orderBy === 'paymentStatus'} direction={orderBy === 'paymentStatus' ? order : 'asc'} onClick={() => handleRequestSort('paymentStatus')}>
-                                        Payment
-                                    </TableSortLabel>
-                                </TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Actions</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {(rowsPerPage > 0
-                                ? sortedPurchases.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                : sortedPurchases
-                            ).map((po) => (
-                                <TableRow key={po.id} hover>
-                                    <TableCell>
-                                        <Typography variant="body2" fontWeight={600}>{new Date(po.date).toLocaleDateString()}</Typography>
-                                        <Typography variant="caption" color="text.secondary">#{po.id.slice(-6)}</Typography>
-                                    </TableCell>
-                                    <TableCell>{po.vendorName}</TableCell>
-                                    <TableCell>{po.items.length} Items</TableCell>
-                                    <TableCell sx={{ fontWeight: 700 }}>₹{po.total.toLocaleString()}</TableCell>
-                                    <TableCell>
-                                        <Chip
-                                            label={po.status}
-                                            size="small"
-                                            color={po.status === 'Received' ? 'success' : 'warning'}
-                                            variant="outlined"
-                                            sx={{ fontWeight: 700 }}
-                                        />
-                                    </TableCell>
-                                    <TableCell>
+
+            <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)} sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}>
+                <Tab label="Purchase Orders" icon={<ReceiptLong />} iconPosition="start" />
+                <Tab label="Smart Restock" icon={<AutoAwesome />} iconPosition="start" />
+            </Tabs>
+
+            {
+                tabValue === 0 && (
+                    <>
+                        <Grid container spacing={3} sx={{ mb: 4 }}>
+                            <Grid item xs={12} sm={4}>
+                                <Card sx={{
+                                    borderRadius: 4,
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                    boxShadow: '0 10px 25px -5px rgba(25, 118, 210, 0.15)',
+                                    border: '1px solid rgba(25, 118, 210, 0.1)',
+                                    background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(25, 118, 210, 0.05) 100%)`,
+                                    transition: 'all 0.3s ease',
+                                    '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(25, 118, 210, 0.3)' }
+                                }}>
+                                    <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#1976d2' }} />
+                                    <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                         <Box>
-                                            <Chip
-                                                label={po.paymentStatus}
-                                                size="small"
-                                                sx={{
-                                                    bgcolor: po.paymentStatus === 'Paid' ? 'rgba(46, 125, 50, 0.1)' : 'rgba(237, 108, 2, 0.1)',
-                                                    color: po.paymentStatus === 'Paid' ? 'success.main' : 'warning.main',
-                                                    fontWeight: 700,
-                                                    mb: 0.5
-                                                }}
-                                            />
-                                            {(po.paymentStatus === 'Paid' || po.paymentStatus === 'Partial') && (
-                                                <Typography variant="caption" display="block" sx={{ fontWeight: 600 }}>
-                                                    Paid: ₹{po.amountPaid?.toLocaleString()}
-                                                </Typography>
-                                            )}
+                                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>Total Orders</Typography>
+                                            <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5 }}>{purchases.length}</Typography>
                                         </Box>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Box sx={{ display: 'flex', gap: 0.5 }}>
-                                            {/* <IconButton size="small"><Visibility fontSize="small" /></IconButton> */}
-                                            {po.status === 'Ordered' && (
-                                                <Button
-                                                    size="small"
-                                                    onClick={() => handleReceiveStock(po)}
-                                                    sx={{ fontSize: '0.7rem', minWidth: 'auto', px: 1, mr: 1 }}
-                                                    variant="outlined"
-                                                    color="success"
-                                                >
-                                                    Receive
-                                                </Button>
-                                            )}
-                                            <IconButton size="small" onClick={() => handleOpen(po)} sx={{ color: 'primary.main' }}>
-                                                <Edit fontSize="small" />
-                                            </IconButton>
-                                            <IconButton size="small" onClick={() => openDeleteDialog(po.id)} sx={{ color: 'error.main' }}>
-                                                <Delete fontSize="small" />
-                                            </IconButton>
+                                        <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(25, 118, 210, 0.1)', color: '#1976d2' }}><ReceiptLong /></Box>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                            <Grid item xs={12} sm={4}>
+                                <Card sx={{
+                                    borderRadius: 4,
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                    boxShadow: '0 10px 25px -5px rgba(237, 108, 2, 0.15)',
+                                    border: '1px solid rgba(237, 108, 2, 0.1)',
+                                    background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(237, 108, 2, 0.05) 100%)`,
+                                    transition: 'all 0.3s ease',
+                                    '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(237, 108, 2, 0.3)' }
+                                }}>
+                                    <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#ed6c02' }} />
+                                    <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <Box>
+                                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>Pending Delivery</Typography>
+                                            <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#ed6c02' }}>
+                                                {purchases.filter(p => p.status === 'Ordered').length}
+                                            </Typography>
                                         </Box>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                            {purchases.length === 0 && (
-                                <TableRow>
-                                    <TableCell colSpan={7} align="center" sx={{ py: 8, color: 'text.secondary' }}>No purchase orders found.</TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
-                    component="div"
-                    count={purchases.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-            </Paper>
+                                        <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(237, 108, 2, 0.1)', color: '#ed6c02' }}><ReceiptLong /></Box>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                            <Grid item xs={12} sm={4}>
+                                <Card sx={{
+                                    borderRadius: 4,
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                    boxShadow: '0 10px 25px -5px rgba(46, 125, 50, 0.15)',
+                                    border: '1px solid rgba(46, 125, 50, 0.1)',
+                                    background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(46, 125, 50, 0.05) 100%)`,
+                                    transition: 'all 0.3s ease',
+                                    '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(46, 125, 50, 0.3)' }
+                                }}>
+                                    <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#2e7d32' }} />
+                                    <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <Box>
+                                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>Total Spent</Typography>
+                                            <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#2e7d32' }}>
+                                                ₹{purchases.reduce((sum, p) => sum + p.total, 0).toLocaleString()}
+                                            </Typography>
+                                        </Box>
+                                        <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(46, 125, 50, 0.1)', color: '#2e7d32' }}><AttachMoney /></Box>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        </Grid>
+
+                        <Paper sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.05)' }}>
+                            <TableContainer>
+                                <Table>
+                                    <TableHead sx={{ bgcolor: 'primary.light', borderBottom: '2px solid rgba(183, 110, 121, 0.1)' }}>
+                                        <TableRow>
+                                            <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>
+                                                <TableSortLabel active={orderBy === 'date'} direction={orderBy === 'date' ? order : 'asc'} onClick={() => handleRequestSort('date')}>
+                                                    Date
+                                                </TableSortLabel>
+                                            </TableCell>
+                                            <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>
+                                                <TableSortLabel active={orderBy === 'vendorName'} direction={orderBy === 'vendorName' ? order : 'asc'} onClick={() => handleRequestSort('vendorName')}>
+                                                    Vendor
+                                                </TableSortLabel>
+                                            </TableCell>
+                                            <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Items</TableCell>
+                                            <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>
+                                                <TableSortLabel active={orderBy === 'total'} direction={orderBy === 'total' ? order : 'asc'} onClick={() => handleRequestSort('total')}>
+                                                    Total Cost
+                                                </TableSortLabel>
+                                            </TableCell>
+                                            <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>
+                                                <TableSortLabel active={orderBy === 'status'} direction={orderBy === 'status' ? order : 'asc'} onClick={() => handleRequestSort('status')}>
+                                                    Order Status
+                                                </TableSortLabel>
+                                            </TableCell>
+                                            <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>
+                                                <TableSortLabel active={orderBy === 'paymentStatus'} direction={orderBy === 'paymentStatus' ? order : 'asc'} onClick={() => handleRequestSort('paymentStatus')}>
+                                                    Payment
+                                                </TableSortLabel>
+                                            </TableCell>
+                                            <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Actions</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {(rowsPerPage > 0
+                                            ? sortedPurchases.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                            : sortedPurchases
+                                        ).map((po) => (
+                                            <TableRow key={po.id} hover>
+                                                <TableCell>
+                                                    <Typography variant="body2" fontWeight={600}>{new Date(po.date).toLocaleDateString()}</Typography>
+                                                    <Typography variant="caption" color="text.secondary">#{po.id.slice(-6)}</Typography>
+                                                </TableCell>
+                                                <TableCell>{po.vendorName}</TableCell>
+                                                <TableCell>{po.items.length} Items</TableCell>
+                                                <TableCell sx={{ fontWeight: 700 }}>₹{po.total.toLocaleString()}</TableCell>
+                                                <TableCell>
+                                                    <Chip
+                                                        label={po.status}
+                                                        size="small"
+                                                        color={po.status === 'Received' ? 'success' : 'warning'}
+                                                        variant="outlined"
+                                                        sx={{ fontWeight: 700 }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Box>
+                                                        <Chip
+                                                            label={po.paymentStatus}
+                                                            size="small"
+                                                            sx={{
+                                                                bgcolor: po.paymentStatus === 'Paid' ? 'rgba(46, 125, 50, 0.1)' : 'rgba(237, 108, 2, 0.1)',
+                                                                color: po.paymentStatus === 'Paid' ? 'success.main' : 'warning.main',
+                                                                fontWeight: 700,
+                                                                mb: 0.5
+                                                            }}
+                                                        />
+                                                        {(po.paymentStatus === 'Paid' || po.paymentStatus === 'Partial') && (
+                                                            <Typography variant="caption" display="block" sx={{ fontWeight: 600 }}>
+                                                                Paid: ₹{po.amountPaid?.toLocaleString()}
+                                                            </Typography>
+                                                        )}
+                                                    </Box>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => navigate('/barcodes', { state: { purchaseOrder: po } })}
+                                                            title="Print Labels"
+                                                            sx={{ color: 'secondary.main' }}
+                                                        >
+                                                            <Print fontSize="small" />
+                                                        </IconButton>
+                                                        {/* <IconButton size="small"><Visibility fontSize="small" /></IconButton> */}
+                                                        {po.status === 'Ordered' && (
+                                                            <Button
+                                                                size="small"
+                                                                onClick={() => handleReceiveStock(po)}
+                                                                sx={{ fontSize: '0.7rem', minWidth: 'auto', px: 1, mr: 1 }}
+                                                                variant="outlined"
+                                                                color="success"
+                                                            >
+                                                                Receive
+                                                            </Button>
+                                                        )}
+                                                        <IconButton size="small" onClick={() => handleOpen(po)} sx={{ color: 'primary.main' }}>
+                                                            <Edit fontSize="small" />
+                                                        </IconButton>
+                                                        <IconButton size="small" onClick={() => openDeleteDialog(po.id)} sx={{ color: 'error.main' }}>
+                                                            <Delete fontSize="small" />
+                                                        </IconButton>
+                                                    </Box>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                        {purchases.length === 0 && (
+                                            <TableRow>
+                                                <TableCell colSpan={7} align="center" sx={{ py: 8, color: 'text.secondary' }}>No purchase orders found.</TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                            <TablePagination
+                                rowsPerPageOptions={[5, 10, 25]}
+                                component="div"
+                                count={purchases.length}
+                                rowsPerPage={rowsPerPage}
+                                page={page}
+                                onPageChange={handleChangePage}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                            />
+                        </Paper>
+                    </>
+                )
+            }
+
+            {tabValue === 1 && <SmartRestockView getLowStockItems={getLowStockItems} vendors={vendors} handleOpen={handleOpen} setVendorId={setVendorId} setPoItems={setPoItems} />}
 
             {/* Create/Edit PO Dialog */}
             <Dialog
@@ -669,6 +693,25 @@ const Purchases = () => {
                                         </IconButton>
                                     </Grid>
                                 </Grid>
+                                {item.productId && inventory.find(i => i.id === item.productId)?.hasVariants && (
+                                    <Box sx={{ mt: 2 }}>
+                                        <TextField
+                                            select
+                                            fullWidth
+                                            size="small"
+                                            label="Select Variant (to receive stock into)"
+                                            value={item.variantSku || ''}
+                                            onChange={(e) => handleItemChange(index, 'variantSku', e.target.value)}
+                                            error={!item.variantSku && poItems.length > 0}
+                                        >
+                                            {inventory.find(i => i.id === item.productId).variants.map((v) => (
+                                                <MenuItem key={v.sku} value={v.sku}>
+                                                    {v.size} / {v.color} (Current Stock: {v.quantity})
+                                                </MenuItem>
+                                            ))}
+                                        </TextField>
+                                    </Box>
+                                )}
                             </Paper>
                         ))
                     }
@@ -839,6 +882,153 @@ const Purchases = () => {
                 content="Are you sure you want to delete this purchase order? This action cannot be undone."
             />
         </Box >
+    );
+};
+
+const SmartRestockView = ({ getLowStockItems, vendors, handleOpen, setVendorId, setPoItems }) => {
+    const [selectedItems, setSelectedItems] = useState([]);
+    const lowStockItems = getLowStockItems ? getLowStockItems() : [];
+
+    // Group by Supplier
+    const groupedItems = lowStockItems.reduce((groups, item) => {
+        const supplier = item.supplier || 'Unknown Supplier';
+        if (!groups[supplier]) groups[supplier] = [];
+        groups[supplier].push(item);
+        return groups;
+    }, {});
+
+    const handleSelectAll = (supplier, items, checked) => {
+        if (checked) {
+            const newSelected = [...selectedItems];
+            items.forEach(item => {
+                const uniqueId = item.isVariant ? `${item.id}-${item.variantSku}` : item.id;
+                if (!newSelected.includes(uniqueId)) newSelected.push(uniqueId);
+            });
+            setSelectedItems(newSelected);
+        } else {
+            const idsToRemove = items.map(item => item.isVariant ? `${item.id}-${item.variantSku}` : item.id);
+            setSelectedItems(selectedItems.filter(id => !idsToRemove.includes(id)));
+        }
+    };
+
+    const handleSelectItem = (uniqueId) => {
+        if (selectedItems.includes(uniqueId)) {
+            setSelectedItems(selectedItems.filter(id => id !== uniqueId));
+        } else {
+            setSelectedItems([...selectedItems, uniqueId]);
+        }
+    };
+
+    const createBulkPO = (supplier, items) => {
+        const vendor = vendors.find(v => v.name.toLowerCase() === supplier.toLowerCase());
+        const vendorIdToUse = vendor ? vendor.id : '';
+
+        // Filter items selected for this supplier
+        const itemsToOrder = items.filter(item => {
+            const uniqueId = item.isVariant ? `${item.id}-${item.variantSku}` : item.id;
+            return selectedItems.includes(uniqueId);
+        });
+
+        if (itemsToOrder.length === 0) {
+            alert("Please select items to order.");
+            return;
+        }
+
+        const poItemsData = itemsToOrder.map(item => ({
+            productId: item.id,
+            productName: item.name,
+            quantity: (item.minStockLevel * 2) - item.quantity > 0 ? (item.minStockLevel * 2) - item.quantity : 10, // Default logic: Target 2x Min Stock
+            cost: item.cost || 0,
+            variantSku: item.variantSku || ''
+        }));
+
+        setVendorId(vendorIdToUse);
+        setPoItems(poItemsData);
+        handleOpen(); // Open the main dialog logic
+    };
+
+    return (
+        <Box>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>Recommended Restock</Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                Items below their minimum stock level. Select items to generate Purchase Orders.
+            </Typography>
+
+            {Object.keys(groupedItems).length === 0 && (
+                <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 4 }}>
+                    <Typography variant="h6" color="text.secondary">All stock levels are healthy!</Typography>
+                    <Typography variant="body2" color="text.secondary">No items are below their minimum threshold.</Typography>
+                </Paper>
+            )}
+
+            {Object.entries(groupedItems).map(([supplier, items]) => (
+                <Paper key={supplier} sx={{ mb: 3, borderRadius: 3, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
+                    <Box sx={{ p: 2, bgcolor: 'grey.50', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Checkbox
+                                checked={items.every(item => selectedItems.includes(item.isVariant ? `${item.id}-${item.variantSku}` : item.id))}
+                                indeterminate={
+                                    items.some(item => selectedItems.includes(item.isVariant ? `${item.id}-${item.variantSku}` : item.id)) &&
+                                    !items.every(item => selectedItems.includes(item.isVariant ? `${item.id}-${item.variantSku}` : item.id))
+                                }
+                                onChange={(e) => handleSelectAll(supplier, items, e.target.checked)}
+                            />
+                            <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>{supplier}</Typography>
+                            <Chip label={`${items.length} Items`} size="small" />
+                        </Box>
+                        <Button
+                            variant="contained"
+                            size="small"
+                            onClick={() => createBulkPO(supplier, items)}
+                            disabled={!items.some(item => selectedItems.includes(item.isVariant ? `${item.id}-${item.variantSku}` : item.id))}
+                        >
+                            Create PO
+                        </Button>
+                    </Box>
+                    <TableContainer>
+                        <Table size="small">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell sx={{ minWidth: 50 }} />
+                                    <TableCell>Product</TableCell>
+                                    <TableCell>Cost</TableCell>
+                                    <TableCell align="center">Current Stock</TableCell>
+                                    <TableCell align="center">Min Level</TableCell>
+                                    <TableCell align="center">Status</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {items.map((item, idx) => {
+                                    const uniqueId = item.isVariant ? `${item.id}-${item.variantSku}` : item.id;
+                                    return (
+                                        <TableRow key={uniqueId} hover>
+                                            <TableCell padding="checkbox">
+                                                <Checkbox
+                                                    checked={selectedItems.includes(uniqueId)}
+                                                    onChange={() => handleSelectItem(uniqueId)}
+                                                />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Typography variant="body2" fontWeight={600}>{item.name}</Typography>
+                                                {item.isVariant && <Typography variant="caption" color="text.secondary">SKU: {item.variantSku}</Typography>}
+                                            </TableCell>
+                                            <TableCell>₹{item.cost || 0}</TableCell>
+                                            <TableCell align="center">
+                                                <Chip label={item.quantity} size="small" color="error" variant="outlined" sx={{ fontWeight: 700 }} />
+                                            </TableCell>
+                                            <TableCell align="center">{item.minStockLevel || 5}</TableCell>
+                                            <TableCell align="center">
+                                                <Typography variant="caption" color="error" fontWeight="bold">Low Stock</Typography>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Paper>
+            ))}
+        </Box>
     );
 };
 
