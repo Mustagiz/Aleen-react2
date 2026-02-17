@@ -40,6 +40,7 @@ const Layout = () => {
     {
       title: 'Reports',
       items: [
+        { text: 'Advanced Reports', icon: <Assessment />, path: '/advanced-reports', adminOnly: true },
         { text: 'Payment Summary', icon: <AccountBalanceWallet />, path: '/payment-summary', adminOnly: true },
         { text: 'Profit & Loss', icon: <TrendingUp />, path: '/profit-loss', adminOnly: true },
         { text: 'Sales Reports', icon: <Assessment />, path: '/sales-reports' },

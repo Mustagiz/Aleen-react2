@@ -20,6 +20,7 @@ import Barcodes from './pages/Barcodes';
 import Marketing from './pages/Marketing';
 import PaymentSummary from './pages/PaymentSummary';
 import Loyalty from './pages/Loyalty';
+import AdvancedReports from './pages/AdvancedReports';
 import Layout from './components/Layout';
 
 const PrivateRoute = ({ children }) => {
@@ -51,6 +52,7 @@ function App() {
                 <Route path="marketing" element={<Marketing />} />
                 <Route path="payment-summary" element={<PaymentSummary />} />
                 <Route path="loyalty" element={<Loyalty />} />
+                <Route path="advanced-reports" element={<AdvancedReports />} />
                 <Route path="settings" element={<Settings />} />
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />
