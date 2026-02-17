@@ -1,81 +1,79 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { db, auth } from '../firebase';
-import { doc, onSnapshot, setDoc, getDoc } from 'firebase/firestore';
-import { signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from 'firebase/auth';
+import { db } from '../firebase';
+import { doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
 
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+  const [adminPassword, setAdminPassword] = useState('admin123');
+  const [cashierPassword, setCashierPassword] = useState('cashier123');
   const [loading, setLoading] = useState(true);
 
+  // Sync passwords from Firestore
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        try {
-          // Fetch user role from Firestore
-          const userDocRef = doc(db, 'users', firebaseUser.uid);
-          const userDoc = await getDoc(userDocRef);
-
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            setUser({ ...firebaseUser, ...userData, role: userData.role || 'cashier' }); // Default to cashier if no role
-          } else {
-            // If no firestore doc exists yet (manual console creation), treat as admin for now or handle gracefully
-            // For safety in this migration phase, if email is 'admin@aleen.com', give admin role
-            const role = firebaseUser.email === 'admin@aleen.com' ? 'admin' : 'cashier';
-            setUser({ ...firebaseUser, role });
-
-            // Create the doc so it exists next time
-            try {
-              await setDoc(userDocRef, {
-                email: firebaseUser.email,
-                role,
-                createdAt: new Date().toISOString()
-              });
-            } catch (docError) {
-              console.error("Error creating user profile:", docError);
-            }
-          }
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-          // Fallback to allow login even if Firestore fails
-          setUser({ ...firebaseUser, role: 'cashier' });
-        }
+    const unsub = onSnapshot(doc(db, 'settings', 'auth'), (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        setAdminPassword(data.password || 'admin123');
+        setCashierPassword(data.cashierPassword || 'cashier123');
       } else {
-        setUser(null);
+        // Initialize if not exists
+        setDoc(doc(db, 'settings', 'auth'), {
+          password: 'admin123',
+          cashierPassword: 'cashier123'
+        });
       }
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => unsub();
   }, []);
 
   const login = (email, password) => {
-    return signInWithEmailAndPassword(auth, email, password);
+    return new Promise((resolve, reject) => {
+      if (email === 'admin@aleen.com' && password === adminPassword) {
+        const userData = { email, role: 'admin' };
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+        resolve(userData);
+      } else if (email === 'cashier@aleen.com' && password === cashierPassword) {
+        const userData = { email, role: 'cashier' };
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+        resolve(userData);
+      } else {
+        reject(new Error('Invalid credentials'));
+      }
+    });
+  };
+
+  const changePassword = (currentPassword, newPassword) => {
+    if (currentPassword !== adminPassword) {
+      return Promise.resolve({ success: false, error: 'Current password is incorrect' });
+    }
+    return updateDoc(doc(db, 'settings', 'auth'), { password: newPassword })
+      .then(() => ({ success: true }));
+  };
+
+  const changeCashierPassword = (newPassword) => {
+    return updateDoc(doc(db, 'settings', 'auth'), { cashierPassword: newPassword })
+      .then(() => ({ success: true }));
   };
 
   const logout = () => {
-    return signOut(auth);
-  };
-
-  // Admin function to create new staff users
-  const createStaffUser = async (email, password, role, name) => {
-    // Note: This will sign in as the new user immediately if used on client side without a secondary app instance.
-    // For a simple app, we can use a Cloud Function or just accept the relog behavior for now, 
-    // OR just creating them in Firebase Console is safer for the existing Admin.
-    // For this implementation, we will assume Admin creates them via Console or a separate process, 
-    // BUT we need a way to set their role. Here is a helper to just set role for a UID if we know it, 
-    // or we can implement a full "Manage Users" page later.
-
-    // For now, let's just stick to standard Auth functions.
-    // The previous 'changePassword' logic is no longer needed as Firebase handles it.
+    setUser(null);
+    localStorage.removeItem('user');
+    return Promise.resolve();
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, changePassword, changeCashierPassword, loading }}>
       {children}
     </AuthContext.Provider>
   );
