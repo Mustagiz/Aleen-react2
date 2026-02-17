@@ -1117,69 +1117,63 @@ const Invoices = () => {
                 helperText="Search by name. Triggers on Enter or when you tap away."
               />
             </Box>
-            <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'flex-start' }}>
-              <Box sx={{ flex: 1, width: '100%' }}>
-                <TextField
-                  label="Phone (with country code)"
-                  value={phone}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    // Always start with +91
-                    let suffix = val;
-                    if (val.startsWith('+91')) {
-                      suffix = val.slice(3);
-                    } else if (val.length < 3) {
-                      setPhone('+91');
-                      return;
-                    }
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+              <TextField
+                label="Phone (with country code)"
+                value={phone}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  // Always start with +91
+                  let suffix = val;
+                  if (val.startsWith('+91')) {
+                    suffix = val.slice(3);
+                  } else if (val.length < 3) {
+                    setPhone('+91');
+                    return;
+                  }
 
-                    // Only allow digits in suffix and max 10 digits
-                    const cleanedSuffix = suffix.replace(/[^0-9]/g, '').slice(0, 10);
-                    const newPhone = `+91${cleanedSuffix}`;
-                    setPhone(newPhone);
+                  // Only allow digits in suffix and max 10 digits
+                  const cleanedSuffix = suffix.replace(/[^0-9]/g, '').slice(0, 10);
+                  const newPhone = `+91${cleanedSuffix}`;
+                  setPhone(newPhone);
 
-                    // Auto-fetch if full number (13 chars: +91 + 10 digits)
-                    if (newPhone.length === 13) {
-                      const matched = customers.find(c => c.phone === newPhone || c.phone === cleanedSuffix);
-                      if (matched) {
-                        setCustomer(matched.name);
-                        setSelectedCustomerId(matched.id);
-                      }
+                  // Auto-fetch if full number (13 chars: +91 + 10 digits)
+                  if (newPhone.length === 13) {
+                    const matched = customers.find(c => c.phone === newPhone || c.phone === cleanedSuffix);
+                    if (matched) {
+                      setCustomer(matched.name);
+                      setSelectedCustomerId(matched.id);
                     }
-                  }}
-                  onBlur={() => {
+                  }
+                }}
+                onBlur={() => {
+                  const val = phone.trim();
+                  if (val.length > 3) {
+                    const matched = customers.find(c => c.phone === val || c.phone === val.replace('+91', '').trim());
+                    if (matched) {
+                      setCustomer(matched.name);
+                      setSelectedCustomerId(matched.id);
+                    }
+                  }
+                }}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    // Fetch customer logic only on Enter
                     const val = phone.trim();
-                    if (val.length > 3) {
-                      const matched = customers.find(c => c.phone === val || c.phone === val.replace('+91', '').trim());
-                      if (matched) {
-                        setCustomer(matched.name);
-                        setSelectedCustomerId(matched.id);
-                      }
+                    const matched = customers.find(c => c.phone === val || c.phone === val.replace('+91', '').trim());
+                    if (matched) {
+                      setCustomer(matched.name);
+                      setSelectedCustomerId(matched.id);
                     }
-                  }}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      // Fetch customer logic only on Enter
-                      const val = phone.trim();
-                      const matched = customers.find(c => c.phone === val || c.phone === val.replace('+91', '').trim());
-                      if (matched) {
-                        setCustomer(matched.name);
-                        setSelectedCustomerId(matched.id);
-                      }
-                    }
-                  }}
-                  fullWidth
-                  placeholder="919876543210"
-                  helperText="Press Enter to search for existing customer name"
-                />
-                {selectedCustomerId && (
-                  <Chip
-                    size="small"
-                    label={`Points: ${customers.find(c => c.id === selectedCustomerId)?.loyaltyPoints || 0}`}
-                    sx={{ mt: 1, bgcolor: 'primary.light', color: 'primary.main', fontWeight: 800 }}
-                  />
-                )}
-              </Box>
+                  }
+                }}
+                fullWidth
+                placeholder="919876543210"
+                helperText={selectedCustomerId ? `Points: ${customers.find(c => c.id === selectedCustomerId)?.loyaltyPoints || 0}` : "Press Enter to search for existing customer"}
+                InputProps={{
+                  sx: { fontFamily: 'monospace' }
+                }}
+              />
               <TextField
                 label="Invoice Date & Time"
                 type="datetime-local"

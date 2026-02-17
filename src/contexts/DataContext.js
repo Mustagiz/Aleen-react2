@@ -363,10 +363,26 @@ export const DataProvider = ({ children }) => {
       const customer = customers.find(c => c.id === invoice.customerId);
       if (customer) {
         const pointsEarned = Math.floor(invoice.total / 100);
+        const newTotalSpent = (customer.totalSpent || 0) + invoice.total;
+        const newTier = calculateLoyaltyTier(newTotalSpent);
+        const pointsHistory = customer.pointsHistory || [];
+
         batch.update(customerRef, {
-          totalSpent: (customer.totalSpent || 0) + invoice.total,
+          totalSpent: newTotalSpent,
           visitCount: (customer.visitCount || 0) + 1,
-          loyaltyPoints: (customer.loyaltyPoints || 0) + pointsEarned
+          loyaltyPoints: (customer.loyaltyPoints || 0) + pointsEarned,
+          loyaltyTier: newTier,
+          pointsHistory: [
+            ...pointsHistory,
+            {
+              date: new Date().toISOString(),
+              points: pointsEarned,
+              type: 'earned',
+              reason: `Purchase - Invoice #${id}`,
+              invoiceId: id,
+              invoiceTotal: invoice.total
+            }
+          ]
         });
       }
     }
@@ -433,7 +449,10 @@ export const DataProvider = ({ children }) => {
       dateAdded: new Date().toISOString(),
       totalSpent: 0,
       visitCount: 0,
-      loyaltyPoints: 0
+      loyaltyPoints: 0,
+      loyaltyTier: 'Bronze',
+      pointsHistory: [],
+      birthday: customer.birthday || null
     };
     await setDoc(doc(db, 'customers', id), newCustomer);
     return id;
@@ -449,6 +468,62 @@ export const DataProvider = ({ children }) => {
 
   const deleteCustomer = async (id) => {
     await deleteDoc(doc(db, 'customers', id));
+  };
+
+  // Loyalty Program Functions
+  const calculateLoyaltyTier = (totalSpent) => {
+    if (totalSpent >= 100000) return 'Platinum';
+    if (totalSpent >= 50000) return 'Gold';
+    if (totalSpent >= 25000) return 'Silver';
+    return 'Bronze';
+  };
+
+  const redeemLoyaltyPoints = async (customerId, pointsToRedeem) => {
+    const customer = customers.find(c => c.id === customerId);
+    if (!customer) throw new Error('Customer not found');
+    if (customer.loyaltyPoints < pointsToRedeem) {
+      throw new Error('Insufficient points');
+    }
+
+    const customerRef = doc(db, 'customers', customerId);
+    const pointsHistory = customer.pointsHistory || [];
+
+    await updateDoc(customerRef, {
+      loyaltyPoints: customer.loyaltyPoints - pointsToRedeem,
+      pointsHistory: [
+        ...pointsHistory,
+        {
+          date: new Date().toISOString(),
+          points: -pointsToRedeem,
+          type: 'redeemed',
+          reason: 'Points Redeemed',
+          redemptionValue: pointsToRedeem // 1 point = ₹1
+        }
+      ]
+    });
+
+    return pointsToRedeem; // Return discount amount
+  };
+
+  const addBirthdayBonus = async (customerId, bonusPoints = 100) => {
+    const customer = customers.find(c => c.id === customerId);
+    if (!customer) return;
+
+    const customerRef = doc(db, 'customers', customerId);
+    const pointsHistory = customer.pointsHistory || [];
+
+    await updateDoc(customerRef, {
+      loyaltyPoints: (customer.loyaltyPoints || 0) + bonusPoints,
+      pointsHistory: [
+        ...pointsHistory,
+        {
+          date: new Date().toISOString(),
+          points: bonusPoints,
+          type: 'earned',
+          reason: 'Birthday Bonus'
+        }
+      ]
+    });
   };
 
   const addMarketingTemplate = async (template) => {
