@@ -2,11 +2,32 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { CssBaseline, Box } from '@mui/material';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { DataProvider } from './contexts/DataProvider';
+import { DataProvider } from './contexts/DataContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-// ... other imports unchanged
+import Inventory from './pages/Inventory';
+import Invoices from './pages/Invoices';
+import Customers from './pages/Customers';
+import SalesReports from './pages/SalesReports';
+import InventoryReports from './pages/InventoryReports';
+import ProfitLoss from './pages/ProfitLoss';
+import Expenses from './pages/Expenses';
+import Vendors from './pages/Vendors';
+import Purchases from './pages/Purchases';
+import Barcodes from './pages/Barcodes';
+import Marketing from './pages/Marketing';
+import PaymentSummary from './pages/PaymentSummary';
+import Loyalty from './pages/Loyalty';
+import AdvancedReports from './pages/AdvancedReports';
+import Settings from './pages/Settings';
+import Layout from './components/Layout';
+
+const PrivateRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  return user ? children : <Navigate to="/login" />;
+};
 
 const PageWrapper = ({ children }) => (
   <motion.div
