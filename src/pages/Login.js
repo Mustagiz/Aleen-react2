@@ -70,7 +70,8 @@ const Login = () => {
           </Box>
           <Box sx={{ mt: 3, p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'center' }}>
-              Authentication is now secured via Firebase.
+              Demo Credentials:<br />
+              <strong>admin@aleen.com</strong> / <strong>admin123</strong>
             </Typography>
           </Box>
         </Paper>

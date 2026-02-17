@@ -70,10 +70,7 @@ const Layout = () => {
     }
   ].map(section => ({
     ...section,
-    items: section.items.filter(item => {
-      if (item.adminOnly) return user?.role === 'admin';
-      return true;
-    })
+    items: section.items.filter(item => !item.adminOnly || user?.role === 'admin')
   }));
 
   const handleLogout = async () => {
@@ -94,10 +91,7 @@ const Layout = () => {
     { text: 'Stock', icon: <Assessment />, path: '/inventory-reports' },
     { text: 'Marketing', icon: <Campaign />, path: '/marketing' },
     { text: 'Settings', icon: <Settings />, path: '/settings', adminOnly: true }
-  ].filter(item => {
-    if (item.adminOnly) return user?.role === 'admin' || user?.role === 'manager'; // Allow managers some access? No, strict for now.
-    return true;
-  }).filter(item => !item.adminOnly || user?.role === 'admin');
+  ].filter(item => !item.adminOnly || user?.role === 'admin');
 
   return (
     <Box sx={{
