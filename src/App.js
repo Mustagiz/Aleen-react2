@@ -19,6 +19,7 @@ import Expenses from './pages/Expenses';
 import Barcodes from './pages/Barcodes';
 import Marketing from './pages/Marketing';
 import PaymentSummary from './pages/PaymentSummary';
+import Loyalty from './pages/Loyalty';
 import Layout from './components/Layout';
 
 const PrivateRoute = ({ children }) => {
@@ -49,6 +50,7 @@ function App() {
                 <Route path="barcodes" element={<Barcodes />} />
                 <Route path="marketing" element={<Marketing />} />
                 <Route path="payment-summary" element={<PaymentSummary />} />
+                <Route path="loyalty" element={<Loyalty />} />
                 <Route path="settings" element={<Settings />} />
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />

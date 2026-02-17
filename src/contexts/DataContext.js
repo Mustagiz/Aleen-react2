@@ -611,7 +611,11 @@ export const DataProvider = ({ children }) => {
       addExpense,
       updateExpense,
       deleteExpense,
-      bulkAddExpenses
+      bulkAddExpenses,
+      // Loyalty Program Functions
+      calculateLoyaltyTier,
+      redeemLoyaltyPoints,
+      addBirthdayBonus
     }}>
       {children}
     </DataContext.Provider>
