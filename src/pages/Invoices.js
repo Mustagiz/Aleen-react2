@@ -39,6 +39,18 @@ const Invoices = () => {
   const offscreenInvoiceRef = useRef(null);
 
 
+  const toSentenceCase = (text) => {
+    if (!text) return '';
+    const firstLetterMatch = text.match(/[a-zA-Z]/);
+    if (!firstLetterMatch) return text;
+    const index = firstLetterMatch.index;
+    return (
+      text.slice(0, index) +
+      text.charAt(index).toUpperCase() +
+      text.slice(index + 1).toLowerCase()
+    );
+  };
+
   const playBeep = () => {
     try {
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -636,6 +648,8 @@ const Invoices = () => {
 
     let finalCustomerId = selectedCustomerId;
 
+    const finalCustomerName = toSentenceCase(customer.trim()) || 'Walk-in';
+
     // Auto-Customer logic: If no customer ID but we have name/phone, check if exists or add
     if (!finalCustomerId && customer && phone) {
       const existingCustomer = customers.find(c => c.phone === phone);
@@ -644,7 +658,7 @@ const Invoices = () => {
       } else {
         // Add new customer automatically
         finalCustomerId = await addCustomer({
-          name: customer,
+          name: finalCustomerName,
           phone: phone,
           email: '', // Default empty
           address: '' // Default empty
@@ -661,7 +675,7 @@ const Invoices = () => {
     const invoice = {
       id: invoiceNumber,
       date: new Date(invoiceDate).toISOString(),
-      customer,
+      customer: finalCustomerName,
       phone,
       customerId: finalCustomerId,
       paymentMethod: finalPaymentMethod,
@@ -1611,18 +1625,20 @@ const Invoices = () => {
                     fullWidth
                     size="small"
                     value={customer}
-                    placeholder="e.g. Saira Banu"
+                    placeholder="e.g. Saira banu"
                     onChange={(e) => {
-                      const val = e.target.value.replace(/\b\w/g, (l) => l.toUpperCase());
+                      const val = toSentenceCase(e.target.value);
                       setCustomer(val);
                       if (selectedCustomerId) setSelectedCustomerId(null);
                     }}
                     onBlur={() => {
-                      const searchTerm = customer.toLowerCase().trim();
+                      const formatted = toSentenceCase(customer.trim());
+                      setCustomer(formatted);
+                      const searchTerm = formatted.toLowerCase();
                       if (searchTerm) {
-                        const matched = customers.find(c => c.name.toLowerCase() === searchTerm);
+                        const matched = customers.find(c => c.name && c.name.toLowerCase() === searchTerm);
                         if (matched) {
-                          setCustomer(matched.name);
+                          setCustomer(toSentenceCase(matched.name));
                           setPhone(matched.phone || '+91');
                           setSelectedCustomerId(matched.id);
                         }
@@ -1630,16 +1646,20 @@ const Invoices = () => {
                     }}
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
-                        const searchTerm = customer.toLowerCase().trim();
-                        const matched = customers.find(c => c.name.toLowerCase() === searchTerm);
-                        if (matched) {
-                          setCustomer(matched.name);
-                          setPhone(matched.phone || '+91');
-                          setSelectedCustomerId(matched.id);
+                        const formatted = toSentenceCase(customer.trim());
+                        setCustomer(formatted);
+                        const searchTerm = formatted.toLowerCase();
+                        if (searchTerm) {
+                          const matched = customers.find(c => c.name && c.name.toLowerCase() === searchTerm);
+                          if (matched) {
+                            setCustomer(toSentenceCase(matched.name));
+                            setPhone(matched.phone || '+91');
+                            setSelectedCustomerId(matched.id);
+                          }
                         }
                       }
                     }}
-                    helperText="Search by name. Triggers auto-lookup on Enter or tap away."
+                    helperText="Type customer name in sentence case. Auto-formats on type and lookup."
                   />
                 </Box>
 
@@ -1665,7 +1685,7 @@ const Invoices = () => {
                       if (newPhone.length === 13) {
                         const matched = customers.find(c => c.phone === newPhone || c.phone === cleanedSuffix);
                         if (matched) {
-                          setCustomer(matched.name);
+                          setCustomer(toSentenceCase(matched.name));
                           setSelectedCustomerId(matched.id);
                         }
                       }
@@ -1675,7 +1695,7 @@ const Invoices = () => {
                       if (val.length > 3) {
                         const matched = customers.find(c => c.phone === val || c.phone === val.replace('+91', '').trim());
                         if (matched) {
-                          setCustomer(matched.name);
+                          setCustomer(toSentenceCase(matched.name));
                           setSelectedCustomerId(matched.id);
                         }
                       }
@@ -1685,7 +1705,7 @@ const Invoices = () => {
                         const val = phone.trim();
                         const matched = customers.find(c => c.phone === val || c.phone === val.replace('+91', '').trim());
                         if (matched) {
-                          setCustomer(matched.name);
+                          setCustomer(toSentenceCase(matched.name));
                           setSelectedCustomerId(matched.id);
                         }
                       }
