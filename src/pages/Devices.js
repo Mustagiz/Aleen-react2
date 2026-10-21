@@ -48,52 +48,36 @@ import {
     Speed,
     LinkOff,
     Link,
-    PlayArrow
+    PlayArrow,
+    CameraAlt,
+    InfoOutlined
 } from '@mui/icons-material';
+import { Html5Qrcode } from 'html5-qrcode';
 import { useNavigate } from 'react-router-dom';
 import { useData } from '../contexts/DataContext';
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 
-// Initial Mock / LocalStorage Device Seed
-const DEFAULT_DEVICES = [
-    {
-        id: 'dev_netum_01',
-        name: 'Netum NT-1228BL Handheld Scanner',
-        type: 'bluetooth_scanner',
-        typeName: 'Bluetooth 2D/QR Scanner',
-        status: 'connected',
-        battery: 88,
-        signalStrength: 95,
-        macAddress: '9C:28:40:B1:A2:18',
-        lastScan: new Date(Date.now() - 1000 * 60 * 3).toISOString(),
-        totalScans: 42
-    },
-    {
-        id: 'dev_phone_bridge_01',
-        name: "Faeez's iPhone 15 Pro (Camera Bridge)",
-        type: 'phone_camera',
-        typeName: 'Smartphone Camera Viewfinder',
-        status: 'connected',
-        battery: 92,
-        signalStrength: 100,
-        macAddress: 'IP: 192.168.1.104 (Local Bridge)',
-        lastScan: new Date(Date.now() - 1000 * 60 * 12).toISOString(),
-        totalScans: 19
-    }
-];
-
 export default function Devices() {
     const navigate = useNavigate();
     const { inventory } = useData();
 
-    // Stored paired devices
+    // Stored paired devices - Starts empty, filters out any legacy mock devices
     const [devices, setDevices] = useState(() => {
         const saved = localStorage.getItem('aleen_paired_devices');
         if (saved) {
-            try { return JSON.parse(saved); } catch (e) { }
+            try {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed)) {
+                    return parsed.filter(d => 
+                        d.id !== 'dev_netum_01' && 
+                        d.id !== 'dev_phone_bridge_01' &&
+                        !d.name?.includes('Netum NT-1228BL')
+                    );
+                }
+            } catch (e) { }
         }
-        return DEFAULT_DEVICES;
+        return [];
     });
 
     useEffect(() => {
@@ -103,33 +87,17 @@ export default function Devices() {
     // Modals
     const [bluetoothModalOpen, setBluetoothModalOpen] = useState(false);
     const [phoneModalOpen, setPhoneModalOpen] = useState(false);
+    const [cameraScannerOpen, setCameraScannerOpen] = useState(false);
+    const [cameraError, setCameraError] = useState('');
     const [customDeviceName, setCustomDeviceName] = useState('');
     const [customDeviceType, setCustomDeviceType] = useState('bluetooth_scanner');
     const [isScanningBluetooth, setIsScanningBluetooth] = useState(false);
     const [bluetoothError, setBluetoothError] = useState('');
-    const [discoveredDevices, setDiscoveredDevices] = useState([]);
 
-    // Scan Test Bench State
+    // Scan Test Bench State - Starts empty with real logs only
     const [testInput, setTestInput] = useState('');
     const [lastScannedResult, setLastScannedResult] = useState(null);
-    const [scanHistory, setScanHistory] = useState([
-        {
-            id: 'scan_1',
-            timestamp: new Date(Date.now() - 1000 * 60 * 3).toISOString(),
-            rawCode: 'ALN-SILK-4029',
-            deviceName: 'Netum NT-1228BL Handheld Scanner',
-            deviceType: 'bluetooth_scanner',
-            status: 'matched'
-        },
-        {
-            id: 'scan_2',
-            timestamp: new Date(Date.now() - 1000 * 60 * 12).toISOString(),
-            rawCode: 'ALN-BRIDAL-7021',
-            deviceName: "Faeez's iPhone 15 Pro (Camera Bridge)",
-            deviceType: 'phone_camera',
-            status: 'matched'
-        }
-    ]);
+    const [scanHistory, setScanHistory] = useState([]);
 
     // Audio & UX Preferences
     const [soundEnabled, setSoundEnabled] = useState(true);
@@ -241,87 +209,95 @@ export default function Devices() {
         }
     };
 
-    // Bluetooth Discovery trigger
+    // Live Camera Scanner Lifecycle (Html5Qrcode)
+    useEffect(() => {
+        let html5QrCode = null;
+        if (cameraScannerOpen) {
+            setCameraError('');
+            const timer = setTimeout(async () => {
+                try {
+                    const readerElem = document.getElementById('device-tab-reader');
+                    if (!readerElem) return;
+
+                    html5QrCode = new Html5Qrcode('device-tab-reader');
+                    const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+                    const onScanSuccess = (decodedText) => {
+                        processScan(decodedText, 'Live Camera Viewfinder', 'phone_camera');
+                        setCameraScannerOpen(false);
+                    };
+
+                    try {
+                        await html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess, () => {});
+                    } catch (envErr) {
+                        // Fallback to front/user camera (e.g. laptop webcam)
+                        await html5QrCode.start({ facingMode: 'user' }, config, onScanSuccess, () => {});
+                    }
+                } catch (err) {
+                    console.error('Camera initialization error:', err);
+                    setCameraError('Camera access failed: ' + (err.message || 'Please check browser camera permissions.'));
+                }
+            }, 350);
+
+            return () => {
+                clearTimeout(timer);
+                if (html5QrCode && html5QrCode.isScanning) {
+                    html5QrCode.stop().catch(() => {}).finally(() => {
+                        try { html5QrCode.clear(); } catch (e) {}
+                    });
+                }
+            };
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [cameraScannerOpen]);
+
+    // Bluetooth Discovery trigger - Real Web Bluetooth without dummy data
     const startBluetoothDiscovery = async () => {
         setIsScanningBluetooth(true);
         setBluetoothError('');
-        setDiscoveredDevices([]);
 
-        if (navigator.bluetooth) {
-            try {
-                const device = await navigator.bluetooth.requestDevice({
-                    acceptAllDevices: true,
-                    optionalServices: ['battery_service', 'device_information']
-                });
-
-                if (device) {
-                    const newDev = {
-                        id: 'dev_bt_' + Date.now(),
-                        name: device.name || 'Bluetooth Barcode Scanner',
-                        type: 'bluetooth_scanner',
-                        typeName: 'Bluetooth 2D/QR Scanner',
-                        status: 'connected',
-                        battery: 90,
-                        signalStrength: 98,
-                        macAddress: device.id ? device.id.slice(0, 17) : 'BT-CONNECTED',
-                        lastScan: new Date().toISOString(),
-                        totalScans: 0
-                    };
-                    setDevices(prev => [newDev, ...prev]);
-                    setIsScanningBluetooth(false);
-                    setBluetoothModalOpen(false);
-                    playScanChime('success');
-                    return;
-                }
-            } catch (err) {
-                if (err.name !== 'NotFoundError') {
-                    setBluetoothError(err.message || 'Bluetooth connection failed.');
-                }
-            }
+        if (!navigator.bluetooth) {
+            setIsScanningBluetooth(false);
+            setBluetoothError(
+                'Web Bluetooth is not supported in this browser or over insecure HTTP. Web Bluetooth requires Google Chrome, Microsoft Edge, or Opera on Mac/Windows/Android over HTTPS or localhost (Safari does not support Web Bluetooth). If you wish to scan barcodes with a phone, please click "Open Camera Scanner" instead.'
+            );
+            return;
         }
 
-        // Simulated scanner discovery if browser blocks or for quick demo pairing
-        setTimeout(() => {
-            setDiscoveredDevices([
-                {
-                    name: 'Netum 2D Wireless Barcode Reader',
-                    model: 'NT-1228BL',
-                    rssi: -58,
-                    type: 'bluetooth_scanner'
-                },
-                {
-                    name: 'Eyoyo Bluetooth Wearable Ring Scanner',
-                    model: 'EY-022',
-                    rssi: -64,
-                    type: 'bluetooth_scanner'
-                },
-                {
-                    name: 'Inateck Pro 2D Imager Gun',
-                    model: 'BCST-70',
-                    rssi: -72,
-                    type: 'bluetooth_scanner'
-                }
-            ]);
-            setIsScanningBluetooth(false);
-        }, 1200);
-    };
+        try {
+            const device = await navigator.bluetooth.requestDevice({
+                acceptAllDevices: true,
+                optionalServices: ['battery_service', 'device_information']
+            });
 
-    const addDiscoveredDevice = (disc) => {
-        const newDev = {
-            id: 'dev_' + Date.now(),
-            name: disc.name,
-            type: disc.type,
-            typeName: 'Bluetooth 2D/QR Scanner',
-            status: 'connected',
-            battery: Math.floor(Math.random() * 20) + 80,
-            signalStrength: Math.abs(disc.rssi) < 60 ? 98 : 88,
-            macAddress: 'BT:' + Math.random().toString(36).substring(2, 6).toUpperCase() + ':' + Math.random().toString(36).substring(2, 6).toUpperCase(),
-            lastScan: new Date().toISOString(),
-            totalScans: 0
-        };
-        setDevices(prev => [newDev, ...prev]);
-        setBluetoothModalOpen(false);
-        playScanChime('success');
+            if (device) {
+                const newDev = {
+                    id: 'dev_bt_' + Date.now(),
+                    name: device.name || 'Bluetooth Barcode Scanner',
+                    type: 'bluetooth_scanner',
+                    typeName: 'Bluetooth 2D/QR Scanner',
+                    status: 'connected',
+                    battery: 100,
+                    signalStrength: 98,
+                    macAddress: device.id ? device.id.slice(0, 17) : 'BT-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
+                    lastScan: new Date().toISOString(),
+                    totalScans: 0
+                };
+                setDevices(prev => [newDev, ...prev]);
+                setIsScanningBluetooth(false);
+                setBluetoothModalOpen(false);
+                playScanChime('success');
+            }
+        } catch (err) {
+            setIsScanningBluetooth(false);
+            if (err.name === 'NotFoundError') {
+                setBluetoothError('No Bluetooth device was selected or pairing was cancelled. Please ensure your physical scanner is turned ON and in pairing mode.');
+            } else if (err.name === 'SecurityError') {
+                setBluetoothError('Bluetooth permission was blocked by the browser. Please check site permissions in your browser address bar.');
+            } else {
+                setBluetoothError(err.message || 'Bluetooth connection failed.');
+            }
+        }
     };
 
     const handleAddCustomDevice = () => {
@@ -368,10 +344,9 @@ export default function Devices() {
 
     // Trigger simulated scan from Phone Camera Bridge
     const simulatePhoneScan = () => {
-        // Pick an inventory item or default
         const sample = inventory.length > 0 ? inventory[0] : null;
         const sampleCode = sample?.productId || sample?.id || 'ALN-SILK-4029';
-        processScan(String(sampleCode), "Faeez's iPhone 15 Pro (Camera Bridge)", 'phone_camera');
+        processScan(String(sampleCode), 'Mobile Phone Camera', 'phone_camera');
     };
 
     // KPI Calculations
@@ -387,6 +362,22 @@ export default function Devices() {
                 subtitle="Pair wireless Bluetooth QR scanners, connect smartphone camera bridges, and monitor hardware telemetry"
                 actions={
                     <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+                        <Button
+                            variant="outlined"
+                            startIcon={<CameraAlt />}
+                            onClick={() => setCameraScannerOpen(true)}
+                            sx={{
+                                borderColor: '#0F766E',
+                                color: '#0F766E',
+                                borderRadius: 2.5,
+                                fontWeight: 700,
+                                textTransform: 'none',
+                                px: 2.5,
+                                '&:hover': { borderColor: '#042F2E', bgcolor: 'rgba(15, 118, 110, 0.06)' }
+                            }}
+                        >
+                            Open Camera Scanner
+                        </Button>
                         <Button
                             variant="outlined"
                             startIcon={<PhoneAndroid />}
@@ -497,14 +488,31 @@ export default function Devices() {
                                     Manage physical handheld scanners and wireless smartphone camera bridges
                                 </Typography>
                             </Box>
-                            <Button
-                                size="small"
-                                startIcon={<Refresh />}
-                                onClick={() => setDevices([...devices])}
-                                sx={{ textTransform: 'none', fontWeight: 700, color: '#0F766E' }}
-                            >
-                                Refresh Telemetry
-                            </Button>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                {devices.length > 0 && (
+                                    <Button
+                                        size="small"
+                                        startIcon={<Delete />}
+                                        onClick={() => {
+                                            if (window.confirm('Clear all paired scanner devices?')) {
+                                                setDevices([]);
+                                                localStorage.removeItem('aleen_paired_devices');
+                                            }
+                                        }}
+                                        sx={{ textTransform: 'none', fontWeight: 700, color: 'error.main' }}
+                                    >
+                                        Clear All
+                                    </Button>
+                                )}
+                                <Button
+                                    size="small"
+                                    startIcon={<Refresh />}
+                                    onClick={() => setDevices([...devices])}
+                                    sx={{ textTransform: 'none', fontWeight: 700, color: '#0F766E' }}
+                                >
+                                    Refresh
+                                </Button>
+                            </Box>
                         </Box>
 
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -992,60 +1000,44 @@ export default function Devices() {
                         </Alert>
                     )}
 
-                    {/* Discovered Device List */}
-                    {discoveredDevices.length > 0 && (
-                        <Box sx={{ mb: 3 }}>
-                            <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', color: 'text.secondary', display: 'block', mb: 1 }}>
-                                Available Scanners Found:
-                            </Typography>
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                                {discoveredDevices.map((disc, idx) => (
-                                    <Paper
-                                        key={idx}
-                                        elevation={0}
-                                        sx={{
-                                            p: 1.5,
-                                            borderRadius: 2,
-                                            border: '1px solid',
-                                            borderColor: 'divider',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between',
-                                            '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.04)', borderColor: '#0F766E' }
-                                        }}
-                                    >
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                            <Avatar sx={{ width: 34, height: 34, bgcolor: '#0F766E' }}>
-                                                <Bluetooth sx={{ fontSize: 18 }} />
-                                            </Avatar>
-                                            <Box>
-                                                <Typography variant="body2" sx={{ fontWeight: 750 }}>
-                                                    {disc.name}
-                                                </Typography>
-                                                <Typography variant="caption" color="text.secondary">
-                                                    Model: {disc.model} • Signal: {disc.rssi} dBm
-                                                </Typography>
-                                            </Box>
-                                        </Box>
-                                        <Button
-                                            size="small"
-                                            variant="contained"
-                                            onClick={() => addDiscoveredDevice(disc)}
-                                            sx={{
-                                                borderRadius: 2,
-                                                fontWeight: 700,
-                                                textTransform: 'none',
-                                                bgcolor: '#0F766E',
-                                                '&:hover': { bgcolor: '#042F2E' }
-                                            }}
-                                        >
-                                            Connect
-                                        </Button>
-                                    </Paper>
-                                ))}
-                            </Box>
-                        </Box>
-                    )}
+                    {/* Smartphone Guidance Callout */}
+                    <Alert
+                        severity="warning"
+                        icon={<InfoOutlined />}
+                        sx={{
+                            mb: 2.5,
+                            borderRadius: 2.5,
+                            border: '1px solid rgba(217, 119, 6, 0.3)',
+                            bgcolor: 'rgba(217, 119, 6, 0.08)'
+                        }}
+                    >
+                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#92400E' }}>
+                            Looking for your phone in Bluetooth search?
+                        </Typography>
+                        <Typography variant="body2" sx={{ fontSize: '0.82rem', color: '#78350F', mt: 0.5, mb: 1.2 }}>
+                            Smartphones (iPhone & Android) do not broadcast as Bluetooth barcode accessories. Even with Bluetooth ON, phones cannot be detected in this list. To use your phone as a scanner, click below:
+                        </Typography>
+                        <Button
+                            size="small"
+                            variant="contained"
+                            startIcon={<CameraAlt />}
+                            onClick={() => {
+                                setBluetoothModalOpen(false);
+                                setCameraScannerOpen(true);
+                            }}
+                            sx={{
+                                textTransform: 'none',
+                                fontWeight: 700,
+                                fontSize: '0.78rem',
+                                bgcolor: '#D97706',
+                                color: '#FFFFFF',
+                                borderRadius: 2,
+                                '&:hover': { bgcolor: '#B45309' }
+                            }}
+                        >
+                            Open Camera Scanner Instead
+                        </Button>
+                    </Alert>
 
                     {/* Manual / HID Scanner Registration */}
                     <Box sx={{ p: 2, borderRadius: 2.5, bgcolor: 'rgba(0,0,0,0.02)', border: '1px solid', borderColor: 'divider' }}>
@@ -1250,6 +1242,72 @@ export default function Devices() {
                 <DialogActions sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider' }}>
                     <Button onClick={() => setPhoneModalOpen(false)} sx={{ fontWeight: 700, color: 'text.secondary' }}>
                         Done
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* MODAL 3: Direct Live Camera Barcode & QR Scanner (Html5Qrcode) */}
+            <Dialog
+                open={cameraScannerOpen}
+                onClose={() => setCameraScannerOpen(false)}
+                maxWidth="sm"
+                fullWidth
+                PaperProps={{ sx: { borderRadius: 4 } }}
+            >
+                <DialogTitle sx={{
+                    fontWeight: 800,
+                    bgcolor: 'rgba(15, 118, 110, 0.05)',
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                    color: '#042F2E',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <CameraAlt sx={{ color: '#0F766E' }} /> Live Camera Barcode & QR Scanner
+                    </Box>
+                    <IconButton size="small" onClick={() => setCameraScannerOpen(false)}>
+                        <Close fontSize="small" />
+                    </IconButton>
+                </DialogTitle>
+                <DialogContent sx={{ pt: 2.5 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                        Hold any garment tag or product QR code in front of the lens. It will scan and resolve the item automatically.
+                    </Typography>
+
+                    {cameraError ? (
+                        <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
+                            {cameraError}
+                        </Alert>
+                    ) : (
+                        <Box sx={{
+                            position: 'relative',
+                            borderRadius: 3,
+                            overflow: 'hidden',
+                            border: '2px solid #0F766E',
+                            bgcolor: '#000000',
+                            minHeight: 280,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                            <div id="device-tab-reader" style={{ width: '100%', minHeight: 280 }} />
+                        </Box>
+                    )}
+
+                    <Box sx={{ mt: 2, p: 2, borderRadius: 2.5, bgcolor: 'rgba(15, 118, 110, 0.04)', border: '1px solid', borderColor: 'divider' }}>
+                        <Typography variant="caption" sx={{ fontWeight: 700, color: '#0F766E', display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                            <Sensors fontSize="small" /> Real-time Inventory Matcher Active
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.3 }}>
+                            Detected codes are immediately matched against Aleen inventory and logged in the Test Bench.
+                        </Typography>
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider' }}>
+                    <Button onClick={() => setCameraScannerOpen(false)} sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                        Close Camera
                     </Button>
                 </DialogActions>
             </Dialog>
