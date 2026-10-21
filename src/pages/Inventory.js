@@ -56,6 +56,7 @@ import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 import GlassCard from '../components/GlassCard';
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
+import { TableSkeleton } from '../components/crm/AtelierSkeleton';
 import Papa from 'papaparse';
 
 const SIZE_PRESETS = ['Free Size', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', 'Unstitched', 'Semi-Stitched'];
@@ -81,7 +82,8 @@ const Inventory = () => {
     deleteInventoryItem,
     bulkAddInventory,
     categories = [],
-    updateCategories
+    updateCategories,
+    loading
   } = useData();
 
   const safeCategories = Array.isArray(categories) && categories.length > 0
@@ -336,27 +338,29 @@ const Inventory = () => {
     }
   };
 
-  // Safe search & filtering: null-safe and undefined-safe
-  const filteredInventory = (inventory || []).filter(item => {
-    if (!item) return false;
-    const name = String(item.name || '').toLowerCase();
-    const pId = String(item.productId || '').toLowerCase();
-    const supp = String(item.supplier || '').toLowerCase();
+  // Safe search & filtering: memoized for 5,000+ item performance
+  const filteredInventory = React.useMemo(() => {
     const q = String(search || '').toLowerCase().trim();
-    const matchesSearch = !q || name.includes(q) || pId.includes(q) || supp.includes(q);
-    const matchesCategory = !categoryFilter || item.category === categoryFilter;
-    return matchesSearch && matchesCategory;
-  }).sort((a, b) => {
-    const isAsc = order === 'asc';
-    if (orderBy === 'price' || orderBy === 'quantity') {
-      const valA = Number(a[orderBy]) || 0;
-      const valB = Number(b[orderBy]) || 0;
-      return isAsc ? (valA - valB) : (valB - valA);
-    }
-    const valA = String(a[orderBy] || '').toLowerCase();
-    const valB = String(b[orderBy] || '').toLowerCase();
-    return isAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
-  });
+    return (inventory || []).filter(item => {
+      if (!item) return false;
+      const name = String(item.name || '').toLowerCase();
+      const pId = String(item.productId || '').toLowerCase();
+      const supp = String(item.supplier || '').toLowerCase();
+      const matchesSearch = !q || name.includes(q) || pId.includes(q) || supp.includes(q);
+      const matchesCategory = !categoryFilter || item.category === categoryFilter;
+      return matchesSearch && matchesCategory;
+    }).sort((a, b) => {
+      const isAsc = order === 'asc';
+      if (orderBy === 'price' || orderBy === 'quantity') {
+        const valA = Number(a[orderBy]) || 0;
+        const valB = Number(b[orderBy]) || 0;
+        return isAsc ? (valA - valB) : (valB - valA);
+      }
+      const valA = String(a[orderBy] || '').toLowerCase();
+      const valB = String(b[orderBy] || '').toLowerCase();
+      return isAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+    });
+  }, [inventory, search, categoryFilter, orderBy, order]);
 
   // Calculate profit and margin dynamically for the modal form
   const sellingPrice = parseFloat(form.price) || 0;
@@ -595,7 +599,9 @@ const Inventory = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filteredInventory.length === 0 ? (
+                {loading ? (
+                  <TableSkeleton rows={rowsPerPage} columns={8} />
+                ) : filteredInventory.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={8} sx={{ textAlign: 'center', py: 5, color: 'text.secondary' }}>
                       <Inventory2 sx={{ fontSize: 40, opacity: 0.3, mb: 1, display: 'block', mx: 'auto' }} />

@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel, CircularProgress, Alert, Snackbar, InputAdornment } from '@mui/material';
-import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, FilterList, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, CheckCircle, Sensors, PhoneAndroid, ContentCopy } from '@mui/icons-material';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel, CircularProgress, Alert, Snackbar, InputAdornment, List } from '@mui/material';
+import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, FilterList, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, ShoppingCart } from '@mui/icons-material';
 import { Html5Qrcode } from 'html5-qrcode';
 import { db } from '../firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -18,10 +18,11 @@ import { useThemeContext } from '../contexts/ThemeContext';
 import GlassCard from '../components/GlassCard';
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
+import { TableSkeleton } from '../components/crm/AtelierSkeleton';
 
 const Invoices = () => {
   const { user } = useAuth();
-  const { inventory, invoices, addInvoice, deleteInvoice, profile, customers, addCustomer } = useData();
+  const { inventory, invoices, addInvoice, deleteInvoice, profile, customers, addCustomer, loading } = useData();
   const { mode } = useThemeContext();
   const [open, setOpen] = useState(false);
   const [viewInvoice, setViewInvoice] = useState(null);
@@ -51,45 +52,103 @@ const Invoices = () => {
     );
   };
 
-  const playBeep = () => {
+  // Smart Dual-Tone POS Barcode Audio Feedback
+  const playBeep = (type = 'success') => {
     try {
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
-
-      oscillator.connect(gainNode);
       gainNode.connect(audioCtx.destination);
 
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
-      gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+      if (type === 'success') {
+        // High-pitched cheerful POS dual-chime (A6 -> E7)
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
+        osc1.connect(gainNode);
+        osc2.connect(gainNode);
 
-      oscillator.start();
-      oscillator.stop(audioCtx.currentTime + 0.1);
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(1760, audioCtx.currentTime);
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(2637, audioCtx.currentTime + 0.04);
+
+        gainNode.gain.setValueAtTime(0.22, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.14);
+
+        osc1.start(audioCtx.currentTime);
+        osc1.stop(audioCtx.currentTime + 0.05);
+        osc2.start(audioCtx.currentTime + 0.04);
+        osc2.stop(audioCtx.currentTime + 0.14);
+      } else {
+        // Low-frequency warning buzz (320Hz)
+        const osc = audioCtx.createOscillator();
+        osc.connect(gainNode);
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(320, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.25, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.22);
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.22);
+      }
     } catch (e) {
-      console.warn("Audio beep failed", e);
+      console.warn("Audio feedback synthesis failed", e);
     }
   };
 
   const playVibration = () => {
     if ("vibrate" in navigator) {
-      navigator.vibrate(50); // Short 50ms vibration
+      navigator.vibrate(50); // Short 50ms tactile vibration
     }
   };
 
+  // Hold / Park Cart State
+  const [parkedCarts, setParkedCarts] = useState(() => {
+    try {
+      const saved = localStorage.getItem('aleen_parked_carts');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [heldCartsDialogOpen, setHeldCartsDialogOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('aleen_parked_carts', JSON.stringify(parkedCarts));
+    } catch (e) {
+      console.error("Failed to save parked carts", e);
+    }
+  }, [parkedCarts]);
+
+  const handleSaveInvoiceRef = useRef(null);
+
+  // Keyboard-First Hotkeys: F2 (New Bill), F4 (Pay / Issue), ESC (Close)
   React.useEffect(() => {
     const handleKeyDown = (e) => {
-      // Alt + N: New Invoice
-      if (e.altKey && e.key.toLowerCase() === 'n') {
+      // F2 or Alt + N: New Invoice
+      if (e.key === 'F2' || (e.altKey && e.key.toLowerCase() === 'n')) {
         e.preventDefault();
         setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0 }]);
         setOpen(true);
       }
+      // F4 or Alt + P: Issue / Pay current invoice
+      else if (e.key === 'F4' || (e.altKey && e.key.toLowerCase() === 'p')) {
+        if (open && handleSaveInvoiceRef.current) {
+          e.preventDefault();
+          handleSaveInvoiceRef.current();
+        }
+      }
+      // ESC: Close open modals
+      else if (e.key === 'Escape') {
+        if (heldCartsDialogOpen) {
+          setHeldCartsDialogOpen(false);
+        } else if (open) {
+          setOpen(false);
+        }
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [open, heldCartsDialogOpen]);
 
   const handleMenuClick = (event, invoiceId) => {
     setAnchorEl(event.currentTarget);
@@ -560,16 +619,21 @@ const Invoices = () => {
   const todayInvoices = invoices.filter(inv => new Date(inv.date).toDateString() === new Date().toDateString()).length;
   const avgAmount = totalInvoices > 0 ? totalAmount / totalInvoices : 0;
 
-  const filteredInvoices = invoices.filter(inv => {
-    const matchesSearch = inv.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (inv.customer || '').toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredInvoices = useMemo(() => {
+    const s = (searchTerm || '').toLowerCase();
+    return invoices.filter(inv => {
+      const matchesSearch = !s ||
+        (inv.id && inv.id.toLowerCase().includes(s)) ||
+        (inv.customer && inv.customer.toLowerCase().includes(s)) ||
+        (inv.phone && inv.phone.includes(s));
 
-    const matchesDate = !dateFilter || new Date(inv.date).toLocaleDateString() === new Date(dateFilter).toLocaleDateString();
+      const matchesDate = !dateFilter || new Date(inv.date).toLocaleDateString() === new Date(dateFilter).toLocaleDateString();
 
-    const matchesPayment = paymentFilter === 'All' || inv.paymentMethod === paymentFilter;
+      const matchesPayment = paymentFilter === 'All' || inv.paymentMethod === paymentFilter;
 
-    return matchesSearch && matchesDate && matchesPayment;
-  });
+      return matchesSearch && matchesDate && matchesPayment;
+    });
+  }, [invoices, searchTerm, dateFilter, paymentFilter]);
 
   // Sorting State
   const [orderBy, setOrderBy] = useState('date');
@@ -581,20 +645,22 @@ const Invoices = () => {
     setOrderBy(property);
   };
 
-  const sortedInvoices = [...filteredInvoices].sort((a, b) => {
-    if (orderBy === 'total') {
-      return order === 'asc' ? (a[orderBy] - b[orderBy]) : (b[orderBy] - a[orderBy]);
-    }
-    if (orderBy === 'date') {
-      return order === 'asc' ? new Date(a.date) - new Date(b.date) : new Date(b.date) - new Date(a.date);
-    }
-    // Handle string sorting (case-insensitive)
-    const valA = (a[orderBy] || '').toString().toLowerCase();
-    const valB = (b[orderBy] || '').toString().toLowerCase();
-    if (valA < valB) return order === 'asc' ? -1 : 1;
-    if (valA > valB) return order === 'asc' ? 1 : -1;
-    return 0;
-  });
+  const sortedInvoices = useMemo(() => {
+    return [...filteredInvoices].sort((a, b) => {
+      if (orderBy === 'total') {
+        return order === 'asc' ? (a[orderBy] - b[orderBy]) : (b[orderBy] - a[orderBy]);
+      }
+      if (orderBy === 'date') {
+        return order === 'asc' ? new Date(a.date) - new Date(b.date) : new Date(b.date) - new Date(a.date);
+      }
+      // Handle string sorting (case-insensitive)
+      const valA = (a[orderBy] || '').toString().toLowerCase();
+      const valB = (b[orderBy] || '').toString().toLowerCase();
+      if (valA < valB) return order === 'asc' ? -1 : 1;
+      if (valA > valB) return order === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [filteredInvoices, orderBy, order]);
 
   const handleAddItem = () => {
     setSelectedItems([...selectedItems, { id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0, variantSku: '' }]);
@@ -760,7 +826,68 @@ const Invoices = () => {
     setIsEMI(false);
     setEmiTenure(3);
     setReceivedAmount('');
+  };
 
+  handleSaveInvoiceRef.current = handleSaveInvoice;
+
+  // Park / Hold Cart Handlers
+  const handleParkCart = () => {
+    const validItems = selectedItems.filter(item => item.id || (item.isCustom && item.customName && item.customPrice > 0));
+    if (validItems.length === 0 && !customer && phone === '+91') {
+      alert('The current invoice cart is empty. Add products or client details before holding/parking.');
+      return;
+    }
+    const { total } = calculateTotal();
+    const newHeldCart = {
+      id: `cart_${Date.now()}`,
+      parkedAt: new Date().toISOString(),
+      customer: customer || 'Walk-in Guest',
+      phone: phone || '',
+      selectedCustomerId,
+      selectedItems: [...selectedItems],
+      discountPercent,
+      discountAmount,
+      tax,
+      paymentMethod,
+      isSplitPayment,
+      splitAmount,
+      paymentMethod2,
+      totalAmount: total || 0
+    };
+
+    setParkedCarts(prev => [newHeldCart, ...prev]);
+    setOpen(false);
+    // Reset state for new guest checkout
+    setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0, variantSku: '' }]);
+    setCustomer('');
+    setPhone('+91');
+    setSelectedCustomerId(null);
+    setDiscountPercent('');
+    setDiscountAmount('');
+    setTax('');
+  };
+
+  const handleResumeCart = (cart) => {
+    setSelectedItems(cart.selectedItems || [{ id: '', quantity: 1 }]);
+    setCustomer(cart.customer === 'Walk-in Guest' ? '' : (cart.customer || ''));
+    setPhone(cart.phone || '+91');
+    setSelectedCustomerId(cart.selectedCustomerId || null);
+    setDiscountPercent(cart.discountPercent || '');
+    setDiscountAmount(cart.discountAmount || '');
+    setTax(cart.tax || '');
+    setPaymentMethod(cart.paymentMethod || 'Cash');
+    setIsSplitPayment(cart.isSplitPayment || false);
+    setSplitAmount(cart.splitAmount || 0);
+    setPaymentMethod2(cart.paymentMethod2 || 'Card');
+
+    // Remove from held carts and reopen POS checkout modal
+    setParkedCarts(prev => prev.filter(c => c.id !== cart.id));
+    setHeldCartsDialogOpen(false);
+    setOpen(true);
+  };
+
+  const handleDiscardParkedCart = (cartId) => {
+    setParkedCarts(prev => prev.filter(c => c.id !== cartId));
   };
 
   const downloadInvoices = () => {
@@ -1204,11 +1331,38 @@ const Invoices = () => {
             >
               Export CSV
             </Button>
+            {parkedCarts.length > 0 && (
+              <Button
+                variant="outlined"
+                startIcon={<PauseCircle sx={{ fontSize: 19, color: '#D97706' }} />}
+                onClick={() => setHeldCartsDialogOpen(true)}
+                sx={{
+                  height: 42,
+                  minHeight: 42,
+                  px: 2.5,
+                  borderRadius: '24px',
+                  fontWeight: 700,
+                  fontSize: '0.84rem',
+                  textTransform: 'none',
+                  border: '1.5px solid #D97706',
+                  color: '#D97706',
+                  bgcolor: 'rgba(217, 119, 6, 0.08)',
+                  boxSizing: 'border-box',
+                  '&:hover': {
+                    border: '1.5px solid #B45309',
+                    bgcolor: 'rgba(217, 119, 6, 0.16)',
+                    transform: 'translateY(-1px)'
+                  }
+                }}
+              >
+                Held Carts ({parkedCarts.length})
+              </Button>
+            )}
             <Button
               variant="contained"
               startIcon={<Add sx={{ fontSize: 19, color: '#FFFFFF !important' }} />}
               onClick={() => {
-                setSelectedItems([{ id: '', quantity: 1 }]);
+                setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0 }]);
                 setOpen(true);
               }}
               sx={{
@@ -1222,6 +1376,7 @@ const Invoices = () => {
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                gap: 1,
                 boxSizing: 'border-box',
                 background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%) !important',
                 color: '#FFFFFF !important',
@@ -1237,7 +1392,19 @@ const Invoices = () => {
                 }
               }}
             >
-              Create Invoice (Alt+N)
+              <span>Create Invoice</span>
+              <Chip
+                label="F2"
+                size="small"
+                sx={{
+                  height: 20,
+                  fontSize: '0.68rem',
+                  fontWeight: 800,
+                  bgcolor: 'rgba(255, 255, 255, 0.22)',
+                  color: '#FFFFFF',
+                  borderRadius: '6px'
+                }}
+              />
             </Button>
           </Box>
         }
@@ -1474,7 +1641,10 @@ const Invoices = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {sortedInvoices.length > 0 ? sortedInvoices
+                  {loading ? (
+                    <TableSkeleton rows={rowsPerPage} columns={6} />
+                  ) : sortedInvoices.length > 0 ? (
+                    sortedInvoices
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((inv, idx) => (
                       <TableRow
@@ -1570,7 +1740,7 @@ const Invoices = () => {
                           </Menu>
                         </TableCell>
                       </TableRow>
-                    )) : (
+                    ))) : (
                     <TableRow>
                       <TableCell colSpan={6} sx={{ textAlign: 'center', py: 8 }}>
                         <Receipt sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
@@ -1654,9 +1824,34 @@ const Invoices = () => {
               </Typography>
             </Box>
           </Box>
-          <IconButton onClick={() => setOpen(false)} sx={{ color: 'rgba(255, 255, 255, 0.8)', '&:hover': { color: '#ffffff', bgcolor: 'rgba(255, 255, 255, 0.1)' } }}>
-            <Close />
-          </IconButton>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Button
+              size="small"
+              onClick={handleParkCart}
+              startIcon={<PauseCircle sx={{ fontSize: 18 }} />}
+              sx={{
+                color: '#FBBF24',
+                borderColor: 'rgba(251, 191, 36, 0.45)',
+                border: '1px solid',
+                borderRadius: '16px',
+                px: 1.5,
+                py: 0.4,
+                textTransform: 'none',
+                fontWeight: 700,
+                fontSize: '0.78rem',
+                bgcolor: 'rgba(251, 191, 36, 0.12)',
+                '&:hover': {
+                  bgcolor: 'rgba(251, 191, 36, 0.22)',
+                  borderColor: '#FBBF24'
+                }
+              }}
+            >
+              Park Cart
+            </Button>
+            <IconButton onClick={() => setOpen(false)} sx={{ color: 'rgba(255, 255, 255, 0.8)', '&:hover': { color: '#ffffff', bgcolor: 'rgba(255, 255, 255, 0.1)' } }}>
+              <Close />
+            </IconButton>
+          </Box>
         </DialogTitle>
 
         <DialogContent sx={{ p: { xs: 2, sm: 3 }, bgcolor: mode === 'light' ? '#F8FAFC' : 'background.default' }}>
@@ -2553,14 +2748,33 @@ const Invoices = () => {
             Cancel
           </Button>
 
-          <Box sx={{ display: 'flex', gap: 1.5 }}>
+          <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+            <Button
+              onClick={handleParkCart}
+              variant="outlined"
+              size="medium"
+              startIcon={<PauseCircle />}
+              sx={{
+                borderRadius: '10px',
+                fontWeight: 700,
+                color: '#D97706',
+                borderColor: '#D97706',
+                bgcolor: 'rgba(217, 119, 6, 0.06)',
+                '&:hover': {
+                  borderColor: '#B45309',
+                  bgcolor: 'rgba(217, 119, 6, 0.14)'
+                }
+              }}
+            >
+              Park Cart
+            </Button>
             <Button
               onClick={handleSaveInvoice}
               variant="contained"
               size="large"
               startIcon={<ReceiptLong />}
               sx={{
-                px: 4,
+                px: 3.5,
                 py: 1.2,
                 borderRadius: '10px',
                 fontWeight: 800,
@@ -2568,12 +2782,27 @@ const Invoices = () => {
                 background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
                 color: '#ffffff',
                 boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 1,
                 '&:hover': {
                   background: 'linear-gradient(135deg, #115E59 0%, #022c22 100%)'
                 }
               }}
             >
-              Issue Retail Invoice • ₹{total.toFixed(0).toLocaleString('en-IN')}
+              <span>Issue Retail Invoice • ₹{total.toFixed(0).toLocaleString('en-IN')}</span>
+              <Chip
+                label="F4"
+                size="small"
+                sx={{
+                  height: 20,
+                  fontSize: '0.68rem',
+                  fontWeight: 800,
+                  bgcolor: 'rgba(255, 255, 255, 0.25)',
+                  color: '#FFFFFF',
+                  borderRadius: '6px'
+                }}
+              />
             </Button>
           </Box>
         </DialogActions>
@@ -2763,6 +2992,124 @@ const Invoices = () => {
               Done
             </Button>
           </Box>
+        </DialogContent>
+      </Dialog>
+
+      {/* Parked Carts / On-Hold POS Tickets Dialog */}
+      <Dialog
+        open={heldCartsDialogOpen}
+        onClose={() => setHeldCartsDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3.5,
+            overflow: 'hidden',
+            boxShadow: '0 24px 60px rgba(0,0,0,0.2)'
+          }
+        }}
+      >
+        <DialogTitle sx={{
+          background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+          color: 'white',
+          p: 2.5,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Avatar sx={{ bgcolor: 'rgba(217, 119, 6, 0.25)', color: '#FBBF24', width: 40, height: 40 }}>
+              <PauseCircle />
+            </Avatar>
+            <Box>
+              <Typography sx={{ fontWeight: 800, fontSize: '1.15rem', color: '#FFFFFF' }}>
+                Held & Parked Carts ({parkedCarts.length})
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.75)' }}>
+                Resume browsing customers without losing entered cart lines
+              </Typography>
+            </Box>
+          </Box>
+          <IconButton onClick={() => setHeldCartsDialogOpen(false)} sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+            <Close />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent sx={{ p: 2.5, bgcolor: mode === 'light' ? '#F8FAFC' : 'background.default' }}>
+          {parkedCarts.length === 0 ? (
+            <Box sx={{ textAlign: 'center', py: 6 }}>
+              <ShoppingCart sx={{ fontSize: 56, color: 'text.disabled', mb: 1.5 }} />
+              <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                No Carts On Hold
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 360, mx: 'auto', mt: 0.5 }}>
+                While billing in the Create Invoice modal, click <strong>Park Cart</strong> to temporarily hold a guest's items.
+              </Typography>
+            </Box>
+          ) : (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
+              {parkedCarts.map((cart, idx) => (
+                <Paper
+                  key={cart.id || idx}
+                  sx={{
+                    p: 2.2,
+                    borderRadius: 2.5,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    display: 'flex',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    alignItems: { xs: 'flex-start', sm: 'center' },
+                    justifyContent: 'space-between',
+                    gap: 2,
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+                  }}
+                >
+                  <Box sx={{ flex: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                      <Typography sx={{ fontWeight: 800, fontSize: '0.98rem', color: 'text.primary' }}>
+                        {cart.customer || 'Walk-in Guest'}
+                      </Typography>
+                      {cart.phone && (
+                        <Chip label={cart.phone} size="small" sx={{ height: 20, fontSize: '0.72rem' }} />
+                      )}
+                    </Box>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 0.8 }}>
+                      Parked {new Date(cart.parkedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {cart.selectedItems?.length || 0} line items
+                    </Typography>
+                    <Typography sx={{ fontWeight: 800, color: '#0F766E', fontSize: '1.05rem' }}>
+                      ₹{Number(cart.totalAmount || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: { xs: '100%', sm: 'auto' }, justifyContent: 'flex-end' }}>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={() => handleResumeCart(cart)}
+                      sx={{
+                        background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                        color: '#fff',
+                        fontWeight: 700,
+                        borderRadius: '20px',
+                        px: 2.5,
+                        textTransform: 'none'
+                      }}
+                    >
+                      Resume
+                    </Button>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => handleDiscardParkedCart(cart.id)}
+                      title="Discard held cart"
+                    >
+                      <Delete fontSize="small" />
+                    </IconButton>
+                  </Box>
+                </Paper>
+              ))}
+            </Box>
+          )}
         </DialogContent>
       </Dialog>
 

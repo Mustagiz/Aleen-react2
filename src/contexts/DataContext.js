@@ -33,19 +33,34 @@ export const DataProvider = ({ children }) => {
   const [purchases, setPurchases] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [expenseCategories, setExpenseCategories] = useState(['General', 'Rent', 'Electricity', 'Water', 'Repairs', 'Staff Welfare', 'Marketing', 'Courier', 'Stationery', 'Others']);
+  const [loading, setLoading] = useState(true);
 
   // Real-time synchronization
   useEffect(() => {
+    let initialCount = 0;
+    const markLoaded = () => {
+      initialCount++;
+      if (initialCount >= 2) {
+        setLoading(false);
+      }
+    };
+    const safetyTimer = setTimeout(() => {
+      setLoading(false);
+    }, 1200);
+
     const onError = (collectionName) => (err) => {
       console.warn(`Firestore sync [${collectionName}] warning:`, err);
+      markLoaded();
     };
 
     const unsubInventory = onSnapshot(collection(db, 'inventory'), (snapshot) => {
       setInventory(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      markLoaded();
     }, onError('inventory'));
 
     const unsubInvoices = onSnapshot(collection(db, 'invoices'), (snapshot) => {
       setInvoices(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      markLoaded();
     }, onError('invoices'));
 
     const unsubCustomers = onSnapshot(collection(db, 'customers'), (snapshot) => {
@@ -102,6 +117,7 @@ export const DataProvider = ({ children }) => {
       if (unsubCategories) unsubCategories();
       if (unsubExpenseCategories) unsubExpenseCategories();
       if (unsubMarketingTemplates) unsubMarketingTemplates();
+      clearTimeout(safetyTimer);
     };
   }, []);
 
@@ -759,6 +775,7 @@ export const DataProvider = ({ children }) => {
 
   return (
     <DataContext.Provider value={{
+      loading,
       inventory,
       invoices,
       categories,

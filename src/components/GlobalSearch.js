@@ -1,391 +1,565 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
-    Dialog,
-    DialogContent,
-    TextField,
-    List,
-    ListItem,
-    ListItemText,
-    ListItemIcon,
-    Box,
-    Typography,
-    Chip,
-    InputAdornment,
-    Divider,
-    Paper
+  Dialog,
+  DialogContent,
+  TextField,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Box,
+  Typography,
+  Chip,
+  InputAdornment,
+  Divider,
+  Paper,
+  Button
 } from '@mui/material';
 import {
-    Search,
-    Inventory,
-    Receipt,
-    People,
-    Store,
-    ShoppingCart,
-    TrendingUp,
-    KeyboardArrowRight
+  Search,
+  Inventory,
+  Receipt,
+  People,
+  Store,
+  ShoppingCart,
+  TrendingUp,
+  Straighten,
+  QrCode2,
+  AccountBalanceWallet,
+  Assessment,
+  Close,
+  KeyboardReturn,
+  ArrowDownward,
+  ArrowUpward
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useData } from '../contexts/DataContext';
 
+const CATEGORIES = [
+  { id: 'all', label: 'All Results' },
+  { id: 'action', label: 'Quick Actions' },
+  { id: 'inventory', label: 'Garments' },
+  { id: 'invoice', label: 'Invoices' },
+  { id: 'customer', label: 'Clientele' },
+  { id: 'tailoring', label: 'Tailoring' }
+];
+
 const GlobalSearch = ({ open, onClose }) => {
-    const navigate = useNavigate();
-    const { inventory, customers, invoices, vendors } = useData();
-    const [searchQuery, setSearchQuery] = useState('');
-    const [results, setResults] = useState([]);
-    const [selectedIndex, setSelectedIndex] = useState(0);
+  const navigate = useNavigate();
+  const { inventory = [], customers = [], invoices = [], vendors = [] } = useData();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const inputRef = useRef(null);
 
-    useEffect(() => {
-        if (!searchQuery.trim()) {
-            setResults([]);
-            return;
-        }
+  // Load tailoring orders from local storage for deep command search
+  const tailoringOrders = useMemo(() => {
+    try {
+      const stored = localStorage.getItem('aleen_tailoring_orders');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  }, [open]);
 
-        const query = searchQuery.toLowerCase();
-        const allResults = [];
-
-        // Search Inventory
-        inventory.forEach(item => {
-            if (
-                item.name?.toLowerCase().includes(query) ||
-                item.category?.toLowerCase().includes(query) ||
-                item.sku?.toLowerCase().includes(query)
-            ) {
-                allResults.push({
-                    type: 'inventory',
-                    icon: <Inventory />,
-                    title: item.name,
-                    subtitle: `${item.category} • SKU: ${item.sku} • Stock: ${item.quantity}`,
-                    action: () => {
-                        navigate('/inventory');
-                        onClose();
-                    },
-                    color: '#059669'
-                });
-            }
-        });
-
-        // Search Customers
-        customers.forEach(customer => {
-            if (
-                customer.name?.toLowerCase().includes(query) ||
-                customer.phone?.includes(query) ||
-                customer.email?.toLowerCase().includes(query)
-            ) {
-                allResults.push({
-                    type: 'customer',
-                    icon: <People />,
-                    title: customer.name,
-                    subtitle: `${customer.phone} • ${customer.loyaltyTier || 'Bronze'} • ${customer.loyaltyPoints || 0} pts`,
-                    action: () => {
-                        navigate('/customers');
-                        onClose();
-                    },
-                    color: '#7C3AED'
-                });
-            }
-        });
-
-        // Search Invoices
-        invoices.forEach(invoice => {
-            const invoiceNumber = invoice.id?.toString();
-            const customerName = customers.find(c => c.id === invoice.customerId)?.name || 'Walk-in';
-
-            if (
-                invoiceNumber?.includes(query) ||
-                customerName?.toLowerCase().includes(query)
-            ) {
-                allResults.push({
-                    type: 'invoice',
-                    icon: <Receipt />,
-                    title: `Invoice #${invoice.id}`,
-                    subtitle: `${customerName} • ₹${invoice.total.toLocaleString('en-IN')} • ${new Date(invoice.date).toLocaleDateString('en-IN')}`,
-                    action: () => {
-                        navigate('/invoices');
-                        onClose();
-                    },
-                    color: '#E11D48'
-                });
-            }
-        });
-
-        // Search Vendors
-        vendors.forEach(vendor => {
-            if (
-                vendor.name?.toLowerCase().includes(query) ||
-                vendor.phone?.includes(query) ||
-                vendor.email?.toLowerCase().includes(query)
-            ) {
-                allResults.push({
-                    type: 'vendor',
-                    icon: <Store />,
-                    title: vendor.name,
-                    subtitle: `${vendor.phone} • Balance: ₹${(vendor.balance || 0).toLocaleString('en-IN')}`,
-                    action: () => {
-                        navigate('/vendors');
-                        onClose();
-                    },
-                    color: '#D97706'
-                });
-            }
-        });
-
-        // Quick Actions
-        const quickActions = [
-            {
-                type: 'action',
-                icon: <ShoppingCart />,
-                title: 'New Invoice',
-                subtitle: 'Create a new sales invoice',
-                action: () => {
-                    navigate('/invoices');
-                    onClose();
-                },
-                color: '#E11D48',
-                keywords: ['new', 'invoice', 'sale', 'bill']
-            },
-            {
-                type: 'action',
-                icon: <Inventory />,
-                title: 'Add Product',
-                subtitle: 'Add new product to inventory',
-                action: () => {
-                    navigate('/inventory');
-                    onClose();
-                },
-                color: '#059669',
-                keywords: ['new', 'product', 'add', 'inventory', 'item']
-            },
-            {
-                type: 'action',
-                icon: <People />,
-                title: 'Add Customer',
-                subtitle: 'Register new customer',
-                action: () => {
-                    navigate('/customers');
-                    onClose();
-                },
-                color: '#7C3AED',
-                keywords: ['new', 'customer', 'add', 'register']
-            },
-            {
-                type: 'action',
-                icon: <TrendingUp />,
-                title: 'View Reports',
-                subtitle: 'Advanced business reports',
-                action: () => {
-                    navigate('/advanced-reports');
-                    onClose();
-                },
-                color: '#D97706',
-                keywords: ['report', 'analytics', 'stats', 'dashboard']
-            }
-        ];
-
-        quickActions.forEach(action => {
-            if (action.keywords.some(keyword => keyword.includes(query))) {
-                allResults.push(action);
-            }
-        });
-
-        setResults(allResults.slice(0, 10));
-        setSelectedIndex(0);
-    }, [searchQuery, inventory, customers, invoices, vendors, navigate, onClose]);
-
-    const handleKeyDown = (e) => {
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            setSelectedIndex(prev => (prev + 1) % results.length);
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            setSelectedIndex(prev => (prev - 1 + results.length) % results.length);
-        } else if (e.key === 'Enter' && results[selectedIndex]) {
-            e.preventDefault();
-            results[selectedIndex].action();
-        } else if (e.key === 'Escape') {
-            onClose();
-        }
-    };
-
-    const handleClose = () => {
-        setSearchQuery('');
-        setResults([]);
-        setSelectedIndex(0);
+  // Built-in Quick Action Commands
+  const quickActions = useMemo(() => [
+    {
+      id: 'cmd-new-invoice',
+      type: 'action',
+      icon: <ShoppingCart sx={{ fontSize: 20 }} />,
+      title: 'New Retail Bill / Invoice',
+      subtitle: 'Open high-speed boutique POS counter (Press F2)',
+      shortcut: 'F2',
+      action: () => {
+        navigate('/invoices?action=new');
         onClose();
-    };
+      },
+      color: '#0F766E',
+      keywords: ['new', 'invoice', 'sale', 'bill', 'pos', 'counter', 'checkout']
+    },
+    {
+      id: 'cmd-tailoring',
+      type: 'action',
+      icon: <Straighten sx={{ fontSize: 20 }} />,
+      title: 'Bespoke Tailoring & Measurements',
+      subtitle: 'Create bespoke tailoring job, patterns & trials',
+      shortcut: 'Kanban',
+      action: () => {
+        navigate('/tailoring');
+        onClose();
+      },
+      color: '#7C3AED',
+      keywords: ['tailor', 'alteration', 'blouse', 'fitting', 'bespoke', 'measurement']
+    },
+    {
+      id: 'cmd-barcodes',
+      type: 'action',
+      icon: <QrCode2 sx={{ fontSize: 20 }} />,
+      title: 'Barcode & Price Tag Studio',
+      subtitle: 'Batch design and print retail thermal price stickers',
+      shortcut: 'Tags',
+      action: () => {
+        navigate('/barcodes');
+        onClose();
+      },
+      color: '#D97706',
+      keywords: ['barcode', 'price', 'tag', 'sticker', 'thermal', 'print']
+    },
+    {
+      id: 'cmd-cash-ledger',
+      type: 'action',
+      icon: <AccountBalanceWallet sx={{ fontSize: 20 }} />,
+      title: 'Daily Cash Ledger & Audit',
+      subtitle: 'Daily counter cash, UPI collections & audit ledger',
+      shortcut: 'Ledger',
+      action: () => {
+        navigate('/payment-summary');
+        onClose();
+      },
+      color: '#059669',
+      keywords: ['cash', 'ledger', 'audit', 'drawer', 'collections', 'summary']
+    },
+    {
+      id: 'cmd-profit-loss',
+      type: 'action',
+      icon: <Assessment sx={{ fontSize: 20 }} />,
+      title: 'Profit & Loss Statement',
+      subtitle: 'Real-time gross revenue, COGS and net margins',
+      shortcut: 'P&L',
+      action: () => {
+        navigate('/profit-loss');
+        onClose();
+      },
+      color: '#2563EB',
+      keywords: ['profit', 'loss', 'cogs', 'statement', 'margins', 'revenue']
+    },
+    {
+      id: 'cmd-inventory',
+      type: 'action',
+      icon: <Inventory sx={{ fontSize: 20 }} />,
+      title: 'Inventory Catalog & Garments',
+      subtitle: 'Manage styles, variants, cost prices & stock levels',
+      shortcut: 'Stock',
+      action: () => {
+        navigate('/inventory');
+        onClose();
+      },
+      color: '#0F766E',
+      keywords: ['inventory', 'product', 'item', 'stock', 'catalog', 'garment']
+    },
+    {
+      id: 'cmd-clientele',
+      type: 'action',
+      icon: <People sx={{ fontSize: 20 }} />,
+      title: 'Clientele 360° Directory',
+      subtitle: 'VIP guests, purchase history & loyalty profiles',
+      shortcut: 'VIP',
+      action: () => {
+        navigate('/customers');
+        onClose();
+      },
+      color: '#DB2777',
+      keywords: ['customer', 'guest', 'client', 'vip', 'loyalty', 'phone']
+    }
+  ], [navigate, onClose]);
 
-    const getTypeLabel = (type) => {
-        switch (type) {
-            case 'inventory': return 'Product';
-            case 'customer': return 'Customer';
-            case 'invoice': return 'Invoice';
-            case 'vendor': return 'Vendor';
-            case 'action': return 'Action';
-            default: return type;
+  // Deep Search Query Matching
+  const filteredResults = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+
+    if (!q) {
+      // Default to Quick Actions when search box is empty
+      return activeCategory === 'all' || activeCategory === 'action' ? quickActions : [];
+    }
+
+    const matched = [];
+
+    // 1. Actions Match
+    if (activeCategory === 'all' || activeCategory === 'action') {
+      quickActions.forEach(action => {
+        if (
+          action.title.toLowerCase().includes(q) ||
+          action.subtitle.toLowerCase().includes(q) ||
+          action.keywords.some(k => k.includes(q))
+        ) {
+          matched.push(action);
         }
-    };
+      });
+    }
 
-    return (
-        <Dialog
-            open={open}
-            onClose={handleClose}
-            maxWidth="sm"
+    // 2. Inventory / Products Match
+    if (activeCategory === 'all' || activeCategory === 'inventory') {
+      inventory.forEach(item => {
+        if (
+          item.name?.toLowerCase().includes(q) ||
+          item.category?.toLowerCase().includes(q) ||
+          item.sku?.toLowerCase().includes(q) ||
+          item.productId?.toLowerCase().includes(q)
+        ) {
+          matched.push({
+            id: `inv-${item.id}`,
+            type: 'inventory',
+            icon: <Inventory sx={{ fontSize: 20 }} />,
+            title: item.name,
+            subtitle: `${item.category || 'Apparel'} • SKU: ${item.sku || item.productId || 'N/A'} • Stock: ${item.quantity || 0} • ₹${(item.price || 0).toLocaleString('en-IN')}`,
+            action: () => {
+              navigate('/inventory');
+              onClose();
+            },
+            color: '#0F766E'
+          });
+        }
+      });
+    }
+
+    // 3. Customers Match
+    if (activeCategory === 'all' || activeCategory === 'customer') {
+      customers.forEach(customer => {
+        if (
+          customer.name?.toLowerCase().includes(q) ||
+          customer.phone?.includes(q) ||
+          customer.email?.toLowerCase().includes(q)
+        ) {
+          matched.push({
+            id: `cust-${customer.id}`,
+            type: 'customer',
+            icon: <People sx={{ fontSize: 20 }} />,
+            title: customer.name,
+            subtitle: `${customer.phone || 'No Phone'} • VIP Tier: ${customer.loyaltyTier || 'Standard'} • ${customer.loyaltyPoints || 0} Pts`,
+            action: () => {
+              navigate('/customers');
+              onClose();
+            },
+            color: '#7C3AED'
+          });
+        }
+      });
+    }
+
+    // 4. Invoices Match
+    if (activeCategory === 'all' || activeCategory === 'invoice') {
+      invoices.forEach(inv => {
+        const invId = String(inv.id || '');
+        const custName = inv.customerName || customers.find(c => c.id === inv.customerId)?.name || 'Guest';
+        if (invId.toLowerCase().includes(q) || custName.toLowerCase().includes(q)) {
+          matched.push({
+            id: `inv-bill-${inv.id}`,
+            type: 'invoice',
+            icon: <Receipt sx={{ fontSize: 20 }} />,
+            title: `Invoice #${inv.id}`,
+            subtitle: `${custName} • ₹${(inv.total || 0).toLocaleString('en-IN')} • ${inv.date ? new Date(inv.date).toLocaleDateString('en-IN') : 'Recent'}`,
+            action: () => {
+              navigate('/invoices');
+              onClose();
+            },
+            color: '#D97706'
+          });
+        }
+      });
+    }
+
+    // 5. Tailoring Orders Match
+    if (activeCategory === 'all' || activeCategory === 'tailoring') {
+      tailoringOrders.forEach(order => {
+        const orderId = String(order.id || '');
+        const cName = order.customerName || '';
+        const garment = order.garment || '';
+        if (
+          orderId.toLowerCase().includes(q) ||
+          cName.toLowerCase().includes(q) ||
+          garment.toLowerCase().includes(q)
+        ) {
+          matched.push({
+            id: `tlr-${order.id}`,
+            type: 'tailoring',
+            icon: <Straighten sx={{ fontSize: 20 }} />,
+            title: `Job #${order.id} - ${order.garment}`,
+            subtitle: `Client: ${cName} • Status: ${(order.status || '').toUpperCase()} • Due: ${order.targetDate || 'TBD'}`,
+            action: () => {
+              navigate('/tailoring');
+              onClose();
+            },
+            color: '#059669'
+          });
+        }
+      });
+    }
+
+    return matched.slice(0, 15);
+  }, [searchQuery, activeCategory, quickActions, inventory, customers, invoices, tailoringOrders, navigate, onClose]);
+
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [filteredResults]);
+
+  // Focus input automatically when opened
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => inputRef.current?.focus(), 50);
+    } else {
+      setSearchQuery('');
+      setActiveCategory('all');
+      setSelectedIndex(0);
+    }
+  }, [open]);
+
+  // Keyboard navigation
+  const handleKeyDown = (e) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex(prev => (prev + 1) % Math.max(1, filteredResults.length));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex(prev => (prev - 1 + filteredResults.length) % Math.max(1, filteredResults.length));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (filteredResults[selectedIndex]) {
+        filteredResults[selectedIndex].action();
+      }
+    } else if (e.key === 'Escape') {
+      onClose();
+    }
+  };
+
+  const getTypeLabel = (type) => {
+    switch (type) {
+      case 'action': return 'Command';
+      case 'inventory': return 'Garment';
+      case 'customer': return 'Client';
+      case 'invoice': return 'Invoice';
+      case 'tailoring': return 'Craft Job';
+      default: return type;
+    }
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="md"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 3.5,
+          position: 'fixed',
+          top: { xs: 40, sm: 80 },
+          m: 0,
+          bgcolor: 'background.paper',
+          backgroundImage: 'linear-gradient(180deg, rgba(15, 118, 110, 0.03) 0%, rgba(0, 0, 0, 0) 100%)',
+          boxShadow: '0 25px 50px -12px rgba(4, 47, 46, 0.35), 0 0 0 1px rgba(15, 118, 110, 0.2)',
+          overflow: 'hidden'
+        }
+      }}
+    >
+      <DialogContent sx={{ p: 0 }}>
+        {/* Search Header Input */}
+        <Box sx={{
+          p: 2,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1.5,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'rgba(15, 118, 110, 0.04)'
+        }}>
+          <Search sx={{ color: '#0F766E', fontSize: 26 }} />
+          <TextField
             fullWidth
-            PaperProps={{
-                sx: {
-                    borderRadius: 3,
-                    position: 'fixed',
-                    top: 100,
-                    m: 0
-                }
+            inputRef={inputRef}
+            placeholder="Type a command, customer phone, SKU, or invoice #..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
+            variant="standard"
+            InputProps={{
+              disableUnderline: true,
+              sx: {
+                fontSize: '1.05rem',
+                fontWeight: 600,
+                color: 'text.primary'
+              }
             }}
-        >
-            <DialogContent sx={{ p: 0 }}>
-                {/* Search Input */}
-                <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
-                    <TextField
-                        fullWidth
-                        autoFocus
-                        placeholder="Search products, customers, invoices..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <Search sx={{ color: 'text.secondary' }} />
-                                </InputAdornment>
-                            ),
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <Chip
-                                        label="ESC"
-                                        size="small"
-                                        sx={{
-                                            height: 24,
-                                            fontSize: '0.75rem',
-                                            bgcolor: 'rgba(0,0,0,0.08)',
-                                            fontWeight: 600
-                                        }}
-                                    />
-                                </InputAdornment>
-                            )
-                        }}
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                '& fieldset': { border: 'none' },
-                                bgcolor: 'rgba(0,0,0,0.02)',
-                                borderRadius: 2
-                            }
-                        }}
-                    />
-                </Box>
+          />
+          <Chip
+            label="ESC"
+            size="small"
+            onClick={onClose}
+            sx={{
+              height: 22,
+              fontSize: '0.68rem',
+              fontWeight: 800,
+              bgcolor: 'action.hover',
+              cursor: 'pointer'
+            }}
+          />
+        </Box>
 
-                {/* Results */}
-                {results.length > 0 ? (
-                    <List sx={{ maxHeight: 400, overflow: 'auto', p: 1 }}>
-                        {results.map((result, index) => (
-                            <ListItem
-                                key={index}
-                                button
-                                selected={index === selectedIndex}
-                                onClick={result.action}
-                                sx={{
-                                    borderRadius: 2,
-                                    mb: 0.5,
-                                    '&.Mui-selected': {
-                                        bgcolor: 'rgba(136, 14, 79, 0.08)',
-                                        '&:hover': {
-                                            bgcolor: 'rgba(136, 14, 79, 0.12)'
-                                        }
-                                    }
-                                }}
-                            >
-                                <ListItemIcon>
-                                    <Box
-                                        sx={{
-                                            p: 1,
-                                            borderRadius: 1.5,
-                                            bgcolor: `${result.color}15`,
-                                            color: result.color,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
-                                        }}
-                                    >
-                                        {result.icon}
-                                    </Box>
-                                </ListItemIcon>
-                                <ListItemText
-                                    primary={
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                                {result.title}
-                                            </Typography>
-                                            <Chip
-                                                label={getTypeLabel(result.type)}
-                                                size="small"
-                                                sx={{
-                                                    height: 20,
-                                                    fontSize: '0.65rem',
-                                                    bgcolor: `${result.color}20`,
-                                                    color: result.color,
-                                                    fontWeight: 700
-                                                }}
-                                            />
-                                        </Box>
-                                    }
-                                    secondary={result.subtitle}
-                                    secondaryTypographyProps={{
-                                        variant: 'caption',
-                                        sx: { color: 'text.secondary' }
-                                    }}
-                                />
-                                <KeyboardArrowRight sx={{ color: 'text.secondary', fontSize: 20 }} />
-                            </ListItem>
-                        ))}
-                    </List>
-                ) : searchQuery ? (
-                    <Box sx={{ p: 4, textAlign: 'center' }}>
-                        <Search sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-                        <Typography variant="body2" color="text.secondary">
-                            No results found for "{searchQuery}"
-                        </Typography>
+        {/* Category Filter Pills */}
+        <Box sx={{
+          px: 2,
+          py: 1,
+          display: 'flex',
+          gap: 1,
+          overflowX: 'auto',
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          {CATEGORIES.map((cat) => {
+            const isSelected = activeCategory === cat.id;
+            return (
+              <Chip
+                key={cat.id}
+                label={cat.label}
+                size="small"
+                onClick={() => setActiveCategory(cat.id)}
+                sx={{
+                  height: 24,
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  bgcolor: isSelected ? '#0F766E' : 'transparent',
+                  color: isSelected ? '#FFFFFF' : 'text.secondary',
+                  border: '1px solid',
+                  borderColor: isSelected ? '#0F766E' : 'divider',
+                  '&:hover': {
+                    bgcolor: isSelected ? '#042F2E' : 'rgba(15, 118, 110, 0.08)'
+                  }
+                }}
+              />
+            );
+          })}
+        </Box>
+
+        {/* Results List */}
+        {filteredResults.length > 0 ? (
+          <List sx={{ maxHeight: 380, overflowY: 'auto', p: 1.25 }}>
+            {filteredResults.map((item, index) => {
+              const isSelected = index === selectedIndex;
+              return (
+                <ListItem
+                  key={item.id || index}
+                  onClick={item.action}
+                  selected={isSelected}
+                  sx={{
+                    borderRadius: 2,
+                    mb: 0.5,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    bgcolor: isSelected ? 'rgba(15, 118, 110, 0.08)' : 'transparent',
+                    border: '1px solid',
+                    borderColor: isSelected ? 'rgba(15, 118, 110, 0.3)' : 'transparent',
+                    '&:hover': {
+                      bgcolor: 'rgba(15, 118, 110, 0.06)'
+                    }
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 42 }}>
+                    <Box
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 1.5,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        bgcolor: `${item.color}15`,
+                        color: item.color
+                      }}
+                    >
+                      {item.icon}
                     </Box>
-                ) : (
-                    <Box sx={{ p: 3 }}>
-                        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, mb: 2, display: 'block' }}>
-                            QUICK TIPS
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                          {item.title}
                         </Typography>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <Chip label="↑↓" size="small" sx={{ bgcolor: 'rgba(0,0,0,0.08)', fontWeight: 600, minWidth: 40 }} />
-                                <Typography variant="caption" color="text.secondary">Navigate</Typography>
-                            </Box>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <Chip label="↵" size="small" sx={{ bgcolor: 'rgba(0,0,0,0.08)', fontWeight: 600, minWidth: 40 }} />
-                                <Typography variant="caption" color="text.secondary">Select</Typography>
-                            </Box>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <Chip label="ESC" size="small" sx={{ bgcolor: 'rgba(0,0,0,0.08)', fontWeight: 600, minWidth: 40 }} />
-                                <Typography variant="caption" color="text.secondary">Close</Typography>
-                            </Box>
-                        </Box>
-                        <Divider sx={{ my: 2 }} />
-                        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, mb: 1, display: 'block' }}>
-                            SEARCH FOR
-                        </Typography>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                            <Chip label="Products" size="small" variant="outlined" />
-                            <Chip label="Customers" size="small" variant="outlined" />
-                            <Chip label="Invoices" size="small" variant="outlined" />
-                            <Chip label="Vendors" size="small" variant="outlined" />
-                            <Chip label="Actions" size="small" variant="outlined" />
-                        </Box>
-                    </Box>
-                )}
-            </DialogContent>
-        </Dialog>
-    );
+                        <Chip
+                          label={getTypeLabel(item.type)}
+                          size="small"
+                          sx={{
+                            height: 18,
+                            fontSize: '0.62rem',
+                            fontWeight: 800,
+                            bgcolor: `${item.color}15`,
+                            color: item.color,
+                            border: `1px solid ${item.color}30`
+                          }}
+                        />
+                      </Box>
+                    }
+                    secondary={item.subtitle}
+                    secondaryTypographyProps={{
+                      variant: 'caption',
+                      sx: { color: 'text.secondary', display: 'block', mt: 0.25 }
+                    }}
+                  />
+                  {item.shortcut ? (
+                    <Chip
+                      label={item.shortcut}
+                      size="small"
+                      sx={{
+                        height: 20,
+                        fontSize: '0.65rem',
+                        fontWeight: 800,
+                        fontFamily: 'monospace',
+                        bgcolor: 'action.hover'
+                      }}
+                    />
+                  ) : (
+                    <KeyboardReturn sx={{ fontSize: 16, color: 'text.disabled' }} />
+                  )}
+                </ListItem>
+              );
+            })}
+          </List>
+        ) : (
+          <Box sx={{ p: 4, textAlign: 'center' }}>
+            <Search sx={{ fontSize: 40, color: 'text.disabled', mb: 1 }} />
+            <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>
+              No matches found for "{searchQuery}"
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Try searching by guest phone number, customer name, invoice ID, or product SKU.
+            </Typography>
+          </Box>
+        )}
+
+        {/* Footer Navigation Hints */}
+        <Box sx={{
+          px: 2.5,
+          py: 1.25,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          bgcolor: 'rgba(0, 0, 0, 0.02)'
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Chip label="↑↓" size="small" sx={{ height: 18, fontSize: '0.62rem', fontWeight: 800 }} />
+              <Typography variant="caption" color="text.secondary">Navigate</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Chip label="↵" size="small" sx={{ height: 18, fontSize: '0.62rem', fontWeight: 800 }} />
+              <Typography variant="caption" color="text.secondary">Execute</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Chip label="ESC" size="small" sx={{ height: 18, fontSize: '0.62rem', fontWeight: 800 }} />
+              <Typography variant="caption" color="text.secondary">Dismiss</Typography>
+            </Box>
+          </Box>
+          <Typography variant="caption" sx={{ fontWeight: 700, color: '#0F766E' }}>
+            Aleen Clothing Boutique Command OS
+          </Typography>
+        </Box>
+      </DialogContent>
+    </Dialog>
+  );
 };
 
 export default GlobalSearch;
