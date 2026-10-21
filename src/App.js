@@ -24,6 +24,7 @@ import AdvancedReports from './pages/AdvancedReports';
 import Settings from './pages/Settings';
 import TailoringKanban from './pages/TailoringKanban';
 import Devices from './pages/Devices';
+import MobileScanner from './pages/MobileScanner';
 import Layout from './components/Layout';
 
 const PrivateRoute = ({ children }) => {
@@ -56,6 +57,7 @@ const AnimatedRoutes = () => {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/login" element={<Login />} />
+        <Route path="/mobile-scanner" element={<MobileScanner />} />
         <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
           <Route index element={<PageWrapper><Dashboard /></PageWrapper>} />
           <Route path="inventory" element={<PageWrapper><Inventory /></PageWrapper>} />

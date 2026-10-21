@@ -50,10 +50,13 @@ import {
     Link,
     PlayArrow,
     CameraAlt,
-    InfoOutlined
+    InfoOutlined,
+    OpenInNew
 } from '@mui/icons-material';
 import { Html5Qrcode } from 'html5-qrcode';
 import { useNavigate } from 'react-router-dom';
+import { db } from '../firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { useData } from '../contexts/DataContext';
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
@@ -109,8 +112,17 @@ export default function Devices() {
 
     // Dynamic pairing token for phone bridge
     const [pairingToken] = useState(() => 'aleen_' + Math.random().toString(36).substring(2, 8));
-    const bridgeUrl = `${window.location.origin}/mobile-scanner?token=${pairingToken}`;
-    const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(bridgeUrl)}&color=042F2E&bgcolor=FFFFFF`;
+    
+    // Resolve reachable IP address: If running on localhost, default to computer LAN IP (192.168.1.30)
+    const [networkHost] = useState(() => {
+        if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+            return '192.168.1.30';
+        }
+        return typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+    });
+
+    const bridgeUrl = `${window.location.protocol}//${networkHost}${window.location.port ? ':' + window.location.port : ''}/mobile-scanner?token=${pairingToken}`;
+    const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(bridgeUrl)}&color=042F2E&bgcolor=FFFFFF`;
 
     // Web Audio Synthesizer Chime
     const playScanChime = (type = 'success') => {
@@ -250,6 +262,86 @@ export default function Devices() {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [cameraScannerOpen]);
+
+    // Realtime Wireless Phone Scanner Listeners (Firestore + BroadcastChannel + LocalStorage)
+    const lastScannedTimeRef = useRef(0);
+
+    useEffect(() => {
+        if (!pairingToken) return;
+
+        // 1. Firestore Real-time Snapshot
+        let unsubFirestore = null;
+        try {
+            const sessionDocRef = doc(db, 'scanner_sessions', pairingToken);
+            unsubFirestore = onSnapshot(sessionDocRef, (snap) => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    if (data && data.code && data.timestamp && data.timestamp > lastScannedTimeRef.current) {
+                        lastScannedTimeRef.current = data.timestamp;
+                        processScan(data.code, data.deviceName || 'Smartphone Camera Bridge', 'phone_camera');
+                        // Ensure phone device appears in active paired devices
+                        setDevices(prev => {
+                            const exists = prev.some(d => d.type === 'phone_camera');
+                            if (!exists) {
+                                return [{
+                                    id: 'phone_' + Date.now(),
+                                    name: data.deviceName || 'Smartphone Camera Bridge',
+                                    type: 'phone_camera',
+                                    typeName: 'Smartphone Camera Viewfinder',
+                                    status: 'connected',
+                                    battery: 95,
+                                    signalStrength: 100,
+                                    macAddress: 'IP: Wireless Remote Bridge',
+                                    lastScan: new Date().toISOString(),
+                                    totalScans: 1
+                                }, ...prev];
+                            }
+                            return prev;
+                        });
+                    }
+                }
+            }, (err) => {
+                console.warn('Firestore session listener notice:', err);
+            });
+        } catch (e) {}
+
+        // 2. BroadcastChannel
+        let bc = null;
+        try {
+            if (typeof BroadcastChannel !== 'undefined') {
+                bc = new BroadcastChannel('aleen_scanner_bridge');
+                bc.onmessage = (event) => {
+                    if (event.data && event.data.code && event.data.token === pairingToken) {
+                        if (event.data.timestamp > lastScannedTimeRef.current) {
+                            lastScannedTimeRef.current = event.data.timestamp;
+                            processScan(event.data.code, 'Smartphone Camera Viewfinder', 'phone_camera');
+                        }
+                    }
+                };
+            }
+        } catch (e) {}
+
+        // 3. LocalStorage Event (for multi-tab / same machine)
+        const handleStorage = (e) => {
+            if (e.key === 'aleen_last_phone_scan' && e.newValue) {
+                try {
+                    const parsed = JSON.parse(e.newValue);
+                    if (parsed.token === pairingToken && parsed.code && parsed.timestamp > lastScannedTimeRef.current) {
+                        lastScannedTimeRef.current = parsed.timestamp;
+                        processScan(parsed.code, 'Smartphone Camera Viewfinder', 'phone_camera');
+                    }
+                } catch (err) {}
+            }
+        };
+        window.addEventListener('storage', handleStorage);
+
+        return () => {
+            if (unsubFirestore) unsubFirestore();
+            if (bc) bc.close();
+            window.removeEventListener('storage', handleStorage);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pairingToken]);
 
     // Bluetooth Discovery trigger - Real Web Bluetooth without dummy data
     const startBluetoothDiscovery = async () => {
@@ -1194,6 +1286,19 @@ export default function Devices() {
                         </Typography>
                     </Box>
 
+                    {/* Network Host Settings */}
+                    <Box sx={{ mb: 2, textAlign: 'left', p: 1.5, borderRadius: 2, bgcolor: 'rgba(0,0,0,0.02)', border: '1px solid', borderColor: 'divider' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
+                            <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary' }}>
+                                Computer Wi-Fi Address:
+                            </Typography>
+                            <Chip label={networkHost} size="small" sx={{ fontWeight: 700, fontSize: '0.72rem', bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E' }} />
+                        </Box>
+                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                            Ensure your smartphone is connected to the same Wi-Fi network as this register.
+                        </Typography>
+                    </Box>
+
                     {/* Quick Link & Simulation */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                         <TextField
@@ -1220,24 +1325,42 @@ export default function Devices() {
                         />
                     </Box>
 
-                    <Button
-                        fullWidth
-                        variant="contained"
-                        startIcon={<PlayArrow />}
-                        onClick={() => {
-                            simulatePhoneScan();
-                            setPhoneModalOpen(false);
-                        }}
-                        sx={{
-                            borderRadius: 2.5,
-                            fontWeight: 700,
-                            textTransform: 'none',
-                            background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
-                            color: '#FFFFFF'
-                        }}
-                    >
-                        Test Sample Mobile Camera Scan Now
-                    </Button>
+                    <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            startIcon={<OpenInNew />}
+                            onClick={() => window.open(bridgeUrl, '_blank')}
+                            sx={{
+                                borderRadius: 2.5,
+                                fontWeight: 700,
+                                textTransform: 'none',
+                                borderColor: '#0F766E',
+                                color: '#0F766E',
+                                '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.06)' }
+                            }}
+                        >
+                            Open Scanner Viewfinder
+                        </Button>
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            startIcon={<PlayArrow />}
+                            onClick={() => {
+                                simulatePhoneScan();
+                                setPhoneModalOpen(false);
+                            }}
+                            sx={{
+                                borderRadius: 2.5,
+                                fontWeight: 700,
+                                textTransform: 'none',
+                                background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
+                                color: '#FFFFFF'
+                            }}
+                        >
+                            Test Signal
+                        </Button>
+                    </Box>
                 </DialogContent>
                 <DialogActions sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider' }}>
                     <Button onClick={() => setPhoneModalOpen(false)} sx={{ fontWeight: 700, color: 'text.secondary' }}>
