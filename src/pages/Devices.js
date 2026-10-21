@@ -62,12 +62,14 @@ import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { useData } from '../contexts/DataContext';
+import { useFeedback } from '../contexts/FeedbackContext';
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 
 export default function Devices() {
     const navigate = useNavigate();
     const { inventory } = useData();
+    const { showToast, showConfirm } = useFeedback();
 
     // Stored paired devices - Starts empty, filters out any legacy mock devices
     const [devices, setDevices] = useState(() => {
@@ -463,9 +465,18 @@ export default function Devices() {
     };
 
     const removeDevice = (id) => {
-        if (window.confirm('Are you sure you want to unpair this scanner device?')) {
-            setDevices(prev => prev.filter(d => d.id !== id));
-        }
+        const target = devices.find(d => d.id === id);
+        const deviceName = target?.name || 'this scanner device';
+        showConfirm({
+            title: 'Unpair Scanner Device',
+            message: `Are you sure you want to unpair "${deviceName}"? You can easily reconnect it at any time by scanning the device QR code.`,
+            confirmText: 'Unpair Device',
+            isDanger: true,
+            onConfirm: () => {
+                setDevices(prev => prev.filter(d => d.id !== id));
+                showToast(`Unpaired ${deviceName} successfully`, 'info');
+            }
+        });
     };
 
     // Trigger simulated scan from Phone Camera Bridge
@@ -619,10 +630,17 @@ export default function Devices() {
                                         size="small"
                                         startIcon={<Delete />}
                                         onClick={() => {
-                                            if (window.confirm('Clear all paired scanner devices?')) {
-                                                setDevices([]);
-                                                localStorage.removeItem('aleen_paired_devices');
-                                            }
+                                            showConfirm({
+                                                title: 'Clear All Paired Devices',
+                                                message: 'Are you sure you want to clear all paired scanners and phone bridges from this workstation?',
+                                                confirmText: 'Clear All',
+                                                isDanger: true,
+                                                onConfirm: () => {
+                                                    setDevices([]);
+                                                    localStorage.removeItem('aleen_paired_devices');
+                                                    showToast('All scanner devices cleared successfully', 'info');
+                                                }
+                                            });
                                         }}
                                         sx={{ textTransform: 'none', fontWeight: 700, color: 'error.main' }}
                                     >

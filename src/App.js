@@ -3,6 +3,7 @@ import { CssBaseline, Box, CircularProgress } from '@mui/material';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { DataProvider } from './contexts/DataContext';
+import { FeedbackProvider } from './contexts/FeedbackContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import ErrorBoundary from './components/ErrorBoundary';
 import Login from './pages/Login';
@@ -91,9 +92,11 @@ function App() {
       <ErrorBoundary>
         <AuthProvider>
           <DataProvider>
-            <Router basename={process.env.PUBLIC_URL}>
-              <AnimatedRoutes />
-            </Router>
+            <FeedbackProvider>
+              <Router basename={process.env.PUBLIC_URL}>
+                <AnimatedRoutes />
+              </Router>
+            </FeedbackProvider>
           </DataProvider>
         </AuthProvider>
       </ErrorBoundary>

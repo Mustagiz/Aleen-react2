@@ -51,9 +51,11 @@ import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import Customer360Drawer from '../components/crm/Customer360Drawer';
 import ClienteleNavTabs from '../components/crm/ClienteleNavTabs';
+import { useFeedback } from '../contexts/FeedbackContext';
 
 const Customers = () => {
     const { customers, addCustomer, updateCustomer, deleteCustomer, invoices, profile, addPaymentRecord } = useData();
+    const { showToast, showConfirm } = useFeedback();
     const [open, setOpen] = useState(false);
     const [editCustomer, setEditCustomer] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -126,7 +128,7 @@ const Customers = () => {
 
     const handleSave = async () => {
         if (!formData.name) {
-            alert('Name is required');
+            showToast('Client name is required', 'warning');
             return;
         }
         if (editCustomer) {
@@ -139,7 +141,7 @@ const Customers = () => {
 
     const handleRecordPayment = async () => {
         if (!paymentData.amount || parseFloat(paymentData.amount) <= 0) {
-            alert('Please enter a valid amount');
+            showToast('Please enter a valid payment amount', 'warning');
             return;
         }
 
@@ -151,7 +153,7 @@ const Customers = () => {
             .sort((a, b) => new Date(a.date) - new Date(b.date));
 
         if (outstandingInvoices.length === 0) {
-            alert('No outstanding invoices found for this customer');
+            showToast('No outstanding invoices found for this client', 'info');
             return;
         }
 
@@ -188,7 +190,7 @@ const Customers = () => {
             totalDue: updatedCustomerDue
         });
 
-        alert(`Successfully recorded payment of ₹${paymentData.amount}.`);
+        showToast(`Successfully recorded payment of ₹${paymentData.amount}`, 'success');
         setPaymentDialogOpen(false);
         setPaymentData({ amount: '', method: 'Cash', transactionId: '', note: '' });
     };
@@ -632,9 +634,16 @@ const Customers = () => {
                                                             <IconButton
                                                                 size="small"
                                                                 onClick={() => {
-                                                                    if (window.confirm(`Are you sure you want to delete ${cust.name}?`)) {
-                                                                        deleteCustomer(cust.id);
-                                                                    }
+                                                                    showConfirm({
+                                                                        title: 'Delete Patron Profile',
+                                                                        message: `Are you sure you want to delete "${cust.name}"? This will remove their profile and records from the client register.`,
+                                                                        confirmText: 'Delete Client',
+                                                                        isDanger: true,
+                                                                        onConfirm: () => {
+                                                                            deleteCustomer(cust.id);
+                                                                            showToast(`Patron profile "${cust.name}" removed`, 'info');
+                                                                        }
+                                                                    });
                                                                 }}
                                                                 sx={{ color: '#DC2626', bgcolor: 'rgba(220, 38, 38, 0.08)' }}
                                                             >

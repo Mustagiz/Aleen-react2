@@ -17,6 +17,7 @@ import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 import GlassCard from '../components/GlassCard';
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
+import { useFeedback } from '../contexts/FeedbackContext';
 
 const Purchases = () => {
     const navigate = useNavigate();
@@ -25,6 +26,7 @@ const Purchases = () => {
         deletePurchase, categories, addInventoryItem, updateCategories, 
         getLowStockItems 
     } = useData();
+    const { showToast, showConfirm } = useFeedback();
     const [open, setOpen] = useState(false);
     const [tabValue, setTabValue] = useState(0);
 
@@ -244,14 +246,21 @@ const Purchases = () => {
         setDeleteDialogOpen(true);
     };
 
-    const handleReceiveStock = async (po) => {
-        if (window.confirm(`Mark PO #${po.id.slice(-6)} as Received? This will update warehouse inventory and adjust stock counts.`)) {
-            await updatePurchase(po.id, {
-                status: 'Received',
-                paymentStatus: 'Paid',
-                amountPaid: po.total
-            }, po);
-        }
+    const handleReceiveStock = (po) => {
+        showConfirm({
+            title: 'Receive Purchase Order Stock',
+            message: `Mark PO #${po.id.slice(-6)} as Received? This will update warehouse inventory and adjust stock counts.`,
+            confirmText: 'Mark Received',
+            isDanger: false,
+            onConfirm: async () => {
+                await updatePurchase(po.id, {
+                    status: 'Received',
+                    paymentStatus: 'Paid',
+                    amountPaid: po.total
+                }, po);
+                showToast(`PO #${po.id.slice(-6)} received and inventory updated`, 'success');
+            }
+        });
     };
 
     const downloadPurchases = () => {

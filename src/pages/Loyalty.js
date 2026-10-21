@@ -39,9 +39,11 @@ import { useData } from '../contexts/DataContext';
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import ClienteleNavTabs from '../components/crm/ClienteleNavTabs';
+import { useFeedback } from '../contexts/FeedbackContext';
 
 const Loyalty = () => {
     const { customers, redeemLoyaltyPoints, addBirthdayBonus } = useData();
+    const { showToast } = useFeedback();
     const [redeemDialog, setRedeemDialog] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [pointsToRedeem, setPointsToRedeem] = useState('');
@@ -111,7 +113,7 @@ const Loyalty = () => {
             setRedeemDialog(false);
             setSelectedCustomer(null);
             setPointsToRedeem('');
-            alert(`Successfully redeemed ${points} points for ${selectedCustomer.name}. ₹${points} credit applied!`);
+            showToast(`Successfully redeemed ${points} points for ${selectedCustomer.name}. ₹${points} credit applied!`, 'success');
         } catch (err) {
             setError(err.message);
         }
@@ -120,9 +122,9 @@ const Loyalty = () => {
     const handleBirthdayBonus = async (customer) => {
         try {
             await addBirthdayBonus(customer.id, 100);
-            alert(`Birthday bonus of 100 points added to ${customer.name}'s account!`);
+            showToast(`Birthday bonus of 100 points credited to ${customer.name}'s account!`, 'success');
         } catch (err) {
-            alert('Error adding birthday bonus: ' + err.message);
+            showToast('Error adding birthday bonus: ' + err.message, 'error');
         }
     };
 

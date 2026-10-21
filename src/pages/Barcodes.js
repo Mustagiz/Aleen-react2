@@ -53,6 +53,7 @@ import {
     Percent
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
+import { useFeedback } from '../contexts/FeedbackContext';
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import GlassCard from '../components/GlassCard';
@@ -262,6 +263,7 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
 
 export default function BarcodeGenerator() {
     const { inventory, profile } = useData();
+    const { showToast, showConfirm } = useFeedback();
     const location = useLocation();
 
     // Print Queue List
@@ -433,8 +435,17 @@ export default function BarcodeGenerator() {
     };
 
     const handleClearQueue = () => {
-        if (selectedProducts.length > 0 && window.confirm('Clear all items from barcode print queue?')) {
-            setSelectedProducts([]);
+        if (selectedProducts.length > 0) {
+            showConfirm({
+                title: 'Clear Barcode Queue',
+                message: `Are you sure you want to clear all ${selectedProducts.length} items from the barcode printing queue?`,
+                confirmText: 'Clear Queue',
+                isDanger: true,
+                onConfirm: () => {
+                    setSelectedProducts([]);
+                    showToast('Barcode print queue cleared', 'info');
+                }
+            });
         }
     };
 

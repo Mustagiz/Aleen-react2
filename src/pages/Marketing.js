@@ -44,7 +44,8 @@ import {
     Radio,
     RadioGroup,
     FormControl,
-    FormLabel
+    FormLabel,
+    Pagination
 } from '@mui/material';
 import {
     WhatsApp,
@@ -205,6 +206,7 @@ const Marketing = () => {
 
     // Template Management State
     const [templateFilterCategory, setTemplateFilterCategory] = useState('all');
+    const [templatePage, setTemplatePage] = useState(1);
     const [editTemplateDialogOpen, setEditTemplateDialogOpen] = useState(false);
     const [editingTemplate, setEditingTemplate] = useState(null);
     const [templateFormData, setTemplateFormData] = useState({
@@ -821,6 +823,19 @@ const Marketing = () => {
             true
         );
     };
+
+    // Template Studio Pagination & Filtering (Exactly 9 templates per page)
+    const TEMPLATES_PER_PAGE = 9;
+    const filteredTemplates = useMemo(() => {
+        return marketingTemplates.filter(t => templateFilterCategory === 'all' || (t.category || t.type) === templateFilterCategory);
+    }, [marketingTemplates, templateFilterCategory]);
+
+    const totalTemplatePages = Math.ceil(filteredTemplates.length / TEMPLATES_PER_PAGE) || 1;
+
+    const paginatedTemplates = useMemo(() => {
+        const start = (templatePage - 1) * TEMPLATES_PER_PAGE;
+        return filteredTemplates.slice(start, start + TEMPLATES_PER_PAGE);
+    }, [filteredTemplates, templatePage]);
 
     // Copy Phone numbers for Broadcast Lists
     const handleCopySelectedNumbers = () => {
@@ -2155,7 +2170,10 @@ const Marketing = () => {
                                     clickable
                                     color={templateFilterCategory === cat ? 'primary' : 'default'}
                                     variant={templateFilterCategory === cat ? 'filled' : 'outlined'}
-                                    onClick={() => setTemplateFilterCategory(cat)}
+                                    onClick={() => {
+                                        setTemplateFilterCategory(cat);
+                                        setTemplatePage(1);
+                                    }}
                                     sx={{ fontWeight: 800, fontSize: '0.75rem', borderRadius: 2 }}
                                 />
                             ))}
@@ -2187,123 +2205,161 @@ const Marketing = () => {
                     </Box>
 
                     <Grid container spacing={3}>
-                        {marketingTemplates
-                            .filter(t => templateFilterCategory === 'all' || (t.category || t.type) === templateFilterCategory)
-                            .map((template) => (
-                                <Grid item xs={12} sm={6} md={4} key={template.id}>
-                                    <Paper
-                                        elevation={0}
-                                        sx={{
-                                            p: 3,
-                                            borderRadius: 3.5,
-                                            border: '1.5px solid',
-                                            borderColor: 'divider',
-                                            bgcolor: 'background.paper',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            height: '100%',
-                                            position: 'relative',
-                                            transition: 'all 0.22s',
-                                            '&:hover': {
-                                                borderColor: '#0F766E',
-                                                transform: 'translateY(-3px)',
-                                                boxShadow: '0 8px 24px rgba(15, 118, 110, 0.08)'
-                                            }
-                                        }}
-                                    >
-                                        {template.imageUrl && (
-                                            <Box sx={{ mb: 2, borderRadius: 2, overflow: 'hidden', height: 120, border: '1px solid divider' }}>
-                                                <img
-                                                    src={template.imageUrl}
-                                                    alt={template.title}
-                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                                />
-                                            </Box>
-                                        )}
-
-                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: template.color || '#0F766E' }} />
-                                                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
-                                                    {template.title}
-                                                </Typography>
-                                            </Box>
-                                            <Chip
-                                                size="small"
-                                                label={template.category || template.type || 'Campaign'}
-                                                sx={{ height: 20, fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase' }}
+                        {paginatedTemplates.map((template) => (
+                            <Grid item xs={12} sm={6} md={4} key={template.id}>
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        p: 3,
+                                        borderRadius: 3.5,
+                                        border: '1.5px solid',
+                                        borderColor: 'divider',
+                                        bgcolor: 'background.paper',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        height: '100%',
+                                        position: 'relative',
+                                        transition: 'all 0.22s',
+                                        '&:hover': {
+                                            borderColor: '#0F766E',
+                                            transform: 'translateY(-3px)',
+                                            boxShadow: '0 8px 24px rgba(15, 118, 110, 0.08)'
+                                        }
+                                    }}
+                                >
+                                    {template.imageUrl && (
+                                        <Box sx={{ mb: 2, borderRadius: 2, overflow: 'hidden', height: 120, border: '1px solid divider' }}>
+                                            <img
+                                                src={template.imageUrl}
+                                                alt={template.title}
+                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                             />
                                         </Box>
+                                    )}
 
-                                        <Typography
-                                            variant="body2"
-                                            color="text.secondary"
-                                            sx={{
-                                                flex: 1,
-                                                mb: 2.5,
-                                                lineHeight: 1.5,
-                                                fontStyle: 'italic',
-                                                bgcolor: 'rgba(0,0,0,0.02)',
-                                                p: 1.5,
-                                                borderRadius: 2
-                                            }}
-                                        >
-                                            "{template.message}"
-                                        </Typography>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: template.color || '#0F766E' }} />
+                                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                                                {template.title}
+                                            </Typography>
+                                        </Box>
+                                        <Chip
+                                            size="small"
+                                            label={template.category || template.type || 'Campaign'}
+                                            sx={{ height: 20, fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase' }}
+                                        />
+                                    </Box>
 
-                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 1, borderTop: '1px solid', borderColor: 'divider' }}>
-                                            <Box sx={{ display: 'flex', gap: 0.5 }}>
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={() => {
-                                                        setEditingTemplate(template);
-                                                        setTemplateFormData({
-                                                            title: template.title,
-                                                            message: template.message,
-                                                            color: template.color || '#0F766E',
-                                                            category: template.category || template.type || 'festive',
-                                                            imageUrl: template.imageUrl || ''
-                                                        });
-                                                        setEditTemplateDialogOpen(true);
-                                                    }}
-                                                >
-                                                    <Edit fontSize="small" sx={{ fontSize: 18 }} />
-                                                </IconButton>
-                                                <IconButton
-                                                    size="small"
-                                                    color="error"
-                                                    onClick={() => handleDeleteTemplate(template.id)}
-                                                >
-                                                    <Delete fontSize="small" sx={{ fontSize: 18 }} />
-                                                </IconButton>
-                                            </Box>
+                                    <Typography
+                                        variant="body2"
+                                        color="text.secondary"
+                                        sx={{
+                                            flex: 1,
+                                            mb: 2.5,
+                                            lineHeight: 1.5,
+                                            fontStyle: 'italic',
+                                            bgcolor: 'rgba(0,0,0,0.02)',
+                                            p: 1.5,
+                                            borderRadius: 2
+                                        }}
+                                    >
+                                        "{template.message}"
+                                    </Typography>
 
-                                            <Button
-                                                variant="contained"
+                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 1, borderTop: '1px solid', borderColor: 'divider' }}>
+                                        <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                            <IconButton
                                                 size="small"
-                                                startIcon={<WhatsApp />}
                                                 onClick={() => {
-                                                    setComposerTitle(template.title);
-                                                    setComposerMessage(template.message);
-                                                    setComposerImage(template.imageUrl || '');
-                                                    setActiveSubTab(0);
-                                                }}
-                                                sx={{
-                                                    bgcolor: '#0F766E',
-                                                    '&:hover': { bgcolor: '#042F2E' },
-                                                    borderRadius: 2,
-                                                    fontWeight: 750,
-                                                    fontSize: '0.75rem',
-                                                    textTransform: 'none'
+                                                    setEditingTemplate(template);
+                                                    setTemplateFormData({
+                                                        title: template.title,
+                                                        message: template.message,
+                                                        color: template.color || '#0F766E',
+                                                        category: template.category || template.type || 'festive',
+                                                        imageUrl: template.imageUrl || ''
+                                                    });
+                                                    setEditTemplateDialogOpen(true);
                                                 }}
                                             >
-                                                Use in Studio
-                                            </Button>
+                                                <Edit fontSize="small" sx={{ fontSize: 18 }} />
+                                            </IconButton>
+                                            <IconButton
+                                                size="small"
+                                                color="error"
+                                                onClick={() => handleDeleteTemplate(template.id)}
+                                            >
+                                                <Delete fontSize="small" sx={{ fontSize: 18 }} />
+                                            </IconButton>
                                         </Box>
-                                    </Paper>
-                                </Grid>
-                            ))}
+
+                                        <Button
+                                            variant="contained"
+                                            size="small"
+                                            startIcon={<WhatsApp />}
+                                            onClick={() => {
+                                                setComposerTitle(template.title);
+                                                setComposerMessage(template.message);
+                                                setComposerImage(template.imageUrl || '');
+                                                setActiveSubTab(0);
+                                            }}
+                                            sx={{
+                                                bgcolor: '#0F766E',
+                                                '&:hover': { bgcolor: '#042F2E' },
+                                                borderRadius: 2,
+                                                fontWeight: 750,
+                                                fontSize: '0.75rem',
+                                                textTransform: 'none'
+                                            }}
+                                        >
+                                            Use in Studio
+                                        </Button>
+                                    </Box>
+                                </Paper>
+                            </Grid>
+                        ))}
                     </Grid>
+
+                    {/* Template Pagination: Maximum 9 templates per page */}
+                    {totalTemplatePages > 1 && (
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                mt: 4,
+                                mb: 1,
+                                p: 2,
+                                borderRadius: 3,
+                                bgcolor: 'rgba(15, 118, 110, 0.04)',
+                                border: '1px solid rgba(15, 118, 110, 0.12)',
+                                flexWrap: 'wrap',
+                                gap: 2
+                            }}
+                        >
+                            <Typography variant="body2" sx={{ fontWeight: 750, color: '#042F2E' }}>
+                                Showing {Math.min((templatePage - 1) * TEMPLATES_PER_PAGE + 1, filteredTemplates.length)}–{Math.min(templatePage * TEMPLATES_PER_PAGE, filteredTemplates.length)} of {filteredTemplates.length} campaign templates (9 per page)
+                            </Typography>
+                            <Pagination
+                                count={totalTemplatePages}
+                                page={templatePage}
+                                onChange={(_, val) => {
+                                    setTemplatePage(val);
+                                    window.scrollTo({ top: 120, behavior: 'smooth' });
+                                }}
+                                color="primary"
+                                shape="rounded"
+                                sx={{
+                                    '& .Mui-selected': {
+                                        bgcolor: '#0F766E !important',
+                                        color: '#FFFFFF !important',
+                                        fontWeight: 800
+                                    }
+                                }}
+                            />
+                        </Box>
+                    )}
                 </Box>
             )}
 
