@@ -41,7 +41,8 @@ import {
   Search,
   PointOfSale,
   Add,
-  Circle
+  Circle,
+  Straighten
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
@@ -116,9 +117,10 @@ export default function Layout() {
       ]
     },
     {
-      title: 'Merchandise',
+      title: 'Merchandise & Craft',
       items: [
         { text: 'Atelier Inventory', icon: <Inventory />, path: '/inventory' },
+        { text: 'Tailoring & Craft', icon: <Straighten />, path: '/tailoring' },
         { text: 'Purchase Orders', icon: <Receipt />, path: '/purchases', adminOnly: true },
         { text: 'Fabric & Vendors', icon: <Store />, path: '/vendors', adminOnly: true }
       ]

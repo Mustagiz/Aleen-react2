@@ -21,6 +21,7 @@ import PaymentSummary from './pages/PaymentSummary';
 import Loyalty from './pages/Loyalty';
 import AdvancedReports from './pages/AdvancedReports';
 import Settings from './pages/Settings';
+import TailoringKanban from './pages/TailoringKanban';
 import Layout from './components/Layout';
 
 const PrivateRoute = ({ children }) => {
@@ -50,6 +51,7 @@ const AnimatedRoutes = () => {
         <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
           <Route index element={<PageWrapper><Dashboard /></PageWrapper>} />
           <Route path="inventory" element={<PageWrapper><Inventory /></PageWrapper>} />
+          <Route path="tailoring" element={<PageWrapper><TailoringKanban /></PageWrapper>} />
           <Route path="invoices" element={<PageWrapper><Invoices /></PageWrapper>} />
           <Route path="customers" element={<PageWrapper><Customers /></PageWrapper>} />
           <Route path="sales-reports" element={<PageWrapper><SalesReports /></PageWrapper>} />

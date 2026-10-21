@@ -4,6 +4,9 @@ import { WhatsApp, ShoppingBag, Event, Search, MoreVert, TrendingUp, Group, Warn
 import { useData } from '../contexts/DataContext';
 import { storage } from '../firebase';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
+import PageHeader from '../components/crm/PageHeader';
+import AtelierKpiCard from '../components/crm/AtelierKpiCard';
+import GlassCard from '../components/GlassCard';
 
 const Marketing = () => {
     const { customers, invoices, profile, updateCustomer, marketingTemplates, addMarketingTemplate, updateMarketingTemplate, deleteMarketingTemplate } = useData();
@@ -232,27 +235,79 @@ const Marketing = () => {
 
     return (
         <Box>
-            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Box>
-                    <Typography variant="h4" sx={{ fontWeight: 800, mb: 0.5 }}>Marketing Center</Typography>
-                    <Typography variant="body2" color="text.secondary">Engage with your customers and drive sales</Typography>
-                </Box>
-            </Box>
+            {/* Atelier Page Header */}
+            <PageHeader
+                title="Automated WhatsApp & Marketing Engine"
+                subtitle="Broadcast couture announcements, celebrate VIP birthdays, and re-engage dormant patrons"
+                breadcrumbs={[
+                    { label: 'Aleen Atelier', path: '/' },
+                    { label: 'Clientele & CRM', path: '/customers' },
+                    { label: 'Marketing Engine' }
+                ]}
+                actions={
+                    <Button
+                        variant="contained"
+                        startIcon={<Add fontSize="small" />}
+                        onClick={() => {
+                            setEditingTemplate(null);
+                            setTemplateFormData({ title: '', message: '', color: '#d97706', imageUrl: '' });
+                            setEditTemplateDialogOpen(true);
+                        }}
+                        sx={{
+                            px: 3,
+                            py: 1,
+                            borderRadius: '10px',
+                            fontWeight: 800,
+                            fontSize: '0.84rem',
+                            background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
+                            color: '#ffffff',
+                            boxShadow: '0 4px 14px rgba(217, 119, 6, 0.3)'
+                        }}
+                    >
+                        + Create Campaign Template
+                    </Button>
+                }
+            />
 
-            <Grid container spacing={3} sx={{ mb: 4 }}>
+            {/* Marketing Intelligence KPI Cards */}
+            <Grid container spacing={2.5} sx={{ mb: 4 }}>
                 <Grid item xs={12} sm={6} md={3}>
-                    <StatCard title="Total Customers" value={customers.length} icon={<Group />} color={theme.palette.primary.main} />
+                    <AtelierKpiCard
+                        title="Audience Reach"
+                        value={customers.length}
+                        icon={<Group fontSize="small" />}
+                        goldAccent={true}
+                        subtitle="Total registered clientele"
+                    />
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
-                    <StatCard title="Dormant Customers" value={dormantCustomers.length} icon={<Warning />} color="#ef4444" />
+                    <AtelierKpiCard
+                        title="Dormant Guests"
+                        value={dormantCustomers.length}
+                        icon={<Warning fontSize="small" />}
+                        trend={dormantCustomers.length > 0 ? `${dormantCustomers.length} re-engage` : 'None'}
+                        trendPositive={dormantCustomers.length === 0}
+                        subtitle="No visits in 30+ days"
+                    />
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
-                    <StatCard title="Today's Birthdays" value={anniversaries.length} icon={<Celebration />} color="#f59e0b" />
+                    <AtelierKpiCard
+                        title="Today's Birthdays"
+                        value={anniversaries.length}
+                        icon={<Celebration fontSize="small" />}
+                        subtitle="Eligible for VIP gift"
+                    />
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
-                    <StatCard title="Active Campaigns" value="2" icon={<TrendingUp />} color="#10b981" />
+                    <AtelierKpiCard
+                        title="Campaign Templates"
+                        value={marketingTemplates.length}
+                        icon={<TrendingUp fontSize="small" />}
+                        subtitle="Ready for WhatsApp dispatch"
+                    />
                 </Grid>
             </Grid>
+
 
             <Grid container spacing={3}>
                 {/* Dormant Customers Section */}

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, Avatar, TablePagination, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
-import { Add, Edit, Delete, Search, People, Phone, Email, ShoppingBag, TrendingUp, FilterList, MoreVert, Download, WhatsApp, Payments, CurrencyRupee } from '@mui/icons-material';
+import { Add, Edit, Delete, Search, People, Phone, Email, ShoppingBag, TrendingUp, FilterList, MoreVert, Download, WhatsApp, Payments, CurrencyRupee, Straighten, Visibility } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import GlassCard from '../components/GlassCard';
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
+import Customer360Drawer from '../components/crm/Customer360Drawer';
 
 const Customers = () => {
     const { customers, addCustomer, updateCustomer, deleteCustomer, invoices, profile, addPaymentRecord } = useData();
@@ -15,6 +16,8 @@ const Customers = () => {
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
     const [selectedCustomerForPayment, setSelectedCustomerForPayment] = useState(null);
+    const [selected360Customer, setSelected360Customer] = useState(null);
+    const [is360Open, setIs360Open] = useState(false);
     const [paymentData, setPaymentData] = useState({
         amount: '',
         method: 'Cash',
@@ -23,6 +26,13 @@ const Customers = () => {
     });
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+    const handleOpen360 = (cust) => {
+        // Find most up-to-date customer object from list
+        const latest = customers.find(c => c.id === cust.id) || cust;
+        setSelected360Customer(latest);
+        setIs360Open(true);
+    };
 
     const [formData, setFormData] = useState({
         name: '',
@@ -274,14 +284,27 @@ const Customers = () => {
                             <GlassCard key={cust.id} sx={{ mb: 2 }}>
                                 <CardContent sx={{ p: 2.5 }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                                        <Avatar sx={{ bgcolor: 'primary.light', width: 48, height: 48, fontWeight: 700 }}>{getInitials(cust.name)}</Avatar>
-                                        <Box sx={{ flex: 1 }}>
+                                        <Avatar
+                                            onClick={() => handleOpen360(cust)}
+                                            sx={{ bgcolor: 'secondary.light', width: 48, height: 48, fontWeight: 700, cursor: 'pointer' }}
+                                        >
+                                            {getInitials(cust.name)}
+                                        </Avatar>
+                                        <Box sx={{ flex: 1, cursor: 'pointer' }} onClick={() => handleOpen360(cust)}>
                                             <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>{cust.name}</Typography>
                                             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                                 <Phone sx={{ fontSize: 12 }} /> {cust.phone}
                                             </Typography>
+                                            <Typography variant="caption" sx={{ color: 'primary.main', display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 700 }}>
+                                                <Straighten sx={{ fontSize: 11 }} /> {cust.measurements ? 'Specs recorded' : 'Add measurements'}
+                                            </Typography>
                                         </Box>
                                         <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                            <Tooltip title="360° Profile">
+                                                <IconButton size="small" onClick={() => handleOpen360(cust)} sx={{ color: '#0F766E' }}>
+                                                    <Visibility fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
                                             {(cust.totalDue || 0) > 0 && (
                                                 <IconButton size="small" onClick={() => handleOpenPaymentDialog(cust.id)} sx={{ color: 'success.main' }}>
                                                     <Payments fontSize="small" />
@@ -343,9 +366,24 @@ const Customers = () => {
                                     return (
                                         <TableRow key={cust.id} hover>
                                             <TableCell>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                <Box
+                                                    onClick={() => handleOpen360(cust)}
+                                                    sx={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: 1.5,
+                                                        cursor: 'pointer',
+                                                        '&:hover .cust-name': { color: 'primary.main' }
+                                                    }}
+                                                >
                                                     <Avatar sx={{ bgcolor: 'secondary.light', width: 36, height: 36, fontSize: '0.875rem' }}>{getInitials(cust.name)}</Avatar>
-                                                    <Typography sx={{ fontWeight: 700 }}>{cust.name}</Typography>
+                                                    <Box>
+                                                        <Typography className="cust-name" sx={{ fontWeight: 700, transition: 'color 0.15s' }}>{cust.name}</Typography>
+                                                        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                            <Straighten sx={{ fontSize: 11, color: '#D97706' }} />
+                                                            {cust.measurements?.bust ? `Bust: ${cust.measurements.bust}" • ${cust.measurements.preferredFit || 'Custom'}` : 'No specs'}
+                                                        </Typography>
+                                                    </Box>
                                                 </Box>
                                             </TableCell>
                                             <TableCell>
@@ -376,6 +414,11 @@ const Customers = () => {
                                                 <Typography variant="body2" sx={{ fontWeight: 500 }}>{customerStat.lastVisit}</Typography>
                                             </TableCell>
                                             <TableCell align="right">
+                                                <Tooltip title="Guest 360° Profile & Measurements">
+                                                    <IconButton size="small" onClick={() => handleOpen360(cust)} sx={{ color: '#0F766E' }}>
+                                                        <Visibility fontSize="small" />
+                                                    </IconButton>
+                                                </Tooltip>
                                                 {(cust.totalDue || 0) > 0 && (
                                                     <Tooltip title="Record Payment">
                                                         <IconButton size="small" sx={{ color: 'success.main' }} onClick={() => handleOpenPaymentDialog(cust.id)}>
@@ -489,6 +532,21 @@ const Customers = () => {
                     <Button variant="contained" color="success" onClick={handleRecordPayment} sx={{ px: 4, borderRadius: 2, fontWeight: 700 }}>Confirm Payment</Button>
                 </DialogActions>
             </Dialog>
+
+            {/* Customer 360 SlideOver Drawer */}
+            <Customer360Drawer
+                open={is360Open}
+                onClose={() => setIs360Open(false)}
+                customer={selected360Customer}
+                onRecordPayment={(id) => {
+                    setIs360Open(false);
+                    handleOpenPaymentDialog(id);
+                }}
+                onEdit={(c) => {
+                    setIs360Open(false);
+                    handleOpen(c);
+                }}
+            />
         </Box>
     );
 };
