@@ -116,8 +116,15 @@ export default function Devices() {
 
     const testInputRef = useRef(null);
 
-    // Dynamic pairing token for phone bridge
-    const [pairingToken] = useState(() => 'aleen_' + Math.random().toString(36).substring(2, 8));
+    // Persistent pairing token for phone bridge across all tabs & pages
+    const [pairingToken] = useState(() => {
+        let t = localStorage.getItem('aleen_workstation_scanner_token');
+        if (!t) {
+            t = 'aleen_' + Math.random().toString(36).substring(2, 8);
+            localStorage.setItem('aleen_workstation_scanner_token', t);
+        }
+        return t;
+    });
     
     // Resolve reachable IP address: If running on localhost, default to computer LAN IP (192.168.1.30)
     const [networkHost] = useState(() => {

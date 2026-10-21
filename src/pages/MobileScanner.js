@@ -98,13 +98,19 @@ export default function MobileScanner() {
 
         // 3. Firestore Realtime Document
         try {
-            const sessionRef = doc(db, 'scanner_sessions', token);
-            await setDoc(sessionRef, {
+            const scanData = {
                 code,
                 token,
                 deviceName: /iPhone|iPad|iPod/.test(navigator.userAgent) ? 'iPhone Camera' : (/Android/.test(navigator.userAgent) ? 'Android Camera' : 'Mobile Camera'),
                 timestamp: Date.now()
-            }, { merge: true });
+            };
+            const sessionRef = doc(db, 'scanner_sessions', token);
+            await setDoc(sessionRef, scanData, { merge: true });
+
+            // Global session broadcast document so any workstation screen receives it
+            const globalRef = doc(db, 'scanner_sessions', 'latest_scan');
+            await setDoc(globalRef, scanData, { merge: true });
+
             setSendStatus('sent');
         } catch (err) {
             console.warn('Firestore session sync warning:', err);

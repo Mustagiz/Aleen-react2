@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel, CircularProgress, Alert, Snackbar, InputAdornment } from '@mui/material';
-import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, FilterList, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, CheckCircle, Sensors } from '@mui/icons-material';
+import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, FilterList, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, CheckCircle, Sensors, PhoneAndroid, ContentCopy } from '@mui/icons-material';
 import { Html5Qrcode } from 'html5-qrcode';
+import { db } from '../firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
@@ -124,23 +126,81 @@ const Invoices = () => {
   const [scannerError, setScannerError] = useState('');
   const [scannerStatus, setScannerStatus] = useState('Initializing...');
   const [scanFeedback, setScanFeedback] = useState(null);
+  const [unrecognizedScan, setUnrecognizedScan] = useState(null);
+  const [phonePairModalOpen, setPhonePairModalOpen] = useState(false);
+  const [phoneCopied, setPhoneCopied] = useState(false);
   const barcodeBufferRef = useRef('');
   const lastKeyTimeRef = useRef(0);
+  const lastRemoteScanTimestampRef = useRef(0);
   const quickAddInputRef = useRef(null);
 
-  // Auto-dismiss scan feedback after 5 seconds
+  const [networkHost] = useState(() => {
+    if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+      return '192.168.1.30';
+    }
+    return typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+  });
+
+  const getActiveWorkstationToken = () => {
+    let t = localStorage.getItem('aleen_workstation_scanner_token');
+    if (!t) {
+      t = 'aleen_' + Math.random().toString(36).substring(2, 8);
+      localStorage.setItem('aleen_workstation_scanner_token', t);
+    }
+    return t;
+  };
+
+  const phoneBridgeUrl = `${window.location.protocol}//${networkHost}${window.location.port ? ':' + window.location.port : ''}/mobile-scanner?token=${getActiveWorkstationToken()}`;
+  const phoneQrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(phoneBridgeUrl)}&color=042F2E&bgcolor=FFFFFF`;
+
+  // Auto-dismiss scan feedback after 6 seconds
   useEffect(() => {
     if (scanFeedback) {
-      const timer = setTimeout(() => setScanFeedback(null), 5000);
+      const timer = setTimeout(() => {
+        setScanFeedback(null);
+        setUnrecognizedScan(null);
+      }, 6000);
       return () => clearTimeout(timer);
     }
   }, [scanFeedback]);
 
-  // Universal barcode/product finder
+  // Universal barcode/QR/product finder with URL, JSON, and tag normalization
   const findProductByCode = (code) => {
     if (!code) return null;
-    const clean = String(code).trim();
+    let clean = String(code).trim();
     if (!clean) return null;
+
+    // 0. Handle JSON formatted QR codes (e.g. {"productId": "ALN-101", ...})
+    if (clean.startsWith('{') && clean.endsWith('}')) {
+      try {
+        const parsed = JSON.parse(clean);
+        const candidate = parsed.productId || parsed.id || parsed.sku || parsed.barcode || parsed.code || parsed.itemCode;
+        if (candidate) clean = String(candidate).trim();
+      } catch (e) {}
+    }
+
+    // 0. Handle URL formatted QR codes (e.g. http://.../product?id=ALN-101 or .../PRD-1001)
+    if (clean.includes('://') || clean.includes('?')) {
+      try {
+        const urlObj = new URL(clean);
+        const idParam = urlObj.searchParams.get('id') ||
+          urlObj.searchParams.get('productId') ||
+          urlObj.searchParams.get('sku') ||
+          urlObj.searchParams.get('code') ||
+          urlObj.searchParams.get('barcode');
+        if (idParam) {
+          clean = idParam.trim();
+        } else {
+          const pathSegments = urlObj.pathname.split('/').filter(Boolean);
+          if (pathSegments.length > 0) {
+            clean = pathSegments[pathSegments.length - 1].trim();
+          }
+        }
+      } catch (e) {}
+    }
+
+    // Strip wrapping quotes
+    clean = clean.replace(/^["']|["']$/g, '').trim();
     const lower = clean.toLowerCase();
 
     // 1. Direct match on productId
@@ -185,15 +245,15 @@ const Invoices = () => {
       }
     }
 
-    // 7. Exact item name match fallback
+    // 7. Case-insensitive exact item name match fallback
     if (!product) {
       product = inventory.find(inv => inv.name && String(inv.name).trim().toLowerCase() === lower);
     }
 
     if (product) {
-      return { product, variantSku };
+      return { product, variantSku, resolvedCode: clean };
     }
-    return null;
+    return { product: null, variantSku: null, resolvedCode: clean };
   };
 
   // Main barcode handler that accepts scans from Hardware Scanners, Mobile Phone Camera, or Web Camera
@@ -202,10 +262,10 @@ const Invoices = () => {
     const cleanCode = String(rawCode).trim();
     if (!cleanCode) return;
 
-    const match = findProductByCode(cleanCode);
+    const matchResult = findProductByCode(cleanCode);
 
-    if (match) {
-      const { product, variantSku } = match;
+    if (matchResult && matchResult.product) {
+      const { product, variantSku } = matchResult;
       playBeep();
       playVibration();
 
@@ -257,15 +317,18 @@ const Invoices = () => {
       });
 
       setItemSearchTerm('');
+      setUnrecognizedScan(null);
       setScanFeedback({
         type: 'success',
         message: `✓ Added: "${product.name}" (${variantSku || product.productId || cleanCode}) via ${source}`
       });
     } else {
       playBeep();
+      const codeToShow = matchResult?.resolvedCode || cleanCode;
+      setUnrecognizedScan(codeToShow);
       setScanFeedback({
         type: 'warning',
-        message: `⚠️ Barcode "${cleanCode}" scanned via ${source} not found in inventory catalog.`
+        message: `⚠️ Code "${codeToShow}" scanned via ${source} was not found in inventory catalog.`
       });
     }
   };
@@ -288,7 +351,6 @@ const Invoices = () => {
 
     let timeout = null;
     const handleGlobalKeyDown = (e) => {
-      // Don't intercept if user is pressing control/meta keys or alt keys
       if (e.ctrlKey || e.metaKey || e.altKey) return;
 
       const activeEl = document.activeElement;
@@ -308,9 +370,7 @@ const Invoices = () => {
         return;
       }
 
-      // Printable single character
       if (e.key.length === 1) {
-        // High speed typing (< 60ms) indicates a hardware barcode scanner gun
         if (timeDiff < 60 || barcodeBufferRef.current.length > 0 || !isInput) {
           barcodeBufferRef.current += e.key;
           clearTimeout(timeout);
@@ -328,27 +388,69 @@ const Invoices = () => {
     };
   }, [open, inventory]);
 
-  // Wireless Smartphone Scanner Bridge (BroadcastChannel + LocalStorage)
+  // Realtime Wireless Smartphone Scanner Bridge (Firebase Firestore + BroadcastChannel + LocalStorage)
   useEffect(() => {
-    if (!open) return;
+    const token = getActiveWorkstationToken();
+    let unsubSession = null;
+    let unsubGlobal = null;
 
+    try {
+      // 1. Listen to active workstation token doc in Firestore
+      const sessionRef = doc(db, 'scanner_sessions', token);
+      unsubSession = onSnapshot(sessionRef, (snap) => {
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data && data.code && data.timestamp && data.timestamp > lastRemoteScanTimestampRef.current) {
+            lastRemoteScanTimestampRef.current = data.timestamp;
+            if (!open) setOpen(true);
+            handleProcessBarcode(data.code, data.deviceName || 'Wireless Phone Camera');
+          }
+        }
+      }, (err) => {
+        console.warn('Firestore session listener notice:', err);
+      });
+
+      // 2. Also listen to latest_scan document in Firestore as automatic fallback
+      const globalRef = doc(db, 'scanner_sessions', 'latest_scan');
+      unsubGlobal = onSnapshot(globalRef, (snap) => {
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data && data.code && data.timestamp && data.timestamp > lastRemoteScanTimestampRef.current) {
+            lastRemoteScanTimestampRef.current = data.timestamp;
+            if (!open) setOpen(true);
+            handleProcessBarcode(data.code, data.deviceName || 'Wireless Phone Camera');
+          }
+        }
+      }, (err) => {
+        console.warn('Firestore latest_scan notice:', err);
+      });
+    } catch (e) {
+      console.warn('Error attaching Firestore phone scanner:', e);
+    }
+
+    // 3. BroadcastChannel (for testing in another tab)
     let bc = null;
     try {
       if (typeof BroadcastChannel !== 'undefined') {
         bc = new BroadcastChannel('aleen_scanner_bridge');
         bc.onmessage = (event) => {
-          if (event.data && event.data.code) {
+          if (event.data && event.data.code && event.data.timestamp > lastRemoteScanTimestampRef.current) {
+            lastRemoteScanTimestampRef.current = event.data.timestamp;
+            if (!open) setOpen(true);
             handleProcessBarcode(event.data.code, 'Wireless Phone Camera');
           }
         };
       }
     } catch (e) {}
 
+    // 4. LocalStorage event fallback
     const handleStorage = (event) => {
       if (event.key === 'aleen_last_phone_scan' && event.newValue) {
         try {
           const parsed = JSON.parse(event.newValue);
-          if (parsed && parsed.code) {
+          if (parsed && parsed.code && parsed.timestamp > lastRemoteScanTimestampRef.current) {
+            lastRemoteScanTimestampRef.current = parsed.timestamp;
+            if (!open) setOpen(true);
             handleProcessBarcode(parsed.code, 'Wireless Phone Camera');
           }
         } catch (e) {}
@@ -357,6 +459,8 @@ const Invoices = () => {
     window.addEventListener('storage', handleStorage);
 
     return () => {
+      if (unsubSession) unsubSession();
+      if (unsubGlobal) unsubGlobal();
       if (bc) bc.close();
       window.removeEventListener('storage', handleStorage);
     };
@@ -1627,7 +1731,45 @@ const Invoices = () => {
                   <Alert
                     severity={scanFeedback.type}
                     icon={scanFeedback.type === 'success' ? <CheckCircle /> : undefined}
-                    onClose={() => setScanFeedback(null)}
+                    onClose={() => {
+                      setScanFeedback(null);
+                      setUnrecognizedScan(null);
+                    }}
+                    action={
+                      unrecognizedScan ? (
+                        <Button
+                          color="inherit"
+                          size="small"
+                          onClick={() => {
+                            setSelectedItems(prev => [
+                              ...prev.filter(i => i.id || i.isCustom),
+                              {
+                                id: 'custom_' + Date.now(),
+                                quantity: 1,
+                                variantSku: '',
+                                isCustom: true,
+                                customName: `Custom Garment (${unrecognizedScan})`,
+                                customPrice: 0,
+                                customCost: 0
+                              }
+                            ]);
+                            setScanFeedback({ type: 'success', message: `Added "${unrecognizedScan}" as custom item. Enter sale price below.` });
+                            setUnrecognizedScan(null);
+                          }}
+                          sx={{
+                            fontWeight: 800,
+                            textTransform: 'none',
+                            border: '1px solid currentColor',
+                            borderRadius: 1.5,
+                            fontSize: '0.72rem',
+                            py: 0.3,
+                            px: 1
+                          }}
+                        >
+                          + Add to Bill Anyway
+                        </Button>
+                      ) : undefined
+                    }
                     sx={{
                       mb: 2,
                       borderRadius: 2.5,
@@ -1648,15 +1790,18 @@ const Invoices = () => {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
                       <Chip
                         icon={<Sensors sx={{ fontSize: '13px !important', color: '#059669' }} />}
-                        label="Scanner & Phone Ready"
+                        label="Phone & Scanner Ready"
                         size="small"
+                        onClick={() => setPhonePairModalOpen(true)}
                         sx={{
-                          height: 20,
+                          cursor: 'pointer',
+                          height: 22,
                           fontSize: '0.65rem',
                           fontWeight: 800,
                           bgcolor: 'rgba(5, 150, 105, 0.08)',
                           color: '#059669',
-                          border: '1px solid rgba(5, 150, 105, 0.2)'
+                          border: '1px solid rgba(5, 150, 105, 0.25)',
+                          '&:hover': { bgcolor: 'rgba(5, 150, 105, 0.16)' }
                         }}
                       />
                     </Box>
@@ -1769,6 +1914,46 @@ const Invoices = () => {
                     <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary' }}>
                       Point your camera at a product barcode.
                     </Typography>
+                  </DialogContent>
+                </Dialog>
+
+                {/* Phone Camera Pairing Dialog */}
+                <Dialog
+                  open={phonePairModalOpen}
+                  onClose={() => setPhonePairModalOpen(false)}
+                  maxWidth="xs"
+                  fullWidth
+                  PaperProps={{ sx: { borderRadius: 3.5 } }}
+                >
+                  <DialogTitle sx={{ fontWeight: 800, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <PhoneAndroid sx={{ color: '#D97706' }} /> Link Phone Camera Scanner
+                    </Box>
+                    <IconButton size="small" onClick={() => setPhonePairModalOpen(false)}><Close /></IconButton>
+                  </DialogTitle>
+                  <DialogContent sx={{ textAlign: 'center', pt: 1 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontSize: '0.82rem' }}>
+                      Scan this QR code with your iPhone or Android camera to instantly stream scans into this invoice:
+                    </Typography>
+                    <Box sx={{ display: 'inline-block', p: 1.5, bgcolor: '#fff', borderRadius: 3, border: '2px solid #0F766E', mb: 2 }}>
+                      <Box component="img" src={phoneQrApiUrl} alt="Pairing QR Code" sx={{ width: 200, height: 200, display: 'block' }} />
+                    </Box>
+                    <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary', mb: 2 }}>
+                      Connected Workstation: <strong>{getActiveWorkstationToken()}</strong>
+                    </Typography>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      startIcon={<ContentCopy />}
+                      onClick={() => {
+                        navigator.clipboard.writeText(phoneBridgeUrl);
+                        setPhoneCopied(true);
+                        setTimeout(() => setPhoneCopied(false), 2000);
+                      }}
+                      sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2 }}
+                    >
+                      {phoneCopied ? 'Copied Link!' : 'Copy Scanner Link'}
+                    </Button>
                   </DialogContent>
                 </Dialog>
 
