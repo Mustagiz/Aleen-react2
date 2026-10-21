@@ -546,6 +546,10 @@ export default function BarcodeGenerator() {
     const totalLabelsCount = selectedProducts.reduce((sum, p) => sum + (p.labelCount || 1), 0);
 
     const handlePrint = () => {
+        if (selectedProducts.length === 0) {
+            showToast('Please select at least one garment from your inventory to print labels.', 'info');
+            return;
+        }
         window.print();
     };
 
@@ -614,26 +618,62 @@ export default function BarcodeGenerator() {
                     <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
                         <Button
                             variant="outlined"
-                            startIcon={<Add fontSize="small" />}
+                            startIcon={<Add sx={{ fontSize: 19, color: '#0F766E' }} />}
                             onClick={() => setIsBulkSelectOpen(true)}
-                            sx={{ px: 2.5, py: 1, borderRadius: 2, fontWeight: 700, fontSize: '0.82rem' }}
+                            sx={{
+                                height: 42,
+                                minHeight: 42,
+                                px: 2.75,
+                                borderRadius: '24px',
+                                border: '1.5px solid #0F766E',
+                                color: '#0F766E',
+                                bgcolor: 'background.paper',
+                                fontWeight: 700,
+                                fontSize: '0.85rem',
+                                textTransform: 'none',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxSizing: 'border-box',
+                                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                                '&:hover': {
+                                    border: '1.5px solid #042F2E',
+                                    bgcolor: 'rgba(15, 118, 110, 0.05)',
+                                    transform: 'translateY(-1px)'
+                                }
+                            }}
                         >
                             Bulk Inventory Picker
                         </Button>
                         <Button
                             variant="contained"
-                            startIcon={<Print />}
+                            startIcon={<Print sx={{ fontSize: 19, color: '#FFFFFF !important' }} />}
                             onClick={handlePrint}
-                            disabled={selectedProducts.length === 0}
                             sx={{
-                                px: 3.5,
-                                py: 1,
-                                borderRadius: 2,
-                                fontWeight: 800,
+                                height: 42,
+                                minHeight: 42,
+                                px: 3.25,
+                                borderRadius: '24px',
+                                fontWeight: 700,
                                 fontSize: '0.85rem',
-                                background: selectedProducts.length > 0 ? 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)' : undefined,
-                                color: '#ffffff',
-                                boxShadow: selectedProducts.length > 0 ? '0 4px 14px rgba(15,118,110,0.3)' : 'none'
+                                textTransform: 'none',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxSizing: 'border-box',
+                                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%) !important',
+                                color: '#FFFFFF !important',
+                                boxShadow: '0 4px 14px rgba(15, 118, 110, 0.3)',
+                                opacity: selectedProducts.length > 0 ? 1 : 0.9,
+                                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                                '& .MuiSvgIcon-root': {
+                                    color: '#FFFFFF !important'
+                                },
+                                '&:hover': {
+                                    background: 'linear-gradient(135deg, #115E59 0%, #021C1B 100%) !important',
+                                    boxShadow: '0 6px 18px rgba(15, 118, 110, 0.45)',
+                                    transform: 'translateY(-1px)'
+                                }
                             }}
                         >
                             Print {totalLabelsCount > 0 ? `${totalLabelsCount} Labels` : 'Labels'}
