@@ -1245,27 +1245,57 @@ const Purchases = () => {
 const SmartRestockView = ({ getLowStockItems, vendors, handleOpen, setVendorId, setPoItems }) => {
     const theme = useTheme();
     const [selectedItems, setSelectedItems] = useState([]);
-    const lowStockItems = getLowStockItems ? getLowStockItems() : [];
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [supplierFilter, setSupplierFilter] = useState('All');
+    const [urgencyFilter, setUrgencyFilter] = useState('All');
 
-    // Group by Supplier
-    const groupedItems = lowStockItems.reduce((groups, item) => {
-        const supplier = item.supplier || 'Unknown Supplier';
-        if (!groups[supplier]) groups[supplier] = [];
-        groups[supplier].push(item);
-        return groups;
-    }, {});
+    const lowStockItems = useMemo(() => {
+        return getLowStockItems ? getLowStockItems() : [];
+    }, [getLowStockItems]);
 
-    const handleSelectAll = (supplier, items, checked) => {
+    // Unique suppliers list
+    const uniqueSuppliers = useMemo(() => {
+        const suppliers = new Set();
+        lowStockItems.forEach(item => {
+            if (item.supplier) suppliers.add(item.supplier);
+        });
+        return Array.from(suppliers);
+    }, [lowStockItems]);
+
+    // Filtered items
+    const filteredItems = useMemo(() => {
+        return lowStockItems.filter(item => {
+            const query = searchQuery.toLowerCase().trim();
+            const matchesSearch = !query || 
+                (item.name || '').toLowerCase().includes(query) ||
+                (item.productId || '').toLowerCase().includes(query) ||
+                (item.variantSku || '').toLowerCase().includes(query) ||
+                (item.supplier || '').toLowerCase().includes(query);
+
+            const matchesSupplier = supplierFilter === 'All' || item.supplier === supplierFilter;
+
+            const matchesUrgency = urgencyFilter === 'All' || 
+                (urgencyFilter === 'OutOfStock' && (item.quantity || 0) <= 0) ||
+                (urgencyFilter === 'Critical' && (item.quantity || 0) > 0);
+
+            return matchesSearch && matchesSupplier && matchesUrgency;
+        });
+    }, [lowStockItems, searchQuery, supplierFilter, urgencyFilter]);
+
+    // Paginated 10 entries per page
+    const paginatedItems = useMemo(() => {
+        return filteredItems.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    }, [filteredItems, page, rowsPerPage]);
+
+    // Select/Deselect handlers
+    const handleSelectAllOnPage = (checked) => {
+        const pageIds = paginatedItems.map(item => item.isVariant ? `${item.id}-${item.variantSku}` : item.id);
         if (checked) {
-            const newSelected = [...selectedItems];
-            items.forEach(item => {
-                const uniqueId = item.isVariant ? `${item.id}-${item.variantSku}` : item.id;
-                if (!newSelected.includes(uniqueId)) newSelected.push(uniqueId);
-            });
-            setSelectedItems(newSelected);
+            setSelectedItems(prev => Array.from(new Set([...prev, ...pageIds])));
         } else {
-            const idsToRemove = items.map(item => item.isVariant ? `${item.id}-${item.variantSku}` : item.id);
-            setSelectedItems(selectedItems.filter(id => !idsToRemove.includes(id)));
+            setSelectedItems(prev => prev.filter(id => !pageIds.includes(id)));
         }
     };
 
@@ -1277,21 +1307,49 @@ const SmartRestockView = ({ getLowStockItems, vendors, handleOpen, setVendorId, 
         }
     };
 
-    const createBulkPO = (supplier, items) => {
-        const vendor = vendors.find(v => v.name.toLowerCase() === supplier.toLowerCase());
+    // Quick Order for a single item
+    const handleOrderSingle = (item) => {
+        const vendor = vendors.find(v => (v.name || '').toLowerCase() === (item.supplier || '').toLowerCase());
         const vendorIdToUse = vendor ? vendor.id : '';
+        const recQty = Math.max(10, ((item.minStockLevel || 5) * 2) - (item.quantity || 0));
 
-        const itemsToOrder = items.filter(item => {
+        setVendorId(vendorIdToUse);
+        setPoItems([{
+            productId: item.id,
+            productName: item.name,
+            quantity: recQty,
+            cost: item.cost || 0,
+            variantSku: item.variantSku || ''
+        }]);
+        handleOpen();
+    };
+
+    // Create bulk PO for selected items
+    const handleOrderSelected = () => {
+        const itemsToOrder = lowStockItems.filter(item => {
             const uniqueId = item.isVariant ? `${item.id}-${item.variantSku}` : item.id;
             return selectedItems.includes(uniqueId);
         });
 
         if (itemsToOrder.length === 0) {
-            alert("Please select items to order.");
+            alert("Please select at least one item from the table.");
             return;
         }
 
-        const poItemsData = itemsToOrder.map(item => ({
+        const suppliers = [...new Set(itemsToOrder.map(i => i.supplier || 'Unknown Supplier'))];
+        const primarySupplier = suppliers[0];
+
+        const vendor = vendors.find(v => (v.name || '').toLowerCase() === primarySupplier.toLowerCase());
+        const vendorIdToUse = vendor ? vendor.id : '';
+
+        // If multiple suppliers, alert user that PO is being prepared for the first group
+        const targetItems = itemsToOrder.filter(i => (i.supplier || 'Unknown Supplier') === primarySupplier);
+
+        if (suppliers.length > 1) {
+            alert(`Selected items are from multiple suppliers (${suppliers.join(', ')}). A Purchase Order will be created for the first supplier: "${primarySupplier}" (${targetItems.length} items).`);
+        }
+
+        const poItemsData = targetItems.map(item => ({
             productId: item.id,
             productName: item.name,
             quantity: Math.max(10, ((item.minStockLevel || 5) * 2) - (item.quantity || 0)),
@@ -1304,141 +1362,331 @@ const SmartRestockView = ({ getLowStockItems, vendors, handleOpen, setVendorId, 
         handleOpen();
     };
 
+    const isAllPageSelected = paginatedItems.length > 0 && paginatedItems.every(item => {
+        const uniqueId = item.isVariant ? `${item.id}-${item.variantSku}` : item.id;
+        return selectedItems.includes(uniqueId);
+    });
+
+    const isSomePageSelected = paginatedItems.some(item => {
+        const uniqueId = item.isVariant ? `${item.id}-${item.variantSku}` : item.id;
+        return selectedItems.includes(uniqueId);
+    }) && !isAllPageSelected;
+
     return (
         <Box>
-            <Box sx={{ mb: 3 }}>
-                <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary' }}>
-                    Recommended Low-Stock Replenishment
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    Items below minimum buffer stock level. Select items and click "Create PO" to auto-populate an order.
-                </Typography>
+            {/* Header info */}
+            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                <Box>
+                    <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                        Smart Restock Assistant
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Showing low-stock items below buffer thresholds (10 entries per page). Select items to batch generate Purchase Orders.
+                    </Typography>
+                </Box>
+                {selectedItems.length > 0 && (
+                    <Button
+                        variant="contained"
+                        onClick={handleOrderSelected}
+                        sx={{
+                            borderRadius: 2,
+                            px: 3,
+                            py: 1,
+                            fontWeight: 700,
+                            textTransform: 'none',
+                            background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
+                            color: '#ffffff',
+                            boxShadow: '0 4px 12px rgba(217,119,6,0.3)',
+                            '&:hover': {
+                                background: 'linear-gradient(135deg, #b45309 0%, #92400e 100%)',
+                            }
+                        }}
+                    >
+                        Generate PO for Selected ({selectedItems.length})
+                    </Button>
+                )}
             </Box>
 
-            {Object.keys(groupedItems).length === 0 ? (
-                <GlassCard sx={{ p: 5, textAlign: 'center' }}>
-                    <CheckCircle sx={{ fontSize: 48, color: '#059669', mb: 1.5 }} />
-                    <Typography variant="h6" sx={{ fontWeight: 800 }}>All Fabric & Garment Stock Levels Healthy!</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        No products are currently under their configured minimum threshold.
-                    </Typography>
-                </GlassCard>
-            ) : (
-                Object.entries(groupedItems).map(([supplier, items]) => (
-                    <GlassCard key={supplier} sx={{ mb: 3, p: 0, overflow: 'hidden' }}>
-                        <Box sx={{ 
-                            p: 2, 
-                            bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(15, 118, 110, 0.05)', 
-                            display: 'flex', 
-                            justifyContent: 'space-between', 
-                            alignItems: 'center',
-                            borderBottom: '1px solid',
-                            borderColor: 'divider'
-                        }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                <Checkbox
-                                    checked={items.every(item => selectedItems.includes(item.isVariant ? `${item.id}-${item.variantSku}` : item.id))}
-                                    indeterminate={
-                                        items.some(item => selectedItems.includes(item.isVariant ? `${item.id}-${item.variantSku}` : item.id)) &&
-                                        !items.every(item => selectedItems.includes(item.isVariant ? `${item.id}-${item.variantSku}` : item.id))
-                                    }
-                                    onChange={(e) => handleSelectAll(supplier, items, e.target.checked)}
-                                />
-                                <Box>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>{supplier}</Typography>
-                                    <Typography variant="caption" color="text.secondary">
-                                        {items.length} items requiring replenishment
-                                    </Typography>
-                                </Box>
-                            </Box>
-                            <Button
-                                variant="contained"
-                                size="small"
-                                onClick={() => createBulkPO(supplier, items)}
-                                disabled={!items.some(item => selectedItems.includes(item.isVariant ? `${item.id}-${item.variantSku}` : item.id))}
-                                sx={{
-                                    textTransform: 'none',
-                                    fontWeight: 700,
-                                    borderRadius: 2,
-                                    px: 2.5,
-                                    background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
+            {/* Filter and Search Bar */}
+            <GlassCard sx={{ p: 2, mb: 3 }}>
+                <Grid container spacing={2} alignItems="center">
+                    <Grid item xs={12} md={5}>
+                        <TextField
+                            fullWidth
+                            size="small"
+                            placeholder="Search by product name, SKU, or supplier..."
+                            value={searchQuery}
+                            onChange={(e) => {
+                                setSearchQuery(e.target.value);
+                                setPage(0);
+                            }}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <Search fontSize="small" sx={{ color: 'text.secondary' }} />
+                                    </InputAdornment>
+                                ),
+                                endAdornment: searchQuery && (
+                                    <InputAdornment position="end">
+                                        <IconButton size="small" onClick={() => setSearchQuery('')}>
+                                            <Close fontSize="small" />
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }}
+                        />
+                    </Grid>
+                    <Grid item xs={6} sm={4} md={3}>
+                        <TextField
+                            select
+                            fullWidth
+                            size="small"
+                            label="Filter by Supplier"
+                            value={supplierFilter}
+                            onChange={(e) => {
+                                setSupplierFilter(e.target.value);
+                                setPage(0);
+                            }}
+                        >
+                            <MenuItem value="All">All Suppliers ({uniqueSuppliers.length})</MenuItem>
+                            {uniqueSuppliers.map(sup => (
+                                <MenuItem key={sup} value={sup}>
+                                    {sup}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+                    </Grid>
+                    <Grid item xs={6} sm={4} md={2.5}>
+                        <TextField
+                            select
+                            fullWidth
+                            size="small"
+                            label="Stock Urgency"
+                            value={urgencyFilter}
+                            onChange={(e) => {
+                                setUrgencyFilter(e.target.value);
+                                setPage(0);
+                            }}
+                        >
+                            <MenuItem value="All">All Deficits</MenuItem>
+                            <MenuItem value="OutOfStock">Out of Stock (0 Qty)</MenuItem>
+                            <MenuItem value="Critical">Low Stock (&le; Min)</MenuItem>
+                        </TextField>
+                    </Grid>
+                    <Grid item xs={12} sm={4} md={1.5} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        {(searchQuery || supplierFilter !== 'All' || urgencyFilter !== 'All') && (
+                            <Button 
+                                size="small" 
+                                color="inherit" 
+                                onClick={() => {
+                                    setSearchQuery('');
+                                    setSupplierFilter('All');
+                                    setUrgencyFilter('All');
+                                    setPage(0);
                                 }}
+                                sx={{ textTransform: 'none', fontSize: '0.75rem', fontWeight: 600 }}
                             >
-                                Generate PO for Selected ({items.filter(item => selectedItems.includes(item.isVariant ? `${item.id}-${item.variantSku}` : item.id)).length})
+                                Reset
                             </Button>
-                        </Box>
-                        <TableContainer>
-                            <Table size="small">
-                                <TableHead sx={{ bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' }}>
-                                    <TableRow>
-                                        <TableCell sx={{ width: 48 }} />
-                                        <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', color: 'text.secondary' }}>Product & Details</TableCell>
-                                        <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', color: 'text.secondary' }}>Buy Cost (₹)</TableCell>
-                                        <TableCell align="center" sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', color: 'text.secondary' }}>Current Stock</TableCell>
-                                        <TableCell align="center" sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', color: 'text.secondary' }}>Min Threshold</TableCell>
-                                        <TableCell align="center" sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', color: 'text.secondary' }}>Status</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {items.map((item) => {
-                                        const uniqueId = item.isVariant ? `${item.id}-${item.variantSku}` : item.id;
-                                        const isSelected = selectedItems.includes(uniqueId);
+                        )}
+                    </Grid>
+                </Grid>
+            </GlassCard>
 
-                                        return (
-                                            <TableRow key={uniqueId} hover selected={isSelected}>
-                                                <TableCell padding="checkbox">
-                                                    <Checkbox
-                                                        checked={isSelected}
-                                                        onChange={() => handleSelectItem(uniqueId)}
-                                                    />
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.name}</Typography>
-                                                    {item.isVariant && (
+            {/* Smart Replenishment Table (10 Entries Per Page) */}
+            <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
+                <TableContainer>
+                    <Table size="small">
+                        <TableHead sx={{ bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(15, 118, 110, 0.04)' }}>
+                            <TableRow>
+                                <TableCell padding="checkbox" sx={{ pl: 2 }}>
+                                    <Checkbox
+                                        checked={isAllPageSelected}
+                                        indeterminate={isSomePageSelected}
+                                        onChange={(e) => handleSelectAllOnPage(e.target.checked)}
+                                    />
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
+                                    Product & Variant
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
+                                    Supplier / Mill
+                                </TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
+                                    Unit Buy Cost
+                                </TableCell>
+                                <TableCell align="center" sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
+                                    Current Stock
+                                </TableCell>
+                                <TableCell align="center" sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
+                                    Min Threshold
+                                </TableCell>
+                                <TableCell align="center" sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
+                                    Deficit / Rec. Order
+                                </TableCell>
+                                <TableCell align="center" sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
+                                    Status
+                                </TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75, pr: 2 }}>
+                                    Action
+                                </TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {paginatedItems.length > 0 ? (
+                                paginatedItems.map((item) => {
+                                    const uniqueId = item.isVariant ? `${item.id}-${item.variantSku}` : item.id;
+                                    const isSelected = selectedItems.includes(uniqueId);
+                                    const isOutOfStock = (item.quantity || 0) <= 0;
+                                    const recQty = Math.max(10, ((item.minStockLevel || 5) * 2) - (item.quantity || 0));
+
+                                    return (
+                                        <TableRow 
+                                            key={uniqueId} 
+                                            hover 
+                                            selected={isSelected}
+                                            sx={{ '&:hover': { bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(15, 118, 110, 0.02)' } }}
+                                        >
+                                            <TableCell padding="checkbox" sx={{ pl: 2 }}>
+                                                <Checkbox
+                                                    checked={isSelected}
+                                                    onChange={() => handleSelectItem(uniqueId)}
+                                                />
+                                            </TableCell>
+                                            <TableCell sx={{ py: 1.75 }}>
+                                                <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                                                    {item.name}
+                                                </Typography>
+                                                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 0.3 }}>
+                                                    {item.isVariant ? (
+                                                        <Chip 
+                                                            label={`Variant: ${item.variantSku} (${item.size || ''} / ${item.color || ''})`} 
+                                                            size="small" 
+                                                            sx={{ height: 20, fontSize: '0.68rem', fontWeight: 600 }}
+                                                        />
+                                                    ) : (
                                                         <Typography variant="caption" color="text.secondary">
-                                                            Variant: {item.variantSku} ({item.size} / {item.color})
+                                                            SKU: {item.productId || item.id.slice(-6)}
                                                         </Typography>
                                                     )}
-                                                </TableCell>
-                                                <TableCell align="right" sx={{ fontWeight: 700 }}>
+                                                    {item.category && (
+                                                        <Typography variant="caption" color="text.secondary">
+                                                            • {item.category}
+                                                        </Typography>
+                                                    )}
+                                                </Box>
+                                            </TableCell>
+                                            <TableCell sx={{ py: 1.75 }}>
+                                                <Chip 
+                                                    label={item.supplier || 'Unassigned'} 
+                                                    size="small" 
+                                                    sx={{ 
+                                                        height: 22, 
+                                                        fontSize: '0.72rem', 
+                                                        fontWeight: 600,
+                                                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(15, 118, 110, 0.2)' : 'rgba(15, 118, 110, 0.08)',
+                                                        color: '#0F766E'
+                                                    }}
+                                                />
+                                            </TableCell>
+                                            <TableCell align="right" sx={{ py: 1.75 }}>
+                                                <Typography variant="body2" sx={{ fontWeight: 800 }}>
                                                     ₹{(item.cost || 0).toLocaleString('en-IN')}
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    <Chip 
-                                                        label={item.quantity || 0} 
-                                                        size="small" 
-                                                        sx={{ 
-                                                            bgcolor: 'rgba(239, 68, 68, 0.1)', 
-                                                            color: '#DC2626', 
-                                                            fontWeight: 800,
-                                                            border: '1px solid rgba(239, 68, 68, 0.2)'
-                                                        }} 
-                                                    />
-                                                </TableCell>
-                                                <TableCell align="center" sx={{ fontWeight: 600 }}>
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell align="center" sx={{ py: 1.75 }}>
+                                                <Chip 
+                                                    label={`${item.quantity || 0} Units`} 
+                                                    size="small" 
+                                                    sx={{ 
+                                                        bgcolor: isOutOfStock ? 'rgba(239, 68, 68, 0.12)' : 'rgba(245, 158, 11, 0.12)', 
+                                                        color: isOutOfStock ? '#DC2626' : '#D97706', 
+                                                        fontWeight: 800,
+                                                        border: isOutOfStock ? '1px solid rgba(239, 68, 68, 0.25)' : '1px solid rgba(245, 158, 11, 0.25)',
+                                                        fontSize: '0.75rem'
+                                                    }} 
+                                                />
+                                            </TableCell>
+                                            <TableCell align="center" sx={{ py: 1.75 }}>
+                                                <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
                                                     {item.minStockLevel || 5}
-                                                </TableCell>
-                                                <TableCell align="center">
-                                                    <Chip
-                                                        label="Critical Low"
-                                                        size="small"
-                                                        sx={{
-                                                            bgcolor: 'rgba(239, 68, 68, 0.1)',
-                                                            color: '#DC2626',
-                                                            fontWeight: 800,
-                                                            fontSize: '0.7rem'
-                                                        }}
-                                                    />
-                                                </TableCell>
-                                            </TableRow>
-                                        );
-                                    })}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </GlassCard>
-                ))
-            )}
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell align="center" sx={{ py: 1.75 }}>
+                                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                                                    +{recQty} Units
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell align="center" sx={{ py: 1.75 }}>
+                                                <Chip
+                                                    label={isOutOfStock ? 'Out of Stock' : 'Critical Low'}
+                                                    size="small"
+                                                    sx={{
+                                                        bgcolor: isOutOfStock ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                                                        color: isOutOfStock ? '#DC2626' : '#D97706',
+                                                        fontWeight: 800,
+                                                        fontSize: '0.7rem'
+                                                    }}
+                                                />
+                                            </TableCell>
+                                            <TableCell align="right" sx={{ py: 1.75, pr: 2 }}>
+                                                <Button
+                                                    size="small"
+                                                    variant="outlined"
+                                                    onClick={() => handleOrderSingle(item)}
+                                                    sx={{
+                                                        fontSize: '0.72rem',
+                                                        fontWeight: 700,
+                                                        py: 0.3,
+                                                        px: 1.5,
+                                                        borderRadius: 1.5,
+                                                        textTransform: 'none',
+                                                        borderColor: '#0F766E',
+                                                        color: '#0F766E',
+                                                        '&:hover': {
+                                                            borderColor: '#0b5650',
+                                                            bgcolor: 'rgba(15, 118, 110, 0.05)'
+                                                        }
+                                                    }}
+                                                >
+                                                    Order Now
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={9} align="center" sx={{ py: 6 }}>
+                                        <CheckCircle sx={{ fontSize: 44, color: '#059669', opacity: 0.8, mb: 1 }} />
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
+                                            {lowStockItems.length === 0 ? 'All Inventory Stock Levels Are Healthy' : 'No low stock items match your filter criteria'}
+                                        </Typography>
+                                        <Typography variant="caption" color="text.secondary">
+                                            {lowStockItems.length === 0 ? 'No products currently have stock below their minimum buffer.' : 'Try adjusting your supplier or urgency filters.'}
+                                        </Typography>
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+
+                {/* Table Pagination: 10 entries per page */}
+                <TablePagination
+                    rowsPerPageOptions={[10, 25, 50]}
+                    component="div"
+                    count={filteredItems.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={(e, newPage) => setPage(newPage)}
+                    onRowsPerPageChange={(e) => {
+                        setRowsPerPage(parseInt(e.target.value, 10));
+                        setPage(0);
+                    }}
+                    sx={{ borderTop: '1px solid', borderColor: 'divider' }}
+                />
+            </GlassCard>
         </Box>
     );
 };
