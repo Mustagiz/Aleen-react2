@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel } from '@mui/material';
+import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel, CircularProgress } from '@mui/material';
 import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, FilterList, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices } from '@mui/icons-material';
 import { Html5Qrcode } from 'html5-qrcode';
 import { useData } from '../contexts/DataContext';
@@ -9,6 +9,7 @@ import { generateInvoiceNumber } from '../utils/helpers';
 import InvoicePrint from '../components/InvoicePrint';
 import InvoiceTemplateDialog from '../components/InvoiceTemplateDialog';
 import { INVOICE_TEMPLATES, getStoredInvoiceSettings } from '../constants/invoiceTemplates';
+import { generatePdfFromElement } from '../utils/pdfExport';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useThemeContext } from '../contexts/ThemeContext';
@@ -31,6 +32,9 @@ const Invoices = () => {
   const [successInvoice, setSuccessInvoice] = useState(null);
   const [invoiceSettings, setInvoiceSettings] = useState(() => getStoredInvoiceSettings());
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
+  const [offscreenInvoice, setOffscreenInvoice] = useState(null);
+  const offscreenInvoiceRef = useRef(null);
 
 
   const playBeep = () => {
@@ -704,14 +708,64 @@ const Invoices = () => {
     return doc;
   };
 
-  const downloadPDF = (invoice) => {
-    const doc = generatePDF(invoice, invoiceSettings.template, invoiceSettings);
-    doc.save(`invoice-${invoice.id}.pdf`);
+  const downloadPDF = async (invoice) => {
+    if (!invoice) return;
+    try {
+      setIsExportingPDF(true);
+      const isSlip = invoiceSettings.template === 'boutique-slip';
+
+      // 1. If currently viewing this invoice, capture directly from on-screen preview ref
+      if (viewInvoice && viewInvoice.id === invoice.id && printRef.current) {
+        const doc = await generatePdfFromElement(printRef.current, isSlip);
+        doc.save(`invoice-${invoice.id}.pdf`);
+        return;
+      }
+
+      // 2. Otherwise render into offscreen container and capture
+      setOffscreenInvoice(invoice);
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      if (offscreenInvoiceRef.current) {
+        const doc = await generatePdfFromElement(offscreenInvoiceRef.current, isSlip);
+        doc.save(`invoice-${invoice.id}.pdf`);
+      } else {
+        // Fallback to vector generation
+        const doc = generatePDF(invoice, invoiceSettings.template, invoiceSettings);
+        doc.save(`invoice-${invoice.id}.pdf`);
+      }
+    } catch (err) {
+      console.error('Error generating PDF from template:', err);
+      const doc = generatePDF(invoice, invoiceSettings.template, invoiceSettings);
+      doc.save(`invoice-${invoice.id}.pdf`);
+    } finally {
+      setOffscreenInvoice(null);
+      setIsExportingPDF(false);
+    }
   };
 
   const sharePDF = async (invoice) => {
+    if (!invoice) return;
     try {
-      const doc = generatePDF(invoice, invoiceSettings.template, invoiceSettings);
+      setIsExportingPDF(true);
+      const isSlip = invoiceSettings.template === 'boutique-slip';
+      let doc;
+
+      if (viewInvoice && viewInvoice.id === invoice.id && printRef.current) {
+        doc = await generatePdfFromElement(printRef.current, isSlip);
+      } else {
+        setOffscreenInvoice(invoice);
+        await new Promise(resolve => setTimeout(resolve, 300));
+        if (offscreenInvoiceRef.current) {
+          doc = await generatePdfFromElement(offscreenInvoiceRef.current, isSlip);
+        } else {
+          doc = generatePDF(invoice, invoiceSettings.template, invoiceSettings);
+        }
+      }
+
+      if (!doc) {
+        doc = generatePDF(invoice, invoiceSettings.template, invoiceSettings);
+      }
+
       const pdfBlob = doc.output('blob');
       const file = new File([pdfBlob], `invoice-${invoice.id}.pdf`, { type: 'application/pdf' });
 
@@ -722,11 +776,14 @@ const Invoices = () => {
           text: `Invoice from ${profile.businessName}`
         });
       } else {
-        downloadPDF(invoice);
+        doc.save(`invoice-${invoice.id}.pdf`);
         alert('Sharing is not supported on this browser. The invoice has been downloaded instead.');
       }
     } catch (error) {
       console.error('Error sharing PDF:', error);
+    } finally {
+      setOffscreenInvoice(null);
+      setIsExportingPDF(false);
     }
   };
 
@@ -2071,9 +2128,25 @@ const Invoices = () => {
           '& > :not(style) + :not(style)': { ml: { xs: 0, sm: 1 } }
         }}>
           <Button onClick={() => setViewInvoice(null)} fullWidth={isMobile} variant="outlined">Close</Button>
-          {!isMobile && <Box sx={{ flexGrow: 1 }} />}
-          <Button onClick={() => downloadPDF(viewInvoice)} startIcon={<Download />} variant="outlined" fullWidth={isMobile}>Download PDF</Button>
-          <Button onClick={() => sharePDF(viewInvoice)} startIcon={<Share />} variant="outlined" color="primary" fullWidth={isMobile}>Share PDF</Button>
+          <Button
+            onClick={() => downloadPDF(viewInvoice)}
+            startIcon={isExportingPDF ? <CircularProgress size={16} color="inherit" /> : <Download />}
+            variant="outlined"
+            fullWidth={isMobile}
+            disabled={isExportingPDF}
+          >
+            {isExportingPDF ? 'Generating PDF...' : 'Download PDF'}
+          </Button>
+          <Button
+            onClick={() => sharePDF(viewInvoice)}
+            startIcon={<Share />}
+            variant="outlined"
+            color="primary"
+            fullWidth={isMobile}
+            disabled={isExportingPDF}
+          >
+            Share PDF
+          </Button>
           <Button onClick={() => sendWhatsApp(viewInvoice)} startIcon={<WhatsApp />} variant="contained" sx={{ bgcolor: '#25D366', '&:hover': { bgcolor: '#1da851' } }} fullWidth={isMobile}>WhatsApp</Button>
           {!isMobile && <Button onClick={() => handlePrint(viewInvoice)} variant="contained" startIcon={<Print />}>Print</Button>}
         </DialogActions>
@@ -2146,6 +2219,19 @@ const Invoices = () => {
         settings={invoiceSettings}
         onSaveSettings={(newSettings) => setInvoiceSettings(newSettings)}
       />
+
+      {/* Hidden offscreen container for pixel-perfect PDF export */}
+      <Box sx={{ position: 'fixed', left: '-9999px', top: '-9999px', width: invoiceSettings.template === 'boutique-slip' ? 480 : 840, zIndex: -100 }}>
+        {offscreenInvoice && (
+          <Box ref={offscreenInvoiceRef}>
+            <InvoicePrint
+              invoice={offscreenInvoice}
+              template={invoiceSettings.template}
+              settings={invoiceSettings}
+            />
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 };

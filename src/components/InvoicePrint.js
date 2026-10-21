@@ -90,6 +90,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings }, ref) => {
       sx={{
         p: isSlip ? { xs: 2, sm: 2.5 } : { xs: 2, sm: 4 },
         bgcolor: '#FFFFFF',
+        color: '#0F172A',
         maxWidth: isSlip ? 480 : 840,
         mx: 'auto',
         position: 'relative',
