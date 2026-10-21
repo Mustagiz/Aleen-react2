@@ -102,27 +102,35 @@ const toSentenceCase = (str) => {
 const PRESET_BROADCASTS = [
     {
         title: '🌙 Haute Eid Couture Exclusive',
+        shortTitle: 'Haute',
         category: 'festive',
         color: '#0F766E',
-        message: 'Eid Mubarak {customer_name}! 🌙 Celebrate in bespoke luxury with our hand-embroidered shararas, anarkalis, and raw silk sarees. Visit {store_name} this week to explore private festive preview privileges!'
+        offerCode: 'HAUTE20',
+        message: 'Eid Mubarak {customer_name}! 🌙 Celebrate in bespoke luxury with our hand-embroidered shararas, anarkalis, and raw silk sarees. Visit {store_name} this week to explore private festive preview privileges with code {offer_code}!'
     },
     {
         title: '✨ Royal Festive & Bridal Splendour',
+        shortTitle: 'Royal',
         category: 'bridal',
         color: '#D97706',
-        message: 'Dear {customer_name}, step into timeless glamour. Our Royal Wedding & Bridal Couture collection is now open for private atelier fittings at {store_name}. Reserve your bespoke consultation slot today!'
+        offerCode: 'ROYALVIP',
+        message: 'Dear {customer_name}, step into timeless glamour. Our Royal Wedding & Bridal Couture collection is now open for private atelier fittings at {store_name}. Reserve your bespoke consultation slot with code {offer_code}!'
     },
     {
         title: '🎁 VIP Loyalty Privileges & Rewards',
+        shortTitle: 'VIP',
         category: 'vip',
         color: '#B45309',
-        message: 'Hello {customer_name}! As an esteemed VIP patron of {store_name}, you have {loyalty_points} loyalty credits ready to redeem. Indulge in our new arrivals and enjoy your exclusive atelier privileges.'
+        offerCode: 'VIPCLUB',
+        message: 'Hello {customer_name}! As an esteemed VIP patron of {store_name}, you have {loyalty_points} loyalty credits ready to redeem. Indulge in our new arrivals and enjoy exclusive {tier_name} privileges with promo code {offer_code}.'
     },
     {
         title: '👗 Seasonal Trunk Show & Arrivals',
+        shortTitle: 'Seasonal',
         category: 'arrivals',
         color: '#2563EB',
-        message: 'Greetings {customer_name}! Fresh weaves and artisan silhouettes just arrived at {store_name}. Early patrons receive complimentary custom sizing adjustments. We look forward to welcoming you soon!'
+        offerCode: 'SEASONAL15',
+        message: 'Greetings {customer_name}! Fresh weaves and artisan silhouettes just arrived at {store_name}. Early patrons receive complimentary custom sizing adjustments. Quote code {offer_code} at our studio!'
     }
 ];
 
@@ -190,7 +198,7 @@ const Marketing = () => {
 
     // Composer & Live Preview State
     const [composerTitle, setComposerTitle] = useState('Bespoke Broadcast');
-    const [composerMessage, setComposerMessage] = useState('');
+    const [composerMessage, setComposerMessage] = useState(PRESET_BROADCASTS[0].message);
     const [composerImage, setComposerImage] = useState('');
     const [composerOfferCode, setComposerOfferCode] = useState('HAUTE20');
     const [activeCustomerForPreview, setActiveCustomerForPreview] = useState(null);
@@ -517,17 +525,55 @@ const Marketing = () => {
     };
 
     // Insert Merge Tag into Composer
+    // Insert Merge Tag into Composer
     const insertMergeTag = (tag) => {
-        setComposerMessage(prev => prev ? `${prev} ${tag}` : tag);
+        setComposerMessage(prev => {
+            const current = prev || PRESET_BROADCASTS[0].message;
+            return `${current} ${tag}`;
+        });
+        showToast(`Inserted tag: ${tag}`, 'info');
+    };
+
+    // Helper: Safely open WhatsApp in new tab / application across all browsers
+    const openWhatsAppUrl = (url) => {
+        try {
+            // Standard window.open without feature flags preserves window handle and avoids pop-up blockers
+            const newWindow = window.open(url, '_blank');
+            if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                const a = document.createElement('a');
+                a.href = url;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    if (document.body.contains(a)) {
+                        document.body.removeChild(a);
+                    }
+                }, 150);
+            }
+        } catch (e) {
+            window.location.href = url;
+        }
     };
 
     // ==============================================================
     // CORE WHATSAPP DISPATCHER (META CLOUD API / WEBHOOK / BROWSER)
     // ==============================================================
     const dispatchWhatsApp = async (customer, customMsg, customImg, templateTitle) => {
-        const rawPhone = customer.phone.replace(/\D/g, '');
+        if (!customer) {
+            showToast('Please select a patron to message', 'warning');
+            return { success: false };
+        }
+
+        const rawPhone = (customer.phone || '').replace(/\D/g, '');
+        if (!rawPhone || rawPhone.length < 5) {
+            showToast(`Patron ${customer.displayName || customer.name || 'selected'} has no valid phone number recorded`, 'warning');
+            return { success: false };
+        }
+
         const cleanPhone = rawPhone.startsWith('91') ? rawPhone : (rawPhone.length === 10 ? `91${rawPhone}` : rawPhone);
-        const textToSend = formatPersonalizedMessage(customMsg, customer);
+        const textToSend = formatPersonalizedMessage(customMsg || composerMessage || PRESET_BROADCASTS[0].message, customer);
 
         // 1. Meta WhatsApp Cloud API Mode (Headless background send)
         if (gatewayConfig.mode === 'meta_cloud' && gatewayConfig.metaPhoneNumberId && gatewayConfig.metaAccessToken) {
@@ -548,7 +594,8 @@ const Marketing = () => {
 
                 if (response.ok) {
                     if (customer.id) updateCustomer(customer.id, { lastReminderSent: new Date().toISOString() });
-                    recordDispatch(customer, templateTitle, textToSend, 'Meta Cloud API');
+                    recordDispatch(customer, templateTitle || 'Meta Cloud Broadcast', textToSend, 'Meta Cloud API');
+                    showToast(`Dispatched to ${toSentenceCase(customer.name)} via Meta WhatsApp Cloud API`, 'success');
                     return { success: true, channel: 'Meta Cloud API' };
                 }
             } catch (err) {
@@ -574,7 +621,8 @@ const Marketing = () => {
 
                 if (response.ok) {
                     if (customer.id) updateCustomer(customer.id, { lastReminderSent: new Date().toISOString() });
-                    recordDispatch(customer, templateTitle, textToSend, 'Custom Webhook Gateway');
+                    recordDispatch(customer, templateTitle || 'Webhook Broadcast', textToSend, 'Custom Webhook Gateway');
+                    showToast(`Dispatched to ${toSentenceCase(customer.name)} via WhatsApp Gateway`, 'success');
                     return { success: true, channel: 'Webhook' };
                 }
             } catch (err) {
@@ -582,14 +630,16 @@ const Marketing = () => {
             }
         }
 
-        // 3. Universal Browser Click-to-Chat (wa.me)
+        // 3. Universal Browser Direct Dispatch (api.whatsapp.com / wa.me)
         let fullPayload = textToSend;
         if (customImg) fullPayload += `\n\n${customImg}`;
-        const url = `https://wa.me/${cleanPhone}/?text=${encodeURIComponent(fullPayload)}`;
-        window.open(url, '_blank');
+
+        const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(fullPayload)}`;
+        openWhatsAppUrl(whatsappUrl);
 
         if (customer.id) updateCustomer(customer.id, { lastReminderSent: new Date().toISOString() });
-        recordDispatch(customer, templateTitle, fullPayload, 'WhatsApp Web / Mobile');
+        recordDispatch(customer, templateTitle || 'WhatsApp Broadcast', fullPayload, 'WhatsApp');
+        showToast(`Opening WhatsApp chat with ${toSentenceCase(customer.name)}...`, 'success');
         return { success: true, channel: 'Browser wa.me' };
     };
 
@@ -1140,17 +1190,20 @@ const Marketing = () => {
                                             <Grid item xs={12} sm={6} key={customer.id}>
                                                 <Card
                                                     elevation={0}
+                                                    onClick={() => setActiveCustomerForPreview(customer)}
                                                     sx={{
+                                                        cursor: 'pointer',
                                                         borderRadius: 3,
-                                                        border: '1.5px solid',
-                                                        borderColor: isPreviewActive ? '#0F766E' : isSelected ? 'rgba(15, 118, 110, 0.4)' : 'divider',
-                                                        bgcolor: isPreviewActive ? 'rgba(15, 118, 110, 0.03)' : 'background.paper',
+                                                        border: '2px solid',
+                                                        borderColor: isPreviewActive ? '#0F766E' : isSelected ? 'rgba(15, 118, 110, 0.5)' : 'divider',
+                                                        bgcolor: isPreviewActive ? 'rgba(15, 118, 110, 0.05)' : 'background.paper',
+                                                        boxShadow: isPreviewActive ? '0 6px 20px rgba(15, 118, 110, 0.15)' : 'none',
                                                         transition: 'all 0.2s',
                                                         position: 'relative',
                                                         overflow: 'hidden',
                                                         '&:hover': {
                                                             borderColor: '#0F766E',
-                                                            boxShadow: '0 4px 16px rgba(15, 118, 110, 0.08)',
+                                                            boxShadow: '0 4px 16px rgba(15, 118, 110, 0.12)',
                                                             transform: 'translateY(-2px)'
                                                         }
                                                     }}
@@ -1161,6 +1214,7 @@ const Marketing = () => {
                                                                 <Checkbox
                                                                     size="small"
                                                                     checked={isSelected}
+                                                                    onClick={(e) => e.stopPropagation()}
                                                                     onChange={(e) => {
                                                                         if (e.target.checked) {
                                                                             setSelectedCustomerIds(prev => [...prev, customer.id]);
@@ -1247,25 +1301,28 @@ const Marketing = () => {
 
                                                         {/* Bottom Row Actions */}
                                                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 0.5 }}>
-                                                            <Button
-                                                                size="small"
-                                                                onClick={() => setActiveCustomerForPreview(customer)}
-                                                                sx={{
-                                                                    textTransform: 'none',
-                                                                    fontWeight: 700,
-                                                                    fontSize: '0.72rem',
-                                                                    color: isPreviewActive ? '#0F766E' : 'text.secondary',
-                                                                    p: 0
-                                                                }}
-                                                            >
-                                                                {isPreviewActive ? '● Previewing in Phone' : 'Preview Live'}
-                                                            </Button>
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                <Typography
+                                                                    variant="caption"
+                                                                    sx={{
+                                                                        fontWeight: 800,
+                                                                        fontSize: '0.72rem',
+                                                                        color: isPreviewActive ? '#0F766E' : 'text.secondary',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        gap: 0.5
+                                                                    }}
+                                                                >
+                                                                    {isPreviewActive ? '● Previewing in Phone' : 'Preview Live'}
+                                                                </Typography>
+                                                            </Box>
 
                                                             <Button
                                                                 size="small"
                                                                 variant="contained"
                                                                 startIcon={<WhatsApp sx={{ fontSize: '1rem !important' }} />}
-                                                                onClick={() => {
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
                                                                     const msg = composerMessage || PRESET_BROADCASTS[0].message;
                                                                     dispatchWhatsApp(customer, msg, composerImage, composerTitle);
                                                                 }}
@@ -1325,17 +1382,23 @@ const Marketing = () => {
                                             .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
                                             .map((customer) => {
                                                 const isSelected = selectedCustomerIds.includes(customer.id);
+                                                const isPreviewActive = samplePreviewCustomer?.id === customer.id;
                                                 return (
                                                     <TableRow
                                                         key={customer.id}
                                                         hover
                                                         selected={isSelected}
-                                                        sx={{ cursor: 'pointer' }}
+                                                        onClick={() => setActiveCustomerForPreview(customer)}
+                                                        sx={{
+                                                            cursor: 'pointer',
+                                                            bgcolor: isPreviewActive ? 'rgba(15, 118, 110, 0.06)' : 'inherit'
+                                                        }}
                                                     >
-                                                        <TableCell padding="checkbox">
+                                                        <TableCell padding="checkbox" onClick={(e) => e.stopPropagation()}>
                                                             <Checkbox
                                                                 size="small"
                                                                 checked={isSelected}
+                                                                onClick={(e) => e.stopPropagation()}
                                                                 onChange={(e) => {
                                                                     if (e.target.checked) {
                                                                         setSelectedCustomerIds(prev => [...prev, customer.id]);
@@ -1346,7 +1409,7 @@ const Marketing = () => {
                                                                 sx={{ color: '#0F766E', '&.Mui-checked': { color: '#0F766E' } }}
                                                             />
                                                         </TableCell>
-                                                        <TableCell onClick={() => setActiveCustomerForPreview(customer)}>
+                                                        <TableCell>
                                                             <Typography variant="body2" sx={{ fontWeight: 750, color: '#042F2E' }}>
                                                                 {customer.displayName}
                                                             </Typography>
@@ -1382,7 +1445,8 @@ const Marketing = () => {
                                                                 size="small"
                                                                 variant="contained"
                                                                 startIcon={<WhatsApp />}
-                                                                onClick={() => {
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
                                                                     const msg = composerMessage || PRESET_BROADCASTS[0].message;
                                                                     dispatchWhatsApp(customer, msg, composerImage, composerTitle);
                                                                 }}
@@ -1457,25 +1521,36 @@ const Marketing = () => {
                                 Quick Load Preset Campaign:
                             </Typography>
                             <Stack direction="row" spacing={1} sx={{ overflowX: 'auto', pb: 1.5, '::-webkit-scrollbar': { height: 4 } }}>
-                                {PRESET_BROADCASTS.map((preset, idx) => (
-                                    <Chip
-                                        key={idx}
-                                        label={preset.title.split(' ')[1] || preset.title}
-                                        size="small"
-                                        clickable
-                                        onClick={() => {
-                                            setComposerTitle(preset.title);
-                                            setComposerMessage(preset.message);
-                                        }}
-                                        sx={{
-                                            fontWeight: 700,
-                                            fontSize: '0.72rem',
-                                            bgcolor: 'rgba(15, 118, 110, 0.06)',
-                                            color: '#0F766E',
-                                            '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.15)' }
-                                        }}
-                                    />
-                                ))}
+                                {PRESET_BROADCASTS.map((preset, idx) => {
+                                    const isActive = composerTitle === preset.title;
+                                    return (
+                                        <Chip
+                                            key={idx}
+                                            label={preset.shortTitle || preset.title.split(' ')[1] || preset.title}
+                                            size="small"
+                                            clickable
+                                            onClick={() => {
+                                                setComposerTitle(preset.title);
+                                                setComposerMessage(preset.message);
+                                                if (preset.offerCode) setComposerOfferCode(preset.offerCode);
+                                                showToast(`Loaded ${preset.shortTitle || preset.title} campaign template`, 'info');
+                                            }}
+                                            sx={{
+                                                fontWeight: 800,
+                                                fontSize: '0.74rem',
+                                                bgcolor: isActive ? '#0F766E' : 'rgba(15, 118, 110, 0.08)',
+                                                color: isActive ? '#FFFFFF' : '#0F766E',
+                                                border: '1.5px solid',
+                                                borderColor: isActive ? '#0F766E' : 'transparent',
+                                                boxShadow: isActive ? '0 2px 8px rgba(15, 118, 110, 0.25)' : 'none',
+                                                transition: 'all 0.18s ease',
+                                                '&:hover': {
+                                                    bgcolor: isActive ? '#115E59' : 'rgba(15, 118, 110, 0.16)'
+                                                }
+                                            }}
+                                        />
+                                    );
+                                })}
                             </Stack>
 
                             {/* SMARTPHONE DEVICE CONTAINER */}
@@ -1675,15 +1750,48 @@ const Marketing = () => {
                             </Box>
 
                             {/* Message Input in Preview Sidebar */}
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 2.5, mb: 0.75 }}>
+                                <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary' }}>
+                                    Message Content (Live Editable):
+                                </Typography>
+                                <Button
+                                    size="small"
+                                    onClick={() => {
+                                        const found = PRESET_BROADCASTS.find(p => p.title === composerTitle) || PRESET_BROADCASTS[0];
+                                        setComposerMessage(found.message);
+                                        if (found.offerCode) setComposerOfferCode(found.offerCode);
+                                        showToast('Reset message to original template', 'info');
+                                    }}
+                                    sx={{
+                                        p: 0,
+                                        fontSize: '0.68rem',
+                                        fontWeight: 750,
+                                        textTransform: 'none',
+                                        color: '#0F766E',
+                                        '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' }
+                                    }}
+                                >
+                                    Reset Template
+                                </Button>
+                            </Box>
                             <TextField
                                 fullWidth
                                 multiline
-                                rows={3}
+                                rows={4}
                                 size="small"
-                                placeholder="Edit broadcast message here..."
+                                placeholder="Type or customize your broadcast message here..."
                                 value={composerMessage}
                                 onChange={(e) => setComposerMessage(e.target.value)}
-                                sx={{ mt: 2, '& .MuiOutlinedInput-root': { borderRadius: 2.5 } }}
+                                helperText="Click dynamic tags above to insert. Smartphone preview updates live."
+                                FormHelperTextProps={{ sx: { fontSize: '0.68rem', color: 'text.secondary', mx: 0.5 } }}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: 2.5,
+                                        bgcolor: '#FFFFFF',
+                                        fontSize: '0.82rem',
+                                        lineHeight: 1.45
+                                    }
+                                }}
                             />
 
                             {/* Direct Broadcast to Current Patron */}
