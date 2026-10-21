@@ -1513,17 +1513,34 @@ const Invoices = () => {
                           ₹{inv.total.toLocaleString('en-IN')}
                         </TableCell>
                         <TableCell>
-                          <IconButton
-                            size="small"
-                            onClick={(e) => handleMenuClick(e, inv.id)}
-                            sx={{
-                              color: 'primary.main',
-                              bgcolor: 'action.hover',
-                              '&:hover': { bgcolor: 'primary.light', color: 'primary.contrastText' }
-                            }}
-                          >
-                            <MoreVert fontSize="small" />
-                          </IconButton>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                            <Tooltip title="Send WhatsApp E-Receipt">
+                              <IconButton
+                                size="small"
+                                onClick={() => sendWhatsApp(inv)}
+                                sx={{
+                                  color: '#059669',
+                                  bgcolor: 'rgba(5, 150, 105, 0.08)',
+                                  border: '1px solid rgba(5, 150, 105, 0.25)',
+                                  '&:hover': { bgcolor: 'rgba(5, 150, 105, 0.18)', transform: 'scale(1.05)' },
+                                  transition: 'all 0.15s ease'
+                                }}
+                              >
+                                <WhatsApp sx={{ fontSize: 16 }} />
+                              </IconButton>
+                            </Tooltip>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => handleMenuClick(e, inv.id)}
+                              sx={{
+                                color: 'primary.main',
+                                bgcolor: 'action.hover',
+                                '&:hover': { bgcolor: 'primary.light', color: 'primary.contrastText' }
+                              }}
+                            >
+                              <MoreVert fontSize="small" />
+                            </IconButton>
+                          </Box>
                           <Menu
                             anchorEl={anchorEl}
                             open={Boolean(anchorEl) && selectedInvoiceId === inv.id}
@@ -2251,27 +2268,74 @@ const Invoices = () => {
                 position: { lg: 'sticky' },
                 top: 16
               }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <PaymentsOutlined sx={{ color: '#D97706', fontSize: 20 }} />
-                    <Typography variant="subtitle2" sx={{ fontWeight: 800, letterSpacing: '0.02em', textTransform: 'uppercase', fontSize: '0.78rem' }}>
-                      Settlement & Ledger
-                    </Typography>
+                <Box sx={{ mb: 2 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <PaymentsOutlined sx={{ color: '#0F766E', fontSize: 20 }} />
+                      <Typography variant="subtitle2" sx={{ fontWeight: 800, letterSpacing: '0.02em', textTransform: 'uppercase', fontSize: '0.78rem', color: '#0F766E' }}>
+                        Multi-Tender Settlement Console
+                      </Typography>
+                    </Box>
+                    <Chip 
+                      size="small" 
+                      label={isSplitPayment ? "SPLIT TENDER ACTIVE" : `${paymentMethod.toUpperCase()}`}
+                      sx={{ 
+                        fontWeight: 800, 
+                        fontSize: '0.68rem',
+                        bgcolor: isSplitPayment ? 'rgba(217, 119, 6, 0.12)' : 'rgba(15, 118, 110, 0.12)',
+                        color: isSplitPayment ? '#D97706' : '#0F766E',
+                        border: '1px solid',
+                        borderColor: isSplitPayment ? 'rgba(217, 119, 6, 0.3)' : 'rgba(15, 118, 110, 0.3)'
+                      }} 
+                    />
                   </Box>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={isSplitPayment}
-                        onChange={(e) => {
-                          setIsSplitPayment(e.target.checked);
-                          if (e.target.checked) setSplitAmount(Math.round(total / 2));
-                        }}
-                        size="small"
-                      />
-                    }
-                    label={<Typography variant="caption" sx={{ fontWeight: 700, fontSize: '0.72rem' }}>Split Payment</Typography>}
-                    sx={{ m: 0 }}
-                  />
+
+                  {/* Fast Tender Shortcut Buttons */}
+                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, mb: 2 }}>
+                    {[
+                      { label: '💵 Cash', method: 'Cash', split: false },
+                      { label: '⚡ UPI', method: 'UPI', split: false },
+                      { label: '💳 Card', method: 'Card', split: false },
+                      { label: '⚖️ Split', method: 'Split', split: true }
+                    ].map((tender) => {
+                      const isSelected = tender.split ? isSplitPayment : (!isSplitPayment && paymentMethod === tender.method);
+                      return (
+                        <Button
+                          key={tender.label}
+                          size="small"
+                          variant={isSelected ? 'contained' : 'outlined'}
+                          onClick={() => {
+                            if (tender.split) {
+                              setIsSplitPayment(true);
+                              if (!splitAmount || splitAmount >= total) setSplitAmount(Math.round(total / 2));
+                            } else {
+                              setIsSplitPayment(false);
+                              setPaymentMethod(tender.method);
+                              setPaymentStatus('paid');
+                              setIsEMI(false);
+                            }
+                          }}
+                          sx={{
+                            py: 0.8,
+                            fontSize: '0.74rem',
+                            fontWeight: 800,
+                            borderRadius: '16px',
+                            textTransform: 'none',
+                            bgcolor: isSelected ? '#0F766E' : 'transparent',
+                            color: isSelected ? '#FFFFFF' : '#334155',
+                            borderColor: isSelected ? '#0F766E' : 'rgba(0,0,0,0.12)',
+                            boxShadow: isSelected ? '0 2px 8px rgba(15, 118, 110, 0.25)' : 'none',
+                            '&:hover': {
+                              bgcolor: isSelected ? '#042F2E' : 'rgba(15, 118, 110, 0.06)',
+                              borderColor: '#0F766E'
+                            }
+                          }}
+                        >
+                          {tender.label}
+                        </Button>
+                      );
+                    })}
+                  </Box>
                 </Box>
 
                 {!isSplitPayment ? (
@@ -2299,10 +2363,10 @@ const Invoices = () => {
 
                     {paymentMethod === 'UPI' && (
                       <TextField select label="UPI App / Gateway" value={upiProvider} onChange={(e) => setUpiProvider(e.target.value)} fullWidth size="small">
-                        <MenuItem value="PhonePe">PhonePe</MenuItem>
+                        <MenuItem value="PhonePe">PhonePe Business</MenuItem>
                         <MenuItem value="GPay">Google Pay (GPay)</MenuItem>
-                        <MenuItem value="Paytm">Paytm UPI</MenuItem>
-                        <MenuItem value="BHIM">BHIM / Static QR</MenuItem>
+                        <MenuItem value="Paytm">Paytm Soundbox / QR</MenuItem>
+                        <MenuItem value="BHIM">BHIM / Static Standee QR</MenuItem>
                       </TextField>
                     )}
 
@@ -2336,18 +2400,44 @@ const Invoices = () => {
                   </Box>
                 ) : (
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 2 }}>
+                    {/* Live Split Progress & Quick Adjustment */}
+                    <Box sx={{ 
+                      p: 1.5, 
+                      borderRadius: 2, 
+                      bgcolor: 'rgba(15, 118, 110, 0.05)', 
+                      border: '1px dashed rgba(15, 118, 110, 0.25)' 
+                    }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                          Split Breakdown (Total: ₹{total.toFixed(2)})
+                        </Typography>
+                        <Button 
+                          size="small" 
+                          variant="text" 
+                          onClick={() => setSplitAmount(Math.round(total / 2))}
+                          sx={{ textTransform: 'none', fontSize: '0.7rem', py: 0, px: 0.8, color: '#0F766E', fontWeight: 700 }}
+                        >
+                          50:50 Split
+                        </Button>
+                      </Box>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: '#475569', fontWeight: 600 }}>
+                        <span>Tender 1: <strong style={{ color: '#0F766E' }}>₹{Number(splitAmount || 0).toFixed(2)}</strong></span>
+                        <span>Tender 2: <strong style={{ color: '#D97706' }}>₹{Math.max(0, total - (Number(splitAmount) || 0)).toFixed(2)}</strong></span>
+                      </Box>
+                    </Box>
+
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                      <TextField select label="Method 1" value={paymentMethod} onChange={(e) => {
+                      <TextField select label="Primary Method" value={paymentMethod} onChange={(e) => {
                         setPaymentMethod(e.target.value);
                         if (e.target.value === 'Credit') setPaymentStatus('partial');
                       }} fullWidth size="small">
-                        <MenuItem value="Cash">Cash</MenuItem>
-                        <MenuItem value="Card">Card</MenuItem>
-                        <MenuItem value="UPI">UPI</MenuItem>
-                        <MenuItem value="Credit">Credit</MenuItem>
+                        <MenuItem value="Cash">💵 Cash</MenuItem>
+                        <MenuItem value="Card">💳 Card POS</MenuItem>
+                        <MenuItem value="UPI">⚡ UPI QR</MenuItem>
+                        <MenuItem value="Credit">📋 Credit / Khata</MenuItem>
                       </TextField>
                       <TextField
-                        label="Amount 1 (₹)"
+                        label="Tender 1 Amount (₹)"
                         type="number"
                         value={splitAmount}
                         onChange={(e) => setSplitAmount(parseFloat(e.target.value) || 0)}
@@ -2357,22 +2447,22 @@ const Invoices = () => {
                     </Box>
 
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                      <TextField select label="Method 2" value={paymentMethod2} onChange={(e) => {
+                      <TextField select label="Secondary Method" value={paymentMethod2} onChange={(e) => {
                         setPaymentMethod2(e.target.value);
                         if (e.target.value === 'Credit') setPaymentStatus('partial');
                       }} fullWidth size="small">
-                        <MenuItem value="Cash">Cash</MenuItem>
-                        <MenuItem value="Card">Card</MenuItem>
-                        <MenuItem value="UPI">UPI</MenuItem>
-                        <MenuItem value="Credit">Credit</MenuItem>
+                        <MenuItem value="Cash">💵 Cash</MenuItem>
+                        <MenuItem value="Card">💳 Card POS</MenuItem>
+                        <MenuItem value="UPI">⚡ UPI QR</MenuItem>
+                        <MenuItem value="Credit">📋 Credit / Khata</MenuItem>
                       </TextField>
                       <TextField
-                        label="Amount 2 (₹)"
-                        value={(total - splitAmount).toFixed(2)}
+                        label="Tender 2 Balance (₹)"
+                        value={Math.max(0, total - (Number(splitAmount) || 0)).toFixed(2)}
                         disabled
                         fullWidth
                         size="small"
-                        helperText="Remainder balance"
+                        helperText="Calculated remainder"
                       />
                     </Box>
                   </Box>

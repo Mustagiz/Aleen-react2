@@ -52,6 +52,84 @@ import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import GlassCard from '../components/GlassCard';
 
 
+const SILHOUETTE_CONFIG = {
+  blouse: {
+    label: 'Blouse / Choli',
+    icon: '👚',
+    defaultDesc: 'Designer Bespoke Blouse',
+    fields: [
+      { key: 'bust', label: 'Bust / Chest' },
+      { key: 'underbust', label: 'Underbust' },
+      { key: 'waist', label: 'Blouse Waist' },
+      { key: 'shoulder', label: 'Shoulder' },
+      { key: 'armhole', label: 'Armhole' },
+      { key: 'sleeveLength', label: 'Sleeve Length' },
+      { key: 'sleeveRound', label: 'Sleeve Round' },
+      { key: 'frontNeck', label: 'Front Neck' },
+      { key: 'backNeck', label: 'Back Neck' },
+      { key: 'apexPoint', label: 'Apex / Bust Point' },
+      { key: 'blouseLength', label: 'Blouse Length' }
+    ]
+  },
+  kurti: {
+    label: 'Kurti / Suit',
+    icon: '👗',
+    defaultDesc: 'Bespoke Suit & Kurti Ensemble',
+    fields: [
+      { key: 'bust', label: 'Bust / Chest' },
+      { key: 'waist', label: 'Waist' },
+      { key: 'hip', label: 'Seat / Hip' },
+      { key: 'shoulder', label: 'Shoulder' },
+      { key: 'armhole', label: 'Armhole' },
+      { key: 'sleeveLength', label: 'Sleeve Length' },
+      { key: 'kurtiLength', label: 'Kurti Length' },
+      { key: 'frontNeck', label: 'Front Neck' },
+      { key: 'backNeck', label: 'Back Neck' },
+      { key: 'bottomWaist', label: 'Bottom Waist' },
+      { key: 'bottomLength', label: 'Bottom Length' }
+    ]
+  },
+  lehenga: {
+    label: 'Lehenga / Skirt',
+    icon: '👑',
+    defaultDesc: 'Bridal / Festive Lehenga & Skirt',
+    fields: [
+      { key: 'waist', label: 'Lehenga Waist' },
+      { key: 'hip', label: 'Seat / Hip' },
+      { key: 'length', label: 'Lehenga Length' },
+      { key: 'flare', label: 'Flare / Ghera (m)' },
+      { key: 'blouseBust', label: 'Blouse Bust' },
+      { key: 'blouseWaist', label: 'Blouse Waist' }
+    ]
+  },
+  gown: {
+    label: 'Evening Gown',
+    icon: '✨',
+    defaultDesc: 'Couture Evening Gown',
+    fields: [
+      { key: 'bust', label: 'Bust' },
+      { key: 'underbust', label: 'Underbust' },
+      { key: 'waist', label: 'Natural Waist' },
+      { key: 'hip', label: 'High Hip / Hip' },
+      { key: 'shoulder', label: 'Shoulder' },
+      { key: 'armhole', label: 'Armhole' },
+      { key: 'frontNeck', label: 'Front Neck' },
+      { key: 'floorLength', label: 'Floor Length' }
+    ]
+  },
+  alteration: {
+    label: 'Alteration / Refit',
+    icon: '✂️',
+    defaultDesc: 'Bespoke Garment Alteration & Refit',
+    fields: [
+      { key: 'chestAlt', label: 'Chest In/Out' },
+      { key: 'waistAlt', label: 'Waist Tapering' },
+      { key: 'lengthAlt', label: 'Hemming / Shorten' },
+      { key: 'sleeveAlt', label: 'Sleeve Alteration' }
+    ]
+  }
+};
+
 const KANBAN_COLUMNS = [
   { id: 'intake', label: 'Intake & Specs', icon: <Straighten fontSize="small" />, color: '#64748B' },
   { id: 'cutting', label: 'Cutting & Pattern', icon: <ContentCut fontSize="small" />, color: '#D97706' },
@@ -167,6 +245,8 @@ export default function TailoringKanban() {
   const [search, setSearch] = useState('');
   const [completedSearch, setCompletedSearch] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedSilhouette, setSelectedSilhouette] = useState('blouse');
+  const [measurementData, setMeasurementData] = useState({});
   const [formData, setFormData] = useState({
     customerName: '',
     phone: '+91 ',
@@ -175,9 +255,29 @@ export default function TailoringKanban() {
     targetDate: '',
     tailor: 'Master Rafiq',
     price: '',
+    artisanWage: '',
     advance: '',
     urgent: false
   });
+
+  const handleMeasurementChange = (fieldKey, value) => {
+    const updated = { ...measurementData, [fieldKey]: value };
+    setMeasurementData(updated);
+
+    const config = SILHOUETTE_CONFIG[selectedSilhouette];
+    const parts = (config?.fields || [])
+      .filter(f => updated[f.key] && updated[f.key].toString().trim() !== '')
+      .map(f => `${f.label}: ${updated[f.key]}"`);
+
+    const autoSummary = parts.length > 0 
+      ? `[${config?.label || selectedSilhouette}] ${parts.join(', ')}` 
+      : '';
+    
+    setFormData(prev => ({
+      ...prev,
+      specs: autoSummary
+    }));
+  };
 
   useEffect(() => {
     localStorage.setItem('aleen_tailoring_orders', JSON.stringify(orders));
@@ -257,27 +357,31 @@ export default function TailoringKanban() {
   };
 
   const handleCreateOrder = () => {
-    if (!formData.customerName || !formData.garment) {
-      alert('Please provide customer name and garment type.');
+    if (!formData.customerName) {
+      alert('Please provide customer name.');
       return;
     }
 
+    const defaultGarment = SILHOUETTE_CONFIG[selectedSilhouette]?.defaultDesc || 'Bespoke Garment';
     const newOrder = {
       id: `TLR-${Math.floor(100 + Math.random() * 900)}`,
       customerName: formData.customerName,
       phone: formData.phone,
-      garment: formData.garment,
+      garment: formData.garment || defaultGarment,
+      silhouette: selectedSilhouette,
       specs: formData.specs,
       targetDate: formData.targetDate || new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0],
       tailor: formData.tailor || (tailors[0]?.name || 'Master Tailor'),
       status: 'intake',
       price: parseFloat(formData.price) || 0,
+      artisanWage: parseFloat(formData.artisanWage) || 0,
       advance: parseFloat(formData.advance) || 0,
       urgent: formData.urgent
     };
 
     setOrders(prev => [newOrder, ...prev]);
     setDialogOpen(false);
+    setMeasurementData({});
     setFormData({
       customerName: '',
       phone: '+91 ',
@@ -286,18 +390,28 @@ export default function TailoringKanban() {
       targetDate: '',
       tailor: tailors[0]?.name || '',
       price: '',
+      artisanWage: '',
       advance: '',
       urgent: false
     });
   };
 
-  const sendWhatsAppUpdate = (order) => {
+  const sendWhatsAppUpdate = (order, customType = null) => {
     const cleanPhone = (order.phone || '').replace(/\D/g, '');
     const phone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
-    const isDelivered = order.status === 'delivered';
-    const msgText = isDelivered
-      ? `Hello ${order.customerName}! 🌟 Thank you for trusting Aleen Atelier with your bespoke garment "${order.garment}". It has been successfully completed and handed over. We hope you love the fit and craft!`
-      : `Hello ${order.customerName}, update from Aleen Atelier! 🪡 Your bespoke garment "${order.garment}" status is currently: ${order.status.toUpperCase()}. We are ensuring perfection for your fitting on ${order.targetDate}.`;
+    const type = customType || order.status;
+    
+    let msgText = '';
+    if (type === 'trial' || order.status === 'trial') {
+      msgText = `Dear ${order.customerName}! ✨ Your bespoke creation "${order.garment}" is ready for your exclusive Trial Fitting session at Aleen Atelier. Kindly visit us or reply with your preferred time slot! 🪞`;
+    } else if (type === 'ready' || order.status === 'ready') {
+      const balance = Math.max(0, (order.price || 0) - (order.advance || 0));
+      msgText = `Dear ${order.customerName}! 👗 Splendid news! Your bespoke creation "${order.garment}" has completed final master hand-finishing & steam press, and is ready for pickup at Aleen Atelier. ${balance > 0 ? `Remaining Balance: ₹${balance.toFixed(2)}.` : 'Fully Settled.'} We look forward to seeing you!`;
+    } else if (order.status === 'delivered') {
+      msgText = `Hello ${order.customerName}! 🌟 Thank you for trusting Aleen Atelier with your bespoke garment "${order.garment}". It has been successfully completed and handed over. We hope you love the fit and craft!`;
+    } else {
+      msgText = `Hello ${order.customerName}, craft update from Aleen Atelier! 🪡 Your bespoke garment "${order.garment}" status is currently: ${order.status.toUpperCase()}. Target trial/delivery date: ${order.targetDate}.`;
+    }
 
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msgText)}`, '_blank');
   };
@@ -622,7 +736,7 @@ export default function TailoringKanban() {
                         )}
 
                         {/* Tailor & Meta */}
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.8 }}>
                           <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.secondary', fontWeight: 600 }}>
                             ✂️ {order.tailor || 'Master Tailor'}
                           </Typography>
@@ -630,6 +744,17 @@ export default function TailoringKanban() {
                             ₹{order.price}
                           </Typography>
                         </Box>
+
+                        {order.artisanWage > 0 && (
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1, px: 0.8, py: 0.3, bgcolor: 'rgba(15, 118, 110, 0.05)', borderRadius: 1 }}>
+                            <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.secondary' }}>
+                              Labor: ₹{order.artisanWage}
+                            </Typography>
+                            <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 700, color: '#0F766E' }}>
+                              Margin: ₹{Math.max(0, (order.price || 0) - (order.artisanWage || 0))}
+                            </Typography>
+                          </Box>
+                        )}
 
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
                           <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 700, color: 'text.secondary' }}>
@@ -640,27 +765,69 @@ export default function TailoringKanban() {
                           </Typography>
                         </Box>
 
-                        {/* Quick Delivered Button for Ready phase */}
-                        {order.status === 'ready' && (
+                        {/* Quick Trial Fitting WhatsApp Notification for Trial phase */}
+                        {order.status === 'trial' && (
                           <Button
                             fullWidth
                             size="small"
-                            variant="contained"
-                            startIcon={<CheckCircleOutline sx={{ fontSize: 16 }} />}
-                            onClick={() => markAsDelivered(order.id)}
+                            variant="outlined"
+                            startIcon={<WhatsApp sx={{ fontSize: 15, color: '#25D366' }} />}
+                            onClick={() => sendWhatsAppUpdate(order, 'trial')}
                             sx={{
                               mb: 1.2,
                               py: 0.4,
                               borderRadius: 1.5,
                               fontSize: '0.72rem',
                               fontWeight: 800,
-                              background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                              color: '#ffffff',
-                              boxShadow: '0 2px 8px rgba(5, 150, 105, 0.25)'
+                              color: '#0F766E',
+                              borderColor: 'rgba(15, 118, 110, 0.4)',
+                              '&:hover': { borderColor: '#0F766E', bgcolor: 'rgba(15, 118, 110, 0.06)' }
                             }}
                           >
-                            Mark Delivered
+                            Notify Trial Fitting
                           </Button>
+                        )}
+
+                        {/* Quick Pickup Ready & Delivered Buttons for Ready phase */}
+                        {order.status === 'ready' && (
+                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8, mb: 1.2 }}>
+                            <Button
+                              fullWidth
+                              size="small"
+                              variant="outlined"
+                              startIcon={<WhatsApp sx={{ fontSize: 15, color: '#25D366' }} />}
+                              onClick={() => sendWhatsAppUpdate(order, 'ready')}
+                              sx={{
+                                py: 0.35,
+                                borderRadius: 1.5,
+                                fontSize: '0.72rem',
+                                fontWeight: 800,
+                                color: '#15803D',
+                                borderColor: 'rgba(34, 197, 94, 0.5)',
+                                '&:hover': { borderColor: '#16A34A', bgcolor: 'rgba(34, 197, 94, 0.08)' }
+                              }}
+                            >
+                              Notify Pickup Ready
+                            </Button>
+                            <Button
+                              fullWidth
+                              size="small"
+                              variant="contained"
+                              startIcon={<CheckCircleOutline sx={{ fontSize: 16 }} />}
+                              onClick={() => markAsDelivered(order.id)}
+                              sx={{
+                                py: 0.4,
+                                borderRadius: 1.5,
+                                fontSize: '0.72rem',
+                                fontWeight: 800,
+                                background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                                color: '#ffffff',
+                                boxShadow: '0 2px 8px rgba(5, 150, 105, 0.25)'
+                              }}
+                            >
+                              Mark Delivered
+                            </Button>
+                          </Box>
                         )}
 
                         {/* Card Controls */}
@@ -861,51 +1028,175 @@ export default function TailoringKanban() {
         </TableContainer>
       </GlassCard>
 
-      {/* New Tailoring Job Dialog */}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: 800 }}>Create Bespoke Tailoring Job</DialogTitle>
-        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-          <TextField
-            label="Client Name"
-            fullWidth
-            size="small"
-            value={formData.customerName}
-            onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
-            placeholder="e.g. Saira Banu"
-          />
+      {/* Bespoke Visual Silhouette & Measurement Studio Dialog */}
+      <Dialog 
+        open={dialogOpen} 
+        onClose={() => setDialogOpen(false)} 
+        maxWidth="md" 
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            overflow: 'hidden'
+          }
+        }}
+      >
+        <Box sx={{
+          background: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)',
+          color: '#FFFFFF',
+          p: 2.5,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 800, color: '#FFFFFF', letterSpacing: '0.02em' }}>
+              Bespoke Measurement & Craft Studio
+            </Typography>
+            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.75rem' }}>
+              Precision anatomical silhouette profiling, master tailor allocation & craft labor economics
+            </Typography>
+          </Box>
+          <IconButton size="small" onClick={() => setDialogOpen(false)} sx={{ color: 'rgba(255,255,255,0.8)' }}>
+            <Close fontSize="small" />
+          </IconButton>
+        </Box>
 
-          <TextField
-            label="Client Phone (for WhatsApp)"
-            fullWidth
-            size="small"
-            value={formData.phone}
-            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-          />
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, p: 3 }}>
+          {/* Client Details Row */}
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                label="Client Name"
+                fullWidth
+                size="small"
+                required
+                value={formData.customerName}
+                onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
+                placeholder="e.g. Saira Banu"
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                label="Client Phone (WhatsApp)"
+                fullWidth
+                size="small"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="+91 98765 43210"
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                label="Garment Description"
+                fullWidth
+                size="small"
+                value={formData.garment}
+                onChange={(e) => setFormData({ ...formData, garment: e.target.value })}
+                placeholder={SILHOUETTE_CONFIG[selectedSilhouette]?.defaultDesc || 'e.g. Designer Bridal Blouse'}
+              />
+            </Grid>
+          </Grid>
 
-          <TextField
-            label="Garment Description"
-            fullWidth
-            size="small"
-            value={formData.garment}
-            onChange={(e) => setFormData({ ...formData, garment: e.target.value })}
-            placeholder="e.g. Designer Bridal Blouse with Dori"
-          />
+          {/* Visual Silhouette Selector Pills */}
+          <Box sx={{ p: 2, bgcolor: 'rgba(15, 118, 110, 0.04)', borderRadius: 2.5, border: '1px solid rgba(15, 118, 110, 0.15)' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+              <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#0F766E' }}>
+                Select Anatomical Silhouette Template
+              </Typography>
+              <Chip 
+                size="small" 
+                label={`${SILHOUETTE_CONFIG[selectedSilhouette]?.label} Active`} 
+                sx={{ fontWeight: 800, bgcolor: 'rgba(15, 118, 110, 0.12)', color: '#0F766E', fontSize: '0.68rem' }}
+              />
+            </Box>
 
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(5, 1fr)' }, gap: 1 }}>
+              {Object.entries(SILHOUETTE_CONFIG).map(([key, cfg]) => {
+                const isSelected = selectedSilhouette === key;
+                return (
+                  <Button
+                    key={key}
+                    size="small"
+                    variant={isSelected ? 'contained' : 'outlined'}
+                    onClick={() => {
+                      setSelectedSilhouette(key);
+                      if (!formData.garment) {
+                        setFormData(prev => ({ ...prev, garment: cfg.defaultDesc }));
+                      }
+                    }}
+                    sx={{
+                      py: 1,
+                      px: 1,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: 0.5,
+                      textTransform: 'none',
+                      borderRadius: 2,
+                      bgcolor: isSelected ? '#0F766E' : 'background.paper',
+                      color: isSelected ? '#FFFFFF' : '#334155',
+                      borderColor: isSelected ? '#0F766E' : 'rgba(0,0,0,0.12)',
+                      boxShadow: isSelected ? '0 2px 8px rgba(15, 118, 110, 0.25)' : 'none',
+                      '&:hover': {
+                        bgcolor: isSelected ? '#042F2E' : 'rgba(15, 118, 110, 0.06)',
+                        borderColor: '#0F766E'
+                      }
+                    }}
+                  >
+                    <span style={{ fontSize: '1.25rem' }}>{cfg.icon}</span>
+                    <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.72rem' }}>
+                      {cfg.label}
+                    </Typography>
+                  </Button>
+                );
+              })}
+            </Box>
+
+            {/* Silhouette-Specific Anatomical Measurements Grid */}
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="caption" sx={{ display: 'block', fontWeight: 700, color: 'text.secondary', mb: 1 }}>
+                Precision Anatomical Measurements (Inches ")
+              </Typography>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)', md: 'repeat(4, 1fr)' }, gap: 1.5 }}>
+                {SILHOUETTE_CONFIG[selectedSilhouette]?.fields.map((f) => (
+                  <TextField
+                    key={f.key}
+                    label={f.label}
+                    size="small"
+                    type="number"
+                    value={measurementData[f.key] || ''}
+                    onChange={(e) => handleMeasurementChange(f.key, e.target.value)}
+                    InputProps={{
+                      endAdornment: <InputAdornment position="end"><Typography variant="caption" sx={{ fontWeight: 700 }}>"</Typography></InputAdornment>
+                    }}
+                    sx={{
+                      '& .MuiInputBase-root': { bgcolor: 'background.paper', borderRadius: 1.5 }
+                    }}
+                  />
+                ))}
+              </Box>
+            </Box>
+          </Box>
+
+          {/* Formatted Specs & Hand-Embellishment Notes */}
           <TextField
-            label="Bespoke Measurements & Alteration Specs"
+            label="Bespoke Specifications & Artisan Work Notes"
             fullWidth
             multiline
-            rows={3}
+            rows={2}
             size="small"
             value={formData.specs}
             onChange={(e) => setFormData({ ...formData, specs: e.target.value })}
-            placeholder="Bust: 36, Waist: 29, Armhole: 15, Neck Deep: 8 inches..."
+            placeholder="Anatomical specs will populate automatically above, or type custom artisan requests (e.g. latkan, double padding, princess cut, maggam embroidery)..."
+            helperText="Auto-composed from anatomical profile above. You can freely edit or append bespoke styling instructions."
           />
 
+          {/* Master Tailor Allocation & Timeline */}
           <Grid container spacing={2}>
-            <Grid item xs={6}>
+            <Grid item xs={12} sm={4}>
               <TextField
-                label="Target Delivery Date"
+                label="Target Fitting / Delivery Date"
                 type="date"
                 fullWidth
                 size="small"
@@ -915,7 +1206,7 @@ export default function TailoringKanban() {
               />
             </Grid>
 
-            <Grid item xs={6}>
+            <Grid item xs={12} sm={4}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
                 <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>
                   Assigned Master Tailor
@@ -926,7 +1217,7 @@ export default function TailoringKanban() {
                   onClick={() => setTailorDialogOpen(true)}
                   sx={{ fontSize: '0.72rem', p: 0, minWidth: 'auto', textTransform: 'none', color: '#0F766E', fontWeight: 800 }}
                 >
-                  + Manage Tailors
+                  + Tailors
                 </Button>
               </Box>
               <TextField
@@ -946,46 +1237,87 @@ export default function TailoringKanban() {
                 )}
               </TextField>
             </Grid>
-          </Grid>
 
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
+            <Grid item xs={12} sm={4}>
+              <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mb: 0.5 }}>
+                Atelier Turnaround
+              </Typography>
               <TextField
-                label="Total Craft Price (₹)"
-                type="number"
+                select
                 fullWidth
                 size="small"
-                value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-              />
-            </Grid>
-
-            <Grid item xs={6}>
-              <TextField
-                label="Advance Paid (₹)"
-                type="number"
-                fullWidth
-                size="small"
-                value={formData.advance}
-                onChange={(e) => setFormData({ ...formData, advance: e.target.value })}
-              />
+                value={formData.urgent ? 'yes' : 'no'}
+                onChange={(e) => setFormData({ ...formData, urgent: e.target.value === 'yes' })}
+              >
+                <MenuItem value="no">Standard Atelier (3 - 5 days)</MenuItem>
+                <MenuItem value="yes">⚡ Rush Order (24 - 48 hours)</MenuItem>
+              </TextField>
             </Grid>
           </Grid>
 
-          <TextField
-            select
-            label="Priority / Turnaround"
-            fullWidth
-            size="small"
-            value={formData.urgent ? 'yes' : 'no'}
-            onChange={(e) => setFormData({ ...formData, urgent: e.target.value === 'yes' })}
-          >
-            <MenuItem value="no">Standard Atelier Timeline (3 - 5 days)</MenuItem>
-            <MenuItem value="yes">⚡ Rush Order / Urgent (24 - 48 hours)</MenuItem>
-          </TextField>
+          {/* Craft Financial Economics & Margin Calculation */}
+          <Box sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 2.5, border: '1px solid', borderColor: 'divider' }}>
+            <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#D97706', display: 'block', mb: 1.5 }}>
+              Craft Economics & Piece-Rate Labor Tracking
+            </Typography>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} sm={3}>
+                <TextField
+                  label="Client Craft Price (₹)"
+                  type="number"
+                  fullWidth
+                  size="small"
+                  required
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={3}>
+                <TextField
+                  label="Karigar / Labor Wage (₹)"
+                  type="number"
+                  fullWidth
+                  size="small"
+                  value={formData.artisanWage}
+                  onChange={(e) => setFormData({ ...formData, artisanWage: e.target.value })}
+                  helperText="Master tailor piece rate"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={3}>
+                <TextField
+                  label="Advance Received (₹)"
+                  type="number"
+                  fullWidth
+                  size="small"
+                  value={formData.advance}
+                  onChange={(e) => setFormData({ ...formData, advance: e.target.value })}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={3}>
+                <Box sx={{ 
+                  p: 1.2, 
+                  borderRadius: 2, 
+                  bgcolor: 'rgba(15, 118, 110, 0.08)', 
+                  border: '1px solid rgba(15, 118, 110, 0.2)',
+                  textAlign: 'center'
+                }}>
+                  <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block' }}>
+                    Est. Atelier Gross Margin
+                  </Typography>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#0F766E' }}>
+                    ₹{Math.max(0, (parseFloat(formData.price) || 0) - (parseFloat(formData.artisanWage) || 0)).toFixed(2)}
+                  </Typography>
+                </Box>
+              </Grid>
+            </Grid>
+          </Box>
         </DialogContent>
-        <DialogActions sx={{ p: 2.5 }}>
-          <Button onClick={() => setDialogOpen(false)} sx={{ fontWeight: 700 }}>
+
+        <DialogActions sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider' }}>
+          <Button onClick={() => setDialogOpen(false)} sx={{ fontWeight: 700, color: 'text.secondary' }}>
             Cancel
           </Button>
           <Button
@@ -995,10 +1327,16 @@ export default function TailoringKanban() {
               background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
               color: '#FFFFFF',
               fontWeight: 800,
-              px: 3
+              px: 3.5,
+              py: 1,
+              borderRadius: '24px',
+              boxShadow: '0 4px 12px rgba(15, 118, 110, 0.3)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #042F2E 0%, #021716 100%)'
+              }
             }}
           >
-            Issue Craft Job
+            Issue Bespoke Craft Order
           </Button>
         </DialogActions>
       </Dialog>
