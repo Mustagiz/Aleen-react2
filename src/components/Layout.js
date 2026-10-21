@@ -46,7 +46,8 @@ import {
   ReceiptLong,
   Insights,
   BarChart,
-  FactCheck
+  FactCheck,
+  QrCodeScanner
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
@@ -110,7 +111,8 @@ export default function Layout() {
       items: [
         { text: 'Dashboard', icon: <Dashboard />, path: '/' },
         { text: 'Invoices & Billing', icon: <Receipt />, path: '/invoices' },
-        { text: 'Barcode Studio', icon: <QrCode />, path: '/barcodes' }
+        { text: 'Barcode Studio', icon: <QrCode />, path: '/barcodes' },
+        { text: 'Device', icon: <QrCodeScanner />, path: '/devices' }
       ]
     },
     {
@@ -169,6 +171,7 @@ export default function Layout() {
     if (path === '/purchases') return 'Purchase Orders';
     if (path === '/vendors') return 'Fabric & Vendors';
     if (path === '/barcodes') return 'Barcode Label Studio';
+    if (path === '/devices') return 'Device & Scanner Hub';
     if (path === '/profit-loss') return 'Financial Profit & Loss';
     if (path === '/payment-summary') return 'Cash Ledger & Register';
     if (path === '/expenses') return 'Operating Expenses';

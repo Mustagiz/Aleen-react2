@@ -1,0 +1,1258 @@
+import React, { useState, useEffect, useRef } from 'react';
+import {
+    Box,
+    Typography,
+    Grid,
+    Paper,
+    Button,
+    Chip,
+    TextField,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    IconButton,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Avatar,
+    Tooltip,
+    Alert,
+    Switch,
+    FormControlLabel,
+    InputAdornment,
+    LinearProgress
+} from '@mui/material';
+import {
+    QrCodeScanner,
+    Bluetooth,
+    PhoneAndroid,
+    BatteryChargingFull,
+    Battery90,
+    Battery60,
+    CheckCircle,
+    Warning,
+    Refresh,
+    Delete,
+    VolumeUp,
+    VolumeOff,
+    Close,
+    ContentCopy,
+    Check,
+    Receipt,
+    Inventory as InventoryIcon,
+    Sensors,
+    Speed,
+    LinkOff,
+    Link,
+    PlayArrow
+} from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import { useData } from '../contexts/DataContext';
+import PageHeader from '../components/crm/PageHeader';
+import AtelierKpiCard from '../components/crm/AtelierKpiCard';
+
+// Initial Mock / LocalStorage Device Seed
+const DEFAULT_DEVICES = [
+    {
+        id: 'dev_netum_01',
+        name: 'Netum NT-1228BL Handheld Scanner',
+        type: 'bluetooth_scanner',
+        typeName: 'Bluetooth 2D/QR Scanner',
+        status: 'connected',
+        battery: 88,
+        signalStrength: 95,
+        macAddress: '9C:28:40:B1:A2:18',
+        lastScan: new Date(Date.now() - 1000 * 60 * 3).toISOString(),
+        totalScans: 42
+    },
+    {
+        id: 'dev_phone_bridge_01',
+        name: "Faeez's iPhone 15 Pro (Camera Bridge)",
+        type: 'phone_camera',
+        typeName: 'Smartphone Camera Viewfinder',
+        status: 'connected',
+        battery: 92,
+        signalStrength: 100,
+        macAddress: 'IP: 192.168.1.104 (Local Bridge)',
+        lastScan: new Date(Date.now() - 1000 * 60 * 12).toISOString(),
+        totalScans: 19
+    }
+];
+
+export default function Devices() {
+    const navigate = useNavigate();
+    const { inventory } = useData();
+
+    // Stored paired devices
+    const [devices, setDevices] = useState(() => {
+        const saved = localStorage.getItem('aleen_paired_devices');
+        if (saved) {
+            try { return JSON.parse(saved); } catch (e) { }
+        }
+        return DEFAULT_DEVICES;
+    });
+
+    useEffect(() => {
+        localStorage.setItem('aleen_paired_devices', JSON.stringify(devices));
+    }, [devices]);
+
+    // Modals
+    const [bluetoothModalOpen, setBluetoothModalOpen] = useState(false);
+    const [phoneModalOpen, setPhoneModalOpen] = useState(false);
+    const [customDeviceName, setCustomDeviceName] = useState('');
+    const [customDeviceType, setCustomDeviceType] = useState('bluetooth_scanner');
+    const [isScanningBluetooth, setIsScanningBluetooth] = useState(false);
+    const [bluetoothError, setBluetoothError] = useState('');
+    const [discoveredDevices, setDiscoveredDevices] = useState([]);
+
+    // Scan Test Bench State
+    const [testInput, setTestInput] = useState('');
+    const [lastScannedResult, setLastScannedResult] = useState(null);
+    const [scanHistory, setScanHistory] = useState([
+        {
+            id: 'scan_1',
+            timestamp: new Date(Date.now() - 1000 * 60 * 3).toISOString(),
+            rawCode: 'ALN-SILK-4029',
+            deviceName: 'Netum NT-1228BL Handheld Scanner',
+            deviceType: 'bluetooth_scanner',
+            status: 'matched'
+        },
+        {
+            id: 'scan_2',
+            timestamp: new Date(Date.now() - 1000 * 60 * 12).toISOString(),
+            rawCode: 'ALN-BRIDAL-7021',
+            deviceName: "Faeez's iPhone 15 Pro (Camera Bridge)",
+            deviceType: 'phone_camera',
+            status: 'matched'
+        }
+    ]);
+
+    // Audio & UX Preferences
+    const [soundEnabled, setSoundEnabled] = useState(true);
+    const [autoClear, setAutoClear] = useState(true);
+    const [pulsingDeviceId, setPulsingDeviceId] = useState(null);
+    const [copiedBridgeUrl, setCopiedBridgeUrl] = useState(false);
+
+    const testInputRef = useRef(null);
+
+    // Dynamic pairing token for phone bridge
+    const [pairingToken] = useState(() => 'aleen_' + Math.random().toString(36).substring(2, 8));
+    const bridgeUrl = `${window.location.origin}/mobile-scanner?token=${pairingToken}`;
+    const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(bridgeUrl)}&color=042F2E&bgcolor=FFFFFF`;
+
+    // Web Audio Synthesizer Chime
+    const playScanChime = (type = 'success') => {
+        if (!soundEnabled) return;
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const audioCtx = new AudioContext();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'success') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+                osc.frequency.setValueAtTime(1174.66, audioCtx.currentTime + 0.08); // D6
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.28);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.28);
+            } else {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(320, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.25);
+            }
+        } catch (e) {
+            // Audio context policy fallback
+        }
+    };
+
+    // Process Inbound Barcode / QR
+    const processScan = (rawText, sourceDeviceName = 'Keyboard / HID Scanner', deviceType = 'bluetooth_scanner') => {
+        const code = rawText.trim();
+        if (!code) return;
+
+        // Try lookup in catalog
+        const lower = code.toLowerCase();
+        let matched = inventory.find(i => 
+            (i.id && String(i.id).toLowerCase() === lower) ||
+            (i.productId && i.productId.toLowerCase() === lower) ||
+            (i.name && i.name.toLowerCase().includes(lower))
+        );
+
+        if (!matched) {
+            // Check variants
+            for (const item of inventory) {
+                if (item.variants && Array.isArray(item.variants)) {
+                    const v = item.variants.find(varItem => varItem.sku && varItem.sku.toLowerCase() === lower);
+                    if (v) {
+                        matched = { ...item, matchedVariant: v };
+                        break;
+                    }
+                }
+            }
+        }
+
+        const scanEntry = {
+            id: 'scan_' + Date.now(),
+            timestamp: new Date().toISOString(),
+            rawCode: code,
+            deviceName: sourceDeviceName,
+            deviceType: deviceType,
+            status: matched ? 'matched' : 'unrecognized',
+            product: matched || null
+        };
+
+        if (matched) {
+            playScanChime('success');
+            setLastScannedResult({ status: 'found', item: matched, rawCode: code });
+        } else {
+            playScanChime('error');
+            setLastScannedResult({ status: 'not_found', rawCode: code });
+        }
+
+        setScanHistory(prev => [scanEntry, ...prev.slice(0, 19)]);
+
+        // Update device scan count
+        setDevices(prev => prev.map(d => {
+            if (d.name === sourceDeviceName || d.type === deviceType) {
+                return {
+                    ...d,
+                    lastScan: new Date().toISOString(),
+                    totalScans: (d.totalScans || 0) + 1
+                };
+            }
+            return d;
+        }));
+
+        if (autoClear) {
+            setTestInput('');
+        }
+    };
+
+    // Bluetooth Discovery trigger
+    const startBluetoothDiscovery = async () => {
+        setIsScanningBluetooth(true);
+        setBluetoothError('');
+        setDiscoveredDevices([]);
+
+        if (navigator.bluetooth) {
+            try {
+                const device = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: ['battery_service', 'device_information']
+                });
+
+                if (device) {
+                    const newDev = {
+                        id: 'dev_bt_' + Date.now(),
+                        name: device.name || 'Bluetooth Barcode Scanner',
+                        type: 'bluetooth_scanner',
+                        typeName: 'Bluetooth 2D/QR Scanner',
+                        status: 'connected',
+                        battery: 90,
+                        signalStrength: 98,
+                        macAddress: device.id ? device.id.slice(0, 17) : 'BT-CONNECTED',
+                        lastScan: new Date().toISOString(),
+                        totalScans: 0
+                    };
+                    setDevices(prev => [newDev, ...prev]);
+                    setIsScanningBluetooth(false);
+                    setBluetoothModalOpen(false);
+                    playScanChime('success');
+                    return;
+                }
+            } catch (err) {
+                if (err.name !== 'NotFoundError') {
+                    setBluetoothError(err.message || 'Bluetooth connection failed.');
+                }
+            }
+        }
+
+        // Simulated scanner discovery if browser blocks or for quick demo pairing
+        setTimeout(() => {
+            setDiscoveredDevices([
+                {
+                    name: 'Netum 2D Wireless Barcode Reader',
+                    model: 'NT-1228BL',
+                    rssi: -58,
+                    type: 'bluetooth_scanner'
+                },
+                {
+                    name: 'Eyoyo Bluetooth Wearable Ring Scanner',
+                    model: 'EY-022',
+                    rssi: -64,
+                    type: 'bluetooth_scanner'
+                },
+                {
+                    name: 'Inateck Pro 2D Imager Gun',
+                    model: 'BCST-70',
+                    rssi: -72,
+                    type: 'bluetooth_scanner'
+                }
+            ]);
+            setIsScanningBluetooth(false);
+        }, 1200);
+    };
+
+    const addDiscoveredDevice = (disc) => {
+        const newDev = {
+            id: 'dev_' + Date.now(),
+            name: disc.name,
+            type: disc.type,
+            typeName: 'Bluetooth 2D/QR Scanner',
+            status: 'connected',
+            battery: Math.floor(Math.random() * 20) + 80,
+            signalStrength: Math.abs(disc.rssi) < 60 ? 98 : 88,
+            macAddress: 'BT:' + Math.random().toString(36).substring(2, 6).toUpperCase() + ':' + Math.random().toString(36).substring(2, 6).toUpperCase(),
+            lastScan: new Date().toISOString(),
+            totalScans: 0
+        };
+        setDevices(prev => [newDev, ...prev]);
+        setBluetoothModalOpen(false);
+        playScanChime('success');
+    };
+
+    const handleAddCustomDevice = () => {
+        if (!customDeviceName.trim()) return;
+        const newDev = {
+            id: 'dev_custom_' + Date.now(),
+            name: customDeviceName.trim(),
+            type: customDeviceType,
+            typeName: customDeviceType === 'phone_camera' ? 'Smartphone Camera Viewfinder' : 'Bluetooth 2D/QR Scanner',
+            status: 'connected',
+            battery: 100,
+            signalStrength: 95,
+            macAddress: 'MANUAL-PAIR-' + Math.floor(Math.random() * 900 + 100),
+            lastScan: new Date().toISOString(),
+            totalScans: 0
+        };
+        setDevices(prev => [newDev, ...prev]);
+        setCustomDeviceName('');
+        setBluetoothModalOpen(false);
+        playScanChime('success');
+    };
+
+    const toggleDeviceConnection = (id) => {
+        setDevices(prev => prev.map(d => {
+            if (d.id === id) {
+                const nextStatus = d.status === 'connected' ? 'disconnected' : 'connected';
+                return { ...d, status: nextStatus };
+            }
+            return d;
+        }));
+    };
+
+    const testDeviceBeep = (device) => {
+        setPulsingDeviceId(device.id);
+        playScanChime('success');
+        setTimeout(() => setPulsingDeviceId(null), 1200);
+    };
+
+    const removeDevice = (id) => {
+        if (window.confirm('Are you sure you want to unpair this scanner device?')) {
+            setDevices(prev => prev.filter(d => d.id !== id));
+        }
+    };
+
+    // Trigger simulated scan from Phone Camera Bridge
+    const simulatePhoneScan = () => {
+        // Pick an inventory item or default
+        const sample = inventory.length > 0 ? inventory[0] : null;
+        const sampleCode = sample?.productId || sample?.id || 'ALN-SILK-4029';
+        processScan(String(sampleCode), "Faeez's iPhone 15 Pro (Camera Bridge)", 'phone_camera');
+    };
+
+    // KPI Calculations
+    const activeBluetoothScanners = devices.filter(d => d.type === 'bluetooth_scanner' && d.status === 'connected').length;
+    const activePhoneBridges = devices.filter(d => d.type === 'phone_camera' && d.status === 'connected').length;
+    const totalScansProcessed = scanHistory.length;
+
+    return (
+        <Box sx={{ maxWidth: 1400, mx: 'auto', p: { xs: 2, md: 3 } }}>
+            {/* Page Header */}
+            <PageHeader
+                title="Device & Scanner Hub"
+                subtitle="Pair wireless Bluetooth QR scanners, connect smartphone camera bridges, and monitor hardware telemetry"
+                actions={
+                    <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+                        <Button
+                            variant="outlined"
+                            startIcon={<PhoneAndroid />}
+                            onClick={() => setPhoneModalOpen(true)}
+                            sx={{
+                                borderColor: '#D97706',
+                                color: '#D97706',
+                                borderRadius: 2.5,
+                                fontWeight: 700,
+                                textTransform: 'none',
+                                px: 2.5,
+                                '&:hover': { borderColor: '#B45309', bgcolor: 'rgba(217, 119, 6, 0.06)' }
+                            }}
+                        >
+                            Connect Phone Camera
+                        </Button>
+                        <Button
+                            variant="contained"
+                            startIcon={<Bluetooth />}
+                            onClick={() => {
+                                setBluetoothModalOpen(true);
+                                startBluetoothDiscovery();
+                            }}
+                            sx={{
+                                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                                color: '#FFFFFF',
+                                borderRadius: 2.5,
+                                fontWeight: 700,
+                                textTransform: 'none',
+                                px: 3,
+                                boxShadow: '0 4px 14px rgba(15, 118, 110, 0.25)',
+                                '&:hover': {
+                                    background: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)'
+                                }
+                            }}
+                        >
+                            + Pair Bluetooth Device
+                        </Button>
+                    </Box>
+                }
+            />
+
+            {/* 4 Atelier Intelligence KPIs */}
+            <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
+                <Grid item xs={12} sm={6} md={3}>
+                    <AtelierKpiCard
+                        title="Bluetooth Scanners"
+                        value={`${activeBluetoothScanners} Active`}
+                        subtitle={`${devices.filter(d => d.type === 'bluetooth_scanner').length} total hardware scanners registered`}
+                        icon={<QrCodeScanner />}
+                        color="primary"
+                        delta={{
+                            text: `${activeBluetoothScanners > 0 ? 'Online' : 'Offline'}`,
+                            isPositive: activeBluetoothScanners > 0
+                        }}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                    <AtelierKpiCard
+                        title="Phone Camera Bridges"
+                        value={`${activePhoneBridges} Connected`}
+                        subtitle="Smartphones linked as wireless viewfinders"
+                        icon={<PhoneAndroid />}
+                        color="warning"
+                    />
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                    <AtelierKpiCard
+                        title="Scan Engine Status"
+                        value="Listening"
+                        subtitle="Web Bluetooth & Camera Engine Live"
+                        icon={<Sensors />}
+                        color="success"
+                    />
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                    <AtelierKpiCard
+                        title="Session Scans"
+                        value={totalScansProcessed.toLocaleString()}
+                        subtitle="Items verified in current workstation session"
+                        icon={<Speed />}
+                        color="primary"
+                    />
+                </Grid>
+            </Grid>
+
+            {/* Grid Layout: Left = Connected Devices, Right = Interactive Test Bench */}
+            <Grid container spacing={3} sx={{ mb: 3.5 }}>
+                {/* LEFT: Paired Hardware & Mobile Viewfinders */}
+                <Grid item xs={12} lg={7}>
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: 3,
+                            borderRadius: 3.5,
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            height: '100%',
+                            boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+                        }}
+                    >
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5 }}>
+                            <Box>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                                    Paired Devices & Scanners ({devices.length})
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                    Manage physical handheld scanners and wireless smartphone camera bridges
+                                </Typography>
+                            </Box>
+                            <Button
+                                size="small"
+                                startIcon={<Refresh />}
+                                onClick={() => setDevices([...devices])}
+                                sx={{ textTransform: 'none', fontWeight: 700, color: '#0F766E' }}
+                            >
+                                Refresh Telemetry
+                            </Button>
+                        </Box>
+
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            {devices.map((device) => {
+                                const isConnected = device.status === 'connected';
+                                const isPulsing = pulsingDeviceId === device.id;
+
+                                return (
+                                    <Paper
+                                        key={device.id}
+                                        elevation={0}
+                                        sx={{
+                                            p: 2.5,
+                                            borderRadius: 3,
+                                            border: '1px solid',
+                                            borderColor: isConnected ? (isPulsing ? '#D97706' : '#0F766E') : 'divider',
+                                            bgcolor: isConnected ? 'background.paper' : 'rgba(0,0,0,0.02)',
+                                            transition: 'all 0.3s ease',
+                                            transform: isPulsing ? 'scale(1.02)' : 'none',
+                                            boxShadow: isPulsing ? '0 0 16px rgba(217, 119, 6, 0.35)' : 'none'
+                                        }}
+                                    >
+                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 2 }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                <Avatar
+                                                    sx={{
+                                                        width: 46,
+                                                        height: 46,
+                                                        bgcolor: isConnected 
+                                                            ? (device.type === 'phone_camera' ? 'rgba(217, 119, 6, 0.12)' : 'rgba(15, 118, 110, 0.12)')
+                                                            : 'rgba(0,0,0,0.06)',
+                                                        color: isConnected 
+                                                            ? (device.type === 'phone_camera' ? '#D97706' : '#0F766E')
+                                                            : 'text.secondary'
+                                                    }}
+                                                >
+                                                    {device.type === 'phone_camera' ? <PhoneAndroid /> : <QrCodeScanner />}
+                                                </Avatar>
+                                                <Box>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <Typography variant="body1" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                                                            {device.name}
+                                                        </Typography>
+                                                        <Chip
+                                                            label={isConnected ? 'Live' : 'Offline'}
+                                                            size="small"
+                                                            sx={{
+                                                                height: 20,
+                                                                fontSize: '0.68rem',
+                                                                fontWeight: 800,
+                                                                bgcolor: isConnected ? 'rgba(15, 118, 110, 0.1)' : 'rgba(0,0,0,0.08)',
+                                                                color: isConnected ? '#0F766E' : 'text.secondary'
+                                                            }}
+                                                        />
+                                                    </Box>
+                                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                                        {device.typeName} • {device.macAddress}
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
+
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                {/* Battery Meter */}
+                                                <Tooltip title={`Battery: ${device.battery}%`}>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, bgcolor: 'rgba(0,0,0,0.04)', px: 1, py: 0.5, borderRadius: 2 }}>
+                                                        {device.battery > 80 ? (
+                                                            <Battery90 sx={{ fontSize: 16, color: '#059669' }} />
+                                                        ) : device.battery > 50 ? (
+                                                            <Battery60 sx={{ fontSize: 16, color: '#D97706' }} />
+                                                        ) : (
+                                                            <BatteryChargingFull sx={{ fontSize: 16, color: '#DC2626' }} />
+                                                        )}
+                                                        <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                                                            {device.battery}%
+                                                        </Typography>
+                                                    </Box>
+                                                </Tooltip>
+                                            </Box>
+                                        </Box>
+
+                                        {/* Telemetry Row & Actions */}
+                                        <Box sx={{ mt: 2, pt: 1.5, borderTop: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1.5 }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                <Typography variant="caption" color="text.secondary">
+                                                    Signal: <strong>{device.signalStrength}%</strong>
+                                                </Typography>
+                                                <Typography variant="caption" color="text.secondary">
+                                                    Lifetime Scans: <strong>{device.totalScans || 0}</strong>
+                                                </Typography>
+                                            </Box>
+
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                {device.type === 'phone_camera' && isConnected && (
+                                                    <Button
+                                                        size="small"
+                                                        variant="outlined"
+                                                        startIcon={<PlayArrow />}
+                                                        onClick={simulatePhoneScan}
+                                                        sx={{
+                                                            fontSize: '0.74rem',
+                                                            py: 0.4,
+                                                            px: 1.5,
+                                                            borderRadius: 2,
+                                                            textTransform: 'none',
+                                                            fontWeight: 700,
+                                                            borderColor: '#D97706',
+                                                            color: '#D97706'
+                                                        }}
+                                                    >
+                                                        Simulate Scan
+                                                    </Button>
+                                                )}
+                                                <Tooltip title="Test Scanner Audio Chime & Signal">
+                                                    <Button
+                                                        size="small"
+                                                        variant="outlined"
+                                                        onClick={() => testDeviceBeep(device)}
+                                                        sx={{
+                                                            fontSize: '0.74rem',
+                                                            py: 0.4,
+                                                            px: 1.5,
+                                                            borderRadius: 2,
+                                                            textTransform: 'none',
+                                                            fontWeight: 700,
+                                                            borderColor: 'divider',
+                                                            color: 'text.primary'
+                                                        }}
+                                                    >
+                                                        Test Signal
+                                                    </Button>
+                                                </Tooltip>
+                                                <Tooltip title={isConnected ? 'Disconnect device' : 'Reconnect device'}>
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => toggleDeviceConnection(device.id)}
+                                                        sx={{ color: isConnected ? '#0F766E' : 'text.secondary' }}
+                                                    >
+                                                        {isConnected ? <Link /> : <LinkOff />}
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="Unpair Device">
+                                                    <IconButton
+                                                        size="small"
+                                                        color="error"
+                                                        onClick={() => removeDevice(device.id)}
+                                                    >
+                                                        <Delete fontSize="small" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </Box>
+                                        </Box>
+                                    </Paper>
+                                );
+                            })}
+
+                            {devices.length === 0 && (
+                                <Box sx={{ py: 6, textAlign: 'center', color: 'text.secondary' }}>
+                                    <QrCodeScanner sx={{ fontSize: 48, opacity: 0.3, mb: 1 }} />
+                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                        No scanning devices registered yet.
+                                    </Typography>
+                                    <Typography variant="caption">
+                                        Click "+ Pair Bluetooth Device" or "Connect Phone Camera" above to get started.
+                                    </Typography>
+                                </Box>
+                            )}
+                        </Box>
+                    </Paper>
+                </Grid>
+
+                {/* RIGHT: Live Scan Test Bench & Catalog Lookup */}
+                <Grid item xs={12} lg={5}>
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: 3,
+                            borderRadius: 3.5,
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            height: '100%',
+                            boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }}
+                    >
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                            <Box>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                                    Interactive Scan Test Bench
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                    Aim any scanner here to test barcode resolution in real-time
+                                </Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <FormControlLabel
+                                    control={
+                                        <Switch
+                                            size="small"
+                                            checked={autoClear}
+                                            onChange={(e) => setAutoClear(e.target.checked)}
+                                            sx={{
+                                                '& .MuiSwitch-switchBase.Mui-checked': {
+                                                    color: '#0F766E',
+                                                    '& + .MuiSwitch-track': {
+                                                        backgroundColor: '#0F766E',
+                                                    },
+                                                },
+                                            }}
+                                        />
+                                    }
+                                    label={<Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>Auto-clear</Typography>}
+                                    sx={{ m: 0 }}
+                                />
+                                <Tooltip title={soundEnabled ? 'Scanner sound ON' : 'Scanner sound MUTED'}>
+                                    <IconButton
+                                        size="small"
+                                        onClick={() => setSoundEnabled(!soundEnabled)}
+                                        sx={{ color: soundEnabled ? '#0F766E' : 'text.secondary' }}
+                                    >
+                                        {soundEnabled ? <VolumeUp fontSize="small" /> : <VolumeOff fontSize="small" />}
+                                    </IconButton>
+                                </Tooltip>
+                            </Box>
+                        </Box>
+
+                        {/* Scanner Live Input */}
+                        <Box sx={{ mb: 2.5 }}>
+                            <TextField
+                                fullWidth
+                                autoFocus
+                                inputRef={testInputRef}
+                                label="Scanner Input Receiver"
+                                placeholder="Scan tag or type SKU (e.g. ALN-SILK-4029)..."
+                                value={testInput}
+                                onChange={(e) => setTestInput(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        processScan(testInput);
+                                    }
+                                }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <QrCodeScanner sx={{ color: '#0F766E' }} />
+                                        </InputAdornment>
+                                    ),
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <Button
+                                                size="small"
+                                                variant="contained"
+                                                onClick={() => processScan(testInput)}
+                                                sx={{
+                                                    textTransform: 'none',
+                                                    fontWeight: 700,
+                                                    borderRadius: 2,
+                                                    bgcolor: '#0F766E',
+                                                    '&:hover': { bgcolor: '#042F2E' }
+                                                }}
+                                            >
+                                                Test
+                                            </Button>
+                                        </InputAdornment>
+                                    )
+                                }}
+                                helperText="Scanners configured with auto-enter will verify automatically."
+                            />
+                        </Box>
+
+                        {/* Scan Result Card */}
+                        <Box sx={{ mb: 2.5 }}>
+                            {lastScannedResult?.status === 'found' ? (
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        p: 2.5,
+                                        borderRadius: 3,
+                                        bgcolor: 'rgba(15, 118, 110, 0.05)',
+                                        border: '1px solid rgba(15, 118, 110, 0.25)'
+                                    }}
+                                >
+                                    <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 1.5 }}>
+                                        <Box>
+                                            <Chip
+                                                icon={<CheckCircle sx={{ fontSize: '14px !important', color: '#059669' }} />}
+                                                label="Catalog Match Verified ✓"
+                                                size="small"
+                                                sx={{ bgcolor: 'rgba(5, 150, 105, 0.1)', color: '#059669', fontWeight: 800, mb: 1 }}
+                                            />
+                                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                                                {lastScannedResult.item.name}
+                                            </Typography>
+                                            <Typography variant="caption" color="text.secondary">
+                                                Code: {lastScannedResult.rawCode} • Category: {lastScannedResult.item.category || 'Couture'}
+                                            </Typography>
+                                        </Box>
+                                        <Typography variant="h6" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                                            ₹{lastScannedResult.item.price?.toLocaleString('en-IN')}
+                                        </Typography>
+                                    </Box>
+
+                                    <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+                                        <Button
+                                            size="small"
+                                            variant="contained"
+                                            startIcon={<Receipt />}
+                                            onClick={() => navigate('/invoices')}
+                                            sx={{
+                                                flex: 1,
+                                                borderRadius: 2,
+                                                fontWeight: 700,
+                                                textTransform: 'none',
+                                                bgcolor: '#0F766E',
+                                                '&:hover': { bgcolor: '#042F2E' }
+                                            }}
+                                        >
+                                            Ring Up in Billing
+                                        </Button>
+                                        <Button
+                                            size="small"
+                                            variant="outlined"
+                                            startIcon={<InventoryIcon />}
+                                            onClick={() => navigate('/inventory')}
+                                            sx={{
+                                                flex: 1,
+                                                borderRadius: 2,
+                                                fontWeight: 700,
+                                                textTransform: 'none',
+                                                borderColor: 'divider',
+                                                color: 'text.primary'
+                                            }}
+                                        >
+                                            View Stock
+                                        </Button>
+                                    </Box>
+                                </Paper>
+                            ) : lastScannedResult?.status === 'not_found' ? (
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        p: 2,
+                                        borderRadius: 2.5,
+                                        bgcolor: 'rgba(220, 38, 38, 0.05)',
+                                        border: '1px solid rgba(220, 38, 38, 0.2)'
+                                    }}
+                                >
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Warning sx={{ color: '#DC2626' }} />
+                                        <Box>
+                                            <Typography variant="body2" sx={{ fontWeight: 800, color: '#DC2626' }}>
+                                                Unknown Barcode: "{lastScannedResult.rawCode}"
+                                            </Typography>
+                                            <Typography variant="caption" color="text.secondary">
+                                                This barcode is not mapped to any active item in the inventory catalog.
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                </Paper>
+                            ) : (
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        p: 3,
+                                        borderRadius: 2.5,
+                                        bgcolor: 'rgba(0,0,0,0.02)',
+                                        border: '1px dashed',
+                                        borderColor: 'divider',
+                                        textAlign: 'center'
+                                    }}
+                                >
+                                    <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                                        Ready for scan. Pull the scanner trigger or scan via phone.
+                                    </Typography>
+                                </Paper>
+                            )}
+                        </Box>
+
+                        {/* Recent Scan History */}
+                        <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                                <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', color: 'text.secondary', letterSpacing: '0.05em' }}>
+                                    Recent Workstation Scan Log
+                                </Typography>
+                                {scanHistory.length > 0 && (
+                                    <Button
+                                        size="small"
+                                        onClick={() => setScanHistory([])}
+                                        sx={{ fontSize: '0.7rem', color: 'text.secondary', textTransform: 'none' }}
+                                    >
+                                        Clear Log
+                                    </Button>
+                                )}
+                            </Box>
+
+                            <TableContainer sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, maxHeight: 220 }}>
+                                <Table size="small">
+                                    <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
+                                        <TableRow>
+                                            <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem' }}>Timestamp</TableCell>
+                                            <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem' }}>Barcode / QR</TableCell>
+                                            <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem' }}>Scanner</TableCell>
+                                            <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem' }} align="right">Status</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {scanHistory.map((scan) => (
+                                            <TableRow key={scan.id} hover>
+                                                <TableCell sx={{ fontSize: '0.72rem', color: 'text.secondary' }}>
+                                                    {new Date(scan.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                                </TableCell>
+                                                <TableCell sx={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.75rem' }}>
+                                                    {scan.rawCode}
+                                                </TableCell>
+                                                <TableCell sx={{ fontSize: '0.72rem' }}>
+                                                    {scan.deviceType === 'phone_camera' ? '📱 Mobile' : '🔫 Scanner'}
+                                                </TableCell>
+                                                <TableCell align="right">
+                                                    <Chip
+                                                        label={scan.status === 'matched' ? 'Found' : 'Unmapped'}
+                                                        size="small"
+                                                        sx={{
+                                                            height: 18,
+                                                            fontSize: '0.62rem',
+                                                            fontWeight: 800,
+                                                            bgcolor: scan.status === 'matched' ? 'rgba(5, 150, 105, 0.1)' : 'rgba(220, 38, 38, 0.1)',
+                                                            color: scan.status === 'matched' ? '#059669' : '#DC2626'
+                                                        }}
+                                                    />
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </Box>
+                    </Paper>
+                </Grid>
+            </Grid>
+
+            {/* MODAL 1: Connect Bluetooth Handheld Scanner */}
+            <Dialog
+                open={bluetoothModalOpen}
+                onClose={() => setBluetoothModalOpen(false)}
+                maxWidth="sm"
+                fullWidth
+                PaperProps={{ sx: { borderRadius: 4 } }}
+            >
+                <DialogTitle sx={{
+                    fontWeight: 800,
+                    bgcolor: 'rgba(15, 118, 110, 0.04)',
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                    color: '#042F2E',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Bluetooth sx={{ color: '#0F766E' }} /> Pair Bluetooth Barcode & QR Scanner
+                    </Box>
+                    <IconButton size="small" onClick={() => setBluetoothModalOpen(false)}>
+                        <Close fontSize="small" />
+                    </IconButton>
+                </DialogTitle>
+                <DialogContent sx={{ pt: 2.5 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                        Ensure your Bluetooth scanner is in pairing / discovery mode. Most scanners have a "Bluetooth HID Pairing" barcode in their user manual.
+                    </Typography>
+
+                    {isScanningBluetooth && (
+                        <Box sx={{ mb: 2.5 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
+                                <Typography variant="caption" sx={{ fontWeight: 700, color: '#0F766E' }}>
+                                    Scanning for nearby Bluetooth devices...
+                                </Typography>
+                            </Box>
+                            <LinearProgress sx={{ borderRadius: 2, height: 6, bgcolor: 'rgba(15, 118, 110, 0.1)', '& .MuiLinearProgress-bar': { bgcolor: '#0F766E' } }} />
+                        </Box>
+                    )}
+
+                    {bluetoothError && (
+                        <Alert severity="info" sx={{ mb: 2, borderRadius: 2 }}>
+                            {bluetoothError}
+                        </Alert>
+                    )}
+
+                    {/* Discovered Device List */}
+                    {discoveredDevices.length > 0 && (
+                        <Box sx={{ mb: 3 }}>
+                            <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', color: 'text.secondary', display: 'block', mb: 1 }}>
+                                Available Scanners Found:
+                            </Typography>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                {discoveredDevices.map((disc, idx) => (
+                                    <Paper
+                                        key={idx}
+                                        elevation={0}
+                                        sx={{
+                                            p: 1.5,
+                                            borderRadius: 2,
+                                            border: '1px solid',
+                                            borderColor: 'divider',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.04)', borderColor: '#0F766E' }
+                                        }}
+                                    >
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                            <Avatar sx={{ width: 34, height: 34, bgcolor: '#0F766E' }}>
+                                                <Bluetooth sx={{ fontSize: 18 }} />
+                                            </Avatar>
+                                            <Box>
+                                                <Typography variant="body2" sx={{ fontWeight: 750 }}>
+                                                    {disc.name}
+                                                </Typography>
+                                                <Typography variant="caption" color="text.secondary">
+                                                    Model: {disc.model} • Signal: {disc.rssi} dBm
+                                                </Typography>
+                                            </Box>
+                                        </Box>
+                                        <Button
+                                            size="small"
+                                            variant="contained"
+                                            onClick={() => addDiscoveredDevice(disc)}
+                                            sx={{
+                                                borderRadius: 2,
+                                                fontWeight: 700,
+                                                textTransform: 'none',
+                                                bgcolor: '#0F766E',
+                                                '&:hover': { bgcolor: '#042F2E' }
+                                            }}
+                                        >
+                                            Connect
+                                        </Button>
+                                    </Paper>
+                                ))}
+                            </Box>
+                        </Box>
+                    )}
+
+                    {/* Manual / HID Scanner Registration */}
+                    <Box sx={{ p: 2, borderRadius: 2.5, bgcolor: 'rgba(0,0,0,0.02)', border: '1px solid', borderColor: 'divider' }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1, color: '#042F2E' }}>
+                            Or Register Scanner Profile Manually:
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 1, mb: 1.5 }}>
+                            <Button
+                                size="small"
+                                variant={customDeviceType === 'bluetooth_scanner' ? 'contained' : 'outlined'}
+                                onClick={() => setCustomDeviceType('bluetooth_scanner')}
+                                sx={{
+                                    textTransform: 'none',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 700,
+                                    borderRadius: 2,
+                                    bgcolor: customDeviceType === 'bluetooth_scanner' ? '#0F766E' : 'transparent',
+                                    borderColor: '#0F766E',
+                                    color: customDeviceType === 'bluetooth_scanner' ? '#fff' : '#0F766E',
+                                    '&:hover': {
+                                        bgcolor: customDeviceType === 'bluetooth_scanner' ? '#042F2E' : 'rgba(15, 118, 110, 0.08)'
+                                    }
+                                }}
+                            >
+                                Bluetooth Scanner
+                            </Button>
+                            <Button
+                                size="small"
+                                variant={customDeviceType === 'phone_camera' ? 'contained' : 'outlined'}
+                                onClick={() => setCustomDeviceType('phone_camera')}
+                                sx={{
+                                    textTransform: 'none',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 700,
+                                    borderRadius: 2,
+                                    bgcolor: customDeviceType === 'phone_camera' ? '#D97706' : 'transparent',
+                                    borderColor: '#D97706',
+                                    color: customDeviceType === 'phone_camera' ? '#fff' : '#D97706',
+                                    '&:hover': {
+                                        bgcolor: customDeviceType === 'phone_camera' ? '#B45309' : 'rgba(217, 119, 6, 0.08)'
+                                    }
+                                }}
+                            >
+                                Phone Camera
+                            </Button>
+                        </Box>
+                        <TextField
+                            fullWidth
+                            size="small"
+                            label="Scanner Name / Model *"
+                            placeholder="e.g. Eyoyo Ring Scanner, Netum 2D Gun"
+                            value={customDeviceName}
+                            onChange={(e) => setCustomDeviceName(e.target.value)}
+                            sx={{ mb: 1.5 }}
+                        />
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            disabled={!customDeviceName.trim()}
+                            onClick={handleAddCustomDevice}
+                            sx={{
+                                borderRadius: 2,
+                                fontWeight: 700,
+                                textTransform: 'none',
+                                borderColor: '#0F766E',
+                                color: '#0F766E'
+                            }}
+                        >
+                            + Add Device to Workstation
+                        </Button>
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider' }}>
+                    <Button onClick={() => setBluetoothModalOpen(false)} sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                        Close
+                    </Button>
+                    <Button
+                        variant="contained"
+                        startIcon={<Refresh />}
+                        onClick={startBluetoothDiscovery}
+                        sx={{
+                            borderRadius: 2.5,
+                            fontWeight: 700,
+                            textTransform: 'none',
+                            bgcolor: '#0F766E',
+                            '&:hover': { bgcolor: '#042F2E' }
+                        }}
+                    >
+                        Re-Scan
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* MODAL 2: Connect Mobile Phone Camera Viewfinder Bridge */}
+            <Dialog
+                open={phoneModalOpen}
+                onClose={() => setPhoneModalOpen(false)}
+                maxWidth="sm"
+                fullWidth
+                PaperProps={{ sx: { borderRadius: 4 } }}
+            >
+                <DialogTitle sx={{
+                    fontWeight: 800,
+                    bgcolor: 'rgba(217, 119, 6, 0.05)',
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                    color: '#042F2E',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <PhoneAndroid sx={{ color: '#D97706' }} /> Turn Mobile Phone into Wireless QR Scanner
+                    </Box>
+                    <IconButton size="small" onClick={() => setPhoneModalOpen(false)}>
+                        <Close fontSize="small" />
+                    </IconButton>
+                </DialogTitle>
+                <DialogContent sx={{ pt: 2.5, textAlign: 'center' }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
+                        Scan this pairing QR code with your iPhone or Android camera to instantly stream live barcode scans to this computer screen.
+                    </Typography>
+
+                    {/* QR Code Container */}
+                    <Box sx={{
+                        p: 2,
+                        display: 'inline-block',
+                        borderRadius: 3,
+                        border: '2px solid #0F766E',
+                        bgcolor: '#FFFFFF',
+                        boxShadow: '0 8px 24px rgba(15, 118, 110, 0.15)',
+                        mb: 2.5
+                    }}>
+                        <img
+                            src={qrApiUrl}
+                            alt="Pairing QR Code"
+                            style={{ width: 200, height: 200, display: 'block', borderRadius: 4 }}
+                        />
+                    </Box>
+
+                    {/* Step by Step Guide */}
+                    <Box sx={{ textAlign: 'left', p: 2, bgcolor: 'rgba(15, 118, 110, 0.04)', borderRadius: 2.5, mb: 2.5 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1, color: '#042F2E' }}>
+                            How to pair your phone:
+                        </Typography>
+                        <Typography variant="caption" sx={{ display: 'block', mb: 0.5 }}>
+                            1. Open your phone's built-in <strong>Camera app</strong> (no app installation needed).
+                        </Typography>
+                        <Typography variant="caption" sx={{ display: 'block', mb: 0.5 }}>
+                            2. Point camera at the QR code above and tap the link that appears.
+                        </Typography>
+                        <Typography variant="caption" sx={{ display: 'block' }}>
+                            3. Point phone at any garment tag to scan. Scanned items appear in the POS instantly!
+                        </Typography>
+                    </Box>
+
+                    {/* Quick Link & Simulation */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                        <TextField
+                            size="small"
+                            fullWidth
+                            readOnly
+                            value={bridgeUrl}
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(bridgeUrl);
+                                                setCopiedBridgeUrl(true);
+                                                setTimeout(() => setCopiedBridgeUrl(false), 2000);
+                                            }}
+                                        >
+                                            {copiedBridgeUrl ? <Check sx={{ color: '#059669' }} /> : <ContentCopy fontSize="small" />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }}
+                        />
+                    </Box>
+
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        startIcon={<PlayArrow />}
+                        onClick={() => {
+                            simulatePhoneScan();
+                            setPhoneModalOpen(false);
+                        }}
+                        sx={{
+                            borderRadius: 2.5,
+                            fontWeight: 700,
+                            textTransform: 'none',
+                            background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
+                            color: '#FFFFFF'
+                        }}
+                    >
+                        Test Sample Mobile Camera Scan Now
+                    </Button>
+                </DialogContent>
+                <DialogActions sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider' }}>
+                    <Button onClick={() => setPhoneModalOpen(false)} sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                        Done
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </Box>
+    );
+}

@@ -23,6 +23,7 @@ import Loyalty from './pages/Loyalty';
 import AdvancedReports from './pages/AdvancedReports';
 import Settings from './pages/Settings';
 import TailoringKanban from './pages/TailoringKanban';
+import Devices from './pages/Devices';
 import Layout from './components/Layout';
 
 const PrivateRoute = ({ children }) => {
@@ -68,6 +69,7 @@ const AnimatedRoutes = () => {
           <Route path="vendors" element={<PageWrapper><Vendors /></PageWrapper>} />
           <Route path="purchases" element={<PageWrapper><Purchases /></PageWrapper>} />
           <Route path="barcodes" element={<PageWrapper><Barcodes /></PageWrapper>} />
+          <Route path="devices" element={<PageWrapper><Devices /></PageWrapper>} />
           <Route path="marketing" element={<PageWrapper><Marketing /></PageWrapper>} />
           <Route path="payment-summary" element={<PageWrapper><PaymentSummary /></PageWrapper>} />
           <Route path="loyalty" element={<PageWrapper><Loyalty /></PageWrapper>} />
