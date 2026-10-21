@@ -20,6 +20,7 @@ import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import { TableSkeleton } from '../components/crm/AtelierSkeleton';
 import InvoiceWhatsAppDialog from '../components/InvoiceWhatsAppDialog';
+import { printInvoiceElement } from '../utils/printInvoice';
 
 const Invoices = () => {
   const { user } = useAuth();
@@ -1220,8 +1221,24 @@ const Invoices = () => {
   };
 
   const handlePrint = (invoice) => {
+    if (!invoice) return;
+    const isSlip = invoiceSettings.template === 'boutique-slip';
+
+    // If currently viewing this invoice in the modal, print its DOM element directly
+    if (viewInvoice && viewInvoice.id === invoice.id && printRef.current) {
+      printInvoiceElement(printRef.current, isSlip);
+      return;
+    }
+
+    // Otherwise load it into viewInvoice and trigger isolated print
     setViewInvoice(invoice);
-    setTimeout(() => window.print(), 300);
+    setTimeout(() => {
+      if (printRef.current) {
+        printInvoiceElement(printRef.current, isSlip);
+      } else {
+        window.print();
+      }
+    }, 280);
   };
 
   const sendWhatsApp = (invoice) => {

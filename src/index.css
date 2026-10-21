@@ -48,31 +48,9 @@ body {
 
 /* Print Utilities */
 @media print {
-  html,
-  body,
-  #root,
-  [class*="MuiBox-root"],
-  [class*="MuiDialog-root"] {
-    height: auto !important;
-    overflow: visible !important;
-    position: static !important;
-  }
-
-  body * {
-    visibility: hidden;
-  }
-
-  .printable-area,
-  .printable-area * {
-    visibility: visible !important;
-  }
-
-  .printable-area {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    margin: 0;
-    padding: 0;
+  /* Delegate to print.css */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
