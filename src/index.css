@@ -1,37 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --emerald-primary: #0F766E;
+  --emerald-dark: #042F2E;
+  --gold-accent: #D97706;
+}
+
 body {
   margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #F8FAFC;
+  color: #0F172A;
 }
 
 * {
   box-sizing: border-box;
 }
 
+::selection {
+  background: rgba(15, 118, 110, 0.2);
+  color: #042F2E;
+}
+
+/* Custom Sleek Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
+  background: rgba(15, 118, 110, 0.18);
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: rgba(15, 118, 110, 0.35);
 }
 
+/* Print Utilities */
 @media print {
-
-  /* Reset height/overflow for printing */
   html,
   body,
   #root,
@@ -58,14 +74,5 @@ body {
     width: 100%;
     margin: 0;
     padding: 0;
-  }
-
-  @page {
-    margin: 0.5cm;
-  }
-
-  /* Hide scrollbars during print */
-  ::-webkit-scrollbar {
-    display: none;
   }
 }
