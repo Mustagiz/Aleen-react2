@@ -143,7 +143,7 @@ const Invoices = () => {
   const [phoneCopied, setPhoneCopied] = useState(false);
   const barcodeBufferRef = useRef('');
   const lastKeyTimeRef = useRef(0);
-  const lastRemoteScanTimestampRef = useRef(0);
+  const lastRemoteScanTimestampRef = useRef(Date.now());
   const quickAddInputRef = useRef(null);
 
   const [networkHost] = useState(() => {
@@ -402,6 +402,8 @@ const Invoices = () => {
 
   // Realtime Wireless Smartphone Scanner Bridge (Firebase Firestore + BroadcastChannel + LocalStorage)
   useEffect(() => {
+    if (!open) return; // Do not attach scanner listeners or open modal when dialog is closed
+
     const token = getActiveWorkstationToken();
     let unsubSession = null;
     let unsubGlobal = null;
@@ -414,7 +416,6 @@ const Invoices = () => {
           const data = snap.data();
           if (data && data.code && data.timestamp && data.timestamp > lastRemoteScanTimestampRef.current) {
             lastRemoteScanTimestampRef.current = data.timestamp;
-            if (!open) setOpen(true);
             handleProcessBarcode(data.code, data.deviceName || 'Wireless Phone Camera');
           }
         }
@@ -429,7 +430,6 @@ const Invoices = () => {
           const data = snap.data();
           if (data && data.code && data.timestamp && data.timestamp > lastRemoteScanTimestampRef.current) {
             lastRemoteScanTimestampRef.current = data.timestamp;
-            if (!open) setOpen(true);
             handleProcessBarcode(data.code, data.deviceName || 'Wireless Phone Camera');
           }
         }
@@ -448,7 +448,6 @@ const Invoices = () => {
         bc.onmessage = (event) => {
           if (event.data && event.data.code && event.data.timestamp > lastRemoteScanTimestampRef.current) {
             lastRemoteScanTimestampRef.current = event.data.timestamp;
-            if (!open) setOpen(true);
             handleProcessBarcode(event.data.code, 'Wireless Phone Camera');
           }
         };
@@ -462,7 +461,6 @@ const Invoices = () => {
           const parsed = JSON.parse(event.newValue);
           if (parsed && parsed.code && parsed.timestamp > lastRemoteScanTimestampRef.current) {
             lastRemoteScanTimestampRef.current = parsed.timestamp;
-            if (!open) setOpen(true);
             handleProcessBarcode(parsed.code, 'Wireless Phone Camera');
           }
         } catch (e) {}
