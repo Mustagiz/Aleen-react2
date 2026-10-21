@@ -40,6 +40,7 @@ import {
     ToggleButton,
     Switch,
     Alert,
+    Snackbar,
     Radio,
     RadioGroup,
     FormControl,
@@ -325,6 +326,41 @@ const Marketing = () => {
     });
 
     const [copiedAlert, setCopiedAlert] = useState(false);
+
+    // Proper Atelier Notification & Confirmation States
+    const [toast, setToast] = useState({
+        open: false,
+        message: '',
+        severity: 'success' // 'success' | 'info' | 'warning' | 'error'
+    });
+
+    const showToast = (message, severity = 'success') => {
+        setToast({
+            open: true,
+            message,
+            severity
+        });
+    };
+
+    const [confirmDialog, setConfirmDialog] = useState({
+        open: false,
+        title: '',
+        message: '',
+        confirmText: 'Delete',
+        isDanger: true,
+        onConfirm: null
+    });
+
+    const openConfirm = (title, message, onConfirm, confirmText = 'Delete', isDanger = true) => {
+        setConfirmDialog({
+            open: true,
+            title,
+            message,
+            confirmText,
+            isDanger,
+            onConfirm
+        });
+    };
 
     // Record dispatch in history
     const recordDispatch = (customer, templateTitle, finalMessage, channel = 'WhatsApp') => {
@@ -651,12 +687,12 @@ const Marketing = () => {
         if (!file) return;
 
         if (!file.type.startsWith('image/')) {
-            alert('Please select a valid image file');
+            showToast('Please select a valid image file (JPG, PNG, WEBP)', 'warning');
             return;
         }
 
         if (file.size > 5 * 1024 * 1024) {
-            alert('Image size must be less than 5MB');
+            showToast('Image size must be less than 5MB', 'warning');
             return;
         }
 
@@ -672,7 +708,7 @@ const Marketing = () => {
             },
             (error) => {
                 console.error('Upload error:', error);
-                alert('Upload failed. Please check internet connection.');
+                showToast('Upload failed. Please check internet connection.', 'error');
                 setIsUploading(false);
                 setUploadProgress(0);
             },
@@ -685,6 +721,7 @@ const Marketing = () => {
                 }
                 setIsUploading(false);
                 setUploadProgress(0);
+                showToast('Lookbook banner uploaded successfully', 'success');
             }
         );
     };
@@ -695,8 +732,10 @@ const Marketing = () => {
 
         if (editingTemplate) {
             await updateMarketingTemplate(editingTemplate.id, templateFormData);
+            showToast('Campaign template updated successfully', 'success');
         } else {
             await addMarketingTemplate(templateFormData);
+            showToast('New campaign template created in atelier library', 'success');
         }
 
         setEditTemplateDialogOpen(false);
@@ -710,20 +749,27 @@ const Marketing = () => {
         });
     };
 
-    // Delete Template
-    const handleDeleteTemplate = async (id) => {
-        if (window.confirm('Delete this broadcast template from your atelier library?')) {
-            const template = marketingTemplates.find(t => t.id === id);
-            if (template?.imageUrl && template.imageUrl.includes('firebase')) {
-                try {
-                    const imageRef = ref(storage, template.imageUrl);
-                    await deleteObject(imageRef);
-                } catch (error) {
-                    console.error('Error removing template image:', error);
+    // Delete Template with Bespoke Confirmation Modal
+    const handleDeleteTemplate = (id) => {
+        const template = marketingTemplates.find(t => t.id === id);
+        openConfirm(
+            'Delete Broadcast Template?',
+            `Are you sure you want to delete "${template?.title || 'this campaign template'}" from your atelier library? This action cannot be undone.`,
+            async () => {
+                if (template?.imageUrl && template.imageUrl.includes('firebase')) {
+                    try {
+                        const imageRef = ref(storage, template.imageUrl);
+                        await deleteObject(imageRef);
+                    } catch (error) {
+                        console.error('Error removing template image:', error);
+                    }
                 }
-            }
-            await deleteMarketingTemplate(id);
-        }
+                await deleteMarketingTemplate(id);
+                showToast('Campaign template removed from atelier library', 'info');
+            },
+            'Delete Template',
+            true
+        );
     };
 
     // Copy Phone numbers for Broadcast Lists
@@ -733,6 +779,7 @@ const Marketing = () => {
         navigator.clipboard.writeText(numbers);
         setCopiedAlert(true);
         setTimeout(() => setCopiedAlert(false), 3000);
+        showToast(`${selectedList.length} patron phone numbers copied to clipboard`, 'success');
     };
 
     // Sample preview customer
@@ -2432,11 +2479,18 @@ const Marketing = () => {
                                                         size="small"
                                                         color="error"
                                                         onClick={() => {
-                                                            if (window.confirm(`Delete keyword "${kw.keyword}"?`)) {
-                                                                const updated = keywordsList.filter(k => k.id !== kw.id);
-                                                                setKeywordsList(updated);
-                                                                localStorage.setItem('atelier_whatsapp_keywords', JSON.stringify(updated));
-                                                            }
+                                                            openConfirm(
+                                                                'Delete Keyword Trigger?',
+                                                                `Are you sure you want to delete inbound trigger "${kw.keyword}"?`,
+                                                                () => {
+                                                                    const updated = keywordsList.filter(k => k.id !== kw.id);
+                                                                    setKeywordsList(updated);
+                                                                    localStorage.setItem('atelier_whatsapp_keywords', JSON.stringify(updated));
+                                                                    showToast(`Keyword trigger "${kw.keyword}" deleted`, 'info');
+                                                                },
+                                                                'Delete Keyword',
+                                                                true
+                                                            );
                                                         }}
                                                     >
                                                         <Delete fontSize="small" sx={{ fontSize: 18 }} />
@@ -2471,7 +2525,7 @@ const Marketing = () => {
                                                 startIcon={<ContentCopy sx={{ fontSize: 16 }} />}
                                                 onClick={() => {
                                                     navigator.clipboard.writeText(qrClickUrl);
-                                                    alert(`Copied WhatsApp QR link for keyword "${kw.keyword}"! You can print this link or generate a QR sticker.`);
+                                                    showToast(`Copied WhatsApp QR link for "${kw.keyword}" to clipboard!`, 'success');
                                                 }}
                                                 sx={{ textTransform: 'none', fontWeight: 750, fontSize: '0.75rem', color: '#0F766E' }}
                                             >
@@ -2522,10 +2576,17 @@ const Marketing = () => {
                                 size="small"
                                 color="error"
                                 onClick={() => {
-                                    if (window.confirm('Clear dispatch history?')) {
-                                        setDispatchHistory([]);
-                                        localStorage.removeItem('atelier_marketing_dispatches');
-                                    }
+                                    openConfirm(
+                                        'Clear Dispatch History?',
+                                        'Are you sure you want to clear your local campaign dispatch audit log? This will reset the dispatch count.',
+                                        () => {
+                                            setDispatchHistory([]);
+                                            localStorage.removeItem('atelier_marketing_dispatches');
+                                            showToast('Dispatch audit history cleared', 'info');
+                                        },
+                                        'Clear History',
+                                        true
+                                    );
                                 }}
                                 sx={{ textTransform: 'none', fontWeight: 700 }}
                             >
@@ -3336,6 +3397,94 @@ const Marketing = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            {/* ============================================================== */}
+            {/* BESPOKE ATELIER CONFIRMATION MODAL                            */}
+            {/* ============================================================== */}
+            <Dialog
+                open={confirmDialog.open}
+                onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
+                maxWidth="xs"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        borderRadius: 3.5,
+                        p: 1,
+                        boxShadow: '0 20px 60px rgba(0,0,0,0.2)'
+                    }
+                }}
+            >
+                <DialogTitle sx={{ fontWeight: 800, color: '#042F2E', display: 'flex', alignItems: 'center', gap: 1.5, pb: 1 }}>
+                    <Avatar sx={{
+                        bgcolor: confirmDialog.isDanger ? 'rgba(220, 38, 38, 0.1)' : 'rgba(15, 118, 110, 0.1)',
+                        color: confirmDialog.isDanger ? '#DC2626' : '#0F766E',
+                        width: 40,
+                        height: 40
+                    }}>
+                        <Warning fontSize="small" />
+                    </Avatar>
+                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#042F2E', fontSize: '1.1rem' }}>
+                        {confirmDialog.title}
+                    </Typography>
+                </DialogTitle>
+                <DialogContent sx={{ pt: 1 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+                        {confirmDialog.message}
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ p: 2, pt: 1, gap: 1 }}>
+                    <Button
+                        onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
+                        sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'none' }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={() => {
+                            if (confirmDialog.onConfirm) confirmDialog.onConfirm();
+                            setConfirmDialog(prev => ({ ...prev, open: false }));
+                        }}
+                        sx={{
+                            bgcolor: confirmDialog.isDanger ? '#DC2626' : '#0F766E',
+                            '&:hover': { bgcolor: confirmDialog.isDanger ? '#B91C1C' : '#042F2E' },
+                            fontWeight: 750,
+                            textTransform: 'none',
+                            borderRadius: 2.5,
+                            px: 3
+                        }}
+                    >
+                        {confirmDialog.confirmText || 'Confirm'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* ============================================================== */}
+            {/* BESPOKE ATELIER SNACKBAR / TOAST NOTIFICATION                  */}
+            {/* ============================================================== */}
+            <Snackbar
+                open={toast.open}
+                autoHideDuration={4000}
+                onClose={() => setToast(prev => ({ ...prev, open: false }))}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert
+                    onClose={() => setToast(prev => ({ ...prev, open: false }))}
+                    severity={toast.severity || 'success'}
+                    variant="filled"
+                    sx={{
+                        fontWeight: 750,
+                        borderRadius: 2.5,
+                        boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
+                        px: 2.5,
+                        py: 1,
+                        fontSize: '0.88rem',
+                        ...(toast.severity === 'success' ? { bgcolor: '#0F766E' } : {})
+                    }}
+                >
+                    {toast.message}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 };
