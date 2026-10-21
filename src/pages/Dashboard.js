@@ -8,6 +8,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { DateRange, CalendarMonth, History, ViewWeek } from '@mui/icons-material';
 import GlassCard from '../components/GlassCard';
+import PageHeader from '../components/crm/PageHeader';
+import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler);
 
@@ -335,76 +337,133 @@ const Dashboard = () => {
 
   return (
     <Box sx={{ maxWidth: 1600, mx: 'auto' }}>
-      <Box sx={{ mb: 6, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'center' }, gap: 3 }}>
-        <Box>
-          <Typography variant="h3" sx={{ fontWeight: 900, color: 'text.primary', mb: 1, letterSpacing: '-0.04em' }}>
-            Dashboard
-          </Typography>
-          <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 500, opacity: 0.8 }}>
-            Overview of your business performance.
-          </Typography>
-        </Box>
+      {/* Atelier Page Header with Breadcrumbs & Timeframe Switcher */}
+      <PageHeader
+        title="Boutique Intelligence & Overview"
+        subtitle="Real-time atelier revenue, stock health, and financial ledger"
+        breadcrumbs={[
+          { label: 'Aleen Atelier', path: '/' },
+          { label: 'Executive Dashboard' }
+        ]}
+        actions={
+          <GlassCard sx={{ p: 0.5, borderRadius: '9999px', display: 'flex', gap: 0.5 }}>
+            {[
+              { id: '7days', label: '7 Days' },
+              { id: '30days', label: '30 Days' },
+              { id: 'thisMonth', label: 'Month' },
+              { id: 'all', label: 'All' }
+            ].map((item) => (
+              <Button
+                key={item.id}
+                onClick={() => setDateRange(item.id)}
+                variant={dateRange === item.id ? 'contained' : 'text'}
+                size="small"
+                sx={{
+                  px: 2,
+                  py: 0.5,
+                  borderRadius: '9999px',
+                  fontSize: '0.78rem',
+                  fontWeight: 700
+                }}
+              >
+                {item.label}
+              </Button>
+            ))}
+          </GlassCard>
+        }
+      />
 
-        <GlassCard sx={{ p: 0.75, borderRadius: 5, display: 'flex', gap: 1 }}>
-          {[
-            { id: '7days', label: '7 Days' },
-            { id: '30days', label: '30 Days' },
-            { id: 'thisMonth', label: 'Month' },
-            { id: 'all', label: 'All' }
-          ].map((item) => (
-            <Button
-              key={item.id}
-              onClick={() => setDateRange(item.id)}
-              variant={dateRange === item.id ? 'contained' : 'text'}
-              sx={{
-                px: 3,
-                py: 1,
-                borderRadius: 4,
-                boxShadow: dateRange === item.id ? theme.shadows[2] : 'none',
-              }}
-            >
-              {item.label}
-            </Button>
-          ))}
-        </GlassCard>
-      </Box>
-
-      <Grid container spacing={3} sx={{ mb: 6 }}>
-        {/* StatCards use the updated component below */}
+      {/* KPI Cards Row 1 & 2 */}
+      <Grid container spacing={2.5} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} lg={3}>
-          <StatCard title="Today's Sales" value={`₹${todaySales.toLocaleString('en-IN')}`} icon={<AttachMoney />} color="#E11D48" trend={salesTrend} onClick={() => navigate('/sales-reports')} />
-        </Grid>
-        {user?.role === 'admin' && (
-          <Grid item xs={12} sm={6} lg={3}>
-            <StatCard title="Total Purchases" value={`₹${totalPurchasesCost.toLocaleString('en-IN')}`} icon={<Receipt />} color="#1976d2" onClick={() => navigate('/purchases')} />
-          </Grid>
-        )}
-        {user?.role === 'admin' && (
-          <Grid item xs={12} sm={6} lg={3}>
-            <StatCard title="Net Cash Available" value={`₹${netCash.toLocaleString('en-IN')}`} icon={<TrendingUp />} color="#059669" onClick={() => navigate('/profit-loss')} />
-          </Grid>
-        )}
-        <Grid item xs={12} sm={6} lg={3}>
-          <StatCard title="Total Stock" value={totalItems.toLocaleString('en-IN')} icon={<Inventory2 />} color="#D97706" onClick={() => navigate('/inventory')} />
+          <AtelierKpiCard
+            title="Today's Sales"
+            value={`₹${todaySales.toLocaleString('en-IN')}`}
+            icon={<AttachMoney fontSize="small" />}
+            trend={salesTrend !== undefined ? `${Math.abs(salesTrend)}%` : null}
+            trendPositive={salesTrend >= 0}
+            goldAccent={true}
+            onClick={() => navigate('/sales-reports')}
+            subtitle="vs yesterday"
+          />
         </Grid>
 
-        {/* Row 2 */}
         <Grid item xs={12} sm={6} lg={3}>
-          <StatCard title="Low Stock Items" value={lowStockCount} icon={<Warning />} color="#EA580C" onClick={() => navigate('/inventory')} subtitle="Items below threshold" />
+          <AtelierKpiCard
+            title="Total Stock Units"
+            value={totalItems.toLocaleString('en-IN')}
+            icon={<Inventory2 fontSize="small" />}
+            onClick={() => navigate('/inventory')}
+            subtitle="Available garments"
+          />
         </Grid>
-        {user?.role === 'admin' && (
-          <Grid item xs={12} sm={6} lg={3}>
-            <StatCard title="Gross Profit" value={`₹${grossProfit.toLocaleString('en-IN')}`} icon={<Assessment />} color="#7C3AED" onClick={() => navigate('/profit-loss')} />
-          </Grid>
-        )}
-        {user?.role === 'admin' && (
-          <Grid item xs={12} sm={6} lg={3}>
-            <StatCard title="Total Inventory Value" value={`₹${totalInventoryValue.toLocaleString('en-IN')}`} icon={<AccountBalanceWallet />} color="#DB2777" onClick={() => navigate('/inventory')} />
-          </Grid>
-        )}
+
         <Grid item xs={12} sm={6} lg={3}>
-          <StatCard title="Avg Transaction" value={`₹${atv.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} icon={<ShoppingCart />} color="#0891B2" onClick={() => navigate('/sales-reports')} />
+          <AtelierKpiCard
+            title="Low Stock Items"
+            value={lowStockCount}
+            icon={<Warning fontSize="small" />}
+            trend={lowStockCount > 0 ? `${lowStockCount} critical` : null}
+            trendPositive={lowStockCount === 0}
+            onClick={() => navigate('/inventory')}
+            subtitle="Below reorder threshold"
+          />
         </Grid>
+
+        <Grid item xs={12} sm={6} lg={3}>
+          <AtelierKpiCard
+            title="Avg Transaction Value"
+            value={`₹${atv.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`}
+            icon={<ShoppingCart fontSize="small" />}
+            onClick={() => navigate('/sales-reports')}
+            subtitle="Per checkout ticket"
+          />
+        </Grid>
+
+        {user?.role === 'admin' && (
+          <>
+            <Grid item xs={12} sm={6} lg={3}>
+              <AtelierKpiCard
+                title="Gross Profit"
+                value={`₹${grossProfit.toLocaleString('en-IN')}`}
+                icon={<Assessment fontSize="small" />}
+                goldAccent={true}
+                onClick={() => navigate('/profit-loss')}
+                subtitle="Revenue minus COGS"
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6} lg={3}>
+              <AtelierKpiCard
+                title="Net Cash Flow"
+                value={`₹${netCash.toLocaleString('en-IN')}`}
+                icon={<TrendingUp fontSize="small" />}
+                onClick={() => navigate('/profit-loss')}
+                subtitle="Sales minus vendor payouts"
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6} lg={3}>
+              <AtelierKpiCard
+                title="Inventory Valuation"
+                value={`₹${totalInventoryValue.toLocaleString('en-IN')}`}
+                icon={<AccountBalanceWallet fontSize="small" />}
+                onClick={() => navigate('/inventory')}
+                subtitle="Total purchase cost basis"
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6} lg={3}>
+              <AtelierKpiCard
+                title="Total Purchases"
+                value={`₹${totalPurchasesCost.toLocaleString('en-IN')}`}
+                icon={<Receipt fontSize="small" />}
+                onClick={() => navigate('/purchases')}
+                subtitle="Vendor procurement"
+              />
+            </Grid>
+          </>
+        )}
       </Grid>
 
       {user?.role === 'admin' && (

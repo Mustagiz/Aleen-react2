@@ -3,6 +3,8 @@ import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, 
 import { Add, Edit, Delete, Search, People, Phone, Email, ShoppingBag, TrendingUp, FilterList, MoreVert, Download, WhatsApp, Payments, CurrencyRupee } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import GlassCard from '../components/GlassCard';
+import PageHeader from '../components/crm/PageHeader';
+import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 
 const Customers = () => {
     const { customers, addCustomer, updateCustomer, deleteCustomer, invoices, profile, addPaymentRecord } = useData();
@@ -173,81 +175,81 @@ const Customers = () => {
 
     return (
         <Box>
-            <Box sx={{ mb: 4, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, gap: 2 }}>
-                <Box>
-                    <Typography variant="h4" sx={{ fontWeight: 800, mb: 0.5 }}>Customers</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>Manage client relations and purchase history</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                    <Button
-                        variant="outlined"
-                        startIcon={<Download />}
-                        onClick={downloadCustomers}
-                        sx={{
-                            px: 3, py: 1.5,
-                            borderRadius: 2,
-                            fontWeight: 700,
-                            textTransform: 'none',
-                            borderColor: 'primary.main',
-                            color: 'primary.main',
-                            '&:hover': {
-                                borderColor: 'primary.dark',
-                                bgcolor: 'primary.light',
-                                transform: 'translateY(-2px)'
-                            }
-                        }}
-                    >
-                        Export CSV
-                    </Button>
-                    <Button
-                        variant="contained"
-                        startIcon={<Add />}
-                        onClick={() => handleOpen()}
-                        sx={{
-                            px: 4, py: 1.5,
-                            borderRadius: 2,
-                            fontWeight: 700,
-                            textTransform: 'none',
-                            background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)',
-                            boxShadow: `0 4px 12px ${theme.palette.primary.main}33`,
-                            transition: 'all 0.2s ease-in-out',
-                            '&:hover': {
-                                background: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)',
-                                boxShadow: `0 6px 16px ${theme.palette.primary.main}4D`,
-                                transform: 'translateY(-2px)'
-                            }
-                        }}
-                    >
-                        Add Customer
-                    </Button>
-                </Box>
-            </Box>
+            <PageHeader
+                title="Clientele & Guest Directory"
+                subtitle="Manage VIP customer relations, bespoke measurements, and lifetime purchasing value"
+                breadcrumbs={[
+                    { label: 'Aleen Atelier', path: '/' },
+                    { label: 'Clientele CRM', path: '/customers' },
+                    { label: 'Guest Directory' }
+                ]}
+                actions={
+                    <>
+                        <Button
+                            variant="outlined"
+                            startIcon={<Download fontSize="small" />}
+                            onClick={downloadCustomers}
+                            sx={{
+                                px: 2.5,
+                                py: 1,
+                                borderRadius: '10px',
+                                fontWeight: 700,
+                                fontSize: '0.84rem'
+                            }}
+                        >
+                            Export Directory
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            startIcon={<Add fontSize="small" />}
+                            onClick={() => handleOpen()}
+                            sx={{
+                                px: 3,
+                                py: 1,
+                                borderRadius: '10px',
+                                fontWeight: 800,
+                                fontSize: '0.84rem',
+                                boxShadow: '0 4px 14px rgba(217, 119, 6, 0.3)'
+                            }}
+                        >
+                            Register Guest
+                        </Button>
+                    </>
+                }
+            />
 
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-                {stats.map((stat, idx) => (
-                    <Grid item xs={12} sm={4} key={idx}>
-                        <GlassCard sx={{ height: '100%', p: 0 }}>
-                            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: stat.color }} />
-                            <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <Box>
-                                    <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: '0.1em' }}>{stat.title}</Typography>
-                                    <Typography variant="h4" sx={{ fontWeight: 900, mt: 0.5 }}>{stat.value}</Typography>
-                                </Box>
-                                <Box sx={{
-                                    p: 1.5,
-                                    borderRadius: 3,
-                                    bgcolor: `${stat.color}15`,
-                                    color: stat.color,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}>
-                                    {stat.icon}
-                                </Box>
-                            </CardContent>
-                        </GlassCard>
-                    </Grid>
-                ))}
+            <Grid container spacing={2.5} sx={{ mb: 4 }}>
+                <Grid item xs={12} sm={4}>
+                    <AtelierKpiCard
+                        title="Total Guests"
+                        value={customers.length.toLocaleString()}
+                        icon={<People fontSize="small" />}
+                        goldAccent={true}
+                        subtitle="Registered atelier clientele"
+                    />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                    <AtelierKpiCard
+                        title="Repeat Clientele"
+                        value={customers.filter(c => calculateCustomerStats(c.id).visitCount > 1).length.toLocaleString()}
+                        icon={<TrendingUp fontSize="small" />}
+                        trend={`${Math.round((customers.filter(c => calculateCustomerStats(c.id).visitCount > 1).length / (customers.length || 1)) * 100)}% loyalty`}
+                        trendPositive={true}
+                        subtitle="Guests with > 1 boutique visit"
+                    />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                    <AtelierKpiCard
+                        title="Active This Month"
+                        value={customers.filter(c => {
+                            const lastVisit = calculateCustomerStats(c.id).lastVisit;
+                            return lastVisit !== 'Never' && new Date(lastVisit).getMonth() === new Date().getMonth();
+                        }).length.toLocaleString()}
+                        icon={<ShoppingBag fontSize="small" />}
+                        subtitle="Recent boutique purchases"
+                    />
+                </Grid>
             </Grid>
 
             <GlassCard sx={{ p: 2, mb: 3 }}>
