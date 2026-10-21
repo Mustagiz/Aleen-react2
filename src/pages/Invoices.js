@@ -1150,19 +1150,28 @@ const Invoices = () => {
           <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
             <Button
               variant="outlined"
-              startIcon={<Palette fontSize="small" />}
+              startIcon={<Palette sx={{ fontSize: 19, color: '#0F766E' }} />}
               onClick={() => setTemplateModalOpen(true)}
               sx={{
-                px: 2.5,
-                py: 1,
-                borderRadius: 2,
-                fontWeight: 700,
-                fontSize: '0.82rem',
-                borderColor: '#0F766E',
+                height: 42,
+                minHeight: 42,
+                px: 2.75,
+                borderRadius: '24px',
+                border: '1.5px solid #0F766E',
                 color: '#0F766E',
+                bgcolor: 'background.paper',
+                fontWeight: 700,
+                fontSize: '0.84rem',
+                textTransform: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxSizing: 'border-box',
+                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                 '&:hover': {
-                  borderColor: '#0b5650',
-                  backgroundColor: 'rgba(15, 118, 110, 0.08)'
+                  border: '1.5px solid #042F2E',
+                  bgcolor: 'rgba(15, 118, 110, 0.05)',
+                  transform: 'translateY(-1px)'
                 }
               }}
             >
@@ -1170,30 +1179,63 @@ const Invoices = () => {
             </Button>
             <Button
               variant="outlined"
-              startIcon={<Download fontSize="small" />}
+              startIcon={<Download sx={{ fontSize: 19, color: '#0F766E' }} />}
               onClick={downloadInvoices}
-              sx={{ px: 2.5, py: 1, borderRadius: 2, fontWeight: 700, fontSize: '0.82rem' }}
+              sx={{
+                height: 42,
+                minHeight: 42,
+                px: 2.75,
+                borderRadius: '24px',
+                border: '1.5px solid #0F766E',
+                color: '#0F766E',
+                bgcolor: 'background.paper',
+                fontWeight: 700,
+                fontSize: '0.84rem',
+                textTransform: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxSizing: 'border-box',
+                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                '&:hover': {
+                  border: '1.5px solid #042F2E',
+                  bgcolor: 'rgba(15, 118, 110, 0.05)',
+                  transform: 'translateY(-1px)'
+                }
+              }}
             >
               Export CSV
             </Button>
             <Button
               variant="contained"
-              startIcon={<Add />}
+              startIcon={<Add sx={{ fontSize: 19, color: '#FFFFFF !important' }} />}
               onClick={() => {
                 setSelectedItems([{ id: '', quantity: 1 }]);
                 setOpen(true);
               }}
               sx={{
+                height: 42,
+                minHeight: 42,
                 px: 3,
-                py: 1,
-                borderRadius: 2,
+                borderRadius: '24px',
                 fontWeight: 700,
-                fontSize: '0.85rem',
-                background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
-                color: '#ffffff',
-                boxShadow: '0 4px 14px rgba(217,119,6,0.3)',
+                fontSize: '0.84rem',
+                textTransform: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxSizing: 'border-box',
+                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%) !important',
+                color: '#FFFFFF !important',
+                boxShadow: '0 4px 14px rgba(15, 118, 110, 0.3)',
+                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                '& .MuiSvgIcon-root': {
+                  color: '#FFFFFF !important'
+                },
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #b45309 0%, #92400e 100%)',
+                  background: 'linear-gradient(135deg, #115E59 0%, #021C1B 100%) !important',
+                  boxShadow: '0 6px 18px rgba(15, 118, 110, 0.45)',
+                  transform: 'translateY(-1px)'
                 }
               }}
             >
@@ -1277,7 +1319,20 @@ const Invoices = () => {
             <Button
               variant="outlined"
               onClick={() => { setSearchTerm(''); setDateFilter(''); setPaymentFilter('All'); }}
-              size="small"
+              sx={{
+                height: 40,
+                borderRadius: '20px',
+                px: 2.5,
+                border: '1.5px solid rgba(15, 118, 110, 0.3)',
+                color: '#0F766E',
+                textTransform: 'none',
+                fontWeight: 700,
+                fontSize: '0.82rem',
+                '&:hover': {
+                  border: '1.5px solid #0F766E',
+                  bgcolor: 'rgba(15, 118, 110, 0.05)'
+                }
+              }}
             >
               Clear
             </Button>
