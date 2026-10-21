@@ -3,8 +3,6 @@ import {
     Box,
     Typography,
     Grid,
-    Card,
-    CardContent,
     Paper,
     Table,
     TableBody,
@@ -24,35 +22,36 @@ import {
     Alert,
     IconButton,
     Tooltip,
-    useTheme
+    TablePagination
 } from '@mui/material';
 import {
     EmojiEvents,
     Stars,
     TrendingUp,
-    CardGiftcard,
     History,
     Redeem,
     Close,
     Cake,
-    LocalOffer
+    LocalOffer,
+    WorkspacePremium
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
-import GlassCard from '../components/GlassCard';
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
+import ClienteleNavTabs from '../components/crm/ClienteleNavTabs';
 
 const Loyalty = () => {
     const { customers, redeemLoyaltyPoints, addBirthdayBonus } = useData();
-    const theme = useTheme();
     const [redeemDialog, setRedeemDialog] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [pointsToRedeem, setPointsToRedeem] = useState('');
     const [error, setError] = useState('');
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     // Calculate tier statistics
     const tierStats = {
-        Bronze: customers.filter(c => c.loyaltyTier === 'Bronze').length,
+        Bronze: customers.filter(c => c.loyaltyTier === 'Bronze' || !c.loyaltyTier).length,
         Silver: customers.filter(c => c.loyaltyTier === 'Silver').length,
         Gold: customers.filter(c => c.loyaltyTier === 'Gold').length,
         Platinum: customers.filter(c => c.loyaltyTier === 'Platinum').length
@@ -63,30 +62,30 @@ const Loyalty = () => {
 
     const getTierColor = (tier) => {
         switch (tier) {
-            case 'Bronze': return '#CD7F32';
-            case 'Silver': return '#C0C0C0';
-            case 'Gold': return '#FFD700';
-            case 'Platinum': return '#E5E4E2';
+            case 'Bronze': return '#B45309';
+            case 'Silver': return '#64748B';
+            case 'Gold': return '#D97706';
+            case 'Platinum': return '#0F766E';
             default: return '#9E9E9E';
         }
     };
 
     const getTierBenefits = (tier) => {
         switch (tier) {
-            case 'Bronze': return '1x points earning';
-            case 'Silver': return '1.25x points earning';
-            case 'Gold': return '1.5x points + early sale access';
-            case 'Platinum': return '2x points + exclusive offers';
-            default: return '';
+            case 'Bronze': return '1x points accrual on regular billing';
+            case 'Silver': return '1.25x points + seasonal preview invitations';
+            case 'Gold': return '1.5x points + priority atelier fitting slots';
+            case 'Platinum': return '2x points + bespoke home consultations & private previews';
+            default: return '1x points';
         }
     };
 
     const getTierProgress = (customer) => {
         const spent = customer.totalSpent || 0;
-        if (spent >= 100000) return { next: 'Max Tier', progress: 100 };
-        if (spent >= 50000) return { next: 'Platinum (₹100,000)', progress: (spent / 100000) * 100 };
-        if (spent >= 25000) return { next: 'Gold (₹50,000)', progress: (spent / 50000) * 100 };
-        return { next: 'Silver (₹25,000)', progress: (spent / 25000) * 100 };
+        if (spent >= 100000) return { next: 'Haute Elite (Max Tier)', progress: 100 };
+        if (spent >= 50000) return { next: 'Platinum (₹1,00,000)', progress: Math.min(100, (spent / 100000) * 100) };
+        if (spent >= 25000) return { next: 'Gold (₹50,000)', progress: Math.min(100, (spent / 50000) * 100) };
+        return { next: 'Silver (₹25,000)', progress: Math.min(100, (spent / 25000) * 100) };
     };
 
     const handleRedeemOpen = (customer) => {
@@ -103,8 +102,8 @@ const Loyalty = () => {
                 setError('Please enter a valid number of points');
                 return;
             }
-            if (points > selectedCustomer.loyaltyPoints) {
-                setError('Insufficient points');
+            if (points > (selectedCustomer.loyaltyPoints || 0)) {
+                setError('Insufficient points available in client balance');
                 return;
             }
 
@@ -112,346 +111,475 @@ const Loyalty = () => {
             setRedeemDialog(false);
             setSelectedCustomer(null);
             setPointsToRedeem('');
+            alert(`Successfully redeemed ${points} points for ${selectedCustomer.name}. ₹${points} credit applied!`);
         } catch (err) {
             setError(err.message);
         }
     };
 
-    const handleBirthdayBonus = async (customerId) => {
+    const handleBirthdayBonus = async (customer) => {
         try {
-            await addBirthdayBonus(customerId, 100);
-            alert('Birthday bonus of 100 points added successfully!');
+            await addBirthdayBonus(customer.id, 100);
+            alert(`Birthday bonus of 100 points added to ${customer.name}'s account!`);
         } catch (err) {
             alert('Error adding birthday bonus: ' + err.message);
         }
     };
 
-    // Top loyalty members
-    const topMembers = [...customers]
-        .sort((a, b) => (b.loyaltyPoints || 0) - (a.loyaltyPoints || 0))
-        .slice(0, 10);
+    // Sorted loyalty patrons
+    const sortedMembers = [...customers]
+        .sort((a, b) => (b.loyaltyPoints || 0) - (a.loyaltyPoints || 0));
 
     return (
-        <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
+        <Box sx={{ maxWidth: 1400, mx: 'auto', p: { xs: 2, md: 3 } }}>
             {/* Atelier Page Header */}
             <PageHeader
-                title="Clientele Loyalty & Privileges"
-                subtitle="Manage VIP rewards tiers, membership point accruals, and boutique privileges"
-                breadcrumbs={[
-                    { label: 'Aleen Atelier', path: '/' },
-                    { label: 'Clientele & CRM', path: '/customers' },
-                    { label: 'Loyalty Program' }
-                ]}
+                title="VIP Loyalty & Atelier Privileges"
+                subtitle="Manage tier progression, reward point accruals, birthday credits, and bespoke privileges"
             />
 
-            {/* Summary Cards */}
-            <Grid container spacing={2.5} sx={{ mb: 4 }}>
+            {/* Clientele & CRM Tab Switcher */}
+            <ClienteleNavTabs />
+
+            {/* 4 Atelier Intelligence KPIs */}
+            <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
                 <Grid item xs={12} sm={6} md={3}>
                     <AtelierKpiCard
                         title="Circulating Points"
                         value={totalPoints.toLocaleString()}
-                        icon={<Stars fontSize="small" />}
-                        goldAccent={true}
-                        subtitle="Reward balance"
+                        subtitle="Total redeemable points balance"
+                        icon={<Stars />}
+                        color="warning"
                     />
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={3}>
                     <AtelierKpiCard
-                        title="Active VIP Members"
-                        value={activeMembers}
-                        icon={<TrendingUp fontSize="small" />}
-                        subtitle="Clients with points"
+                        title="Active Privilege Members"
+                        value={activeMembers.toLocaleString()}
+                        subtitle="Clients with active point balances"
+                        icon={<TrendingUp />}
+                        color="success"
+                        delta={{
+                            text: `${customers.length > 0 ? Math.round((activeMembers / customers.length) * 100) : 0}% Active`,
+                            isPositive: true
+                        }}
                     />
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={3}>
                     <AtelierKpiCard
-                        title="Platinum Members"
-                        value={tierStats.Platinum}
-                        icon={<EmojiEvents fontSize="small" />}
-                        subtitle="Top spenders tier"
+                        title="Platinum Haute Tier"
+                        value={tierStats.Platinum.toLocaleString()}
+                        subtitle="Top spenders with bespoke privileges"
+                        icon={<WorkspacePremium />}
+                        color="primary"
                     />
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={3}>
                     <AtelierKpiCard
-                        title="Gold Members"
-                        value={tierStats.Gold}
-                        icon={<CardGiftcard fontSize="small" />}
-                        subtitle="Frequent patrons"
+                        title="Gold Privilege Tier"
+                        value={tierStats.Gold.toLocaleString()}
+                        subtitle="Frequent atelier couture patrons"
+                        icon={<EmojiEvents />}
+                        color="warning"
                     />
                 </Grid>
             </Grid>
 
-
-            {/* Tier Distribution */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
+            {/* Tier Distribution & Program Rules */}
+            <Grid container spacing={3} sx={{ mb: 3.5 }}>
+                {/* Tier Breakdown */}
                 <Grid item xs={12} md={6}>
-                    <GlassCard sx={{ p: 3, height: '100%' }}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 3, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'primary.main' }}>
-                            Tier Distribution
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: 3,
+                            borderRadius: 3.5,
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            height: '100%',
+                            boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+                        }}
+                    >
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 2.5, color: '#042F2E' }}>
+                            Membership Tier Hierarchy
                         </Typography>
                         {['Platinum', 'Gold', 'Silver', 'Bronze'].map((tier) => (
-                            <Box key={tier} sx={{ mb: 2 }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                            <Box key={tier} sx={{ mb: 2.5 }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.75 }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <EmojiEvents sx={{ fontSize: 20, color: getTierColor(tier) }} />
-                                        <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                                            {tier}
+                                        <EmojiEvents sx={{ fontSize: 18, color: getTierColor(tier) }} />
+                                        <Typography variant="body2" sx={{ fontWeight: 750, color: 'text.primary' }}>
+                                            {tier} Tier
                                         </Typography>
                                     </Box>
-                                    <Typography variant="body2" sx={{ fontWeight: 800, color: 'primary.main' }}>
-                                        {tierStats[tier]} members
+                                    <Typography variant="body2" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                                        {tierStats[tier]} {tierStats[tier] === 1 ? 'member' : 'members'}
                                     </Typography>
                                 </Box>
                                 <LinearProgress
                                     variant="determinate"
-                                    value={(tierStats[tier] / customers.length) * 100}
+                                    value={customers.length > 0 ? (tierStats[tier] / customers.length) * 100 : 0}
                                     sx={{
-                                        height: 8,
+                                        height: 7,
                                         borderRadius: 4,
-                                        bgcolor: `${getTierColor(tier)}20`,
+                                        bgcolor: 'rgba(0,0,0,0.04)',
                                         '& .MuiLinearProgress-bar': {
                                             bgcolor: getTierColor(tier),
                                             borderRadius: 4
                                         }
                                     }}
                                 />
-                                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block', fontWeight: 500 }}>
+                                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
                                     {getTierBenefits(tier)}
                                 </Typography>
                             </Box>
                         ))}
-                    </GlassCard>
+                    </Paper>
                 </Grid>
 
+                {/* Program Rules */}
                 <Grid item xs={12} md={6}>
-                    <GlassCard sx={{ p: 3, height: '100%' }}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 3, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'primary.main' }}>
-                            Program Rules
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: 3,
+                            borderRadius: 3.5,
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            height: '100%',
+                            boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+                        }}
+                    >
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 2.5, color: '#042F2E' }}>
+                            Privilege Program Architecture
                         </Typography>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(136, 14, 79, 0.05)' }}>
-                                    <LocalOffer sx={{ color: 'primary.main', fontSize: 20 }} />
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', p: 1.5, borderRadius: 2.5, bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
+                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E' }}>
+                                    <LocalOffer sx={{ fontSize: 20 }} />
                                 </Box>
                                 <Box>
-                                    <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                                        Earning Points
+                                    <Typography variant="body2" sx={{ fontWeight: 750, color: '#042F2E' }}>
+                                        Reward Accrual Rate
                                     </Typography>
-                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
-                                        ₹100 spent = 1 point
+                                    <Typography variant="caption" color="text.secondary">
+                                        ₹100 invoiced spend = 1 Loyalty Point automatically credited to guest wallet
                                     </Typography>
                                 </Box>
                             </Box>
-                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(136, 14, 79, 0.05)' }}>
-                                    <Redeem sx={{ color: 'primary.main', fontSize: 20 }} />
+
+                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', p: 1.5, borderRadius: 2.5, bgcolor: 'rgba(217, 119, 6, 0.04)' }}>
+                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(217, 119, 6, 0.12)', color: '#D97706' }}>
+                                    <Redeem sx={{ fontSize: 20 }} />
                                 </Box>
                                 <Box>
-                                    <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                                        Redeeming Points
+                                    <Typography variant="body2" sx={{ fontWeight: 750, color: '#042F2E' }}>
+                                        Direct Checkout Redemption
                                     </Typography>
-                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
-                                        100 points = ₹100 discount
+                                    <Typography variant="caption" color="text.secondary">
+                                        1 Point = ₹1 immediate discount deduction against any bespoke couture invoice
                                     </Typography>
                                 </Box>
                             </Box>
-                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(136, 14, 79, 0.05)' }}>
-                                    <Cake sx={{ color: 'primary.main', fontSize: 20 }} />
+
+                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', p: 1.5, borderRadius: 2.5, bgcolor: 'rgba(16, 185, 129, 0.04)' }}>
+                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(16, 185, 129, 0.12)', color: '#059669' }}>
+                                    <Cake sx={{ fontSize: 20 }} />
                                 </Box>
                                 <Box>
-                                    <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                                        Birthday Bonus
+                                    <Typography variant="body2" sx={{ fontWeight: 750, color: '#042F2E' }}>
+                                        Annual Birthday Gift Credit
                                     </Typography>
-                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
-                                        100 bonus points on birthday
+                                    <Typography variant="caption" color="text.secondary">
+                                        100 Bonus Privileges automatically gifted during the patron's celebration month
                                     </Typography>
                                 </Box>
                             </Box>
-                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(136, 14, 79, 0.05)' }}>
-                                    <History sx={{ color: 'primary.main', fontSize: 20 }} />
+
+                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', p: 1.5, borderRadius: 2.5, bgcolor: 'rgba(100, 116, 139, 0.04)' }}>
+                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(100, 116, 139, 0.12)', color: '#64748B' }}>
+                                    <History sx={{ fontSize: 20 }} />
                                 </Box>
                                 <Box>
-                                    <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                                        Points Expiry
+                                    <Typography variant="body2" sx={{ fontWeight: 750, color: '#042F2E' }}>
+                                        Points Validity
                                     </Typography>
-                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
-                                        Points expire after 1 year
+                                    <Typography variant="caption" color="text.secondary">
+                                        Reward points remain active for 365 days from date of accrual
                                     </Typography>
                                 </Box>
                             </Box>
                         </Box>
-                    </GlassCard>
+                    </Paper>
                 </Grid>
             </Grid>
 
-            {/* Top Loyalty Members */}
-            <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
-                <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
-                    <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                        Top Loyalty Members
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                        Customers with the highest loyalty points
+            {/* Top Loyalty Patrons Table */}
+            <Paper
+                elevation={0}
+                sx={{
+                    borderRadius: 3.5,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    overflow: 'hidden',
+                    boxShadow: '0 4px 20px -4px rgba(15, 118, 110, 0.08)'
+                }}
+            >
+                <Box sx={{ px: 3, py: 2, bgcolor: 'rgba(15, 118, 110, 0.02)', borderBottom: '1px solid', borderColor: 'divider' }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                        Clientele Loyalty Leaderboard & Privilege Balances
                     </Typography>
                 </Box>
+
                 <TableContainer>
                     <Table>
-                        <TableHead sx={{ bgcolor: 'action.hover' }}>
+                        <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Rank</TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Customer</TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tier</TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Points</TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Spent</TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Progress</TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }} align="right">Actions</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: '#042F2E', width: 70 }} align="center">Rank</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Client Details</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="center">Membership Tier</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Available Points</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Lifetime Spend</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Next Tier Target</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Privilege Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {topMembers.map((customer, index) => {
-                                const progress = getTierProgress(customer);
-                                return (
-                                    <TableRow key={customer.id} hover>
-                                        <TableCell>
-                                            <Chip
-                                                label={`#${index + 1}`}
-                                                size="small"
-                                                sx={{
-                                                    bgcolor: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : 'rgba(0,0,0,0.08)',
-                                                    color: index < 3 ? 'white' : 'text.primary',
-                                                    fontWeight: 700
-                                                }}
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                <Avatar sx={{ bgcolor: getTierColor(customer.loyaltyTier), width: 36, height: 36, fontSize: '0.875rem' }}>
-                                                    {customer.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                                                </Avatar>
-                                                <Box>
-                                                    <Typography sx={{ fontWeight: 600 }}>{customer.name}</Typography>
-                                                    <Typography variant="caption" color="text.secondary">{customer.phone}</Typography>
-                                                </Box>
-                                            </Box>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Chip
-                                                icon={<EmojiEvents sx={{ fontSize: '16px !important' }} />}
-                                                label={customer.loyaltyTier}
-                                                size="small"
-                                                sx={{
-                                                    bgcolor: `${getTierColor(customer.loyaltyTier)}20`,
-                                                    color: getTierColor(customer.loyaltyTier),
-                                                    fontWeight: 700,
-                                                    border: `1px solid ${getTierColor(customer.loyaltyTier)}40`
-                                                }}
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Typography variant="body2" sx={{ fontWeight: 700, color: 'primary.main' }}>
-                                                {(customer.loyaltyPoints || 0).toLocaleString()}
-                                            </Typography>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                                ₹{(customer.totalSpent || 0).toLocaleString()}
-                                            </Typography>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Box sx={{ minWidth: 120 }}>
-                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-                                                    Next: {progress.next}
-                                                </Typography>
-                                                <LinearProgress
-                                                    variant="determinate"
-                                                    value={progress.progress}
-                                                    sx={{
-                                                        height: 6,
-                                                        borderRadius: 3,
-                                                        bgcolor: 'rgba(0,0,0,0.08)',
-                                                        '& .MuiLinearProgress-bar': {
-                                                            bgcolor: getTierColor(customer.loyaltyTier),
-                                                            borderRadius: 3
-                                                        }
-                                                    }}
-                                                />
-                                            </Box>
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            <Tooltip title="Redeem Points">
-                                                <IconButton size="small" onClick={() => handleRedeemOpen(customer)} sx={{ color: 'primary.main' }}>
-                                                    <Redeem fontSize="small" />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Birthday Bonus">
-                                                <IconButton size="small" onClick={() => handleBirthdayBonus(customer.id)} sx={{ color: '#F59E0B' }}>
-                                                    <Cake fontSize="small" />
-                                                </IconButton>
-                                            </Tooltip>
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })}
+                            {sortedMembers.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={7} align="center" sx={{ py: 6, color: 'text.secondary' }}>
+                                        No loyalty members registered yet.
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                sortedMembers
+                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                    .map((customer, index) => {
+                                        const globalRank = page * rowsPerPage + index + 1;
+                                        const progress = getTierProgress(customer);
+                                        const tier = customer.loyaltyTier || 'Bronze';
+
+                                        return (
+                                            <TableRow key={customer.id} hover sx={{ '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.02)' } }}>
+                                                {/* Rank */}
+                                                <TableCell align="center">
+                                                    <Chip
+                                                        label={`#${globalRank}`}
+                                                        size="small"
+                                                        sx={{
+                                                            bgcolor: globalRank === 1 ? '#D97706' : globalRank === 2 ? '#64748B' : globalRank === 3 ? '#B45309' : 'rgba(0,0,0,0.06)',
+                                                            color: globalRank <= 3 ? '#FFFFFF' : 'text.primary',
+                                                            fontWeight: 800,
+                                                            fontSize: '0.72rem'
+                                                        }}
+                                                    />
+                                                </TableCell>
+
+                                                {/* Client Name & Avatar */}
+                                                <TableCell>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                        <Avatar 
+                                                            sx={{ 
+                                                                bgcolor: getTierColor(tier), 
+                                                                color: '#FFFFFF',
+                                                                width: 36, 
+                                                                height: 36, 
+                                                                fontSize: '0.85rem',
+                                                                fontWeight: 800 
+                                                            }}
+                                                        >
+                                                            {customer.name?.split(' ').map(n => n[0]).join('').slice(0, 2) || 'CL'}
+                                                        </Avatar>
+                                                        <Box>
+                                                            <Typography sx={{ fontWeight: 700, color: 'text.primary' }}>
+                                                                {customer.name}
+                                                            </Typography>
+                                                            <Typography variant="caption" color="text.secondary">
+                                                                {customer.phone}
+                                                            </Typography>
+                                                        </Box>
+                                                    </Box>
+                                                </TableCell>
+
+                                                {/* Tier */}
+                                                <TableCell align="center">
+                                                    <Chip
+                                                        icon={<EmojiEvents sx={{ fontSize: '15px !important', color: `${getTierColor(tier)} !important` }} />}
+                                                        label={tier}
+                                                        size="small"
+                                                        sx={{
+                                                            bgcolor: `${getTierColor(tier)}15`,
+                                                            color: getTierColor(tier),
+                                                            fontWeight: 800,
+                                                            fontSize: '0.74rem',
+                                                            border: `1px solid ${getTierColor(tier)}30`
+                                                        }}
+                                                    />
+                                                </TableCell>
+
+                                                {/* Available Points (Right Aligned) */}
+                                                <TableCell align="right">
+                                                    <Typography variant="body2" sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.95rem' }}>
+                                                        {(customer.loyaltyPoints || 0).toLocaleString()} pts
+                                                    </Typography>
+                                                    <Typography variant="caption" color="text.secondary">
+                                                        ₹{(customer.loyaltyPoints || 0).toLocaleString()} value
+                                                    </Typography>
+                                                </TableCell>
+
+                                                {/* Lifetime Spend (Right Aligned) */}
+                                                <TableCell align="right">
+                                                    <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                                                        ₹{(customer.totalSpent || 0).toLocaleString('en-IN')}
+                                                    </Typography>
+                                                </TableCell>
+
+                                                {/* Progress to Next Tier */}
+                                                <TableCell>
+                                                    <Box sx={{ minWidth: 140 }}>
+                                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5, fontWeight: 600 }}>
+                                                            {progress.next}
+                                                        </Typography>
+                                                        <LinearProgress
+                                                            variant="determinate"
+                                                            value={progress.progress}
+                                                            sx={{
+                                                                height: 6,
+                                                                borderRadius: 3,
+                                                                bgcolor: 'rgba(0,0,0,0.06)',
+                                                                '& .MuiLinearProgress-bar': {
+                                                                    bgcolor: getTierColor(tier),
+                                                                    borderRadius: 3
+                                                                }
+                                                            }}
+                                                        />
+                                                    </Box>
+                                                </TableCell>
+
+                                                {/* Actions */}
+                                                <TableCell align="right">
+                                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5 }}>
+                                                        <Tooltip title="Redeem Available Points">
+                                                            <span>
+                                                                <IconButton
+                                                                    size="small"
+                                                                    disabled={!customer.loyaltyPoints || customer.loyaltyPoints <= 0}
+                                                                    onClick={() => handleRedeemOpen(customer)}
+                                                                    sx={{ color: '#0F766E', bgcolor: 'rgba(15, 118, 110, 0.08)' }}
+                                                                >
+                                                                    <Redeem fontSize="small" />
+                                                                </IconButton>
+                                                            </span>
+                                                        </Tooltip>
+                                                        <Tooltip title="Gift Birthday 100 Points Credit">
+                                                            <IconButton
+                                                                size="small"
+                                                                onClick={() => handleBirthdayBonus(customer)}
+                                                                sx={{ color: '#D97706', bgcolor: 'rgba(217, 119, 6, 0.08)' }}
+                                                            >
+                                                                <Cake fontSize="small" />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    </Box>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })
+                            )}
                         </TableBody>
                     </Table>
                 </TableContainer>
-            </GlassCard>
+
+                <TablePagination
+                    rowsPerPageOptions={[10, 25, 50]}
+                    component="div"
+                    count={sortedMembers.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={(e, newPage) => setPage(newPage)}
+                    onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0); }}
+                    sx={{ borderTop: '1px solid', borderColor: 'divider' }}
+                />
+            </Paper>
 
             {/* Redeem Points Dialog */}
-            <Dialog open={redeemDialog} onClose={() => setRedeemDialog(false)} maxWidth="sm" fullWidth>
-                <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                        Redeem Points
-                    </Typography>
+            <Dialog 
+                open={redeemDialog} 
+                onClose={() => setRedeemDialog(false)} 
+                maxWidth="xs" 
+                fullWidth
+                PaperProps={{ sx: { borderRadius: 4 } }}
+            >
+                <DialogTitle sx={{ 
+                    fontWeight: 800, 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    bgcolor: 'rgba(15, 118, 110, 0.04)',
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                    color: '#042F2E'
+                }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Redeem sx={{ color: '#0F766E' }} /> Redeem Privilege Points
+                    </Box>
                     <IconButton onClick={() => setRedeemDialog(false)} size="small">
-                        <Close />
+                        <Close fontSize="small" />
                     </IconButton>
                 </DialogTitle>
-                <DialogContent>
+                <DialogContent sx={{ pt: 2.5 }}>
                     {selectedCustomer && (
                         <Box>
-                            <Alert severity="info" sx={{ mb: 3 }}>
+                            <Alert severity="info" sx={{ mb: 2.5, borderRadius: 2 }}>
                                 <Typography variant="body2">
-                                    <strong>{selectedCustomer.name}</strong> has <strong>{selectedCustomer.loyaltyPoints}</strong> points available
-                                </Typography>
-                                <Typography variant="caption" color="text.secondary">
-                                    1 point = ₹1 discount
+                                    <strong>{selectedCustomer.name}</strong> has <strong>{selectedCustomer.loyaltyPoints || 0}</strong> points available (₹{selectedCustomer.loyaltyPoints || 0} discount).
                                 </Typography>
                             </Alert>
                             <TextField
                                 fullWidth
-                                label="Points to Redeem"
+                                label="Points to Redeem *"
                                 type="number"
+                                margin="normal"
                                 value={pointsToRedeem}
                                 onChange={(e) => setPointsToRedeem(e.target.value)}
                                 error={!!error}
                                 helperText={error || `Maximum: ${selectedCustomer.loyaltyPoints} points`}
                                 InputProps={{
-                                    inputProps: { min: 0, max: selectedCustomer.loyaltyPoints }
+                                    inputProps: { min: 1, max: selectedCustomer.loyaltyPoints }
                                 }}
                             />
-                            {pointsToRedeem && (
-                                <Box sx={{ mt: 2, p: 2, bgcolor: 'success.light', borderRadius: 2 }}>
-                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                        Discount Amount: ₹{parseInt(pointsToRedeem || 0).toLocaleString()}
+                            {pointsToRedeem && parseInt(pointsToRedeem) > 0 && (
+                                <Box sx={{ mt: 2, p: 2, bgcolor: 'rgba(15, 118, 110, 0.06)', borderRadius: 2.5, border: '1px solid rgba(15, 118, 110, 0.15)' }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 750, color: '#0F766E' }}>
+                                        Instant Invoice Discount: ₹{parseInt(pointsToRedeem || 0).toLocaleString()}
                                     </Typography>
                                     <Typography variant="caption" color="text.secondary">
-                                        Remaining Points: {selectedCustomer.loyaltyPoints - parseInt(pointsToRedeem || 0)}
+                                        Remaining Balance: {Math.max(0, (selectedCustomer.loyaltyPoints || 0) - parseInt(pointsToRedeem || 0))} points
                                     </Typography>
                                 </Box>
                             )}
                         </Box>
                     )}
                 </DialogContent>
-                <DialogActions sx={{ p: 3 }}>
-                    <Button onClick={() => setRedeemDialog(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleRedeemPoints} disabled={!pointsToRedeem}>
-                        Redeem Points
+                <DialogActions sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider' }}>
+                    <Button onClick={() => setRedeemDialog(false)} sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                        Cancel
+                    </Button>
+                    <Button 
+                        variant="contained" 
+                        onClick={handleRedeemPoints} 
+                        disabled={!pointsToRedeem || parseInt(pointsToRedeem) <= 0}
+                        sx={{ 
+                            px: 3.5, 
+                            borderRadius: 2.5, 
+                            fontWeight: 700,
+                            background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)'
+                        }}
+                    >
+                        Redeem Discount
                     </Button>
                 </DialogActions>
             </Dialog>
