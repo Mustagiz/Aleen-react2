@@ -357,6 +357,20 @@ export default function BarcodeGenerator() {
         }
     };
 
+    const handleSelectAllFiltered = () => {
+        const existingIds = new Set(selectedProducts.map(p => p.id));
+        const toAdd = filteredAndSortedInventory
+            .filter(item => !existingIds.has(item.id))
+            .map(item => ({ ...item, labelCount: Math.max(1, item.quantity || 1) }));
+        if (toAdd.length === 0) return;
+        setSelectedProducts(prev => [...prev, ...toAdd]);
+    };
+
+    const handleDeselectFiltered = () => {
+        const filteredIds = new Set(filteredAndSortedInventory.map(item => item.id));
+        setSelectedProducts(prev => prev.filter(p => !filteredIds.has(p.id)));
+    };
+
     // Extract all distinct categories
     const categories = useMemo(() => {
         return Array.from(new Set(inventory.map(item => item.category).filter(Boolean)));
@@ -872,70 +886,146 @@ export default function BarcodeGenerator() {
                     </Grid>
                 </Grid>
 
-                {/* Primary Autocomplete Dropdown with Rich Option Cards */}
-                <Autocomplete
-                    options={filteredAndSortedInventory}
-                    getOptionLabel={(option) => `${option.name} (${option.productId || 'No ID'})`}
-                    onChange={(e, val) => {
-                        if (val) handleAddProduct(val);
-                    }}
-                    renderOption={(props, option) => (
-                        <Box
-                            component="li"
-                            {...props}
+                {/* Multi-Selection Batch Controls */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5, flexWrap: 'wrap', gap: 1 }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                        Matching Garments: <strong>{filteredAndSortedInventory.length}</strong> items
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Button
+                            size="small"
+                            variant="contained"
+                            color="primary"
+                            startIcon={<Add fontSize="small" />}
+                            onClick={handleSelectAllFiltered}
+                            disabled={filteredAndSortedInventory.length === 0}
                             sx={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                py: 1.25,
-                                px: 2,
-                                borderBottom: '1px solid',
-                                borderColor: 'divider',
-                                '&:hover': { bgcolor: 'action.hover' }
+                                borderRadius: 1.5,
+                                fontSize: '0.75rem',
+                                fontWeight: 700,
+                                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                                color: '#ffffff'
                             }}
                         >
-                            <Box sx={{ flex: 1, minWidth: 0 }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Typography variant="body2" sx={{ fontWeight: 800 }}>
-                                        {option.name}
-                                    </Typography>
-                                    {option.variantName && (
-                                        <Chip
-                                            label={option.variantName}
-                                            size="small"
-                                            sx={{ height: 18, fontSize: '0.65rem', fontWeight: 600 }}
-                                        />
-                                    )}
-                                </Box>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 0.25 }}>
-                                    <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 700 }}>
-                                        #{option.productId || 'NO-SKU'}
-                                    </Typography>
-                                    {option.category && (
-                                        <Typography variant="caption" color="text.secondary">
-                                            • {option.category}
-                                        </Typography>
-                                    )}
-                                    <Typography variant="caption" sx={{ color: (option.quantity || 0) > 0 ? 'text.secondary' : 'error.main' }}>
-                                        • Stock: {option.quantity || 0} units
-                                    </Typography>
-                                </Box>
-                            </Box>
+                            + Queue All Filtered ({filteredAndSortedInventory.length})
+                        </Button>
+                        <Button
+                            size="small"
+                            variant="outlined"
+                            onClick={handleDeselectFiltered}
+                            disabled={filteredAndSortedInventory.length === 0}
+                            sx={{ borderRadius: 1.5, fontSize: '0.75rem', fontWeight: 700 }}
+                        >
+                            Deselect Filtered
+                        </Button>
+                    </Box>
+                </Box>
 
-                            <Box sx={{ textAlign: 'right', pl: 2 }}>
-                                <Typography variant="body2" sx={{ fontWeight: 800, color: '#D97706' }}>
-                                    ₹{(option.price || 0).toLocaleString('en-IN')}
-                                </Typography>
-                                <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 700 }}>
-                                    + Add to Queue
-                                </Typography>
+                {/* Multi-Select Autocomplete Dropdown with Checkboxes */}
+                <Autocomplete
+                    multiple
+                    disableCloseOnSelect
+                    options={filteredAndSortedInventory}
+                    value={selectedProducts}
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                    getOptionLabel={(option) => `${option.name} (${option.productId || 'No ID'})`}
+                    onChange={(event, newValues) => {
+                        const existingCountMap = new Map(selectedProducts.map(p => [p.id, p.labelCount]));
+                        const updated = newValues.map(item => ({
+                            ...item,
+                            labelCount: existingCountMap.get(item.id) || Math.max(1, item.quantity || 1)
+                        }));
+                        setSelectedProducts(updated);
+                    }}
+                    renderTags={(tagValue, getTagProps) =>
+                        tagValue.slice(0, 4).map((option, index) => (
+                            <Chip
+                                {...getTagProps({ index })}
+                                key={option.id}
+                                label={`${option.name} (${option.labelCount || 1}x)`}
+                                size="small"
+                                sx={{
+                                    height: 24,
+                                    fontSize: '0.75rem',
+                                    fontWeight: 700,
+                                    bgcolor: 'rgba(15, 118, 110, 0.1)',
+                                    color: '#0F766E',
+                                    border: '1px solid rgba(15, 118, 110, 0.25)'
+                                }}
+                            />
+                        ))
+                    }
+                    renderOption={(props, option) => {
+                        const isSelected = selectedProducts.some(p => p.id === option.id);
+                        return (
+                            <Box
+                                component="li"
+                                {...props}
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 1.5,
+                                    py: 1,
+                                    px: 1.5,
+                                    borderBottom: '1px solid',
+                                    borderColor: 'divider',
+                                    bgcolor: isSelected ? 'rgba(15, 118, 110, 0.06)' : 'transparent',
+                                    '&:hover': { bgcolor: 'action.hover' }
+                                }}
+                            >
+                                <Checkbox
+                                    size="small"
+                                    checked={isSelected}
+                                    sx={{
+                                        color: 'text.secondary',
+                                        '&.Mui-checked': { color: '#0F766E' },
+                                        p: 0.5
+                                    }}
+                                />
+                                <Box sx={{ flex: 1, minWidth: 0 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Typography variant="body2" sx={{ fontWeight: 800 }}>
+                                            {option.name}
+                                        </Typography>
+                                        {option.variantName && (
+                                            <Chip
+                                                label={option.variantName}
+                                                size="small"
+                                                sx={{ height: 18, fontSize: '0.65rem', fontWeight: 600 }}
+                                            />
+                                        )}
+                                    </Box>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 0.25 }}>
+                                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 700 }}>
+                                            #{option.productId || 'NO-SKU'}
+                                        </Typography>
+                                        {option.category && (
+                                            <Typography variant="caption" color="text.secondary">
+                                                • {option.category}
+                                            </Typography>
+                                        )}
+                                        <Typography variant="caption" sx={{ color: (option.quantity || 0) > 0 ? 'text.secondary' : 'error.main' }}>
+                                            • Stock: {option.quantity || 0} units
+                                        </Typography>
+                                    </Box>
+                                </Box>
+
+                                <Box sx={{ textAlign: 'right', pl: 1 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 800, color: '#D97706' }}>
+                                        ₹{(option.price || 0).toLocaleString('en-IN')}
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ color: isSelected ? '#0F766E' : 'text.secondary', fontWeight: 700 }}>
+                                        {isSelected ? '✓ In Queue' : '+ Add'}
+                                    </Typography>
+                                </Box>
                             </Box>
-                        </Box>
-                    )}
+                        );
+                    }}
                     renderInput={(params) => (
                         <TextField
                             {...params}
-                            label={`Select Product from ${filteredAndSortedInventory.length} filtered items`}
+                            label={`Select Multiple Garments from ${filteredAndSortedInventory.length} filtered items`}
+                            placeholder={selectedProducts.length > 0 ? `${selectedProducts.length} items in queue...` : "Click or type to select multiple garments..."}
                             variant="outlined"
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                         />

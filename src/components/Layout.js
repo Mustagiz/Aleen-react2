@@ -50,6 +50,7 @@ import { useThemeContext } from '../contexts/ThemeContext';
 import NotificationCenter from './NotificationCenter';
 import GlobalSearch from './GlobalSearch';
 import NetworkStatus from './NetworkStatus';
+import AtelierFooter from './crm/AtelierFooter';
 
 const SIDEBAR_EXPANDED_WIDTH = 260;
 const SIDEBAR_COLLAPSED_WIDTH = 74;
@@ -585,10 +586,15 @@ export default function Layout() {
             flex: 1,
             overflowY: 'auto',
             p: { xs: 2, sm: 3, md: 3.5 },
-            bgcolor: 'background.default'
+            bgcolor: 'background.default',
+            display: 'flex',
+            flexDirection: 'column'
           }}
         >
-          <Outlet />
+          <Box sx={{ flex: 1 }}>
+            <Outlet />
+          </Box>
+          <AtelierFooter />
         </Box>
       </Box>
 
