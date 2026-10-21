@@ -39,6 +39,8 @@ import {
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import GlassCard from '../components/GlassCard';
+import PageHeader from '../components/crm/PageHeader';
+import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 
 const Loyalty = () => {
     const { customers, redeemLoyaltyPoints, addBirthdayBonus } = useData();
@@ -131,94 +133,57 @@ const Loyalty = () => {
 
     return (
         <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
-            {/* Header */}
-            <Box sx={{ mb: 4 }}>
-                <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>
-                    Loyalty Program
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                    Manage customer rewards and tier benefits
-                </Typography>
-            </Box>
+            {/* Atelier Page Header */}
+            <PageHeader
+                title="Clientele Loyalty & Privileges"
+                subtitle="Manage VIP rewards tiers, membership point accruals, and boutique privileges"
+                breadcrumbs={[
+                    { label: 'Aleen Atelier', path: '/' },
+                    { label: 'Clientele & CRM', path: '/customers' },
+                    { label: 'Loyalty Program' }
+                ]}
+            />
 
             {/* Summary Cards */}
-            <Grid container spacing={3} sx={{ mb: 6 }}>
+            <Grid container spacing={2.5} sx={{ mb: 4 }}>
                 <Grid item xs={12} sm={6} md={3}>
-                    <GlassCard sx={{ height: '100%', p: 0 }}>
-                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: 'primary.main' }} />
-                        <CardContent sx={{ p: 3 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                                <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>
-                                    Total Points
-                                </Typography>
-                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(136, 14, 79, 0.1)' }}>
-                                    <Stars sx={{ color: 'primary.main', fontSize: 20 }} />
-                                </Box>
-                            </Box>
-                            <Typography variant="h4" sx={{ fontWeight: 900 }}>
-                                {totalPoints.toLocaleString()}
-                            </Typography>
-                        </CardContent>
-                    </GlassCard>
+                    <AtelierKpiCard
+                        title="Circulating Points"
+                        value={totalPoints.toLocaleString()}
+                        icon={<Stars fontSize="small" />}
+                        goldAccent={true}
+                        subtitle="Reward balance"
+                    />
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={3}>
-                    <GlassCard sx={{ height: '100%', p: 0 }}>
-                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#059669' }} />
-                        <CardContent sx={{ p: 3 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                                <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>
-                                    Active Members
-                                </Typography>
-                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(5, 150, 105, 0.1)' }}>
-                                    <TrendingUp sx={{ color: '#059669', fontSize: 20 }} />
-                                </Box>
-                            </Box>
-                            <Typography variant="h4" sx={{ fontWeight: 900 }}>
-                                {activeMembers}
-                            </Typography>
-                        </CardContent>
-                    </GlassCard>
+                    <AtelierKpiCard
+                        title="Active VIP Members"
+                        value={activeMembers}
+                        icon={<TrendingUp fontSize="small" />}
+                        subtitle="Clients with points"
+                    />
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={3}>
-                    <GlassCard sx={{ height: '100%', p: 0 }}>
-                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#D97706' }} />
-                        <CardContent sx={{ p: 3 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                                <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>
-                                    Platinum Members
-                                </Typography>
-                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(217, 119, 6, 0.1)' }}>
-                                    <EmojiEvents sx={{ color: '#D97706', fontSize: 20 }} />
-                                </Box>
-                            </Box>
-                            <Typography variant="h4" sx={{ fontWeight: 900 }}>
-                                {tierStats.Platinum}
-                            </Typography>
-                        </CardContent>
-                    </GlassCard>
+                    <AtelierKpiCard
+                        title="Platinum Members"
+                        value={tierStats.Platinum}
+                        icon={<EmojiEvents fontSize="small" />}
+                        subtitle="Top spenders tier"
+                    />
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={3}>
-                    <GlassCard sx={{ height: '100%', p: 0 }}>
-                        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#7C3AED' }} />
-                        <CardContent sx={{ p: 3 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                                <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>
-                                    Gold Members
-                                </Typography>
-                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(124, 58, 237, 0.1)' }}>
-                                    <CardGiftcard sx={{ color: '#7C3AED', fontSize: 20 }} />
-                                </Box>
-                            </Box>
-                            <Typography variant="h4" sx={{ fontWeight: 900 }}>
-                                {tierStats.Gold}
-                            </Typography>
-                        </CardContent>
-                    </GlassCard>
+                    <AtelierKpiCard
+                        title="Gold Members"
+                        value={tierStats.Gold}
+                        icon={<CardGiftcard fontSize="small" />}
+                        subtitle="Frequent patrons"
+                    />
                 </Grid>
             </Grid>
+
 
             {/* Tier Distribution */}
             <Grid container spacing={3} sx={{ mb: 4 }}>

@@ -6,6 +6,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 import GlassCard from '../components/GlassCard';
+import PageHeader from '../components/crm/PageHeader';
+import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import Papa from 'papaparse';
 
 const Inventory = () => {
@@ -258,36 +260,39 @@ const Inventory = () => {
 
   return (
     <Box>
-      {/* Header with Stats */}
-      <Box sx={{ mb: 4 }}>
-        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, gap: 2, mb: 3 }}>
-          <Box>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>Inventory Management</Typography>
-            <Typography variant="body2" color="text.secondary">Manage your products and stock levels</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+      {/* Atelier Page Header with Breadcrumbs & Actions */}
+      <PageHeader
+        title="Merchandise & Inventory"
+        subtitle="Catalogue garment collections, monitor stock levels, and organize variants"
+        breadcrumbs={[
+          { label: 'Aleen Atelier', path: '/' },
+          { label: 'Merchandise', path: '/inventory' },
+          { label: 'Inventory' }
+        ]}
+        actions={
+          <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
             <Button
               variant="outlined"
-              startIcon={<Download />}
+              startIcon={<Download fontSize="small" />}
               onClick={downloadInventory}
-              sx={{ px: 3, py: 1.5, borderRadius: 2, fontWeight: 700, textTransform: 'none' }}
+              sx={{ px: 2, py: 1, borderRadius: 2, fontWeight: 700, fontSize: '0.82rem' }}
             >
-              Export CSV
+              Export
             </Button>
             <Button
               variant="outlined"
-              startIcon={<Download />}
+              startIcon={<Download fontSize="small" />}
               onClick={downloadTemplate}
               color="secondary"
-              sx={{ px: 3, py: 1.5, borderRadius: 2, fontWeight: 700, textTransform: 'none' }}
+              sx={{ px: 2, py: 1, borderRadius: 2, fontWeight: 700, fontSize: '0.82rem' }}
             >
               Template
             </Button>
             <Button
               variant="outlined"
               component="label"
-              startIcon={<Upload />}
-              sx={{ px: 3, py: 1.5, borderRadius: 2, fontWeight: 700, textTransform: 'none' }}
+              startIcon={<Upload fontSize="small" />}
+              sx={{ px: 2, py: 1, borderRadius: 2, fontWeight: 700, fontSize: '0.82rem' }}
             >
               Bulk Upload
               <input type="file" hidden accept=".csv" onChange={handleBulkUpload} />
@@ -297,97 +302,66 @@ const Inventory = () => {
               startIcon={<Add />}
               onClick={() => handleOpen()}
               sx={{
-                width: { xs: '100%', sm: 'auto' },
-                px: { xs: 2, sm: 4 },
-                py: 1.5,
+                px: 3,
+                py: 1,
                 borderRadius: 2,
                 fontWeight: 700,
-                textTransform: 'none',
-                background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)',
-                boxShadow: `0 4px 12px ${theme.palette.primary.main} 33`,
-                transition: 'all 0.2s ease-in-out',
+                fontSize: '0.85rem',
+                background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
+                color: '#ffffff',
+                boxShadow: '0 4px 14px rgba(217,119,6,0.3)',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)',
-                  boxShadow: `0 6px 16px ${theme.palette.primary.main} 4D`,
-                  transform: 'translateY(-2px)'
+                  background: 'linear-gradient(135deg, #b45309 0%, #92400e 100%)',
                 }
               }}
             >
-              Add Product
+              + Add Garment
             </Button>
           </Box>
-        </Box>
+        }
+      />
 
-        {/* Stats Cards */}
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={3}>
-            <GlassCard sx={{ height: '100%', p: 0 }}>
-              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: 'primary.main' }} />
-              <CardContent sx={{ p: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Box>
-                    <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Total Items</Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', mt: 0.5 }}>{totalItems}</Typography>
-                  </Box>
-                  <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'primary.light', color: 'primary.contrastText' }}>
-                    <Inventory2 />
-                  </Box>
-                </Box>
-              </CardContent>
-            </GlassCard>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <GlassCard sx={{ height: '100%', p: 0 }}>
-              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#2e7d32' }} />
-              <CardContent sx={{ p: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Box>
-                    <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Inventory Value</Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', mt: 0.5 }}>₹{totalValue.toLocaleString('en-IN')}</Typography>
-                  </Box>
-                  <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(46, 125, 50, 0.1)', color: '#2e7d32' }}>
-                    <AttachMoney />
-                  </Box>
-                </Box>
-              </CardContent>
-            </GlassCard>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <GlassCard sx={{ height: '100%', p: 0 }}>
-              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#f57f17' }} />
-              <CardContent sx={{ p: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Box>
-                    <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Low Stock</Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 900, color: '#f57f17', mt: 0.5 }}>{lowStockItems}</Typography>
-                  </Box>
-                  <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(245, 127, 23, 0.1)', color: '#f57f17' }}>
-                    <Warning />
-                  </Box>
-                </Box>
-              </CardContent>
-            </GlassCard>
-          </Grid>
-          {user?.role === 'admin' && (
-            <Grid item xs={12} sm={6} md={3}>
-              <GlassCard sx={{ height: '100%', p: 0 }}>
-                <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#DB2777' }} />
-                <CardContent sx={{ p: 3 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Box>
-                      <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Est. Margin</Typography>
-                      <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', mt: 0.5 }}>₹{totalProfit.toLocaleString('en-IN')}</Typography>
-                    </Box>
-                    <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(219, 39, 119, 0.1)', color: '#DB2777' }}>
-                      <TrendingUp />
-                    </Box>
-                  </Box>
-                </CardContent>
-              </GlassCard>
-            </Grid>
-          )}
+      {/* Atelier KPI Cards */}
+      <Grid container spacing={2.5} sx={{ mb: 4 }}>
+        <Grid item xs={12} sm={6} md={3}>
+          <AtelierKpiCard
+            title="Total Stock Units"
+            value={totalItems}
+            icon={<Inventory2 fontSize="small" />}
+            subtitle="Available garments"
+          />
         </Grid>
-      </Box>
+        <Grid item xs={12} sm={6} md={3}>
+          <AtelierKpiCard
+            title="Valuation (M.R.P)"
+            value={`₹${totalValue.toLocaleString('en-IN')}`}
+            icon={<AttachMoney fontSize="small" />}
+            goldAccent={true}
+            subtitle="Retail stock valuation"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <AtelierKpiCard
+            title="Low Stock Alert"
+            value={lowStockItems}
+            icon={<Warning fontSize="small" />}
+            trend={lowStockItems > 0 ? `${lowStockItems} items` : 'Healthy'}
+            trendPositive={lowStockItems === 0}
+            subtitle="Below safety threshold"
+          />
+        </Grid>
+        {user?.role === 'admin' && (
+          <Grid item xs={12} sm={6} md={3}>
+            <AtelierKpiCard
+              title="Estimated Margin"
+              value={`₹${totalProfit.toLocaleString('en-IN')}`}
+              icon={<TrendingUp fontSize="small" />}
+              subtitle="Projected profit margin"
+            />
+          </Grid>
+        )}
+      </Grid>
+
 
       {/* Search and Filter */}
       <GlassCard sx={{ p: 3, mb: 4 }}>

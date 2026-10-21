@@ -11,6 +11,8 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useThemeContext } from '../contexts/ThemeContext';
 import GlassCard from '../components/GlassCard';
+import PageHeader from '../components/crm/PageHeader';
+import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 
 const Invoices = () => {
   const { user } = useAuth();
@@ -680,19 +682,22 @@ const Invoices = () => {
 
   return (
     <Box>
-      {/* Header with Stats */}
-      <Box sx={{ mb: 4 }}>
-        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, gap: 2, mb: 3 }}>
-          <Box>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>Invoices</Typography>
-            <Typography variant="body2" color="text.secondary">Create, manage and track all your invoices</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', gap: 1 }}>
+      {/* Atelier Page Header with Breadcrumbs & Actions */}
+      <PageHeader
+        title="Billing & Invoices"
+        subtitle="Create, manage and track all customer boutique invoices and receipts"
+        breadcrumbs={[
+          { label: 'Aleen Atelier', path: '/' },
+          { label: 'Sales & POS', path: '/pos' },
+          { label: 'Invoices' }
+        ]}
+        actions={
+          <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
             <Button
               variant="outlined"
-              startIcon={<Download />}
+              startIcon={<Download fontSize="small" />}
               onClick={downloadInvoices}
-              sx={{ px: 3, py: 1.5, borderRadius: 2, fontWeight: 700, textTransform: 'none' }}
+              sx={{ px: 2.5, py: 1, borderRadius: 2, fontWeight: 700, fontSize: '0.82rem' }}
             >
               Export CSV
             </Button>
@@ -703,81 +708,55 @@ const Invoices = () => {
                 setSelectedItems([{ id: '', quantity: 1 }]);
                 setOpen(true);
               }}
-              size="large"
               sx={{
-                width: { xs: '100%', sm: 'auto' },
-                px: { xs: 2, sm: 4 },
-                py: 1.5,
+                px: 3,
+                py: 1,
                 borderRadius: 2,
                 fontWeight: 700,
-                textTransform: 'none',
-                background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)',
-                boxShadow: `0 4px 12px ${theme.palette.primary.main}33`,
-                transition: 'all 0.2s ease-in-out',
+                fontSize: '0.85rem',
+                background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
+                color: '#ffffff',
+                boxShadow: '0 4px 14px rgba(217,119,6,0.3)',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)',
-                  boxShadow: `0 6px 16px ${theme.palette.primary.main}4D`,
-                  transform: 'translateY(-2px)'
+                  background: 'linear-gradient(135deg, #b45309 0%, #92400e 100%)',
                 }
               }}
             >
-              Create Invoice
+              Create Invoice (Alt+N)
             </Button>
           </Box>
-        </Box>
+        }
+      />
 
-        {/* Stats Cards */}
-        <Grid container spacing={3} sx={{ mb: 6 }}>
-          <Grid item xs={12} sm={4}>
-            <GlassCard sx={{ height: '100%', p: 0 }}>
-              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#1976d2' }} />
-              <CardContent sx={{ p: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Box>
-                    <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Total Invoices</Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', mt: 0.5 }}>{totalInvoices}</Typography>
-                  </Box>
-                  <Avatar sx={{ bgcolor: 'rgba(25, 118, 210, 0.1)', color: '#1976d2', borderRadius: 2.5 }}>
-                    <Receipt fontSize="small" />
-                  </Avatar>
-                </Box>
-              </CardContent>
-            </GlassCard>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <GlassCard sx={{ height: '100%', p: 0 }}>
-              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#2e7d32' }} />
-              <CardContent sx={{ p: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Box>
-                    <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Revenue</Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', mt: 0.5 }}>₹{totalAmount.toLocaleString('en-IN')}</Typography>
-                  </Box>
-                  <Avatar sx={{ bgcolor: 'rgba(46, 125, 50, 0.1)', color: '#2e7d32', borderRadius: 2.5 }}>
-                    <AttachMoney fontSize="small" />
-                  </Avatar>
-                </Box>
-              </CardContent>
-            </GlassCard>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <GlassCard sx={{ height: '100%', p: 0 }}>
-              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#ed6c02' }} />
-              <CardContent sx={{ p: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Box>
-                    <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Avg Invoice</Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', mt: 0.5 }}>₹{avgAmount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</Typography>
-                  </Box>
-                  <Avatar sx={{ bgcolor: 'rgba(237, 108, 2, 0.1)', color: '#ed6c02', borderRadius: 2.5 }}>
-                    <TrendingUp fontSize="small" />
-                  </Avatar>
-                </Box>
-              </CardContent>
-            </GlassCard>
-          </Grid>
+      {/* Atelier KPI Cards */}
+      <Grid container spacing={2.5} sx={{ mb: 4 }}>
+        <Grid item xs={12} sm={4}>
+          <AtelierKpiCard
+            title="Total Invoices"
+            value={totalInvoices}
+            icon={<Receipt fontSize="small" />}
+            subtitle="Generated records"
+          />
         </Grid>
-      </Box>
+        <Grid item xs={12} sm={4}>
+          <AtelierKpiCard
+            title="Total Revenue"
+            value={`₹${totalAmount.toLocaleString('en-IN')}`}
+            icon={<AttachMoney fontSize="small" />}
+            goldAccent={true}
+            subtitle="Total invoiced gross"
+          />
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <AtelierKpiCard
+            title="Average Ticket"
+            value={`₹${avgAmount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
+            icon={<TrendingUp fontSize="small" />}
+            subtitle="Per completed invoice"
+          />
+        </Grid>
+      </Grid>
+
 
       {/* Search and Filter Bar */}
       <GlassCard sx={{ p: 3, mb: 4 }}>
