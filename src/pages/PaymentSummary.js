@@ -12,11 +12,7 @@ import {
     TableRow,
     Chip,
     IconButton,
-    Menu,
     MenuItem,
-    ListItemIcon,
-    ListItemText,
-    Divider,
     TextField,
     InputAdornment,
     TablePagination,
@@ -48,7 +44,6 @@ const PaymentSummary = () => {
     const { invoices } = useData();
     const theme = useTheme();
     const [dateRange, setDateRange] = useState('today');
-    const [anchorEl, setAnchorEl] = useState(null);
 
     // Search and Table Filter State
     const [searchQuery, setSearchQuery] = useState('');
@@ -255,7 +250,6 @@ const PaymentSummary = () => {
         });
 
         doc.save(`aleen-daily-cash-ledger-${label.toLowerCase().replace(' ', '-')}-${new Date().toISOString().split('T')[0]}.pdf`);
-        handleMenuClose();
     };
 
     const exportToExcel = () => {
@@ -286,20 +280,10 @@ const PaymentSummary = () => {
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Payment Summary');
         XLSX.writeFile(wb, `aleen_daily_cash_ledger_${label.toLowerCase().replace(' ', '-')}_${new Date().toISOString().split('T')[0]}.xlsx`);
-        handleMenuClose();
-    };
-
-    const handleMenuClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleMenuClose = () => {
-        setAnchorEl(null);
     };
 
     const handlePrint = () => {
         window.print();
-        handleMenuClose();
     };
 
     return (
@@ -314,11 +298,11 @@ const PaymentSummary = () => {
                     { label: 'Daily Cash Ledger' }
                 ]}
                 actions={
-                    <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
                         <Button
                             variant="outlined"
                             startIcon={<Download sx={{ fontSize: 19, color: '#0F766E' }} />}
-                            onClick={handleMenuClick}
+                            onClick={exportToExcel}
                             sx={{
                                 height: 42,
                                 minHeight: 42,
@@ -342,28 +326,69 @@ const PaymentSummary = () => {
                                 }
                             }}
                         >
-                            Export Audit
+                            Export Excel
                         </Button>
-                        <Menu 
-                            anchorEl={anchorEl} 
-                            open={Boolean(anchorEl)} 
-                            onClose={handleMenuClose}
-                            PaperProps={{ sx: { borderRadius: 2.5, minWidth: 160, boxShadow: '0 8px 24px rgba(0,0,0,0.15)' } }}
+                        <Button
+                            variant="outlined"
+                            startIcon={<Print sx={{ fontSize: 19, color: '#0F766E' }} />}
+                            onClick={handlePrint}
+                            sx={{
+                                height: 42,
+                                minHeight: 42,
+                                px: 2.75,
+                                borderRadius: '24px',
+                                border: '1.5px solid #0F766E',
+                                color: '#0F766E',
+                                bgcolor: 'background.paper',
+                                fontWeight: 700,
+                                fontSize: '0.84rem',
+                                textTransform: 'none',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxSizing: 'border-box',
+                                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                                '&:hover': {
+                                    border: '1.5px solid #042F2E',
+                                    bgcolor: 'rgba(15, 118, 110, 0.05)',
+                                    transform: 'translateY(-1px)'
+                                }
+                            }}
                         >
-                            <MenuItem onClick={exportToPDF}>
-                                <ListItemIcon><Download fontSize="small" sx={{ color: '#0F766E' }} /></ListItemIcon>
-                                <ListItemText primaryTypographyProps={{ fontWeight: 600, fontSize: '0.85rem' }}>Export PDF</ListItemText>
-                            </MenuItem>
-                            <MenuItem onClick={exportToExcel}>
-                                <ListItemIcon><Download fontSize="small" sx={{ color: '#0F766E' }} /></ListItemIcon>
-                                <ListItemText primaryTypographyProps={{ fontWeight: 600, fontSize: '0.85rem' }}>Export Excel</ListItemText>
-                            </MenuItem>
-                            <Divider sx={{ my: 0.5 }} />
-                            <MenuItem onClick={handlePrint}>
-                                <ListItemIcon><Print fontSize="small" /></ListItemIcon>
-                                <ListItemText primaryTypographyProps={{ fontWeight: 600, fontSize: '0.85rem' }}>Print Report</ListItemText>
-                            </MenuItem>
-                        </Menu>
+                            Print
+                        </Button>
+                        <Button
+                            variant="contained"
+                            startIcon={<Download sx={{ fontSize: 19, color: '#FFFFFF !important' }} />}
+                            onClick={exportToPDF}
+                            sx={{
+                                height: 42,
+                                minHeight: 42,
+                                px: 3,
+                                borderRadius: '24px',
+                                textTransform: 'none',
+                                fontWeight: 700,
+                                fontSize: '0.84rem',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxSizing: 'border-box',
+                                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%) !important',
+                                color: '#FFFFFF !important',
+                                boxShadow: '0 4px 14px rgba(15, 118, 110, 0.3)',
+                                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                                '& .MuiSvgIcon-root': {
+                                    color: '#FFFFFF !important'
+                                },
+                                '&:hover': {
+                                    background: 'linear-gradient(135deg, #115E59 0%, #021C1B 100%) !important',
+                                    boxShadow: '0 6px 18px rgba(15, 118, 110, 0.45)',
+                                    transform: 'translateY(-1px)'
+                                }
+                            }}
+                        >
+                            Export Audit PDF
+                        </Button>
                     </Box>
                 }
             />
@@ -379,7 +404,17 @@ const PaymentSummary = () => {
                         Reconciliation Period:
                     </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(15, 118, 110, 0.04)', p: 0.5, borderRadius: 2.5 }}>
+                <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    bgcolor: 'background.paper',
+                    p: '3px',
+                    height: 42,
+                    boxSizing: 'border-box',
+                    borderRadius: '24px',
+                    border: '1.5px solid rgba(15, 118, 110, 0.25)',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
+                }}>
                     {[
                         { key: 'today', label: 'Today' },
                         { key: 'yesterday', label: 'Yesterday' },
@@ -395,17 +430,17 @@ const PaymentSummary = () => {
                                     setPage(0);
                                 }}
                                 sx={{
-                                    px: 2.5,
-                                    py: 0.75,
-                                    borderRadius: 2,
+                                    height: 34,
+                                    px: 2,
+                                    borderRadius: '20px',
                                     textTransform: 'none',
-                                    fontWeight: isSelected ? 800 : 600,
-                                    fontSize: '0.825rem',
-                                    color: isSelected ? '#ffffff' : 'text.secondary',
-                                    background: isSelected ? 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)' : 'transparent',
-                                    boxShadow: isSelected ? '0 2px 8px rgba(15, 118, 110, 0.25)' : 'none',
+                                    fontWeight: 700,
+                                    fontSize: '0.82rem',
+                                    color: isSelected ? '#FFFFFF' : 'text.secondary',
+                                    bgcolor: isSelected ? '#0F766E' : 'transparent',
+                                    transition: 'all 0.15s ease',
                                     '&:hover': {
-                                        background: isSelected ? 'linear-gradient(135deg, #0b5650 0%, #021e1d 100%)' : 'rgba(15, 118, 110, 0.08)'
+                                        bgcolor: isSelected ? '#042F2E' : 'rgba(15, 118, 110, 0.08)'
                                     }
                                 }}
                             >
@@ -519,7 +554,7 @@ const PaymentSummary = () => {
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <Search fontSize="small" sx={{ color: 'text.secondary' }} />
+                                        <Search fontSize="small" sx={{ color: '#0F766E' }} />
                                     </InputAdornment>
                                 ),
                                 endAdornment: searchQuery && (
@@ -529,6 +564,17 @@ const PaymentSummary = () => {
                                         </IconButton>
                                     </InputAdornment>
                                 )
+                            }}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    height: 42,
+                                    borderRadius: '24px',
+                                    bgcolor: 'background.paper',
+                                    fontSize: '0.84rem',
+                                    '& fieldset': { borderColor: 'rgba(15, 118, 110, 0.25)' },
+                                    '&:hover fieldset': { borderColor: '#0F766E' },
+                                    '&.Mui-focused fieldset': { borderColor: '#0F766E', borderWidth: 1.5 }
+                                }
                             }}
                         />
                     </Grid>
@@ -543,6 +589,17 @@ const PaymentSummary = () => {
                                 setMethodFilter(e.target.value);
                                 setPage(0);
                             }}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    height: 42,
+                                    borderRadius: '24px',
+                                    bgcolor: 'background.paper',
+                                    fontSize: '0.84rem',
+                                    '& fieldset': { borderColor: 'rgba(15, 118, 110, 0.25)' },
+                                    '&:hover fieldset': { borderColor: '#0F766E' },
+                                    '&.Mui-focused fieldset': { borderColor: '#0F766E', borderWidth: 1.5 }
+                                }
+                            }}
                         >
                             <MenuItem value="All">All Methods ({allTransactions.length})</MenuItem>
                             {['Cash', 'UPI', 'Card', 'Credit', 'Net Banking'].map(m => (
@@ -552,17 +609,31 @@ const PaymentSummary = () => {
                             ))}
                         </TextField>
                     </Grid>
-                    <Grid item xs={12} sm={6} md={2.5} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Grid item xs={12} sm={6} md={2.5} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                         {(searchQuery || methodFilter !== 'All') && (
                             <Button 
                                 size="small" 
-                                color="inherit" 
                                 onClick={() => {
                                     setSearchQuery('');
                                     setMethodFilter('All');
                                     setPage(0);
                                 }}
-                                sx={{ textTransform: 'none', fontSize: '0.75rem', fontWeight: 600 }}
+                                sx={{
+                                    height: 38,
+                                    borderRadius: '20px',
+                                    px: 2,
+                                    border: '1.5px solid rgba(15, 118, 110, 0.3)',
+                                    color: '#0F766E',
+                                    textTransform: 'none',
+                                    fontSize: '0.82rem',
+                                    fontWeight: 700,
+                                    transition: 'all 0.15s ease',
+                                    '&:hover': {
+                                        border: '1.5px solid #0F766E',
+                                        bgcolor: 'rgba(15, 118, 110, 0.05)',
+                                        transform: 'translateY(-1px)'
+                                    }
+                                }}
                             >
                                 Reset Filters
                             </Button>
