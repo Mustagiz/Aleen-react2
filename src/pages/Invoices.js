@@ -19,6 +19,7 @@ import GlassCard from '../components/GlassCard';
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import { TableSkeleton } from '../components/crm/AtelierSkeleton';
+import InvoiceWhatsAppDialog from '../components/InvoiceWhatsAppDialog';
 
 const Invoices = () => {
   const { user } = useAuth();
@@ -26,6 +27,8 @@ const Invoices = () => {
   const { mode } = useThemeContext();
   const [open, setOpen] = useState(false);
   const [viewInvoice, setViewInvoice] = useState(null);
+  const [whatsAppDialogOpen, setWhatsAppDialogOpen] = useState(false);
+  const [whatsAppInvoice, setWhatsAppInvoice] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -1222,27 +1225,9 @@ const Invoices = () => {
   };
 
   const sendWhatsApp = (invoice) => {
-    const message = `*${profile.businessName}*%0A${profile.address}%0A%0A` +
-      `*Invoice: ${invoice.id}*%0A` +
-      `Date: ${new Date(invoice.date).toLocaleDateString()}%0A` +
-      `Customer: ${invoice.customer || 'Walk-in'}%0A%0A` +
-      `*Items:*%0A` +
-      invoice.items.map(item => `${item.name} x${item.quantity} = ₹${(item.price * item.quantity).toFixed(2)}`).join('%0A') +
-      `%0A%0A` +
-      `Subtotal: ₹${invoice.subtotal.toFixed(2)}%0A` +
-      `GST (${invoice.gst}%): ₹${invoice.tax.toFixed(2)}%0A` +
-      (invoice.discount > 0 ? `Discount: ₹${invoice.discount.toFixed(2)} (${invoice.discountPercentage || 0}%)%0A` : '') +
-      `*Total: ₹${invoice.total.toFixed(2)}*%0A%0A` +
-      `Payment: ${invoice.paymentMethod}%0A%0A` +
-      `Thank you for shopping with us!%0A%0A` +
-      `*${profile.businessName.toUpperCase()} | ${profile.address}*`;
-
-    const phoneNumber = invoice.phone?.replace(/[^0-9]/g, '');
-    const whatsappUrl = phoneNumber
-      ? `https://wa.me/${phoneNumber.startsWith('91') ? '' : '91'}${phoneNumber}?text=${message}`
-      : `https://wa.me/?text=${message}`;
-
-    window.open(whatsappUrl, '_blank');
+    if (!invoice) return;
+    setWhatsAppInvoice(invoice);
+    setWhatsAppDialogOpen(true);
   };
 
   const handleConfirmDelete = async () => {
@@ -3119,6 +3104,17 @@ const Invoices = () => {
         onClose={() => setTemplateModalOpen(false)}
         settings={invoiceSettings}
         onSaveSettings={(newSettings) => setInvoiceSettings(newSettings)}
+      />
+
+      {/* Invoice WhatsApp Dispatch Studio & Custom Templates Dialog */}
+      <InvoiceWhatsAppDialog
+        open={whatsAppDialogOpen}
+        onClose={() => {
+          setWhatsAppDialogOpen(false);
+          setWhatsAppInvoice(null);
+        }}
+        invoice={whatsAppInvoice}
+        profile={profile}
       />
 
       {/* Hidden offscreen container for pixel-perfect PDF export */}
