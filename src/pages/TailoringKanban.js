@@ -45,7 +45,8 @@ import {
   Group,
   Phone,
   Close,
-  PersonAdd
+  PersonAdd,
+  CalendarMonth
 } from '@mui/icons-material';
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
@@ -1044,26 +1045,32 @@ export default function TailoringKanban() {
         <Box sx={{
           background: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)',
           color: '#FFFFFF',
-          p: 2.5,
+          px: 3,
+          py: 2.2,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <Box>
-            <Typography variant="h6" sx={{ fontWeight: 800, color: '#FFFFFF', letterSpacing: '0.02em' }}>
-              Bespoke Measurement & Craft Studio
-            </Typography>
-            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.75rem' }}>
-              Precision anatomical silhouette profiling, master tailor allocation & craft labor economics
-            </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.15)', color: '#FFFFFF', width: 40, height: 40 }}>
+              <Straighten />
+            </Avatar>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 800, color: '#FFFFFF', letterSpacing: '0.01em', lineHeight: 1.2 }}>
+                Bespoke Measurement & Craft Studio
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.75rem' }}>
+                Precision anatomical silhouette profiling, master tailor allocation & craft labor economics
+              </Typography>
+            </Box>
           </Box>
-          <IconButton size="small" onClick={() => setDialogOpen(false)} sx={{ color: 'rgba(255,255,255,0.8)' }}>
+          <IconButton size="small" onClick={() => setDialogOpen(false)} sx={{ color: 'rgba(255,255,255,0.8)', '&:hover': { color: '#FFFFFF', bgcolor: 'rgba(255,255,255,0.1)' } }}>
             <Close fontSize="small" />
           </IconButton>
         </Box>
 
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, p: 3 }}>
-          {/* Client Details Row */}
+          {/* Client Details Row - Perfectly Aligned */}
           <Grid container spacing={2}>
             <Grid item xs={12} sm={4}>
               <TextField
@@ -1128,9 +1135,11 @@ export default function TailoringKanban() {
                     sx={{
                       py: 1,
                       px: 1,
+                      minHeight: 58,
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
+                      justifyContent: 'center',
                       gap: 0.5,
                       textTransform: 'none',
                       borderRadius: 2,
@@ -1192,24 +1201,12 @@ export default function TailoringKanban() {
             helperText="Auto-composed from anatomical profile above. You can freely edit or append bespoke styling instructions."
           />
 
-          {/* Master Tailor Allocation & Timeline */}
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                label="Target Fitting / Delivery Date"
-                type="date"
-                fullWidth
-                size="small"
-                InputLabelProps={{ shrink: true }}
-                value={formData.targetDate}
-                onChange={(e) => setFormData({ ...formData, targetDate: e.target.value })}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={4}>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
-                <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>
-                  Assigned Master Tailor
+          {/* Master Tailor & Atelier Turnaround Calendar - Symmetrically Aligned */}
+          <Grid container spacing={2} alignItems="flex-start">
+            <Grid item xs={12} sm={5}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.75, minHeight: 22 }}>
+                <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <Person sx={{ fontSize: 15, color: '#0F766E' }} /> Assigned Master Tailor
                 </Typography>
                 <Button
                   size="small"
@@ -1238,29 +1235,114 @@ export default function TailoringKanban() {
               </TextField>
             </Grid>
 
-            <Grid item xs={12} sm={4}>
-              <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mb: 0.5 }}>
-                Atelier Turnaround
-              </Typography>
+            <Grid item xs={12} sm={7}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.75, minHeight: 22, flexWrap: 'wrap', gap: 0.5 }}>
+                <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <CalendarMonth sx={{ fontSize: 15, color: '#0F766E' }} /> Atelier Turnaround Calendar
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 0.5 }}>
+                  <Button
+                    size="small"
+                    variant={formData.urgent ? 'contained' : 'outlined'}
+                    onClick={() => {
+                      const rushDate = new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0];
+                      setFormData(prev => ({ ...prev, urgent: true, targetDate: rushDate }));
+                    }}
+                    sx={{
+                      py: 0,
+                      px: 0.8,
+                      minHeight: 20,
+                      fontSize: '0.68rem',
+                      fontWeight: 800,
+                      textTransform: 'none',
+                      borderRadius: 1,
+                      bgcolor: formData.urgent ? '#EF4444' : 'transparent',
+                      color: formData.urgent ? '#FFFFFF' : '#EF4444',
+                      borderColor: '#EF4444',
+                      '&:hover': { bgcolor: formData.urgent ? '#DC2626' : 'rgba(239, 68, 68, 0.08)' }
+                    }}
+                  >
+                    ⚡ Rush (48h)
+                  </Button>
+                  <Button
+                    size="small"
+                    variant={!formData.urgent ? 'contained' : 'outlined'}
+                    onClick={() => {
+                      const stdDate = new Date(Date.now() + 4 * 86400000).toISOString().split('T')[0];
+                      setFormData(prev => ({ ...prev, urgent: false, targetDate: stdDate }));
+                    }}
+                    sx={{
+                      py: 0,
+                      px: 0.8,
+                      minHeight: 20,
+                      fontSize: '0.68rem',
+                      fontWeight: 800,
+                      textTransform: 'none',
+                      borderRadius: 1,
+                      bgcolor: !formData.urgent ? '#0F766E' : 'transparent',
+                      color: !formData.urgent ? '#FFFFFF' : '#0F766E',
+                      borderColor: '#0F766E',
+                      '&:hover': { bgcolor: !formData.urgent ? '#042F2E' : 'rgba(15, 118, 110, 0.08)' }
+                    }}
+                  >
+                    🧵 Standard (4d)
+                  </Button>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => {
+                      const bridalDate = new Date(Date.now() + 8 * 86400000).toISOString().split('T')[0];
+                      setFormData(prev => ({ ...prev, urgent: false, targetDate: bridalDate }));
+                    }}
+                    sx={{
+                      py: 0,
+                      px: 0.8,
+                      minHeight: 20,
+                      fontSize: '0.68rem',
+                      fontWeight: 800,
+                      textTransform: 'none',
+                      borderRadius: 1,
+                      color: '#D97706',
+                      borderColor: '#D97706',
+                      '&:hover': { bgcolor: 'rgba(217, 119, 6, 0.08)' }
+                    }}
+                  >
+                    👑 Bridal (8d)
+                  </Button>
+                </Box>
+              </Box>
+
               <TextField
-                select
+                type="date"
                 fullWidth
                 size="small"
-                value={formData.urgent ? 'yes' : 'no'}
-                onChange={(e) => setFormData({ ...formData, urgent: e.target.value === 'yes' })}
-              >
-                <MenuItem value="no">Standard Atelier (3 - 5 days)</MenuItem>
-                <MenuItem value="yes">⚡ Rush Order (24 - 48 hours)</MenuItem>
-              </TextField>
+                value={formData.targetDate}
+                onChange={(e) => setFormData({ ...formData, targetDate: e.target.value })}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <CalendarMonth sx={{ fontSize: 18, color: '#0F766E' }} />
+                    </InputAdornment>
+                  )
+                }}
+                inputProps={{
+                  min: new Date().toISOString().split('T')[0]
+                }}
+                helperText={
+                  formData.targetDate
+                    ? `Promised delivery on ${new Date(formData.targetDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })} (${formData.urgent ? '⚡ Rush order' : 'Standard atelier turnaround'})`
+                    : 'Pick turnaround target delivery date on the calendar'
+                }
+              />
             </Grid>
           </Grid>
 
-          {/* Craft Financial Economics & Margin Calculation */}
+          {/* Craft Financial Economics & Margin Calculation - Harmoniously Aligned */}
           <Box sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 2.5, border: '1px solid', borderColor: 'divider' }}>
             <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#D97706', display: 'block', mb: 1.5 }}>
               Craft Economics & Piece-Rate Labor Tracking
             </Typography>
-            <Grid container spacing={2} alignItems="center">
+            <Grid container spacing={2} alignItems="flex-start">
               <Grid item xs={12} sm={3}>
                 <TextField
                   label="Client Craft Price (₹)"
@@ -1281,7 +1363,6 @@ export default function TailoringKanban() {
                   size="small"
                   value={formData.artisanWage}
                   onChange={(e) => setFormData({ ...formData, artisanWage: e.target.value })}
-                  helperText="Master tailor piece rate"
                 />
               </Grid>
 
@@ -1298,16 +1379,19 @@ export default function TailoringKanban() {
 
               <Grid item xs={12} sm={3}>
                 <Box sx={{ 
-                  p: 1.2, 
-                  borderRadius: 2, 
+                  height: 40,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 1.5, 
                   bgcolor: 'rgba(15, 118, 110, 0.08)', 
-                  border: '1px solid rgba(15, 118, 110, 0.2)',
-                  textAlign: 'center'
+                  border: '1px solid rgba(15, 118, 110, 0.2)'
                 }}>
-                  <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block' }}>
+                  <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.68rem', lineHeight: 1 }}>
                     Est. Atelier Gross Margin
                   </Typography>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#0F766E' }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#0F766E', lineHeight: 1.2 }}>
                     ₹{Math.max(0, (parseFloat(formData.price) || 0) - (parseFloat(formData.artisanWage) || 0)).toFixed(2)}
                   </Typography>
                 </Box>
