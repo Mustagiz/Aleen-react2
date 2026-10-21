@@ -10,25 +10,25 @@ const GlassCard = ({ children, sx = {}, ...props }) => {
     return (
         <Box
             component={motion.div}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            whileHover={{ y: -5 }}
+            transition={{ duration: 0.35, ease: 'easeOut' }}
+            whileHover={{ y: -3 }}
         >
             <Paper
                 elevation={0}
                 sx={{
                     background: isDark
-                        ? 'rgba(30, 30, 40, 0.6)'
-                        : 'rgba(255, 255, 255, 0.7)',
-                    backdropFilter: 'blur(12px)',
+                        ? 'rgba(17, 32, 32, 0.85)'
+                        : 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(16px)',
                     border: isDark
-                        ? '1px solid rgba(255, 255, 255, 0.08)'
-                        : '1px solid rgba(255, 255, 255, 0.4)',
-                    borderRadius: 4,
+                        ? '1px solid rgba(20, 184, 166, 0.15)'
+                        : '1px solid rgba(15, 118, 110, 0.12)',
+                    borderRadius: 3.5,
                     boxShadow: isDark
-                        ? '0 8px 32px 0 rgba(0, 0, 0, 0.3)'
-                        : '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+                        ? '0 8px 32px 0 rgba(0, 0, 0, 0.45)'
+                        : '0 4px 24px -2px rgba(15, 118, 110, 0.06), 0 1px 3px rgba(0, 0, 0, 0.02)',
                     overflow: 'hidden',
                     ...sx
                 }}
