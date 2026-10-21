@@ -1,9 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { CssBaseline, Box } from '@mui/material';
+import { CssBaseline, Box, CircularProgress } from '@mui/material';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { DataProvider } from './contexts/DataContext';
 import { AnimatePresence, motion } from 'framer-motion';
+import ErrorBoundary from './components/ErrorBoundary';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Inventory from './pages/Inventory';
@@ -26,8 +27,14 @@ import Layout from './components/Layout';
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  if (loading) return null;
-  return user ? children : <Navigate to="/login" />;
+  if (loading && !user) {
+    return (
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#0B1313' }}>
+        <CircularProgress sx={{ color: '#0F766E' }} />
+      </Box>
+    );
+  }
+  return user ? children : <Navigate to="/login" replace />;
 };
 
 const PageWrapper = ({ children }) => (
@@ -77,13 +84,15 @@ function App() {
   return (
     <ThemeProvider>
       <CssBaseline />
-      <AuthProvider>
-        <DataProvider>
-          <Router basename={process.env.PUBLIC_URL}>
-            <AnimatedRoutes />
-          </Router>
-        </DataProvider>
-      </AuthProvider>
+      <ErrorBoundary>
+        <AuthProvider>
+          <DataProvider>
+            <Router basename={process.env.PUBLIC_URL}>
+              <AnimatedRoutes />
+            </Router>
+          </DataProvider>
+        </AuthProvider>
+      </ErrorBoundary>
     </ThemeProvider>
   );
 }

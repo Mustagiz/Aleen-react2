@@ -36,68 +36,72 @@ export const DataProvider = ({ children }) => {
 
   // Real-time synchronization
   useEffect(() => {
+    const onError = (collectionName) => (err) => {
+      console.warn(`Firestore sync [${collectionName}] warning:`, err);
+    };
+
     const unsubInventory = onSnapshot(collection(db, 'inventory'), (snapshot) => {
       setInventory(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    });
+    }, onError('inventory'));
 
     const unsubInvoices = onSnapshot(collection(db, 'invoices'), (snapshot) => {
       setInvoices(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    });
+    }, onError('invoices'));
 
     const unsubCustomers = onSnapshot(collection(db, 'customers'), (snapshot) => {
       setCustomers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    });
+    }, onError('customers'));
 
     const unsubLogs = onSnapshot(collection(db, 'inventory_logs'), (snapshot) => {
       setInventoryLogs(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    });
+    }, onError('inventory_logs'));
 
     const unsubVendors = onSnapshot(collection(db, 'vendors'), (snapshot) => {
       setVendors(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    });
+    }, onError('vendors'));
 
     const unsubPurchases = onSnapshot(collection(db, 'purchases'), (snapshot) => {
       setPurchases(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    });
+    }, onError('purchases'));
 
     const unsubExpenses = onSnapshot(collection(db, 'expenses'), (snapshot) => {
       setExpenses(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    });
+    }, onError('expenses'));
 
     const unsubProfile = onSnapshot(doc(db, 'settings', 'profile'), (snapshot) => {
       if (snapshot.exists()) {
         setProfile(snapshot.data());
       }
-    });
+    }, onError('profile'));
 
     const unsubCategories = onSnapshot(doc(db, 'settings', 'inventory'), (snapshot) => {
       if (snapshot.exists() && snapshot.data().categories) {
         setCategories(snapshot.data().categories);
       }
-    });
+    }, onError('categories'));
 
     const unsubMarketingTemplates = onSnapshot(collection(db, 'marketing_templates'), (snapshot) => {
       setMarketingTemplates(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    });
+    }, onError('marketing_templates'));
 
     const unsubExpenseCategories = onSnapshot(doc(db, 'settings', 'expenses'), (snapshot) => {
       if (snapshot.exists() && snapshot.data().categories) {
         setExpenseCategories(snapshot.data().categories);
       }
-    });
+    }, onError('expense_categories'));
 
     return () => {
-      unsubInventory();
-      unsubInvoices();
-      unsubCustomers();
-      unsubLogs();
-      unsubVendors();
-      unsubPurchases();
-      unsubExpenses();
-      unsubProfile();
-      unsubCategories();
-      unsubExpenseCategories();
-      unsubMarketingTemplates();
+      if (unsubInventory) unsubInventory();
+      if (unsubInvoices) unsubInvoices();
+      if (unsubCustomers) unsubCustomers();
+      if (unsubLogs) unsubLogs();
+      if (unsubVendors) unsubVendors();
+      if (unsubPurchases) unsubPurchases();
+      if (unsubExpenses) unsubExpenses();
+      if (unsubProfile) unsubProfile();
+      if (unsubCategories) unsubCategories();
+      if (unsubExpenseCategories) unsubExpenseCategories();
+      if (unsubMarketingTemplates) unsubMarketingTemplates();
     };
   }, []);
 

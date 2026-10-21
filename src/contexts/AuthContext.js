@@ -13,26 +13,51 @@ export const AuthProvider = ({ children }) => {
   });
   const [adminPassword, setAdminPassword] = useState('admin123');
   const [cashierPassword, setCashierPassword] = useState('cashier123');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // Sync passwords from Firestore
   useEffect(() => {
-    const unsub = onSnapshot(doc(db, 'settings', 'auth'), (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.data();
-        setAdminPassword(data.password || 'admin123');
-        setCashierPassword(data.cashierPassword || 'cashier123');
-      } else {
-        // Initialize if not exists
-        setDoc(doc(db, 'settings', 'auth'), {
-          password: 'admin123',
-          cashierPassword: 'cashier123'
-        });
-      }
+    let unsub = () => {};
+    try {
+      unsub = onSnapshot(
+        doc(db, 'settings', 'auth'),
+        (snapshot) => {
+          if (snapshot.exists()) {
+            const data = snapshot.data();
+            setAdminPassword(data.password || 'admin123');
+            setCashierPassword(data.cashierPassword || 'cashier123');
+          } else {
+            // Initialize if not exists
+            setDoc(doc(db, 'settings', 'auth'), {
+              password: 'admin123',
+              cashierPassword: 'cashier123'
+            }).catch((err) => {
+              console.warn('Could not initialize auth document in Firestore:', err);
+            });
+          }
+          setLoading(false);
+        },
+        (error) => {
+          console.warn('Auth settings sync warning (offline or permissions):', error);
+          setLoading(false);
+        }
+      );
+    } catch (err) {
+      console.warn('Error attaching auth listener:', err);
       setLoading(false);
-    });
+    }
 
-    return () => unsub();
+    // Safety timeout: ensure loading is never stuck as true
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
+      if (typeof unsub === 'function') {
+        unsub();
+      }
+    };
   }, []);
 
   const login = (email, password) => {
