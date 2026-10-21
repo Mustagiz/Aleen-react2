@@ -59,7 +59,7 @@ const AtelierPageLoader = () => (
         opacity: 0.8
       }}
     >
-      Aleen Atelier • Loading
+      Aleen Clothing • Loading
     </Typography>
   </Box>
 );

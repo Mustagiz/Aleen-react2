@@ -306,7 +306,7 @@ const Purchases = () => {
                 title="Purchase Orders & Procurement"
                 subtitle="Track textile procurement orders, mill deliveries, stock receipt & supplier payments"
                 breadcrumbs={[
-                    { label: 'Aleen Atelier', path: '/' },
+                    { label: 'Aleen Clothing', path: '/' },
                     { label: 'Inventory & Stock', path: '/inventory' },
                     { label: 'Purchase Orders' }
                 ]}

@@ -387,7 +387,7 @@ const Dashboard = () => {
         title="Boutique Intelligence & Overview"
         subtitle="Real-time atelier revenue, stock health, and financial ledger"
         breadcrumbs={[
-          { label: 'Aleen Atelier', path: '/' },
+          { label: 'Aleen Clothing', path: '/' },
           { label: 'Executive Dashboard' }
         ]}
         actions={

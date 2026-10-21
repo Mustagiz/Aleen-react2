@@ -369,7 +369,7 @@ const Inventory = () => {
       <PageHeader
         title="Inventory & Garments"
         subtitle="Track stock levels, size variants, costs, profit margins, and manage your luxury apparel catalog"
-        breadcrumbs={[{ label: 'Aleen Atelier', path: '/' }, { label: 'Inventory' }]}
+        breadcrumbs={[{ label: 'Aleen Clothing', path: '/' }, { label: 'Inventory' }]}
         actions={
           <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
             <Button

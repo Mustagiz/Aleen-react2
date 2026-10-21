@@ -157,7 +157,7 @@ const Vendors = () => {
                 title="Fabric & Vendors Directory"
                 subtitle="Manage textile suppliers, master craft mills, and procurement partners"
                 breadcrumbs={[
-                    { label: 'Aleen Atelier', path: '/' },
+                    { label: 'Aleen Clothing', path: '/' },
                     { label: 'Purchases & Stock', path: '/purchases' },
                     { label: 'Vendors & Mills' }
                 ]}
@@ -597,7 +597,7 @@ const Vendors = () => {
                                 {editItem ? 'Edit Vendor / Mill Profile' : 'Register New Vendor / Mill'}
                             </Typography>
                             <Typography variant="caption" sx={{ opacity: 0.85, fontWeight: 500 }}>
-                                Aleen Atelier Supplier & Textile Partner Directory
+                                Aleen Clothing Supplier & Textile Partner Directory
                             </Typography>
                         </Box>
                     </Box>

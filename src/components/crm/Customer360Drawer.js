@@ -141,7 +141,7 @@ export default function Customer360Drawer({
     const rawPhone = (customer.phone || '').replace(/\D/g, '');
     const cleanPhone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
     const greeting = encodeURIComponent(
-      `Hello ${customer.name}, greetings from Aleen Atelier! ✨ We are delighted to assist you with your wardrobe selections and bespoke fittings.`
+      `Hello ${customer.name}, greetings from Aleen Clothing! ✨ We are delighted to assist you with your wardrobe selections and bespoke fittings.`
     );
     window.open(`https://wa.me/${cleanPhone}?text=${greeting}`, '_blank');
   };

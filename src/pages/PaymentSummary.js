@@ -212,7 +212,7 @@ const PaymentSummary = () => {
 
         doc.setFontSize(18);
         doc.setFont('helvetica', 'bold');
-        doc.text('Aleen Atelier - Daily Cash & Audit Ledger', 14, 20);
+        doc.text('Aleen Clothing - Daily Cash & Audit Ledger', 14, 20);
 
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
@@ -254,7 +254,7 @@ const PaymentSummary = () => {
 
     const exportToExcel = () => {
         const summarySheet = [
-            ['Aleen Atelier - Daily Cash & Audit Ledger'],
+            ['Aleen Clothing - Daily Cash & Audit Ledger'],
             ['Period', label],
             ['Generated', new Date().toLocaleString('en-IN')],
             [],
@@ -293,7 +293,7 @@ const PaymentSummary = () => {
                 title="Daily Cash Ledger & Audit"
                 subtitle="Reconcile daily counter cash, UPI collections, card transactions & POS intake"
                 breadcrumbs={[
-                    { label: 'Aleen Atelier', path: '/' },
+                    { label: 'Aleen Clothing', path: '/' },
                     { label: 'Finance & Audit' },
                     { label: 'Daily Cash Ledger' }
                 ]}

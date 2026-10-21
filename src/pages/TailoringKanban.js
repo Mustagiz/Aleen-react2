@@ -403,14 +403,14 @@ export default function TailoringKanban() {
     
     let msgText = '';
     if (type === 'trial' || order.status === 'trial') {
-      msgText = `Dear ${order.customerName}! ✨ Your bespoke creation "${order.garment}" is ready for your exclusive Trial Fitting session at Aleen Atelier. Kindly visit us or reply with your preferred time slot! 🪞`;
+      msgText = `Dear ${order.customerName}! ✨ Your bespoke creation "${order.garment}" is ready for your exclusive Trial Fitting session at Aleen Clothing. Kindly visit us or reply with your preferred time slot! 🪞`;
     } else if (type === 'ready' || order.status === 'ready') {
       const balance = Math.max(0, (order.price || 0) - (order.advance || 0));
-      msgText = `Dear ${order.customerName}! 👗 Splendid news! Your bespoke creation "${order.garment}" has completed final master hand-finishing & steam press, and is ready for pickup at Aleen Atelier. ${balance > 0 ? `Remaining Balance: ₹${balance.toFixed(2)}.` : 'Fully Settled.'} We look forward to seeing you!`;
+      msgText = `Dear ${order.customerName}! 👗 Splendid news! Your bespoke creation "${order.garment}" has completed final master hand-finishing & steam press, and is ready for pickup at Aleen Clothing. ${balance > 0 ? `Remaining Balance: ₹${balance.toFixed(2)}.` : 'Fully Settled.'} We look forward to seeing you!`;
     } else if (order.status === 'delivered') {
-      msgText = `Hello ${order.customerName}! 🌟 Thank you for trusting Aleen Atelier with your bespoke garment "${order.garment}". It has been successfully completed and handed over. We hope you love the fit and craft!`;
+      msgText = `Hello ${order.customerName}! 🌟 Thank you for trusting Aleen Clothing with your bespoke garment "${order.garment}". It has been successfully completed and handed over. We hope you love the fit and craft!`;
     } else {
-      msgText = `Hello ${order.customerName}, craft update from Aleen Atelier! 🪡 Your bespoke garment "${order.garment}" status is currently: ${order.status.toUpperCase()}. Target trial/delivery date: ${order.targetDate}.`;
+      msgText = `Hello ${order.customerName}, craft update from Aleen Clothing! 🪡 Your bespoke garment "${order.garment}" status is currently: ${order.status.toUpperCase()}. Target trial/delivery date: ${order.targetDate}.`;
     }
 
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msgText)}`, '_blank');
@@ -441,7 +441,7 @@ export default function TailoringKanban() {
         title="Bespoke Tailoring & Alterations Board"
         subtitle="End-to-end craft workflow: measurements, pattern cutting, artisan stitching, fitting trial and client handover"
         breadcrumbs={[
-          { label: 'Aleen Atelier', path: '/' },
+          { label: 'Aleen Clothing', path: '/' },
           { label: 'Merchandise', path: '/inventory' },
           { label: 'Tailoring Kanban' }
         ]}

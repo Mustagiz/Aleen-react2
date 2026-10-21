@@ -50,19 +50,19 @@ export const DEFAULT_INVOICE_SETTINGS = {
   useCustomLetterhead: false,
   customLetterheadImage: '',
   showWatermark: true,
-  watermarkText: 'ALEEN ATELIER',
+  watermarkText: 'ALEEN CLOTHING',
   tagline: 'Haute Couture & Bespoke Craftsmanship',
   showBankDetails: true,
   bankDetails: {
     bankName: 'HDFC Bank Ltd',
     accountNumber: '50200088992211',
     ifsc: 'HDFC0001234',
-    upiId: 'aleenatelier@hdfcbank'
+    upiId: 'aleenclothing@hdfcbank'
   },
   showSignatureStamp: true,
   signatureLabel: 'Authorized Atelier Signatory',
   termsText: '1. Goods once sold may be exchanged within 7 days with original price tag and invoice.\n2. Bespoke alterations are complimentary within 30 days of delivery.\n3. Custom tailored and made-to-measure bridal orders are non-refundable.',
-  customFooterNote: 'Thank you for shopping with Aleen Atelier! We cherish dressing your finest moments.'
+  customFooterNote: 'Thank you for shopping with Aleen Clothing! We cherish dressing your finest moments.'
 };
 
 export const getStoredInvoiceSettings = () => {

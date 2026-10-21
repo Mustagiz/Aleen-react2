@@ -127,7 +127,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings }, ref) => {
             textTransform: 'uppercase'
           }}
         >
-          {activeSettings.watermarkText || 'ALEEN ATELIER'}
+          {activeSettings.watermarkText || 'ALEEN CLOTHING'}
         </Box>
       )}
 
@@ -150,7 +150,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings }, ref) => {
         /* Slip Header */
         <Box sx={{ textAlign: 'center', pb: 2, mb: 2, borderBottom: '1px dashed #64748B', position: 'relative', zIndex: 1 }}>
           <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: 1 }}>
-            {profile.businessName?.toUpperCase() || 'ALEEN ATELIER'}
+            {profile.businessName?.toUpperCase() || 'ALEEN CLOTHING'}
           </Typography>
           <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
             {activeSettings.tagline || 'Boutique & Bespoke Atelier'}
@@ -187,7 +187,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings }, ref) => {
                 </Typography>
               </Box>
               <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: -0.5, mt: 0.5, color: '#FFFFFF' }}>
-                {profile.businessName || 'Aleen Atelier'}
+                {profile.businessName || 'Aleen Clothing'}
               </Typography>
               <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)', mt: 0.5, fontSize: '0.82rem' }}>
                 {profile.address}

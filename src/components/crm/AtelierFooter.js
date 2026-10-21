@@ -37,7 +37,7 @@ export default function AtelierFooter() {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
             <Diamond sx={{ fontSize: 16, color: '#D97706' }} />
             <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary', letterSpacing: '0.02em' }}>
-              {profile?.businessName || 'Aleen Atelier'}
+              {profile?.businessName || 'Aleen Clothing'}
             </Typography>
           </Box>
 
@@ -125,7 +125,7 @@ export default function AtelierFooter() {
         }}
       >
         <Typography variant="caption" sx={{ color: 'text.disabled' }}>
-          © {new Date().getFullYear()} {profile?.businessName || 'Aleen Atelier'}. Tailored for luxury boutiques and bespoke salons.
+          © {new Date().getFullYear()} {profile?.businessName || 'Aleen Clothing'}. Tailored for luxury boutiques and bespoke salons.
         </Typography>
 
         <Typography variant="caption" sx={{ color: 'text.disabled', fontFamily: 'monospace' }}>

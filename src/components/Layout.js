@@ -235,7 +235,7 @@ export default function Layout() {
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
               }}>
-                {profile.businessName || 'Aleen Atelier'}
+                {profile.businessName || 'Aleen Clothing'}
               </Typography>
               <Typography sx={{ 
                 fontSize: '0.68rem', 
@@ -483,7 +483,7 @@ export default function Layout() {
 
             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
               <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary', fontWeight: 600 }}>
-                Aleen Atelier CRM
+                Aleen Clothing CRM
               </Typography>
               <Typography sx={{ fontSize: '0.95rem', color: 'text.primary', fontWeight: 800, letterSpacing: '-0.015em' }}>
                 {getBreadcrumbTitle()}

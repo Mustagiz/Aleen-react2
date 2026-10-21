@@ -166,7 +166,7 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                         textOverflow: 'ellipsis'
                     }}
                 >
-                    {businessName || 'ALEEN ATELIER'}
+                    {businessName || 'ALEEN CLOTHING'}
                 </Typography>
             )}
 
@@ -610,7 +610,7 @@ export default function BarcodeGenerator() {
                 title="Barcode & Price Tag Studio"
                 subtitle="Design and batch-print thermal price labels, barcode tags, and luxury retail stickers"
                 breadcrumbs={[
-                    { label: 'Aleen Atelier', path: '/' },
+                    { label: 'Aleen Clothing', path: '/' },
                     { label: 'Merchandise', path: '/inventory' },
                     { label: 'Barcode Studio' }
                 ]}
@@ -1023,7 +1023,7 @@ export default function BarcodeGenerator() {
 
                                 <BarcodeItem
                                     value={sampleProduct.productId || 'PRD-1001'}
-                                    businessName={profile?.businessName || 'Aleen Atelier'}
+                                    businessName={profile?.businessName || 'Aleen Clothing'}
                                     product={sampleProduct}
                                     settings={settings}
                                 />
@@ -1686,7 +1686,7 @@ export default function BarcodeGenerator() {
                             <BarcodeItem
                                 key={`${product.id}-${i}`}
                                 value={product.variantSku || product.productId || product.id}
-                                businessName={profile?.businessName || 'Aleen Atelier'}
+                                businessName={profile?.businessName || 'Aleen Clothing'}
                                 product={product}
                                 settings={settings}
                             />

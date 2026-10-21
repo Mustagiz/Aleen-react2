@@ -125,7 +125,7 @@ export default function Login() {
                   textTransform: 'uppercase'
                 }}
               >
-                Aleen Atelier
+                Aleen Clothing
               </Typography>
               <Typography
                 variant="caption"
@@ -475,7 +475,7 @@ export default function Login() {
               fontWeight: 500
             }}
           >
-            © {new Date().getFullYear()} Aleen Atelier. All rights reserved.
+            © {new Date().getFullYear()} Aleen Clothing. All rights reserved.
           </Typography>
         </motion.div>
       </Box>

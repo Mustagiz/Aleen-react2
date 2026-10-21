@@ -838,7 +838,7 @@ const Invoices = () => {
       doc.setTextColor(255, 255, 255);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(18);
-      doc.text(profile.businessName || 'ALEEN ATELIER', 20, 22);
+      doc.text(profile.businessName || 'ALEEN CLOTHING', 20, 22);
 
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8.5);
@@ -1140,7 +1140,7 @@ const Invoices = () => {
         title="Billing & Invoices"
         subtitle="Create, manage and track all customer boutique invoices and receipts"
         breadcrumbs={[
-          { label: 'Aleen Atelier', path: '/' },
+          { label: 'Aleen Clothing', path: '/' },
           { label: 'Sales & POS', path: '/pos' },
           { label: 'Invoices' }
         ]}
@@ -1650,7 +1650,7 @@ const Invoices = () => {
                 />
               </Box>
               <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)', display: 'block' }}>
-                Aleen Atelier Luxury Billing & Client Ledger
+                Aleen Clothing Luxury Billing & Client Ledger
               </Typography>
             </Box>
           </Box>

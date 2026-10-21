@@ -39,7 +39,7 @@ Transform the Aleen Clothing retail management app from a generic, pink-tinted P
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
-│ [≡] ALEEN ATELIER   🔍 Search guests, SKUs, bills (Cmd+K)    [● Register: Open] [+ New Bill] │
+│ [≡] ALEEN CLOTHING   🔍 Search guests, SKUs, bills (Cmd+K)    [● Register: Open] [+ New Bill] │
 ├─────────────────────┬──────────────────────────────────────────────────────────────────┤
 │ ▼ SALES & POS       │ Breadcrumbs: Atelier CRM / Guests / VIP Directory                 │
 │   • POS Terminal    │                                                                  │

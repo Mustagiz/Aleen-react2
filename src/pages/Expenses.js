@@ -231,7 +231,7 @@ const Expenses = () => {
                 title="Boutique Expenses Register"
                 subtitle="Track workshop rent, master tailor disbursements, packaging & operating overheads"
                 breadcrumbs={[
-                    { label: 'Aleen Atelier', path: '/' },
+                    { label: 'Aleen Clothing', path: '/' },
                     { label: 'Finance & Audit' },
                     { label: 'Expenses Register' }
                 ]}
@@ -648,7 +648,7 @@ const Expenses = () => {
                                 {editItem ? 'Edit Overhead Expense' : 'Log New Boutique Expense'}
                             </Typography>
                             <Typography variant="caption" sx={{ opacity: 0.85 }}>
-                                Aleen Atelier Internal Expense Ledger
+                                Aleen Clothing Internal Expense Ledger
                             </Typography>
                         </Box>
                     </Box>

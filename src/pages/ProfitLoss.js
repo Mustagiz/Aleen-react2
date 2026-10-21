@@ -139,7 +139,7 @@ const ProfitLoss = () => {
         const doc = new jsPDF();
         doc.setFontSize(18);
         doc.setFont('helvetica', 'bold');
-        doc.text('Aleen Atelier - Profit & Loss Statement', 14, 20);
+        doc.text('Aleen Clothing - Profit & Loss Statement', 14, 20);
 
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
@@ -205,7 +205,7 @@ const ProfitLoss = () => {
                 title="Profit & Loss Statement"
                 subtitle="Analyze gross boutique revenue, COGS, deducible overheads, and net margins"
                 breadcrumbs={[
-                    { label: 'Aleen Atelier', path: '/' },
+                    { label: 'Aleen Clothing', path: '/' },
                     { label: 'Finance & Audit' },
                     { label: 'Profit & Loss' }
                 ]}
