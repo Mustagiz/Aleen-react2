@@ -24,7 +24,11 @@ import {
     Switch,
     FormControlLabel,
     InputAdornment,
-    LinearProgress
+    LinearProgress,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel
 } from '@mui/material';
 import {
     QrCodeScanner,
@@ -92,6 +96,8 @@ export default function Devices() {
     const [phoneModalOpen, setPhoneModalOpen] = useState(false);
     const [cameraScannerOpen, setCameraScannerOpen] = useState(false);
     const [cameraError, setCameraError] = useState('');
+    const [availableCameras, setAvailableCameras] = useState([]);
+    const [selectedCameraId, setSelectedCameraId] = useState('');
     const [customDeviceName, setCustomDeviceName] = useState('');
     const [customDeviceType, setCustomDeviceType] = useState('bluetooth_scanner');
     const [isScanningBluetooth, setIsScanningBluetooth] = useState(false);
@@ -239,10 +245,27 @@ export default function Devices() {
                         setCameraScannerOpen(false);
                     };
 
+                    // Enumerate available cameras
+                    try {
+                        const cams = await Html5Qrcode.getCameras();
+                        if (cams && cams.length > 0) {
+                            setAvailableCameras(cams);
+                            const phoneCam = cams.find(c => c.label.toLowerCase().includes('phone') || c.label.toLowerCase().includes('iphone'));
+                            const targetCamId = selectedCameraId || (phoneCam ? phoneCam.id : cams[0].id);
+                            if (!selectedCameraId && targetCamId) {
+                                setSelectedCameraId(targetCamId);
+                            }
+                            await html5QrCode.start(targetCamId, config, onScanSuccess, () => {});
+                            return;
+                        }
+                    } catch (e) {
+                        console.warn('Camera enumeration fallback:', e);
+                    }
+
+                    // Fallback facingMode
                     try {
                         await html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess, () => {});
                     } catch (envErr) {
-                        // Fallback to front/user camera (e.g. laptop webcam)
                         await html5QrCode.start({ facingMode: 'user' }, config, onScanSuccess, () => {});
                     }
                 } catch (err) {
@@ -261,7 +284,11 @@ export default function Devices() {
             };
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [cameraScannerOpen]);
+    }, [cameraScannerOpen, selectedCameraId]);
+
+    const handleCameraChange = (newCamId) => {
+        setSelectedCameraId(newCamId);
+    };
 
     // Realtime Wireless Phone Scanner Listeners (Firestore + BroadcastChannel + LocalStorage)
     const lastScannedTimeRef = useRef(0);
@@ -1398,6 +1425,40 @@ export default function Devices() {
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                         Hold any garment tag or product QR code in front of the lens. It will scan and resolve the item automatically.
                     </Typography>
+
+                    {/* Camera Selector (Supports Wireless Phone Continuity Camera) */}
+                    {availableCameras.length > 0 && (
+                        <Box sx={{ mb: 2 }}>
+                            <FormControl fullWidth size="small">
+                                <InputLabel id="camera-source-label">Camera Lens / Device</InputLabel>
+                                <Select
+                                    labelId="camera-source-label"
+                                    value={selectedCameraId || (availableCameras[0] ? availableCameras[0].id : '')}
+                                    label="Camera Lens / Device"
+                                    onChange={(e) => handleCameraChange(e.target.value)}
+                                    sx={{ borderRadius: 2 }}
+                                >
+                                    {availableCameras.map((cam) => {
+                                        const isPhone = cam.label.toLowerCase().includes('iphone') || cam.label.toLowerCase().includes('phone');
+                                        return (
+                                            <MenuItem key={cam.id} value={cam.id}>
+                                                {isPhone ? `📱 ${cam.label} (Continuity Bluetooth)` : `💻 ${cam.label || 'Camera'}`}
+                                            </MenuItem>
+                                        );
+                                    })}
+                                </Select>
+                            </FormControl>
+                        </Box>
+                    )}
+
+                    <Alert severity="info" sx={{ mb: 2, borderRadius: 2, bgcolor: 'rgba(15, 118, 110, 0.08)' }}>
+                        <Typography variant="caption" sx={{ fontWeight: 700, color: '#042F2E', display: 'block' }}>
+                            📱 Apple Continuity Camera (Mac + Phone over Bluetooth)
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                            Ensure Bluetooth & Wi-Fi are ON on both your Mac and phone. When selected in the menu above, macOS automatically triggers and opens your phone's camera wirelessly.
+                        </Typography>
+                    </Alert>
 
                     {cameraError ? (
                         <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
