@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel } from '@mui/material';
-import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, FilterList, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt } from '@mui/icons-material';
+import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, FilterList, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong } from '@mui/icons-material';
 import { Html5Qrcode } from 'html5-qrcode';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -1061,638 +1061,796 @@ const Invoices = () => {
       <Dialog
         open={open}
         onClose={() => setOpen(false)}
-        maxWidth="md"
+        maxWidth="lg"
         fullWidth
         fullScreen={isMobile}
         PaperProps={{
           sx: {
-            borderRadius: isMobile ? 0 : 4,
+            borderRadius: isMobile ? 0 : 3.5,
             overflow: 'hidden',
-            maxHeight: isMobile ? '100%' : '90vh'
+            maxHeight: isMobile ? '100%' : '92vh',
+            boxShadow: '0 24px 60px rgba(15, 118, 110, 0.22)'
           }
         }}
       >
         <DialogTitle sx={{
-          bgcolor: 'primary.main',
+          background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
           color: 'white',
-          fontWeight: 800,
-          fontSize: { xs: '1.1rem', sm: '1.25rem' },
-          py: { xs: 2.5, sm: 3 },
+          p: { xs: 2, sm: 2.5 },
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderBottom: '1px solid rgba(217, 119, 6, 0.2)'
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Avatar sx={{ bgcolor: 'rgba(217, 119, 6, 0.2)', color: '#D97706', width: 40, height: 40, border: '1px solid rgba(217, 119, 6, 0.4)' }}>
+              <PointOfSale fontSize="small" />
+            </Avatar>
+            <Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography sx={{ fontWeight: 800, fontSize: { xs: '1.05rem', sm: '1.25rem' }, letterSpacing: '-0.01em', color: '#FFFFFF' }}>
+                  Create Retail Invoice
+                </Typography>
+                <Chip
+                  label="POS Checkout"
+                  size="small"
+                  sx={{
+                    height: 20,
+                    fontSize: '0.68rem',
+                    fontWeight: 800,
+                    bgcolor: 'rgba(217, 119, 6, 0.25)',
+                    color: '#FBBF24',
+                    border: '1px solid rgba(251, 191, 36, 0.4)'
+                  }}
+                />
+              </Box>
+              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)', display: 'block' }}>
+                Aleen Atelier Luxury Billing & Client Ledger
+              </Typography>
+            </Box>
+          </Box>
+          <IconButton onClick={() => setOpen(false)} sx={{ color: 'rgba(255, 255, 255, 0.8)', '&:hover': { color: '#ffffff', bgcolor: 'rgba(255, 255, 255, 0.1)' } }}>
+            <Close />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent sx={{ p: { xs: 2, sm: 3 }, bgcolor: mode === 'light' ? '#F8FAFC' : 'background.default' }}>
+          <Grid container spacing={2.5}>
+            {/* Left Column: Customer & Item Cart */}
+            <Grid item xs={12} lg={7}>
+              {/* Customer Information Card */}
+              <Paper sx={{
+                p: 2.5,
+                mb: 2.5,
+                bgcolor: 'background.paper',
+                borderRadius: 2.5,
+                border: '1px solid',
+                borderColor: 'divider',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
+              }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <PersonOutline sx={{ color: '#0F766E', fontSize: 20 }} />
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, letterSpacing: '0.02em', textTransform: 'uppercase', fontSize: '0.78rem' }}>
+                      Client Details
+                    </Typography>
+                  </Box>
+                  {selectedCustomerId && (
+                    <Chip
+                      size="small"
+                      label={`VIP Client • ${customers.find(c => c.id === selectedCustomerId)?.loyaltyPoints || 0} pts`}
+                      sx={{ bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E', fontWeight: 700, height: 22 }}
+                    />
+                  )}
+                </Box>
+
+                <Box sx={{ mb: 2 }}>
+                  <TextField
+                    label="Customer Name"
+                    fullWidth
+                    size="small"
+                    value={customer}
+                    placeholder="e.g. Saira Banu"
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\b\w/g, (l) => l.toUpperCase());
+                      setCustomer(val);
+                      if (selectedCustomerId) setSelectedCustomerId(null);
+                    }}
+                    onBlur={() => {
+                      const searchTerm = customer.toLowerCase().trim();
+                      if (searchTerm) {
+                        const matched = customers.find(c => c.name.toLowerCase() === searchTerm);
+                        if (matched) {
+                          setCustomer(matched.name);
+                          setPhone(matched.phone || '+91');
+                          setSelectedCustomerId(matched.id);
+                        }
+                      }
+                    }}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        const searchTerm = customer.toLowerCase().trim();
+                        const matched = customers.find(c => c.name.toLowerCase() === searchTerm);
+                        if (matched) {
+                          setCustomer(matched.name);
+                          setPhone(matched.phone || '+91');
+                          setSelectedCustomerId(matched.id);
+                        }
+                      }
+                    }}
+                    helperText="Search by name. Triggers auto-lookup on Enter or tap away."
+                  />
+                </Box>
+
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+                  <TextField
+                    label="Phone Number"
+                    size="small"
+                    value={phone}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      let suffix = val;
+                      if (val.startsWith('+91')) {
+                        suffix = val.slice(3);
+                      } else if (val.length < 3) {
+                        setPhone('+91');
+                        return;
+                      }
+
+                      const cleanedSuffix = suffix.replace(/[^0-9]/g, '').slice(0, 10);
+                      const newPhone = `+91${cleanedSuffix}`;
+                      setPhone(newPhone);
+
+                      if (newPhone.length === 13) {
+                        const matched = customers.find(c => c.phone === newPhone || c.phone === cleanedSuffix);
+                        if (matched) {
+                          setCustomer(matched.name);
+                          setSelectedCustomerId(matched.id);
+                        }
+                      }
+                    }}
+                    onBlur={() => {
+                      const val = phone.trim();
+                      if (val.length > 3) {
+                        const matched = customers.find(c => c.phone === val || c.phone === val.replace('+91', '').trim());
+                        if (matched) {
+                          setCustomer(matched.name);
+                          setSelectedCustomerId(matched.id);
+                        }
+                      }
+                    }}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        const val = phone.trim();
+                        const matched = customers.find(c => c.phone === val || c.phone === val.replace('+91', '').trim());
+                        if (matched) {
+                          setCustomer(matched.name);
+                          setSelectedCustomerId(matched.id);
+                        }
+                      }
+                    }}
+                    fullWidth
+                    placeholder="919876543210"
+                    InputProps={{
+                      sx: { fontFamily: 'monospace' }
+                    }}
+                  />
+                  <TextField
+                    label="Invoice Date & Time"
+                    type="datetime-local"
+                    size="small"
+                    value={invoiceDate}
+                    onChange={(e) => setInvoiceDate(e.target.value)}
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Box>
+              </Paper>
+
+              {/* Items Card */}
+              <Paper sx={{
+                p: 2.5,
+                bgcolor: 'background.paper',
+                borderRadius: 2.5,
+                border: '1px solid',
+                borderColor: 'divider',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
+              }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <ShoppingBagOutlined sx={{ color: '#0F766E', fontSize: 20 }} />
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, letterSpacing: '0.02em', textTransform: 'uppercase', fontSize: '0.78rem' }}>
+                      Selected Garments & Merchandise ({selectedItems.filter(i => i.id).length})
+                    </Typography>
+                  </Box>
+                </Box>
+
+                {/* Quick Add / Scan Barcode Bar */}
+                <Box sx={{ mb: 2 }}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    placeholder="Scan Barcode / Product ID to Quick Add..."
+                    value={itemSearchTerm}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setItemSearchTerm(val);
+
+                      if (val.trim()) {
+                        const trimmed = val.toLowerCase().trim();
+                        let matchedProduct = inventory.find(inv =>
+                          inv.productId && inv.productId.toLowerCase() === trimmed && (parseInt(inv.quantity) || 0) > 0
+                        );
+                        let matchedVariantSku = null;
+
+                        if (!matchedProduct) {
+                          for (const inv of inventory) {
+                            if (inv.hasVariants && inv.variants) {
+                              const variant = inv.variants.find(v => v.sku && v.sku.toLowerCase() === trimmed);
+                              if (variant) {
+                                matchedProduct = inv;
+                                matchedVariantSku = variant.sku;
+                                break;
+                              }
+                            }
+                          }
+                        }
+
+                        if (matchedProduct) {
+                          const emptyIndex = selectedItems.findIndex(item => !item.id);
+                          if (emptyIndex !== -1) {
+                            handleItemChange(emptyIndex, 'id', matchedProduct.id);
+                            if (matchedVariantSku) handleItemChange(emptyIndex, 'variantSku', matchedVariantSku);
+                          } else {
+                            setSelectedItems([...selectedItems, {
+                              id: matchedProduct.id,
+                              quantity: 1,
+                              variantSku: matchedVariantSku || '',
+                              isCustom: false,
+                              customName: '',
+                              customPrice: 0,
+                              customCost: 0
+                            }]);
+                          }
+                          setItemSearchTerm('');
+                        }
+                      }
+                    }}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        const trimmed = itemSearchTerm.toLowerCase().trim();
+                        let matchedProduct = inventory.find(inv =>
+                          inv.productId && inv.productId.toLowerCase() === trimmed && (parseInt(inv.quantity) || 0) > 0
+                        );
+                        let matchedVariantSku = null;
+
+                        if (!matchedProduct) {
+                          for (const inv of inventory) {
+                            if (inv.hasVariants && inv.variants) {
+                              const variant = inv.variants.find(v => v.sku && v.sku.toLowerCase() === trimmed);
+                              if (variant) {
+                                matchedProduct = inv;
+                                matchedVariantSku = variant.sku;
+                                break;
+                              }
+                            }
+                          }
+                        }
+
+                        if (matchedProduct) {
+                          const emptyIndex = selectedItems.findIndex(item => !item.id);
+                          if (emptyIndex !== -1) {
+                            handleItemChange(emptyIndex, 'id', matchedProduct.id);
+                            if (matchedVariantSku) handleItemChange(emptyIndex, 'variantSku', matchedVariantSku);
+                          } else {
+                            setSelectedItems([...selectedItems, {
+                              id: matchedProduct.id,
+                              quantity: 1,
+                              variantSku: matchedVariantSku || '',
+                              isCustom: false,
+                              customName: '',
+                              customPrice: 0,
+                              customCost: 0
+                            }]);
+                          }
+                          setItemSearchTerm('');
+                        }
+                      }
+                    }}
+                    InputProps={{
+                      startAdornment: <Search sx={{ color: 'text.secondary', mr: 1, fontSize: 18 }} />,
+                      endAdornment: (
+                        <Tooltip title="Scan using Camera">
+                          <IconButton size="small" onClick={() => setScannerOpen(true)} sx={{ color: '#0F766E' }}>
+                            <CameraAlt fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      ),
+                      sx: { borderRadius: 2 }
+                    }}
+                  />
+                </Box>
+
+                {/* Scanner Dialog */}
+                <Dialog open={scannerOpen} onClose={() => setScannerOpen(false)} maxWidth="xs" fullWidth>
+                  <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 800 }}>
+                    Scan Product Barcode
+                    <IconButton onClick={() => setScannerOpen(false)} size="small"><Close /></IconButton>
+                  </DialogTitle>
+                  <DialogContent sx={{ textAlign: 'center' }}>
+                    <Box id="reader" sx={{ width: '100%', minHeight: '250px', bgcolor: '#000', borderRadius: 2, overflow: 'hidden', mb: 2 }} />
+
+                    {scannerError ? (
+                      <Box sx={{ color: 'error.main', mb: 2 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>{scannerError}</Typography>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="error"
+                          onClick={() => setScannerOpen(false)}
+                          sx={{ mt: 1, mr: 1 }}
+                        >
+                          Close
+                        </Button>
+                        <Button
+                          size="small"
+                          variant="contained"
+                          color="primary"
+                          onClick={() => { setScannerOpen(false); setTimeout(() => setScannerOpen(true), 500); }}
+                          sx={{ mt: 1 }}
+                        >
+                          Retry
+                        </Button>
+                      </Box>
+                    ) : (
+                      <Typography variant="body2" color="primary" sx={{ fontWeight: 600, mb: 1 }}>
+                        {scannerStatus}
+                      </Typography>
+                    )}
+
+                    <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary' }}>
+                      Point your camera at a product barcode.
+                    </Typography>
+                  </DialogContent>
+                </Dialog>
+
+                {/* Selected Items List */}
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 2 }}>
+                  {selectedItems.map((item, index) => {
+                    const filteredInventory = inventory.filter(inv => (parseInt(inv.currentQty || inv.quantity) || 0) > 0);
+                    const selectedProduct = inventory.find(i => i.id === item.id);
+
+                    return (
+                      <Box key={index} sx={{
+                        p: 1.5,
+                        bgcolor: mode === 'light' ? '#F8FAFC' : 'background.default',
+                        borderRadius: 2,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        transition: 'all 0.15s ease-in-out',
+                        '&:hover': {
+                          borderColor: '#0F766E',
+                          boxShadow: '0 4px 12px rgba(15,118,110,0.06)'
+                        }
+                      }}>
+                        <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}>
+                          <Box sx={{ flex: 1, minWidth: 0 }}>
+                            {!item.isCustom ? (
+                              <Autocomplete
+                                value={selectedProduct || null}
+                                onChange={(event, newValue) => {
+                                  handleItemChange(index, 'id', newValue ? newValue.id : '');
+                                }}
+                                options={filteredInventory}
+                                getOptionLabel={(option) => `${option.name} (₹${option.price})`}
+                                filterOptions={(options, { inputValue }) => {
+                                  return options.filter(option =>
+                                    option.name.toLowerCase().includes(inputValue.toLowerCase()) ||
+                                    (option.productId && option.productId.toLowerCase().includes(inputValue.toLowerCase()))
+                                  );
+                                }}
+                                renderOption={(props, option) => (
+                                  <Box component="li" {...props} key={option.id}>
+                                    <Box>
+                                      <Typography variant="body2" sx={{ fontWeight: 700 }}>{option.name}</Typography>
+                                      <Typography variant="caption" color="text.secondary">
+                                        ID: {option.productId || 'N/A'} • Stock: {option.quantity} • ₹{option.price}
+                                      </Typography>
+                                    </Box>
+                                  </Box>
+                                )}
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    label="Select Garment / Product"
+                                    size="small"
+                                    fullWidth
+                                    error={!item.id && selectedItems.length > 0}
+                                  />
+                                )}
+                              />
+                            ) : (
+                              <Box sx={{ display: 'flex', gap: 1, flexDirection: 'column' }}>
+                                <TextField
+                                  label="Custom Garment Name / Alteration"
+                                  size="small"
+                                  fullWidth
+                                  value={item.customName}
+                                  onChange={(e) => handleItemChange(index, 'customName', e.target.value)}
+                                  error={!item.customName && selectedItems.length > 0}
+                                />
+                                <Box sx={{ display: 'flex', gap: 1 }}>
+                                  <TextField
+                                    label="Sale Price (₹)"
+                                    size="small"
+                                    type="number"
+                                    fullWidth
+                                    value={item.customPrice}
+                                    onChange={(e) => handleItemChange(index, 'customPrice', parseFloat(e.target.value) || 0)}
+                                  />
+                                  <TextField
+                                    label="Cost Basis (₹)"
+                                    size="small"
+                                    type="number"
+                                    fullWidth
+                                    value={item.customCost}
+                                    onChange={(e) => handleItemChange(index, 'customCost', parseFloat(e.target.value) || 0)}
+                                  />
+                                </Box>
+                              </Box>
+                            )}
+                          </Box>
+
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <Tooltip title="Toggle bespoke / custom item without stock decrement">
+                              <FormControlLabel
+                                control={
+                                  <Switch
+                                    size="small"
+                                    checked={item.isCustom}
+                                    onChange={(e) => {
+                                      handleItemChange(index, 'isCustom', e.target.checked);
+                                      if (e.target.checked) handleItemChange(index, 'id', 'custom');
+                                      else handleItemChange(index, 'id', '');
+                                    }}
+                                  />
+                                }
+                                label={<Typography variant="caption" sx={{ fontWeight: 700, fontSize: '0.65rem', color: 'text.secondary' }}>Custom</Typography>}
+                                labelPlacement="top"
+                                sx={{ m: 0 }}
+                              />
+                            </Tooltip>
+                            {selectedItems.length > 1 && (
+                              <IconButton
+                                size="small"
+                                onClick={() => setSelectedItems(selectedItems.filter((_, i) => i !== index))}
+                                sx={{ color: 'error.main', p: 0.5 }}
+                              >
+                                <Delete fontSize="small" sx={{ fontSize: 18 }} />
+                              </IconButton>
+                            )}
+                          </Box>
+                        </Box>
+
+                        {/* Variant Selector if item has variants */}
+                        {!item.isCustom && item.id && selectedProduct?.hasVariants && (
+                          <Box sx={{ mt: 1.5 }}>
+                            <TextField
+                              select
+                              fullWidth
+                              size="small"
+                              label="Select Garment Size & Shade Variant"
+                              value={item.variantSku || ''}
+                              onChange={(e) => handleItemChange(index, 'variantSku', e.target.value)}
+                              error={!item.variantSku && selectedItems.length > 0}
+                            >
+                              {selectedProduct.variants.map((v) => (
+                                <MenuItem key={v.sku} value={v.sku} disabled={(parseInt(v.quantity) || 0) <= 0}>
+                                  {v.size} / {v.color} (Stock: {v.quantity}) - ₹{v.price}
+                                </MenuItem>
+                              ))}
+                            </TextField>
+                          </Box>
+                        )}
+
+                        {/* Quantity and Row Subtotal */}
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1.5, pt: 1, borderTop: '1px dashed', borderColor: 'divider' }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>Quantity:</Typography>
+                            <TextField
+                              type="number"
+                              size="small"
+                              value={item.quantity}
+                              onChange={(e) => handleItemChange(index, 'quantity', Math.max(1, parseInt(e.target.value) || 1))}
+                              sx={{ width: 80, '& input': { py: 0.5, textAlign: 'center', fontWeight: 800 } }}
+                            />
+                          </Box>
+
+                          <Box sx={{ textAlign: 'right' }}>
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.68rem' }}>Line Total</Typography>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                              ₹{item.isCustom
+                                ? ((item.customPrice || 0) * item.quantity).toLocaleString('en-IN')
+                                : (selectedProduct ? (selectedProduct.price * item.quantity).toLocaleString('en-IN') : '0')
+                              }
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Box>
+                    );
+                  })}
+                </Box>
+
+                <Button
+                  onClick={handleAddItem}
+                  startIcon={<Add />}
+                  variant="outlined"
+                  fullWidth
+                  sx={{
+                    py: 1,
+                    borderRadius: 2,
+                    fontWeight: 700,
+                    borderStyle: 'dashed',
+                    color: '#0F766E',
+                    borderColor: '#0F766E',
+                    '&:hover': {
+                      borderStyle: 'dashed',
+                      bgcolor: 'rgba(15, 118, 110, 0.04)'
+                    }
+                  }}
+                >
+                  + Add Another Garment
+                </Button>
+              </Paper>
+            </Grid>
+
+            {/* Right Column: Settlement, Taxes & Luxury Ledger Summary */}
+            <Grid item xs={12} lg={5}>
+              <Paper sx={{
+                p: 2.5,
+                bgcolor: 'background.paper',
+                borderRadius: 2.5,
+                border: '1px solid',
+                borderColor: 'divider',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
+                position: { lg: 'sticky' },
+                top: 16
+              }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <PaymentsOutlined sx={{ color: '#D97706', fontSize: 20 }} />
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, letterSpacing: '0.02em', textTransform: 'uppercase', fontSize: '0.78rem' }}>
+                      Settlement & Ledger
+                    </Typography>
+                  </Box>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={isSplitPayment}
+                        onChange={(e) => {
+                          setIsSplitPayment(e.target.checked);
+                          if (e.target.checked) setSplitAmount(Math.round(total / 2));
+                        }}
+                        size="small"
+                      />
+                    }
+                    label={<Typography variant="caption" sx={{ fontWeight: 700, fontSize: '0.72rem' }}>Split Payment</Typography>}
+                    sx={{ m: 0 }}
+                  />
+                </Box>
+
+                {!isSplitPayment ? (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 2 }}>
+                    <TextField
+                      select
+                      label="Payment Method"
+                      value={paymentMethod}
+                      onChange={(e) => {
+                        setPaymentMethod(e.target.value);
+                        if (e.target.value === 'Credit') setPaymentStatus('pending');
+                        else if (e.target.value === 'EMI') { setPaymentStatus('paid'); setIsEMI(true); }
+                        else { setPaymentStatus('paid'); setIsEMI(false); }
+                      }}
+                      fullWidth
+                      size="small"
+                    >
+                      <MenuItem value="Cash">Cash (Store Counter)</MenuItem>
+                      <MenuItem value="Card">Card (POS Terminal)</MenuItem>
+                      <MenuItem value="UPI">UPI (QR / PhonePe / GPay)</MenuItem>
+                      <MenuItem value="EMI">EMI (Installments)</MenuItem>
+                      <MenuItem value="Net Banking">Net Banking</MenuItem>
+                      <MenuItem value="Credit">Credit (Pay Later / Khata)</MenuItem>
+                    </TextField>
+
+                    {paymentMethod === 'UPI' && (
+                      <TextField select label="UPI App / Gateway" value={upiProvider} onChange={(e) => setUpiProvider(e.target.value)} fullWidth size="small">
+                        <MenuItem value="PhonePe">PhonePe</MenuItem>
+                        <MenuItem value="GPay">Google Pay (GPay)</MenuItem>
+                        <MenuItem value="Paytm">Paytm UPI</MenuItem>
+                        <MenuItem value="BHIM">BHIM / Static QR</MenuItem>
+                      </TextField>
+                    )}
+
+                    {paymentMethod === 'EMI' && (
+                      <Box sx={{ display: 'flex', gap: 1.5 }}>
+                        <TextField select label="Tenure" value={emiTenure} onChange={(e) => {
+                          setEmiTenure(e.target.value);
+                          setIsEMI(true);
+                        }} fullWidth size="small">
+                          <MenuItem value={3}>3 Months</MenuItem>
+                          <MenuItem value={6}>6 Months</MenuItem>
+                          <MenuItem value={9}>9 Months</MenuItem>
+                          <MenuItem value={12}>12 Months</MenuItem>
+                        </TextField>
+                        <TextField label="Monthly Est." value={`₹${(total / (emiTenure || 3)).toFixed(0)}`} disabled fullWidth size="small" />
+                      </Box>
+                    )}
+
+                    <TextField
+                      select
+                      label="Payment Status"
+                      value={paymentStatus}
+                      onChange={(e) => setPaymentStatus(e.target.value)}
+                      fullWidth
+                      size="small"
+                    >
+                      <MenuItem value="paid">Paid (Fully Settled)</MenuItem>
+                      <MenuItem value="partial">Partially Paid</MenuItem>
+                      <MenuItem value="pending">Pending Settlement</MenuItem>
+                    </TextField>
+                  </Box>
+                ) : (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 2 }}>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <TextField select label="Method 1" value={paymentMethod} onChange={(e) => {
+                        setPaymentMethod(e.target.value);
+                        if (e.target.value === 'Credit') setPaymentStatus('partial');
+                      }} fullWidth size="small">
+                        <MenuItem value="Cash">Cash</MenuItem>
+                        <MenuItem value="Card">Card</MenuItem>
+                        <MenuItem value="UPI">UPI</MenuItem>
+                        <MenuItem value="Credit">Credit</MenuItem>
+                      </TextField>
+                      <TextField
+                        label="Amount 1 (₹)"
+                        type="number"
+                        value={splitAmount}
+                        onChange={(e) => setSplitAmount(parseFloat(e.target.value) || 0)}
+                        fullWidth
+                        size="small"
+                      />
+                    </Box>
+
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <TextField select label="Method 2" value={paymentMethod2} onChange={(e) => {
+                        setPaymentMethod2(e.target.value);
+                        if (e.target.value === 'Credit') setPaymentStatus('partial');
+                      }} fullWidth size="small">
+                        <MenuItem value="Cash">Cash</MenuItem>
+                        <MenuItem value="Card">Card</MenuItem>
+                        <MenuItem value="UPI">UPI</MenuItem>
+                        <MenuItem value="Credit">Credit</MenuItem>
+                      </TextField>
+                      <TextField
+                        label="Amount 2 (₹)"
+                        value={(total - splitAmount).toFixed(2)}
+                        disabled
+                        fullWidth
+                        size="small"
+                        helperText="Remainder balance"
+                      />
+                    </Box>
+                  </Box>
+                )}
+
+                {/* Taxes & Discounts */}
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 1, mb: 2 }}>
+                  <TextField label="GST (%)" type="number" size="small" value={tax} onChange={(e) => setTax(e.target.value)} fullWidth />
+                  <TextField
+                    label="Disc (%)"
+                    type="number"
+                    size="small"
+                    value={discountPercent}
+                    onChange={(e) => setDiscountPercent(e.target.value)}
+                    fullWidth
+                  />
+                  <TextField
+                    label="Disc (₹)"
+                    type="number"
+                    size="small"
+                    value={discountAmount}
+                    onChange={(e) => setDiscountAmount(e.target.value)}
+                    fullWidth
+                  />
+                </Box>
+
+                {/* Luxury Ledger Total Box */}
+                <Box sx={{
+                  p: 2.5,
+                  borderRadius: 2.5,
+                  background: 'linear-gradient(135deg, rgba(15,118,110,0.06) 0%, rgba(217,119,6,0.06) 100%)',
+                  border: '1px solid',
+                  borderColor: 'rgba(15,118,110,0.15)'
+                }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                    <Typography variant="body2" color="text.secondary">Gross Subtotal:</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 700 }}>₹{subtotal.toFixed(2).toLocaleString('en-IN')}</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                    <Typography variant="body2" color="text.secondary">GST ({(parseFloat(tax) || 0)}%):</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 700 }}>₹{taxAmount.toFixed(2).toLocaleString('en-IN')}</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                    <Typography variant="body2" color="text.secondary">Discount Applied:</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 800, color: 'error.main' }}>
+                      - ₹{absDiscount.toFixed(2).toLocaleString('en-IN')}
+                    </Typography>
+                  </Box>
+
+                  <Divider sx={{ my: 1.5, borderColor: 'rgba(15,118,110,0.2)' }} />
+
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box>
+                      <Typography variant="caption" sx={{ textTransform: 'uppercase', fontWeight: 800, color: '#D97706', letterSpacing: '0.04em' }}>
+                        Net Payable
+                      </Typography>
+                      <Typography variant="h4" sx={{ fontWeight: 900, color: '#0F766E', letterSpacing: '-0.02em' }}>
+                        ₹{total.toFixed(2).toLocaleString('en-IN')}
+                      </Typography>
+                    </Box>
+                    <Chip
+                      label={paymentStatus.toUpperCase()}
+                      size="small"
+                      color={paymentStatus === 'paid' ? 'success' : paymentStatus === 'partial' ? 'warning' : 'default'}
+                      sx={{ fontWeight: 800, fontSize: '0.7rem' }}
+                    />
+                  </Box>
+                </Box>
+              </Paper>
+            </Grid>
+          </Grid>
+        </DialogContent>
+
+        <DialogActions sx={{
+          p: { xs: 2, sm: 2.5 },
+          bgcolor: 'background.paper',
+          borderTop: '1px solid',
+          borderColor: 'divider',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          Create Retail Invoice
-          {isMobile && (
-            <IconButton onClick={() => setOpen(false)} sx={{ color: 'white' }}>
-              <Close />
-            </IconButton>
-          )}
-        </DialogTitle>
-        <DialogContent sx={{ p: { xs: 2, sm: 3 }, mt: 2 }}>
-          <Paper sx={{ p: { xs: 1.5, sm: 2 }, mb: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2 }}>Customer Information</Typography>
-            <Box sx={{ mb: 2 }}>
-              <TextField
-                label="Customer Name"
-                fullWidth
-                value={customer}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/\b\w/g, (l) => l.toUpperCase());
-                  setCustomer(val);
-                  if (selectedCustomerId) setSelectedCustomerId(null);
-                }}
-                onBlur={() => {
-                  const searchTerm = customer.toLowerCase().trim();
-                  if (searchTerm) {
-                    const matched = customers.find(c => c.name.toLowerCase() === searchTerm);
-                    if (matched) {
-                      setCustomer(matched.name);
-                      setPhone(matched.phone || '+91');
-                      setSelectedCustomerId(matched.id);
-                    }
-                  }
-                }}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    const searchTerm = customer.toLowerCase().trim();
-                    const matched = customers.find(c => c.name.toLowerCase() === searchTerm);
-                    if (matched) {
-                      setCustomer(matched.name);
-                      setPhone(matched.phone || '+91');
-                      setSelectedCustomerId(matched.id);
-                    }
-                  }
-                }}
-                helperText="Search by name. Triggers on Enter or when you tap away."
-              />
-            </Box>
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
-              <TextField
-                label="Phone (with country code)"
-                value={phone}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  // Always start with +91
-                  let suffix = val;
-                  if (val.startsWith('+91')) {
-                    suffix = val.slice(3);
-                  } else if (val.length < 3) {
-                    setPhone('+91');
-                    return;
-                  }
+          <Button
+            onClick={() => setOpen(false)}
+            variant="text"
+            sx={{ fontWeight: 700, color: 'text.secondary', px: 2 }}
+          >
+            Cancel
+          </Button>
 
-                  // Only allow digits in suffix and max 10 digits
-                  const cleanedSuffix = suffix.replace(/[^0-9]/g, '').slice(0, 10);
-                  const newPhone = `+91${cleanedSuffix}`;
-                  setPhone(newPhone);
-
-                  // Auto-fetch if full number (13 chars: +91 + 10 digits)
-                  if (newPhone.length === 13) {
-                    const matched = customers.find(c => c.phone === newPhone || c.phone === cleanedSuffix);
-                    if (matched) {
-                      setCustomer(matched.name);
-                      setSelectedCustomerId(matched.id);
-                    }
-                  }
-                }}
-                onBlur={() => {
-                  const val = phone.trim();
-                  if (val.length > 3) {
-                    const matched = customers.find(c => c.phone === val || c.phone === val.replace('+91', '').trim());
-                    if (matched) {
-                      setCustomer(matched.name);
-                      setSelectedCustomerId(matched.id);
-                    }
-                  }
-                }}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    // Fetch customer logic only on Enter
-                    const val = phone.trim();
-                    const matched = customers.find(c => c.phone === val || c.phone === val.replace('+91', '').trim());
-                    if (matched) {
-                      setCustomer(matched.name);
-                      setSelectedCustomerId(matched.id);
-                    }
-                  }
-                }}
-                fullWidth
-                placeholder="919876543210"
-                helperText={selectedCustomerId ? `Points: ${customers.find(c => c.id === selectedCustomerId)?.loyaltyPoints || 0}` : "Press Enter to search for existing customer"}
-                InputProps={{
-                  sx: { fontFamily: 'monospace' }
-                }}
-              />
-              <TextField
-                label="Invoice Date & Time"
-                type="datetime-local"
-                value={invoiceDate}
-                onChange={(e) => setInvoiceDate(e.target.value)}
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-              />
-            </Box>
-          </Paper>
-
-          <Paper sx={{ p: { xs: 1.5, sm: 2 }, mb: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2 }}>Invoice Items</Typography>
-
-
-
-            <Box sx={{ mb: 2 }}>
-              <TextField
-                fullWidth
-                placeholder="Scan Barcode / Product ID to Quick Add..."
-                value={itemSearchTerm}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setItemSearchTerm(val);
-
-                  // Auto-select on exact Product ID or Variant SKU match
-                  if (val.trim()) {
-                    const trimmed = val.toLowerCase().trim();
-                    let matchedProduct = inventory.find(inv =>
-                      inv.productId && inv.productId.toLowerCase() === trimmed && (parseInt(inv.quantity) || 0) > 0
-                    );
-                    let matchedVariantSku = null;
-
-                    if (!matchedProduct) {
-                      for (const inv of inventory) {
-                        if (inv.hasVariants && inv.variants) {
-                          const variant = inv.variants.find(v => v.sku && v.sku.toLowerCase() === trimmed);
-                          if (variant) {
-                            matchedProduct = inv;
-                            matchedVariantSku = variant.sku;
-                            break;
-                          }
-                        }
-                      }
-                    }
-
-                    if (matchedProduct) {
-                      const emptyIndex = selectedItems.findIndex(item => !item.id);
-                      if (emptyIndex !== -1) {
-                        handleItemChange(emptyIndex, 'id', matchedProduct.id);
-                        if (matchedVariantSku) handleItemChange(emptyIndex, 'variantSku', matchedVariantSku);
-                      } else {
-                        setSelectedItems([...selectedItems, {
-                          id: matchedProduct.id,
-                          quantity: 1,
-                          variantSku: matchedVariantSku || '',
-                          isCustom: false,
-                          customName: '',
-                          customPrice: 0,
-                          customCost: 0
-                        }]);
-                      }
-                      setItemSearchTerm('');
-                    }
-                  }
-                }}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    const trimmed = itemSearchTerm.toLowerCase().trim();
-                    let matchedProduct = inventory.find(inv =>
-                      inv.productId && inv.productId.toLowerCase() === trimmed && (parseInt(inv.quantity) || 0) > 0
-                    );
-                    let matchedVariantSku = null;
-
-                    if (!matchedProduct) {
-                      for (const inv of inventory) {
-                        if (inv.hasVariants && inv.variants) {
-                          const variant = inv.variants.find(v => v.sku && v.sku.toLowerCase() === trimmed);
-                          if (variant) {
-                            matchedProduct = inv;
-                            matchedVariantSku = variant.sku;
-                            break;
-                          }
-                        }
-                      }
-                    }
-
-                    if (matchedProduct) {
-                      const emptyIndex = selectedItems.findIndex(item => !item.id);
-                      if (emptyIndex !== -1) {
-                        handleItemChange(emptyIndex, 'id', matchedProduct.id);
-                        if (matchedVariantSku) handleItemChange(emptyIndex, 'variantSku', matchedVariantSku);
-                      } else {
-                        setSelectedItems([...selectedItems, {
-                          id: matchedProduct.id,
-                          quantity: 1,
-                          variantSku: matchedVariantSku || '',
-                          isCustom: false,
-                          customName: '',
-                          customPrice: 0,
-                          customCost: 0
-                        }]);
-                      }
-                      setItemSearchTerm('');
-                    }
-                  }
-                }}
-                InputProps={{
-                  startAdornment: <Search sx={{ color: 'text.secondary', mr: 1 }} />,
-                  endAdornment: (
-                    <IconButton size="small" onClick={() => setScannerOpen(true)} sx={{ color: 'primary.main' }}>
-                      <CameraAlt />
-                    </IconButton>
-                  )
-                }}
-                helperText="Scanning, typing a Product ID, or using Camera adds it automatically"
-              />
-            </Box>
-
-            {/* Scanner Dialog */}
-            <Dialog open={scannerOpen} onClose={() => setScannerOpen(false)} maxWidth="xs" fullWidth>
-              <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                Scan Product Barcode
-                <IconButton onClick={() => setScannerOpen(false)} size="small"><Close /></IconButton>
-              </DialogTitle>
-              <DialogContent sx={{ textAlign: 'center' }}>
-                <Box id="reader" sx={{ width: '100%', minHeight: '250px', bgcolor: '#000', borderRadius: 2, overflow: 'hidden', mb: 2 }} />
-
-                {scannerError ? (
-                  <Box sx={{ color: 'error.main', mb: 2 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{scannerError}</Typography>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      color="error"
-                      onClick={() => setScannerOpen(false)}
-                      sx={{ mt: 1, mr: 1 }}
-                    >
-                      Close
-                    </Button>
-                    <Button
-                      size="small"
-                      variant="contained"
-                      color="primary"
-                      onClick={() => { setScannerOpen(false); setTimeout(() => setScannerOpen(true), 500); }}
-                      sx={{ mt: 1 }}
-                    >
-                      Retry
-                    </Button>
-                  </Box>
-                ) : (
-                  <Typography variant="body2" color="primary" sx={{ fontWeight: 600, mb: 1 }}>
-                    {scannerStatus}
-                  </Typography>
-                )}
-
-                <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary' }}>
-                  Point your camera at a product barcode.
-                </Typography>
-              </DialogContent>
-            </Dialog>
-
-            {selectedItems.map((item, index) => {
-              // Filter inventory based quantity > 0
-              const filteredInventory = inventory.filter(inv => (parseInt(inv.currentQty || inv.quantity) || 0) > 0);
-
-              return (
-                <Box key={index} sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 1.5,
-                  mb: 2,
-                  p: { xs: 1.5, sm: 2 },
-                  bgcolor: 'white',
-                  borderRadius: 2,
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                  position: 'relative'
-                }}>
-                  <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                      {!item.isCustom ? (
-                        <Autocomplete
-                          value={inventory.find(i => i.id === item.id) || null}
-                          onChange={(event, newValue) => {
-                            handleItemChange(index, 'id', newValue ? newValue.id : '');
-                          }}
-                          options={filteredInventory}
-                          getOptionLabel={(option) => `${option.name} (₹${option.price})`}
-                          filterOptions={(options, { inputValue }) => {
-                            return options.filter(option =>
-                              option.name.toLowerCase().includes(inputValue.toLowerCase()) ||
-                              (option.productId && option.productId.toLowerCase().includes(inputValue.toLowerCase()))
-                            );
-                          }}
-                          renderOption={(props, option) => (
-                            <Box component="li" {...props} key={option.id}>
-                              <Box>
-                                <Typography variant="body2" sx={{ fontWeight: 600 }}>{option.name}</Typography>
-                                <Typography variant="caption" color="text.secondary">
-                                  ID: {option.productId || 'N/A'} | Stock: {option.quantity} | ₹{option.price}
-                                </Typography>
-                              </Box>
-                            </Box>
-                          )}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              label="Search Product (Name or ID)"
-                              size="small"
-                              fullWidth
-                              error={!item.id && selectedItems.length > 0}
-                            />
-                          )}
-                        />
-                      ) : (
-                        <Box sx={{ display: 'flex', gap: 1.5, flexDirection: 'column' }}>
-                          <TextField
-                            label="Custom Product Name"
-                            size="small"
-                            fullWidth
-                            value={item.customName}
-                            onChange={(e) => handleItemChange(index, 'customName', e.target.value)}
-                            error={!item.customName && selectedItems.length > 0}
-                          />
-                          <Box sx={{ display: 'flex', gap: 1 }}>
-                            <TextField
-                              label="Sale (₹)"
-                              size="small"
-                              type="number"
-                              fullWidth
-                              value={item.customPrice}
-                              onChange={(e) => handleItemChange(index, 'customPrice', parseFloat(e.target.value) || 0)}
-                            />
-                            <TextField
-                              label="Cost (₹)"
-                              size="small"
-                              type="number"
-                              fullWidth
-                              value={item.customCost}
-                              onChange={(e) => handleItemChange(index, 'customCost', parseFloat(e.target.value) || 0)}
-                            />
-                          </Box>
-                        </Box>
-                      )}
-                    </Box>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            size="small"
-                            checked={item.isCustom}
-                            onChange={(e) => {
-                              handleItemChange(index, 'isCustom', e.target.checked);
-                              if (e.target.checked) handleItemChange(index, 'id', 'custom'); // Placeholder ID
-                              else handleItemChange(index, 'id', '');
-                            }}
-                          />
-                        }
-                        label={<Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.65rem' }}>Custom?</Typography>}
-                        labelPlacement="top"
-                        sx={{ m: 0 }}
-                      />
-                      {user?.role === 'admin' && (
-                        <IconButton
-                          size="small"
-                          onClick={() => setSelectedItems(selectedItems.filter((_, i) => i !== index))}
-                          sx={{ color: 'error.main' }}
-                        >
-                          <Delete fontSize="small" />
-                        </IconButton>
-                      )}
-                    </Box>
-                  </Box>
-
-                  {!item.isCustom && item.id && inventory.find(i => i.id === item.id)?.hasVariants && (
-                    <Box sx={{ mt: 1 }}>
-                      <TextField
-                        select
-                        fullWidth
-                        size="small"
-                        label="Select Variant (Size / Color)"
-                        value={item.variantSku || ''}
-                        onChange={(e) => handleItemChange(index, 'variantSku', e.target.value)}
-                        error={!item.variantSku && selectedItems.length > 0}
-                      >
-                        {inventory.find(i => i.id === item.id).variants.map((v) => (
-                          <MenuItem key={v.sku} value={v.sku} disabled={(parseInt(v.quantity) || 0) <= 0}>
-                            {v.size} / {v.color} (Stock: {v.quantity}) - ₹{v.price}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    </Box>
-                  )}
-                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                    <TextField
-                      label="Qty"
-                      type="number"
-                      size="small"
-                      value={item.quantity}
-                      onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value) || 1)}
-                      sx={{ width: 100 }}
-                    />
-                    {item.isCustom ? (
-                      <Typography variant="body2" sx={{ fontWeight: 700, ml: 'auto', color: 'primary.main' }}>
-                        ₹{((item.customPrice || 0) * item.quantity).toLocaleString()}
-                      </Typography>
-                    ) : (
-                      item.id && (
-                        <Typography variant="body2" sx={{ fontWeight: 700, ml: 'auto', color: 'primary.main' }}>
-                          ₹{(inventory.find(i => i.id === item.id)?.price * item.quantity || 0).toLocaleString()}
-                        </Typography>
-                      )
-                    )}
-                  </Box>
-                </Box>
-              );
-            })}
-            <Button onClick={handleAddItem} startIcon={<Add />} variant="outlined" fullWidth>Add More Item</Button>
-          </Paper>
-
-          <Paper sx={{ p: { xs: 1.5, sm: 2 }, bgcolor: 'grey.50', borderRadius: 2 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>Payment & Totals</Typography>
-              <FormControlLabel
-                control={<Switch checked={isSplitPayment} onChange={(e) => {
-                  setIsSplitPayment(e.target.checked);
-                  if (e.target.checked) setSplitAmount(Math.round(total / 2));
-                }} size="small" />}
-                label={<Typography variant="body2" sx={{ fontWeight: 600 }}>Split Payment</Typography>}
-              />
-            </Box>
-
-            {!isSplitPayment ? (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <TextField select label="Payment Method" value={paymentMethod} onChange={(e) => {
-                  setPaymentMethod(e.target.value);
-                  if (e.target.value === 'Credit') setPaymentStatus('pending');
-                  else if (e.target.value === 'EMI') { setPaymentStatus('paid'); setIsEMI(true); }
-                  else { setPaymentStatus('paid'); setIsEMI(false); }
-                }} fullWidth size="small">
-                  <MenuItem value="Cash">Cash</MenuItem>
-                  <MenuItem value="Card">Card</MenuItem>
-                  <MenuItem value="UPI">UPI</MenuItem>
-                  <MenuItem value="EMI">EMI (Installments)</MenuItem>
-                  <MenuItem value="Net Banking">Net Banking</MenuItem>
-                  <MenuItem value="Credit">Credit (Pay Later / Khata)</MenuItem>
-                </TextField>
-                {paymentMethod === 'UPI' && (
-                  <TextField select label="UPI Provider" value={upiProvider} onChange={(e) => setUpiProvider(e.target.value)} fullWidth size="small">
-                    <MenuItem value="PhonePe">PhonePe</MenuItem>
-                    <MenuItem value="GPay">GPay</MenuItem>
-                    <MenuItem value="Paytm">Paytm</MenuItem>
-                    <MenuItem value="BHIM">BHIM / Other</MenuItem>
-                  </TextField>
-                )}
-                {paymentMethod === 'EMI' && (
-                  <Box sx={{ display: 'flex', gap: 1.5 }}>
-                    <TextField select label="Tenure" value={emiTenure} onChange={(e) => {
-                      setEmiTenure(e.target.value);
-                      setIsEMI(true);
-                    }} fullWidth size="small">
-                      <MenuItem value={3}>3 Months</MenuItem>
-                      <MenuItem value={6}>6 Months</MenuItem>
-                      <MenuItem value={9}>9 Months</MenuItem>
-                      <MenuItem value={12}>12 Months</MenuItem>
-                    </TextField>
-                    <TextField label="Monthly" value={`₹${(total / (emiTenure || 3)).toFixed(0)}`} disabled fullWidth size="small" />
-                  </Box>
-                )}
-                <TextField
-                  select
-                  label="Payment Status"
-                  value={paymentStatus}
-                  onChange={(e) => setPaymentStatus(e.target.value)}
-                  fullWidth
-                  size="small"
-                >
-                  <MenuItem value="paid">Paid</MenuItem>
-                  <MenuItem value="partial">Partially Paid</MenuItem>
-                  <MenuItem value="pending">Pending</MenuItem>
-                </TextField>
-              </Box>
-            ) : (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Box sx={{ display: 'flex', gap: 1.5, flexDirection: { xs: 'column', sm: 'row' } }}>
-                  <TextField select label="Method 1" value={paymentMethod} onChange={(e) => {
-                    setPaymentMethod(e.target.value);
-                    if (e.target.value === 'Credit') setPaymentStatus('partial');
-                  }} fullWidth size="small">
-                    <MenuItem value="Cash">Cash</MenuItem>
-                    <MenuItem value="Card">Card</MenuItem>
-                    <MenuItem value="UPI">UPI</MenuItem>
-                    <MenuItem value="EMI">EMI</MenuItem>
-                    <MenuItem value="Net Banking">Net Banking</MenuItem>
-                    <MenuItem value="Credit">Credit</MenuItem>
-                  </TextField>
-                  <TextField
-                    label="Amount 1"
-                    type="number"
-                    value={splitAmount}
-                    onChange={(e) => setSplitAmount(parseFloat(e.target.value) || 0)}
-                    fullWidth
-                    size="small"
-                  />
-                </Box>
-                {paymentMethod === 'UPI' && (
-                  <TextField select label="UPI Provider 1" value={upiProvider} onChange={(e) => setUpiProvider(e.target.value)} fullWidth size="small">
-                    <MenuItem value="PhonePe">PhonePe</MenuItem>
-                    <MenuItem value="GPay">GPay</MenuItem>
-                    <MenuItem value="Paytm">Paytm</MenuItem>
-                    <MenuItem value="BHIM">BHIM / Other</MenuItem>
-                  </TextField>
-                )}
-                {(paymentMethod === 'UPI' || paymentMethod === 'Card') && (
-                  <TextField
-                    label={`${paymentMethod} Transaction ID`}
-                    placeholder="Transaction ID for Method 1"
-                    value={upiTransactionId}
-                    onChange={(e) => setUpiTransactionId(e.target.value)}
-                    fullWidth
-                    size="small"
-                  />
-                )}
-                <Box sx={{ display: 'flex', gap: 1.5, flexDirection: { xs: 'column', sm: 'row' } }}>
-                  <TextField select label="Method 2" value={paymentMethod2} onChange={(e) => {
-                    setPaymentMethod2(e.target.value);
-                    if (e.target.value === 'Credit') setPaymentStatus('partial');
-                  }} fullWidth size="small">
-                    <MenuItem value="Cash">Cash</MenuItem>
-                    <MenuItem value="Card">Card</MenuItem>
-                    <MenuItem value="UPI">UPI</MenuItem>
-                    <MenuItem value="EMI">EMI</MenuItem>
-                    <MenuItem value="Net Banking">Net Banking</MenuItem>
-                    <MenuItem value="Credit">Credit</MenuItem>
-                  </TextField>
-                  <TextField
-                    label="Amount 2"
-                    value={(total - splitAmount).toFixed(2)}
-                    disabled
-                    fullWidth
-                    size="small"
-                    helperText="Auto-calculated remainder"
-                  />
-                </Box>
-                {paymentMethod2 === 'UPI' && (
-                  <TextField select label="UPI Provider 2" value={upiProvider2} onChange={(e) => setUpiProvider2(e.target.value)} fullWidth size="small">
-                    <MenuItem value="PhonePe">PhonePe</MenuItem>
-                    <MenuItem value="GPay">GPay</MenuItem>
-                    <MenuItem value="Paytm">Paytm</MenuItem>
-                    <MenuItem value="BHIM">BHIM / Other</MenuItem>
-                  </TextField>
-                )}
-                {(paymentMethod2 === 'UPI' || paymentMethod2 === 'Card') && (
-                  <TextField
-                    label={`${paymentMethod2} Transaction ID`}
-                    placeholder="Transaction ID for Method 2"
-                    value={upiTransactionId2}
-                    onChange={(e) => setUpiTransactionId2(e.target.value)}
-                    fullWidth
-                    size="small"
-                  />
-                )}
-              </Box>
-            )}
-            <Box sx={{ display: 'flex', gap: 2, mt: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
-              <TextField label="GST (%)" type="number" size="small" value={tax} onChange={(e) => setTax(e.target.value)} fullWidth />
-              <Box sx={{ display: 'flex', gap: 1.5, width: '100%', flexDirection: { xs: 'column', sm: 'row' } }}>
-                <TextField
-                  label="Discount (%)"
-                  type="number"
-                  size="small"
-                  value={discountPercent}
-                  onChange={(e) => setDiscountPercent(e.target.value)}
-                  fullWidth
-                />
-                <TextField
-                  label="Discount (₹)"
-                  type="number"
-                  size="small"
-                  value={discountAmount}
-                  onChange={(e) => setDiscountAmount(e.target.value)}
-                  fullWidth
-                />
-              </Box>
-            </Box>
-            <Box sx={{ mt: 3, p: 2, bgcolor: mode === 'light' ? 'primary.light' : 'rgba(255, 255, 255, 0.05)', borderRadius: 2 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                <Typography variant="body2">Subtotal:</Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>₹{subtotal.toFixed(2).toLocaleString()}</Typography>
-              </Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                <Typography variant="body2">GST ({(parseFloat(tax) || 0)}%):</Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>₹{taxAmount.toFixed(2).toLocaleString()}</Typography>
-              </Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                <Typography variant="body2">Discount (Total):</Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600, color: 'error.main' }}>- ₹{absDiscount.toFixed(2).toLocaleString()}</Typography>
-              </Box>
-              <Divider sx={{ my: 1.5 }} />
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>Total Amount:</Typography>
-                <Typography variant="h5" sx={{ fontWeight: 800, color: 'primary.main' }}>₹{total.toFixed(2).toLocaleString()}</Typography>
-              </Box>
-            </Box>
-          </Paper>
-        </DialogContent>
-        <DialogActions sx={{ p: { xs: 2.5, sm: 3 }, bgcolor: 'grey.50', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
-          <Button onClick={() => setOpen(false)} variant="outlined" fullWidth={isMobile}>Cancel</Button>
-          <Button onClick={handleSaveInvoice} variant="contained" size="large" sx={{ px: 4 }} fullWidth={isMobile}>Save Invoice</Button>
+          <Box sx={{ display: 'flex', gap: 1.5 }}>
+            <Button
+              onClick={handleSaveInvoice}
+              variant="contained"
+              size="large"
+              startIcon={<ReceiptLong />}
+              sx={{
+                px: 4,
+                py: 1.2,
+                borderRadius: '10px',
+                fontWeight: 800,
+                fontSize: '0.92rem',
+                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                color: '#ffffff',
+                boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #115E59 0%, #022c22 100%)'
+                }
+              }}
+            >
+              Issue Retail Invoice • ₹{total.toFixed(0).toLocaleString('en-IN')}
+            </Button>
+          </Box>
         </DialogActions>
       </Dialog>
 
