@@ -518,7 +518,6 @@ export default function Devices() {
                             startIcon={<Bluetooth />}
                             onClick={() => {
                                 setBluetoothModalOpen(true);
-                                startBluetoothDiscovery();
                             }}
                             sx={{
                                 background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
@@ -1098,154 +1097,215 @@ export default function Devices() {
                     </IconButton>
                 </DialogTitle>
                 <DialogContent sx={{ pt: 2.5 }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                        Ensure your Bluetooth scanner is in pairing / discovery mode. Most scanners have a "Bluetooth HID Pairing" barcode in their user manual.
-                    </Typography>
-
-                    {isScanningBluetooth && (
-                        <Box sx={{ mb: 2.5 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
-                                <Typography variant="caption" sx={{ fontWeight: 700, color: '#0F766E' }}>
-                                    Scanning for nearby Bluetooth devices...
-                                </Typography>
-                            </Box>
-                            <LinearProgress sx={{ borderRadius: 2, height: 6, bgcolor: 'rgba(15, 118, 110, 0.1)', '& .MuiLinearProgress-bar': { bgcolor: '#0F766E' } }} />
-                        </Box>
-                    )}
-
-                    {bluetoothError && (
-                        <Alert severity="info" sx={{ mb: 2, borderRadius: 2 }}>
-                            {bluetoothError}
-                        </Alert>
-                    )}
-
-                    {/* Smartphone Guidance Callout */}
-                    <Alert
-                        severity="warning"
-                        icon={<InfoOutlined />}
+                    {/* SECTION 1: SMARTPHONE (iPhone & Android) */}
+                    <Paper
+                        elevation={0}
                         sx={{
-                            mb: 2.5,
-                            borderRadius: 2.5,
-                            border: '1px solid rgba(217, 119, 6, 0.3)',
-                            bgcolor: 'rgba(217, 119, 6, 0.08)'
+                            p: 2.5,
+                            borderRadius: 3,
+                            bgcolor: 'rgba(217, 119, 6, 0.05)',
+                            border: '1.5px solid #D97706',
+                            mb: 3
                         }}
                     >
-                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#92400E' }}>
-                            Looking for your phone in Bluetooth search?
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontSize: '0.82rem', color: '#78350F', mt: 0.5, mb: 1.2 }}>
-                            Smartphones (iPhone & Android) do not broadcast as Bluetooth barcode accessories. Even with Bluetooth ON, phones cannot be detected in this list. To use your phone as a scanner, click below:
-                        </Typography>
-                        <Button
-                            size="small"
-                            variant="contained"
-                            startIcon={<CameraAlt />}
-                            onClick={() => {
-                                setBluetoothModalOpen(false);
-                                setCameraScannerOpen(true);
-                            }}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                            <PhoneAndroid sx={{ color: '#D97706', fontSize: 24 }} />
+                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#92400E' }}>
+                                Connect a Smartphone (iPhone / Android)
+                            </Typography>
+                        </Box>
+
+                        <Alert
+                            severity="info"
+                            icon={<InfoOutlined />}
                             sx={{
-                                textTransform: 'none',
-                                fontWeight: 700,
-                                fontSize: '0.78rem',
-                                bgcolor: '#D97706',
-                                color: '#FFFFFF',
+                                mb: 2,
                                 borderRadius: 2,
-                                '&:hover': { bgcolor: '#B45309' }
+                                bgcolor: 'rgba(255,255,255,0.7)',
+                                border: '1px solid rgba(217, 119, 6, 0.2)'
                             }}
                         >
-                            Open Camera Scanner Instead
-                        </Button>
-                    </Alert>
+                            <Typography variant="caption" sx={{ fontWeight: 700, color: '#92400E', display: 'block' }}>
+                                Why doesn't your phone show in Bluetooth search lists?
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                                Smartphones (iOS & Android) do <strong>NOT</strong> broadcast as Bluetooth accessory guns. Mobile OS privacy blocks computers from pairing phones as barcode hardware. Use one of these two direct methods:
+                            </Typography>
+                        </Alert>
 
-                    {/* Manual / HID Scanner Registration */}
-                    <Box sx={{ p: 2, borderRadius: 2.5, bgcolor: 'rgba(0,0,0,0.02)', border: '1px solid', borderColor: 'divider' }}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1, color: '#042F2E' }}>
-                            Or Register Scanner Profile Manually:
-                        </Typography>
-                        <Box sx={{ display: 'flex', gap: 1, mb: 1.5 }}>
+                        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1.5 }}>
                             <Button
-                                size="small"
-                                variant={customDeviceType === 'bluetooth_scanner' ? 'contained' : 'outlined'}
-                                onClick={() => setCustomDeviceType('bluetooth_scanner')}
+                                fullWidth
+                                variant="contained"
+                                startIcon={<CameraAlt />}
+                                onClick={() => {
+                                    setBluetoothModalOpen(false);
+                                    setCameraScannerOpen(true);
+                                }}
                                 sx={{
                                     textTransform: 'none',
-                                    fontSize: '0.75rem',
-                                    fontWeight: 700,
-                                    borderRadius: 2,
-                                    bgcolor: customDeviceType === 'bluetooth_scanner' ? '#0F766E' : 'transparent',
-                                    borderColor: '#0F766E',
-                                    color: customDeviceType === 'bluetooth_scanner' ? '#fff' : '#0F766E',
-                                    '&:hover': {
-                                        bgcolor: customDeviceType === 'bluetooth_scanner' ? '#042F2E' : 'rgba(15, 118, 110, 0.08)'
-                                    }
+                                    fontWeight: 800,
+                                    fontSize: '0.8rem',
+                                    borderRadius: 2.5,
+                                    bgcolor: '#0F766E',
+                                    color: '#FFFFFF',
+                                    py: 1.2,
+                                    '&:hover': { bgcolor: '#042F2E' }
                                 }}
                             >
-                                Bluetooth Scanner
+                                Open Phone Camera (Continuity Bluetooth)
                             </Button>
                             <Button
-                                size="small"
-                                variant={customDeviceType === 'phone_camera' ? 'contained' : 'outlined'}
-                                onClick={() => setCustomDeviceType('phone_camera')}
+                                fullWidth
+                                variant="outlined"
+                                startIcon={<QrCodeScanner />}
+                                onClick={() => {
+                                    setBluetoothModalOpen(false);
+                                    setPhoneModalOpen(true);
+                                }}
                                 sx={{
                                     textTransform: 'none',
-                                    fontSize: '0.75rem',
-                                    fontWeight: 700,
-                                    borderRadius: 2,
-                                    bgcolor: customDeviceType === 'phone_camera' ? '#D97706' : 'transparent',
+                                    fontWeight: 800,
+                                    fontSize: '0.8rem',
+                                    borderRadius: 2.5,
                                     borderColor: '#D97706',
-                                    color: customDeviceType === 'phone_camera' ? '#fff' : '#D97706',
-                                    '&:hover': {
-                                        bgcolor: customDeviceType === 'phone_camera' ? '#B45309' : 'rgba(217, 119, 6, 0.08)'
-                                    }
+                                    color: '#D97706',
+                                    py: 1.2,
+                                    '&:hover': { bgcolor: 'rgba(217, 119, 6, 0.08)' }
                                 }}
                             >
-                                Phone Camera
+                                Scan Pairing QR Code with Phone
                             </Button>
                         </Box>
-                        <TextField
-                            fullWidth
-                            size="small"
-                            label="Scanner Name / Model *"
-                            placeholder="e.g. Eyoyo Ring Scanner, Netum 2D Gun"
-                            value={customDeviceName}
-                            onChange={(e) => setCustomDeviceName(e.target.value)}
-                            sx={{ mb: 1.5 }}
-                        />
+                    </Paper>
+
+                    {/* SECTION 2: PHYSICAL HARDWARE SCANNER */}
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: 2.5,
+                            borderRadius: 3,
+                            bgcolor: 'rgba(0,0,0,0.02)',
+                            border: '1px solid',
+                            borderColor: 'divider'
+                        }}
+                    >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                            <Bluetooth sx={{ color: '#0F766E', fontSize: 24 }} />
+                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                                Pair Hardware Scanner Gun / Ring Scanner
+                            </Typography>
+                        </Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontSize: '0.82rem' }}>
+                            For dedicated retail barcode scanners (Netum, Zebra, Eyoyo, Inateck). Put your scanner into Bluetooth pairing mode first.
+                        </Typography>
+
+                        {isScanningBluetooth && (
+                            <Box sx={{ mb: 2 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
+                                    <Typography variant="caption" sx={{ fontWeight: 700, color: '#0F766E' }}>
+                                        Scanning for nearby hardware scanners...
+                                    </Typography>
+                                </Box>
+                                <LinearProgress sx={{ borderRadius: 2, height: 6, bgcolor: 'rgba(15, 118, 110, 0.1)', '& .MuiLinearProgress-bar': { bgcolor: '#0F766E' } }} />
+                            </Box>
+                        )}
+
+                        {bluetoothError && (
+                            <Alert severity="warning" sx={{ mb: 2, borderRadius: 2 }}>
+                                {bluetoothError}
+                            </Alert>
+                        )}
+
                         <Button
                             fullWidth
-                            variant="outlined"
-                            disabled={!customDeviceName.trim()}
-                            onClick={handleAddCustomDevice}
+                            variant="contained"
+                            startIcon={<Bluetooth />}
+                            onClick={startBluetoothDiscovery}
+                            disabled={isScanningBluetooth}
                             sx={{
-                                borderRadius: 2,
-                                fontWeight: 700,
+                                borderRadius: 2.5,
+                                fontWeight: 800,
                                 textTransform: 'none',
-                                borderColor: '#0F766E',
-                                color: '#0F766E'
+                                bgcolor: '#0F766E',
+                                color: '#FFFFFF',
+                                py: 1.2,
+                                mb: 2,
+                                '&:hover': { bgcolor: '#042F2E' }
                             }}
                         >
-                            + Add Device to Workstation
+                            {isScanningBluetooth ? 'Searching...' : 'Search for Hardware Scanner (Bluetooth)'}
                         </Button>
-                    </Box>
+
+                        {/* Manual / HID Scanner Registration */}
+                        <Box sx={{ pt: 1.5, borderTop: '1px solid', borderColor: 'divider' }}>
+                            <Typography variant="caption" sx={{ fontWeight: 800, display: 'block', mb: 1, color: 'text.secondary' }}>
+                                Or Register Hardware Profile Manually:
+                            </Typography>
+                            <Box sx={{ display: 'flex', gap: 1, mb: 1.5 }}>
+                                <Button
+                                    size="small"
+                                    variant={customDeviceType === 'bluetooth_scanner' ? 'contained' : 'outlined'}
+                                    onClick={() => setCustomDeviceType('bluetooth_scanner')}
+                                    sx={{
+                                        textTransform: 'none',
+                                        fontSize: '0.72rem',
+                                        fontWeight: 700,
+                                        borderRadius: 2,
+                                        bgcolor: customDeviceType === 'bluetooth_scanner' ? '#0F766E' : 'transparent',
+                                        borderColor: '#0F766E',
+                                        color: customDeviceType === 'bluetooth_scanner' ? '#fff' : '#0F766E'
+                                    }}
+                                >
+                                    Bluetooth Scanner Gun
+                                </Button>
+                                <Button
+                                    size="small"
+                                    variant={customDeviceType === 'phone_camera' ? 'contained' : 'outlined'}
+                                    onClick={() => setCustomDeviceType('phone_camera')}
+                                    sx={{
+                                        textTransform: 'none',
+                                        fontSize: '0.72rem',
+                                        fontWeight: 700,
+                                        borderRadius: 2,
+                                        bgcolor: customDeviceType === 'phone_camera' ? '#D97706' : 'transparent',
+                                        borderColor: '#D97706',
+                                        color: customDeviceType === 'phone_camera' ? '#fff' : '#D97706'
+                                    }}
+                                >
+                                    Phone Camera
+                                </Button>
+                            </Box>
+                            <TextField
+                                fullWidth
+                                size="small"
+                                label="Device Name / Model"
+                                placeholder="e.g. Eyoyo Ring Scanner, Netum 2D Gun"
+                                value={customDeviceName}
+                                onChange={(e) => setCustomDeviceName(e.target.value)}
+                                sx={{ mb: 1.5 }}
+                            />
+                            <Button
+                                fullWidth
+                                variant="outlined"
+                                disabled={!customDeviceName.trim()}
+                                onClick={handleAddCustomDevice}
+                                sx={{
+                                    borderRadius: 2,
+                                    fontWeight: 700,
+                                    textTransform: 'none',
+                                    borderColor: '#0F766E',
+                                    color: '#0F766E'
+                                }}
+                            >
+                                + Add Device to Workstation
+                            </Button>
+                        </Box>
+                    </Paper>
                 </DialogContent>
-                <DialogActions sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider' }}>
+                <DialogActions sx={{ p: 2, borderTop: '1px solid', borderColor: 'divider' }}>
                     <Button onClick={() => setBluetoothModalOpen(false)} sx={{ fontWeight: 700, color: 'text.secondary' }}>
                         Close
-                    </Button>
-                    <Button
-                        variant="contained"
-                        startIcon={<Refresh />}
-                        onClick={startBluetoothDiscovery}
-                        sx={{
-                            borderRadius: 2.5,
-                            fontWeight: 700,
-                            textTransform: 'none',
-                            bgcolor: '#0F766E',
-                            '&:hover': { bgcolor: '#042F2E' }
-                        }}
-                    >
-                        Re-Scan
                     </Button>
                 </DialogActions>
             </Dialog>
