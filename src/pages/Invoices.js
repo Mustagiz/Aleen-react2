@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel } from '@mui/material';
-import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, FilterList, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong } from '@mui/icons-material';
+import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, FilterList, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices } from '@mui/icons-material';
 import { Html5Qrcode } from 'html5-qrcode';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 import { generateInvoiceNumber } from '../utils/helpers';
 import InvoicePrint from '../components/InvoicePrint';
+import InvoiceTemplateDialog from '../components/InvoiceTemplateDialog';
+import { INVOICE_TEMPLATES, getStoredInvoiceSettings } from '../constants/invoiceTemplates';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useThemeContext } from '../contexts/ThemeContext';
@@ -27,6 +29,9 @@ const Invoices = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [successInvoice, setSuccessInvoice] = useState(null);
+  const [invoiceSettings, setInvoiceSettings] = useState(() => getStoredInvoiceSettings());
+  const [templateModalOpen, setTemplateModalOpen] = useState(false);
+
 
   const playBeep = () => {
     try {
@@ -483,141 +488,230 @@ const Invoices = () => {
     link.click();
   };
 
-  const generatePDF = (invoice) => {
+  const generatePDF = (invoice, customTemplate, customSettings) => {
     const doc = new jsPDF();
-    const primaryColor = '#d97706'; // Warm Amber (Matches Application Primary)
-    const accentColor = '#f97316'; // Warm Coral (Matches Application Secondary)
+    const activeSettings = customSettings || invoiceSettings;
+    const activeTemplate = customTemplate || activeSettings.template || 'atelier-emerald';
 
-    // Header Layout: Left (Business Info) | Right (Invoice Status)
-    doc.setTextColor(primaryColor);
-    doc.setFontSize(28);
-    doc.setFont(undefined, 'bold');
-    doc.text(profile.businessName, 20, 25);
+    // Theme Colors
+    let primaryRGB = [15, 118, 110]; // Atelier Emerald
+    let accentRGB = [217, 119, 6];   // Champagne Gold
 
-    doc.setTextColor(80, 80, 80);
-    doc.setFontSize(9);
-    doc.setFont(undefined, 'normal');
-    doc.text(profile.address, 20, 32);
-    doc.text(`Phone: ${profile.phone} | GSTIN: ${profile.gstin}`, 20, 37);
-
-    doc.setTextColor(40, 40, 40);
-    doc.setFontSize(22);
-    doc.setFont(undefined, 'bold');
-    doc.text('INVOICE', 190, 25, { align: 'right' });
-
-    doc.setTextColor(primaryColor);
-    doc.setFontSize(14);
-    doc.text(invoice.id, 190, 33, { align: 'right' });
-
-    doc.setTextColor(80, 80, 80);
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
-    doc.text(`Date: ${new Date(invoice.date).toLocaleDateString('en-IN')}`, 190, 40, { align: 'right' });
-
-    // Thick Primary Border Line
-    doc.setDrawColor(primaryColor);
-    doc.setLineWidth(1.5);
-    doc.line(20, 46, 190, 46);
-
-    // Bill To Section
-    doc.setFontSize(11);
-    doc.setFont(undefined, 'bold');
-    doc.setTextColor(40, 40, 40);
-    doc.text('Bill To:', 20, 58);
-    doc.setFontSize(12);
-    doc.text(invoice.customer || 'Walk-in Customer', 20, 65);
-    if (invoice.phone) {
-      doc.setFontSize(10);
-      doc.setFont(undefined, 'normal');
-      doc.text(`Phone: ${invoice.phone}`, 20, 71);
+    if (activeTemplate === 'champagne-gold') {
+      primaryRGB = [180, 83, 9];
+      accentRGB = [217, 119, 6];
+    } else if (activeTemplate === 'minimal-haute') {
+      primaryRGB = [24, 24, 27];
+      accentRGB = [82, 82, 91];
+    } else if (activeTemplate === 'boutique-slip') {
+      primaryRGB = [51, 65, 85];
+      accentRGB = [15, 118, 110];
     }
 
-    // Items Table
+    let startY = 18;
+
+    // 1. HEADER: Custom Graphic Letterhead or Luxury Vector Header
+    if (activeSettings.useCustomLetterhead && activeSettings.customLetterheadImage) {
+      try {
+        doc.addImage(activeSettings.customLetterheadImage, 'JPEG', 14, 10, 182, 35);
+        startY = 52;
+      } catch (err) {
+        console.error('Error adding letterhead to PDF:', err);
+        startY = 20;
+      }
+    } else {
+      // Luxury Header Banner
+      doc.setFillColor(primaryRGB[0], primaryRGB[1], primaryRGB[2]);
+      doc.rect(14, 10, 182, 34, 'F');
+
+      // Accent gold flourish line
+      doc.setFillColor(accentRGB[0], accentRGB[1], accentRGB[2]);
+      doc.rect(14, 44, 182, 1.5, 'F');
+
+      // Left: Atelier Business Info
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(18);
+      doc.text(profile.businessName || 'ALEEN ATELIER', 20, 22);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(230, 230, 230);
+      doc.text(profile.address || '', 20, 29);
+      doc.text(`Phone: ${profile.phone || ''} | GSTIN: ${profile.gstin || ''}`, 20, 36);
+
+      // Right: TAX INVOICE & Meta
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.text('TAX INVOICE', 190, 22, { align: 'right' });
+
+      doc.setFontSize(10);
+      doc.setTextColor(253, 230, 138); // Champagne highlight
+      doc.text(`#${invoice.id}`, 190, 29, { align: 'right' });
+
+      doc.setFontSize(8);
+      doc.setTextColor(230, 230, 230);
+      doc.text(`Date: ${new Date(invoice.date).toLocaleDateString('en-IN')}`, 190, 36, { align: 'right' });
+
+      startY = 52;
+    }
+
+    // 2. CLIENT & INVOICE DETAILS CARD
+    doc.setFillColor(248, 250, 252);
+    doc.setDrawColor(226, 232, 240);
+    doc.roundedRect(14, startY, 182, 22, 2, 2, 'FD');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(primaryRGB[0], primaryRGB[1], primaryRGB[2]);
+    doc.text('BILLED TO (CLIENT DETAILS):', 20, startY + 6.5);
+
+    doc.setFontSize(10.5);
+    doc.setTextColor(30, 41, 59);
+    doc.text(invoice.customer || 'Walk-in Patron', 20, startY + 13.5);
+
+    if (invoice.phone) {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(100, 116, 139);
+      doc.text(`Contact: ${invoice.phone}`, 20, startY + 18.5);
+    }
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`Payment: ${invoice.paymentMethod || 'Cash'}`, 190, startY + 8, { align: 'right' });
+    doc.text(`Status: ${(invoice.status || 'Paid').toUpperCase()}`, 190, startY + 15, { align: 'right' });
+
+    // 3. ITEMS TABLE
     const tableData = invoice.items.map(item => [
-      { content: item.name, styles: { fontStyle: 'bold' } },
-      item.category || '-',
+      item.name,
+      item.category || 'Atelier Wear',
       item.quantity,
-      `₹${item.price.toFixed(2)}`,
-      `₹${(item.price * item.quantity).toFixed(2)}`
+      `₹${(item.price || 0).toFixed(2)}`,
+      `₹${((item.price || 0) * (item.quantity || 1)).toFixed(2)}`
     ]);
 
     autoTable(doc, {
-      startY: 80,
-      head: [['Item', 'Category', 'Qty', 'Price', 'Amount']],
+      startY: startY + 26,
+      head: [['Garment / Merchandise', 'Category', 'Qty', 'Unit Rate', 'Amount']],
       body: tableData,
-      headStyles: { fillColor: primaryColor, textColor: 255, fontSize: 10, halign: 'center' },
+      headStyles: {
+        fillColor: primaryRGB,
+        textColor: [255, 255, 255],
+        fontSize: 9,
+        fontStyle: 'bold',
+        halign: 'left'
+      },
       columnStyles: {
-        0: { cellWidth: 'auto' },
-        1: { halign: 'center' },
-        2: { halign: 'center' },
-        3: { halign: 'right' },
-        4: { halign: 'right' }
+        0: { cellWidth: 70 },
+        1: { cellWidth: 35 },
+        2: { cellWidth: 15, halign: 'center' },
+        3: { cellWidth: 30, halign: 'right' },
+        4: { cellWidth: 32, halign: 'right' }
       },
       theme: 'striped',
-      styles: { fontSize: 9 }
+      styles: { fontSize: 8.5, cellPadding: 3.5 }
     });
 
-    // Totals
-    const finalY = doc.lastAutoTable.finalY + 10;
-    const rightAlignX = 190;
+    const finalY = doc.lastAutoTable.finalY + 8;
 
-    doc.setFontSize(10);
-    doc.setTextColor(80, 80, 80);
-    doc.text('Subtotal:', 140, finalY);
-    doc.text(`₹${invoice.subtotal.toFixed(2)}`, rightAlignX, finalY, { align: 'right' });
-
-    if (invoice.discount > 0) {
-      doc.setTextColor(accentColor);
-      doc.text(`Discount (${invoice.discountPercentage || 0}%):`, 140, finalY + 7);
-      doc.text(`-₹${invoice.discount.toFixed(2)}`, rightAlignX, finalY + 7, { align: 'right' });
-      doc.setTextColor(80, 80, 80);
-    }
-
-    doc.text(`GST (${invoice.gst || 18}%):`, 140, finalY + 14);
-    doc.text(`₹${invoice.tax.toFixed(2)}`, rightAlignX, finalY + 14, { align: 'right' });
-
-    doc.setDrawColor(200);
-    doc.setLineWidth(0.5);
-    doc.line(140, finalY + 18, 190, finalY + 18);
-
-    doc.setFontSize(12);
-    doc.setFont(undefined, 'bold');
-    doc.setTextColor(primaryColor);
-    doc.text('Total Amount:', 140, finalY + 25);
-    doc.text(`₹${invoice.total.toFixed(2)}`, rightAlignX, finalY + 25, { align: 'right' });
-
-    // Footer - Simplified to avoid auto-linking and match print style
-    const pageHeight = doc.internal.pageSize.height;
-    doc.setDrawColor(200);
-    doc.setLineWidth(0.5);
-    doc.line(20, pageHeight - 30, 190, pageHeight - 30);
+    // 4. FINANCIAL LEDGER BOX (Right Side)
+    const ledgerX = 115;
+    const ledgerW = 81;
+    doc.setFillColor(248, 250, 252);
+    doc.setDrawColor(226, 232, 240);
+    doc.roundedRect(ledgerX, finalY, ledgerW, 36, 2, 2, 'FD');
 
     doc.setFontSize(9);
-    doc.setTextColor(120);
-    doc.setFont(undefined, 'normal');
-    doc.text(`Thank you for shopping with ${profile.businessName}!`, 105, pageHeight - 20, { align: 'center' });
+    doc.setTextColor(100, 116, 139);
+    doc.text('Subtotal:', ledgerX + 5, finalY + 8);
+    doc.setTextColor(30, 41, 59);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`₹${(invoice.subtotal || 0).toFixed(2)}`, 190, finalY + 8, { align: 'right' });
 
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'bold');
-    doc.setTextColor(primaryColor);
-    doc.text(`${profile.businessName.toUpperCase()}`, 105, pageHeight - 14, { align: 'center' });
+    if (invoice.discount > 0) {
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(217, 119, 6);
+      doc.text(`Discount (${invoice.discountPercentage || 0}%):`, ledgerX + 5, finalY + 15);
+      doc.text(`-₹${(invoice.discount || 0).toFixed(2)}`, 190, finalY + 15, { align: 'right' });
+    }
 
-    doc.setFontSize(8);
-    doc.setTextColor(140);
-    doc.setFont(undefined, 'normal');
-    doc.text(profile.address, 105, pageHeight - 9, { align: 'center' });
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 116, 139);
+    doc.text(`GST (${invoice.gst || 18}%):`, ledgerX + 5, finalY + 22);
+    doc.setTextColor(30, 41, 59);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`₹${(invoice.tax || 0).toFixed(2)}`, 190, finalY + 22, { align: 'right' });
+
+    // Net Total Banner
+    doc.setFillColor(primaryRGB[0], primaryRGB[1], primaryRGB[2]);
+    doc.rect(ledgerX, finalY + 26, ledgerW, 10, 'F');
+    doc.setFontSize(10.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(255, 255, 255);
+    doc.text('NET TOTAL:', ledgerX + 5, finalY + 33);
+    doc.text(`₹${(invoice.total || 0).toFixed(2)}`, 190, finalY + 33, { align: 'right' });
+
+    // 5. BANK & UPI DETAILS (Left Side)
+    if (activeSettings.showBankDetails) {
+      doc.setFillColor(248, 250, 252);
+      doc.setDrawColor(226, 232, 240);
+      doc.roundedRect(14, finalY, 95, 36, 2, 2, 'FD');
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(primaryRGB[0], primaryRGB[1], primaryRGB[2]);
+      doc.text('BANK & UPI SETTLEMENT DETAILS:', 18, finalY + 7);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(71, 85, 105);
+      doc.text(`Bank: ${activeSettings.bankDetails?.bankName || ''}`, 18, finalY + 14);
+      doc.text(`A/C No: ${activeSettings.bankDetails?.accountNumber || ''}`, 18, finalY + 20);
+      doc.text(`IFSC: ${activeSettings.bankDetails?.ifsc || ''}`, 18, finalY + 26);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`UPI ID: ${activeSettings.bankDetails?.upiId || ''}`, 18, finalY + 32);
+    }
+
+    // 6. TERMS & FOOTER
+    const pageHeight = doc.internal.pageSize.height;
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.5);
+    doc.line(14, pageHeight - 32, 196, pageHeight - 32);
+
+    doc.setFontSize(7.5);
+    doc.setTextColor(148, 163, 184);
+    doc.setFont('helvetica', 'normal');
+    doc.text(activeSettings.termsText || 'Terms: Goods once sold can be exchanged within 7 days.', 14, pageHeight - 25);
+
+    doc.setFontSize(8.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(primaryRGB[0], primaryRGB[1], primaryRGB[2]);
+    doc.text(activeSettings.customFooterNote || `Thank you for shopping with ${profile.businessName}!`, 14, pageHeight - 12);
+
+    // Signature stamp
+    if (activeSettings.showSignatureStamp) {
+      doc.setDrawColor(148, 163, 184);
+      doc.line(145, pageHeight - 16, 190, pageHeight - 16);
+      doc.setFontSize(7.5);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 116, 139);
+      doc.text(activeSettings.signatureLabel || 'Authorized Signatory', 167.5, pageHeight - 11, { align: 'center' });
+    }
 
     return doc;
   };
 
   const downloadPDF = (invoice) => {
-    const doc = generatePDF(invoice);
+    const doc = generatePDF(invoice, invoiceSettings.template, invoiceSettings);
     doc.save(`invoice-${invoice.id}.pdf`);
   };
 
   const sharePDF = async (invoice) => {
     try {
-      const doc = generatePDF(invoice);
+      const doc = generatePDF(invoice, invoiceSettings.template, invoiceSettings);
       const pdfBlob = doc.output('blob');
       const file = new File([pdfBlob], `invoice-${invoice.id}.pdf`, { type: 'application/pdf' });
 
@@ -693,6 +787,26 @@ const Invoices = () => {
         ]}
         actions={
           <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
+            <Button
+              variant="outlined"
+              startIcon={<Palette fontSize="small" />}
+              onClick={() => setTemplateModalOpen(true)}
+              sx={{
+                px: 2.5,
+                py: 1,
+                borderRadius: 2,
+                fontWeight: 700,
+                fontSize: '0.82rem',
+                borderColor: '#0F766E',
+                color: '#0F766E',
+                '&:hover': {
+                  borderColor: '#0b5650',
+                  backgroundColor: 'rgba(15, 118, 110, 0.08)'
+                }
+              }}
+            >
+              Templates & Letterhead
+            </Button>
             <Button
               variant="outlined"
               startIcon={<Download fontSize="small" />}
@@ -1860,7 +1974,7 @@ const Invoices = () => {
         maxWidth="md"
         fullWidth
         fullScreen={isMobile}
-        PaperProps={{ sx: { borderRadius: isMobile ? 0 : 4 } }}
+        PaperProps={{ sx: { borderRadius: isMobile ? 0 : 3, overflow: 'hidden' } }}
       >
         {isMobile && (
           <AppBar sx={{ position: 'relative', bgcolor: 'primary.main' }}>
@@ -1877,21 +1991,90 @@ const Invoices = () => {
             </Toolbar>
           </AppBar>
         )}
-        <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
-          {viewInvoice && <InvoicePrint ref={printRef} invoice={viewInvoice} />}
+
+        {/* Template Quick Switcher Header Bar */}
+        <Box
+          sx={{
+            p: 1.5,
+            px: 2.5,
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'action.hover',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 1
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+            <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>
+              Template:
+            </Typography>
+            {INVOICE_TEMPLATES.map(tmpl => {
+              const isActive = invoiceSettings.template === tmpl.id;
+              return (
+                <Chip
+                  key={tmpl.id}
+                  label={tmpl.name}
+                  size="small"
+                  onClick={() => setInvoiceSettings(prev => ({ ...prev, template: tmpl.id }))}
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: '0.72rem',
+                    cursor: 'pointer',
+                    bgcolor: isActive ? tmpl.primaryColor : 'background.paper',
+                    color: isActive ? '#ffffff' : 'text.primary',
+                    border: '1px solid',
+                    borderColor: isActive ? tmpl.primaryColor : 'divider',
+                    '&:hover': {
+                      bgcolor: isActive ? tmpl.primaryColor : 'action.selected'
+                    }
+                  }}
+                />
+              );
+            })}
+          </Box>
+
+          <Button
+            size="small"
+            startIcon={<DesignServices fontSize="small" />}
+            onClick={() => setTemplateModalOpen(true)}
+            sx={{
+              fontWeight: 800,
+              fontSize: '0.74rem',
+              color: '#0F766E',
+              textTransform: 'none'
+            }}
+          >
+            🎨 Custom Letterhead & Settings
+          </Button>
+        </Box>
+
+        <DialogContent sx={{ p: { xs: 2, sm: 3 }, bgcolor: '#F8FAFC' }}>
+          {viewInvoice && (
+            <InvoicePrint
+              ref={printRef}
+              invoice={viewInvoice}
+              template={invoiceSettings.template}
+              settings={invoiceSettings}
+            />
+          )}
         </DialogContent>
         <DialogActions sx={{
           p: 2,
-          bgcolor: 'grey.50',
+          bgcolor: 'background.paper',
+          borderTop: '1px solid',
+          borderColor: 'divider',
           flexDirection: { xs: 'column', sm: 'row' },
           gap: 1.5,
           '& > :not(style) + :not(style)': { ml: { xs: 0, sm: 1 } }
         }}>
           <Button onClick={() => setViewInvoice(null)} fullWidth={isMobile} variant="outlined">Close</Button>
           {!isMobile && <Box sx={{ flexGrow: 1 }} />}
-          <Button onClick={() => downloadPDF(viewInvoice)} startIcon={<Download />} variant="outlined" fullWidth={isMobile}>Download</Button>
+          <Button onClick={() => downloadPDF(viewInvoice)} startIcon={<Download />} variant="outlined" fullWidth={isMobile}>Download PDF</Button>
           <Button onClick={() => sharePDF(viewInvoice)} startIcon={<Share />} variant="outlined" color="primary" fullWidth={isMobile}>Share PDF</Button>
-          <Button onClick={() => sendWhatsApp(viewInvoice)} startIcon={<WhatsApp />} variant="contained" sx={{ bgcolor: '#25D366', '&:hover': { bgcolor: '#1da851' } }} fullWidth={isMobile}>Text Message</Button>
+          <Button onClick={() => sendWhatsApp(viewInvoice)} startIcon={<WhatsApp />} variant="contained" sx={{ bgcolor: '#25D366', '&:hover': { bgcolor: '#1da851' } }} fullWidth={isMobile}>WhatsApp</Button>
           {!isMobile && <Button onClick={() => handlePrint(viewInvoice)} variant="contained" startIcon={<Print />}>Print</Button>}
         </DialogActions>
       </Dialog>
@@ -1955,7 +2138,15 @@ const Invoices = () => {
           </Box>
         </DialogContent>
       </Dialog>
-    </Box >
+
+      {/* Invoice Template & Letterhead Studio Dialog */}
+      <InvoiceTemplateDialog
+        open={templateModalOpen}
+        onClose={() => setTemplateModalOpen(false)}
+        settings={invoiceSettings}
+        onSaveSettings={(newSettings) => setInvoiceSettings(newSettings)}
+      />
+    </Box>
   );
 };
 
