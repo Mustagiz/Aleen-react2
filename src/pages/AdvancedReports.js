@@ -344,11 +344,13 @@ const AdvancedReports = () => {
                         {/* Period Pills */}
                         <Box sx={{
                             display: 'flex',
+                            alignItems: 'center',
                             bgcolor: 'background.paper',
-                            p: 0.5,
-                            borderRadius: 3,
-                            border: '1px solid',
-                            borderColor: 'divider',
+                            p: '3px',
+                            height: 42,
+                            boxSizing: 'border-box',
+                            borderRadius: '24px',
+                            border: '1.5px solid rgba(15, 118, 110, 0.25)',
                             boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
                         }}>
                             {[
@@ -358,17 +360,17 @@ const AdvancedReports = () => {
                             ].map((tab) => (
                                 <Button
                                     key={tab.id}
-                                    size="small"
                                     onClick={() => setDateRange(tab.id)}
                                     sx={{
+                                        height: 34,
                                         px: 2,
-                                        py: 0.5,
-                                        borderRadius: 2.5,
+                                        borderRadius: '20px',
                                         textTransform: 'none',
                                         fontWeight: 700,
-                                        fontSize: '0.8rem',
+                                        fontSize: '0.82rem',
                                         color: dateRange === tab.id ? '#FFFFFF' : 'text.secondary',
                                         bgcolor: dateRange === tab.id ? '#0F766E' : 'transparent',
+                                        transition: 'all 0.15s ease',
                                         '&:hover': {
                                             bgcolor: dateRange === tab.id ? '#042F2E' : 'rgba(15, 118, 110, 0.08)'
                                         }
@@ -381,51 +383,87 @@ const AdvancedReports = () => {
 
                         <Button
                             variant="outlined"
-                            size="small"
                             onClick={exportToPDF}
-                            startIcon={<Download />}
+                            startIcon={<Download sx={{ fontSize: 18, color: '#0F766E' }} />}
                             sx={{
-                                borderColor: 'divider',
-                                color: 'text.primary',
-                                borderRadius: 2.5,
-                                textTransform: 'none',
+                                height: 42,
+                                minHeight: 42,
+                                px: 2.5,
+                                borderRadius: '24px',
+                                border: '1.5px solid #0F766E',
+                                color: '#0F766E',
+                                bgcolor: 'background.paper',
                                 fontWeight: 700,
-                                px: 2,
-                                '&:hover': { borderColor: '#0F766E', bgcolor: 'rgba(15, 118, 110, 0.04)' }
+                                fontSize: '0.84rem',
+                                textTransform: 'none',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxSizing: 'border-box',
+                                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                                '&:hover': {
+                                    border: '1.5px solid #042F2E',
+                                    bgcolor: 'rgba(15, 118, 110, 0.05)',
+                                    transform: 'translateY(-1px)'
+                                }
                             }}
                         >
                             PDF
                         </Button>
                         <Button
                             variant="outlined"
-                            size="small"
                             onClick={exportToExcel}
-                            startIcon={<Download />}
+                            startIcon={<Download sx={{ fontSize: 18, color: '#0F766E' }} />}
                             sx={{
-                                borderColor: 'divider',
-                                color: 'text.primary',
-                                borderRadius: 2.5,
-                                textTransform: 'none',
+                                height: 42,
+                                minHeight: 42,
+                                px: 2.5,
+                                borderRadius: '24px',
+                                border: '1.5px solid #0F766E',
+                                color: '#0F766E',
+                                bgcolor: 'background.paper',
                                 fontWeight: 700,
-                                px: 2,
-                                '&:hover': { borderColor: '#0F766E', bgcolor: 'rgba(15, 118, 110, 0.04)' }
+                                fontSize: '0.84rem',
+                                textTransform: 'none',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxSizing: 'border-box',
+                                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                                '&:hover': {
+                                    border: '1.5px solid #042F2E',
+                                    bgcolor: 'rgba(15, 118, 110, 0.05)',
+                                    transform: 'translateY(-1px)'
+                                }
                             }}
                         >
                             Excel
                         </Button>
                         <Button
                             variant="outlined"
-                            size="small"
                             onClick={handlePrint}
-                            startIcon={<Print />}
+                            startIcon={<Print sx={{ fontSize: 18, color: '#0F766E' }} />}
                             sx={{
-                                borderColor: 'divider',
-                                color: 'text.primary',
-                                borderRadius: 2.5,
-                                textTransform: 'none',
+                                height: 42,
+                                minHeight: 42,
+                                px: 2.5,
+                                borderRadius: '24px',
+                                border: '1.5px solid #0F766E',
+                                color: '#0F766E',
+                                bgcolor: 'background.paper',
                                 fontWeight: 700,
-                                px: 2,
-                                '&:hover': { borderColor: '#0F766E', bgcolor: 'rgba(15, 118, 110, 0.04)' }
+                                fontSize: '0.84rem',
+                                textTransform: 'none',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxSizing: 'border-box',
+                                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                                '&:hover': {
+                                    border: '1.5px solid #042F2E',
+                                    bgcolor: 'rgba(15, 118, 110, 0.05)',
+                                    transform: 'translateY(-1px)'
+                                }
                             }}
                         >
                             Print

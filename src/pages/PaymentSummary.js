@@ -317,20 +317,28 @@ const PaymentSummary = () => {
                     <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
                         <Button
                             variant="outlined"
-                            startIcon={<Download fontSize="small" />}
+                            startIcon={<Download sx={{ fontSize: 19, color: '#0F766E' }} />}
                             onClick={handleMenuClick}
                             sx={{
-                                px: 2.5,
-                                py: 1.1,
-                                borderRadius: 2,
-                                fontWeight: 700,
-                                fontSize: '0.825rem',
-                                borderColor: 'rgba(15, 118, 110, 0.4)',
+                                height: 42,
+                                minHeight: 42,
+                                px: 2.75,
+                                borderRadius: '24px',
+                                border: '1.5px solid #0F766E',
                                 color: '#0F766E',
+                                bgcolor: 'background.paper',
+                                fontWeight: 700,
+                                fontSize: '0.84rem',
                                 textTransform: 'none',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxSizing: 'border-box',
+                                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
-                                    borderColor: '#0F766E',
-                                    bgcolor: 'rgba(15, 118, 110, 0.05)'
+                                    border: '1.5px solid #042F2E',
+                                    bgcolor: 'rgba(15, 118, 110, 0.05)',
+                                    transform: 'translateY(-1px)'
                                 }
                             }}
                         >

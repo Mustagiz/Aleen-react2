@@ -339,26 +339,53 @@ export default function TailoringKanban() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               InputProps={{
-                startAdornment: <Search sx={{ mr: 1, color: 'text.secondary', fontSize: 18 }} />
+                startAdornment: <Search sx={{ mr: 1, color: '#0F766E', fontSize: 18 }} />
               }}
-              sx={{ width: 230, '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+              sx={{
+                width: 240,
+                '& .MuiOutlinedInput-root': {
+                  height: 42,
+                  borderRadius: '24px',
+                  bgcolor: 'background.paper',
+                  fontSize: '0.84rem',
+                  '& fieldset': {
+                    borderColor: 'rgba(15, 118, 110, 0.3)'
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#0F766E'
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#0F766E',
+                    borderWidth: 1.5
+                  }
+                }
+              }}
             />
             <Button
               variant="outlined"
-              startIcon={<Group />}
+              startIcon={<Group sx={{ fontSize: 19, color: '#0F766E' }} />}
               onClick={() => setTailorDialogOpen(true)}
               sx={{
-                px: 2,
-                py: 1,
-                borderRadius: '10px',
+                height: 42,
+                minHeight: 42,
+                px: 2.5,
+                borderRadius: '24px',
+                border: '1.5px solid #0F766E',
+                color: '#0F766E',
+                bgcolor: 'background.paper',
                 fontWeight: 700,
                 fontSize: '0.84rem',
-                borderColor: '#0F766E',
-                color: '#0F766E',
+                textTransform: 'none',
                 whiteSpace: 'nowrap',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxSizing: 'border-box',
+                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                 '&:hover': {
-                  borderColor: '#0b5650',
-                  backgroundColor: 'rgba(15, 118, 110, 0.08)'
+                  border: '1.5px solid #042F2E',
+                  bgcolor: 'rgba(15, 118, 110, 0.05)',
+                  transform: 'translateY(-1px)'
                 }
               }}
             >
@@ -366,21 +393,36 @@ export default function TailoringKanban() {
             </Button>
             <Button
               variant="contained"
-              startIcon={<Add />}
+              startIcon={<Add sx={{ fontSize: 19, color: '#FFFFFF !important' }} />}
               onClick={() => setDialogOpen(true)}
               sx={{
+                height: 42,
+                minHeight: 42,
                 px: 3,
-                py: 1,
-                borderRadius: '10px',
-                fontWeight: 800,
+                borderRadius: '24px',
+                fontWeight: 700,
                 fontSize: '0.84rem',
-                background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
-                color: '#ffffff',
-                boxShadow: '0 4px 14px rgba(217, 119, 6, 0.3)',
-                whiteSpace: 'nowrap'
+                textTransform: 'none',
+                whiteSpace: 'nowrap',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxSizing: 'border-box',
+                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%) !important',
+                color: '#FFFFFF !important',
+                boxShadow: '0 4px 14px rgba(15, 118, 110, 0.3)',
+                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                '& .MuiSvgIcon-root': {
+                  color: '#FFFFFF !important'
+                },
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #115E59 0%, #021C1B 100%) !important',
+                  boxShadow: '0 6px 18px rgba(15, 118, 110, 0.45)',
+                  transform: 'translateY(-1px)'
+                }
               }}
             >
-              + New Tailoring Job
+              New Tailoring Job
             </Button>
           </Box>
         }
