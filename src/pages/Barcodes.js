@@ -29,7 +29,8 @@ import {
     Tooltip,
     Stack,
     Collapse,
-    Badge
+    Badge,
+    InputAdornment
 } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import {
@@ -47,7 +48,9 @@ import {
     RestartAlt,
     Inventory2,
     Layers,
-    Straighten
+    Straighten,
+    LocalOffer,
+    CurrencyRupee
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import PageHeader from '../components/crm/PageHeader';
@@ -68,7 +71,8 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
         showCategory,
         showSizeColor,
         barcodeHeight,
-        fontSize
+        fontSize,
+        mrpMarkupPercent = 25
     } = settings;
 
     // Dimensions based on template
@@ -92,7 +96,7 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                     format: "CODE128",
                     width: dims.barW,
                     height: dims.barH,
-                    displayValue: false, // We render custom SKU typography below barcode for razor-sharp clarity
+                    displayValue: false, // Custom SKU typography rendered below barcode
                     margin: 0,
                     background: "#ffffff",
                     lineColor: "#000000"
@@ -107,7 +111,13 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
     const isLarge = template === 'large' || template === 'a4_sheet';
 
     const fontScale = fontSize === 'compact' ? 0.85 : fontSize === 'large' ? 1.15 : 1.0;
-    const mrpPrice = product?.cost ? Math.round(product.price * 1.3) : Math.round(product.price * 1.25);
+
+    // Selling price: user custom price takes precedence over default product price
+    const sellingPrice = Number(product?.customPrice !== undefined && product?.customPrice !== '' ? product.customPrice : (product?.price || 0));
+
+    // MRP price: user custom MRP takes precedence over product.mrp, else calculates with markup percentage
+    const defaultCalculatedMrp = Math.round(sellingPrice * (1 + (Number(mrpMarkupPercent) || 25) / 100));
+    const mrpPrice = Number(product?.customMrp !== undefined && product?.customMrp !== '' ? product.customMrp : (product?.mrp || defaultCalculatedMrp));
 
     return (
         <Box
@@ -216,7 +226,7 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
             {/* Price & M.R.P. Row */}
             {showPrice && (
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.75, width: '100%' }}>
-                    {showMrp && (
+                    {showMrp && mrpPrice > 0 && (
                         <Typography
                             sx={{
                                 fontSize: `${(isSmall ? 7 : 8.5) * fontScale}px`,
@@ -226,7 +236,7 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                                 lineHeight: 1
                             }}
                         >
-                            MRP ₹{mrpPrice}
+                            MRP ₹{mrpPrice.toLocaleString('en-IN')}
                         </Typography>
                     )}
                     <Typography
@@ -237,7 +247,7 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                             color: '#000000'
                         }}
                     >
-                        ₹{(product?.price || 0).toLocaleString('en-IN')}
+                        ₹{sellingPrice.toLocaleString('en-IN')}
                     </Typography>
                 </Box>
             )}
@@ -246,10 +256,10 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
 };
 
 export default function BarcodeGenerator() {
-    const { inventory, profile } = useData();
+    const { inventory = [], profile } = useData();
     const location = useLocation();
 
-    // Print Queue List
+    // Print Queue List (with customPrice & customMrp per garment)
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [isBulkSelectOpen, setIsBulkSelectOpen] = useState(false);
     const [tempSelectedIds, setTempSelectedIds] = useState([]);
@@ -278,7 +288,8 @@ export default function BarcodeGenerator() {
         showCategory: false,
         showSizeColor: true,
         barcodeHeight: 30,
-        fontSize: 'normal'
+        fontSize: 'normal',
+        mrpMarkupPercent: 28 // Default ~28% MRP markup over sales price
     });
 
     // Populate from navigation state if routed with specific product
@@ -296,20 +307,29 @@ export default function BarcodeGenerator() {
                     if (item.variantSku) {
                         const variant = product.variants?.find(v => v.sku === item.variantSku);
                         if (variant) {
+                            const initialPrice = Number(variant.price || product.price) || 0;
+                            const defaultMrp = Number(variant.mrp || product.mrp) || Math.round(initialPrice * (1 + (Number(settings.mrpMarkupPercent) || 28) / 100));
                             newProducts.push({
                                 ...product,
                                 id: `${product.id}-${variant.sku}`,
                                 productId: variant.sku,
                                 name: product.name,
                                 variantName: `${variant.size || ''} ${variant.color || ''}`.trim(),
-                                price: variant.price || product.price,
+                                price: initialPrice,
+                                customPrice: initialPrice,
+                                customMrp: defaultMrp,
                                 labelCount: item.quantity
                             });
                             return;
                         }
                     }
+                    const initialPrice = Number(product.price) || 0;
+                    const defaultMrp = Number(product.mrp) || Math.round(initialPrice * (1 + (Number(settings.mrpMarkupPercent) || 28) / 100));
                     newProducts.push({
                         ...product,
+                        price: initialPrice,
+                        customPrice: initialPrice,
+                        customMrp: defaultMrp,
                         labelCount: item.quantity
                     });
                 }
@@ -327,7 +347,14 @@ export default function BarcodeGenerator() {
         setSelectedProducts(prev => {
             const exists = prev.find(p => p.id === product.id);
             if (!exists) {
-                return [...prev, { ...product, labelCount: Math.max(1, product.quantity || 1) }];
+                const initialPrice = Number(product.price) || 0;
+                const defaultMrp = Number(product.mrp) || Math.round(initialPrice * (1 + (Number(settings.mrpMarkupPercent) || 28) / 100));
+                return [...prev, {
+                    ...product,
+                    customPrice: initialPrice,
+                    customMrp: defaultMrp,
+                    labelCount: Math.max(1, product.quantity || 1)
+                }];
             }
             return prev;
         });
@@ -341,6 +368,78 @@ export default function BarcodeGenerator() {
 
     const handleRemove = (productId) => {
         setSelectedProducts(selectedProducts.filter(p => p.id !== productId));
+    };
+
+    // Update custom sales price for an individual garment
+    const handleUpdatePrice = (productId, newPrice) => {
+        setSelectedProducts(prev => prev.map(p => {
+            if (p.id === productId) {
+                const val = newPrice === '' ? '' : Math.max(0, parseFloat(newPrice) || 0);
+                return { ...p, customPrice: val };
+            }
+            return p;
+        }));
+    };
+
+    // Update custom MRP for an individual garment
+    const handleUpdateMrp = (productId, newMrp) => {
+        setSelectedProducts(prev => prev.map(p => {
+            if (p.id === productId) {
+                const val = newMrp === '' ? '' : Math.max(0, parseFloat(newMrp) || 0);
+                return { ...p, customMrp: val };
+            }
+            return p;
+        }));
+    };
+
+    // Reset single item price & MRP back to catalog defaults
+    const handleResetItemPrice = (productId) => {
+        setSelectedProducts(prev => prev.map(p => {
+            if (p.id === productId) {
+                const catalogPrice = Number(p.price || 0);
+                const defaultMrp = Number(p.mrp) || Math.round(catalogPrice * (1 + (Number(settings.mrpMarkupPercent) || 28) / 100));
+                return {
+                    ...p,
+                    customPrice: catalogPrice,
+                    customMrp: defaultMrp
+                };
+            }
+            return p;
+        }));
+    };
+
+    // Apply batch MRP markup percentage to all queued items
+    const handleApplyMrpMarkupToAll = (markupPercent) => {
+        const pct = parseFloat(markupPercent) || 28;
+        setSelectedProducts(prev => prev.map(p => {
+            const salesPrice = p.customPrice !== undefined && p.customPrice !== '' ? Number(p.customPrice) : Number(p.price || 0);
+            const calculatedMrp = Math.round(salesPrice * (1 + pct / 100));
+            return { ...p, customMrp: calculatedMrp };
+        }));
+    };
+
+    // Apply batch discount on sales price (e.g. 10% Festive Sale)
+    const handleApplyDiscountToAllSalesPrice = (discountPercent) => {
+        const pct = parseFloat(discountPercent) || 10;
+        setSelectedProducts(prev => prev.map(p => {
+            const catalogPrice = Number(p.price || 0);
+            const discountedSales = Math.round(catalogPrice * (1 - pct / 100));
+            const mrp = p.customMrp || Math.round(catalogPrice * (1 + (Number(settings.mrpMarkupPercent) || 28) / 100));
+            return { ...p, customPrice: discountedSales, customMrp: mrp };
+        }));
+    };
+
+    // Reset all queued items back to catalog prices
+    const handleResetPricesToCatalog = () => {
+        setSelectedProducts(prev => prev.map(p => {
+            const catalogPrice = Number(p.price || 0);
+            const defaultMrp = Number(p.mrp) || Math.round(catalogPrice * (1 + (Number(settings.mrpMarkupPercent) || 28) / 100));
+            return {
+                ...p,
+                customPrice: catalogPrice,
+                customMrp: defaultMrp
+            };
+        }));
     };
 
     const handleSetAllCounts = (countType) => {
@@ -361,7 +460,16 @@ export default function BarcodeGenerator() {
         const existingIds = new Set(selectedProducts.map(p => p.id));
         const toAdd = filteredAndSortedInventory
             .filter(item => !existingIds.has(item.id))
-            .map(item => ({ ...item, labelCount: Math.max(1, item.quantity || 1) }));
+            .map(item => {
+                const initialPrice = Number(item.price) || 0;
+                const defaultMrp = Number(item.mrp) || Math.round(initialPrice * (1 + (Number(settings.mrpMarkupPercent) || 28) / 100));
+                return {
+                    ...item,
+                    customPrice: initialPrice,
+                    customMrp: defaultMrp,
+                    labelCount: Math.max(1, item.quantity || 1)
+                };
+            });
         if (toAdd.length === 0) return;
         setSelectedProducts(prev => [...prev, ...toAdd]);
     };
@@ -448,15 +556,24 @@ export default function BarcodeGenerator() {
         window.print();
     };
 
-    // Sample item for real-time live preview
-    const sampleProduct = selectedProducts[0] || {
-        name: 'Royal Banarasi Silk Saree',
-        productId: 'BL-9842',
-        price: 4950,
-        category: 'Sarees',
-        size: 'Free Size',
-        color: 'Emerald'
-    };
+    // Sample item for real-time live preview (reflects custom price and MRP)
+    const sampleProduct = useMemo(() => {
+        if (selectedProducts.length > 0) {
+            return selectedProducts[0];
+        }
+        const defaultPrice = 1450;
+        const defaultMrp = Math.round(defaultPrice * (1 + (Number(settings.mrpMarkupPercent) || 28) / 100));
+        return {
+            name: '2 Pc Gotapati',
+            productId: 'Es50',
+            price: defaultPrice,
+            customPrice: defaultPrice,
+            customMrp: defaultMrp,
+            category: 'Kurtis',
+            size: 'FREE SIZE',
+            color: 'MULTI'
+        };
+    }, [selectedProducts, settings.mrpMarkupPercent]);
 
     // Bulk select dialog helpers
     const handleBulkSelectAdd = () => {
@@ -501,7 +618,7 @@ export default function BarcodeGenerator() {
             {/* Atelier Page Header */}
             <PageHeader
                 title="Barcode & Price Tag Studio"
-                subtitle="Design and batch-print thermal price labels, barcode tags, and luxury retail stickers"
+                subtitle="Design and batch-print thermal price labels, barcode tags, and custom retail stickers"
                 breadcrumbs={[
                     { label: 'Aleen Atelier', path: '/' },
                     { label: 'Merchandise', path: '/inventory' },
@@ -650,9 +767,52 @@ export default function BarcodeGenerator() {
                                 </Grid>
                             </Grid>
 
+                            {/* Row 2: Default M.R.P. & Pricing Automation Rule */}
+                            <Box sx={{ p: 1.75, mb: 2, bgcolor: 'action.hover', borderRadius: 2.5, border: '1px solid', borderColor: 'divider' }}>
+                                <Grid container spacing={2} alignItems="center">
+                                    <Grid item xs={12} sm={5}>
+                                        <TextField
+                                            select
+                                            fullWidth
+                                            size="small"
+                                            label="Default M.R.P. Markup %"
+                                            value={settings.mrpMarkupPercent}
+                                            onChange={(e) => setSettings({ ...settings, mrpMarkupPercent: Number(e.target.value) })}
+                                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2, bgcolor: 'background.paper' } }}
+                                        >
+                                            <MenuItem value={15}>+15% Markup over Sales Price</MenuItem>
+                                            <MenuItem value={20}>+20% Markup (Affordable Fashion)</MenuItem>
+                                            <MenuItem value={25}>+25% Markup (Standard Atelier)</MenuItem>
+                                            <MenuItem value={28}>+28% Markup (Gotapati / Boutique)</MenuItem>
+                                            <MenuItem value={30}>+30% Markup (Premium Couture)</MenuItem>
+                                            <MenuItem value={40}>+40% Markup (Luxury Wedding)</MenuItem>
+                                            <MenuItem value={50}>+50% Markup (High-End Exclusive)</MenuItem>
+                                            <MenuItem value={100}>+100% Double MRP (50% Off Tag Display)</MenuItem>
+                                        </TextField>
+                                    </Grid>
+                                    <Grid item xs={12} sm={7}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                                            <Button
+                                                size="small"
+                                                variant="outlined"
+                                                startIcon={<LocalOffer sx={{ fontSize: '1rem !important' }} />}
+                                                onClick={() => handleApplyMrpMarkupToAll(settings.mrpMarkupPercent)}
+                                                disabled={selectedProducts.length === 0}
+                                                sx={{ borderRadius: 1.5, fontWeight: 700, fontSize: '0.75rem', py: 0.6 }}
+                                            >
+                                                Apply +{settings.mrpMarkupPercent}% MRP to Queue
+                                            </Button>
+                                            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                                                Set custom Sales Price & MRP per garment in the queue below.
+                                            </Typography>
+                                        </Box>
+                                    </Grid>
+                                </Grid>
+                            </Box>
+
                             <Divider sx={{ my: 1.5 }} />
 
-                            {/* Row 2: Tag Elements Toggles */}
+                            {/* Row 3: Tag Elements Toggles */}
                             <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', color: 'text.secondary', display: 'block', mb: 1 }}>
                                 Content Elements on Price Sticker:
                             </Typography>
@@ -750,8 +910,8 @@ export default function BarcodeGenerator() {
                                     ✨ Live Sticker Preview:
                                 </Typography>
                                 <BarcodeItem
-                                    value={sampleProduct.productId || 'PRD-1001'}
-                                    businessName={profile?.businessName || 'Aleen Atelier'}
+                                    value={sampleProduct.productId || 'Es50'}
+                                    businessName={profile?.businessName || 'ALEEN CLOTHING'}
                                     product={sampleProduct}
                                     settings={settings}
                                 />
@@ -930,11 +1090,21 @@ export default function BarcodeGenerator() {
                     isOptionEqualToValue={(option, value) => option.id === value.id}
                     getOptionLabel={(option) => `${option.name} (${option.productId || 'No ID'})`}
                     onChange={(event, newValues) => {
-                        const existingCountMap = new Map(selectedProducts.map(p => [p.id, p.labelCount]));
-                        const updated = newValues.map(item => ({
-                            ...item,
-                            labelCount: existingCountMap.get(item.id) || Math.max(1, item.quantity || 1)
-                        }));
+                        const existingMap = new Map(selectedProducts.map(p => [p.id, p]));
+                        const updated = newValues.map(item => {
+                            const prevItem = existingMap.get(item.id);
+                            if (prevItem) {
+                                return prevItem;
+                            }
+                            const initialPrice = Number(item.price) || 0;
+                            const defaultMrp = Number(item.mrp) || Math.round(initialPrice * (1 + (Number(settings.mrpMarkupPercent) || 28) / 100));
+                            return {
+                                ...item,
+                                customPrice: initialPrice,
+                                customMrp: defaultMrp,
+                                labelCount: Math.max(1, item.quantity || 1)
+                            };
+                        });
                         setSelectedProducts(updated);
                     }}
                     renderTags={(tagValue, getTagProps) =>
@@ -1033,14 +1203,97 @@ export default function BarcodeGenerator() {
                     sx={{ mb: 3 }}
                 />
 
-                {/* Queue Summary Badge */}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                {/* Queue Summary Badge & Batch Pricing Toolbar */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5, flexWrap: 'wrap', gap: 1 }}>
                     <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
                         Active Print Queue ({selectedProducts.length} garments • {totalLabelsCount} stickers)
                     </Typography>
                 </Box>
 
-                {/* Selected Products Cards Grid */}
+                {/* Batch Pricing Action Ribbon */}
+                {selectedProducts.length > 0 && (
+                    <Box
+                        sx={{
+                            p: 1.5,
+                            mb: 2.5,
+                            borderRadius: 2,
+                            bgcolor: 'rgba(15, 118, 110, 0.04)',
+                            border: '1px solid rgba(15, 118, 110, 0.15)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            flexWrap: 'wrap',
+                            gap: 1.5
+                        }}
+                    >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <LocalOffer sx={{ fontSize: 18, color: '#0F766E' }} />
+                            <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', color: '#0F766E', letterSpacing: '0.04em' }}>
+                                Batch Pricing Tools:
+                            </Typography>
+                        </Box>
+
+                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, mr: 0.5 }}>
+                                Set MRP:
+                            </Typography>
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                onClick={() => handleApplyMrpMarkupToAll(20)}
+                                sx={{ borderRadius: 1.5, fontSize: '0.72rem', fontWeight: 700, py: 0.25, px: 1 }}
+                            >
+                                +20% MRP
+                            </Button>
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                onClick={() => handleApplyMrpMarkupToAll(25)}
+                                sx={{ borderRadius: 1.5, fontSize: '0.72rem', fontWeight: 700, py: 0.25, px: 1 }}
+                            >
+                                +25% MRP
+                            </Button>
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                onClick={() => handleApplyMrpMarkupToAll(30)}
+                                sx={{ borderRadius: 1.5, fontSize: '0.72rem', fontWeight: 700, py: 0.25, px: 1 }}
+                            >
+                                +30% MRP
+                            </Button>
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                onClick={() => handleApplyMrpMarkupToAll(50)}
+                                sx={{ borderRadius: 1.5, fontSize: '0.72rem', fontWeight: 700, py: 0.25, px: 1 }}
+                            >
+                                +50% MRP
+                            </Button>
+
+                            <Divider orientation="vertical" flexItem sx={{ mx: 0.5, height: 18, alignSelf: 'center' }} />
+
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                color="secondary"
+                                onClick={() => handleApplyDiscountToAllSalesPrice(10)}
+                                sx={{ borderRadius: 1.5, fontSize: '0.72rem', fontWeight: 700, py: 0.25, px: 1 }}
+                            >
+                                10% Festive Sale
+                            </Button>
+                            <Button
+                                size="small"
+                                variant="text"
+                                onClick={handleResetPricesToCatalog}
+                                sx={{ borderRadius: 1.5, fontSize: '0.72rem', fontWeight: 700, color: 'text.secondary' }}
+                            >
+                                Reset All to Catalog
+                            </Button>
+                        </Box>
+                    </Box>
+                )}
+
+                {/* Selected Products Cards Grid with Custom Price & MRP Editors */}
                 {selectedProducts.length === 0 ? (
                     <Box sx={{ p: 4, textAlign: 'center', border: '1px dashed', borderColor: 'divider', borderRadius: 3 }}>
                         <QrCode sx={{ fontSize: 40, color: 'text.secondary', opacity: 0.4, mb: 1 }} />
@@ -1050,63 +1303,150 @@ export default function BarcodeGenerator() {
                     </Box>
                 ) : (
                     <Grid container spacing={2}>
-                        {selectedProducts.map((product) => (
-                            <Grid item xs={12} sm={6} md={4} key={product.id}>
-                                <Card
-                                    variant="outlined"
-                                    sx={{
-                                        borderRadius: 2.5,
-                                        borderColor: 'divider',
-                                        transition: 'all 0.15s ease-in-out',
-                                        '&:hover': {
-                                            borderColor: '#0F766E',
-                                            boxShadow: '0 4px 12px rgba(15,118,110,0.08)'
-                                        }
-                                    }}
-                                >
-                                    <CardContent sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1.5, '&:last-child': { pb: 2 } }}>
-                                        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                                            <Typography
-                                                variant="subtitle2"
-                                                sx={{
-                                                    fontWeight: 800,
-                                                    overflow: 'hidden',
-                                                    whiteSpace: 'nowrap',
-                                                    textOverflow: 'ellipsis'
-                                                }}
-                                            >
-                                                {product.name}
-                                            </Typography>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 700 }}>
-                                                    #{product.productId}
-                                                </Typography>
-                                                <Typography variant="caption" color="text.secondary">
-                                                    • ₹{product.price}
-                                                </Typography>
+                        {selectedProducts.map((product) => {
+                            const currentSp = product.customPrice !== undefined && product.customPrice !== '' ? Number(product.customPrice) : Number(product.price || 0);
+                            const currentMrp = product.customMrp !== undefined && product.customMrp !== '' ? Number(product.customMrp) : Math.round(currentSp * 1.25);
+                            const isCustomSp = product.customPrice !== undefined && product.customPrice !== product.price;
+                            const isCustomMrp = product.customMrp !== undefined && product.customMrp !== (product.mrp || Math.round((product.price || 0) * 1.25));
+
+                            return (
+                                <Grid item xs={12} sm={6} lg={4} key={product.id}>
+                                    <Card
+                                        variant="outlined"
+                                        sx={{
+                                            borderRadius: 2.5,
+                                            borderColor: (isCustomSp || isCustomMrp) ? '#0F766E' : 'divider',
+                                            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                                            transition: 'all 0.15s ease-in-out',
+                                            '&:hover': {
+                                                borderColor: '#0F766E',
+                                                boxShadow: '0 4px 14px rgba(15,118,110,0.1)'
+                                            }
+                                        }}
+                                    >
+                                        <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                                            {/* Top row: Title + SKU + Delete */}
+                                            <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1, mb: 1.5 }}>
+                                                <Box sx={{ minWidth: 0, flex: 1 }}>
+                                                    <Typography
+                                                        variant="subtitle2"
+                                                        sx={{
+                                                            fontWeight: 800,
+                                                            overflow: 'hidden',
+                                                            whiteSpace: 'nowrap',
+                                                            textOverflow: 'ellipsis',
+                                                            fontSize: '0.88rem'
+                                                        }}
+                                                    >
+                                                        {product.name}
+                                                    </Typography>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.25, flexWrap: 'wrap' }}>
+                                                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 700 }}>
+                                                            #{product.productId || product.variantSku || 'NO-SKU'}
+                                                        </Typography>
+                                                        {product.variantName && (
+                                                            <Chip label={product.variantName} size="small" sx={{ height: 18, fontSize: '0.65rem', fontWeight: 600 }} />
+                                                        )}
+                                                        <Typography variant="caption" color="text.secondary">
+                                                            Catalog: ₹{product.price}
+                                                        </Typography>
+                                                    </Box>
+                                                </Box>
+                                                <Tooltip title="Remove from queue">
+                                                    <IconButton color="error" size="small" onClick={() => handleRemove(product.id)} sx={{ p: 0.5 }}>
+                                                        <Delete fontSize="small" />
+                                                    </IconButton>
+                                                </Tooltip>
                                             </Box>
-                                        </Box>
 
-                                        {/* Quantity Stepper */}
-                                        <TextField
-                                            size="small"
-                                            type="number"
-                                            label="Copies"
-                                            value={product.labelCount}
-                                            onChange={(e) => handleUpdateCount(product.id, e.target.value)}
-                                            inputProps={{ min: 1 }}
-                                            sx={{ width: 85, '& .MuiOutlinedInput-root': { borderRadius: 1.5 } }}
-                                        />
+                                            {/* Custom Pricing Inputs: Sales Price & Custom M.R.P. */}
+                                            <Box sx={{ p: 1.25, bgcolor: 'action.hover', borderRadius: 2, mb: 1.5 }}>
+                                                <Grid container spacing={1.5} alignItems="center">
+                                                    <Grid item xs={6}>
+                                                        <TextField
+                                                            size="small"
+                                                            type="number"
+                                                            label="Sales Price (₹)"
+                                                            value={product.customPrice !== undefined ? product.customPrice : (product.price || 0)}
+                                                            onChange={(e) => handleUpdatePrice(product.id, e.target.value)}
+                                                            inputProps={{ min: 0 }}
+                                                            fullWidth
+                                                            sx={{
+                                                                '& .MuiOutlinedInput-root': {
+                                                                    borderRadius: 1.5,
+                                                                    bgcolor: 'background.paper',
+                                                                    fontWeight: 800,
+                                                                    color: '#0F766E'
+                                                                },
+                                                                '& .MuiInputLabel-root': { fontSize: '0.78rem' }
+                                                            }}
+                                                        />
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <TextField
+                                                            size="small"
+                                                            type="number"
+                                                            label="Custom M.R.P. (₹)"
+                                                            value={product.customMrp !== undefined ? product.customMrp : currentMrp}
+                                                            onChange={(e) => handleUpdateMrp(product.id, e.target.value)}
+                                                            inputProps={{ min: 0 }}
+                                                            fullWidth
+                                                            sx={{
+                                                                '& .MuiOutlinedInput-root': {
+                                                                    borderRadius: 1.5,
+                                                                    bgcolor: 'background.paper',
+                                                                    fontWeight: 700
+                                                                },
+                                                                '& .MuiInputLabel-root': { fontSize: '0.78rem' }
+                                                            }}
+                                                        />
+                                                    </Grid>
+                                                </Grid>
 
-                                        <Tooltip title="Remove from queue">
-                                            <IconButton color="error" size="small" onClick={() => handleRemove(product.id)}>
-                                                <Delete fontSize="small" />
-                                            </IconButton>
-                                        </Tooltip>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                        ))}
+                                                {/* Live Discount & Margin Calculation Tag */}
+                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1, px: 0.5 }}>
+                                                    <Typography variant="caption" sx={{ fontSize: '0.7rem', color: 'text.secondary', fontWeight: 600 }}>
+                                                        {(() => {
+                                                            if (currentMrp > currentSp && currentSp > 0) {
+                                                                const discountPct = Math.round(((currentMrp - currentSp) / currentMrp) * 100);
+                                                                return `Customer saves ${discountPct}% off MRP (₹${(currentMrp - currentSp).toLocaleString('en-IN')})`;
+                                                            }
+                                                            return 'Direct Sales Price';
+                                                        })()}
+                                                    </Typography>
+
+                                                    {(isCustomSp || isCustomMrp) && (
+                                                        <Button
+                                                            size="small"
+                                                            onClick={() => handleResetItemPrice(product.id)}
+                                                            sx={{ fontSize: '0.68rem', p: 0, minWidth: 'auto', textTransform: 'none', color: '#D97706', fontWeight: 700 }}
+                                                        >
+                                                            Reset
+                                                        </Button>
+                                                    )}
+                                                </Box>
+                                            </Box>
+
+                                            {/* Bottom Row: Copies Stepper */}
+                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                                                    Sticker Quantity:
+                                                </Typography>
+                                                <TextField
+                                                    size="small"
+                                                    type="number"
+                                                    label="Copies"
+                                                    value={product.labelCount}
+                                                    onChange={(e) => handleUpdateCount(product.id, e.target.value)}
+                                                    inputProps={{ min: 1 }}
+                                                    sx={{ width: 100, '& .MuiOutlinedInput-root': { borderRadius: 1.5 } }}
+                                                />
+                                            </Box>
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+                            );
+                        })}
                     </Grid>
                 )}
             </GlassCard>
