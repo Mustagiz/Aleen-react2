@@ -1,16 +1,52 @@
 import React, { useState } from 'react';
-import { Box, Paper, Typography, TextField, Button, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Card, CardContent, Grid, Chip, TablePagination, MenuItem, useTheme } from '@mui/material';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TableContainer,
+  Grid,
+  Chip,
+  TablePagination,
+  MenuItem,
+  Paper
+} from '@mui/material';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import { useData } from '../contexts/DataContext';
-import { Download, TrendingUp, Receipt, AttachMoney } from '@mui/icons-material';
+import {
+  Download,
+  TrendingUp,
+  Receipt,
+  AttachMoney,
+  FilterList,
+  Clear
+} from '@mui/icons-material';
 import { formatCurrencyForPDF, generateReportPDF } from '../utils/helpers';
-import GlassCard from '../components/GlassCard';
+import PageHeader from '../components/crm/PageHeader';
+import FinanceNavTabs from '../components/crm/FinanceNavTabs';
+import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler);
 
 const SalesReports = () => {
-  const theme = useTheme();
   const { invoices, profile, inventory } = useData();
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -33,7 +69,6 @@ const SalesReports = () => {
     const from = dateFrom ? new Date(dateFrom) : null;
     const to = dateTo ? new Date(dateTo) : null;
 
-    // Date Filter
     if (from && invDate < from) return false;
     if (to) {
       const endOfDay = new Date(to);
@@ -41,24 +76,21 @@ const SalesReports = () => {
       if (invDate > endOfDay) return false;
     }
 
-    // Payment Filter
     if (paymentFilter && inv.paymentMethod !== paymentFilter) return false;
-
-    // Category Filter (Show invoice if any item matches category)
-    if (categoryFilter && !inv.items.some(item => item.category === categoryFilter)) return false;
+    if (categoryFilter && !inv.items?.some(item => item.category === categoryFilter)) return false;
 
     return true;
   });
 
-  const categories = ['All', ...new Set(inventory.map(item => item.category)), 'Custom'];
-  const paymentMethods = ['All', 'Cash', 'UPI', 'Card', 'Other'];
+  const categories = ['All', ...new Set(inventory.map(item => item.category).filter(Boolean)), 'Custom'];
 
   const totalRevenue = filteredInvoices.reduce((sum, inv) => sum + inv.total, 0);
   const totalInvoices = filteredInvoices.length;
   const avgInvoiceValue = totalInvoices > 0 ? totalRevenue / totalInvoices : 0;
 
+  // Group by date
   const salesByDate = filteredInvoices.reduce((acc, inv) => {
-    const date = new Date(inv.date).toLocaleDateString();
+    const date = new Date(inv.date).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
     acc[date] = (acc[date] || 0) + inv.total;
     return acc;
   }, {});
@@ -66,23 +98,25 @@ const SalesReports = () => {
   const chartData = {
     labels: Object.keys(salesByDate),
     datasets: [{
-      label: 'Sales (₹)',
+      label: 'Sales Revenue (₹)',
       data: Object.values(salesByDate),
-      backgroundColor: 'rgba(244, 114, 182, 0.05)',
-      borderColor: '#F472B6',
-      borderWidth: 3,
-      tension: 0.4,
+      backgroundColor: 'rgba(15, 118, 110, 0.08)',
+      borderColor: '#0F766E',
+      borderWidth: 2.5,
+      tension: 0.35,
       fill: true,
-      pointBackgroundColor: '#F472B6',
-      pointBorderColor: '#fff',
+      pointBackgroundColor: '#0F766E',
+      pointBorderColor: '#FFFFFF',
       pointBorderWidth: 2,
+      pointRadius: 4,
     }]
   };
 
   // Category-wise sales
   const categorySales = filteredInvoices.reduce((acc, inv) => {
     inv.items?.forEach(item => {
-      acc[item.category] = (acc[item.category] || 0) + (item.price * item.quantity);
+      const cat = item.category || 'General';
+      acc[cat] = (acc[cat] || 0) + (item.price * item.quantity);
     });
     return acc;
   }, {});
@@ -90,24 +124,25 @@ const SalesReports = () => {
   const categoryChartData = {
     labels: Object.keys(categorySales),
     datasets: [{
-      label: 'Sales by Category',
+      label: 'Sales by Category (₹)',
       data: Object.values(categorySales),
       backgroundColor: [
-        '#880e4f',
-        '#ad1457',
-        '#f57f17',
-        '#bc5100',
-        '#2e7d32',
-        '#c62828'
+        '#0F766E',
+        '#D97706',
+        '#042F2E',
+        '#059669',
+        '#B45309',
+        '#64748B'
       ],
-      borderRadius: 4,
+      borderRadius: 6,
       borderWidth: 0
     }]
   };
 
   // Payment method distribution
   const paymentMethodsChartData = filteredInvoices.reduce((acc, inv) => {
-    acc[inv.paymentMethod] = (acc[inv.paymentMethod] || 0) + 1;
+    const method = inv.paymentMethod || 'Cash';
+    acc[method] = (acc[method] || 0) + 1;
     return acc;
   }, {});
 
@@ -116,13 +151,14 @@ const SalesReports = () => {
     datasets: [{
       data: Object.values(paymentMethodsChartData),
       backgroundColor: [
-        '#2e7d32',
-        '#880e4f',
-        '#ad1457',
-        '#f57f17'
+        '#0F766E',
+        '#D97706',
+        '#10B981',
+        '#6366F1'
       ],
-      borderWidth: 0,
-      hoverOffset: 15
+      borderWidth: 2,
+      borderColor: '#FFFFFF',
+      hoverOffset: 8
     }]
   };
 
@@ -130,7 +166,7 @@ const SalesReports = () => {
     const summaryLines = [
       `Total Revenue: ${formatCurrencyForPDF(totalRevenue)}`,
       `Total Invoices: ${totalInvoices}`,
-      `Average Invoice Value: ${formatCurrencyForPDF(avgInvoiceValue)}`
+      `Average Order Value: ${formatCurrencyForPDF(avgInvoiceValue)}`
     ];
 
     if (paymentFilter) summaryLines.push(`Payment Method: ${paymentFilter}`);
@@ -139,106 +175,118 @@ const SalesReports = () => {
     const tableData = filteredInvoices.map(inv => [
       inv.id,
       new Date(inv.date).toLocaleDateString(),
-      inv.customer || 'Walk-in',
-      inv.paymentMethod,
+      inv.customer?.name || inv.customer || 'Walk-in Client',
+      inv.paymentMethod || 'Cash',
       formatCurrencyForPDF(inv.total)
     ]);
 
     generateReportPDF(
-      'Sales Report',
+      'Sales Audit Report',
       profile,
       summaryLines,
-      ['Invoice ID', 'Date', 'Customer', 'Payment', 'Total'],
+      ['Invoice ID', 'Date', 'Client', 'Payment Tender', 'Total Amount'],
       tableData,
-      'sales-report'
+      'sales-audit-report'
     );
   };
 
   return (
-    <Box>
-      <Box sx={{ mb: 4, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, gap: 2 }}>
-        <Box>
-          <Typography variant="h4" sx={{ fontWeight: 800, mb: 0.5 }}>Sales Reports</Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>Detailed analytics of your business performance</Typography>
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<Download />}
-          onClick={exportPDF}
-          sx={{
-            background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)',
-            boxShadow: `0 4px 12px ${theme.palette.primary.main}33`,
-            textTransform: 'none',
-            fontWeight: 700,
-            borderRadius: 2,
-            px: 4,
-            py: 1.5,
-            transition: 'all 0.2s ease-in-out',
-            '&:hover': {
-              background: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)',
-              boxShadow: `0 6px 16px ${theme.palette.primary.main}4D`,
-              transform: 'translateY(-2px)'
-            }
-          }}
-        >
-          Export Report
-        </Button>
-      </Box>
+    <Box sx={{ maxWidth: 1400, mx: 'auto', p: { xs: 2, md: 3 } }}>
+      {/* Top Header */}
+      <PageHeader
+        title="Boutique Sales Audit"
+        subtitle="Comprehensive breakdown of transaction revenues, payment tender distribution, and category turnover"
+        actions={
+          <Button
+            variant="contained"
+            startIcon={<Download />}
+            onClick={exportPDF}
+            sx={{
+              background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+              color: '#FFFFFF',
+              boxShadow: '0 4px 14px rgba(15, 118, 110, 0.25)',
+              textTransform: 'none',
+              fontWeight: 700,
+              borderRadius: 2.5,
+              px: 3,
+              py: 1,
+              '&:hover': {
+                background: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)',
+                boxShadow: '0 6px 18px rgba(15, 118, 110, 0.35)'
+              }
+            }}
+          >
+            Export PDF Audit
+          </Button>
+        }
+      />
 
-      <Grid container spacing={3} sx={{ mb: 6 }}>
+      {/* Finance & Audit Tab Switcher */}
+      <FinanceNavTabs activeTab="/sales-reports" />
+
+      {/* KPI Cards */}
+      <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
         <Grid item xs={12} sm={4}>
-          <GlassCard sx={{ height: '100%', p: 0 }}>
-            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#E11D48' }} />
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Box>
-                  <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Total Revenue</Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', mt: 0.5 }}>₹{totalRevenue.toLocaleString('en-IN')}</Typography>
-                </Box>
-                <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(225, 29, 72, 0.1)', color: '#E11D48' }}>
-                  <AttachMoney />
-                </Box>
-              </Box>
-            </CardContent>
-          </GlassCard>
+          <AtelierKpiCard
+            title="Total Net Turnover"
+            value={`₹${totalRevenue.toLocaleString('en-IN')}`}
+            subtitle={`Across ${totalInvoices} audited billing records`}
+            icon={<AttachMoney />}
+            color="success"
+          />
         </Grid>
         <Grid item xs={12} sm={4}>
-          <GlassCard sx={{ height: '100%', p: 0 }}>
-            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#1976d2' }} />
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Box>
-                  <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Total Invoices</Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', mt: 0.5 }}>{totalInvoices}</Typography>
-                </Box>
-                <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(25, 118, 210, 0.1)', color: '#1976d2' }}>
-                  <Receipt />
-                </Box>
-              </Box>
-            </CardContent>
-          </GlassCard>
+          <AtelierKpiCard
+            title="Audited Invoices"
+            value={totalInvoices}
+            subtitle="Completed client orders"
+            icon={<Receipt />}
+            color="primary"
+          />
         </Grid>
         <Grid item xs={12} sm={4}>
-          <GlassCard sx={{ height: '100%', p: 0 }}>
-            <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: '#ed6c02' }} />
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Box>
-                  <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>Average Value</Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', mt: 0.5 }}>₹{avgInvoiceValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</Typography>
-                </Box>
-                <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(237, 108, 2, 0.1)', color: '#ed6c02' }}>
-                  <TrendingUp />
-                </Box>
-              </Box>
-            </CardContent>
-          </GlassCard>
+          <AtelierKpiCard
+            title="Average Ticket Size"
+            value={`₹${avgInvoiceValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
+            subtitle="Mean sales value per invoice"
+            icon={<TrendingUp />}
+            color="warning"
+          />
         </Grid>
       </Grid>
 
-      <GlassCard sx={{ p: 3, mb: 4 }}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 2, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'primary.main' }}>Filter Reports</Typography>
-        <Grid container spacing={2} sx={{ mb: 3 }}>
+      {/* Filter Toolbar */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 2.5,
+          mb: 3.5,
+          borderRadius: 3.5,
+          border: '1px solid',
+          borderColor: 'divider',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <FilterList sx={{ color: '#0F766E', fontSize: 20 }} />
+            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#042F2E', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+              Filter Sales Records
+            </Typography>
+          </Box>
+          {(dateFrom || dateTo || paymentFilter || categoryFilter) && (
+            <Button
+              size="small"
+              startIcon={<Clear />}
+              onClick={() => { setDateFrom(''); setDateTo(''); setPaymentFilter(''); setCategoryFilter(''); }}
+              sx={{ textTransform: 'none', fontWeight: 700, color: '#DC2626' }}
+            >
+              Reset Filters
+            </Button>
+          )}
+        </Box>
+
+        <Grid container spacing={2}>
           <Grid item xs={12} sm={6} md={3}>
             <TextField
               label="From Date"
@@ -264,16 +312,17 @@ const SalesReports = () => {
           <Grid item xs={12} sm={6} md={3}>
             <TextField
               select
-              label="Payment Method"
+              label="Payment Tender"
               fullWidth
               value={paymentFilter}
               onChange={(e) => setPaymentFilter(e.target.value)}
               size="small"
             >
-              <MenuItem value="">All Payment Methods</MenuItem>
+              <MenuItem value="">All Tenders</MenuItem>
               <MenuItem value="Cash">Cash</MenuItem>
-              <MenuItem value="UPI">UPI</MenuItem>
+              <MenuItem value="UPI">UPI / QR</MenuItem>
               <MenuItem value="Card">Card</MenuItem>
+              <MenuItem value="Split">Split Payment</MenuItem>
             </TextField>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
@@ -292,64 +341,200 @@ const SalesReports = () => {
             </TextField>
           </Grid>
         </Grid>
-        <Button variant="outlined" size="small" onClick={() => { setDateFrom(''); setDateTo(''); setPaymentFilter(''); setCategoryFilter(''); }}>Clear Filters</Button>
-      </GlassCard>
+      </Paper>
 
-      <GlassCard sx={{ p: 3, mb: 3 }}>
-        <Typography variant="h6" sx={{ fontWeight: 800, mb: 3, color: 'text.primary' }}>Sales Trend</Typography>
-        <Line data={chartData} options={{ responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } } }} />
-      </GlassCard>
-
-      <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid item xs={12} md={8}>
-          <GlassCard sx={{ p: 3 }}>
-            <Typography variant="h6" sx={{ fontWeight: 800, mb: 3, color: 'text.primary' }}>Sales by Category</Typography>
-            <Bar data={categoryChartData} options={{ responsive: true, plugins: { legend: { display: false } } }} />
-          </GlassCard>
+      {/* Visual Analytics */}
+      <Grid container spacing={3} sx={{ mb: 3.5 }}>
+        <Grid item xs={12} lg={8}>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 3,
+              borderRadius: 3.5,
+              border: '1px solid',
+              borderColor: 'divider',
+              height: '100%',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+            }}
+          >
+            <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 2, color: '#042F2E' }}>
+              Sales Revenue Timeline
+            </Typography>
+            <Box sx={{ height: 260 }}>
+              <Line
+                data={chartData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: { legend: { display: false } },
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      ticks: { callback: (val) => `₹${val.toLocaleString('en-IN')}` },
+                      grid: { color: 'rgba(0,0,0,0.04)' }
+                    },
+                    x: { grid: { display: false } }
+                  }
+                }}
+              />
+            </Box>
+          </Paper>
         </Grid>
-        <Grid item xs={12} md={4}>
-          <GlassCard sx={{ p: 3 }}>
-            <Typography variant="h6" sx={{ fontWeight: 800, mb: 3, color: 'text.primary' }}>Payment Methods</Typography>
-            <Doughnut data={paymentChartData} options={{ responsive: true, plugins: { legend: { position: 'bottom' } } }} />
-          </GlassCard>
+        <Grid item xs={12} lg={4}>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 3,
+              borderRadius: 3.5,
+              border: '1px solid',
+              borderColor: 'divider',
+              height: '100%',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+            }}
+          >
+            <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 2, color: '#042F2E' }}>
+              Payment Methods Breakdown
+            </Typography>
+            <Box sx={{ height: 260, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Doughnut
+                data={paymentChartData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: { legend: { position: 'bottom' } }
+                }}
+              />
+            </Box>
+          </Paper>
         </Grid>
       </Grid>
 
-      <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
+      {/* Categorical Sales Bar */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          mb: 3.5,
+          borderRadius: 3.5,
+          border: '1px solid',
+          borderColor: 'divider',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+        }}
+      >
+        <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 2, color: '#042F2E' }}>
+          Revenue by Garment & Haute Couture Category
+        </Typography>
+        <Box sx={{ height: 220 }}>
+          <Bar
+            data={categoryChartData}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: { callback: (val) => `₹${val.toLocaleString('en-IN')}` },
+                  grid: { color: 'rgba(0,0,0,0.04)' }
+                },
+                x: { grid: { display: false } }
+              }
+            }}
+          />
+        </Box>
+      </Paper>
+
+      {/* Itemized Invoices Table */}
+      <Paper
+        elevation={0}
+        sx={{
+          borderRadius: 3.5,
+          border: '1px solid',
+          borderColor: 'divider',
+          overflow: 'hidden',
+          boxShadow: '0 4px 20px -4px rgba(15, 118, 110, 0.08)'
+        }}
+      >
+        <Box sx={{ px: 3, py: 2, bgcolor: 'rgba(15, 118, 110, 0.02)', borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+            Detailed Sales Ledger ({filteredInvoices.length} entries)
+          </Typography>
+        </Box>
+
         <TableContainer>
           <Table>
-            <TableHead sx={{ bgcolor: 'action.hover' }}>
+            <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
               <TableRow>
-                <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Invoice ID</TableCell>
-                <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Date</TableCell>
-                <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: { xs: 'none', sm: 'table-cell' } }}>Items Count</TableCell>
-                <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Amount</TableCell>
+                <TableCell sx={{ fontWeight: 800, color: '#042F2E', width: 140 }}>Invoice No</TableCell>
+                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Date</TableCell>
+                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Client</TableCell>
+                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Payment Method</TableCell>
+                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="center">Items</TableCell>
+                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Invoice Total</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredInvoices
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((inv, idx) => (
-                  <TableRow key={inv.id} sx={{ '&:hover': { bgcolor: 'action.hover' } }}>
-                    <TableCell sx={{ fontWeight: 700 }}>#{inv.id}</TableCell>
-                    <TableCell sx={{ fontSize: '0.875rem' }}>{new Date(inv.date).toLocaleDateString()}</TableCell>
-                    <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>{inv.items?.length || 0} Products</TableCell>
-                    <TableCell sx={{ fontWeight: 900, color: 'primary.main' }}>₹{inv.total.toLocaleString('en-IN')}</TableCell>
-                  </TableRow>
-                ))}
+              {filteredInvoices.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} align="center" sx={{ py: 6, color: 'text.secondary' }}>
+                    No invoice transactions match the selected filters.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredInvoices
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((inv) => (
+                    <TableRow key={inv.id} hover sx={{ '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.02)' } }}>
+                      <TableCell sx={{ fontFamily: 'monospace', fontWeight: 800, color: '#0F766E' }}>
+                        #{inv.id}
+                      </TableCell>
+                      <TableCell sx={{ fontSize: '0.875rem' }}>
+                        {new Date(inv.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>
+                        {inv.customer?.name || inv.customer || 'Walk-in Client'}
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={inv.paymentMethod || 'Cash'}
+                          size="small"
+                          sx={{
+                            fontWeight: 700,
+                            fontSize: '0.72rem',
+                            bgcolor: inv.paymentMethod === 'UPI' ? 'rgba(16, 185, 129, 0.1)' : inv.paymentMethod === 'Card' ? 'rgba(99, 102, 241, 0.1)' : 'rgba(217, 119, 6, 0.1)',
+                            color: inv.paymentMethod === 'UPI' ? '#059669' : inv.paymentMethod === 'Card' ? '#4F46E5' : '#D97706'
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell align="center">
+                        <Chip
+                          label={`${inv.items?.length || 0} items`}
+                          size="small"
+                          variant="outlined"
+                          sx={{ borderColor: 'divider', fontWeight: 600, fontSize: '0.72rem' }}
+                        />
+                      </TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.95rem' }}>
+                        ₹{inv.total.toLocaleString('en-IN')}
+                      </TableCell>
+                    </TableRow>
+                  ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={[10, 25, 50]}
           component="div"
           count={filteredInvoices.length}
           rowsPerPage={rowsPerPage}
+          page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
+          sx={{ borderTop: '1px solid', borderColor: 'divider' }}
         />
-      </GlassCard>
-    </Box >
+      </Paper>
+    </Box>
   );
 };
 

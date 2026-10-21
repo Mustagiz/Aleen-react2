@@ -1,12 +1,39 @@
 import React, { useState } from 'react';
-import { Box, Paper, Typography, TextField, Button, Table, TableBody, TableCell, TableHead, TableRow, MenuItem, TableContainer, Card, CardContent, Grid, Chip, useMediaQuery, useTheme, Divider, TablePagination } from '@mui/material';
+import {
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  MenuItem,
+  TableContainer,
+  Grid,
+  Chip,
+  TablePagination,
+  Tabs,
+  Tab
+} from '@mui/material';
 import { useData } from '../contexts/DataContext';
-import { Download, Inventory2, Warning, TrendingUp, History, ListAlt, TrendingDown, AttachMoney } from '@mui/icons-material';
+import {
+  Download,
+  Inventory2,
+  Warning,
+  TrendingDown,
+  ListAlt,
+  History,
+  AttachMoney
+} from '@mui/icons-material';
 import { formatCurrencyForPDF, generateReportPDF } from '../utils/helpers';
+import PageHeader from '../components/crm/PageHeader';
+import FinanceNavTabs from '../components/crm/FinanceNavTabs';
+import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 
 const InventoryReports = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [categoryFilter, setCategoryFilter] = useState('');
   const [stockLevel, setStockLevel] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -25,16 +52,15 @@ const InventoryReports = () => {
     setPage(0);
   };
 
-  const allCategories = [...new Set(inventory.map(item => item.category))];
+  const allCategories = [...new Set(inventory.map(item => item.category).filter(Boolean))];
 
   const filteredInventory = inventory.filter(item => {
     const categoryMatch = categoryFilter === '' || item.category === categoryFilter;
     const stockMatch = stockLevel === '' ||
       (stockLevel === 'low' && item.quantity < 2) ||
-      (stockLevel === 'medium' && item.quantity >= 10 && item.quantity < 50) ||
-      (stockLevel === 'high' && item.quantity >= 50);
+      (stockLevel === 'medium' && item.quantity >= 2 && item.quantity < 20) ||
+      (stockLevel === 'high' && item.quantity >= 20);
 
-    // Date filtering logic with fallback
     const itemDate = item.dateAdded ? new Date(item.dateAdded) : (isNaN(item.id) ? new Date() : new Date(parseInt(item.id)));
     const start = startDate ? new Date(startDate) : null;
     const end = endDate ? new Date(endDate) : null;
@@ -47,14 +73,14 @@ const InventoryReports = () => {
 
   const totalValue = filteredInventory.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const lowStockCount = filteredInventory.filter(item => item.quantity < 2).length;
-  const totalItems = filteredInventory.length;
-  const totalProfit = filteredInventory.reduce((sum, item) => sum + ((item.price - (item.cost || 0)) * item.quantity), 0);
+  const totalItemsCount = filteredInventory.reduce((sum, item) => sum + (item.quantity || 0), 0);
 
   const exportPDF = () => {
     const summaryLines = [
-      `Total Items: ${filteredInventory.length}`,
-      `Total Value: ${formatCurrencyForPDF(totalValue)}`,
-      `Low Stock Items: ${lowStockCount}`
+      `Total Item SKUs: ${filteredInventory.length}`,
+      `Total Physical Units: ${totalItemsCount}`,
+      `Total Inventory Valuation: ${formatCurrencyForPDF(totalValue)}`,
+      `Low Stock Alerts: ${lowStockCount}`
     ];
 
     if (startDate || endDate) {
@@ -63,35 +89,41 @@ const InventoryReports = () => {
 
     const tableData = filteredInventory.map(item => [
       item.name,
-      item.category,
-      item.size,
-      item.color,
+      item.category || 'General',
+      `${item.size || '-'} / ${item.color || '-'}`,
       formatCurrencyForPDF(item.price),
-      item.quantity,
-      item.dateAdded ? new Date(item.dateAdded).toLocaleDateString() : 'N/A'
+      `${item.quantity} units`,
+      formatCurrencyForPDF(item.price * item.quantity)
     ]);
 
     generateReportPDF(
-      'Inventory Report',
+      'Boutique Stock Audit Report',
       profile,
       summaryLines,
-      ['Name', 'Category', 'Size', 'Color', 'Price', 'Stock', 'Added Date'],
+      ['Product Name', 'Category', 'Size / Color', 'Retail Price', 'Current Stock', 'Stock Valuation'],
       tableData,
-      'inventory-report'
+      'stock-audit-report'
     );
   };
 
   const exportCSV = () => {
-    const headers = ['Name', 'Category', 'Size', 'Color', 'Price', 'Quantity', 'Supplier'];
+    const headers = ['Name', 'Category', 'Size', 'Color', 'Price', 'Quantity', 'Valuation', 'Supplier'];
     const rows = filteredInventory.map(item => [
-      item.name, item.category, item.size, item.color, item.price, item.quantity, item.supplier
+      `"${item.name}"`,
+      `"${item.category || ''}"`,
+      `"${item.size || ''}"`,
+      `"${item.color || ''}"`,
+      item.price,
+      item.quantity,
+      item.price * item.quantity,
+      `"${item.supplier || ''}"`
     ]);
-    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+    const csv = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'inventory-report.csv';
+    a.download = 'stock-audit-report.csv';
     a.click();
   };
 
@@ -100,13 +132,11 @@ const InventoryReports = () => {
     ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
     return inventory.filter(item => {
-      // Find all sales for this item in the last 90 days
       const itemSales = invoices.filter(inv => {
         const invDate = new Date(inv.date);
         return invDate >= ninetyDaysAgo && inv.items?.some(i => i.id === item.id);
       });
 
-      // Special Case: New items added in the last 90 days shouldn't be "slow moving" yet
       const itemDate = item.dateAdded ? new Date(item.dateAdded) : (isNaN(item.id) ? new Date() : new Date(parseInt(item.id)));
       if (itemDate >= ninetyDaysAgo) return false;
 
@@ -115,431 +145,434 @@ const InventoryReports = () => {
   };
 
   const slowMovingItems = getSlowMovingItems();
-  const sortedLogs = [...inventoryLogs].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  const sortedLogs = [...(inventoryLogs || [])].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
   return (
-    <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Box>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>Inventory Reports</Typography>
-          <Typography variant="body2" color="text.secondary">Analyze your stock levels and movement history</Typography>
+    <Box sx={{ maxWidth: 1400, mx: 'auto', p: { xs: 2, md: 3 } }}>
+      {/* Top Header */}
+      <PageHeader
+        title="Stock Valuation & Inventory Audit"
+        subtitle="Real-time physical asset valuation, movement logs, and slow-moving SKU detection"
+        actions={
+          <Box sx={{ display: 'flex', gap: 1.5 }}>
+            <Button
+              variant="outlined"
+              startIcon={<Download />}
+              onClick={exportCSV}
+              sx={{
+                borderColor: 'divider',
+                color: 'text.primary',
+                borderRadius: 2.5,
+                fontWeight: 700,
+                textTransform: 'none',
+                px: 2.5,
+                '&:hover': { borderColor: '#0F766E', bgcolor: 'rgba(15, 118, 110, 0.04)' }
+              }}
+            >
+              CSV Export
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<Download />}
+              onClick={exportPDF}
+              sx={{
+                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                color: '#FFFFFF',
+                borderRadius: 2.5,
+                fontWeight: 700,
+                textTransform: 'none',
+                px: 3,
+                boxShadow: '0 4px 14px rgba(15, 118, 110, 0.25)',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)'
+                }
+              }}
+            >
+              Audit PDF
+            </Button>
+          </Box>
+        }
+      />
+
+      {/* Finance & Audit Tab Switcher */}
+      <FinanceNavTabs activeTab="/inventory-reports" />
+
+      {/* 4 Atelier KPIs */}
+      <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
+        <Grid item xs={12} sm={6} md={3}>
+          <AtelierKpiCard
+            title="Total Stock Valuation"
+            value={`₹${totalValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
+            subtitle={`Retail value across ${totalItemsCount} pieces`}
+            icon={<AttachMoney />}
+            color="success"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <AtelierKpiCard
+            title="Active Catalog SKUs"
+            value={filteredInventory.length}
+            subtitle={`${totalItemsCount} total garment units`}
+            icon={<Inventory2 />}
+            color="primary"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <AtelierKpiCard
+            title="Low Stock Warning"
+            value={lowStockCount}
+            subtitle="Pieces with under 2 units remaining"
+            icon={<Warning />}
+            color={lowStockCount > 0 ? "warning" : "success"}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <AtelierKpiCard
+            title="Slow Moving SKUs"
+            value={slowMovingItems.length}
+            subtitle="Zero customer sales in past 90 days"
+            icon={<TrendingDown />}
+            color={slowMovingItems.length > 0 ? "error" : "success"}
+          />
+        </Grid>
+      </Grid>
+
+      {/* Stock Subtabs & Container */}
+      <Paper
+        elevation={0}
+        sx={{
+          borderRadius: 3.5,
+          border: '1px solid',
+          borderColor: 'divider',
+          overflow: 'hidden',
+          boxShadow: '0 4px 20px -4px rgba(15, 118, 110, 0.08)'
+        }}
+      >
+        <Box sx={{ borderBottom: '1px solid', borderColor: 'divider', px: 2, pt: 1, bgcolor: 'rgba(15, 118, 110, 0.02)' }}>
+          <Tabs
+            value={activeTab}
+            onChange={(e, val) => { setActiveTab(val); setPage(0); }}
+            textColor="primary"
+            indicatorColor="primary"
+            sx={{
+              '& .MuiTab-root': {
+                textTransform: 'none',
+                fontWeight: 700,
+                fontSize: '0.9rem',
+                minHeight: 48,
+                color: 'text.secondary',
+                '&.Mui-selected': {
+                  color: '#0F766E'
+                }
+              },
+              '& .MuiTabs-indicator': {
+                backgroundColor: '#0F766E',
+                height: 3,
+                borderRadius: '3px 3px 0 0'
+              }
+            }}
+          >
+            <Tab icon={<ListAlt sx={{ fontSize: 18 }} />} iconPosition="start" label="Stock Audit & Valuation" />
+            <Tab icon={<History sx={{ fontSize: 18 }} />} iconPosition="start" label={`Movement History (${sortedLogs.length})`} />
+            <Tab icon={<TrendingDown sx={{ fontSize: 18 }} />} iconPosition="start" label={`Slow Moving Aging (${slowMovingItems.length})`} />
+          </Tabs>
         </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            variant="contained"
-            startIcon={<Download />}
-            onClick={exportPDF}
-            sx={{
-              background: 'linear-gradient(135deg, #d97706 0%, #f97316 100%)',
-              borderRadius: '8px',
-              fontWeight: 700,
-              textTransform: 'none'
-            }}
-          >
-            PDF
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<Download />}
-            onClick={exportCSV}
-            sx={{ borderRadius: '8px', fontWeight: 700, textTransform: 'none', borderColor: '#d97706', color: '#d97706' }}
-          >
-            CSV
-          </Button>
-        </Box>
-      </Box>
 
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button
-            onClick={() => setActiveTab(0)}
-            startIcon={<ListAlt />}
-            sx={{
-              pb: 1.5,
-              borderRadius: 0,
-              borderBottom: activeTab === 0 ? '3px solid' : 'none',
-              borderColor: 'primary.main',
-              color: activeTab === 0 ? 'primary.main' : 'text.secondary',
-              fontWeight: activeTab === 0 ? 800 : 500
-            }}
-          >
-            Inventory Summary
-          </Button>
-          <Button
-            onClick={() => setActiveTab(1)}
-            startIcon={<History />}
-            sx={{
-              pb: 1.5,
-              borderRadius: 0,
-              borderBottom: activeTab === 1 ? '3px solid' : 'none',
-              borderColor: 'primary.main',
-              color: activeTab === 1 ? 'primary.main' : 'text.secondary',
-              fontWeight: activeTab === 1 ? 800 : 500
-            }}
-          >
-            Movement History
-          </Button>
-          <Button
-            onClick={() => setActiveTab(2)}
-            startIcon={<TrendingDown />}
-            sx={{
-              pb: 1.5,
-              borderRadius: 0,
-              borderBottom: activeTab === 2 ? '3px solid' : 'none',
-              borderColor: 'primary.main',
-              color: activeTab === 2 ? 'primary.main' : 'text.secondary',
-              fontWeight: activeTab === 2 ? 800 : 500
-            }}
-          >
-            Slow Moving Items
-          </Button>
-        </Box>
-      </Box>
+        <Box sx={{ p: { xs: 2, md: 3 } }}>
+          {/* TAB 0: Current Stock Valuation */}
+          {activeTab === 0 && (
+            <>
+              {/* Filter Row */}
+              <Box sx={{ p: 2, mb: 3, borderRadius: 2.5, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider' }}>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={12} sm={6} md={3}>
+                    <TextField
+                      select
+                      fullWidth
+                      size="small"
+                      label="Garment Category"
+                      value={categoryFilter}
+                      onChange={(e) => setCategoryFilter(e.target.value)}
+                    >
+                      <MenuItem value="">All Categories</MenuItem>
+                      {allCategories.map(cat => (
+                        <MenuItem key={cat} value={cat}>{cat}</MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={3}>
+                    <TextField
+                      select
+                      fullWidth
+                      size="small"
+                      label="Stock Threshold"
+                      value={stockLevel}
+                      onChange={(e) => setStockLevel(e.target.value)}
+                    >
+                      <MenuItem value="">All Stock Levels</MenuItem>
+                      <MenuItem value="low">Low Stock (&lt; 2 units)</MenuItem>
+                      <MenuItem value="medium">Medium Stock (2 - 20 units)</MenuItem>
+                      <MenuItem value="high">High Stock (20+ units)</MenuItem>
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={2.5}>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      type="date"
+                      label="From Added Date"
+                      InputLabelProps={{ shrink: true }}
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={2.5}>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      type="date"
+                      label="To Added Date"
+                      InputLabelProps={{ shrink: true }}
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={1}>
+                    {(categoryFilter || stockLevel || startDate || endDate) && (
+                      <Button
+                        size="small"
+                        onClick={() => { setCategoryFilter(''); setStockLevel(''); setStartDate(''); setEndDate(''); }}
+                        sx={{ color: '#DC2626', textTransform: 'none', fontWeight: 700 }}
+                      >
+                        Clear
+                      </Button>
+                    )}
+                  </Grid>
+                </Grid>
+              </Box>
 
-      {activeTab === 0 ? (
-        <>
-
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6} md={3}>
-              <Card sx={{
-                borderRadius: 4,
-                position: 'relative',
-                overflow: 'hidden',
-                boxShadow: '0 10px 25px -5px rgba(183, 110, 121, 0.15)',
-                border: '1px solid rgba(183, 110, 121, 0.15)',
-                background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(183, 110, 121, 0.05) 100%)`,
-                transition: 'all 0.3s ease',
-                '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(183, 110, 121, 0.3)' }
-              }}>
-                <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: 'primary.main' }} />
-                <CardContent sx={{ p: 3 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Box>
-                      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Items</Typography>
-                      <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>{totalItems}</Typography>
-                    </Box>
-                    <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'primary.light', color: 'primary.main' }}>
-                      <Inventory2 />
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <Card sx={{
-                borderRadius: 4,
-                position: 'relative',
-                overflow: 'hidden',
-                boxShadow: '0 10px 25px -5px rgba(46, 125, 50, 0.15)',
-                border: '1px solid rgba(46, 125, 50, 0.15)',
-                background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(46, 125, 50, 0.05) 100%)`,
-                transition: 'all 0.3s ease',
-                '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(46, 125, 50, 0.3)' }
-              }}>
-                <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#2e7d32' }} />
-                <CardContent sx={{ p: 3 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Box>
-                      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Inventory Value</Typography>
-                      <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.5 }}>₹{totalValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</Typography>
-                    </Box>
-                    <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(46, 125, 50, 0.05)', color: '#2e7d32' }}>
-                      <AttachMoney />
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <Card sx={{
-                borderRadius: 4,
-                position: 'relative',
-                overflow: 'hidden',
-                boxShadow: '0 10px 25px -5px rgba(245, 127, 23, 0.15)',
-                border: '1px solid rgba(245, 127, 23, 0.15)',
-                background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(245, 127, 23, 0.05) 100%)`,
-                transition: 'all 0.3s ease',
-                '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(245, 127, 23, 0.3)' }
-              }}>
-                <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#f57f17' }} />
-                <CardContent sx={{ p: 3 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Box>
-                      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Low Stock</Typography>
-                      <Typography variant="h4" sx={{ fontWeight: 800, color: '#f57f17', mt: 0.5 }}>{lowStockCount}</Typography>
-                    </Box>
-                    <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(245, 127, 23, 0.05)', color: '#f57f17' }}>
-                      <Warning />
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <Card sx={{
-                borderRadius: 4,
-                position: 'relative',
-                overflow: 'hidden',
-                boxShadow: '0 10px 25px -5px rgba(219, 39, 119, 0.15)',
-                border: '1px solid rgba(219, 39, 119, 0.15)',
-                background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, rgba(219, 39, 119, 0.05) 100%)`,
-                transition: 'all 0.3s ease',
-                '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -10px rgba(219, 39, 119, 0.3)' }
-              }}>
-                <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: '#DB2777' }} />
-                <CardContent sx={{ p: 3 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Box>
-                      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Est. Margin</Typography>
-                      <Typography variant="h4" sx={{ fontWeight: 800, color: '#DB2777', mt: 0.5 }}>₹{totalProfit.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</Typography>
-                    </Box>
-                    <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(219, 39, 119, 0.05)', color: '#DB2777' }}>
-                      <TrendingUp />
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-
-          <Paper sx={{ p: 3, mb: 3, borderRadius: 3 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2 }}>Filters</Typography>
-            <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' }, flexWrap: 'wrap' }}>
-              <TextField select label="Category" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} sx={{ flex: 1, minWidth: 150 }}>
-                <MenuItem value="">All Categories</MenuItem>
-                {allCategories.map(cat => <MenuItem key={cat} value={cat}>{cat}</MenuItem>)}
-              </TextField>
-              <TextField select label="Stock Level" value={stockLevel} onChange={(e) => setStockLevel(e.target.value)} sx={{ flex: 1, minWidth: 150 }}>
-                <MenuItem value="">All Levels</MenuItem>
-                <MenuItem value="low">Low (&lt;10)</MenuItem>
-                <MenuItem value="medium">Medium (10-49)</MenuItem>
-                <MenuItem value="high">High (≥50)</MenuItem>
-              </TextField>
-              <TextField
-                label="From Date"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                InputLabelProps={{ shrink: true }}
-                sx={{ flex: 1, minWidth: 150 }}
-              />
-              <TextField
-                label="To Date"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                InputLabelProps={{ shrink: true }}
-                sx={{ flex: 1, minWidth: 150 }}
-              />
-              <Button variant="outlined" onClick={() => { setCategoryFilter(''); setStockLevel(''); setStartDate(''); setEndDate(''); }}>Clear</Button>
-            </Box>
-          </Paper>
-
-          {isMobile ? (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {filteredInventory.map((item) => (
-                <Card key={item.id} sx={{ borderRadius: 3, boxShadow: '0 2px 12px rgba(0,0,0,0.05)', border: '1px solid rgba(0,0,0,0.05)' }}>
-                  <CardContent sx={{ p: 2 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                      <Box>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.2 }}>{item.name}</Typography>
-                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 0.5 }}>
-                          <Chip label={item.category} size="small" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700, bgcolor: 'primary.light', color: 'primary.main' }} />
-                          <Typography variant="caption" color="text.secondary">{item.size} • {item.color}</Typography>
-                        </Box>
-                      </Box>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'primary.main' }}>
-                        ₹{(item.price * item.quantity).toLocaleString('en-IN')}
-                      </Typography>
-                    </Box>
-
-                    <Divider sx={{ my: 1.5, borderStyle: 'dashed' }} />
-
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Box>
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>Date Added</Typography>
-                        <Typography variant="caption" sx={{ fontWeight: 700 }}>
-                          {item.dateAdded ? new Date(item.dateAdded).toLocaleDateString() : (isNaN(item.id) ? new Date().toLocaleDateString() : new Date(parseInt(item.id)).toLocaleDateString())}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ textAlign: 'right' }}>
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>Stock Status</Typography>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5, justifyContent: 'flex-end' }}>
-                          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: item.quantity < 2 ? '#ef4444' : item.quantity < 50 ? '#f59e0b' : '#10b981' }} />
-                          <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.quantity} Units</Typography>
-                        </Box>
-                      </Box>
-                    </Box>
-                  </CardContent>
-                </Card>
-              ))}
-              {filteredInventory.length === 0 && (
-                <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 3, bgcolor: 'rgba(0,0,0,0.02)' }}>
-                  <Typography color="text.secondary">No items found matching filters</Typography>
-                </Paper>
-              )}
-            </Box>
-          ) : (
-            <Paper sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.05)' }}>
-              <TableContainer>
+              {/* Table */}
+              <TableContainer sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                 <Table>
-                  <TableHead sx={{ bgcolor: 'primary.light', borderBottom: '2px solid rgba(244, 114, 182, 0.1)' }}>
+                  <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
                     <TableRow>
-                      <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Product Details</TableCell>
-                      <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Added</TableCell>
-                      <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Price & Stock</TableCell>
-                      <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Inventory Value</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Creations / Item Details</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Category</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Specs</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Unit Price</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="center">Stock Level</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Asset Valuation</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {filteredInventory
-                      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((item) => {
-                        const itemDate = item.dateAdded ? new Date(item.dateAdded) : (isNaN(item.id) ? new Date() : new Date(parseInt(item.id)));
-                        return (
-                          <TableRow key={item.id} sx={{ '&:hover': { bgcolor: 'rgba(136, 14, 79, 0.02)' } }}>
+                    {filteredInventory.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} align="center" sx={{ py: 6, color: 'text.secondary' }}>
+                          No inventory items match your filter criteria.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredInventory
+                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                        .map((item) => (
+                          <TableRow key={item.id} hover sx={{ '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.02)' } }}>
                             <TableCell>
-                              <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.name}</Typography>
-                              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 0.5 }}>
-                                <Chip label={item.category} size="small" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700, bgcolor: 'primary.light', color: 'primary.main' }} />
-                                <Typography variant="caption" color="text.secondary">{item.size} • {item.color}</Typography>
-                              </Box>
-                            </TableCell>
-                            <TableCell>
-                              <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                                {itemDate.toLocaleDateString()}
+                              <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                                {item.name}
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', fontFamily: 'monospace' }}>
+                                SKU: #{item.id}
                               </Typography>
                             </TableCell>
                             <TableCell>
-                              <Typography variant="body2" sx={{ fontWeight: 700 }}>₹{item.price}</Typography>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: item.quantity < 2 ? '#ef4444' : item.quantity < 50 ? '#f59e0b' : '#10b981' }} />
-                                <Typography variant="caption" sx={{ fontWeight: 600 }}>{item.quantity} Units</Typography>
-                              </Box>
+                              <Chip
+                                label={item.category || 'General'}
+                                size="small"
+                                sx={{ bgcolor: 'rgba(15, 118, 110, 0.08)', color: '#0F766E', fontWeight: 700, fontSize: '0.72rem' }}
+                              />
                             </TableCell>
-                            <TableCell>
-                              <Typography variant="body2" sx={{ fontWeight: 800, color: 'primary.main' }}>₹{(item.price * item.quantity).toLocaleString('en-IN')}</Typography>
+                            <TableCell sx={{ color: 'text.secondary', fontSize: '0.8rem' }}>
+                              {item.size || 'Free Size'} {item.color ? `• ${item.color}` : ''}
+                            </TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 700 }}>
+                              ₹{item.price?.toLocaleString('en-IN')}
+                            </TableCell>
+                            <TableCell align="center">
+                              <Chip
+                                label={`${item.quantity} in stock`}
+                                size="small"
+                                sx={{
+                                  fontWeight: 800,
+                                  fontSize: '0.72rem',
+                                  bgcolor: item.quantity < 2 ? 'rgba(220, 38, 38, 0.1)' : item.quantity < 20 ? 'rgba(217, 119, 6, 0.1)' : 'rgba(15, 118, 110, 0.1)',
+                                  color: item.quantity < 2 ? '#DC2626' : item.quantity < 20 ? '#D97706' : '#0F766E'
+                                }}
+                              />
+                            </TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.95rem' }}>
+                              ₹{(item.price * item.quantity).toLocaleString('en-IN')}
                             </TableCell>
                           </TableRow>
-                        );
-                      })}
+                        ))
+                    )}
                   </TableBody>
                 </Table>
               </TableContainer>
               <TablePagination
-                rowsPerPageOptions={[5, 10, 25]}
+                rowsPerPageOptions={[10, 25, 50]}
                 component="div"
                 count={filteredInventory.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
+                sx={{ borderTop: '1px solid', borderColor: 'divider' }}
               />
-            </Paper>
+            </>
           )}
-        </>
-      ) : activeTab === 1 ? (
-        <Paper sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
-          <TableContainer>
-            <Table>
-              <TableHead sx={{ bgcolor: 'secondary.light' }}>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: 800 }}>Timestamp</TableCell>
-                  <TableCell sx={{ fontWeight: 800 }}>Product</TableCell>
-                  <TableCell sx={{ fontWeight: 800 }}>Change</TableCell>
-                  <TableCell sx={{ fontWeight: 800 }}>New Stock</TableCell>
-                  <TableCell sx={{ fontWeight: 800 }}>Reason</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {sortedLogs
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((log) => (
-                    <TableRow key={log.id}>
-                      <TableCell>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          {new Date(log.timestamp).toLocaleDateString()}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {new Date(log.timestamp).toLocaleTimeString()}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 700 }}>{log.productName}</TableCell>
-                      <TableCell>
-                        <Chip
-                          label={`${log.change > 0 ? '+' : ''}${log.change}`}
-                          size="small"
-                          sx={{
-                            bgcolor: log.change > 0 ? 'success.light' : 'error.light',
-                            color: log.change > 0 ? 'success.main' : 'error.main',
-                            fontWeight: 800
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 700 }}>{log.newQuantity}</TableCell>
-                      <TableCell>
-                        <Typography variant="body2">{log.reason}</Typography>
-                      </TableCell>
+
+          {/* TAB 1: Movement History Logs */}
+          {activeTab === 1 && (
+            <>
+              <TableContainer sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
+                <Table>
+                  <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Timestamp</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Garment Product</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="center">Adjustment</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="center">Updated Stock</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Reason / Operational Note</TableCell>
                     </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <TablePagination
-            rowsPerPageOptions={[10, 25, 50]}
-            component="div"
-            count={sortedLogs.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </Paper>
-      ) : (
-        <Paper sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
-          <Box sx={{ p: 2, bgcolor: 'error.light', color: 'error.main' }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
-              ⚠️ These items have had ZERO sales in the last 90 days.
-            </Typography>
-          </Box>
-          <TableContainer>
-            <Table>
-              <TableHead sx={{ bgcolor: 'grey.50' }}>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: 800 }}>Product Details</TableCell>
-                  <TableCell sx={{ fontWeight: 800 }}>Category</TableCell>
-                  <TableCell sx={{ fontWeight: 800 }}>Current Stock</TableCell>
-                  <TableCell sx={{ fontWeight: 800 }}>Price</TableCell>
-                  <TableCell sx={{ fontWeight: 800 }}>Stock Value</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {slowMovingItems.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.name}</Typography>
-                      <Typography variant="caption" color="text.secondary">ID: {item.productId || 'N/A'}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Chip label={item.category} size="small" variant="outlined" sx={{ fontWeight: 700, fontSize: '0.65rem' }} />
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 700, color: 'error.main' }}>{item.quantity} Units</TableCell>
-                    <TableCell>₹{item.price}</TableCell>
-                    <TableCell sx={{ fontWeight: 800 }}>₹{(item.price * item.quantity).toLocaleString('en-IN')}</TableCell>
-                  </TableRow>
-                ))}
-                {slowMovingItems.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
-                      <Typography variant="body2" color="text.secondary">Fantastic! No slow-moving items found.</Typography>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
-      )}
+                  </TableHead>
+                  <TableBody>
+                    {sortedLogs.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} align="center" sx={{ py: 6, color: 'text.secondary' }}>
+                          No inventory movement logs recorded yet.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      sortedLogs
+                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                        .map((log) => (
+                          <TableRow key={log.id} hover sx={{ '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.02)' } }}>
+                            <TableCell sx={{ fontSize: '0.825rem' }}>
+                              <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                                {new Date(log.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                {new Date(log.timestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                              </Typography>
+                            </TableCell>
+                            <TableCell sx={{ fontWeight: 700, color: 'text.primary' }}>
+                              {log.productName}
+                            </TableCell>
+                            <TableCell align="center">
+                              <Chip
+                                label={`${log.change > 0 ? '+' : ''}${log.change}`}
+                                size="small"
+                                sx={{
+                                  bgcolor: log.change > 0 ? 'rgba(15, 118, 110, 0.1)' : 'rgba(220, 38, 38, 0.1)',
+                                  color: log.change > 0 ? '#0F766E' : '#DC2626',
+                                  fontWeight: 800,
+                                  fontSize: '0.75rem'
+                                }}
+                              />
+                            </TableCell>
+                            <TableCell align="center" sx={{ fontWeight: 800 }}>
+                              {log.newQuantity} units
+                            </TableCell>
+                            <TableCell sx={{ color: 'text.secondary' }}>
+                              {log.reason || 'Standard Inventory Adjustment'}
+                            </TableCell>
+                          </TableRow>
+                        ))
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <TablePagination
+                rowsPerPageOptions={[10, 25, 50]}
+                component="div"
+                count={sortedLogs.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                sx={{ borderTop: '1px solid', borderColor: 'divider' }}
+              />
+            </>
+          )}
+
+          {/* TAB 2: Slow Moving & Aging Items */}
+          {activeTab === 2 && (
+            <>
+              <Box sx={{ p: 2, mb: 3, borderRadius: 2.5, bgcolor: 'rgba(217, 119, 6, 0.08)', border: '1px solid rgba(217, 119, 6, 0.2)', display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <Warning sx={{ color: '#D97706' }} />
+                <Typography variant="body2" sx={{ fontWeight: 700, color: '#B45309' }}>
+                  Audited Aging SKUs: The following items have had ZERO client sales registered in the past 90 days. Consider promotional discounts or bundle packages.
+                </Typography>
+              </Box>
+
+              <TableContainer sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
+                <Table>
+                  <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Creations / Item Details</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Category</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="center">Current Stock</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Unit Price</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Tied-Up Capital</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {slowMovingItems.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} align="center" sx={{ py: 6, color: 'text.secondary' }}>
+                          Outstanding! No slow-moving inventory found in the 90-day window.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      slowMovingItems.map((item) => (
+                        <TableRow key={item.id} hover sx={{ '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.02)' } }}>
+                          <TableCell>
+                            <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.name}</Typography>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontFamily: 'monospace' }}>
+                              SKU #{item.id}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              label={item.category || 'General'}
+                              size="small"
+                              variant="outlined"
+                              sx={{ borderColor: 'divider', fontWeight: 600, fontSize: '0.72rem' }}
+                            />
+                          </TableCell>
+                          <TableCell align="center">
+                            <Chip
+                              label={`${item.quantity} units`}
+                              size="small"
+                              sx={{ bgcolor: 'rgba(220, 38, 38, 0.1)', color: '#DC2626', fontWeight: 800, fontSize: '0.72rem' }}
+                            />
+                          </TableCell>
+                          <TableCell align="right" sx={{ fontWeight: 700 }}>
+                            ₹{item.price?.toLocaleString('en-IN')}
+                          </TableCell>
+                          <TableCell align="right" sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.95rem' }}>
+                            ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </>
+          )}
+        </Box>
+      </Paper>
     </Box>
   );
 };

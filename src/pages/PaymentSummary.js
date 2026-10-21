@@ -1,11 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
-    Paper,
     Typography,
     Box,
     Grid,
-    Card,
-    CardContent,
     Button,
     Table,
     TableBody,
@@ -19,7 +16,12 @@ import {
     MenuItem,
     ListItemIcon,
     ListItemText,
-    Divider
+    Divider,
+    TextField,
+    InputAdornment,
+    TablePagination,
+    useTheme,
+    Avatar
 } from '@mui/material';
 import {
     AccountBalanceWallet,
@@ -28,20 +30,31 @@ import {
     QrCode2,
     Download,
     Print,
-    MoreVert,
     TrendingUp,
-    TrendingDown,
-    CalendarToday
+    CalendarToday,
+    Search,
+    Close
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import GlassCard from '../components/GlassCard';
+import PageHeader from '../components/crm/PageHeader';
+import AtelierKpiCard from '../components/crm/AtelierKpiCard';
+import FinanceNavTabs from '../components/crm/FinanceNavTabs';
 
 const PaymentSummary = () => {
     const { invoices } = useData();
+    const theme = useTheme();
     const [dateRange, setDateRange] = useState('today');
     const [anchorEl, setAnchorEl] = useState(null);
+
+    // Search and Table Filter State
+    const [searchQuery, setSearchQuery] = useState('');
+    const [methodFilter, setMethodFilter] = useState('All');
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     const getDateRange = () => {
         const now = new Date();
@@ -69,13 +82,15 @@ const PaymentSummary = () => {
     const { start, end, label } = getDateRange();
 
     // Filter invoices by date range
-    const filteredInvoices = invoices.filter(inv => {
-        const invDate = new Date(inv.date);
-        return invDate >= start && invDate <= end;
-    });
+    const filteredInvoices = useMemo(() => {
+        return invoices.filter(inv => {
+            const invDate = new Date(inv.date);
+            return invDate >= start && invDate <= end;
+        });
+    }, [invoices, start, end]);
 
     // Calculate payment summary
-    const calculatePaymentSummary = () => {
+    const paymentSummary = useMemo(() => {
         const summary = {
             Cash: { total: 0, count: 0, transactions: [] },
             UPI: { total: 0, count: 0, transactions: [], providers: {} },
@@ -85,7 +100,6 @@ const PaymentSummary = () => {
         };
 
         filteredInvoices.forEach(inv => {
-            // Handle split payments
             if (inv.payments && inv.payments.length > 0) {
                 inv.payments.forEach(payment => {
                     const method = payment.method || 'Cash';
@@ -99,14 +113,13 @@ const PaymentSummary = () => {
                             id: inv.id,
                             amount: payment.amount,
                             time: inv.date,
-                            customer: inv.customer || 'Walk-in',
+                            customer: inv.customer || 'Walk-in Guest',
                             transactionId: payment.transactionId,
                             upiProvider: payment.upiProvider
                         });
                     }
                 });
             } else {
-                // Single payment method
                 const method = inv.paymentMethod || 'Cash';
                 if (summary[method]) {
                     summary[method].total += inv.total || 0;
@@ -115,7 +128,7 @@ const PaymentSummary = () => {
                         id: inv.id,
                         amount: inv.total,
                         time: inv.date,
-                        customer: inv.customer || 'Walk-in',
+                        customer: inv.customer || 'Walk-in Guest',
                         transactionId: inv.upiTransactionId
                     });
                 }
@@ -123,14 +136,13 @@ const PaymentSummary = () => {
         });
 
         return summary;
-    };
+    }, [filteredInvoices]);
 
-    const paymentSummary = calculatePaymentSummary();
     const totalCollections = Object.values(paymentSummary).reduce((sum, method) => sum + method.total, 0);
     const totalTransactions = Object.values(paymentSummary).reduce((sum, method) => sum + method.count, 0);
 
-    // Get previous period for comparison
-    const getPreviousPeriodData = () => {
+    // Previous period for trend comparison
+    const previousTotal = useMemo(() => {
         const prevStart = new Date(start);
         const prevEnd = new Date(end);
         const diff = end - start;
@@ -143,10 +155,30 @@ const PaymentSummary = () => {
         });
 
         return prevInvoices.reduce((sum, inv) => sum + (inv.total || 0), 0);
-    };
+    }, [invoices, start, end]);
 
-    const previousTotal = getPreviousPeriodData();
     const trend = previousTotal === 0 ? 100 : Math.round(((totalCollections - previousTotal) / previousTotal) * 100);
+
+    // All transactions combined and filtered
+    const allTransactions = useMemo(() => {
+        return Object.entries(paymentSummary)
+            .flatMap(([method, data]) => data.transactions.map(txn => ({ ...txn, method })))
+            .filter(txn => {
+                const query = searchQuery.toLowerCase().trim();
+                const matchesSearch = !query ||
+                    (txn.id || '').toLowerCase().includes(query) ||
+                    (txn.customer || '').toLowerCase().includes(query) ||
+                    (txn.transactionId || '').toLowerCase().includes(query);
+
+                const matchesMethod = methodFilter === 'All' || txn.method === methodFilter;
+                return matchesSearch && matchesMethod;
+            })
+            .sort((a, b) => new Date(b.time) - new Date(a.time));
+    }, [paymentSummary, searchQuery, methodFilter]);
+
+    const paginatedTransactions = useMemo(() => {
+        return allTransactions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    }, [allTransactions, page, rowsPerPage]);
 
     const getPaymentIcon = (method) => {
         switch (method) {
@@ -174,7 +206,7 @@ const PaymentSummary = () => {
             case 'Credit':
                 return '#DC2626';
             case 'Net Banking':
-                return '#EA580C';
+                return '#D97706';
             default:
                 return '#6B7280';
         }
@@ -183,60 +215,52 @@ const PaymentSummary = () => {
     const exportToPDF = () => {
         const doc = new jsPDF();
 
-        // Header
         doc.setFontSize(18);
         doc.setFont('helvetica', 'bold');
-        doc.text('Payment Summary Report', 14, 20);
+        doc.text('Aleen Atelier - Daily Cash & Audit Ledger', 14, 20);
 
-        doc.setFontSize(11);
+        doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
-        doc.text(`Period: ${label}`, 14, 28);
-        doc.text(`Generated: ${new Date().toLocaleString('en-IN')}`, 14, 34);
-
-        // Summary
-        doc.setFontSize(12);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Summary', 14, 45);
+        doc.text(`Period: ${label} | Generated: ${new Date().toLocaleString('en-IN')}`, 14, 28);
 
         const summaryData = [
             ['Total Collections', `₹${totalCollections.toLocaleString('en-IN')}`],
             ['Total Transactions', totalTransactions.toString()],
-            ['Average Transaction', `₹${(totalCollections / totalTransactions || 0).toLocaleString('en-IN')}`]
+            ['Average Transaction Value', `₹${(totalCollections / totalTransactions || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`]
         ];
 
         autoTable(doc, {
-            startY: 50,
-            head: [['Metric', 'Value']],
+            startY: 36,
+            head: [['Financial Audit Metric', 'Value']],
             body: summaryData,
             theme: 'grid',
-            headStyles: { fillColor: [136, 14, 79] }
+            headStyles: { fillColor: [15, 118, 110] }
         });
 
-        // Payment Method Breakdown
         const paymentData = Object.entries(paymentSummary)
             .filter(([_, data]) => data.count > 0)
             .map(([method, data]) => [
                 method,
                 data.count,
                 `₹${data.total.toLocaleString('en-IN')}`,
-                `₹${(data.total / data.count).toLocaleString('en-IN')}`
+                `₹${(data.total / data.count).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
             ]);
 
         autoTable(doc, {
             startY: doc.lastAutoTable.finalY + 10,
-            head: [['Payment Method', 'Count', 'Total', 'Average']],
+            head: [['Settlement Method', 'Transactions', 'Total Collected', 'Average Ticket']],
             body: paymentData,
             theme: 'grid',
-            headStyles: { fillColor: [136, 14, 79] }
+            headStyles: { fillColor: [15, 118, 110] }
         });
 
-        doc.save(`payment-summary-${label.toLowerCase().replace(' ', '-')}-${new Date().toISOString().split('T')[0]}.pdf`);
+        doc.save(`aleen-daily-cash-ledger-${label.toLowerCase().replace(' ', '-')}-${new Date().toISOString().split('T')[0]}.pdf`);
         handleMenuClose();
     };
 
     const exportToExcel = () => {
         const summarySheet = [
-            ['Payment Summary Report'],
+            ['Aleen Atelier - Daily Cash & Audit Ledger'],
             ['Period', label],
             ['Generated', new Date().toLocaleString('en-IN')],
             [],
@@ -261,8 +285,7 @@ const PaymentSummary = () => {
         const ws = XLSX.utils.aoa_to_sheet(summarySheet);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Payment Summary');
-
-        XLSX.writeFile(wb, `payment-summary-${label.toLowerCase().replace(' ', '-')}-${new Date().toISOString().split('T')[0]}.xlsx`);
+        XLSX.writeFile(wb, `aleen_daily_cash_ledger_${label.toLowerCase().replace(' ', '-')}_${new Date().toISOString().split('T')[0]}.xlsx`);
         handleMenuClose();
     };
 
@@ -280,239 +303,383 @@ const PaymentSummary = () => {
     };
 
     return (
-        <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
-            {/* Header */}
-            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-                <Box>
-                    <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>
-                        Payment Summary
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        Track daily collections across all payment methods
+        <Box>
+            {/* Atelier Luxury Header with Breadcrumbs & Action */}
+            <PageHeader
+                title="Daily Cash Ledger & Audit"
+                subtitle="Reconcile daily counter cash, UPI collections, card transactions & POS intake"
+                breadcrumbs={[
+                    { label: 'Aleen Atelier', path: '/' },
+                    { label: 'Finance & Audit' },
+                    { label: 'Daily Cash Ledger' }
+                ]}
+                actions={
+                    <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+                        <Button
+                            variant="outlined"
+                            startIcon={<Download fontSize="small" />}
+                            onClick={handleMenuClick}
+                            sx={{
+                                px: 2.5,
+                                py: 1.1,
+                                borderRadius: 2,
+                                fontWeight: 700,
+                                fontSize: '0.825rem',
+                                borderColor: 'rgba(15, 118, 110, 0.4)',
+                                color: '#0F766E',
+                                textTransform: 'none',
+                                '&:hover': {
+                                    borderColor: '#0F766E',
+                                    bgcolor: 'rgba(15, 118, 110, 0.05)'
+                                }
+                            }}
+                        >
+                            Export Audit
+                        </Button>
+                        <Menu 
+                            anchorEl={anchorEl} 
+                            open={Boolean(anchorEl)} 
+                            onClose={handleMenuClose}
+                            PaperProps={{ sx: { borderRadius: 2.5, minWidth: 160, boxShadow: '0 8px 24px rgba(0,0,0,0.15)' } }}
+                        >
+                            <MenuItem onClick={exportToPDF}>
+                                <ListItemIcon><Download fontSize="small" sx={{ color: '#0F766E' }} /></ListItemIcon>
+                                <ListItemText primaryTypographyProps={{ fontWeight: 600, fontSize: '0.85rem' }}>Export PDF</ListItemText>
+                            </MenuItem>
+                            <MenuItem onClick={exportToExcel}>
+                                <ListItemIcon><Download fontSize="small" sx={{ color: '#0F766E' }} /></ListItemIcon>
+                                <ListItemText primaryTypographyProps={{ fontWeight: 600, fontSize: '0.85rem' }}>Export Excel</ListItemText>
+                            </MenuItem>
+                            <Divider sx={{ my: 0.5 }} />
+                            <MenuItem onClick={handlePrint}>
+                                <ListItemIcon><Print fontSize="small" /></ListItemIcon>
+                                <ListItemText primaryTypographyProps={{ fontWeight: 600, fontSize: '0.85rem' }}>Print Report</ListItemText>
+                            </MenuItem>
+                        </Menu>
+                    </Box>
+                }
+            />
+
+            {/* Finance & Audit Suite Sub-Nav Tabs */}
+            <FinanceNavTabs />
+
+            {/* Date Range Selector Bar */}
+            <GlassCard sx={{ p: 1.5, mb: 3.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <CalendarToday sx={{ fontSize: '1.1rem', color: '#0F766E' }} />
+                    <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                        Reconciliation Period:
                     </Typography>
                 </Box>
-
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                    {/* Date Range Selector */}
-                    <Box sx={{ display: 'flex', bgcolor: 'background.paper', p: 0.5, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
-                        {['today', 'yesterday', 'week', 'month'].map((range) => (
+                <Box sx={{ display: 'flex', bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(15, 118, 110, 0.04)', p: 0.5, borderRadius: 2.5 }}>
+                    {[
+                        { key: 'today', label: 'Today' },
+                        { key: 'yesterday', label: 'Yesterday' },
+                        { key: 'week', label: 'This Week' },
+                        { key: 'month', label: 'This Month' }
+                    ].map((item) => {
+                        const isSelected = dateRange === item.key;
+                        return (
                             <Button
-                                key={range}
-                                onClick={() => setDateRange(range)}
+                                key={item.key}
+                                onClick={() => {
+                                    setDateRange(item.key);
+                                    setPage(0);
+                                }}
                                 sx={{
-                                    px: 2,
+                                    px: 2.5,
                                     py: 0.75,
                                     borderRadius: 2,
-                                    textTransform: 'capitalize',
-                                    fontWeight: 600,
-                                    fontSize: '0.875rem',
-                                    color: dateRange === range ? 'white' : 'text.secondary',
-                                    bgcolor: dateRange === range ? 'primary.main' : 'transparent',
+                                    textTransform: 'none',
+                                    fontWeight: isSelected ? 800 : 600,
+                                    fontSize: '0.825rem',
+                                    color: isSelected ? '#ffffff' : 'text.secondary',
+                                    background: isSelected ? 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)' : 'transparent',
+                                    boxShadow: isSelected ? '0 2px 8px rgba(15, 118, 110, 0.25)' : 'none',
                                     '&:hover': {
-                                        bgcolor: dateRange === range ? 'primary.dark' : 'rgba(0,0,0,0.04)'
+                                        background: isSelected ? 'linear-gradient(135deg, #0b5650 0%, #021e1d 100%)' : 'rgba(15, 118, 110, 0.08)'
                                     }
                                 }}
                             >
-                                {range}
+                                {item.label}
                             </Button>
-                        ))}
-                    </Box>
-
-                    {/* Export Menu */}
-                    <IconButton onClick={handleMenuClick} sx={{ bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider' }}>
-                        <MoreVert />
-                    </IconButton>
-                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-                        <MenuItem onClick={exportToPDF}>
-                            <ListItemIcon><Download fontSize="small" /></ListItemIcon>
-                            <ListItemText>Export PDF</ListItemText>
-                        </MenuItem>
-                        <MenuItem onClick={exportToExcel}>
-                            <ListItemIcon><Download fontSize="small" /></ListItemIcon>
-                            <ListItemText>Export Excel</ListItemText>
-                        </MenuItem>
-                        <MenuItem onClick={handlePrint}>
-                            <ListItemIcon><Print fontSize="small" /></ListItemIcon>
-                            <ListItemText>Print</ListItemText>
-                        </MenuItem>
-                    </Menu>
+                        );
+                    })}
                 </Box>
-            </Box>
+            </GlassCard>
 
-            {/* Summary Cards */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-                <Grid item xs={12} md={4}>
-                    <Card elevation={0} sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-                        <CardContent>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                                <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'rgba(136, 14, 79, 0.1)' }}>
-                                    <AccountBalanceWallet sx={{ color: 'primary.main' }} />
-                                </Box>
-                                {trend !== 0 && (
-                                    <Chip
-                                        icon={trend >= 0 ? <TrendingUp fontSize="small" /> : <TrendingDown fontSize="small" />}
-                                        label={`${Math.abs(trend)}%`}
-                                        size="small"
-                                        sx={{
-                                            bgcolor: trend >= 0 ? 'rgba(5, 150, 105, 0.1)' : 'rgba(220, 38, 38, 0.1)',
-                                            color: trend >= 0 ? '#059669' : '#DC2626',
-                                            fontWeight: 700
-                                        }}
-                                    />
-                                )}
-                            </Box>
-                            <Typography variant="h4" sx={{ fontWeight: 800, mb: 0.5 }}>
-                                ₹{totalCollections.toLocaleString('en-IN')}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
-                                Total Collections
-                            </Typography>
-                        </CardContent>
-                    </Card>
+            {/* Atelier KPI Cards */}
+            <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
+                <Grid item xs={12} sm={4}>
+                    <AtelierKpiCard
+                        title="Total Collections"
+                        value={`₹${totalCollections.toLocaleString('en-IN')}`}
+                        icon={<AccountBalanceWallet fontSize="small" />}
+                        goldAccent={true}
+                        trend={trend !== 0 ? { value: `${Math.abs(trend)}% vs prev`, isPositive: trend >= 0 } : undefined}
+                        subtitle={`Gross intake for ${label.toLowerCase()}`}
+                    />
                 </Grid>
-
-                <Grid item xs={12} md={4}>
-                    <Card elevation={0} sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-                        <CardContent>
-                            <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'rgba(7, 89, 133, 0.1)', mb: 2, width: 'fit-content' }}>
-                                <CalendarToday sx={{ color: '#075985' }} />
-                            </Box>
-                            <Typography variant="h4" sx={{ fontWeight: 800, mb: 0.5 }}>
-                                {totalTransactions}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
-                                Total Transactions
-                            </Typography>
-                        </CardContent>
-                    </Card>
+                <Grid item xs={12} sm={4}>
+                    <AtelierKpiCard
+                        title="Total Transactions"
+                        value={totalTransactions}
+                        icon={<CalendarToday fontSize="small" />}
+                        subtitle={`Completed receipts in ${label.toLowerCase()}`}
+                    />
                 </Grid>
-
-                <Grid item xs={12} md={4}>
-                    <Card elevation={0} sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', height: '100%' }}>
-                        <CardContent>
-                            <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'rgba(217, 119, 6, 0.1)', mb: 2, width: 'fit-content' }}>
-                                <TrendingUp sx={{ color: '#D97706' }} />
-                            </Box>
-                            <Typography variant="h4" sx={{ fontWeight: 800, mb: 0.5 }}>
-                                ₹{(totalCollections / totalTransactions || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
-                                Average Transaction
-                            </Typography>
-                        </CardContent>
-                    </Card>
+                <Grid item xs={12} sm={4}>
+                    <AtelierKpiCard
+                        title="Average Transaction Ticket"
+                        value={`₹${(totalCollections / Math.max(1, totalTransactions)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
+                        icon={<TrendingUp fontSize="small" />}
+                        subtitle="Average sales slip size"
+                    />
                 </Grid>
             </Grid>
 
-            {/* Payment Method Breakdown */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
+            {/* Payment Method Breakdown Cards */}
+            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 800, letterSpacing: '0.08em', display: 'block', mb: 2 }}>
+                Intake by Payment Gateway & Tender
+            </Typography>
+            <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
                 {Object.entries(paymentSummary)
                     .filter(([_, data]) => data.count > 0)
-                    .map(([method, data]) => (
-                        <Grid item xs={12} sm={6} md={4} key={method}>
-                            <Card elevation={0} sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
-                                <CardContent>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                                        <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: `${getPaymentColor(method)}15` }}>
-                                            {React.cloneElement(getPaymentIcon(method), { sx: { color: getPaymentColor(method) } })}
+                    .map(([method, data]) => {
+                        const pctShare = totalCollections > 0 ? ((data.total / totalCollections) * 100).toFixed(1) : 0;
+                        const color = getPaymentColor(method);
+
+                        return (
+                            <Grid item xs={12} sm={6} md={2.4} key={method}>
+                                <GlassCard sx={{ p: 2.25, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                                    <Box>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
+                                            <Box sx={{ p: 1, borderRadius: 2, bgcolor: `${color}18`, color: color, display: 'flex' }}>
+                                                {React.cloneElement(getPaymentIcon(method), { sx: { fontSize: '1.25rem' } })}
+                                            </Box>
+                                            <Chip 
+                                                label={`${pctShare}% Share`} 
+                                                size="small" 
+                                                sx={{ height: 20, fontSize: '0.68rem', fontWeight: 800, bgcolor: `${color}15`, color: color }}
+                                            />
                                         </Box>
-                                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.25 }}>
                                             {method}
                                         </Typography>
-                                    </Box>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                        <Typography variant="body2" color="text.secondary">Amount</Typography>
-                                        <Typography variant="body1" sx={{ fontWeight: 700 }}>
+                                        <Typography variant="h6" sx={{ fontWeight: 900, color: '#0F766E', fontSize: '1.15rem' }}>
                                             ₹{data.total.toLocaleString('en-IN')}
                                         </Typography>
                                     </Box>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                        <Typography variant="body2" color="text.secondary">Transactions</Typography>
-                                        <Typography variant="body1" sx={{ fontWeight: 700 }}>
-                                            {data.count}
-                                        </Typography>
-                                    </Box>
+
+                                    {/* Breakdown of UPI providers if present */}
                                     {method === 'UPI' && data.providers && Object.keys(data.providers).length > 0 && (
-                                        <Box sx={{ mt: 1 }}>
-                                            {Object.entries(data.providers).map(([provider, amount]) => (
-                                                <Box key={provider} sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                                                    <Typography variant="caption" color="text.secondary">{provider}</Typography>
-                                                    <Typography variant="caption" sx={{ fontWeight: 600 }}>₹{amount.toLocaleString()}</Typography>
+                                        <Box sx={{ mt: 1.5, pt: 1, borderTop: '1px dashed', borderColor: 'divider' }}>
+                                            {Object.entries(data.providers).map(([provider, amt]) => (
+                                                <Box key={provider} sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.3 }}>
+                                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>{provider}</Typography>
+                                                    <Typography variant="caption" sx={{ fontWeight: 700 }}>₹{amt.toLocaleString('en-IN')}</Typography>
                                                 </Box>
                                             ))}
                                         </Box>
                                     )}
-                                    <Divider sx={{ my: 1.5 }} />
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <Typography variant="caption" color="text.secondary">Average</Typography>
-                                        <Typography variant="caption" sx={{ fontWeight: 700 }}>
-                                            ₹{(data.total / data.count).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+
+                                    <Box sx={{ mt: 1.5, pt: 1, borderTop: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between' }}>
+                                        <Typography variant="caption" color="text.secondary">{data.count} slips</Typography>
+                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                                            Avg ₹{(data.total / data.count).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                                         </Typography>
                                     </Box>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    ))}
+                                </GlassCard>
+                            </Grid>
+                        );
+                    })}
             </Grid>
 
-            {/* Transaction Details Table */}
-            <Paper elevation={0} sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
-                <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
-                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                        Transaction Details
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        {label} • {totalTransactions} transactions
-                    </Typography>
-                </Box>
+            {/* Transaction Filter Toolbar */}
+            <GlassCard sx={{ p: 2, mb: 3 }}>
+                <Grid container spacing={2} alignItems="center">
+                    <Grid item xs={12} md={6}>
+                        <TextField
+                            fullWidth
+                            size="small"
+                            placeholder="Search by invoice number, guest name, or transaction ID..."
+                            value={searchQuery}
+                            onChange={(e) => {
+                                setSearchQuery(e.target.value);
+                                setPage(0);
+                            }}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <Search fontSize="small" sx={{ color: 'text.secondary' }} />
+                                    </InputAdornment>
+                                ),
+                                endAdornment: searchQuery && (
+                                    <InputAdornment position="end">
+                                        <IconButton size="small" onClick={() => setSearchQuery('')}>
+                                            <Close fontSize="small" />
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={3.5}>
+                        <TextField
+                            select
+                            fullWidth
+                            size="small"
+                            label="Filter by Payment Method"
+                            value={methodFilter}
+                            onChange={(e) => {
+                                setMethodFilter(e.target.value);
+                                setPage(0);
+                            }}
+                        >
+                            <MenuItem value="All">All Methods ({allTransactions.length})</MenuItem>
+                            {['Cash', 'UPI', 'Card', 'Credit', 'Net Banking'].map(m => (
+                                <MenuItem key={m} value={m}>
+                                    {m}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={2.5} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        {(searchQuery || methodFilter !== 'All') && (
+                            <Button 
+                                size="small" 
+                                color="inherit" 
+                                onClick={() => {
+                                    setSearchQuery('');
+                                    setMethodFilter('All');
+                                    setPage(0);
+                                }}
+                                sx={{ textTransform: 'none', fontSize: '0.75rem', fontWeight: 600 }}
+                            >
+                                Reset Filters
+                            </Button>
+                        )}
+                    </Grid>
+                </Grid>
+            </GlassCard>
+
+            {/* Transaction Audit Details Table */}
+            <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
                 <TableContainer>
-                    <Table>
-                        <TableHead sx={{ bgcolor: 'rgba(136, 14, 79, 0.02)' }}>
+                    <Table size="small">
+                        <TableHead sx={{ bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(15, 118, 110, 0.04)' }}>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 700 }}>Invoice ID</TableCell>
-                                <TableCell sx={{ fontWeight: 700 }}>Time</TableCell>
-                                <TableCell sx={{ fontWeight: 700 }}>Customer</TableCell>
-                                <TableCell sx={{ fontWeight: 700 }}>Method</TableCell>
-                                <TableCell sx={{ fontWeight: 700 }}>Transaction ID</TableCell>
-                                <TableCell sx={{ fontWeight: 700 }} align="right">Amount</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
+                                    Invoice Ref
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
+                                    Date & Time
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
+                                    Boutique Guest / Client
+                                </TableCell>
+                                <TableCell align="center" sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
+                                    Settlement Method
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
+                                    Gateway Ref / Txn ID
+                                </TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75, pr: 2 }}>
+                                    Amount Collected
+                                </TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {Object.entries(paymentSummary)
-                                .flatMap(([method, data]) =>
-                                    data.transactions.map(txn => ({ ...txn, method }))
-                                )
-                                .sort((a, b) => new Date(b.time) - new Date(a.time))
-                                .map((txn, index) => (
-                                    <TableRow key={`${txn.id}-${index}`} sx={{ '&:hover': { bgcolor: 'action.hover' } }}>
-                                        <TableCell sx={{ fontWeight: 600 }}>#{txn.id}</TableCell>
-                                        <TableCell>{new Date(txn.time).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</TableCell>
-                                        <TableCell>{txn.customer}</TableCell>
-                                        <TableCell>
-                                            <Chip
-                                                label={txn.method === 'UPI' && txn.upiProvider ? `${txn.method} (${txn.upiProvider})` : txn.method}
-                                                size="small"
-                                                sx={{
-                                                    bgcolor: `${getPaymentColor(txn.method)}15`,
-                                                    color: getPaymentColor(txn.method),
-                                                    fontWeight: 600
-                                                }}
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
-                                                {txn.transactionId || '-'}
-                                            </Typography>
-                                        </TableCell>
-                                        <TableCell align="right" sx={{ fontWeight: 700 }}>
-                                            ₹{txn.amount.toLocaleString('en-IN')}
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                            {paginatedTransactions.length > 0 ? (
+                                paginatedTransactions.map((txn, index) => {
+                                    const methodColor = getPaymentColor(txn.method);
+
+                                    return (
+                                        <TableRow 
+                                            key={`${txn.id}-${index}`} 
+                                            hover
+                                            sx={{ '&:hover': { bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(15, 118, 110, 0.02)' } }}
+                                        >
+                                            <TableCell sx={{ py: 1.75 }}>
+                                                <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary', fontFamily: 'monospace' }}>
+                                                    #{txn.id}
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell sx={{ py: 1.75 }}>
+                                                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                                    {new Date(txn.time).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                                                </Typography>
+                                                <Typography variant="caption" color="text.secondary" display="block">
+                                                    {new Date(txn.time).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell sx={{ py: 1.75 }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <Avatar sx={{ width: 26, height: 26, fontSize: '0.7rem', bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E', fontWeight: 800 }}>
+                                                        {(txn.customer || 'G').charAt(0).toUpperCase()}
+                                                    </Avatar>
+                                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                                        {txn.customer}
+                                                    </Typography>
+                                                </Box>
+                                            </TableCell>
+                                            <TableCell align="center" sx={{ py: 1.75 }}>
+                                                <Chip
+                                                    label={txn.method === 'UPI' && txn.upiProvider ? `${txn.method} (${txn.upiProvider})` : txn.method}
+                                                    size="small"
+                                                    sx={{
+                                                        bgcolor: `${methodColor}18`,
+                                                        color: methodColor,
+                                                        border: `1px solid ${methodColor}33`,
+                                                        fontWeight: 800,
+                                                        fontSize: '0.72rem'
+                                                    }}
+                                                />
+                                            </TableCell>
+                                            <TableCell sx={{ py: 1.75 }}>
+                                                <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.78rem', color: txn.transactionId ? 'text.primary' : 'text.secondary' }}>
+                                                    {txn.transactionId || 'Counter POS'}
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell align="right" sx={{ py: 1.75, pr: 2 }}>
+                                                <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#0F766E', fontSize: '0.95rem' }}>
+                                                    ₹{txn.amount.toLocaleString('en-IN')}
+                                                </Typography>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
+                                        <AccountBalanceWallet sx={{ fontSize: 44, color: 'text.secondary', opacity: 0.4, mb: 1 }} />
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.secondary' }}>
+                                            No payment transactions found for this period.
+                                        </Typography>
+                                        <Typography variant="caption" color="text.secondary">
+                                            Try selecting a different date range or clearing your search filters.
+                                        </Typography>
+                                    </TableCell>
+                                </TableRow>
+                            )}
                         </TableBody>
                     </Table>
                 </TableContainer>
-            </Paper>
+
+                <TablePagination
+                    rowsPerPageOptions={[10, 25, 50]}
+                    component="div"
+                    count={allTransactions.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={(e, newPage) => setPage(newPage)}
+                    onRowsPerPageChange={(e) => {
+                        setRowsPerPage(parseInt(e.target.value, 10));
+                        setPage(0);
+                    }}
+                    sx={{ borderTop: '1px solid', borderColor: 'divider' }}
+                />
+            </GlassCard>
         </Box>
     );
 };

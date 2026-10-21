@@ -42,7 +42,11 @@ import {
   PointOfSale,
   Add,
   Circle,
-  Straighten
+  Straighten,
+  ReceiptLong,
+  Insights,
+  BarChart,
+  FactCheck
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
@@ -131,10 +135,10 @@ export default function Layout() {
       items: [
         { text: 'Daily Cash Ledger', icon: <AccountBalanceWallet />, path: '/payment-summary', adminOnly: true },
         { text: 'Profit & Loss', icon: <TrendingUp />, path: '/profit-loss', adminOnly: true },
-        { text: 'Expenses', icon: <AccountBalanceWallet />, path: '/expenses', adminOnly: true },
-        { text: 'Advanced Analytics', icon: <Assessment />, path: '/advanced-reports', adminOnly: true },
-        { text: 'Sales Reports', icon: <Assessment />, path: '/sales-reports' },
-        { text: 'Stock Reports', icon: <Assessment />, path: '/inventory-reports' }
+        { text: 'Expenses Register', icon: <ReceiptLong />, path: '/expenses', adminOnly: true },
+        { text: 'Advanced Analytics', icon: <Insights />, path: '/advanced-reports', adminOnly: true },
+        { text: 'Sales Reports', icon: <BarChart />, path: '/sales-reports' },
+        { text: 'Stock Audit', icon: <FactCheck />, path: '/inventory-reports' }
       ]
     },
     {

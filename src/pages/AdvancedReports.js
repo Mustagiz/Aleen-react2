@@ -3,8 +3,6 @@ import {
     Box,
     Typography,
     Grid,
-    Card,
-    CardContent,
     Paper,
     Table,
     TableBody,
@@ -15,38 +13,29 @@ import {
     Button,
     Tabs,
     Tab,
-    IconButton,
-    Menu,
-    MenuItem,
-    ListItemIcon,
-    ListItemText,
-    Chip,
-    LinearProgress,
-    useTheme
+    Chip
 } from '@mui/material';
 import {
-    TrendingUp,
-    TrendingDown,
     Download,
     Print,
-    MoreVert,
     ShowChart,
     People,
     ShoppingCart,
     AttachMoney
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
-import { Bar, Line } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import PageHeader from '../components/crm/PageHeader';
+import FinanceNavTabs from '../components/crm/FinanceNavTabs';
+import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 
 const AdvancedReports = () => {
-    const { invoices, inventory, customers } = useData();
-    const theme = useTheme();
+    const { invoices, inventory } = useData();
     const [activeTab, setActiveTab] = useState(0);
     const [dateRange, setDateRange] = useState('month');
-    const [anchorEl, setAnchorEl] = useState(null);
 
     const getDateRange = () => {
         const now = new Date();
@@ -86,7 +75,6 @@ const AdvancedReports = () => {
                 const revenue = item.price * item.quantity;
                 const costTotal = cost * item.quantity;
                 const profit = revenue - costTotal;
-                const margin = revenue > 0 ? (profit / revenue) * 100 : 0;
 
                 if (!categoryData[category]) {
                     categoryData[category] = {
@@ -120,9 +108,10 @@ const AdvancedReports = () => {
 
         filteredInvoices.forEach(inv => {
             inv.items?.forEach(item => {
-                const key = item.id || item.name;
-                if (!productSales[key]) {
-                    productSales[key] = {
+                const id = item.id || item.name;
+                if (!productSales[id]) {
+                    productSales[id] = {
+                        id,
                         name: item.name,
                         category: item.category || 'General',
                         quantity: 0,
@@ -130,74 +119,73 @@ const AdvancedReports = () => {
                         transactions: 0
                     };
                 }
-                productSales[key].quantity += item.quantity;
-                productSales[key].revenue += item.price * item.quantity;
-                productSales[key].transactions += 1;
+                productSales[id].quantity += item.quantity;
+                productSales[id].revenue += item.price * item.quantity;
+                productSales[id].transactions += 1;
             });
         });
 
-        return Object.entries(productSales)
-            .map(([id, data]) => {
-                const invItem = inventory.find(i => i.id === id);
+        return Object.values(productSales)
+            .map(product => {
+                const invItem = inventory.find(i => i.id === product.id);
                 return {
-                    id,
-                    name: data.name,
-                    category: data.category,
-                    quantity: data.quantity,
-                    revenue: data.revenue,
-                    transactions: data.transactions,
-                    stock: invItem?.quantity || 0,
-                    avgPrice: data.revenue / data.quantity
+                    ...product,
+                    stock: invItem?.quantity || 0
                 };
             })
-            .sort((a, b) => b.quantity - a.quantity)
-            .slice(0, 20);
+            .sort((a, b) => b.quantity - a.quantity);
     };
 
-    // 3. CUSTOMER PURCHASE FREQUENCY
+    // 3. CUSTOMER FREQUENCY ANALYSIS
     const calculateCustomerFrequency = () => {
-        const customerData = customers.map(customer => {
-            const customerInvoices = invoices.filter(inv => inv.customerId === customer.id);
-            const totalSpent = customerInvoices.reduce((sum, inv) => sum + inv.total, 0);
-            const purchaseCount = customerInvoices.length;
+        const customerData = {};
 
-            // Calculate days between purchases
-            const dates = customerInvoices.map(inv => new Date(inv.date)).sort((a, b) => a - b);
-            let avgDaysBetween = 0;
-            if (dates.length > 1) {
-                const intervals = [];
-                for (let i = 1; i < dates.length; i++) {
-                    intervals.push((dates[i] - dates[i - 1]) / (1000 * 60 * 60 * 24));
-                }
-                avgDaysBetween = intervals.reduce((sum, val) => sum + val, 0) / intervals.length;
+        invoices.forEach(inv => {
+            const customerId = inv.customer?.phone || inv.customer?.name || 'Walk-in';
+            if (customerId === 'Walk-in') return;
+
+            if (!customerData[customerId]) {
+                customerData[customerId] = {
+                    id: customerId,
+                    name: inv.customer?.name || 'Unknown',
+                    phone: inv.customer?.phone || '',
+                    purchases: [],
+                    totalSpent: 0
+                };
             }
 
-            const lastPurchase = dates.length > 0 ? dates[dates.length - 1] : null;
-            const daysSinceLastPurchase = lastPurchase ? (new Date() - lastPurchase) / (1000 * 60 * 60 * 24) : 999;
+            customerData[customerId].purchases.push(new Date(inv.date));
+            customerData[customerId].totalSpent += inv.total;
+        });
 
-            let segment = 'New';
-            if (purchaseCount >= 10) segment = 'VIP';
-            else if (purchaseCount >= 5) segment = 'Loyal';
-            else if (purchaseCount >= 2) segment = 'Regular';
+        const now = new Date();
+        return Object.values(customerData).map(customer => {
+            const purchases = customer.purchases.sort((a, b) => a - b);
+            const purchaseCount = purchases.length;
+            const lastPurchase = purchases[purchases.length - 1];
+            const daysSinceLastPurchase = Math.floor((now - lastPurchase) / (1000 * 60 * 60 * 24));
 
-            const atRisk = daysSinceLastPurchase > 90;
+            let avgDaysBetween = 0;
+            if (purchaseCount > 1) {
+                const firstPurchase = purchases[0];
+                const totalDays = (lastPurchase - firstPurchase) / (1000 * 60 * 60 * 24);
+                avgDaysBetween = Math.round(totalDays / (purchaseCount - 1));
+            }
+
+            let segment = 'One-Time';
+            if (purchaseCount >= 5) segment = 'VIP';
+            else if (purchaseCount >= 3) segment = 'Loyal';
+            else if (purchaseCount === 2) segment = 'Repeat';
 
             return {
-                id: customer.id,
-                name: customer.name,
-                phone: customer.phone,
+                ...customer,
                 purchaseCount,
-                totalSpent,
-                avgDaysBetween: Math.round(avgDaysBetween),
-                daysSinceLastPurchase: Math.round(daysSinceLastPurchase),
+                avgDaysBetween,
+                daysSinceLastPurchase,
                 segment,
-                atRisk,
-                avgOrderValue: purchaseCount > 0 ? totalSpent / purchaseCount : 0
+                atRisk: daysSinceLastPurchase > 90 && purchaseCount > 1
             };
-        }).filter(c => c.purchaseCount > 0)
-            .sort((a, b) => b.purchaseCount - a.purchaseCount);
-
-        return customerData;
+        }).sort((a, b) => b.totalSpent - a.totalSpent);
     };
 
     // 4. AOV TRENDS
@@ -205,21 +193,21 @@ const AdvancedReports = () => {
         const dailyData = {};
 
         filteredInvoices.forEach(inv => {
-            const date = new Date(inv.date).toLocaleDateString('en-IN');
+            const date = new Date(inv.date).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
             if (!dailyData[date]) {
-                dailyData[date] = { total: 0, count: 0 };
+                dailyData[date] = {
+                    date,
+                    revenue: 0,
+                    orders: 0
+                };
             }
-            dailyData[date].total += inv.total;
-            dailyData[date].count += 1;
+            dailyData[date].revenue += inv.total;
+            dailyData[date].orders += 1;
         });
 
-        const sortedDates = Object.keys(dailyData).sort((a, b) => new Date(a) - new Date(b));
-
-        return sortedDates.map(date => ({
-            date,
-            aov: dailyData[date].total / dailyData[date].count,
-            orders: dailyData[date].count,
-            revenue: dailyData[date].total
+        return Object.values(dailyData).map(day => ({
+            ...day,
+            aov: day.orders > 0 ? day.revenue / day.orders : 0
         }));
     };
 
@@ -228,29 +216,16 @@ const AdvancedReports = () => {
     const customerFrequency = calculateCustomerFrequency();
     const aovTrends = calculateAOVTrends();
 
+    // Summary Metrics
     const totalRevenue = filteredInvoices.reduce((sum, inv) => sum + inv.total, 0);
-    const totalCost = filteredInvoices.reduce((sum, inv) => {
-        return sum + (inv.items?.reduce((itemSum, item) => {
-            const invItem = inventory.find(i => i.id === item.id);
-            return itemSum + ((invItem?.cost || 0) * item.quantity);
-        }, 0) || 0);
-    }, 0);
-    const totalProfit = totalRevenue - totalCost;
+    const totalProfit = profitData.reduce((sum, p) => sum + p.profit, 0);
     const overallMargin = totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
     const avgAOV = filteredInvoices.length > 0 ? totalRevenue / filteredInvoices.length : 0;
-
-    const handleMenuClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
+    const atRiskCount = customerFrequency.filter(c => c.atRisk).length;
 
     const exportToExcel = () => {
         const wb = XLSX.utils.book_new();
 
-        // Profit Margin Sheet
         const profitSheet = XLSX.utils.json_to_sheet(profitData.map(p => ({
             Category: p.category,
             Revenue: p.revenue,
@@ -261,7 +236,6 @@ const AdvancedReports = () => {
         })));
         XLSX.utils.book_append_sheet(wb, profitSheet, 'Profit Margin');
 
-        // Best Sellers Sheet
         const sellersSheet = XLSX.utils.json_to_sheet(bestSellers.map(s => ({
             Product: s.name,
             Category: s.category,
@@ -272,7 +246,6 @@ const AdvancedReports = () => {
         })));
         XLSX.utils.book_append_sheet(wb, sellersSheet, 'Best Sellers');
 
-        // Customer Frequency Sheet
         const frequencySheet = XLSX.utils.json_to_sheet(customerFrequency.map(c => ({
             Customer: c.name,
             Phone: c.phone,
@@ -285,8 +258,7 @@ const AdvancedReports = () => {
         })));
         XLSX.utils.book_append_sheet(wb, frequencySheet, 'Customer Frequency');
 
-        XLSX.writeFile(wb, `advanced-reports-${label.toLowerCase().replace(' ', '-')}-${new Date().toISOString().split('T')[0]}.xlsx`);
-        handleMenuClose();
+        XLSX.writeFile(wb, `advanced-analytics-${label.toLowerCase().replace(' ', '-')}-${new Date().toISOString().split('T')[0]}.xlsx`);
     };
 
     const exportToPDF = () => {
@@ -294,262 +266,318 @@ const AdvancedReports = () => {
 
         doc.setFontSize(18);
         doc.setFont('helvetica', 'bold');
-        doc.text('Advanced Business Reports', 14, 20);
+        doc.text('Aleen Haute Couture - Business Intelligence & Analytics', 14, 20);
 
-        doc.setFontSize(11);
+        doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
-        doc.text(`Period: ${label}`, 14, 28);
-        doc.text(`Generated: ${new Date().toLocaleString('en-IN')}`, 14, 34);
+        doc.text(`Period: ${label}  |  Generated: ${new Date().toLocaleString('en-IN')}`, 14, 28);
 
         // Profit Margin Table
         doc.setFontSize(12);
         doc.setFont('helvetica', 'bold');
-        doc.text('Profit Margin by Category', 14, 45);
+        doc.text('Profit Margin by Category', 14, 40);
 
         autoTable(doc, {
-            startY: 50,
-            head: [['Category', 'Revenue', 'Profit', 'Margin %']],
+            startY: 45,
+            head: [['Category', 'Revenue', 'Cost', 'Net Profit', 'Margin %', 'Units Sold']],
             body: profitData.map(p => [
                 p.category,
                 `₹${p.revenue.toLocaleString('en-IN')}`,
+                `₹${p.cost.toLocaleString('en-IN')}`,
                 `₹${p.profit.toLocaleString('en-IN')}`,
-                `${p.margin.toFixed(2)}%`
+                `${p.margin.toFixed(2)}%`,
+                p.quantity
             ]),
             theme: 'grid',
-            headStyles: { fillColor: [136, 14, 79] }
+            headStyles: { fillColor: [15, 118, 110] },
+            columnStyles: {
+                1: { halign: 'right' },
+                2: { halign: 'right' },
+                3: { halign: 'right' },
+                4: { halign: 'right' },
+                5: { halign: 'right' }
+            }
         });
 
         // Best Sellers Table
         doc.addPage();
         doc.setFontSize(12);
         doc.setFont('helvetica', 'bold');
-        doc.text('Best Sellers', 14, 20);
+        doc.text('Top Performing Creations (Best Sellers)', 14, 20);
 
         autoTable(doc, {
             startY: 25,
-            head: [['Product', 'Category', 'Units Sold', 'Revenue']],
-            body: bestSellers.slice(0, 15).map(s => [
+            head: [['Product', 'Category', 'Units Sold', 'Revenue', 'Txns', 'In Stock']],
+            body: bestSellers.slice(0, 20).map(s => [
                 s.name,
                 s.category,
                 s.quantity,
-                `₹${s.revenue.toLocaleString('en-IN')}`
+                `₹${s.revenue.toLocaleString('en-IN')}`,
+                s.transactions,
+                s.stock
             ]),
             theme: 'grid',
-            headStyles: { fillColor: [136, 14, 79] }
+            headStyles: { fillColor: [15, 118, 110] },
+            columnStyles: {
+                2: { halign: 'right' },
+                3: { halign: 'right' },
+                4: { halign: 'right' },
+                5: { halign: 'right' }
+            }
         });
 
-        doc.save(`advanced-reports-${label.toLowerCase().replace(' ', '-')}-${new Date().toISOString().split('T')[0]}.pdf`);
-        handleMenuClose();
+        doc.save(`advanced-analytics-${label.toLowerCase().replace(' ', '-')}-${new Date().toISOString().split('T')[0]}.pdf`);
     };
 
     const handlePrint = () => {
         window.print();
-        handleMenuClose();
     };
 
     return (
-        <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
-            {/* Header */}
-            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-                <Box>
-                    <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>
-                        Advanced Reports
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        Detailed business intelligence and analytics
-                    </Typography>
-                </Box>
+        <Box sx={{ maxWidth: 1400, mx: 'auto', p: { xs: 2, md: 3 } }}>
+            {/* Top Atelier Header */}
+            <PageHeader
+                title="Advanced Analytics & BI"
+                subtitle={`In-depth intelligence on margins, bestseller items, repeat retention, and basket size for ${label}`}
+                actions={
+                    <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
+                        {/* Period Pills */}
+                        <Box sx={{
+                            display: 'flex',
+                            bgcolor: 'background.paper',
+                            p: 0.5,
+                            borderRadius: 3,
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
+                        }}>
+                            {[
+                                { id: 'week', label: 'Week' },
+                                { id: 'month', label: 'Month' },
+                                { id: 'year', label: 'Year' }
+                            ].map((tab) => (
+                                <Button
+                                    key={tab.id}
+                                    size="small"
+                                    onClick={() => setDateRange(tab.id)}
+                                    sx={{
+                                        px: 2,
+                                        py: 0.5,
+                                        borderRadius: 2.5,
+                                        textTransform: 'none',
+                                        fontWeight: 700,
+                                        fontSize: '0.8rem',
+                                        color: dateRange === tab.id ? '#FFFFFF' : 'text.secondary',
+                                        bgcolor: dateRange === tab.id ? '#0F766E' : 'transparent',
+                                        '&:hover': {
+                                            bgcolor: dateRange === tab.id ? '#042F2E' : 'rgba(15, 118, 110, 0.08)'
+                                        }
+                                    }}
+                                >
+                                    {tab.label}
+                                </Button>
+                            ))}
+                        </Box>
 
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                    {/* Date Range Selector */}
-                    <Box sx={{ display: 'flex', bgcolor: 'background.paper', p: 0.5, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
-                        {['week', 'month', 'year'].map((range) => (
-                            <Button
-                                key={range}
-                                onClick={() => setDateRange(range)}
-                                sx={{
-                                    px: 2,
-                                    py: 0.75,
-                                    borderRadius: 2,
-                                    textTransform: 'capitalize',
-                                    fontWeight: 600,
-                                    fontSize: '0.875rem',
-                                    color: dateRange === range ? 'white' : 'text.secondary',
-                                    bgcolor: dateRange === range ? 'primary.main' : 'transparent',
-                                    '&:hover': {
-                                        bgcolor: dateRange === range ? 'primary.dark' : 'rgba(0,0,0,0.04)'
-                                    }
-                                }}
-                            >
-                                {range}
-                            </Button>
-                        ))}
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={exportToPDF}
+                            startIcon={<Download />}
+                            sx={{
+                                borderColor: 'divider',
+                                color: 'text.primary',
+                                borderRadius: 2.5,
+                                textTransform: 'none',
+                                fontWeight: 700,
+                                px: 2,
+                                '&:hover': { borderColor: '#0F766E', bgcolor: 'rgba(15, 118, 110, 0.04)' }
+                            }}
+                        >
+                            PDF
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={exportToExcel}
+                            startIcon={<Download />}
+                            sx={{
+                                borderColor: 'divider',
+                                color: 'text.primary',
+                                borderRadius: 2.5,
+                                textTransform: 'none',
+                                fontWeight: 700,
+                                px: 2,
+                                '&:hover': { borderColor: '#0F766E', bgcolor: 'rgba(15, 118, 110, 0.04)' }
+                            }}
+                        >
+                            Excel
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={handlePrint}
+                            startIcon={<Print />}
+                            sx={{
+                                borderColor: 'divider',
+                                color: 'text.primary',
+                                borderRadius: 2.5,
+                                textTransform: 'none',
+                                fontWeight: 700,
+                                px: 2,
+                                '&:hover': { borderColor: '#0F766E', bgcolor: 'rgba(15, 118, 110, 0.04)' }
+                            }}
+                        >
+                            Print
+                        </Button>
                     </Box>
+                }
+            />
 
-                    {/* Export Menu */}
-                    <IconButton onClick={handleMenuClick} sx={{ bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider' }}>
-                        <MoreVert />
-                    </IconButton>
-                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-                        <MenuItem onClick={exportToPDF}>
-                            <ListItemIcon><Download fontSize="small" /></ListItemIcon>
-                            <ListItemText>Export PDF</ListItemText>
-                        </MenuItem>
-                        <MenuItem onClick={exportToExcel}>
-                            <ListItemIcon><Download fontSize="small" /></ListItemIcon>
-                            <ListItemText>Export Excel</ListItemText>
-                        </MenuItem>
-                        <MenuItem onClick={handlePrint}>
-                            <ListItemIcon><Print fontSize="small" /></ListItemIcon>
-                            <ListItemText>Print</ListItemText>
-                        </MenuItem>
-                    </Menu>
-                </Box>
-            </Box>
+            {/* Seamless Finance & Audit Navigation Tab Switcher */}
+            <FinanceNavTabs activeTab="/advanced-reports" />
 
-            {/* Summary Cards */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
+            {/* 4 Atelier Intelligence KPIs */}
+            <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
                 <Grid item xs={12} sm={6} md={3}>
-                    <Card elevation={0} sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
-                        <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                                <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'rgba(5, 150, 105, 0.1)' }}>
-                                    <AttachMoney sx={{ color: '#059669' }} />
-                                </Box>
-                                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
-                                    Total Profit
-                                </Typography>
-                            </Box>
-                            <Typography variant="h4" sx={{ fontWeight: 800, mb: 0.5 }}>
-                                ₹{totalProfit.toLocaleString('en-IN')}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                                {overallMargin.toFixed(2)}% margin
-                            </Typography>
-                        </CardContent>
-                    </Card>
+                    <AtelierKpiCard
+                        title="Net Gross Profit"
+                        value={`₹${totalProfit.toLocaleString('en-IN')}`}
+                        subtitle={`${overallMargin.toFixed(1)}% blended margin across ${filteredInvoices.length} invoices`}
+                        icon={<AttachMoney />}
+                        color="success"
+                        delta={{
+                            text: `${overallMargin.toFixed(0)}% Margin`,
+                            isPositive: overallMargin >= 30
+                        }}
+                    />
                 </Grid>
-
                 <Grid item xs={12} sm={6} md={3}>
-                    <Card elevation={0} sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
-                        <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                                <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'rgba(136, 14, 79, 0.1)' }}>
-                                    <ShoppingCart sx={{ color: 'primary.main' }} />
-                                </Box>
-                                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
-                                    Avg Order Value
-                                </Typography>
-                            </Box>
-                            <Typography variant="h4" sx={{ fontWeight: 800 }}>
-                                ₹{avgAOV.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
-                            </Typography>
-                        </CardContent>
-                    </Card>
+                    <AtelierKpiCard
+                        title="Avg Order Value (AOV)"
+                        value={`₹${avgAOV.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
+                        subtitle="Average checkout basket size"
+                        icon={<ShoppingCart />}
+                        color="primary"
+                    />
                 </Grid>
-
                 <Grid item xs={12} sm={6} md={3}>
-                    <Card elevation={0} sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
-                        <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                                <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'rgba(217, 119, 6, 0.1)' }}>
-                                    <ShowChart sx={{ color: '#D97706' }} />
-                                </Box>
-                                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
-                                    Best Category
-                                </Typography>
-                            </Box>
-                            <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                                {profitData[0]?.category || 'N/A'}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                                ₹{(profitData[0]?.profit || 0).toLocaleString('en-IN')} profit
-                            </Typography>
-                        </CardContent>
-                    </Card>
+                    <AtelierKpiCard
+                        title="Top Performing Category"
+                        value={profitData[0]?.category || 'N/A'}
+                        subtitle={profitData[0] ? `₹${profitData[0].profit.toLocaleString('en-IN')} net earnings` : 'No sales yet'}
+                        icon={<ShowChart />}
+                        color="warning"
+                    />
                 </Grid>
-
                 <Grid item xs={12} sm={6} md={3}>
-                    <Card elevation={0} sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
-                        <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                                <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'rgba(124, 58, 237, 0.1)' }}>
-                                    <People sx={{ color: '#7C3AED' }} />
-                                </Box>
-                                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
-                                    At-Risk Customers
-                                </Typography>
-                            </Box>
-                            <Typography variant="h4" sx={{ fontWeight: 800 }}>
-                                {customerFrequency.filter(c => c.atRisk).length}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                                No purchase in 90+ days
-                            </Typography>
-                        </CardContent>
-                    </Card>
+                    <AtelierKpiCard
+                        title="At-Risk Clients"
+                        value={atRiskCount}
+                        subtitle="Prior buyers inactive for 90+ days"
+                        icon={<People />}
+                        color={atRiskCount > 0 ? "error" : "success"}
+                    />
                 </Grid>
             </Grid>
 
-            {/* Tabs */}
-            <Paper elevation={0} sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
-                <Tabs
-                    value={activeTab}
-                    onChange={(e, newValue) => setActiveTab(newValue)}
-                    sx={{
-                        borderBottom: '1px solid',
-                        borderColor: 'divider',
-                        '& .MuiTab-root': {
-                            textTransform: 'none',
-                            fontWeight: 600,
-                            fontSize: '0.875rem'
-                        }
-                    }}
-                >
-                    <Tab label="Profit Margin by Category" />
-                    <Tab label="Best Sellers" />
-                    <Tab label="Customer Frequency" />
-                    <Tab label="AOV Trends" />
-                </Tabs>
+            {/* Analytic Deep Dives with Integrated Subtabs */}
+            <Paper
+                elevation={0}
+                sx={{
+                    borderRadius: 3.5,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    overflow: 'hidden',
+                    boxShadow: '0 4px 20px -4px rgba(15, 118, 110, 0.08)'
+                }}
+            >
+                <Box sx={{ borderBottom: '1px solid', borderColor: 'divider', px: 2, pt: 1, bgcolor: 'rgba(15, 118, 110, 0.02)' }}>
+                    <Tabs
+                        value={activeTab}
+                        onChange={(e, newValue) => setActiveTab(newValue)}
+                        textColor="primary"
+                        indicatorColor="primary"
+                        sx={{
+                            '& .MuiTab-root': {
+                                textTransform: 'none',
+                                fontWeight: 700,
+                                fontSize: '0.9rem',
+                                minHeight: 48,
+                                color: 'text.secondary',
+                                '&.Mui-selected': {
+                                    color: '#0F766E'
+                                }
+                            },
+                            '& .MuiTabs-indicator': {
+                                backgroundColor: '#0F766E',
+                                height: 3,
+                                borderRadius: '3px 3px 0 0'
+                            }
+                        }}
+                    >
+                        <Tab label="Profit Margin by Category" />
+                        <Tab label="Best Sellers" />
+                        <Tab label="Customer Frequency & Retention" />
+                        <Tab label="AOV Daily Trends" />
+                    </Tabs>
+                </Box>
 
-                <Box sx={{ p: 3 }}>
-                    {/* Tab 1: Profit Margin */}
+                <Box sx={{ p: { xs: 2, md: 3 } }}>
+                    {/* Tab 1: Profit Margin by Category */}
                     {activeTab === 0 && (
-                        <TableContainer>
+                        <TableContainer sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                             <Table>
-                                <TableHead sx={{ bgcolor: 'rgba(136, 14, 79, 0.02)' }}>
+                                <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
                                     <TableRow>
-                                        <TableCell sx={{ fontWeight: 700 }}>Category</TableCell>
-                                        <TableCell sx={{ fontWeight: 700 }} align="right">Revenue</TableCell>
-                                        <TableCell sx={{ fontWeight: 700 }} align="right">Cost</TableCell>
-                                        <TableCell sx={{ fontWeight: 700 }} align="right">Profit</TableCell>
-                                        <TableCell sx={{ fontWeight: 700 }} align="right">Margin %</TableCell>
-                                        <TableCell sx={{ fontWeight: 700 }} align="right">Units Sold</TableCell>
+                                        <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Category</TableCell>
+                                        <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Gross Revenue</TableCell>
+                                        <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Estimated Cost</TableCell>
+                                        <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Net Profit</TableCell>
+                                        <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Margin %</TableCell>
+                                        <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Units Sold</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {profitData.map((row) => (
-                                        <TableRow key={row.category} hover>
-                                            <TableCell sx={{ fontWeight: 600 }}>{row.category}</TableCell>
-                                            <TableCell align="right">₹{row.revenue.toLocaleString('en-IN')}</TableCell>
-                                            <TableCell align="right">₹{row.cost.toLocaleString('en-IN')}</TableCell>
-                                            <TableCell align="right" sx={{ fontWeight: 700, color: row.profit >= 0 ? 'success.main' : 'error.main' }}>
-                                                ₹{row.profit.toLocaleString('en-IN')}
+                                    {profitData.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={6} align="center" sx={{ py: 6, color: 'text.secondary' }}>
+                                                No category sales data recorded in this period.
                                             </TableCell>
-                                            <TableCell align="right">
-                                                <Chip
-                                                    label={`${row.margin.toFixed(2)}%`}
-                                                    size="small"
-                                                    sx={{
-                                                        bgcolor: row.margin >= 30 ? 'rgba(5, 150, 105, 0.1)' : row.margin >= 15 ? 'rgba(245, 158, 11, 0.1)' : 'rgba(220, 38, 38, 0.1)',
-                                                        color: row.margin >= 30 ? '#059669' : row.margin >= 15 ? '#F59E0B' : '#DC2626',
-                                                        fontWeight: 700
-                                                    }}
-                                                />
-                                            </TableCell>
-                                            <TableCell align="right">{row.quantity}</TableCell>
                                         </TableRow>
-                                    ))}
+                                    ) : (
+                                        profitData.map((row) => (
+                                            <TableRow key={row.category} hover sx={{ '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.02)' } }}>
+                                                <TableCell sx={{ fontWeight: 700, color: 'text.primary' }}>
+                                                    {row.category}
+                                                </TableCell>
+                                                <TableCell align="right" sx={{ fontWeight: 600 }}>
+                                                    ₹{row.revenue.toLocaleString('en-IN')}
+                                                </TableCell>
+                                                <TableCell align="right" sx={{ color: 'text.secondary' }}>
+                                                    ₹{row.cost.toLocaleString('en-IN')}
+                                                </TableCell>
+                                                <TableCell align="right" sx={{ fontWeight: 800, color: row.profit >= 0 ? '#0F766E' : '#DC2626' }}>
+                                                    ₹{row.profit.toLocaleString('en-IN')}
+                                                </TableCell>
+                                                <TableCell align="right">
+                                                    <Chip
+                                                        label={`${row.margin.toFixed(1)}%`}
+                                                        size="small"
+                                                        sx={{
+                                                            bgcolor: row.margin >= 30 ? 'rgba(15, 118, 110, 0.1)' : row.margin >= 15 ? 'rgba(217, 119, 6, 0.1)' : 'rgba(220, 38, 38, 0.1)',
+                                                            color: row.margin >= 30 ? '#0F766E' : row.margin >= 15 ? '#D97706' : '#DC2626',
+                                                            fontWeight: 800,
+                                                            fontSize: '0.75rem'
+                                                        }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell align="right" sx={{ fontWeight: 700 }}>
+                                                    {row.quantity}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
                                 </TableBody>
                             </Table>
                         </TableContainer>
@@ -557,51 +585,76 @@ const AdvancedReports = () => {
 
                     {/* Tab 2: Best Sellers */}
                     {activeTab === 1 && (
-                        <TableContainer>
+                        <TableContainer sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                             <Table>
-                                <TableHead sx={{ bgcolor: 'rgba(136, 14, 79, 0.02)' }}>
+                                <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
                                     <TableRow>
-                                        <TableCell sx={{ fontWeight: 700 }}>Rank</TableCell>
-                                        <TableCell sx={{ fontWeight: 700 }}>Product</TableCell>
-                                        <TableCell sx={{ fontWeight: 700 }}>Category</TableCell>
-                                        <TableCell sx={{ fontWeight: 700 }} align="right">Units Sold</TableCell>
-                                        <TableCell sx={{ fontWeight: 700 }} align="right">Revenue</TableCell>
-                                        <TableCell sx={{ fontWeight: 700 }} align="right">Transactions</TableCell>
-                                        <TableCell sx={{ fontWeight: 700 }} align="right">Stock Status</TableCell>
+                                        <TableCell sx={{ fontWeight: 800, color: '#042F2E', width: 80 }} align="center">Rank</TableCell>
+                                        <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Creations / Item</TableCell>
+                                        <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Category</TableCell>
+                                        <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Units Sold</TableCell>
+                                        <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Revenue Generated</TableCell>
+                                        <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Invoices</TableCell>
+                                        <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="center">Stock Level</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {bestSellers.map((product, index) => (
-                                        <TableRow key={product.id} hover>
-                                            <TableCell>
-                                                <Chip
-                                                    label={`#${index + 1}`}
-                                                    size="small"
-                                                    sx={{
-                                                        bgcolor: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : 'rgba(0,0,0,0.08)',
-                                                        color: index < 3 ? 'white' : 'text.primary',
-                                                        fontWeight: 700
-                                                    }}
-                                                />
-                                            </TableCell>
-                                            <TableCell sx={{ fontWeight: 600 }}>{product.name}</TableCell>
-                                            <TableCell>{product.category}</TableCell>
-                                            <TableCell align="right" sx={{ fontWeight: 700 }}>{product.quantity}</TableCell>
-                                            <TableCell align="right">₹{product.revenue.toLocaleString('en-IN')}</TableCell>
-                                            <TableCell align="right">{product.transactions}</TableCell>
-                                            <TableCell align="right">
-                                                <Chip
-                                                    label={product.stock > 10 ? 'In Stock' : product.stock > 0 ? 'Low Stock' : 'Out of Stock'}
-                                                    size="small"
-                                                    sx={{
-                                                        bgcolor: product.stock > 10 ? 'rgba(5, 150, 105, 0.1)' : product.stock > 0 ? 'rgba(245, 158, 11, 0.1)' : 'rgba(220, 38, 38, 0.1)',
-                                                        color: product.stock > 10 ? '#059669' : product.stock > 0 ? '#F59E0B' : '#DC2626',
-                                                        fontWeight: 600
-                                                    }}
-                                                />
+                                    {bestSellers.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={7} align="center" sx={{ py: 6, color: 'text.secondary' }}>
+                                                No item volume sales recorded in this period.
                                             </TableCell>
                                         </TableRow>
-                                    ))}
+                                    ) : (
+                                        bestSellers.map((product, index) => (
+                                            <TableRow key={product.id} hover sx={{ '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.02)' } }}>
+                                                <TableCell align="center">
+                                                    <Chip
+                                                        label={`#${index + 1}`}
+                                                        size="small"
+                                                        sx={{
+                                                            bgcolor: index === 0 ? '#D97706' : index === 1 ? '#64748B' : index === 2 ? '#B45309' : 'rgba(0,0,0,0.06)',
+                                                            color: index < 3 ? '#FFFFFF' : 'text.primary',
+                                                            fontWeight: 800,
+                                                            fontSize: '0.72rem'
+                                                        }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell sx={{ fontWeight: 700, color: 'text.primary' }}>
+                                                    {product.name}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Chip
+                                                        label={product.category}
+                                                        size="small"
+                                                        variant="outlined"
+                                                        sx={{ borderColor: 'divider', fontWeight: 600, fontSize: '0.75rem' }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell align="right" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                                                    {product.quantity}
+                                                </TableCell>
+                                                <TableCell align="right" sx={{ fontWeight: 700 }}>
+                                                    ₹{product.revenue.toLocaleString('en-IN')}
+                                                </TableCell>
+                                                <TableCell align="right" sx={{ color: 'text.secondary' }}>
+                                                    {product.transactions}
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <Chip
+                                                        label={product.stock > 10 ? `${product.stock} in stock` : product.stock > 0 ? `Low: ${product.stock}` : 'Out of stock'}
+                                                        size="small"
+                                                        sx={{
+                                                            bgcolor: product.stock > 10 ? 'rgba(15, 118, 110, 0.1)' : product.stock > 0 ? 'rgba(217, 119, 6, 0.1)' : 'rgba(220, 38, 38, 0.1)',
+                                                            color: product.stock > 10 ? '#0F766E' : product.stock > 0 ? '#D97706' : '#DC2626',
+                                                            fontWeight: 700,
+                                                            fontSize: '0.72rem'
+                                                        }}
+                                                    />
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
                                 </TableBody>
                             </Table>
                         </TableContainer>
@@ -609,52 +662,73 @@ const AdvancedReports = () => {
 
                     {/* Tab 3: Customer Frequency */}
                     {activeTab === 2 && (
-                        <TableContainer>
+                        <TableContainer sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                             <Table>
-                                <TableHead sx={{ bgcolor: 'rgba(136, 14, 79, 0.02)' }}>
+                                <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
                                     <TableRow>
-                                        <TableCell sx={{ fontWeight: 700 }}>Customer</TableCell>
-                                        <TableCell sx={{ fontWeight: 700 }} align="right">Purchases</TableCell>
-                                        <TableCell sx={{ fontWeight: 700 }} align="right">Total Spent</TableCell>
-                                        <TableCell sx={{ fontWeight: 700 }} align="right">Avg Days Between</TableCell>
-                                        <TableCell sx={{ fontWeight: 700 }} align="right">Days Since Last</TableCell>
-                                        <TableCell sx={{ fontWeight: 700 }}>Segment</TableCell>
-                                        <TableCell sx={{ fontWeight: 700 }}>Status</TableCell>
+                                        <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Client</TableCell>
+                                        <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Total Orders</TableCell>
+                                        <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Lifetime Value</TableCell>
+                                        <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Avg Days Gap</TableCell>
+                                        <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Days Since Last</TableCell>
+                                        <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="center">Segment</TableCell>
+                                        <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="center">Health Status</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {customerFrequency.slice(0, 20).map((customer) => (
-                                        <TableRow key={customer.id} hover>
+                                    {customerFrequency.slice(0, 25).map((customer) => (
+                                        <TableRow key={customer.id} hover sx={{ '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.02)' } }}>
                                             <TableCell>
                                                 <Box>
-                                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{customer.name}</Typography>
+                                                    <Typography variant="body2" sx={{ fontWeight: 700 }}>{customer.name}</Typography>
                                                     <Typography variant="caption" color="text.secondary">{customer.phone}</Typography>
                                                 </Box>
                                             </TableCell>
-                                            <TableCell align="right" sx={{ fontWeight: 700 }}>{customer.purchaseCount}</TableCell>
-                                            <TableCell align="right">₹{customer.totalSpent.toLocaleString('en-IN')}</TableCell>
-                                            <TableCell align="right">{customer.avgDaysBetween || 'N/A'}</TableCell>
-                                            <TableCell align="right">{customer.daysSinceLastPurchase}</TableCell>
-                                            <TableCell>
+                                            <TableCell align="right" sx={{ fontWeight: 700 }}>
+                                                {customer.purchaseCount}
+                                            </TableCell>
+                                            <TableCell align="right" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                                                ₹{customer.totalSpent.toLocaleString('en-IN')}
+                                            </TableCell>
+                                            <TableCell align="right" sx={{ color: 'text.secondary' }}>
+                                                {customer.avgDaysBetween ? `${customer.avgDaysBetween} d` : '—'}
+                                            </TableCell>
+                                            <TableCell align="right" sx={{ fontWeight: 600 }}>
+                                                {customer.daysSinceLastPurchase} days
+                                            </TableCell>
+                                            <TableCell align="center">
                                                 <Chip
                                                     label={customer.segment}
                                                     size="small"
                                                     sx={{
-                                                        bgcolor: customer.segment === 'VIP' ? 'rgba(136, 14, 79, 0.1)' : customer.segment === 'Loyal' ? 'rgba(5, 150, 105, 0.1)' : 'rgba(217, 119, 6, 0.1)',
-                                                        color: customer.segment === 'VIP' ? 'primary.main' : customer.segment === 'Loyal' ? '#059669' : '#D97706',
-                                                        fontWeight: 700
+                                                        bgcolor: customer.segment === 'VIP' ? 'rgba(217, 119, 6, 0.15)' : customer.segment === 'Loyal' ? 'rgba(15, 118, 110, 0.12)' : 'rgba(0,0,0,0.06)',
+                                                        color: customer.segment === 'VIP' ? '#D97706' : customer.segment === 'Loyal' ? '#0F766E' : 'text.primary',
+                                                        fontWeight: 800,
+                                                        fontSize: '0.72rem'
                                                     }}
                                                 />
                                             </TableCell>
-                                            <TableCell>
-                                                {customer.atRisk && (
+                                            <TableCell align="center">
+                                                {customer.atRisk ? (
                                                     <Chip
                                                         label="At Risk"
                                                         size="small"
                                                         sx={{
                                                             bgcolor: 'rgba(220, 38, 38, 0.1)',
                                                             color: '#DC2626',
-                                                            fontWeight: 600
+                                                            fontWeight: 800,
+                                                            fontSize: '0.72rem'
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <Chip
+                                                        label="Active"
+                                                        size="small"
+                                                        sx={{
+                                                            bgcolor: 'rgba(15, 118, 110, 0.1)',
+                                                            color: '#0F766E',
+                                                            fontWeight: 700,
+                                                            fontSize: '0.72rem'
                                                         }}
                                                     />
                                                 )}
@@ -669,17 +743,20 @@ const AdvancedReports = () => {
                     {/* Tab 4: AOV Trends */}
                     {activeTab === 3 && (
                         <Box>
-                            <Box sx={{ height: 300, mb: 3 }}>
+                            <Box sx={{ height: 280, mb: 3 }}>
                                 <Line
                                     data={{
                                         labels: aovTrends.map(d => d.date),
                                         datasets: [{
-                                            label: 'Average Order Value',
+                                            label: 'Average Order Value (₹)',
                                             data: aovTrends.map(d => d.aov),
-                                            borderColor: '#E11D48',
-                                            backgroundColor: 'rgba(225, 29, 72, 0.1)',
+                                            borderColor: '#0F766E',
+                                            backgroundColor: 'rgba(15, 118, 110, 0.08)',
                                             fill: true,
-                                            tension: 0.4
+                                            tension: 0.35,
+                                            pointBackgroundColor: '#0F766E',
+                                            pointRadius: 4,
+                                            pointHoverRadius: 6
                                         }]
                                     }}
                                     options={{
@@ -693,29 +770,33 @@ const AdvancedReports = () => {
                                                 beginAtZero: true,
                                                 ticks: {
                                                     callback: (value) => `₹${value.toLocaleString('en-IN')}`
-                                                }
+                                                },
+                                                grid: { color: 'rgba(0,0,0,0.04)' }
+                                            },
+                                            x: {
+                                                grid: { display: false }
                                             }
                                         }
                                     }}
                                 />
                             </Box>
-                            <TableContainer>
+                            <TableContainer sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                                 <Table size="small">
-                                    <TableHead sx={{ bgcolor: 'rgba(136, 14, 79, 0.02)' }}>
+                                    <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
                                         <TableRow>
-                                            <TableCell sx={{ fontWeight: 700 }}>Date</TableCell>
-                                            <TableCell sx={{ fontWeight: 700 }} align="right">Orders</TableCell>
-                                            <TableCell sx={{ fontWeight: 700 }} align="right">Revenue</TableCell>
-                                            <TableCell sx={{ fontWeight: 700 }} align="right">AOV</TableCell>
+                                            <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Date</TableCell>
+                                            <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Orders</TableCell>
+                                            <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Total Revenue</TableCell>
+                                            <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Basket Size (AOV)</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {aovTrends.slice(-10).reverse().map((day) => (
-                                            <TableRow key={day.date} hover>
-                                                <TableCell>{day.date}</TableCell>
-                                                <TableCell align="right">{day.orders}</TableCell>
+                                        {aovTrends.slice(-15).reverse().map((day) => (
+                                            <TableRow key={day.date} hover sx={{ '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.02)' } }}>
+                                                <TableCell sx={{ fontWeight: 600 }}>{day.date}</TableCell>
+                                                <TableCell align="right" sx={{ fontWeight: 700 }}>{day.orders}</TableCell>
                                                 <TableCell align="right">₹{day.revenue.toLocaleString('en-IN')}</TableCell>
-                                                <TableCell align="right" sx={{ fontWeight: 700 }}>
+                                                <TableCell align="right" sx={{ fontWeight: 800, color: '#0F766E' }}>
                                                     ₹{day.aov.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                                                 </TableCell>
                                             </TableRow>
