@@ -15,6 +15,15 @@ export default function AtelierKpiCard({
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
 
+  // Safely extract trend label and positive state if trend is an object or string
+  const trendLabel = (typeof trend === 'object' && trend !== null)
+    ? String(trend.value || trend.label || '')
+    : (trend !== undefined && trend !== null ? String(trend) : '');
+
+  const isTrendPositive = (typeof trend === 'object' && trend !== null && trend.isPositive !== undefined)
+    ? Boolean(trend.isPositive)
+    : Boolean(trendPositive);
+
   return (
     <Card
       onClick={onClick}
@@ -107,26 +116,26 @@ export default function AtelierKpiCard({
         </Typography>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-          {trend && (
+          {trendLabel ? (
             <Chip
               size="small"
-              icon={trendPositive ? <TrendingUp fontSize="small" /> : <TrendingDown fontSize="small" />}
-              label={trend}
+              icon={isTrendPositive ? <TrendingUp fontSize="small" /> : <TrendingDown fontSize="small" />}
+              label={trendLabel}
               sx={{
                 height: 22,
                 fontSize: '0.725rem',
                 fontWeight: 700,
-                backgroundColor: trendPositive
+                backgroundColor: isTrendPositive
                   ? isDark ? 'rgba(16, 185, 129, 0.18)' : '#DCFCE7'
                   : isDark ? 'rgba(239, 68, 68, 0.18)' : '#FEE2E2',
-                color: trendPositive ? '#059669' : '#DC2626',
+                color: isTrendPositive ? '#059669' : '#DC2626',
                 '& .MuiChip-icon': {
                   color: 'inherit',
                   fontSize: '0.875rem'
                 }
               }}
             />
-          )}
+          ) : null}
 
           {subtitle && (
             <Typography

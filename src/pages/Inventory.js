@@ -84,6 +84,10 @@ const Inventory = () => {
     updateCategories
   } = useData();
 
+  const safeCategories = Array.isArray(categories) && categories.length > 0
+    ? categories
+    : ['Sarees', 'Kurtis', 'Lehenga', 'Salwar Suits', 'Dupattas', 'Blouses'];
+
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [editItem, setEditItem] = useState(null);
@@ -142,8 +146,8 @@ const Inventory = () => {
 
   const handleAddCategory = () => {
     const trimmed = newCategory.trim();
-    if (trimmed && !categories.includes(trimmed)) {
-      if (updateCategories) updateCategories([...categories, trimmed]);
+    if (trimmed && !safeCategories.includes(trimmed)) {
+      if (updateCategories) updateCategories([...safeCategories, trimmed]);
       setForm(prev => ({ ...prev, category: trimmed }));
       setNewCategory('');
       setShowNewCategoryInput(false);
@@ -163,7 +167,7 @@ const Inventory = () => {
       setForm({
         productId: item.productId || '',
         name: item.name || '',
-        category: item.category || (categories && categories[0]) || 'Sarees',
+        category: item.category || safeCategories[0] || 'Sarees',
         size: item.size || 'Free Size',
         color: item.color || 'Emerald',
         price: item.price !== undefined ? item.price : '',
@@ -179,7 +183,7 @@ const Inventory = () => {
       setForm({
         productId: '',
         name: '',
-        category: (categories && categories[0]) || 'Sarees',
+        category: safeCategories[0] || 'Sarees',
         size: 'Free Size',
         color: 'Emerald',
         price: '',
@@ -431,7 +435,8 @@ const Inventory = () => {
             value={lowStockItems}
             icon={<Warning fontSize="small" />}
             subtitle="Items below 2 units"
-            trend={lowStockItems > 0 ? { value: `${lowStockItems} styles urgent`, isPositive: false } : undefined}
+            trend={lowStockItems > 0 ? `${lowStockItems} styles urgent` : undefined}
+            trendPositive={false}
           />
         </Grid>
         {user?.role === 'admin' && (
@@ -441,7 +446,8 @@ const Inventory = () => {
               value={`₹${totalProfit.toLocaleString('en-IN')}`}
               icon={<TrendingUp fontSize="small" />}
               subtitle="Projected profit on inventory"
-              trend={{ value: `${totalValue > 0 ? ((totalProfit / totalValue) * 100).toFixed(1) : 0}% margin`, isPositive: true }}
+              trend={`${totalValue > 0 ? ((totalProfit / totalValue) * 100).toFixed(1) : 0}% margin`}
+              trendPositive={true}
             />
           </Grid>
         )}
@@ -473,7 +479,7 @@ const Inventory = () => {
               sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
             >
               <MenuItem value="">All Collections & Categories</MenuItem>
-              {(categories || []).map((cat) => (
+              {safeCategories.map((cat) => (
                 <MenuItem key={cat} value={cat}>
                   {cat}
                 </MenuItem>
@@ -859,7 +865,7 @@ const Inventory = () => {
                       onChange={(e) => setForm({ ...form, category: e.target.value })}
                       sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                     >
-                      {(categories || []).map((cat) => (
+                      {safeCategories.map((cat) => (
                         <MenuItem key={cat} value={cat}>
                           {cat}
                         </MenuItem>

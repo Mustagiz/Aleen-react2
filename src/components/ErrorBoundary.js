@@ -70,9 +70,17 @@ class ErrorBoundary extends React.Component {
             <Typography variant="h5" sx={{ fontWeight: 800, mb: 1, color: '#FFFFFF' }}>
               Atelier Notice
             </Typography>
-            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 3 }}>
+            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 2 }}>
               An unexpected render issue occurred while displaying this page. You can refresh or return to the main atelier dashboard.
             </Typography>
+
+            {this.state.error && (
+              <Box sx={{ mt: 1, mb: 3, p: 1.5, borderRadius: 2, bgcolor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.25)', textAlign: 'left' }}>
+                <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#FCA5A5', wordBreak: 'break-word', display: 'block', fontSize: '0.75rem' }}>
+                  {this.state.error?.message || String(this.state.error)}
+                </Typography>
+              </Box>
+            )}
 
             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
               <Button
