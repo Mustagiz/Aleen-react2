@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel, CircularProgress } from '@mui/material';
-import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, FilterList, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices } from '@mui/icons-material';
+import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel, CircularProgress, Alert, Snackbar, InputAdornment } from '@mui/material';
+import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, FilterList, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, CheckCircle, Sensors } from '@mui/icons-material';
 import { Html5Qrcode } from 'html5-qrcode';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -123,7 +123,246 @@ const Invoices = () => {
   const [scannerOpen, setScannerOpen] = useState(false);
   const [scannerError, setScannerError] = useState('');
   const [scannerStatus, setScannerStatus] = useState('Initializing...');
+  const [scanFeedback, setScanFeedback] = useState(null);
+  const barcodeBufferRef = useRef('');
+  const lastKeyTimeRef = useRef(0);
+  const quickAddInputRef = useRef(null);
 
+  // Auto-dismiss scan feedback after 5 seconds
+  useEffect(() => {
+    if (scanFeedback) {
+      const timer = setTimeout(() => setScanFeedback(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [scanFeedback]);
+
+  // Universal barcode/product finder
+  const findProductByCode = (code) => {
+    if (!code) return null;
+    const clean = String(code).trim();
+    if (!clean) return null;
+    const lower = clean.toLowerCase();
+
+    // 1. Direct match on productId
+    let product = inventory.find(inv => inv.productId && String(inv.productId).trim().toLowerCase() === lower);
+    let variantSku = null;
+
+    // 2. Direct match on barcode
+    if (!product) {
+      product = inventory.find(inv => inv.barcode && String(inv.barcode).trim().toLowerCase() === lower);
+    }
+
+    // 3. Direct match on database/document id
+    if (!product) {
+      product = inventory.find(inv => inv.id && String(inv.id).trim().toLowerCase() === lower);
+    }
+
+    // 4. Direct match on sku
+    if (!product) {
+      product = inventory.find(inv => inv.sku && String(inv.sku).trim().toLowerCase() === lower);
+    }
+
+    // 5. Direct match on itemCode
+    if (!product) {
+      product = inventory.find(inv => inv.itemCode && String(inv.itemCode).trim().toLowerCase() === lower);
+    }
+
+    // 6. Match within variants (sku, barcode, id)
+    if (!product) {
+      for (const inv of inventory) {
+        if (inv.variants && Array.isArray(inv.variants)) {
+          const v = inv.variants.find(varItem =>
+            (varItem.sku && String(varItem.sku).trim().toLowerCase() === lower) ||
+            (varItem.barcode && String(varItem.barcode).trim().toLowerCase() === lower) ||
+            (varItem.id && String(varItem.id).trim().toLowerCase() === lower)
+          );
+          if (v) {
+            product = inv;
+            variantSku = v.sku || null;
+            break;
+          }
+        }
+      }
+    }
+
+    // 7. Exact item name match fallback
+    if (!product) {
+      product = inventory.find(inv => inv.name && String(inv.name).trim().toLowerCase() === lower);
+    }
+
+    if (product) {
+      return { product, variantSku };
+    }
+    return null;
+  };
+
+  // Main barcode handler that accepts scans from Hardware Scanners, Mobile Phone Camera, or Web Camera
+  const handleProcessBarcode = (rawCode, source = 'Scanner') => {
+    if (!rawCode) return;
+    const cleanCode = String(rawCode).trim();
+    if (!cleanCode) return;
+
+    const match = findProductByCode(cleanCode);
+
+    if (match) {
+      const { product, variantSku } = match;
+      playBeep();
+      playVibration();
+
+      setSelectedItems(prevItems => {
+        // 1. If item already exists in the cart with the same variantSku, increment quantity
+        const existingIndex = prevItems.findIndex(item =>
+          item.id === product.id && (!variantSku || item.variantSku === variantSku) && !item.isCustom
+        );
+
+        if (existingIndex !== -1) {
+          const updated = [...prevItems];
+          const currentQty = parseInt(updated[existingIndex].quantity) || 1;
+          updated[existingIndex] = {
+            ...updated[existingIndex],
+            quantity: currentQty + 1
+          };
+          return updated;
+        }
+
+        // 2. Populate first unselected empty row if present
+        const emptyIndex = prevItems.findIndex(item => !item.id && !item.isCustom);
+        if (emptyIndex !== -1) {
+          const updated = [...prevItems];
+          updated[emptyIndex] = {
+            id: product.id,
+            quantity: 1,
+            variantSku: variantSku || (product.hasVariants && product.variants?.length ? product.variants[0].sku : ''),
+            isCustom: false,
+            customName: '',
+            customPrice: 0,
+            customCost: 0
+          };
+          return updated;
+        }
+
+        // 3. Otherwise append new line item
+        return [
+          ...prevItems,
+          {
+            id: product.id,
+            quantity: 1,
+            variantSku: variantSku || (product.hasVariants && product.variants?.length ? product.variants[0].sku : ''),
+            isCustom: false,
+            customName: '',
+            customPrice: 0,
+            customCost: 0
+          }
+        ];
+      });
+
+      setItemSearchTerm('');
+      setScanFeedback({
+        type: 'success',
+        message: `✓ Added: "${product.name}" (${variantSku || product.productId || cleanCode}) via ${source}`
+      });
+    } else {
+      playBeep();
+      setScanFeedback({
+        type: 'warning',
+        message: `⚠️ Barcode "${cleanCode}" scanned via ${source} not found in inventory catalog.`
+      });
+    }
+  };
+
+  // Auto-focus quick add barcode input when invoice dialog opens
+  useEffect(() => {
+    if (open) {
+      const timer = setTimeout(() => {
+        if (quickAddInputRef.current) {
+          quickAddInputRef.current.focus();
+        }
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [open]);
+
+  // Global Hardware Scanner Gun Listener (Keyboard wedge / HID)
+  useEffect(() => {
+    if (!open) return;
+
+    let timeout = null;
+    const handleGlobalKeyDown = (e) => {
+      // Don't intercept if user is pressing control/meta keys or alt keys
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+      const activeEl = document.activeElement;
+      const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+
+      const now = Date.now();
+      const timeDiff = now - lastKeyTimeRef.current;
+      lastKeyTimeRef.current = now;
+
+      if (e.key === 'Enter') {
+        if (barcodeBufferRef.current.length >= 2) {
+          e.preventDefault();
+          const code = barcodeBufferRef.current;
+          barcodeBufferRef.current = '';
+          handleProcessBarcode(code, 'Hardware Scanner Gun');
+        }
+        return;
+      }
+
+      // Printable single character
+      if (e.key.length === 1) {
+        // High speed typing (< 60ms) indicates a hardware barcode scanner gun
+        if (timeDiff < 60 || barcodeBufferRef.current.length > 0 || !isInput) {
+          barcodeBufferRef.current += e.key;
+          clearTimeout(timeout);
+          timeout = setTimeout(() => {
+            barcodeBufferRef.current = '';
+          }, 250);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleGlobalKeyDown);
+      clearTimeout(timeout);
+    };
+  }, [open, inventory]);
+
+  // Wireless Smartphone Scanner Bridge (BroadcastChannel + LocalStorage)
+  useEffect(() => {
+    if (!open) return;
+
+    let bc = null;
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        bc = new BroadcastChannel('aleen_scanner_bridge');
+        bc.onmessage = (event) => {
+          if (event.data && event.data.code) {
+            handleProcessBarcode(event.data.code, 'Wireless Phone Camera');
+          }
+        };
+      }
+    } catch (e) {}
+
+    const handleStorage = (event) => {
+      if (event.key === 'aleen_last_phone_scan' && event.newValue) {
+        try {
+          const parsed = JSON.parse(event.newValue);
+          if (parsed && parsed.code) {
+            handleProcessBarcode(parsed.code, 'Wireless Phone Camera');
+          }
+        } catch (e) {}
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+
+    return () => {
+      if (bc) bc.close();
+      window.removeEventListener('storage', handleStorage);
+    };
+  }, [open, inventory]);
+
+  // Web Camera Scanner in Dialog
   useEffect(() => {
     let html5QrCode;
 
@@ -147,69 +386,16 @@ const Invoices = () => {
           { facingMode: "environment" },
           config,
           (decodedText) => {
-            const trimmedCode = decodedText.toLowerCase().trim();
-            // Try matching Product ID first
-            let matchedProduct = inventory.find(inv =>
-              inv.productId && inv.productId.toLowerCase() === trimmedCode && (parseInt(inv.quantity) || 0) > 0
-            );
-            let matchedVariantSku = null;
-
-            // If not found, try matching Variant SKU
-            if (!matchedProduct) {
-              for (const inv of inventory) {
-                if (inv.hasVariants && inv.variants) {
-                  const variant = inv.variants.find(v => v.sku && v.sku.toLowerCase() === trimmedCode);
-                  if (variant) {
-                    matchedProduct = inv;
-                    matchedVariantSku = variant.sku;
-                    break;
-                  }
-                }
-              }
-            }
-
-            if (matchedProduct) {
-              playBeep();
-              playVibration();
-              const emptyIndex = selectedItems.findIndex(item => !item.id);
-              if (emptyIndex !== -1) {
-                handleItemChange(emptyIndex, 'id', matchedProduct.id);
-                if (matchedVariantSku) handleItemChange(emptyIndex, 'variantSku', matchedVariantSku);
-              } else {
-                setSelectedItems([...selectedItems, {
-                  id: matchedProduct.id,
-                  quantity: 1,
-                  variantSku: matchedVariantSku || '',
-                  isCustom: false,
-                  customName: '',
-                  customPrice: 0,
-                  customCost: 0
-                }]);
-              }
-              stopScanner();
-              setScannerOpen(false);
-            }
+            handleProcessBarcode(decodedText, 'Workstation Camera');
+            stopScanner();
+            setScannerOpen(false);
           }
         ).catch(err => {
-          // Fallback if environment camera fails
-          console.warn("Environment camera failed, trying user camera:", err);
+          console.warn("Environment camera failed, trying default user camera:", err);
           return html5QrCode.start({ facingMode: "user" }, config, (decodedText) => {
-            const matchedProduct = inventory.find(inv =>
-              inv.productId && inv.productId.toLowerCase() === decodedText.toLowerCase().trim() && (parseInt(inv.quantity) || 0) > 0
-            );
-
-            if (matchedProduct) {
-              playBeep();
-              playVibration();
-              const emptyIndex = selectedItems.findIndex(item => !item.id);
-              if (emptyIndex !== -1) {
-                handleItemChange(emptyIndex, 'id', matchedProduct.id);
-              } else {
-                setSelectedItems([...selectedItems, { id: matchedProduct.id, quantity: 1 }]);
-              }
-              stopScanner();
-              setScannerOpen(false);
-            }
+            handleProcessBarcode(decodedText, 'Workstation Camera');
+            stopScanner();
+            setScannerOpen(false);
           });
         });
         setScannerStatus('Scanning...');
@@ -231,13 +417,13 @@ const Invoices = () => {
     };
 
     if (scannerOpen) {
-      const timer = setTimeout(() => startScanner(), 500);
+      const timer = setTimeout(() => startScanner(), 400);
       return () => {
         clearTimeout(timer);
         stopScanner();
       };
     }
-  }, [scannerOpen, inventory, selectedItems]);
+  }, [scannerOpen, inventory]);
 
   const getCurrentDateTime = () => {
     const now = new Date();
@@ -1436,110 +1622,111 @@ const Invoices = () => {
                   </Box>
                 </Box>
 
+                {/* Scan Feedback Banner */}
+                {scanFeedback && (
+                  <Alert
+                    severity={scanFeedback.type}
+                    icon={scanFeedback.type === 'success' ? <CheckCircle /> : undefined}
+                    onClose={() => setScanFeedback(null)}
+                    sx={{
+                      mb: 2,
+                      borderRadius: 2.5,
+                      fontWeight: 700,
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+                    }}
+                  >
+                    {scanFeedback.message}
+                  </Alert>
+                )}
+
                 {/* Quick Add / Scan Barcode Bar */}
                 <Box sx={{ mb: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.75 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <QrCodeScanner sx={{ fontSize: 15 }} /> Scan Barcode or SKU
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                      <Chip
+                        icon={<Sensors sx={{ fontSize: '13px !important', color: '#059669' }} />}
+                        label="Scanner & Phone Ready"
+                        size="small"
+                        sx={{
+                          height: 20,
+                          fontSize: '0.65rem',
+                          fontWeight: 800,
+                          bgcolor: 'rgba(5, 150, 105, 0.08)',
+                          color: '#059669',
+                          border: '1px solid rgba(5, 150, 105, 0.2)'
+                        }}
+                      />
+                    </Box>
+                  </Box>
+
                   <TextField
+                    inputRef={quickAddInputRef}
                     fullWidth
                     size="small"
-                    placeholder="Scan Barcode / Product ID to Quick Add..."
+                    placeholder="Aim scanner gun or type barcode / product ID and hit Enter..."
                     value={itemSearchTerm}
                     onChange={(e) => {
                       const val = e.target.value;
                       setItemSearchTerm(val);
-
-                      if (val.trim()) {
-                        const trimmed = val.toLowerCase().trim();
-                        let matchedProduct = inventory.find(inv =>
-                          inv.productId && inv.productId.toLowerCase() === trimmed && (parseInt(inv.quantity) || 0) > 0
-                        );
-                        let matchedVariantSku = null;
-
-                        if (!matchedProduct) {
-                          for (const inv of inventory) {
-                            if (inv.hasVariants && inv.variants) {
-                              const variant = inv.variants.find(v => v.sku && v.sku.toLowerCase() === trimmed);
-                              if (variant) {
-                                matchedProduct = inv;
-                                matchedVariantSku = variant.sku;
-                                break;
-                              }
-                            }
-                          }
-                        }
-
-                        if (matchedProduct) {
-                          const emptyIndex = selectedItems.findIndex(item => !item.id);
-                          if (emptyIndex !== -1) {
-                            handleItemChange(emptyIndex, 'id', matchedProduct.id);
-                            if (matchedVariantSku) handleItemChange(emptyIndex, 'variantSku', matchedVariantSku);
-                          } else {
-                            setSelectedItems([...selectedItems, {
-                              id: matchedProduct.id,
-                              quantity: 1,
-                              variantSku: matchedVariantSku || '',
-                              isCustom: false,
-                              customName: '',
-                              customPrice: 0,
-                              customCost: 0
-                            }]);
-                          }
-                          setItemSearchTerm('');
+                      // If exact match found while typing or scanner pasted
+                      if (val.trim().length >= 3) {
+                        const directMatch = findProductByCode(val.trim());
+                        if (directMatch) {
+                          handleProcessBarcode(val.trim(), 'Barcode Scanner');
                         }
                       }
                     }}
-                    onKeyPress={(e) => {
+                    onKeyDown={(e) => {
                       if (e.key === 'Enter') {
-                        const trimmed = itemSearchTerm.toLowerCase().trim();
-                        let matchedProduct = inventory.find(inv =>
-                          inv.productId && inv.productId.toLowerCase() === trimmed && (parseInt(inv.quantity) || 0) > 0
-                        );
-                        let matchedVariantSku = null;
-
-                        if (!matchedProduct) {
-                          for (const inv of inventory) {
-                            if (inv.hasVariants && inv.variants) {
-                              const variant = inv.variants.find(v => v.sku && v.sku.toLowerCase() === trimmed);
-                              if (variant) {
-                                matchedProduct = inv;
-                                matchedVariantSku = variant.sku;
-                                break;
-                              }
-                            }
-                          }
-                        }
-
-                        if (matchedProduct) {
-                          const emptyIndex = selectedItems.findIndex(item => !item.id);
-                          if (emptyIndex !== -1) {
-                            handleItemChange(emptyIndex, 'id', matchedProduct.id);
-                            if (matchedVariantSku) handleItemChange(emptyIndex, 'variantSku', matchedVariantSku);
-                          } else {
-                            setSelectedItems([...selectedItems, {
-                              id: matchedProduct.id,
-                              quantity: 1,
-                              variantSku: matchedVariantSku || '',
-                              isCustom: false,
-                              customName: '',
-                              customPrice: 0,
-                              customCost: 0
-                            }]);
-                          }
-                          setItemSearchTerm('');
+                        e.preventDefault();
+                        if (itemSearchTerm.trim()) {
+                          handleProcessBarcode(itemSearchTerm.trim(), 'Barcode Quick Add');
                         }
                       }
                     }}
                     InputProps={{
-                      startAdornment: <Search sx={{ color: 'text.secondary', mr: 1, fontSize: 18 }} />,
-                      endAdornment: (
-                        <Tooltip title="Scan using Camera">
-                          <IconButton size="small" onClick={() => setScannerOpen(true)} sx={{ color: '#0F766E' }}>
-                            <CameraAlt fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Search sx={{ color: 'text.secondary', fontSize: 18 }} />
+                        </InputAdornment>
                       ),
-                      sx: { borderRadius: 2 }
+                      endAdornment: (
+                        <InputAdornment position="end" sx={{ display: 'flex', gap: 0.5 }}>
+                          {itemSearchTerm.trim() && (
+                            <Button
+                              size="small"
+                              variant="contained"
+                              onClick={() => handleProcessBarcode(itemSearchTerm.trim(), 'Barcode Quick Add')}
+                              sx={{
+                                py: 0.2,
+                                px: 1,
+                                fontSize: '0.72rem',
+                                fontWeight: 800,
+                                textTransform: 'none',
+                                borderRadius: 1.5,
+                                bgcolor: '#0F766E',
+                                color: '#fff'
+                              }}
+                            >
+                              Add
+                            </Button>
+                          )}
+                          <Tooltip title="Scan using Camera / Phone Viewfinder">
+                            <IconButton size="small" onClick={() => setScannerOpen(true)} sx={{ color: '#0F766E' }}>
+                              <CameraAlt fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </InputAdornment>
+                      ),
+                      sx: { borderRadius: 2.5, bgcolor: 'background.paper' }
                     }}
                   />
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem', display: 'block', mt: 0.5, pl: 0.5 }}>
+                    💡 <em>Tip: Pull the trigger on your Bluetooth scanner gun or scan via phone — items add automatically without clicking!</em>
+                  </Typography>
                 </Box>
 
                 {/* Scanner Dialog */}
@@ -1588,8 +1775,8 @@ const Invoices = () => {
                 {/* Selected Items List */}
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 2 }}>
                   {selectedItems.map((item, index) => {
-                    const filteredInventory = inventory.filter(inv => (parseInt(inv.currentQty || inv.quantity) || 0) > 0);
                     const selectedProduct = inventory.find(i => i.id === item.id);
+                    const optionsList = inventory;
 
                     return (
                       <Box key={index} sx={{
@@ -1612,24 +1799,43 @@ const Invoices = () => {
                                 onChange={(event, newValue) => {
                                   handleItemChange(index, 'id', newValue ? newValue.id : '');
                                 }}
-                                options={filteredInventory}
+                                options={optionsList}
                                 getOptionLabel={(option) => `${option.name} (₹${option.price})`}
                                 filterOptions={(options, { inputValue }) => {
+                                  const term = (inputValue || '').toLowerCase().trim();
                                   return options.filter(option =>
-                                    option.name.toLowerCase().includes(inputValue.toLowerCase()) ||
-                                    (option.productId && option.productId.toLowerCase().includes(inputValue.toLowerCase()))
+                                    (option.name && option.name.toLowerCase().includes(term)) ||
+                                    (option.productId && option.productId.toLowerCase().includes(term)) ||
+                                    (option.barcode && option.barcode.toLowerCase().includes(term)) ||
+                                    (option.sku && option.sku.toLowerCase().includes(term))
                                   );
                                 }}
-                                renderOption={(props, option) => (
-                                  <Box component="li" {...props} key={option.id}>
-                                    <Box>
-                                      <Typography variant="body2" sx={{ fontWeight: 700 }}>{option.name}</Typography>
-                                      <Typography variant="caption" color="text.secondary">
-                                        ID: {option.productId || 'N/A'} • Stock: {option.quantity} • ₹{option.price}
-                                      </Typography>
+                                renderOption={(props, option) => {
+                                  const stock = parseInt(option.currentQty || option.quantity) || 0;
+                                  return (
+                                    <Box component="li" {...props} key={option.id}>
+                                      <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <Box>
+                                          <Typography variant="body2" sx={{ fontWeight: 700 }}>{option.name}</Typography>
+                                          <Typography variant="caption" color="text.secondary">
+                                            ID: {option.productId || option.sku || 'N/A'} • ₹{option.price}
+                                          </Typography>
+                                        </Box>
+                                        <Chip
+                                          label={`Stock: ${stock}`}
+                                          size="small"
+                                          sx={{
+                                            height: 18,
+                                            fontSize: '0.62rem',
+                                            fontWeight: 800,
+                                            bgcolor: stock > 0 ? 'rgba(5, 150, 105, 0.1)' : 'rgba(220, 38, 38, 0.1)',
+                                            color: stock > 0 ? '#059669' : '#DC2626'
+                                          }}
+                                        />
+                                      </Box>
                                     </Box>
-                                  </Box>
-                                )}
+                                  );
+                                }}
                                 renderInput={(params) => (
                                   <TextField
                                     {...params}
