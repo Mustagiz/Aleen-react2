@@ -20,7 +20,9 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  TableContainer
+  TableContainer,
+  Alert,
+  InputAdornment
 } from '@mui/material';
 import {
   Add,
@@ -37,14 +39,18 @@ import {
   Search,
   PriorityHigh,
   Undo,
-  ReceiptLong,
   LocalShipping,
-  CheckCircleOutline
+  CheckCircleOutline,
+  Delete,
+  Group,
+  Phone,
+  Close,
+  PersonAdd
 } from '@mui/icons-material';
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import GlassCard from '../components/GlassCard';
-import { useData } from '../contexts/DataContext';
+
 
 const KANBAN_COLUMNS = [
   { id: 'intake', label: 'Intake & Specs', icon: <Straighten fontSize="small" />, color: '#64748B' },
@@ -136,12 +142,27 @@ const INITIAL_ORDERS = [
   }
 ];
 
+const DEFAULT_TAILORS = [
+  { id: 'TLR-M-1', name: 'Master Rafiq', specialty: 'Blouses & Tops', phone: '+91 98450 12345' },
+  { id: 'TLR-M-2', name: 'Master Anita', specialty: 'Lehengas & Sarees', phone: '+91 98450 23456' },
+  { id: 'TLR-M-3', name: 'Master Imran', specialty: 'Suits & Heavy Craft', phone: '+91 98450 34567' }
+];
+
 export default function TailoringKanban() {
-  const { customers } = useData();
   const [orders, setOrders] = useState(() => {
     const saved = localStorage.getItem('aleen_tailoring_orders');
     return saved ? JSON.parse(saved) : INITIAL_ORDERS;
   });
+
+  const [tailors, setTailors] = useState(() => {
+    const saved = localStorage.getItem('aleen_master_tailors');
+    return saved ? JSON.parse(saved) : DEFAULT_TAILORS;
+  });
+
+  const [tailorDialogOpen, setTailorDialogOpen] = useState(false);
+  const [newTailor, setNewTailor] = useState({ name: '', specialty: '', phone: '' });
+  const [tailorError, setTailorError] = useState('');
+  const [deleteConfirmTailor, setDeleteConfirmTailor] = useState(null);
 
   const [search, setSearch] = useState('');
   const [completedSearch, setCompletedSearch] = useState('');
@@ -161,6 +182,47 @@ export default function TailoringKanban() {
   useEffect(() => {
     localStorage.setItem('aleen_tailoring_orders', JSON.stringify(orders));
   }, [orders]);
+
+  useEffect(() => {
+    localStorage.setItem('aleen_master_tailors', JSON.stringify(tailors));
+  }, [tailors]);
+
+  const handleAddTailor = (e) => {
+    if (e) e.preventDefault();
+    const trimmedName = newTailor.name.trim();
+    if (!trimmedName) {
+      setTailorError('Please enter the Master Tailor name.');
+      return;
+    }
+    const exists = tailors.some(t => t.name.toLowerCase() === trimmedName.toLowerCase());
+    if (exists) {
+      setTailorError(`Master Tailor "${trimmedName}" is already registered.`);
+      return;
+    }
+    const createdTailor = {
+      id: `TLR-M-${Date.now()}`,
+      name: trimmedName,
+      specialty: newTailor.specialty.trim() || 'Bespoke Craft & Alterations',
+      phone: newTailor.phone.trim() || ''
+    };
+    setTailors(prev => [...prev, createdTailor]);
+    setNewTailor({ name: '', specialty: '', phone: '' });
+    setTailorError('');
+    setFormData(prev => ({ ...prev, tailor: trimmedName }));
+  };
+
+  const handleDeleteTailor = (tailorToDelete) => {
+    if (!tailorToDelete) return;
+    setTailors(prev => prev.filter(t => t.id !== tailorToDelete.id && t.name !== tailorToDelete.name));
+    setDeleteConfirmTailor(null);
+    if (formData.tailor === tailorToDelete.name) {
+      const remaining = tailors.filter(t => t.id !== tailorToDelete.id && t.name !== tailorToDelete.name);
+      setFormData(prev => ({
+        ...prev,
+        tailor: remaining.length > 0 ? remaining[0].name : ''
+      }));
+    }
+  };
 
   const moveOrder = (orderId, direction) => {
     setOrders(prev => prev.map(order => {
@@ -207,7 +269,7 @@ export default function TailoringKanban() {
       garment: formData.garment,
       specs: formData.specs,
       targetDate: formData.targetDate || new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0],
-      tailor: formData.tailor,
+      tailor: formData.tailor || (tailors[0]?.name || 'Master Tailor'),
       status: 'intake',
       price: parseFloat(formData.price) || 0,
       advance: parseFloat(formData.advance) || 0,
@@ -222,7 +284,7 @@ export default function TailoringKanban() {
       garment: '',
       specs: '',
       targetDate: '',
-      tailor: 'Master Rafiq',
+      tailor: tailors[0]?.name || '',
       price: '',
       advance: '',
       urgent: false
@@ -243,7 +305,8 @@ export default function TailoringKanban() {
   const filteredOrders = orders.filter(o =>
     (o.customerName || '').toLowerCase().includes(search.toLowerCase()) ||
     (o.garment || '').toLowerCase().includes(search.toLowerCase()) ||
-    (o.id || '').toLowerCase().includes(search.toLowerCase())
+    (o.id || '').toLowerCase().includes(search.toLowerCase()) ||
+    (o.tailor || '').toLowerCase().includes(search.toLowerCase())
   );
 
   const activeOrders = orders.filter(o => o.status !== 'delivered').length;
@@ -269,17 +332,38 @@ export default function TailoringKanban() {
           { label: 'Tailoring Kanban' }
         ]}
         actions={
-          <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
             <TextField
               size="small"
-              placeholder="Search garments or clients..."
+              placeholder="Search garments, clients, tailors..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               InputProps={{
                 startAdornment: <Search sx={{ mr: 1, color: 'text.secondary', fontSize: 18 }} />
               }}
-              sx={{ width: 240, '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+              sx={{ width: 230, '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
             />
+            <Button
+              variant="outlined"
+              startIcon={<Group />}
+              onClick={() => setTailorDialogOpen(true)}
+              sx={{
+                px: 2,
+                py: 1,
+                borderRadius: '10px',
+                fontWeight: 700,
+                fontSize: '0.84rem',
+                borderColor: '#0F766E',
+                color: '#0F766E',
+                whiteSpace: 'nowrap',
+                '&:hover': {
+                  borderColor: '#0b5650',
+                  backgroundColor: 'rgba(15, 118, 110, 0.08)'
+                }
+              }}
+            >
+              Master Tailors ({tailors.length})
+            </Button>
             <Button
               variant="contained"
               startIcon={<Add />}
@@ -292,7 +376,8 @@ export default function TailoringKanban() {
                 fontSize: '0.84rem',
                 background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
                 color: '#ffffff',
-                boxShadow: '0 4px 14px rgba(217, 119, 6, 0.3)'
+                boxShadow: '0 4px 14px rgba(217, 119, 6, 0.3)',
+                whiteSpace: 'nowrap'
               }}
             >
               + New Tailoring Job
@@ -789,17 +874,34 @@ export default function TailoringKanban() {
             </Grid>
 
             <Grid item xs={6}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
+                <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                  Assigned Master Tailor
+                </Typography>
+                <Button
+                  size="small"
+                  variant="text"
+                  onClick={() => setTailorDialogOpen(true)}
+                  sx={{ fontSize: '0.72rem', p: 0, minWidth: 'auto', textTransform: 'none', color: '#0F766E', fontWeight: 800 }}
+                >
+                  + Manage Tailors
+                </Button>
+              </Box>
               <TextField
                 select
-                label="Assigned Master Tailor"
                 fullWidth
                 size="small"
                 value={formData.tailor}
                 onChange={(e) => setFormData({ ...formData, tailor: e.target.value })}
               >
-                <MenuItem value="Master Rafiq">Master Rafiq (Blouses & Tops)</MenuItem>
-                <MenuItem value="Master Anita">Master Anita (Lehengas & Sarees)</MenuItem>
-                <MenuItem value="Master Imran">Master Imran (Suits & Heavy Craft)</MenuItem>
+                {tailors.map(t => (
+                  <MenuItem key={t.id || t.name} value={t.name}>
+                    {t.name} {t.specialty ? `(${t.specialty})` : ''}
+                  </MenuItem>
+                ))}
+                {tailors.length === 0 && (
+                  <MenuItem value="">-- No Tailors Registered --</MenuItem>
+                )}
               </TextField>
             </Grid>
           </Grid>
@@ -855,6 +957,349 @@ export default function TailoringKanban() {
             }}
           >
             Issue Craft Job
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Master Tailors Management Dialog */}
+      <Dialog
+        open={tailorDialogOpen}
+        onClose={() => setTailorDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            overflow: 'hidden'
+          }
+        }}
+      >
+        {/* Luxury Header Banner */}
+        <Box
+          sx={{
+            background: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)',
+            color: '#FFFFFF',
+            p: 2.5,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Avatar sx={{ bgcolor: 'rgba(217, 119, 6, 0.25)', color: '#FDE68A', border: '1px solid rgba(217, 119, 6, 0.4)' }}>
+              <Group />
+            </Avatar>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 800, letterSpacing: -0.2, color: '#FFFFFF' }}>
+                Master Tailors & Artisans
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                Add, manage, or remove master pattern makers and craft specialists
+              </Typography>
+            </Box>
+          </Box>
+          <IconButton onClick={() => setTailorDialogOpen(false)} sx={{ color: 'rgba(255,255,255,0.85)' }}>
+            <Close />
+          </IconButton>
+        </Box>
+
+        <DialogContent sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
+          {/* Add New Tailor Card */}
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2.5,
+              borderRadius: 2.5,
+              border: '1px solid',
+              borderColor: 'rgba(15, 118, 110, 0.25)',
+              background: 'rgba(15, 118, 110, 0.03)'
+            }}
+          >
+            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0F766E', mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <PersonAdd fontSize="small" /> Add New Master Tailor
+            </Typography>
+
+            {tailorError && (
+              <Alert severity="error" onClose={() => setTailorError('')} sx={{ mb: 2, borderRadius: 2 }}>
+                {tailorError}
+              </Alert>
+            )}
+
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  label="Master Tailor Name *"
+                  size="small"
+                  fullWidth
+                  placeholder="e.g. Master Salim"
+                  value={newTailor.name}
+                  onChange={(e) => {
+                    setNewTailor({ ...newTailor, name: e.target.value });
+                    if (tailorError) setTailorError('');
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Person sx={{ fontSize: 18, color: 'text.secondary' }} />
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  label="Craft Specialty"
+                  size="small"
+                  fullWidth
+                  placeholder="e.g. Sherwanis & Heavy Zari"
+                  value={newTailor.specialty}
+                  onChange={(e) => setNewTailor({ ...newTailor, specialty: e.target.value })}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <ContentCut sx={{ fontSize: 18, color: 'text.secondary' }} />
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={2.5}>
+                <TextField
+                  label="Phone / WhatsApp"
+                  size="small"
+                  fullWidth
+                  placeholder="+91 98450..."
+                  value={newTailor.phone}
+                  onChange={(e) => setNewTailor({ ...newTailor, phone: e.target.value })}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Phone sx={{ fontSize: 18, color: 'text.secondary' }} />
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={1.5}>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  onClick={handleAddTailor}
+                  sx={{
+                    py: 1,
+                    borderRadius: '8px',
+                    fontWeight: 800,
+                    fontSize: '0.82rem',
+                    background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                    color: '#ffffff',
+                    whiteSpace: 'nowrap',
+                    boxShadow: '0 3px 10px rgba(15, 118, 110, 0.3)'
+                  }}
+                >
+                  + Add
+                </Button>
+              </Grid>
+            </Grid>
+          </Paper>
+
+          {/* Master Tailors List */}
+          <Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                Registered Master Tailors ({tailors.length})
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                Real-time active workload on workshop floor
+              </Typography>
+            </Box>
+
+            {tailors.length === 0 ? (
+              <Box sx={{ textAlign: 'center', py: 4, px: 2, bgcolor: 'action.hover', borderRadius: 2 }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                  No master tailors registered yet. Use the form above to add your first master artisan.
+                </Typography>
+              </Box>
+            ) : (
+              <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
+                <Table size="small">
+                  <TableHead sx={{ bgcolor: 'action.hover' }}>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase' }}>Master Tailor</TableCell>
+                      <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase' }}>Craft Specialty</TableCell>
+                      <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase' }}>Contact</TableCell>
+                      <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase' }}>Active Jobs</TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase' }}>Action</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {tailors.map((tailor) => {
+                      const activeJobs = orders.filter(o => o.tailor === tailor.name && o.status !== 'delivered').length;
+                      const cleanTailorName = tailor.name.replace(/Master\s+/i, '');
+                      const initials = cleanTailorName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'MT';
+                      return (
+                        <TableRow key={tailor.id || tailor.name} hover>
+                          <TableCell>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                              <Avatar
+                                sx={{
+                                  width: 34,
+                                  height: 34,
+                                  fontSize: '0.8rem',
+                                  fontWeight: 800,
+                                  bgcolor: 'rgba(15, 118, 110, 0.12)',
+                                  color: '#0F766E',
+                                  border: '1px solid rgba(15, 118, 110, 0.25)'
+                                }}
+                              >
+                                {initials}
+                              </Avatar>
+                              <Box>
+                                <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                                  {tailor.name}
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem' }}>
+                                  ID: {tailor.id}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </TableCell>
+
+                          <TableCell>
+                            <Chip
+                              size="small"
+                              label={tailor.specialty || 'General Craft'}
+                              sx={{
+                                fontWeight: 700,
+                                fontSize: '0.72rem',
+                                bgcolor: 'rgba(217, 119, 6, 0.1)',
+                                color: '#D97706',
+                                border: '1px solid rgba(217, 119, 6, 0.25)'
+                              }}
+                            />
+                          </TableCell>
+
+                          <TableCell>
+                            {tailor.phone ? (
+                              <Typography
+                                variant="caption"
+                                component="a"
+                                href={`https://wa.me/${tailor.phone.replace(/\D/g, '')}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                sx={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: 0.5,
+                                  color: '#0F766E',
+                                  textDecoration: 'none',
+                                  fontWeight: 600,
+                                  '&:hover': { textDecoration: 'underline' }
+                                }}
+                              >
+                                <WhatsApp sx={{ fontSize: 14, color: '#25D366' }} />
+                                {tailor.phone}
+                              </Typography>
+                            ) : (
+                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>—</Typography>
+                            )}
+                          </TableCell>
+
+                          <TableCell>
+                            <Chip
+                              size="small"
+                              label={activeJobs === 1 ? '1 Job Active' : `${activeJobs} Jobs Active`}
+                              color={activeJobs > 0 ? 'warning' : 'default'}
+                              sx={{ fontWeight: 700, fontSize: '0.72rem' }}
+                            />
+                          </TableCell>
+
+                          <TableCell align="right">
+                            <Tooltip title={`Delete ${tailor.name}`}>
+                              <IconButton
+                                size="small"
+                                color="error"
+                                onClick={() => setDeleteConfirmTailor(tailor)}
+                                sx={{
+                                  '&:hover': {
+                                    bgcolor: 'rgba(239, 68, 68, 0.1)'
+                                  }
+                                }}
+                              >
+                                <Delete fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </Box>
+        </DialogContent>
+
+        <DialogActions sx={{ p: 2, px: 3, borderTop: '1px solid', borderColor: 'divider', justifyContent: 'space-between' }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+            Changes are saved immediately and synced with your atelier workspace.
+          </Typography>
+          <Button
+            variant="contained"
+            onClick={() => setTailorDialogOpen(false)}
+            sx={{
+              fontWeight: 800,
+              px: 3,
+              borderRadius: '8px',
+              background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+              color: '#ffffff'
+            }}
+          >
+            Done
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Tailor Confirmation Dialog */}
+      <Dialog
+        open={Boolean(deleteConfirmTailor)}
+        onClose={() => setDeleteConfirmTailor(null)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: 3 } }}
+      >
+        <DialogTitle sx={{ fontWeight: 800, display: 'flex', alignItems: 'center', gap: 1, color: 'error.main' }}>
+          <Delete /> Remove Master Tailor?
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" sx={{ mb: 1.5, color: 'text.primary' }}>
+            Are you sure you want to remove <b>{deleteConfirmTailor?.name}</b> from the master tailors list?
+          </Typography>
+          {deleteConfirmTailor && (() => {
+            const activeJobs = orders.filter(o => o.tailor === deleteConfirmTailor.name && o.status !== 'delivered').length;
+            if (activeJobs > 0) {
+              return (
+                <Alert severity="warning" sx={{ borderRadius: 2 }}>
+                  ⚠️ Master {deleteConfirmTailor.name} is currently assigned to <b>{activeJobs} active job(s)</b> on the workshop floor. Existing cards will keep the name for historical records, but new jobs will no longer list them.
+                </Alert>
+              );
+            }
+            return null;
+          })()}
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setDeleteConfirmTailor(null)} sx={{ fontWeight: 700, color: 'text.secondary' }}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => handleDeleteTailor(deleteConfirmTailor)}
+            sx={{ fontWeight: 800, px: 2.5, borderRadius: '8px' }}
+          >
+            Remove Tailor
           </Button>
         </DialogActions>
       </Dialog>
