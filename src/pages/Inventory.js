@@ -18,8 +18,6 @@ import {
   Typography,
   TableContainer,
   Chip,
-  Card,
-  CardContent,
   Grid,
   Tooltip,
   useTheme,
@@ -27,10 +25,10 @@ import {
   Divider,
   TablePagination,
   TableSortLabel,
-  FormControlLabel,
   Switch,
   InputAdornment,
-  Stack
+  Stack,
+  CardContent
 } from '@mui/material';
 import {
   Edit,
@@ -49,10 +47,7 @@ import {
   Straighten,
   LocalOffer,
   Close,
-  CheckCircle,
-  AutoAwesome,
-  Storefront,
-  Palette
+  CheckCircle
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -79,7 +74,16 @@ const COLOR_PRESETS = [
 
 const Inventory = () => {
   const { user } = useAuth();
-  const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, bulkAddInventory, categories, updateCategories, vendors = [] } = useData();
+  const {
+    inventory = [],
+    addInventoryItem,
+    updateInventoryItem,
+    deleteInventoryItem,
+    bulkAddInventory,
+    categories = [],
+    updateCategories
+  } = useData();
+
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [editItem, setEditItem] = useState(null);
@@ -90,13 +94,13 @@ const Inventory = () => {
   const [form, setForm] = useState({
     productId: '',
     name: '',
-    category: '',
-    size: '',
-    color: '',
+    category: 'Sarees',
+    size: 'Free Size',
+    color: 'Emerald',
     price: '',
     cost: '',
-    quantity: '',
-    minStockLevel: '',
+    quantity: 10,
+    minStockLevel: 2,
     supplier: '',
     hasVariants: false,
     variants: []
@@ -130,15 +134,17 @@ const Inventory = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const totalItems = inventory.length;
-  const totalValue = inventory.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const lowStockItems = inventory.filter(item => item.quantity < 2).length;
-  const totalProfit = inventory.reduce((sum, item) => sum + ((item.price - (item.cost || 0)) * item.quantity), 0);
+  // Safe numerical KPIs
+  const totalItems = inventory?.length || 0;
+  const totalValue = (inventory || []).reduce((sum, item) => sum + ((Number(item?.price) || 0) * (Number(item?.quantity) || 0)), 0);
+  const lowStockItems = (inventory || []).filter(item => (Number(item?.quantity) || 0) < 2).length;
+  const totalProfit = (inventory || []).reduce((sum, item) => sum + (((Number(item?.price) || 0) - (Number(item?.cost) || 0)) * (Number(item?.quantity) || 0)), 0);
 
   const handleAddCategory = () => {
-    if (newCategory.trim() && !categories.includes(newCategory.trim())) {
-      updateCategories([...categories, newCategory.trim()]);
-      setForm(prev => ({ ...prev, category: newCategory.trim() }));
+    const trimmed = newCategory.trim();
+    if (trimmed && !categories.includes(trimmed)) {
+      if (updateCategories) updateCategories([...categories, trimmed]);
+      setForm(prev => ({ ...prev, category: trimmed }));
       setNewCategory('');
       setShowNewCategoryInput(false);
     }
@@ -150,53 +156,20 @@ const Inventory = () => {
     setForm(prev => ({ ...prev, productId: `${cat}-${rand}` }));
   };
 
-  const downloadInventory = () => {
-    const csvData = filteredInventory.map(item => {
-      const row = {
-        'Product ID': item.productId || '',
-        'Name': item.name,
-        'Category': item.category,
-        'Size': item.size || '',
-        'Color': item.color || '',
-        'Selling Price': item.price,
-        'Quantity': item.quantity,
-        'Supplier': item.supplier || '',
-      };
-      if (user?.role === 'admin') {
-        row['Cost Price'] = item.cost || 0;
-        row['Profit Margin'] = item.cost ? (((item.price - item.cost) / item.price) * 100).toFixed(1) + '%' : '0%';
-      }
-      return row;
-    });
-
-    const headers = Object.keys(csvData[0] || {});
-    const csvContent = [
-      headers.join(','),
-      ...csvData.map(row => headers.map(h => `"${row[h]}"`).join(','))
-    ].join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `inventory_${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
-  };
-
   const handleOpen = (item = null) => {
     setShowNewCategoryInput(false);
     if (item) {
       setEditItem(item);
       setForm({
-        ...item,
         productId: item.productId || '',
         name: item.name || '',
-        category: item.category || '',
-        size: item.size || '',
-        color: item.color || '',
-        price: item.price || '',
-        cost: item.cost || '',
-        quantity: item.quantity || '',
-        minStockLevel: item.minStockLevel || '',
+        category: item.category || (categories && categories[0]) || 'Sarees',
+        size: item.size || 'Free Size',
+        color: item.color || 'Emerald',
+        price: item.price !== undefined ? item.price : '',
+        cost: item.cost !== undefined ? item.cost : '',
+        quantity: item.quantity !== undefined ? item.quantity : 10,
+        minStockLevel: item.minStockLevel !== undefined ? item.minStockLevel : 2,
         supplier: item.supplier || '',
         hasVariants: item.hasVariants || false,
         variants: item.variants || []
@@ -206,7 +179,7 @@ const Inventory = () => {
       setForm({
         productId: '',
         name: '',
-        category: categories[0] || 'Sarees',
+        category: (categories && categories[0]) || 'Sarees',
         size: 'Free Size',
         color: 'Emerald',
         price: '',
@@ -225,7 +198,7 @@ const Inventory = () => {
     const productId = form.productId.trim() || `PRD-${Date.now()}`;
 
     // Validate variants if enabled
-    if (form.hasVariants && form.variants.length === 0) {
+    if (form.hasVariants && (!form.variants || form.variants.length === 0)) {
       alert("Please add at least one variant");
       return;
     }
@@ -236,7 +209,7 @@ const Inventory = () => {
       price: parseFloat(form.price) || 0,
       cost: parseFloat(form.cost || 0),
       quantity: form.hasVariants
-        ? form.variants.reduce((sum, v) => sum + (parseInt(v.quantity) || 0), 0)
+        ? (form.variants || []).reduce((sum, v) => sum + (parseInt(v.quantity) || 0), 0)
         : parseInt(form.quantity) || 0
     };
 
@@ -249,23 +222,27 @@ const Inventory = () => {
   };
 
   const addVariant = () => {
-    const sku = `${form.productId || 'PRD'}-${form.variants.length + 1}`;
-    setForm({
-      ...form,
-      variants: [...form.variants, { sku, size: form.size || 'Free Size', color: form.color || 'Std', quantity: 5, minStockLevel: 2, price: form.price || 0 }]
-    });
+    const sku = `${form.productId || 'PRD'}-${(form.variants || []).length + 1}`;
+    setForm(prev => ({
+      ...prev,
+      variants: [...(prev.variants || []), { sku, size: prev.size || 'Free Size', color: prev.color || 'Std', quantity: 5, minStockLevel: 2, price: prev.price || 0 }]
+    }));
   };
 
   const removeVariant = (index) => {
-    const newVariants = [...form.variants];
-    newVariants.splice(index, 1);
-    setForm({ ...form, variants: newVariants });
+    setForm(prev => {
+      const newVariants = [...(prev.variants || [])];
+      newVariants.splice(index, 1);
+      return { ...prev, variants: newVariants };
+    });
   };
 
   const updateVariant = (index, field, value) => {
-    const newVariants = [...form.variants];
-    newVariants[index] = { ...newVariants[index], [field]: value };
-    setForm({ ...form, variants: newVariants });
+    setForm(prev => {
+      const newVariants = [...(prev.variants || [])];
+      newVariants[index] = { ...newVariants[index], [field]: value };
+      return { ...prev, variants: newVariants };
+    });
   };
 
   const handleConfirmDelete = async () => {
@@ -279,6 +256,45 @@ const Inventory = () => {
   const openDeleteDialog = (id) => {
     setDeleteId(id);
     setDeleteDialogOpen(true);
+  };
+
+  const downloadInventory = () => {
+    const csvData = filteredInventory.map(item => {
+      const row = {
+        'Product ID': item.productId || '',
+        'Name': item.name || '',
+        'Category': item.category || '',
+        'Size': item.size || '',
+        'Color': item.color || '',
+        'Selling Price': item.price || 0,
+        'Quantity': item.quantity || 0,
+        'Supplier': item.supplier || '',
+      };
+      if (user?.role === 'admin') {
+        const cost = Number(item.cost) || 0;
+        const price = Number(item.price) || 0;
+        row['Cost Price'] = cost;
+        row['Profit Margin'] = (cost > 0 && price > 0) ? (((price - cost) / price) * 100).toFixed(1) + '%' : '0%';
+      }
+      return row;
+    });
+
+    if (csvData.length === 0) {
+      alert("No inventory to export");
+      return;
+    }
+
+    const headers = Object.keys(csvData[0] || {});
+    const csvContent = [
+      headers.join(','),
+      ...csvData.map(row => headers.map(h => `"${row[h]}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `inventory_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
   };
 
   const handleFileUpload = (e) => {
@@ -316,19 +332,25 @@ const Inventory = () => {
     }
   };
 
-  const filteredInventory = inventory.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase()) ||
-      (item.productId && item.productId.toLowerCase().includes(search.toLowerCase())) ||
-      (item.supplier && item.supplier.toLowerCase().includes(search.toLowerCase()));
+  // Safe search & filtering: null-safe and undefined-safe
+  const filteredInventory = (inventory || []).filter(item => {
+    if (!item) return false;
+    const name = String(item.name || '').toLowerCase();
+    const pId = String(item.productId || '').toLowerCase();
+    const supp = String(item.supplier || '').toLowerCase();
+    const q = String(search || '').toLowerCase().trim();
+    const matchesSearch = !q || name.includes(q) || pId.includes(q) || supp.includes(q);
     const matchesCategory = !categoryFilter || item.category === categoryFilter;
     return matchesSearch && matchesCategory;
   }).sort((a, b) => {
     const isAsc = order === 'asc';
     if (orderBy === 'price' || orderBy === 'quantity') {
-      return isAsc ? (a[orderBy] - b[orderBy]) : (b[orderBy] - a[orderBy]);
+      const valA = Number(a[orderBy]) || 0;
+      const valB = Number(b[orderBy]) || 0;
+      return isAsc ? (valA - valB) : (valB - valA);
     }
-    const valA = (a[orderBy] || '').toString().toLowerCase();
-    const valB = (b[orderBy] || '').toString().toLowerCase();
+    const valA = String(a[orderBy] || '').toLowerCase();
+    const valB = String(b[orderBy] || '').toLowerCase();
     return isAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
   });
 
@@ -336,7 +358,7 @@ const Inventory = () => {
   const sellingPrice = parseFloat(form.price) || 0;
   const costPrice = parseFloat(form.cost) || 0;
   const profit = sellingPrice - costPrice;
-  const marginPct = sellingPrice > 0 ? ((profit / sellingPrice) * 100).toFixed(1) : 0;
+  const marginPct = (sellingPrice > 0 && costPrice > 0) ? (((profit / sellingPrice) * 100).toFixed(1)) : '0.0';
 
   return (
     <Box>
@@ -451,7 +473,7 @@ const Inventory = () => {
               sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
             >
               <MenuItem value="">All Collections & Categories</MenuItem>
-              {categories.map((cat) => (
+              {(categories || []).map((cat) => (
                 <MenuItem key={cat} value={cat}>
                   {cat}
                 </MenuItem>
@@ -476,8 +498,12 @@ const Inventory = () => {
       {isMobile ? (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {filteredInventory.map((item) => {
-            const profit = (item.price - (item.cost || 0));
-            const profitMargin = item.cost ? ((profit / item.price) * 100).toFixed(1) : 0;
+            const price = Number(item.price) || 0;
+            const cost = Number(item.cost) || 0;
+            const profitVal = price - cost;
+            const profitMarginVal = (cost > 0 && price > 0) ? (((profitVal / price) * 100).toFixed(1)) : '0.0';
+            const qty = Number(item.quantity) || 0;
+
             return (
               <GlassCard key={item.id} sx={{ p: 2 }}>
                 <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
@@ -487,32 +513,32 @@ const Inventory = () => {
                         #{item.productId || 'NO-SKU'}
                       </Typography>
                       <Typography variant="subtitle1" sx={{ fontWeight: 800, mt: 0.25 }}>
-                        {item.name}
+                        {item.name || 'Unnamed Garment'}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
                         {item.supplier || 'No Supplier'}
                       </Typography>
                     </Box>
-                    <Chip label={item.category} size="small" variant="outlined" sx={{ fontWeight: 700, fontSize: '0.65rem' }} />
+                    <Chip label={item.category || 'General'} size="small" variant="outlined" sx={{ fontWeight: 700, fontSize: '0.65rem' }} />
                   </Box>
                   <Divider sx={{ my: 1.5 }} />
                   <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, textAlign: 'center', mb: 2 }}>
                     <Box>
-                      <Typography variant="body2" sx={{ fontWeight: 800 }}>₹{item.price}</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 800 }}>₹{price.toLocaleString('en-IN')}</Typography>
                       <Typography variant="caption" color="text.secondary">Price</Typography>
                     </Box>
                     {user?.role === 'admin' && (
                       <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 800, color: profit > 0 ? '#059669' : '#DC2626' }}>
-                          ₹{profit.toFixed(0)}
+                        <Typography variant="body2" sx={{ fontWeight: 800, color: profitVal > 0 ? '#059669' : '#DC2626' }}>
+                          ₹{profitVal.toFixed(0)}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">{profitMargin}% margin</Typography>
+                        <Typography variant="caption" color="text.secondary">{profitMarginVal}% margin</Typography>
                       </Box>
                     )}
                     <Box>
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
-                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: item.quantity < 2 ? '#ef4444' : item.quantity < 50 ? '#f59e0b' : '#10b981' }} />
-                        <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.quantity}</Typography>
+                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: qty < 2 ? '#ef4444' : qty < 50 ? '#f59e0b' : '#10b981' }} />
+                        <Typography variant="body2" sx={{ fontWeight: 700 }}>{qty}</Typography>
                       </Box>
                       <Typography variant="caption" color="text.secondary">Stock</Typography>
                     </Box>
@@ -563,82 +589,96 @@ const Inventory = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {(rowsPerPage > 0 ? filteredInventory.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : filteredInventory).map((item) => {
-                  const profit = (item.price - (item.cost || 0));
-                  const profitMargin = item.cost ? ((profit / item.price) * 100).toFixed(1) : 0;
-                  return (
-                    <TableRow key={item.id} hover>
-                      <TableCell>
-                        <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F766E', fontFamily: 'monospace' }}>
-                          {item.productId || 'N/A'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary' }}>{item.name}</Typography>
-                          {item.hasVariants && (
-                            <Tooltip title={`${item.variants?.length || 0} Variants`}>
-                              <Layers sx={{ fontSize: 16, color: 'primary.main' }} />
-                            </Tooltip>
-                          )}
-                        </Box>
-                        <Typography variant="caption" color="text.secondary">{item.supplier || 'In-House Atelier'}</Typography>
-                      </TableCell>
-                      <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                        <Chip label={item.category} size="small" variant="outlined" sx={{ fontWeight: 700, fontSize: '0.68rem', borderRadius: 1 }} />
-                      </TableCell>
-                      <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant="caption" sx={{ fontWeight: 600 }}>{item.size || 'Free Size'}</Typography>
-                          {item.color && (
-                            <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: item.color.toLowerCase(), border: '1px solid rgba(0,0,0,0.1)' }} />
-                          )}
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                          <Typography variant="body2" sx={{ fontWeight: 800 }}>₹{item.price?.toLocaleString('en-IN')}</Typography>
-                          {user?.role === 'admin' && <Typography variant="caption" color="text.secondary">Cost: ₹{(item.cost || 0).toLocaleString('en-IN')}</Typography>}
-                        </Box>
-                      </TableCell>
-                      {user?.role === 'admin' && (
+                {filteredInventory.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} sx={{ textAlign: 'center', py: 5, color: 'text.secondary' }}>
+                      <Inventory2 sx={{ fontSize: 40, opacity: 0.3, mb: 1, display: 'block', mx: 'auto' }} />
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>No garments found</Typography>
+                      <Typography variant="caption">Try adjusting search filters or click "Add Garment" to catalog new styles.</Typography>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  (rowsPerPage > 0 ? filteredInventory.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : filteredInventory).map((item) => {
+                    const price = Number(item.price) || 0;
+                    const cost = Number(item.cost) || 0;
+                    const profitVal = price - cost;
+                    const profitMarginVal = (cost > 0 && price > 0) ? (((profitVal / price) * 100).toFixed(1)) : '0.0';
+                    const qty = Number(item.quantity) || 0;
+
+                    return (
+                      <TableRow key={item.id} hover>
                         <TableCell>
-                          <Typography variant="body2" sx={{ fontWeight: 800, color: profit > 0 ? '#059669' : '#DC2626' }}>
-                            ₹{profit.toFixed(0)}
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: profit > 0 ? '#059669' : '#DC2626', fontWeight: 600 }}>
-                            {profitMargin}% margin
+                          <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F766E', fontFamily: 'monospace' }}>
+                            {item.productId || 'N/A'}
                           </Typography>
                         </TableCell>
-                      )}
-                      <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: item.quantity < 2 ? '#ef4444' : item.quantity < 50 ? '#f59e0b' : '#10b981' }} />
-                          <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.quantity} Units</Typography>
-                        </Box>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
-                          <Tooltip title="Print Barcode Tag">
-                            <IconButton size="small" onClick={() => navigate('/barcodes', { state: { product: item } })} sx={{ color: '#D97706' }}>
-                              <QrCode fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                          {user?.role === 'admin' && (
-                            <>
-                              <IconButton size="small" onClick={() => handleOpen(item)} sx={{ color: '#0F766E' }}>
-                                <Edit fontSize="small" />
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary' }}>{item.name || 'Unnamed Garment'}</Typography>
+                            {item.hasVariants && (
+                              <Tooltip title={`${item.variants?.length || 0} Variants`}>
+                                <Layers sx={{ fontSize: 16, color: 'primary.main' }} />
+                              </Tooltip>
+                            )}
+                          </Box>
+                          <Typography variant="caption" color="text.secondary">{item.supplier || 'In-House Atelier'}</Typography>
+                        </TableCell>
+                        <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                          <Chip label={item.category || 'General'} size="small" variant="outlined" sx={{ fontWeight: 700, fontSize: '0.68rem', borderRadius: 1 }} />
+                        </TableCell>
+                        <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="caption" sx={{ fontWeight: 600 }}>{item.size || 'Free Size'}</Typography>
+                            {item.color && (
+                              <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: typeof item.color === 'string' ? item.color.toLowerCase() : 'transparent', border: '1px solid rgba(0,0,0,0.1)' }} />
+                            )}
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                            <Typography variant="body2" sx={{ fontWeight: 800 }}>₹{price.toLocaleString('en-IN')}</Typography>
+                            {user?.role === 'admin' && <Typography variant="caption" color="text.secondary">Cost: ₹{cost.toLocaleString('en-IN')}</Typography>}
+                          </Box>
+                        </TableCell>
+                        {user?.role === 'admin' && (
+                          <TableCell>
+                            <Typography variant="body2" sx={{ fontWeight: 800, color: profitVal > 0 ? '#059669' : profitVal < 0 ? '#DC2626' : 'text.primary' }}>
+                              ₹{profitVal.toFixed(0)}
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: profitVal > 0 ? '#059669' : profitVal < 0 ? '#DC2626' : 'text.secondary', fontWeight: 600 }}>
+                              {profitMarginVal}% margin
+                            </Typography>
+                          </TableCell>
+                        )}
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: qty < 2 ? '#ef4444' : qty < 50 ? '#f59e0b' : '#10b981' }} />
+                            <Typography variant="body2" sx={{ fontWeight: 700 }}>{qty} Units</Typography>
+                          </Box>
+                        </TableCell>
+                        <TableCell align="right">
+                          <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
+                            <Tooltip title="Print Barcode Tag">
+                              <IconButton size="small" onClick={() => navigate('/barcodes', { state: { product: item } })} sx={{ color: '#D97706' }}>
+                                <QrCode fontSize="small" />
                               </IconButton>
-                              <IconButton size="small" onClick={() => openDeleteDialog(item.id)} sx={{ color: 'error.main' }}>
-                                <Delete fontSize="small" />
-                              </IconButton>
-                            </>
-                          )}
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
+                            </Tooltip>
+                            {user?.role === 'admin' && (
+                              <>
+                                <IconButton size="small" onClick={() => handleOpen(item)} sx={{ color: '#0F766E' }}>
+                                  <Edit fontSize="small" />
+                                </IconButton>
+                                <IconButton size="small" onClick={() => openDeleteDialog(item.id)} sx={{ color: 'error.main' }}>
+                                  <Delete fontSize="small" />
+                                </IconButton>
+                              </>
+                            )}
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
               </TableBody>
             </Table>
           </TableContainer>
@@ -819,7 +859,7 @@ const Inventory = () => {
                       onChange={(e) => setForm({ ...form, category: e.target.value })}
                       sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                     >
-                      {categories.map((cat) => (
+                      {(categories || []).map((cat) => (
                         <MenuItem key={cat} value={cat}>
                           {cat}
                         </MenuItem>
@@ -1080,7 +1120,7 @@ const Inventory = () => {
                 <Box sx={{ mt: 2.5, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
                     <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', color: 'text.secondary' }}>
-                      Variants Breakdown ({form.variants.length} variations)
+                      Variants Breakdown ({(form.variants || []).length} variations)
                     </Typography>
                     <Button
                       startIcon={<Add />}
@@ -1107,7 +1147,7 @@ const Inventory = () => {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {form.variants.length === 0 ? (
+                        {(!form.variants || form.variants.length === 0) ? (
                           <TableRow>
                             <TableCell colSpan={7} sx={{ textAlign: 'center', py: 3, color: 'text.secondary' }}>
                               No variants added yet. Click "+ Add Variant" above to specify sizes and colors.
@@ -1123,7 +1163,7 @@ const Inventory = () => {
                                 <TextField
                                   size="small"
                                   sx={{ width: 90, '& .MuiOutlinedInput-root': { borderRadius: 1.5 } }}
-                                  value={v.size}
+                                  value={v.size || ''}
                                   placeholder="Size"
                                   onChange={(e) => updateVariant(idx, 'size', e.target.value)}
                                 />
@@ -1132,7 +1172,7 @@ const Inventory = () => {
                                 <TextField
                                   size="small"
                                   sx={{ width: 90, '& .MuiOutlinedInput-root': { borderRadius: 1.5 } }}
-                                  value={v.color}
+                                  value={v.color || ''}
                                   placeholder="Color"
                                   onChange={(e) => updateVariant(idx, 'color', e.target.value)}
                                 />
@@ -1142,7 +1182,7 @@ const Inventory = () => {
                                   size="small"
                                   type="number"
                                   sx={{ width: 70, '& .MuiOutlinedInput-root': { borderRadius: 1.5 } }}
-                                  value={v.quantity}
+                                  value={v.quantity || 0}
                                   onChange={(e) => updateVariant(idx, 'quantity', e.target.value)}
                                 />
                               </TableCell>
@@ -1161,7 +1201,7 @@ const Inventory = () => {
                                   size="small"
                                   type="number"
                                   sx={{ width: 90, '& .MuiOutlinedInput-root': { borderRadius: 1.5, fontWeight: 700 } }}
-                                  value={v.price}
+                                  value={v.price || 0}
                                   onChange={(e) => updateVariant(idx, 'price', e.target.value)}
                                 />
                               </TableCell>
@@ -1179,7 +1219,7 @@ const Inventory = () => {
 
                   <Box sx={{ mt: 1.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Chip
-                      label={`Total Inventory: ${form.variants.reduce((sum, v) => sum + (parseInt(v.quantity) || 0), 0)} units`}
+                      label={`Total Inventory: ${(form.variants || []).reduce((sum, v) => sum + (parseInt(v.quantity) || 0), 0)} units`}
                       size="small"
                       sx={{ fontWeight: 800, bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E' }}
                     />
