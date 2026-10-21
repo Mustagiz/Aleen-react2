@@ -25,6 +25,18 @@ const Dashboard = () => {
   today.setHours(23, 59, 59, 999);
 
   const getFilteredData = () => {
+    const invList = invoices || [];
+    const purList = purchases || [];
+    const expList = expenses || [];
+
+    if (dateRange === 'all') {
+      return {
+        filteredInvoices: invList,
+        filteredPurchases: purList,
+        filteredExpenses: expList
+      };
+    }
+
     let startDate = new Date();
     startDate.setHours(0, 0, 0, 0);
 
@@ -35,25 +47,45 @@ const Dashboard = () => {
     } else if (dateRange === 'thisMonth') {
       startDate = new Date(today.getFullYear(), today.getMonth(), 1);
     } else {
-      return { filteredInvoices: invoices, filteredPurchases: purchases };
+      return {
+        filteredInvoices: invList,
+        filteredPurchases: purList,
+        filteredExpenses: expList
+      };
     }
 
-    const fInvoices = invoices.filter(inv => new Date(inv.date) >= startDate);
-    const fPurchases = purchases.filter(p => new Date(p.date) >= startDate);
-    const fExpenses = (expenses || []).filter(e => new Date(e.date) >= startDate);
+    const fInvoices = invList.filter(inv => inv.date && new Date(inv.date) >= startDate);
+    const fPurchases = purList.filter(p => p.date && new Date(p.date) >= startDate);
+    const fExpenses = expList.filter(e => e.date && new Date(e.date) >= startDate);
     return { filteredInvoices: fInvoices, filteredPurchases: fPurchases, filteredExpenses: fExpenses };
   };
 
-  const { filteredInvoices, filteredPurchases, filteredExpenses } = getFilteredData();
+  const { filteredInvoices = [], filteredPurchases = [], filteredExpenses = [] } = getFilteredData();
   const yesterday = new Date(Date.now() - 86400000).toDateString();
 
   const todaySales = invoices.filter(inv => new Date(inv.date).toDateString() === today.toDateString())
-    .reduce((sum, inv) => sum + inv.total, 0);
+    .reduce((sum, inv) => sum + (Number(inv.total) || 0), 0);
 
   const yesterdaySales = invoices.filter(inv => new Date(inv.date).toDateString() === yesterday)
-    .reduce((sum, inv) => sum + inv.total, 0);
+    .reduce((sum, inv) => sum + (Number(inv.total) || 0), 0);
 
   const salesTrend = yesterdaySales === 0 ? 100 : Math.round(((todaySales - yesterdaySales) / yesterdaySales) * 100);
+
+  // Dynamic Sales Title & Subtitle based on active timeframe
+  const salesKpiInfo = React.useMemo(() => {
+    switch (dateRange) {
+      case '7days':
+        return { title: '7 Days Sales', subtitle: 'Past 7 days revenue' };
+      case '30days':
+        return { title: '30 Days Sales', subtitle: 'Past 30 days revenue' };
+      case 'thisMonth':
+        return { title: 'Month Sales', subtitle: 'This month revenue' };
+      case 'all':
+        return { title: 'All-Time Sales', subtitle: 'All registered revenue' };
+      default:
+        return { title: "Today's Sales", subtitle: 'vs yesterday' };
+    }
+  }, [dateRange]);
 
   const lowStockItemsList = getLowStockItems ? getLowStockItems() : [];
   const lowStockCount = lowStockItemsList.length;
@@ -164,27 +196,40 @@ const Dashboard = () => {
 
   // Financial Trends Data (Daily/Monthly)
   const getTrendData = () => {
-    const dailySales = {};
-    const dailyExpenses = {};
+    const isAll = dateRange === 'all';
+    const salesMap = {};
+    const expMap = {};
 
     filteredInvoices.forEach(inv => {
-      const d = new Date(inv.date).toLocaleDateString();
-      dailySales[d] = (dailySales[d] || 0) + inv.total;
+      if (!inv.date) return;
+      const dateObj = new Date(inv.date);
+      if (isNaN(dateObj.getTime())) return;
+      const key = isAll 
+        ? dateObj.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })
+        : dateObj.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+      salesMap[key] = (salesMap[key] || 0) + (Number(inv.total) || 0);
     });
 
     filteredExpenses.forEach(exp => {
-      const d = new Date(exp.date).toLocaleDateString();
-      dailyExpenses[d] = (dailyExpenses[d] || 0) + exp.amount;
+      if (!exp.date) return;
+      const dateObj = new Date(exp.date);
+      if (isNaN(dateObj.getTime())) return;
+      const key = isAll 
+        ? dateObj.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })
+        : dateObj.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+      expMap[key] = (expMap[key] || 0) + (Number(exp.amount) || 0);
     });
 
-    // Merge dates and sort
-    const allDates = [...new Set([...Object.keys(dailySales), ...Object.keys(dailyExpenses)])]
-      .sort((a, b) => new Date(a) - new Date(b));
+    // Merge labels keeping chronological order
+    const rawKeys = [...new Set([...Object.keys(salesMap), ...Object.keys(expMap)])];
+    const sortedKeys = rawKeys.sort((a, b) => new Date(a) - new Date(b));
+
+    const finalLabels = sortedKeys.length > 0 ? sortedKeys : ['No Data'];
 
     return {
-      labels: allDates,
-      sales: allDates.map(d => dailySales[d] || 0),
-      expenses: allDates.map(d => dailyExpenses[d] || 0)
+      labels: finalLabels,
+      sales: finalLabels.map(k => salesMap[k] || 0),
+      expenses: finalLabels.map(k => expMap[k] || 0)
     };
   };
 
@@ -377,14 +422,14 @@ const Dashboard = () => {
       <Grid container spacing={2.5} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} lg={3}>
           <AtelierKpiCard
-            title="Today's Sales"
-            value={`₹${todaySales.toLocaleString('en-IN')}`}
+            title={salesKpiInfo.title}
+            value={`₹${totalRevenue.toLocaleString('en-IN')}`}
             icon={<AttachMoney fontSize="small" />}
-            trend={salesTrend !== undefined ? `${Math.abs(salesTrend)}%` : null}
+            trend={dateRange === '7days' || dateRange === 'today' ? (salesTrend !== undefined ? `${Math.abs(salesTrend)}%` : null) : null}
             trendPositive={salesTrend >= 0}
             goldAccent={true}
             onClick={() => navigate('/sales-reports')}
-            subtitle="vs yesterday"
+            subtitle={salesKpiInfo.subtitle}
           />
         </Grid>
 
