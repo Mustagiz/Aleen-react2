@@ -473,7 +473,13 @@ export default function Devices() {
             confirmText: 'Unpair Device',
             isDanger: true,
             onConfirm: () => {
-                setDevices(prev => prev.filter(d => d.id !== id));
+                setDevices(prev => {
+                    const nextDevices = prev.filter(d => d.id !== id);
+                    try {
+                        localStorage.setItem('aleen_paired_devices', JSON.stringify(nextDevices));
+                    } catch (e) {}
+                    return nextDevices;
+                });
                 showToast(`Unpaired ${deviceName} successfully`, 'info');
             }
         });

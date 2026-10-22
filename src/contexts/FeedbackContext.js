@@ -61,8 +61,8 @@ export const FeedbackProvider = ({ children }) => {
             confirmText,
             cancelText,
             isDanger,
-            onConfirm: onConfirm ? () => onConfirm : null,
-            onCancel: onCancel ? () => onCancel : null
+            onConfirm: typeof onConfirm === 'function' ? onConfirm : null,
+            onCancel: typeof onCancel === 'function' ? onCancel : null
         });
     }, []);
 
@@ -73,16 +73,22 @@ export const FeedbackProvider = ({ children }) => {
     const handleConfirmAction = useCallback(() => {
         const action = confirmState.onConfirm;
         closeConfirm();
-        if (action) {
-            action();
+        if (typeof action === 'function') {
+            const res = action();
+            if (typeof res === 'function') {
+                res();
+            }
         }
     }, [confirmState, closeConfirm]);
 
     const handleCancelAction = useCallback(() => {
         const cancelAction = confirmState.onCancel;
         closeConfirm();
-        if (cancelAction) {
-            cancelAction();
+        if (typeof cancelAction === 'function') {
+            const res = cancelAction();
+            if (typeof res === 'function') {
+                res();
+            }
         }
     }, [confirmState, closeConfirm]);
 
