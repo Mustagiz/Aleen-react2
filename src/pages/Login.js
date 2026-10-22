@@ -324,13 +324,13 @@ export default function Login() {
             <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.25 }}>
               <Box>
                 <Typography variant="caption" sx={{ fontWeight: 700, color: '#334155', mb: 0.75, display: 'block' }}>
-                  Atelier User Email
+                  Atelier Email or Staff Login ID
                 </Typography>
                 <TextField
                   fullWidth
                   size="small"
-                  placeholder="admin@aleen.com"
-                  type="email"
+                  placeholder="e.g. admin@aleen.com or staff_id"
+                  type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required

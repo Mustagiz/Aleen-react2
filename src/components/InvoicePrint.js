@@ -116,7 +116,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings }, ref) => {
       }}
     >
       {/* Background Watermark */}
-      {activeSettings.showWatermark && !isSlip && (
+      {(profile.showWatermark ?? activeSettings.showWatermark) && !isSlip && (
         <Box
           sx={{
             position: 'absolute',
@@ -133,16 +133,16 @@ const InvoicePrint = forwardRef(({ invoice, template, settings }, ref) => {
             textTransform: 'uppercase'
           }}
         >
-          {activeSettings.watermarkText || 'ALEEN CLOTHING'}
+          {profile.watermarkText || activeSettings.watermarkText || profile.businessName || 'ALEEN CLOTHING'}
         </Box>
       )}
 
       {/* HEADER SECTION */}
-      {activeSettings.useCustomLetterhead && activeSettings.customLetterheadImage ? (
+      {(profile.useCustomLetterhead || activeSettings.useCustomLetterhead) && (profile.customLetterheadImage || activeSettings.customLetterheadImage) ? (
         <Box sx={{ mb: 3, textAlign: 'center', position: 'relative', zIndex: 1, pageBreakInside: 'avoid', breakInside: 'avoid' }}>
           <Box
             component="img"
-            src={activeSettings.customLetterheadImage}
+            src={profile.customLetterheadImage || activeSettings.customLetterheadImage}
             alt="Atelier Letterhead"
             sx={{
               width: '100%',
@@ -159,7 +159,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings }, ref) => {
             {profile.businessName?.toUpperCase() || 'ALEEN CLOTHING'}
           </Typography>
           <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
-            {activeSettings.tagline || 'Boutique & Bespoke Atelier'}
+            {profile.tagline || activeSettings.tagline || 'Boutique & Bespoke Atelier'}
           </Typography>
           <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary' }}>
             {profile.address}
@@ -203,7 +203,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings }, ref) => {
           <Box sx={{ flex: 1, pr: { sm: 2 } }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography variant="caption" sx={{ letterSpacing: 2, color: '#FDE68A', fontWeight: 800, textTransform: 'uppercase' }}>
-                ✂️ Haute Couture & Bespoke Craft
+                ✂️ {profile.tagline || activeSettings.tagline || 'Haute Couture & Bespoke Craft'}
               </Typography>
             </Box>
             <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: -0.5, mt: 0.5, color: '#FFFFFF', fontSize: { xs: '1.4rem', sm: '1.75rem' } }}>
@@ -388,7 +388,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings }, ref) => {
       }}>
         {/* Left: Bank / UPI Details */}
         <Box sx={{ flex: 1, width: isSlip ? '100%' : '52%' }}>
-          {activeSettings.showBankDetails && !isSlip ? (
+          {(profile.showBankDetails ?? activeSettings.showBankDetails) && !isSlip ? (
             <Box
               sx={{
                 p: 2,
@@ -408,16 +408,16 @@ const InvoicePrint = forwardRef(({ invoice, template, settings }, ref) => {
                 </Typography>
                 <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 0.4 }}>
                   <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    Bank: <b>{activeSettings.bankDetails?.bankName}</b>
+                    Bank: <b>{profile.bankDetails?.bankName || activeSettings.bankDetails?.bankName}</b>
                   </Typography>
                   <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    A/C No: <b>{activeSettings.bankDetails?.accountNumber}</b>
+                    A/C No: <b>{profile.bankDetails?.accountNumber || activeSettings.bankDetails?.accountNumber}</b>
                   </Typography>
                   <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    IFSC Code: <b>{activeSettings.bankDetails?.ifsc}</b>
+                    IFSC Code: <b>{profile.bankDetails?.ifsc || activeSettings.bankDetails?.ifsc}</b>
                   </Typography>
                   <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    UPI VPA: <b style={{ color: theme.primaryColor }}>{activeSettings.bankDetails?.upiId}</b>
+                    UPI VPA: <b style={{ color: theme.primaryColor }}>{profile.bankDetails?.upiId || activeSettings.bankDetails?.upiId}</b>
                   </Typography>
                 </Box>
               </Box>
@@ -514,19 +514,19 @@ const InvoicePrint = forwardRef(({ invoice, template, settings }, ref) => {
             Terms & Conditions:
           </Typography>
           <Typography variant="caption" sx={{ color: 'text.secondary', whiteSpace: 'pre-line', display: 'block', fontSize: '0.68rem', lineHeight: 1.4 }}>
-            {activeSettings.termsText}
+            {profile.termsText || activeSettings.termsText}
           </Typography>
           <Typography variant="body2" sx={{ mt: 1, fontWeight: 700, color: theme.primaryColor, fontSize: '0.78rem' }}>
-            {activeSettings.customFooterNote || `Thank you for shopping with ${profile.businessName || 'Aleen Clothing'}!`}
+            {profile.customFooterNote || activeSettings.customFooterNote || `Thank you for shopping with ${profile.businessName || 'Aleen Clothing'}!`}
           </Typography>
         </Box>
 
-        {!isSlip && activeSettings.showSignatureStamp && (
+        {!isSlip && (profile.showSignatureStamp ?? activeSettings.showSignatureStamp) && (
           <Box sx={{ textAlign: 'center', width: { xs: '100%', sm: '30%' }, minWidth: 160 }}>
             <Box sx={{ height: 40 }} />
             <Box sx={{ borderBottom: '1px solid #94A3B8', mb: 0.5 }} />
             <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', fontSize: '0.7rem' }}>
-              {activeSettings.signatureLabel || 'Authorized Signatory'}
+              {profile.signatureLabel || activeSettings.signatureLabel || 'Authorized Signatory'}
             </Typography>
             <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.65rem' }}>
               {profile.businessName || 'Aleen Clothing'}

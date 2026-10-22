@@ -151,8 +151,26 @@ export default function Layout() {
     }
   ].map(section => ({
     ...section,
-    items: section.items.filter(item => !item.adminOnly || user?.role === 'admin')
-  }));
+    items: section.items.filter(item => {
+      if (user?.role === 'admin') return true;
+      if (user?.permissions) {
+        if (item.path === '/' && user.permissions.dashboard === false) return false;
+        if (item.path === '/invoices' && !user.permissions.invoices) return false;
+        if (item.path === '/barcodes' && !user.permissions.inventory) return false;
+        if (item.path === '/devices' && !user.permissions.invoices) return false;
+        if (item.path === '/customers' && !user.permissions.customers) return false;
+        if (item.path === '/loyalty' && !user.permissions.customers) return false;
+        if (item.path === '/marketing' && !user.permissions.customers) return false;
+        if (item.path === '/inventory' && !user.permissions.inventory) return false;
+        if (item.path === '/tailoring' && !user.permissions.tailoring) return false;
+        if ((item.path === '/purchases' || item.path === '/vendors') && !user.permissions.purchases) return false;
+        if ((item.path === '/payment-summary' || item.path === '/profit-loss' || item.path === '/expenses' || item.path === '/advanced-reports' || item.path === '/sales-reports' || item.path === '/inventory-reports') && !user.permissions.reports) return false;
+        if (item.path === '/settings' && !user.permissions.settings) return false;
+        return true;
+      }
+      return !item.adminOnly || user?.role === 'admin';
+    })
+  })).filter(section => section.items.length > 0);
 
   const handleLogout = async () => {
     await logout();
