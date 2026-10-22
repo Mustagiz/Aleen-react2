@@ -1560,6 +1560,56 @@ export default function Devices() {
                     </IconButton>
                 </DialogTitle>
                 <DialogContent sx={{ pt: 2.5 }}>
+                    {/* Direct Switch to Wireless Phone Bridge */}
+                    <Box sx={{
+                        mb: 2.5,
+                        p: 1.5,
+                        borderRadius: 2.5,
+                        bgcolor: 'rgba(217, 119, 6, 0.08)',
+                        border: '1px solid rgba(217, 119, 6, 0.25)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: 1.5,
+                        flexWrap: { xs: 'wrap', sm: 'nowrap' }
+                    }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+                            <PhoneAndroid sx={{ color: '#D97706', fontSize: 28 }} />
+                            <Box>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#92400E', lineHeight: 1.2 }}>
+                                    Want to scan using your Phone's Camera?
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem', display: 'block', mt: 0.3 }}>
+                                    Standard Bluetooth does not stream video to Mac. Use the <strong>Wireless QR Bridge</strong> to turn your phone into a handheld scanner gun!
+                                </Typography>
+                            </Box>
+                        </Box>
+                        <Button
+                            variant="contained"
+                            size="small"
+                            startIcon={<QrCodeScanner />}
+                            onClick={() => {
+                                setCameraScannerOpen(false);
+                                setPhoneModalOpen(true);
+                            }}
+                            sx={{
+                                flexShrink: 0,
+                                textTransform: 'none',
+                                fontWeight: 800,
+                                fontSize: '0.76rem',
+                                bgcolor: '#D97706',
+                                color: '#fff',
+                                borderRadius: 2,
+                                px: 2,
+                                py: 0.8,
+                                boxShadow: 'none',
+                                '&:hover': { bgcolor: '#B45309' }
+                            }}
+                        >
+                            Open Phone Bridge
+                        </Button>
+                    </Box>
+
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                         Hold any garment tag or product QR code in front of the lens. It will scan and resolve the item automatically.
                     </Typography>
@@ -1589,12 +1639,15 @@ export default function Devices() {
                         </Box>
                     )}
 
-                    <Alert severity="info" sx={{ mb: 2, borderRadius: 2, bgcolor: 'rgba(15, 118, 110, 0.08)' }}>
-                        <Typography variant="caption" sx={{ fontWeight: 700, color: '#042F2E', display: 'block' }}>
-                            📱 Apple Continuity Camera (Mac + Phone over Bluetooth)
+                    <Alert severity="info" sx={{ mb: 2, borderRadius: 2, bgcolor: 'rgba(15, 118, 110, 0.06)', border: '1px solid rgba(15, 118, 110, 0.2)' }}>
+                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#042F2E', display: 'block', mb: 0.3 }}>
+                            ℹ️ Phone Camera Compatibility:
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                            Ensure Bluetooth & Wi-Fi are ON on both your Mac and phone. When selected in the menu above, macOS automatically triggers and opens your phone's camera wirelessly.
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1.4 }}>
+                            • <strong>Android Phones:</strong> Standard Bluetooth pairing does not stream video to macOS. Click <strong>"Open Phone Bridge"</strong> above to scan directly with your Android phone's camera!
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1.4, mt: 0.3 }}>
+                            • <strong>iPhones (Apple Continuity):</strong> Only appears in the dropdown if your Mac and iPhone are signed into the <em>exact same Apple ID</em> with Wi-Fi & Bluetooth turned on.
                         </Typography>
                     </Alert>
 
@@ -1627,7 +1680,25 @@ export default function Devices() {
                         </Typography>
                     </Box>
                 </DialogContent>
-                <DialogActions sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider' }}>
+                <DialogActions sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between' }}>
+                    <Button
+                        variant="outlined"
+                        startIcon={<QrCodeScanner />}
+                        onClick={() => {
+                            setCameraScannerOpen(false);
+                            setPhoneModalOpen(true);
+                        }}
+                        sx={{
+                            borderRadius: 2,
+                            fontWeight: 700,
+                            textTransform: 'none',
+                            borderColor: '#D97706',
+                            color: '#D97706',
+                            '&:hover': { bgcolor: 'rgba(217, 119, 6, 0.08)' }
+                        }}
+                    >
+                        Use Phone Camera (QR Bridge)
+                    </Button>
                     <Button onClick={() => setCameraScannerOpen(false)} sx={{ fontWeight: 700, color: 'text.secondary' }}>
                         Close Camera
                     </Button>
