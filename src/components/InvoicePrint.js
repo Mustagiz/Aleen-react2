@@ -105,7 +105,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings }, ref) => {
         colorAdjust: 'exact',
         boxSizing: 'border-box',
         '@media print': {
-          p: 0,
+          p: isSlip ? '3mm 2mm' : '6mm 6mm 10mm 6mm',
           maxWidth: isSlip ? '80mm' : '100%',
           width: '100%',
           boxShadow: 'none',
@@ -496,7 +496,8 @@ const InvoicePrint = forwardRef(({ invoice, template, settings }, ref) => {
 
       {/* FOOTER & TERMS */}
       <Box sx={{
-        pt: 2,
+        pt: 2.5,
+        pb: isSlip ? 1.5 : 2.5,
         borderTop: isSlip ? '1px dashed #64748B' : '1px solid #E2E8F0',
         position: 'relative',
         zIndex: 1,

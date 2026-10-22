@@ -66,7 +66,7 @@ export const printInvoiceElement = (element, isSlip = false) => {
 
           @page {
             size: ${isSlip ? '80mm auto' : 'A4 portrait'};
-            margin: ${isSlip ? '3mm' : '8mm 10mm'};
+            margin: ${isSlip ? '4mm 3mm' : '14mm 16mm 14mm 16mm'};
           }
           * {
             box-sizing: border-box !important;
@@ -86,12 +86,13 @@ export const printInvoiceElement = (element, isSlip = false) => {
             width: 100% !important;
             max-width: ${isSlip ? '80mm' : '100%'} !important;
             margin: 0 auto !important;
-            padding: 0 !important;
+            padding: ${isSlip ? '3mm 2mm' : '6mm 6mm 10mm 6mm'} !important;
             box-shadow: none !important;
             border-radius: 0 !important;
             background: #ffffff !important;
             visibility: visible !important;
             position: relative !important;
+            box-sizing: border-box !important;
           }
           table {
             width: 100% !important;
