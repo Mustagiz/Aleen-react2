@@ -583,6 +583,37 @@ export default function Layout() {
             >
               {mode === 'dark' ? <Brightness7 fontSize="small" sx={{ color: '#F59E0B' }} /> : <Brightness4 fontSize="small" sx={{ color: '#0F766E' }} />}
             </IconButton>
+
+            {/* Top Right Logout Button */}
+            <Tooltip title="Log out of Aleen Clothing">
+              <Button
+                onClick={handleLogout}
+                size="small"
+                variant="outlined"
+                color="error"
+                startIcon={<Logout fontSize="small" />}
+                sx={{
+                  height: 36,
+                  borderRadius: '9px',
+                  textTransform: 'none',
+                  fontWeight: 700,
+                  fontSize: '0.78rem',
+                  borderColor: isDark ? 'rgba(239, 68, 68, 0.35)' : 'rgba(239, 68, 68, 0.25)',
+                  color: isDark ? '#FCA5A5' : '#DC2626',
+                  bgcolor: isDark ? 'rgba(239, 68, 68, 0.08)' : 'rgba(254, 242, 242, 0.7)',
+                  px: { xs: 1.2, sm: 1.6 },
+                  minWidth: { xs: 36, sm: 'auto' },
+                  '&:hover': {
+                    borderColor: 'error.main',
+                    bgcolor: isDark ? 'rgba(239, 68, 68, 0.18)' : '#FEE2E2'
+                  }
+                }}
+              >
+                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                  Logout
+                </Box>
+              </Button>
+            </Tooltip>
           </Box>
         </Box>
 
