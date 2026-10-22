@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -50,7 +50,9 @@ import {
   CheckCircle,
   Block,
   Security,
-  ColorLens
+  ColorLens,
+  CloudUpload,
+  Draw
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -106,6 +108,7 @@ export default function Settings() {
     watermarkText: profile.watermarkText || 'ALEEN CLOTHING',
     showSignatureStamp: profile.showSignatureStamp ?? true,
     signatureLabel: profile.signatureLabel || 'Authorized Atelier Signatory',
+    signatureImage: profile.signatureImage || '',
     termsText: profile.termsText || DEFAULT_INVOICE_SETTINGS.termsText,
     customFooterNote: profile.customFooterNote || DEFAULT_INVOICE_SETTINGS.customFooterNote
   });
@@ -126,6 +129,55 @@ export default function Settings() {
 
   // Saving indicator
   const [isSaving, setIsSaving] = useState(false);
+
+  // File input refs for signature & letterhead
+  const signatureInputRef = useRef(null);
+  const letterheadInputRef = useRef(null);
+
+  // Upload handler for custom signature (converted to base64 Data URL)
+  const handleSignatureUpload = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      showToast('Signature file size should be under 2MB.', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setFormProfile(prev => ({
+        ...prev,
+        signatureImage: event.target.result
+      }));
+      showToast('Custom signature loaded! Click "Save Print Configuration" to confirm.', 'success');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveSignature = () => {
+    setFormProfile(prev => ({ ...prev, signatureImage: '' }));
+    if (signatureInputRef.current) signatureInputRef.current.value = '';
+    showToast('Signature removed.', 'info');
+  };
+
+  // Upload handler for custom letterhead
+  const handleLetterheadUpload = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (file.size > 3 * 1024 * 1024) {
+      showToast('Letterhead file size should be under 3MB.', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setFormProfile(prev => ({
+        ...prev,
+        customLetterheadImage: event.target.result,
+        useCustomLetterhead: true
+      }));
+      showToast('Letterhead artwork uploaded!', 'success');
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Save all profile and invoice changes to Firestore and localStorage
   const handleSaveProfile = async () => {
@@ -148,6 +200,7 @@ export default function Settings() {
         watermarkText: formProfile.watermarkText,
         showSignatureStamp: formProfile.showSignatureStamp,
         signatureLabel: formProfile.signatureLabel,
+        signatureImage: formProfile.signatureImage,
         termsText: formProfile.termsText,
         customFooterNote: formProfile.customFooterNote
       };
@@ -918,7 +971,7 @@ export default function Settings() {
 
               <Divider sx={{ my: 3 }} />
 
-              {/* Custom Letterhead Banner URL */}
+              {/* Custom Letterhead Banner */}
               <Box sx={{ mb: 3 }}>
                 <FormControlLabel
                   control={
@@ -931,70 +984,222 @@ export default function Settings() {
                   label={<Typography variant="subtitle2" sx={{ fontWeight: 800 }}>Use Custom Letterhead Artwork</Typography>}
                 />
                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
-                  Replace the top header banner with your graphic letterhead banner image (e.g. from Cloudinary or Image URL).
+                  Replace the top header banner with your graphic letterhead banner image (1200 x 240 px recommended).
                 </Typography>
 
                 {formProfile.useCustomLetterhead && (
+                  <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+                      <Button
+                        variant="outlined"
+                        component="label"
+                        size="small"
+                        startIcon={<CloudUpload />}
+                        sx={{
+                          textTransform: 'none',
+                          fontWeight: 700,
+                          borderColor: '#0F766E',
+                          color: '#0F766E'
+                        }}
+                      >
+                        Upload Letterhead Banner
+                        <input
+                          ref={letterheadInputRef}
+                          type="file"
+                          hidden
+                          accept="image/*"
+                          onChange={handleLetterheadUpload}
+                        />
+                      </Button>
+                      {formProfile.customLetterheadImage && (
+                        <Button
+                          variant="text"
+                          color="error"
+                          size="small"
+                          startIcon={<Delete />}
+                          onClick={() => {
+                            setFormProfile({ ...formProfile, customLetterheadImage: '' });
+                            if (letterheadInputRef.current) letterheadInputRef.current.value = '';
+                          }}
+                          sx={{ textTransform: 'none', fontWeight: 700 }}
+                        >
+                          Remove Artwork
+                        </Button>
+                      )}
+                    </Box>
+
+                    <TextField
+                      fullWidth
+                      size="small"
+                      label="Or Letterhead Image URL"
+                      placeholder="https://your-domain.com/letterhead.png"
+                      value={formProfile.customLetterheadImage}
+                      onChange={(e) => setFormProfile({ ...formProfile, customLetterheadImage: e.target.value })}
+                      helperText="Direct image URL or upload above"
+                    />
+
+                    {formProfile.customLetterheadImage && (
+                      <Box sx={{ mt: 1.5, p: 1, borderRadius: 1.5, bgcolor: '#FFFFFF', border: '1px solid #E2E8F0', textAlign: 'center' }}>
+                        <img
+                          src={formProfile.customLetterheadImage}
+                          alt="Letterhead Preview"
+                          style={{ maxHeight: 70, maxWidth: '100%', objectFit: 'contain' }}
+                        />
+                      </Box>
+                    )}
+                  </Box>
+                )}
+              </Box>
+
+              <Divider sx={{ my: 3 }} />
+
+              {/* Watermark Section */}
+              <Box sx={{ mb: 3 }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={formProfile.showWatermark}
+                      onChange={(e) => setFormProfile({ ...formProfile, showWatermark: e.target.checked })}
+                      color="primary"
+                    />
+                  }
+                  label={<Typography variant="subtitle2" sx={{ fontWeight: 800 }}>Show Diagonal Background Watermark</Typography>}
+                />
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                  Faint luxury watermark printed diagonally behind line items.
+                </Typography>
+
+                {formProfile.showWatermark && (
                   <TextField
                     fullWidth
                     size="small"
-                    label="Letterhead Image URL"
-                    placeholder="https://your-domain.com/letterhead.png"
-                    value={formProfile.customLetterheadImage}
-                    onChange={(e) => setFormProfile({ ...formProfile, customLetterheadImage: e.target.value })}
-                    helperText="Recommended size: 1200 x 240 px (PNG or JPG)"
+                    sx={{ mt: 1 }}
+                    label="Watermark Text"
+                    value={formProfile.watermarkText}
+                    onChange={(e) => setFormProfile({ ...formProfile, watermarkText: e.target.value.toUpperCase() })}
+                    helperText="e.g. ALEEN COUTURE, ORIGINAL INVOICE, PAID"
                   />
                 )}
               </Box>
 
               <Divider sx={{ my: 3 }} />
 
-              {/* Watermark and Signature Toggles */}
-              <Grid container spacing={2} sx={{ mb: 3 }}>
-                <Grid item xs={12} sm={6}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={formProfile.showWatermark}
-                        onChange={(e) => setFormProfile({ ...formProfile, showWatermark: e.target.checked })}
-                      />
-                    }
-                    label={<Typography variant="body2" sx={{ fontWeight: 700 }}>Show Diagonal Watermark</Typography>}
-                  />
-                  {formProfile.showWatermark && (
-                    <TextField
-                      fullWidth
-                      size="small"
-                      sx={{ mt: 1 }}
-                      label="Watermark Text"
-                      value={formProfile.watermarkText}
-                      onChange={(e) => setFormProfile({ ...formProfile, watermarkText: e.target.value.toUpperCase() })}
+              {/* Authorized Signature & Stamp Section */}
+              <Box sx={{ mb: 3 }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={formProfile.showSignatureStamp}
+                      onChange={(e) => setFormProfile({ ...formProfile, showSignatureStamp: e.target.checked })}
+                      color="primary"
                     />
-                  )}
-                </Grid>
+                  }
+                  label={
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Draw sx={{ fontSize: 18, color: '#D97706' }} /> Show Signature Stamp & Custom Signature
+                    </Typography>
+                  }
+                />
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
+                  Prints an official boutique signature image, stamp line, and signatory title on every bill & PDF export.
+                </Typography>
 
-                <Grid item xs={12} sm={6}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={formProfile.showSignatureStamp}
-                        onChange={(e) => setFormProfile({ ...formProfile, showSignatureStamp: e.target.checked })}
-                      />
-                    }
-                    label={<Typography variant="body2" sx={{ fontWeight: 700 }}>Show Signature Stamp</Typography>}
-                  />
-                  {formProfile.showSignatureStamp && (
-                    <TextField
-                      fullWidth
-                      size="small"
-                      sx={{ mt: 1 }}
-                      label="Signatory Label"
-                      value={formProfile.signatureLabel}
-                      onChange={(e) => setFormProfile({ ...formProfile, signatureLabel: e.target.value })}
-                    />
-                  )}
-                </Grid>
-              </Grid>
+                {formProfile.showSignatureStamp && (
+                  <Box sx={{ p: 2.5, borderRadius: 2.5, bgcolor: 'rgba(15, 118, 110, 0.03)', border: '1px solid rgba(15, 118, 110, 0.15)' }}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          label="Signatory Title / Label"
+                          value={formProfile.signatureLabel}
+                          onChange={(e) => setFormProfile({ ...formProfile, signatureLabel: e.target.value })}
+                          helperText="e.g. Authorized Atelier Signatory, Proprietor, Creative Director"
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          label="Or Signature Image URL"
+                          placeholder="https://.../signature.png"
+                          value={formProfile.signatureImage || ''}
+                          onChange={(e) => setFormProfile({ ...formProfile, signatureImage: e.target.value })}
+                          helperText="Direct image URL or upload file below"
+                        />
+                      </Grid>
+
+                      <Grid item xs={12}>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1.5 }}>
+                          <Button
+                            variant="outlined"
+                            component="label"
+                            startIcon={<CloudUpload />}
+                            sx={{
+                              borderColor: '#0F766E',
+                              color: '#0F766E',
+                              textTransform: 'none',
+                              fontWeight: 700,
+                              borderRadius: 2,
+                              '&:hover': {
+                                borderColor: '#042F2E',
+                                bgcolor: 'rgba(15, 118, 110, 0.05)'
+                              }
+                            }}
+                          >
+                            Upload Custom Signature (PNG / JPG)
+                            <input
+                              ref={signatureInputRef}
+                              type="file"
+                              hidden
+                              accept="image/*"
+                              onChange={handleSignatureUpload}
+                            />
+                          </Button>
+
+                          {formProfile.signatureImage && (
+                            <Button
+                              variant="text"
+                              color="error"
+                              startIcon={<Delete />}
+                              onClick={handleRemoveSignature}
+                              sx={{ textTransform: 'none', fontWeight: 700 }}
+                            >
+                              Remove Signature
+                            </Button>
+                          )}
+                        </Box>
+
+                        {/* Signature Preview Card */}
+                        {formProfile.signatureImage ? (
+                          <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 2.5, p: 2, borderRadius: 2, bgcolor: '#FFFFFF', border: '1px dashed #CBD5E1' }}>
+                            <Box sx={{ p: 1, bgcolor: '#F8FAFC', borderRadius: 1.5, border: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 140, minHeight: 54 }}>
+                              <img
+                                src={formProfile.signatureImage}
+                                alt="Signature preview"
+                                style={{ maxHeight: 48, maxWidth: 160, objectFit: 'contain' }}
+                              />
+                            </Box>
+                            <Box>
+                              <Typography variant="body2" sx={{ fontWeight: 800, color: '#042F2E', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <CheckCircle sx={{ fontSize: 16, color: '#0F766E' }} /> Custom Signature Active
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                This signature will render directly above "{formProfile.signatureLabel}" on printed invoices and PDF downloads.
+                              </Typography>
+                            </Box>
+                          </Box>
+                        ) : (
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
+                            Tip: For the cleanest luxury look, upload a transparent PNG of your handwritten signature or boutique stamp.
+                          </Typography>
+                        )}
+                      </Grid>
+                    </Grid>
+                  </Box>
+                )}
+              </Box>
 
               <Divider sx={{ my: 3 }} />
 
@@ -1031,6 +1236,7 @@ export default function Settings() {
                   variant="contained"
                   startIcon={<Save />}
                   onClick={handleSaveProfile}
+                  disabled={isSaving}
                   sx={{
                     borderRadius: 2,
                     fontWeight: 800,
@@ -1039,7 +1245,7 @@ export default function Settings() {
                     color: '#FFFFFF'
                   }}
                 >
-                  Save Print Configuration
+                  {isSaving ? 'Saving...' : 'Save Print Configuration'}
                 </Button>
               </Box>
             </Paper>
@@ -1071,6 +1277,15 @@ export default function Settings() {
                 </Typography>
                 {formProfile.showSignatureStamp && (
                   <Box sx={{ mt: 2, pt: 1, borderTop: '1px solid #CBD5E1', textAlign: 'right' }}>
+                    {formProfile.signatureImage && (
+                      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 0.5 }}>
+                        <img
+                          src={formProfile.signatureImage}
+                          alt="Signature Preview"
+                          style={{ maxHeight: 46, maxWidth: 140, objectFit: 'contain' }}
+                        />
+                      </Box>
+                    )}
                     <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block' }}>
                       {formProfile.signatureLabel}
                     </Typography>

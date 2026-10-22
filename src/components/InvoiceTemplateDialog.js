@@ -525,6 +525,53 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
                     value={localSettings.signatureLabel}
                     onChange={(e) => setLocalSettings({ ...localSettings, signatureLabel: e.target.value })}
                   />
+
+                  <Box sx={{ mt: 1 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 700, display: 'block', mb: 0.5 }}>
+                      Authorized Signature Artwork:
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                      <Button
+                        variant="outlined"
+                        component="label"
+                        size="small"
+                        startIcon={<CloudUpload />}
+                        sx={{ textTransform: 'none', fontWeight: 600 }}
+                      >
+                        Upload Signature Image
+                        <input
+                          type="file"
+                          hidden
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files && e.target.files[0];
+                            if (!file) return;
+                            const reader = new FileReader();
+                            reader.onload = (ev) => {
+                              setLocalSettings(prev => ({ ...prev, signatureImage: ev.target.result }));
+                            };
+                            reader.readAsDataURL(file);
+                          }}
+                        />
+                      </Button>
+                      {localSettings.signatureImage && (
+                        <Button
+                          variant="text"
+                          color="error"
+                          size="small"
+                          onClick={() => setLocalSettings(prev => ({ ...prev, signatureImage: '' }))}
+                          sx={{ textTransform: 'none' }}
+                        >
+                          Remove
+                        </Button>
+                      )}
+                    </Box>
+                    {localSettings.signatureImage && (
+                      <Box sx={{ mt: 1, p: 0.5, border: '1px dashed #CBD5E1', display: 'inline-block', borderRadius: 1 }}>
+                        <img src={localSettings.signatureImage} alt="Signature" style={{ maxHeight: 36, maxWidth: 120, objectFit: 'contain' }} />
+                      </Box>
+                    )}
+                  </Box>
                 </Box>
               </Grid>
             </Grid>

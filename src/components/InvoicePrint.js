@@ -523,7 +523,17 @@ const InvoicePrint = forwardRef(({ invoice, template, settings }, ref) => {
 
         {!isSlip && (profile.showSignatureStamp ?? activeSettings.showSignatureStamp) && (
           <Box sx={{ textAlign: 'center', width: { xs: '100%', sm: '30%' }, minWidth: 160 }}>
-            <Box sx={{ height: 40 }} />
+            {(profile.signatureImage || activeSettings.signatureImage) ? (
+              <Box sx={{ minHeight: 46, maxHeight: 60, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', mb: 0.5 }}>
+                <img
+                  src={profile.signatureImage || activeSettings.signatureImage}
+                  alt="Authorized Signature"
+                  style={{ maxHeight: 52, maxWidth: 150, objectFit: 'contain' }}
+                />
+              </Box>
+            ) : (
+              <Box sx={{ height: 40 }} />
+            )}
             <Box sx={{ borderBottom: '1px solid #94A3B8', mb: 0.5 }} />
             <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', fontSize: '0.7rem' }}>
               {profile.signatureLabel || activeSettings.signatureLabel || 'Authorized Signatory'}

@@ -61,6 +61,7 @@ export const DEFAULT_INVOICE_SETTINGS = {
   },
   showSignatureStamp: true,
   signatureLabel: 'Authorized Atelier Signatory',
+  signatureImage: '',
   termsText: '1. Goods once sold may be exchanged within 7 days with original price tag and invoice.\n2. Bespoke alterations are complimentary within 30 days of delivery.\n3. Custom tailored and made-to-measure bridal orders are non-refundable.',
   customFooterNote: 'Thank you for shopping with Aleen Clothing! We cherish dressing your finest moments.'
 };
