@@ -2836,6 +2836,7 @@ const Invoices = () => {
 
         {/* Template Quick Switcher Header Bar */}
         <Box
+          className="no-print"
           sx={{
             p: 1.5,
             px: 2.5,
@@ -2860,7 +2861,13 @@ const Invoices = () => {
                   key={tmpl.id}
                   label={tmpl.name}
                   size="small"
-                  onClick={() => setInvoiceSettings(prev => ({ ...prev, template: tmpl.id }))}
+                  onClick={() => {
+                    const updated = { ...invoiceSettings, template: tmpl.id };
+                    setInvoiceSettings(updated);
+                    try {
+                      localStorage.setItem('aleen_invoice_template_settings', JSON.stringify(updated));
+                    } catch (e) {}
+                  }}
                   sx={{
                     fontWeight: 700,
                     fontSize: '0.72rem',

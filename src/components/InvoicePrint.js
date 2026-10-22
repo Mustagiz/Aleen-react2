@@ -174,6 +174,12 @@ const InvoicePrint = forwardRef(({ invoice, template, settings }, ref) => {
       ) : (
         /* Full Luxury Header Banner */
         <Box
+          style={{
+            background: theme.headerBg,
+            color: '#FFFFFF',
+            WebkitPrintColorAdjust: 'exact',
+            printColorAdjust: 'exact'
+          }}
           sx={{
             background: theme.headerBg,
             color: '#FFFFFF',
@@ -298,22 +304,25 @@ const InvoicePrint = forwardRef(({ invoice, template, settings }, ref) => {
       <Box sx={{ mb: 3, position: 'relative', zIndex: 1, overflowX: 'auto' }}>
         <Table size={isSlip ? 'small' : 'medium'} sx={{ tableLayout: 'fixed', width: '100%', borderCollapse: 'collapse' }}>
           <TableHead>
-            <TableRow sx={{ bgcolor: theme.tableHeadBg, WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>
-              <TableCell sx={{ width: isSlip ? '48%' : '42%', color: theme.tableHeadText, fontWeight: 800, fontSize: '0.78rem', textTransform: 'uppercase', py: 1.2 }}>
+            <TableRow
+              style={{ backgroundColor: theme.tableHeadBg, color: theme.tableHeadText, WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
+              sx={{ bgcolor: theme.tableHeadBg, WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
+            >
+              <TableCell style={{ backgroundColor: theme.tableHeadBg, color: theme.tableHeadText }} sx={{ width: isSlip ? '48%' : '42%', color: theme.tableHeadText, fontWeight: 800, fontSize: '0.78rem', textTransform: 'uppercase', py: 1.2 }}>
                 Garment / Merchandise
               </TableCell>
               {!isSlip && (
-                <TableCell sx={{ width: '18%', color: theme.tableHeadText, fontWeight: 800, fontSize: '0.78rem', textTransform: 'uppercase', py: 1.2 }}>
+                <TableCell style={{ backgroundColor: theme.tableHeadBg, color: theme.tableHeadText }} sx={{ width: '18%', color: theme.tableHeadText, fontWeight: 800, fontSize: '0.78rem', textTransform: 'uppercase', py: 1.2 }}>
                   Category
                 </TableCell>
               )}
-              <TableCell align="center" sx={{ width: isSlip ? '14%' : '10%', color: theme.tableHeadText, fontWeight: 800, fontSize: '0.78rem', textTransform: 'uppercase', py: 1.2 }}>
+              <TableCell align="center" style={{ backgroundColor: theme.tableHeadBg, color: theme.tableHeadText }} sx={{ width: isSlip ? '14%' : '10%', color: theme.tableHeadText, fontWeight: 800, fontSize: '0.78rem', textTransform: 'uppercase', py: 1.2 }}>
                 Qty
               </TableCell>
-              <TableCell align="right" sx={{ width: isSlip ? '18%' : '15%', color: theme.tableHeadText, fontWeight: 800, fontSize: '0.78rem', textTransform: 'uppercase', py: 1.2 }}>
+              <TableCell align="right" style={{ backgroundColor: theme.tableHeadBg, color: theme.tableHeadText }} sx={{ width: isSlip ? '18%' : '15%', color: theme.tableHeadText, fontWeight: 800, fontSize: '0.78rem', textTransform: 'uppercase', py: 1.2 }}>
                 Rate
               </TableCell>
-              <TableCell align="right" sx={{ width: isSlip ? '20%' : '15%', color: theme.tableHeadText, fontWeight: 800, fontSize: '0.78rem', textTransform: 'uppercase', py: 1.2 }}>
+              <TableCell align="right" style={{ backgroundColor: theme.tableHeadBg, color: theme.tableHeadText }} sx={{ width: isSlip ? '20%' : '15%', color: theme.tableHeadText, fontWeight: 800, fontSize: '0.78rem', textTransform: 'uppercase', py: 1.2 }}>
                 Amount
               </TableCell>
             </TableRow>
@@ -432,6 +441,12 @@ const InvoicePrint = forwardRef(({ invoice, template, settings }, ref) => {
         {/* Right: Calculations */}
         <Box sx={{ width: isSlip ? '100%' : '44%' }}>
           <Box
+            style={{
+              backgroundColor: theme.totalBoxBg,
+              borderColor: theme.totalBoxBorder,
+              WebkitPrintColorAdjust: 'exact',
+              printColorAdjust: 'exact'
+            }}
             sx={{
               p: 2,
               borderRadius: 2,
@@ -471,7 +486,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings }, ref) => {
               <Typography variant="h6" sx={{ fontWeight: 900, color: theme.darkColor, fontSize: '0.98rem' }}>
                 NET TOTAL:
               </Typography>
-              <Typography variant="h5" sx={{ fontWeight: 900, color: theme.primaryColor, fontSize: '1.25rem', fontVariantNumeric: 'tabular-nums' }}>
+              <Typography variant="h5" style={{ color: theme.primaryColor }} sx={{ fontWeight: 900, color: theme.primaryColor, fontSize: '1.25rem', fontVariantNumeric: 'tabular-nums' }}>
                 ₹{Number(invoice.total || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </Typography>
             </Box>

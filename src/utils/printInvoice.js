@@ -1,7 +1,7 @@
 /**
  * Aleen Clothing - Native Pixel-Perfect Invoice Print Utility
- * Creates an isolated print context to guarantee proper page margins,
- * column alignments, and background rendering on all browsers and printers.
+ * Creates an isolated print context with all styles, fonts, and template colors intact,
+ * guaranteeing correct page margins, column alignments, and background rendering.
  */
 export const printInvoiceElement = (element, isSlip = false) => {
   if (!element) {
@@ -26,6 +26,32 @@ export const printInvoiceElement = (element, isSlip = false) => {
   iframe.style.visibility = 'hidden';
   document.body.appendChild(iframe);
 
+  // 1. Harvest all CSS rules from active document stylesheets (including Emotion / MUI inserted rules)
+  let allStyles = '';
+  try {
+    for (const sheet of document.styleSheets) {
+      try {
+        if (sheet.cssRules) {
+          for (const rule of sheet.cssRules) {
+            allStyles += rule.cssText + '\n';
+          }
+        }
+      } catch (e) {
+        // Handle cross-origin stylesheet
+        if (sheet.href) {
+          allStyles += `@import url("${sheet.href}");\n`;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('Error harvesting document.styleSheets:', e);
+  }
+
+  // 2. Harvest all font links and style tags from document.head
+  const headLinks = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
+    .map(el => el.outerHTML)
+    .join('\n');
+
   const doc = iframe.contentWindow.document;
   doc.open();
   doc.write(`
@@ -34,7 +60,10 @@ export const printInvoiceElement = (element, isSlip = false) => {
       <head>
         <meta charset="utf-8" />
         <title>Tax Invoice</title>
+        ${headLinks}
         <style>
+          ${allStyles}
+
           @page {
             size: ${isSlip ? '80mm auto' : 'A4 portrait'};
             margin: ${isSlip ? '3mm' : '8mm 10mm'};
@@ -86,14 +115,14 @@ export const printInvoiceElement = (element, isSlip = false) => {
   `);
   doc.close();
 
-  // Allow styles, fonts, and images to settle, then open native print window
+  // Allow styles, fonts, and images to settle in the iframe, then trigger print
   setTimeout(() => {
     try {
       iframe.contentWindow.focus();
       iframe.contentWindow.print();
     } catch (e) {
-      console.warn('Iframe print fallback triggered:', e);
+      console.warn('Iframe print failed, falling back to window.print', e);
       window.print();
     }
-  }, 300);
+  }, 350);
 };
