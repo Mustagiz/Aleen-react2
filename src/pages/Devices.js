@@ -60,7 +60,7 @@ import {
 import { Html5Qrcode } from 'html5-qrcode';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, deleteDoc } from 'firebase/firestore';
 import { useData } from '../contexts/DataContext';
 import { useFeedback } from '../contexts/FeedbackContext';
 import PageHeader from '../components/crm/PageHeader';
@@ -119,7 +119,7 @@ export default function Devices() {
     const testInputRef = useRef(null);
 
     // Persistent pairing token for phone bridge across all tabs & pages
-    const [pairingToken] = useState(() => {
+    const [pairingToken, setPairingToken] = useState(() => {
         let t = localStorage.getItem('aleen_workstation_scanner_token');
         if (!t) {
             t = 'aleen_' + Math.random().toString(36).substring(2, 8);
@@ -300,7 +300,7 @@ export default function Devices() {
     };
 
     // Realtime Wireless Phone Scanner Listeners (Firestore + BroadcastChannel + LocalStorage)
-    const lastScannedTimeRef = useRef(0);
+    const lastScannedTimeRef = useRef(Date.now());
 
     useEffect(() => {
         if (!pairingToken) return;
@@ -472,7 +472,7 @@ export default function Devices() {
             message: `Are you sure you want to unpair "${deviceName}"? You can easily reconnect it at any time by scanning the device QR code.`,
             confirmText: 'Unpair Device',
             isDanger: true,
-            onConfirm: () => {
+            onConfirm: async () => {
                 setDevices(prev => {
                     const nextDevices = prev.filter(d => d.id !== id);
                     try {
@@ -480,6 +480,27 @@ export default function Devices() {
                     } catch (e) {}
                     return nextDevices;
                 });
+
+                // Invalidate remote session and clean up stored scan state
+                lastScannedTimeRef.current = Date.now();
+                setLastScannedResult(null);
+                setTestInput('');
+                try {
+                    localStorage.removeItem('aleen_last_phone_scan');
+                    if (pairingToken) {
+                        await deleteDoc(doc(db, 'scanner_sessions', pairingToken));
+                    }
+                } catch (e) {}
+
+                // If unpairing a phone bridge, rotate token so old phone connection is severed
+                if (target?.type === 'phone_camera') {
+                    const newToken = 'aleen_' + Math.random().toString(36).substring(2, 8);
+                    try {
+                        localStorage.setItem('aleen_workstation_scanner_token', newToken);
+                    } catch (e) {}
+                    setPairingToken(newToken);
+                }
+
                 showToast(`Unpaired ${deviceName} successfully`, 'info');
             }
         });
@@ -641,9 +662,24 @@ export default function Devices() {
                                                 message: 'Are you sure you want to clear all paired scanners and phone bridges from this workstation?',
                                                 confirmText: 'Clear All',
                                                 isDanger: true,
-                                                onConfirm: () => {
+                                                onConfirm: async () => {
                                                     setDevices([]);
-                                                    localStorage.removeItem('aleen_paired_devices');
+                                                    lastScannedTimeRef.current = Date.now();
+                                                    setScanHistory([]);
+                                                    setLastScannedResult(null);
+                                                    setTestInput('');
+                                                    try {
+                                                        localStorage.removeItem('aleen_paired_devices');
+                                                        localStorage.removeItem('aleen_last_phone_scan');
+                                                        if (pairingToken) {
+                                                            await deleteDoc(doc(db, 'scanner_sessions', pairingToken));
+                                                        }
+                                                    } catch (e) {}
+                                                    const newToken = 'aleen_' + Math.random().toString(36).substring(2, 8);
+                                                    try {
+                                                        localStorage.setItem('aleen_workstation_scanner_token', newToken);
+                                                    } catch (e) {}
+                                                    setPairingToken(newToken);
                                                     showToast('All scanner devices cleared successfully', 'info');
                                                 }
                                             });
@@ -1049,7 +1085,18 @@ export default function Devices() {
                                 {scanHistory.length > 0 && (
                                     <Button
                                         size="small"
-                                        onClick={() => setScanHistory([])}
+                                        onClick={async () => {
+                                            setScanHistory([]);
+                                            setLastScannedResult(null);
+                                            setTestInput('');
+                                            lastScannedTimeRef.current = Date.now();
+                                            try {
+                                                localStorage.removeItem('aleen_last_phone_scan');
+                                                if (pairingToken) {
+                                                    await deleteDoc(doc(db, 'scanner_sessions', pairingToken));
+                                                }
+                                            } catch (e) {}
+                                        }}
                                         sx={{ fontSize: '0.7rem', color: 'text.secondary', textTransform: 'none' }}
                                     >
                                         Clear Log
