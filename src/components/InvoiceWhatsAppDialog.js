@@ -63,7 +63,8 @@ Thank you for gracing our boutique with your presence. Here is your official e-i
 
 ──────────────────
 💵 *Subtotal:* ₹{subtotal}
-{discountSection}🏛️ *GST ({gst}%):* ₹{tax}
+🏷️ *Discount:* {discount}
+🏛️ *GST ({gst}%):* ₹{tax}
 💰 *GRAND TOTAL: ₹{total}*
 💳 *Payment Mode:* {paymentMethod} ({paymentStatus})
 ──────────────────
@@ -86,6 +87,8 @@ Hi *{customer}*, thank you for shopping with us today!
 • *Invoice #:* #{invoiceId}
 • *Date:* {date}
 • *Items ({itemCount} pcs):* {itemSummary}
+• *Subtotal:* ₹{subtotal}
+• *Discount:* {discount}
 • *Grand Total:* *₹{total}* (Paid via {paymentMethod})
 
 📍 *Boutique:* {address}
@@ -111,7 +114,9 @@ It is our distinct privilege curating timeless aesthetics for you.
 🛍️ *Curated Ensembles:*
 {itemList}
 
-✨ *Investment:* *₹{total}* via {paymentMethod}
+💵 *Subtotal:* ₹{subtotal}
+🏷️ *VIP Privilege Discount:* {discount}
+✨ *Final Investment:* *₹{total}* via {paymentMethod}
 
 🎁 *VIP Privileges Included:*
 • Priority fitting sessions & bespoke adjustments
@@ -135,6 +140,8 @@ Please find the billing details for your recent purchase:
 
 • *Invoice Number:* #{invoiceId}
 • *Date:* {date}
+• *Subtotal:* ₹{subtotal}
+• *Discount Applied:* {discount}
 • *Total Bill Value:* *₹{total}*
 • *Payment Mode:* {paymentMethod}
 • *Settlement Status:* *{paymentStatus}*
@@ -165,6 +172,8 @@ Your bespoke festive trousseau order is recorded under:
 👗 *Selected Ensembles:*
 {itemList}
 
+💵 *Subtotal:* ₹{subtotal}
+🏷️ *Festive Discount:* {discount}
 ✨ *Grand Total:* *₹{total}*
 💳 *Tender:* {paymentMethod}
 
@@ -190,19 +199,42 @@ export const generateInvoiceWhatsAppText = (templateText, invoice, profile) => {
     const qty = it.quantity || 1;
     const price = Number(it.price || 0);
     const lineTotal = price * qty;
-    return `  ${idx + 1}. *${it.name || 'Garment'}* (x${qty}) — ₹${lineTotal.toLocaleString('en-IN')}`;
+    const itemDiscount = Number(it.discount || 0);
+    const discountSuffix = itemDiscount > 0 ? ` (Disc: -₹${itemDiscount.toLocaleString('en-IN')})` : '';
+    return `  ${idx + 1}. *${it.name || 'Garment'}* (x${qty}) — ₹${lineTotal.toLocaleString('en-IN')}${discountSuffix}`;
   }).join('\n') || '  1. Garment (x1)';
 
   const itemSummary = items.map(it => it.name).filter(Boolean).join(', ') || 'Apparel';
 
-  const subtotal = Number(invoice.subtotal || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const total = Number(invoice.total || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const tax = Number(invoice.tax || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  // Comprehensive discount evaluation across all possible invoice properties
+  const explicitDiscount = Number(invoice.discount || invoice.discountAmount || 0);
+  const percentVal = Number(invoice.discountPercent || invoice.discountPercentage || 0);
+  const percentCalculated = (percentVal > 0 && invoice.subtotal)
+    ? (Number(invoice.subtotal) * percentVal / 100)
+    : 0;
+  const itemDiscounts = items.reduce((sum, it) => sum + (Number(it.discount || 0) * (Number(it.quantity) || 1)), 0);
+  const subtotalNum = Number(invoice.subtotal || 0);
+  const taxNum = Number(invoice.tax || 0);
+  const totalNum = Number(invoice.total || 0);
+  const diffDiscount = (subtotalNum > 0 && totalNum > 0 && (subtotalNum + taxNum) > totalNum)
+    ? Math.max(0, (subtotalNum + taxNum) - totalNum)
+    : 0;
+
+  const totalDiscountVal = Math.max(explicitDiscount, percentCalculated, itemDiscounts, diffDiscount);
+
+  const subtotal = subtotalNum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const total = totalNum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const tax = taxNum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const gst = Number(invoice.gst || 0);
-  const discountVal = Number(invoice.discount || 0);
-  const discountSection = discountVal > 0
-    ? `🏷️ *Discount Applied:* -₹${discountVal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\n`
-    : '';
+
+  // Formatted discount display string
+  let discountDisplay = '₹0.00';
+  if (totalDiscountVal > 0) {
+    const formattedAmt = totalDiscountVal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    discountDisplay = percentVal > 0 ? `-₹${formattedAmt} (${percentVal}% OFF)` : `-₹${formattedAmt}`;
+  }
+
+  const discountSection = `🏷️ *Discount:* ${discountDisplay}\n`;
 
   const paymentMethod = invoice.paymentMethod || 'Cash';
   const paymentStatus = (invoice.paymentStatus || 'paid').toUpperCase();
@@ -218,7 +250,10 @@ export const generateInvoiceWhatsAppText = (templateText, invoice, profile) => {
     .replace(/{itemSummary}/g, itemSummary)
     .replace(/{itemCount}/g, String(items.length || 1))
     .replace(/{subtotal}/g, subtotal)
+    .replace(/{discount}/g, discountDisplay)
     .replace(/{discountSection}/g, discountSection)
+    .replace(/{discountAmount}/g, totalDiscountVal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
+    .replace(/{discountPercent}/g, String(percentVal))
     .replace(/{gst}/g, String(gst))
     .replace(/{tax}/g, tax)
     .replace(/{total}/g, total)
@@ -605,6 +640,22 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
                   size="small"
                   onClick={() => handleInsertVariable(`#${invoice.id}`)}
                   sx={{ cursor: 'pointer', height: 22, fontSize: '0.7rem', fontWeight: 700 }}
+                />
+                <Chip
+                  label="+ Subtotal (₹)"
+                  size="small"
+                  onClick={() => handleInsertVariable(`💵 *Subtotal:* ₹${Number(invoice.subtotal || 0).toLocaleString('en-IN')}`)}
+                  sx={{ cursor: 'pointer', height: 22, fontSize: '0.7rem', fontWeight: 700 }}
+                />
+                <Chip
+                  label="+ Discount (₹)"
+                  size="small"
+                  onClick={() => {
+                    const disc = Number(invoice.discount || invoice.discountAmount || 0);
+                    const discText = disc > 0 ? `-₹${disc.toLocaleString('en-IN')}` : '₹0.00';
+                    handleInsertVariable(`🏷️ *Discount:* ${discText}`);
+                  }}
+                  sx={{ cursor: 'pointer', height: 22, fontSize: '0.7rem', fontWeight: 700, bgcolor: 'rgba(217, 119, 6, 0.1)', color: '#D97706' }}
                 />
                 <Chip
                   label="+ Fitting Guarantee"

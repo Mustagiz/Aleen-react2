@@ -1205,7 +1205,8 @@ const Invoices = () => {
     if (invoice.discount > 0) {
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(217, 119, 6);
-      doc.text(`Discount (${invoice.discountPercentage || 0}%):`, ledgerX + 5, finalY + 15);
+      const discPct = invoice.discountPercent || invoice.discountPercentage || 0;
+      doc.text(`Discount (${discPct}%):`, ledgerX + 5, finalY + 15);
       doc.text(`-₹${(invoice.discount || 0).toFixed(2)}`, 190, finalY + 15, { align: 'right' });
     }
 
@@ -1317,16 +1318,18 @@ const Invoices = () => {
       const isSlip = invoiceSettings.template === 'boutique-slip';
       let doc;
 
-      if (viewInvoice && viewInvoice.id === invoice.id && printRef.current) {
-        doc = await generatePdfFromElement(printRef.current, isSlip);
-      } else {
-        setOffscreenInvoice(invoice);
-        await new Promise(resolve => setTimeout(resolve, 300));
-        if (offscreenInvoiceRef.current) {
-          doc = await generatePdfFromElement(offscreenInvoiceRef.current, isSlip);
+      try {
+        if (viewInvoice && viewInvoice.id === invoice.id && printRef.current) {
+          doc = await generatePdfFromElement(printRef.current, isSlip);
         } else {
-          doc = generatePDF(invoice, invoiceSettings.template, invoiceSettings);
+          setOffscreenInvoice(invoice);
+          await new Promise(resolve => setTimeout(resolve, 350));
+          if (offscreenInvoiceRef.current) {
+            doc = await generatePdfFromElement(offscreenInvoiceRef.current, isSlip);
+          }
         }
+      } catch (domErr) {
+        console.warn('DOM PDF capture failed, falling back to vector generator:', domErr);
       }
 
       if (!doc) {

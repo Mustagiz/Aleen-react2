@@ -466,7 +466,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings }, ref) => {
 
             {invoice.discount > 0 && (
               <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 0.4, color: '#D97706' }}>
-                <Typography variant="body2">Discount ({invoice.discountPercentage || 0}%):</Typography>
+                <Typography variant="body2">Discount ({invoice.discountPercent || invoice.discountPercentage || 0}%):</Typography>
                 <Typography variant="body2" sx={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
                   -₹{Number(invoice.discount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </Typography>

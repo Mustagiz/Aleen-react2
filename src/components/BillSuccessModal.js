@@ -454,62 +454,6 @@ const BillSuccessModal = ({
               )}
             </Box>
 
-            {/* Format Selection Option Toggle: PDF Bill vs Text Bill */}
-            <Box
-              sx={{
-                bgcolor: theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.25)' : '#FFFFFF',
-                p: 0.5,
-                borderRadius: 2.5,
-                border: '1px solid',
-                borderColor: 'rgba(37, 211, 102, 0.3)'
-              }}
-            >
-              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0.75 }}>
-                <Button
-                  size="small"
-                  variant={whatsappMode === 'pdf' ? 'contained' : 'text'}
-                  startIcon={<PictureAsPdf sx={{ fontSize: 17 }} />}
-                  onClick={() => handleModeChange('pdf')}
-                  sx={{
-                    borderRadius: 2,
-                    py: 0.8,
-                    fontSize: '0.78rem',
-                    fontWeight: 800,
-                    textTransform: 'none',
-                    bgcolor: whatsappMode === 'pdf' ? '#0F766E' : 'transparent',
-                    color: whatsappMode === 'pdf' ? '#FFFFFF' : 'text.primary',
-                    boxShadow: whatsappMode === 'pdf' ? '0 2px 8px rgba(15, 118, 110, 0.25)' : 'none',
-                    '&:hover': {
-                      bgcolor: whatsappMode === 'pdf' ? '#0D6861' : 'rgba(15, 118, 110, 0.08)'
-                    }
-                  }}
-                >
-                  PDF Document Bill
-                </Button>
-                <Button
-                  size="small"
-                  variant={whatsappMode === 'text' ? 'contained' : 'text'}
-                  startIcon={<Chat sx={{ fontSize: 17 }} />}
-                  onClick={() => handleModeChange('text')}
-                  sx={{
-                    borderRadius: 2,
-                    py: 0.8,
-                    fontSize: '0.78rem',
-                    fontWeight: 800,
-                    textTransform: 'none',
-                    bgcolor: whatsappMode === 'text' ? '#25D366' : 'transparent',
-                    color: whatsappMode === 'text' ? '#FFFFFF' : 'text.primary',
-                    boxShadow: whatsappMode === 'text' ? '0 2px 8px rgba(37, 211, 102, 0.25)' : 'none',
-                    '&:hover': {
-                      bgcolor: whatsappMode === 'text' ? '#1EBE5D' : 'rgba(37, 211, 102, 0.08)'
-                    }
-                  }}
-                >
-                  Text Summary Bill
-                </Button>
-              </Box>
-            </Box>
-
             {/* Mobile Number Input */}
             <TextField
               fullWidth
@@ -547,92 +491,107 @@ const BillSuccessModal = ({
               }}
             />
 
-            {/* WhatsApp Dispatch Actions */}
-            {whatsappMode === 'pdf' ? (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
-                <Button
-                  variant="contained"
-                  fullWidth
-                  disabled={isSharingPDF}
-                  startIcon={isSharingPDF ? <CircularProgress size={18} color="inherit" /> : <PictureAsPdf sx={{ fontSize: 20 }} />}
-                  onClick={handleSendPDFWhatsApp}
-                  sx={{
-                    py: 1.35,
-                    bgcolor: '#0F766E',
-                    color: '#FFFFFF',
-                    fontWeight: 800,
-                    fontSize: { xs: '0.86rem', sm: '0.92rem' },
-                    borderRadius: 2,
-                    textTransform: 'none',
-                    boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
-                    '&:hover': {
-                      bgcolor: '#0D6861',
-                      boxShadow: '0 6px 18px rgba(15, 118, 110, 0.45)'
-                    }
-                  }}
-                >
-                  {isSharingPDF ? 'Generating & Attaching PDF...' : 'Share PDF Bill on WhatsApp'}
-                </Button>
-                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                  <Button
-                    size="small"
-                    onClick={handleSendTextWhatsApp}
-                    disabled={isSendingWhatsApp}
-                    sx={{
-                      fontSize: '0.74rem',
-                      fontWeight: 700,
-                      color: 'text.secondary',
-                      textTransform: 'none',
-                      py: 0
-                    }}
-                  >
-                    Or send as Text Summary instead
-                  </Button>
+            {/* Direct WhatsApp Share Actions: Both PDF and Text directly available */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.25 }}>
+              {/* Option 1: Share Official PDF Bill on WhatsApp */}
+              <Button
+                variant="contained"
+                fullWidth
+                disabled={isSharingPDF}
+                startIcon={isSharingPDF ? <CircularProgress size={18} color="inherit" /> : <PictureAsPdf sx={{ fontSize: 20 }} />}
+                onClick={handleSendPDFWhatsApp}
+                sx={{
+                  py: 1.35,
+                  px: 2.5,
+                  bgcolor: '#0F766E',
+                  color: '#FFFFFF',
+                  fontWeight: 800,
+                  fontSize: { xs: '0.86rem', sm: '0.92rem' },
+                  borderRadius: 2.5,
+                  textTransform: 'none',
+                  boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  '&:hover': {
+                    bgcolor: '#0D6861',
+                    boxShadow: '0 6px 18px rgba(15, 118, 110, 0.45)'
+                  }
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, textAlign: 'left' }}>
+                  <Box>
+                    <Typography sx={{ fontWeight: 800, fontSize: { xs: '0.86rem', sm: '0.92rem' }, lineHeight: 1.2 }}>
+                      {isSharingPDF ? 'Generating & Attaching PDF...' : 'Share PDF Bill on WhatsApp'}
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.7rem', opacity: 0.9, fontWeight: 500 }}>
+                      Official branded PDF document sent directly to customer
+                    </Typography>
+                  </Box>
                 </Box>
-              </Box>
-            ) : (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
-                <Button
-                  variant="contained"
-                  fullWidth
-                  disabled={isSendingWhatsApp}
-                  startIcon={isSendingWhatsApp ? <CircularProgress size={18} color="inherit" /> : <WhatsApp sx={{ fontSize: 20 }} />}
-                  onClick={handleSendTextWhatsApp}
+                <Chip
+                  icon={<WhatsApp sx={{ fontSize: '14px !important', color: '#25D366 !important' }} />}
+                  label="PDF Direct"
+                  size="small"
                   sx={{
-                    py: 1.35,
-                    bgcolor: '#25D366',
+                    bgcolor: 'rgba(255, 255, 255, 0.15)',
                     color: '#FFFFFF',
-                    fontWeight: 800,
-                    fontSize: { xs: '0.86rem', sm: '0.92rem' },
-                    borderRadius: 2,
-                    textTransform: 'none',
-                    boxShadow: '0 4px 14px rgba(37, 211, 102, 0.35)',
-                    '&:hover': {
-                      bgcolor: '#1EBE5D',
-                      boxShadow: '0 6px 18px rgba(37, 211, 102, 0.45)'
-                    }
+                    fontWeight: 700,
+                    fontSize: '0.68rem',
+                    height: 22
                   }}
-                >
-                  {isSendingWhatsApp ? 'Opening WhatsApp...' : 'Share Text Bill on WhatsApp'}
-                </Button>
-                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                  <Button
-                    size="small"
-                    onClick={handleSendPDFWhatsApp}
-                    disabled={isSharingPDF}
-                    sx={{
-                      fontSize: '0.74rem',
-                      fontWeight: 700,
-                      color: 'text.secondary',
-                      textTransform: 'none',
-                      py: 0
-                    }}
-                  >
-                    Or send as official PDF Invoice instead
-                  </Button>
+                />
+              </Button>
+
+              {/* Option 2: Share Itemized Text Summary on WhatsApp */}
+              <Button
+                variant="outlined"
+                fullWidth
+                disabled={isSendingWhatsApp}
+                startIcon={isSendingWhatsApp ? <CircularProgress size={18} color="inherit" /> : <WhatsApp sx={{ fontSize: 20, color: '#25D366' }} />}
+                onClick={handleSendTextWhatsApp}
+                sx={{
+                  py: 1.2,
+                  px: 2.5,
+                  borderColor: '#25D366',
+                  color: '#075E54',
+                  fontWeight: 800,
+                  fontSize: { xs: '0.84rem', sm: '0.9rem' },
+                  borderRadius: 2.5,
+                  textTransform: 'none',
+                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(37, 211, 102, 0.08)' : '#FFFFFF',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  '&:hover': {
+                    borderColor: '#128C7E',
+                    bgcolor: 'rgba(37, 211, 102, 0.12)'
+                  }
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, textAlign: 'left' }}>
+                  <Box>
+                    <Typography sx={{ fontWeight: 800, fontSize: { xs: '0.84rem', sm: '0.9rem' }, lineHeight: 1.2, color: theme.palette.mode === 'dark' ? '#34D399' : '#042F2E' }}>
+                      {isSendingWhatsApp ? 'Opening WhatsApp...' : 'Send Text Bill on WhatsApp'}
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary', fontWeight: 500 }}>
+                      Itemized breakdown with items, subtotal, discount & totals
+                    </Typography>
+                  </Box>
                 </Box>
-              </Box>
-            )}
+                <Chip
+                  label="Text Receipt"
+                  size="small"
+                  sx={{
+                    bgcolor: 'rgba(37, 211, 102, 0.15)',
+                    color: '#075E54',
+                    fontWeight: 700,
+                    fontSize: '0.68rem',
+                    height: 22
+                  }}
+                />
+              </Button>
+            </Box>
           </Paper>
 
           {/* Section 2: Print & Download Quick Bar */}
