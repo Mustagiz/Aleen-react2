@@ -67,14 +67,14 @@ export default function AtelierKpiCard({
         }}
       />
 
-      <CardContent sx={{ p: '20px 22px !important' }}>
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 1.5 }}>
+      <CardContent sx={{ p: { xs: '14px 14px !important', sm: '18px 20px !important', md: '20px 22px !important' } }}>
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: { xs: 1, sm: 1.5 } }}>
           <Typography
             variant="subtitle2"
             sx={{
               color: 'text.secondary',
               fontWeight: 700,
-              fontSize: '0.8rem',
+              fontSize: { xs: '0.72rem', sm: '0.78rem', md: '0.8rem' },
               textTransform: 'uppercase',
               letterSpacing: '0.05em'
             }}
@@ -85,9 +85,9 @@ export default function AtelierKpiCard({
           {icon && (
             <Box
               sx={{
-                width: 38,
-                height: 38,
-                borderRadius: '10px',
+                width: { xs: 32, sm: 36, md: 38 },
+                height: { xs: 32, sm: 36, md: 38 },
+                borderRadius: '9px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -109,7 +109,7 @@ export default function AtelierKpiCard({
             color: 'text.primary',
             letterSpacing: '-0.02em',
             mb: 0.75,
-            fontSize: '1.75rem'
+            fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' }
           }}
         >
           {value}

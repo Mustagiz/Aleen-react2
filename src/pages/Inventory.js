@@ -28,7 +28,9 @@ import {
   Switch,
   InputAdornment,
   Stack,
-  CardContent
+  CardContent,
+  ToggleButton,
+  ToggleButtonGroup
 } from '@mui/material';
 import {
   Edit,
@@ -49,7 +51,9 @@ import {
   Close,
   CheckCircle,
   RestartAlt,
-  FilterList
+  FilterList,
+  GridView,
+  ViewList
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -146,7 +150,8 @@ const Inventory = () => {
   };
 
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [viewMode, setViewMode] = useState(() => (typeof window !== 'undefined' && window.innerWidth < 900 ? 'cards' : 'table'));
 
   // Safe numerical KPIs & Stock Counts
   const totalItems = inventory?.length || 0;
@@ -519,12 +524,18 @@ const Inventory = () => {
         subtitle="Track stock levels, size variants, costs, profit margins, and manage your luxury apparel catalog"
         breadcrumbs={[{ label: 'Aleen Clothing', path: '/' }, { label: 'Inventory' }]}
         actions={
-          <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', width: { xs: '100%', sm: 'auto' } }}>
             <Button
               variant="outlined"
               component="label"
               startIcon={<Upload />}
-              sx={{ borderRadius: 2, fontWeight: 700, fontSize: '0.82rem' }}
+              sx={{
+                flex: { xs: 1, sm: 'none' },
+                borderRadius: 2,
+                fontWeight: 700,
+                fontSize: { xs: '0.75rem', sm: '0.82rem' },
+                whiteSpace: 'nowrap'
+              }}
             >
               Import CSV
               <input type="file" accept=".csv" hidden onChange={handleFileUpload} />
@@ -533,7 +544,13 @@ const Inventory = () => {
               variant="outlined"
               startIcon={<Download />}
               onClick={downloadInventory}
-              sx={{ borderRadius: 2, fontWeight: 700, fontSize: '0.82rem' }}
+              sx={{
+                flex: { xs: 1, sm: 'none' },
+                borderRadius: 2,
+                fontWeight: 700,
+                fontSize: { xs: '0.75rem', sm: '0.82rem' },
+                whiteSpace: 'nowrap'
+              }}
             >
               Export CSV
             </Button>
@@ -544,12 +561,14 @@ const Inventory = () => {
               onClick={() => handleOpen()}
               disabled={user?.role !== 'admin'}
               sx={{
+                flex: { xs: '100%', sm: 'none' },
                 borderRadius: 2,
                 fontWeight: 800,
-                fontSize: '0.85rem',
+                fontSize: { xs: '0.8rem', sm: '0.85rem' },
                 background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
                 color: '#ffffff',
-                boxShadow: '0 4px 14px rgba(15,118,110,0.3)'
+                boxShadow: '0 4px 14px rgba(15,118,110,0.3)',
+                whiteSpace: 'nowrap'
               }}
             >
               Add Garment
@@ -558,18 +577,18 @@ const Inventory = () => {
         }
       />
 
-      {/* KPI Cards */}
-      <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
-        <Grid item xs={12} sm={6} md={3}>
+      {/* KPI Cards: Responsive 2x2 Grid on Mobile & Tablet, 4 Columns on Desktop */}
+      <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} sx={{ mb: { xs: 2.5, sm: 3.5 } }}>
+        <Grid item xs={6} sm={6} md={3}>
           <AtelierKpiCard
             title="Total Garments"
             value={totalItems}
             icon={<Inventory2 fontSize="small" />}
-            subtitle={`${totalUnits.toLocaleString('en-IN')} physical units in catalog`}
+            subtitle={`${totalUnits.toLocaleString('en-IN')} physical units`}
             onClick={() => setStockFilter('all')}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={6} sm={6} md={3}>
           <AtelierKpiCard
             title="Portfolio Value"
             value={`₹${totalValue.toLocaleString('en-IN')}`}
@@ -578,21 +597,21 @@ const Inventory = () => {
             goldAccent={true}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={6} sm={6} md={3}>
           <AtelierKpiCard
             title="Low Stock Alerts"
             value={lowOrOutCount}
             icon={<Warning fontSize="small" />}
-            subtitle={outOfStockCount > 0 ? `${outOfStockCount} out of stock • ${lowStockCount} low` : 'Items at or below 2 units'}
+            subtitle={outOfStockCount > 0 ? `${outOfStockCount} out • ${lowStockCount} low` : 'Items below 2 units'}
             trend={lowOrOutCount > 0 ? `${lowOrOutCount} styles urgent` : 'Catalog healthy'}
             trendPositive={lowOrOutCount === 0}
             onClick={() => setStockFilter(prev => prev === 'low_or_out' ? 'all' : 'low_or_out')}
           />
         </Grid>
         {user?.role === 'admin' && (
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={6} sm={6} md={3}>
             <AtelierKpiCard
-              title="Gross Profit Margin"
+              title="Profit Margin"
               value={`₹${totalProfit.toLocaleString('en-IN')}`}
               icon={<TrendingUp fontSize="small" />}
               subtitle="Projected profit on inventory"
@@ -604,10 +623,10 @@ const Inventory = () => {
       </Grid>
 
       {/* Filter and Command Toolbar */}
-      <GlassCard sx={{ p: 2.5, mb: 3, border: '1px solid rgba(15, 118, 110, 0.15)' }}>
-        {/* Row 1: Search, Collection, Sort, and Reset */}
+      <GlassCard sx={{ p: { xs: 2, sm: 2.5 }, mb: 3, border: '1px solid rgba(15, 118, 110, 0.15)' }}>
+        {/* Row 1: Search, Collection, Sort, Order/Reset & View Switcher */}
         <Grid container spacing={1.5} alignItems="center">
-          <Grid item xs={12} md={5}>
+          <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
               size="small"
@@ -660,7 +679,7 @@ const Inventory = () => {
             </TextField>
           </Grid>
 
-          <Grid item xs={6} sm={3} md={2}>
+          <Grid item xs={6} sm={4} md={2}>
             <TextField
               select
               fullWidth
@@ -682,7 +701,7 @@ const Inventory = () => {
             </TextField>
           </Grid>
 
-          <Grid item xs={6} sm={3} md={2}>
+          <Grid item xs={6} sm={4} md={2}>
             <Box sx={{ display: 'flex', gap: 1 }}>
               <Button
                 variant="outlined"
@@ -690,8 +709,8 @@ const Inventory = () => {
                 onClick={() => setOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
                 sx={{
                   borderRadius: 2.5,
-                  minWidth: 44,
-                  px: 1.5,
+                  minWidth: 42,
+                  px: 1.25,
                   fontWeight: 700,
                   fontSize: '0.78rem',
                   borderColor: 'rgba(15, 118, 110, 0.3)',
@@ -722,14 +741,72 @@ const Inventory = () => {
               </Button>
             </Box>
           </Grid>
+
+          {/* View Mode Switcher: Cards vs Table */}
+          <Grid item xs={12} sm={4} md={1}>
+            <Box sx={{ display: 'flex', justifyContent: { xs: 'stretch', sm: 'flex-end' } }}>
+              <ToggleButtonGroup
+                size="small"
+                value={viewMode}
+                exclusive
+                onChange={(e, next) => next && setViewMode(next)}
+                sx={{
+                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : '#FFFFFF',
+                  border: '1px solid rgba(15, 118, 110, 0.2)',
+                  borderRadius: 2.5,
+                  height: 38,
+                  width: { xs: '100%', sm: 'auto' }
+                }}
+              >
+                <ToggleButton
+                  value="cards"
+                  title="Card Grid View"
+                  sx={{
+                    flex: { xs: 1, sm: 'none' },
+                    px: 1.25,
+                    border: 'none',
+                    '&.Mui-selected': { bgcolor: 'rgba(15, 118, 110, 0.15)', color: '#0F766E' }
+                  }}
+                >
+                  <GridView sx={{ fontSize: 18 }} />
+                </ToggleButton>
+                <ToggleButton
+                  value="table"
+                  title="Table View"
+                  sx={{
+                    flex: { xs: 1, sm: 'none' },
+                    px: 1.25,
+                    border: 'none',
+                    '&.Mui-selected': { bgcolor: 'rgba(15, 118, 110, 0.15)', color: '#0F766E' }
+                  }}
+                >
+                  <ViewList sx={{ fontSize: 18 }} />
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
+          </Grid>
         </Grid>
 
         <Divider sx={{ my: 2 }} />
 
-        {/* Row 2: Stock Availability Filter Pills */}
+        {/* Row 2: Touch-Scrollable Stock Filter Chips & Counter */}
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1.5 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mr: 0.5 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              overflowX: 'auto',
+              maxWidth: '100%',
+              py: 0.5,
+              px: 0.25,
+              whiteSpace: 'nowrap',
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none',
+              '&::-webkit-scrollbar': { display: 'none' }
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mr: 0.5, flexShrink: 0 }}>
               <FilterList sx={{ fontSize: 18, color: '#0F766E' }} />
               <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'text.secondary', fontSize: '0.7rem' }}>
                 Stock Filter:
@@ -747,6 +824,7 @@ const Inventory = () => {
                 fontSize: '0.75rem',
                 borderRadius: 2,
                 cursor: 'pointer',
+                flexShrink: 0,
                 bgcolor: stockFilter === 'all' ? '#0F766E' : 'transparent',
                 color: stockFilter === 'all' ? '#FFFFFF' : 'text.primary',
                 borderColor: 'rgba(15, 118, 110, 0.25)',
@@ -765,6 +843,7 @@ const Inventory = () => {
                 fontSize: '0.75rem',
                 borderRadius: 2,
                 cursor: 'pointer',
+                flexShrink: 0,
                 bgcolor: stockFilter === 'low_or_out' ? '#D97706' : 'rgba(217, 119, 6, 0.08)',
                 color: stockFilter === 'low_or_out' ? '#FFFFFF' : '#B45309',
                 borderColor: 'rgba(217, 119, 6, 0.4)',
@@ -783,6 +862,7 @@ const Inventory = () => {
                 fontSize: '0.75rem',
                 borderRadius: 2,
                 cursor: 'pointer',
+                flexShrink: 0,
                 bgcolor: stockFilter === 'out' ? '#DC2626' : 'rgba(239, 68, 68, 0.08)',
                 color: stockFilter === 'out' ? '#FFFFFF' : '#DC2626',
                 borderColor: 'rgba(239, 68, 68, 0.35)',
@@ -801,6 +881,7 @@ const Inventory = () => {
                 fontSize: '0.75rem',
                 borderRadius: 2,
                 cursor: 'pointer',
+                flexShrink: 0,
                 bgcolor: stockFilter === 'low' ? '#F59E0B' : 'rgba(245, 158, 11, 0.08)',
                 color: stockFilter === 'low' ? '#FFFFFF' : '#D97706',
                 borderColor: 'rgba(245, 158, 11, 0.35)',
@@ -819,6 +900,7 @@ const Inventory = () => {
                 fontSize: '0.75rem',
                 borderRadius: 2,
                 cursor: 'pointer',
+                flexShrink: 0,
                 bgcolor: stockFilter === 'in' ? '#059669' : 'rgba(16, 185, 129, 0.08)',
                 color: stockFilter === 'in' ? '#FFFFFF' : '#059669',
                 borderColor: 'rgba(16, 185, 129, 0.35)',
@@ -837,6 +919,7 @@ const Inventory = () => {
                 fontSize: '0.75rem',
                 borderRadius: 2,
                 cursor: 'pointer',
+                flexShrink: 0,
                 bgcolor: stockFilter === 'surplus' ? '#6366F1' : 'rgba(99, 102, 241, 0.08)',
                 color: stockFilter === 'surplus' ? '#FFFFFF' : '#4F46E5',
                 borderColor: 'rgba(99, 102, 241, 0.35)',
@@ -854,139 +937,225 @@ const Inventory = () => {
         </Box>
       </GlassCard>
 
-      {/* Inventory Table or Grid */}
-      {isMobile ? (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      {/* Responsive Garment Presentation: Cards Grid vs Luxury Table */}
+      {viewMode === 'cards' ? (
+        <Box>
           {filteredInventory.length === 0 ? (
-            <GlassCard sx={{ p: 4, textAlign: 'center' }}>
-              <Inventory2 sx={{ fontSize: 44, opacity: 0.3, mb: 1, display: 'block', mx: 'auto', color: '#0F766E' }} />
-              <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>No garments found</Typography>
-              <Typography variant="caption" color="text.secondary">
-                Try adjusting your search query, stock level, or collection filter.
+            <GlassCard sx={{ p: 5, textAlign: 'center' }}>
+              <Inventory2 sx={{ fontSize: 44, opacity: 0.3, mb: 1.5, display: 'block', mx: 'auto', color: '#0F766E' }} />
+              <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>No garments match current criteria</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 420, mx: 'auto', mb: 2 }}>
+                Try adjusting your search query, collection filter, or stock level pills.
               </Typography>
+              {isFiltered && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<RestartAlt />}
+                  onClick={() => { setSearch(''); setCategoryFilter(''); setStockFilter('all'); }}
+                  sx={{ borderRadius: 2, fontWeight: 700, borderColor: '#0F766E', color: '#0F766E' }}
+                >
+                  Clear All Filters
+                </Button>
+              )}
             </GlassCard>
           ) : (
-            filteredInventory.map((item) => {
-              const price = Number(item.price) || 0;
-              const cost = Number(item.cost) || 0;
-              const profitVal = price - cost;
-              const profitMarginVal = (cost > 0 && price > 0) ? (((profitVal / price) * 100).toFixed(1)) : '0.0';
-              const qty = Number(item.quantity) || 0;
-              const isOutOfStock = qty <= 0;
-              const isLowStock = !isOutOfStock && qty <= (Number(item.minStockLevel) || 2);
+            <>
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: {
+                    xs: '1fr',
+                    sm: 'repeat(2, 1fr)',
+                    md: 'repeat(2, 1fr)',
+                    lg: 'repeat(3, 1fr)',
+                    xl: 'repeat(4, 1fr)'
+                  },
+                  gap: { xs: 2, sm: 2.25, md: 2.5 }
+                }}
+              >
+                {(rowsPerPage > 0 ? filteredInventory.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : filteredInventory).map((item) => {
+                  const price = Number(item.price) || 0;
+                  const cost = Number(item.cost) || 0;
+                  const profitVal = price - cost;
+                  const profitMarginVal = (cost > 0 && price > 0) ? (((profitVal / price) * 100).toFixed(1)) : '0.0';
+                  const qty = Number(item.quantity) || 0;
+                  const isOutOfStock = qty <= 0;
+                  const isLowStock = !isOutOfStock && qty <= (Number(item.minStockLevel) || 2);
 
-              return (
-                <GlassCard
-                  key={item.id}
-                  sx={{
-                    p: 2.2,
-                    borderLeft: isOutOfStock ? '4px solid #DC2626' : isLowStock ? '4px solid #D97706' : '4px solid transparent'
-                  }}
-                >
-                  <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                      <Box>
-                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 800 }}>
-                          #{item.productId || 'NO-SKU'}
-                        </Typography>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mt: 0.25 }}>
-                          {item.name || 'Unnamed Garment'}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {item.supplier || 'In-House Atelier'}
-                        </Typography>
-                      </Box>
-                      <Chip
-                        label={item.category || 'General'}
-                        size="small"
-                        variant="outlined"
-                        sx={{ fontWeight: 700, fontSize: '0.68rem', borderRadius: 1.5, borderColor: 'rgba(15, 118, 110, 0.3)' }}
-                      />
-                    </Box>
-
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="caption" sx={{ fontWeight: 700 }}>
-                          {item.size || 'Free Size'}
-                        </Typography>
-                        {item.color && (
-                          <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: typeof item.color === 'string' ? item.color.toLowerCase() : '#ccc', border: '1px solid rgba(0,0,0,0.1)' }} />
-                        )}
-                      </Box>
-                      {renderStockBadge(qty, item.minStockLevel)}
-                    </Box>
-
-                    <Divider sx={{ my: 1.5 }} />
-
-                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, textAlign: 'center', mb: 2 }}>
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 800 }}>₹{price.toLocaleString('en-IN')}</Typography>
-                        <Typography variant="caption" color="text.secondary">Selling Price</Typography>
-                      </Box>
-                      {user?.role === 'admin' ? (
-                        <Box>
-                          <Typography variant="body2" sx={{ fontWeight: 800, color: profitVal > 0 ? '#059669' : '#DC2626' }}>
-                            ₹{profitVal.toFixed(0)}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">{profitMarginVal}% margin</Typography>
+                  return (
+                    <GlassCard
+                      key={item.id}
+                      sx={{
+                        p: { xs: 2, sm: 2.25 },
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        borderLeft: isOutOfStock ? '4px solid #DC2626' : isLowStock ? '4px solid #D97706' : '4px solid transparent',
+                        transition: 'transform 0.18s ease, box-shadow 0.18s ease',
+                        '&:hover': {
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 8px 24px rgba(15, 118, 110, 0.12)'
+                        }
+                      }}
+                    >
+                      <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+                        {/* Top: SKU & Collection */}
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                          <Box sx={{ minWidth: 0, flex: 1, pr: 1 }}>
+                            <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 800, fontSize: '0.8rem' }}>
+                              #{item.productId || 'NO-SKU'}
+                            </Typography>
+                            <Typography
+                              variant="subtitle1"
+                              sx={{
+                                fontWeight: 800,
+                                mt: 0.25,
+                                fontSize: { xs: '0.95rem', sm: '1rem' },
+                                lineHeight: 1.25,
+                                wordBreak: 'break-word'
+                              }}
+                            >
+                              {item.name || 'Unnamed Garment'}
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}>
+                              {item.supplier || 'In-House Atelier'}
+                            </Typography>
+                          </Box>
+                          <Chip
+                            label={item.category || 'General'}
+                            size="small"
+                            variant="outlined"
+                            sx={{
+                              fontWeight: 700,
+                              fontSize: '0.68rem',
+                              borderRadius: 1.5,
+                              borderColor: 'rgba(15, 118, 110, 0.3)',
+                              color: '#0F766E',
+                              flexShrink: 0
+                            }}
+                          />
                         </Box>
-                      ) : (
-                        <Box>
-                          <Typography variant="body2" sx={{ fontWeight: 800 }}>{item.category || 'Apparel'}</Typography>
-                          <Typography variant="caption" color="text.secondary">Collection</Typography>
-                        </Box>
-                      )}
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 800 }}>{qty}</Typography>
-                        <Typography variant="caption" color="text.secondary">Units in Stock</Typography>
-                      </Box>
-                    </Box>
 
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={() => navigate('/barcodes', { state: { product: item } })}
-                        startIcon={<QrCode />}
-                        sx={{ borderRadius: 2, color: '#D97706', borderColor: 'rgba(217, 119, 6, 0.4)' }}
-                      >
-                        Tag
-                      </Button>
-                      <Button
-                        fullWidth
-                        variant="outlined"
-                        color="primary"
-                        size="small"
-                        startIcon={<Edit />}
-                        onClick={() => handleOpen(item)}
-                        disabled={user?.role !== 'admin'}
-                        sx={{ borderRadius: 2 }}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        fullWidth
-                        variant="outlined"
-                        color="error"
-                        size="small"
-                        startIcon={<Delete />}
-                        onClick={() => openDeleteDialog(item.id)}
-                        disabled={user?.role !== 'admin'}
-                        sx={{ borderRadius: 2 }}
-                      >
-                        Delete
-                      </Button>
-                    </Box>
-                  </CardContent>
-                </GlassCard>
-              );
-            })
+                        {/* Mid Row: Size, Color and Status Badge */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1.5, mb: 2, flexWrap: 'wrap', gap: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="caption" sx={{ fontWeight: 700, bgcolor: 'action.hover', px: 1, py: 0.25, borderRadius: 1 }}>
+                              {item.size || 'Free Size'}
+                            </Typography>
+                            {item.color && (
+                              <Tooltip title={`Color: ${item.color}`}>
+                                <Box
+                                  sx={{
+                                    width: 14,
+                                    height: 14,
+                                    borderRadius: '50%',
+                                    bgcolor: typeof item.color === 'string' ? item.color.toLowerCase() : '#ccc',
+                                    border: '1.5px solid rgba(0,0,0,0.15)'
+                                  }}
+                                />
+                              </Tooltip>
+                            )}
+                          </Box>
+                          {renderStockBadge(qty, item.minStockLevel)}
+                        </Box>
+
+                        <Divider sx={{ my: 1.5 }} />
+
+                        {/* Financials & Stock Grid */}
+                        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, textAlign: 'center', mb: 2 }}>
+                          <Box sx={{ bgcolor: 'action.hover', p: 1, borderRadius: 1.5 }}>
+                            <Typography variant="body2" sx={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
+                              ₹{price.toLocaleString('en-IN')}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.68rem' }}>Selling Price</Typography>
+                          </Box>
+                          {user?.role === 'admin' ? (
+                            <Box sx={{ bgcolor: 'action.hover', p: 1, borderRadius: 1.5 }}>
+                              <Typography variant="body2" sx={{ fontWeight: 800, color: profitVal > 0 ? '#059669' : '#DC2626', fontVariantNumeric: 'tabular-nums' }}>
+                                ₹{profitVal.toFixed(0)}
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.68rem' }}>{profitMarginVal}% margin</Typography>
+                            </Box>
+                          ) : (
+                            <Box sx={{ bgcolor: 'action.hover', p: 1, borderRadius: 1.5 }}>
+                              <Typography variant="body2" sx={{ fontWeight: 800 }}>{item.category || 'Apparel'}</Typography>
+                              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.68rem' }}>Collection</Typography>
+                            </Box>
+                          )}
+                          <Box sx={{ bgcolor: 'action.hover', p: 1, borderRadius: 1.5 }}>
+                            <Typography variant="body2" sx={{ fontWeight: 800 }}>{qty}</Typography>
+                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.68rem' }}>Units Available</Typography>
+                          </Box>
+                        </Box>
+
+                        {/* Action Buttons: Touch-optimized */}
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() => navigate('/barcodes', { state: { product: item } })}
+                            startIcon={<QrCode />}
+                            sx={{
+                              borderRadius: 2,
+                              color: '#D97706',
+                              borderColor: 'rgba(217, 119, 6, 0.4)',
+                              fontWeight: 700,
+                              fontSize: '0.75rem',
+                              height: 36
+                            }}
+                          >
+                            Tag
+                          </Button>
+                          <Button
+                            fullWidth
+                            variant="outlined"
+                            color="primary"
+                            size="small"
+                            startIcon={<Edit />}
+                            onClick={() => handleOpen(item)}
+                            disabled={user?.role !== 'admin'}
+                            sx={{ borderRadius: 2, fontWeight: 700, fontSize: '0.75rem', height: 36 }}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            fullWidth
+                            variant="outlined"
+                            color="error"
+                            size="small"
+                            startIcon={<Delete />}
+                            onClick={() => openDeleteDialog(item.id)}
+                            disabled={user?.role !== 'admin'}
+                            sx={{ borderRadius: 2, fontWeight: 700, fontSize: '0.75rem', height: 36 }}
+                          >
+                            Delete
+                          </Button>
+                        </Box>
+                      </CardContent>
+                    </GlassCard>
+                  );
+                })}
+              </Box>
+
+              <GlassCard sx={{ mt: 3, p: 0.5, borderRadius: 2.5 }}>
+                <TablePagination
+                  rowsPerPageOptions={[6, 12, 24, 48]}
+                  component="div"
+                  count={filteredInventory.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                />
+              </GlassCard>
+            </>
           )}
         </Box>
       ) : (
         <GlassCard sx={{ p: 0, overflow: 'hidden', border: '1px solid rgba(15, 118, 110, 0.15)' }}>
-          <TableContainer>
-            <Table>
+          <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <Table sx={{ minWidth: 880 }}>
               <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(15, 118, 110, 0.1)' : 'rgba(15, 118, 110, 0.05)' }}>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 800, width: 130 }}>
@@ -1331,9 +1500,12 @@ const Inventory = () => {
         onClose={() => setOpen(false)}
         maxWidth="md"
         fullWidth
+        fullScreen={isSmallMobile}
         PaperProps={{
           sx: {
-            borderRadius: 3.5,
+            borderRadius: { xs: 0, sm: 3.5 },
+            m: { xs: 0, sm: 2 },
+            maxHeight: { xs: '100%', sm: 'calc(100% - 48px)' },
             overflow: 'hidden',
             boxShadow: '0 24px 60px rgba(15, 118, 110, 0.2), 0 8px 30px rgba(0,0,0,0.12)'
           }
