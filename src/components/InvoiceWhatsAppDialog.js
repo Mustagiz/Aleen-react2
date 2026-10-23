@@ -69,8 +69,9 @@ Thank you for gracing our boutique with your presence. Here is your official e-i
 💳 *Payment Mode:* {paymentMethod} ({paymentStatus})
 ──────────────────
 
-📥 *Download PDF Bill:*
+📥 *Download PDF Bill (Valid for 7 Days):*
 {billLink}
+⏰ _Note: For customer security, this direct download link remains active for 1 week (until {expiryDate})._
 
 💫 *Care & Service Guarantee:*
 Every garment is curated with timeless elegance. We offer complimentary fitting adjustments within 7 days.
@@ -94,6 +95,7 @@ Hi *{customer}*, thank you for shopping with us today!
 • *Discount:* {discount}
 • *Grand Total:* *₹{total}* (Paid via {paymentMethod})
 • *Download PDF Bill:* {billLink}
+⏰ _(Direct download link valid for 7 days until {expiryDate})_
 
 📍 *Boutique:* {address}
 📞 *Helpdesk:* {businessPhone}
@@ -122,8 +124,9 @@ It is our distinct privilege curating timeless aesthetics for you.
 🏷️ *VIP Privilege Discount:* {discount}
 ✨ *Final Investment:* *₹{total}* via {paymentMethod}
 
-📥 *Download PDF Bill:*
+📥 *Download PDF Bill (Valid for 7 Days):*
 {billLink}
+⏰ _Note: Direct download link active for 1 week (expires on {expiryDate})._
 
 🎁 *VIP Privileges Included:*
 • Priority fitting sessions & bespoke adjustments
@@ -153,6 +156,7 @@ Please find the billing details for your recent purchase:
 • *Payment Mode:* {paymentMethod}
 • *Settlement Status:* *{paymentStatus}*
 • *Download PDF Bill:* {billLink}
+⏰ _(Link active for 7 days until {expiryDate})_
 
 🛍️ *Items Accounted:*
 {itemList}
@@ -185,8 +189,9 @@ Your bespoke festive trousseau order is recorded under:
 ✨ *Grand Total:* *₹{total}*
 💳 *Tender:* {paymentMethod}
 
-📥 *Download PDF Bill:*
+📥 *Download PDF Bill (Valid for 7 Days):*
 {billLink}
+⏰ _Note: Digital invoice download link remains active for 1 week (until {expiryDate})._
 
 🕊️ *Complimentary Concierge:*
 We offer complimentary garment steaming, trial re-fitting, and bridal preservation styling.
@@ -256,10 +261,17 @@ export const generateInvoiceWhatsAppText = (templateText, invoice, profile) => {
   const billLink = invoiceId && invoiceId !== 'N/A' ? `${origin}/bill/${invoiceId}` : `${origin}/invoices`;
   const downloadPdfLink = invoiceId && invoiceId !== 'N/A' ? `${origin}/bill/${invoiceId}?download=true` : '';
 
+  const invoiceRawDate = invoice.date ? new Date(invoice.date) : new Date();
+  const expiryRawDate = new Date(invoiceRawDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const expiryDate = !isNaN(expiryRawDate.getTime())
+    ? expiryRawDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+    : '7 days from issue';
+
   return templateText
     .replace(/{customer}/g, customerName)
     .replace(/{invoiceId}/g, invoiceId)
     .replace(/{date}/g, invoiceDate)
+    .replace(/{expiryDate}/g, expiryDate)
     .replace(/{itemList}/g, formattedItemList)
     .replace(/{itemSummary}/g, itemSummary)
     .replace(/{itemCount}/g, String(items.length || 1))

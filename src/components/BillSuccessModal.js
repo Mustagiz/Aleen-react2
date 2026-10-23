@@ -146,7 +146,13 @@ const BillSuccessModal = ({
       const customerName = invoice.customer ? invoice.customer.trim() : 'Valued Patron';
       const storeName = profile?.businessName || 'Aleen Clothing';
 
-      const smsBody = `Dear ${customerName}, thank you for shopping at ${storeName}! Your bill of ₹${totalAmount} (#${invoice.id}) is generated. View & download your official PDF bill here: ${billUrl}`;
+      const invoiceRawDate = invoice.date ? new Date(invoice.date) : new Date();
+      const expiryRawDate = new Date(invoiceRawDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+      const expiryDateStr = !isNaN(expiryRawDate.getTime())
+        ? expiryRawDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })
+        : '7 days';
+
+      const smsBody = `Dear ${customerName}, thank you for shopping at ${storeName}! Your bill of ₹${totalAmount} (#${invoice.invoiceNumber || invoice.id}) is generated. View & download your official PDF bill here: ${billUrl} (Note: Direct download link valid for 7 days until ${expiryDateStr}).`;
 
       const isIOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
       const separator = isIOS ? '&' : '?';
@@ -522,7 +528,7 @@ const BillSuccessModal = ({
                       {isSendingSMS ? 'Opening Messages App...' : 'Send Text Message / SMS (with PDF Link)'}
                     </Typography>
                     <Typography sx={{ fontSize: '0.7rem', opacity: 0.9, fontWeight: 500 }}>
-                      Customer directly opens link to view & download official PDF bill
+                      Customer directly opens link to view & download official PDF bill (valid 7 days)
                     </Typography>
                   </Box>
                 </Box>
@@ -572,7 +578,7 @@ const BillSuccessModal = ({
                       {isSendingWhatsApp ? 'Opening WhatsApp...' : 'Send on WhatsApp (with PDF Link)'}
                     </Typography>
                     <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary', fontWeight: 500 }}>
-                      Itemized summary + direct link to download official PDF bill
+                      Itemized summary + direct link to download official PDF bill (valid 7 days)
                     </Typography>
                   </Box>
                 </Box>

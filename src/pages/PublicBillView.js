@@ -26,7 +26,10 @@ import {
   Phone,
   LocationOn,
   Receipt,
-  Security
+  Security,
+  AccessTime,
+  WhatsApp,
+  TimerOff
 } from '@mui/icons-material';
 import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -376,15 +379,44 @@ const PublicBillView = () => {
     }
   };
 
-  // Auto download trigger if query param download=true
+  // 1-Week (7 Days) Expiration Evaluation
+  const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
+  const getInvoiceTimestamp = () => {
+    if (!invoice) return null;
+    if (invoice.date) {
+      const parsed = new Date(invoice.date).getTime();
+      if (!isNaN(parsed) && parsed > 0) return parsed;
+    }
+    if (invoice.createdAt) {
+      const parsed = new Date(invoice.createdAt).getTime();
+      if (!isNaN(parsed) && parsed > 0) return parsed;
+    }
+    if (invoice.id && !isNaN(Number(invoice.id)) && Number(invoice.id) > 1000000000000) {
+      return Number(invoice.id);
+    }
+    return null;
+  };
+
+  const invoiceTimestamp = getInvoiceTimestamp();
+  const isExpired = invoiceTimestamp ? (Date.now() - invoiceTimestamp > SEVEN_DAYS_MS) : false;
+  const expiryTimestamp = invoiceTimestamp ? (invoiceTimestamp + SEVEN_DAYS_MS) : null;
+  const expiryDateFormatted = expiryTimestamp
+    ? new Date(expiryTimestamp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+    : '';
+  const daysRemaining = expiryTimestamp
+    ? Math.max(0, Math.ceil((expiryTimestamp - Date.now()) / (24 * 60 * 60 * 1000)))
+    : null;
+
+  // Auto download trigger if query param download=true (only if link is not expired)
   useEffect(() => {
-    if (autoDownload && invoice && !loading) {
+    if (autoDownload && invoice && !loading && !isExpired) {
       const timer = setTimeout(() => {
         handleDownloadPDF();
       }, 600);
       return () => clearTimeout(timer);
     }
-  }, [autoDownload, invoice, loading]);
+  }, [autoDownload, invoice, loading, isExpired]);
 
   if (loading) {
     return (
@@ -415,6 +447,152 @@ const PublicBillView = () => {
           </Typography>
         </Paper>
       </Container>
+    );
+  }
+
+  // If link has expired (1 week / 7 days passed since purchase)
+  if (isExpired) {
+    const storePhone = profile?.phone || '+91 98765 43210';
+    const storeName = profile?.businessName || 'Aleen Clothing';
+    const cleanPhone = storePhone.replace(/[^0-9]/g, '');
+    const waText = encodeURIComponent(
+      `Hello ${storeName}, my digital bill download link for Invoice #${invoice.invoiceNumber || invoice.id} has expired (7 days passed). Could you please re-issue a duplicate PDF bill copy for me? Thank you.`
+    );
+    const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${waText}` : `https://wa.me/?text=${waText}`;
+
+    return (
+      <Box sx={{ minHeight: '100vh', bgcolor: '#F8FAFC', py: { xs: 4, sm: 8 }, px: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Container maxWidth="sm">
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 3, sm: 5 },
+              borderRadius: 4,
+              border: '1.5px solid',
+              borderColor: 'rgba(239, 68, 68, 0.3)',
+              bgcolor: '#FFFFFF',
+              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.08)',
+              textAlign: 'center'
+            }}
+          >
+            {/* Expired Clock Icon */}
+            <Box
+              sx={{
+                width: 72,
+                height: 72,
+                borderRadius: '50%',
+                bgcolor: 'rgba(239, 68, 68, 0.1)',
+                color: '#DC2626',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mx: 'auto',
+                mb: 2.5
+              }}
+            >
+              <TimerOff sx={{ fontSize: 38 }} />
+            </Box>
+
+            <Chip
+              icon={<AccessTime sx={{ fontSize: '14px !important', color: '#DC2626 !important' }} />}
+              label="Link Expired • 7-Day Validity Passed"
+              size="small"
+              sx={{
+                bgcolor: 'rgba(239, 68, 68, 0.1)',
+                color: '#DC2626',
+                fontWeight: 800,
+                fontSize: '0.74rem',
+                mb: 2
+              }}
+            />
+
+            <Typography variant="h5" sx={{ fontWeight: 900, color: '#0F172A', mb: 1.5, letterSpacing: '-0.02em' }}>
+              Digital Bill Link Has Expired
+            </Typography>
+
+            <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.6, mb: 3 }}>
+              For customer privacy and billing protection, digital bill download links expire <strong>7 days</strong> after purchase. This link expired on <strong>{expiryDateFormatted}</strong>.
+            </Typography>
+
+            {/* Invoice Reference Card */}
+            <Box sx={{ p: 2, borderRadius: 2.5, bgcolor: '#F8FAFC', border: '1px solid #E2E8F0', mb: 3, textAlign: 'left' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.75 }}>
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700 }}>
+                  Invoice Reference:
+                </Typography>
+                <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                  #{invoice.invoiceNumber || invoice.id}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.75 }}>
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700 }}>
+                  Billed To:
+                </Typography>
+                <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                  {invoice.customer || 'Customer'}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700 }}>
+                  Issued On:
+                </Typography>
+                <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                  {invoice.date ? new Date(invoice.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Recent'}
+                </Typography>
+              </Box>
+            </Box>
+
+            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 2.5, fontWeight: 600 }}>
+              Need an official duplicate PDF bill copy or accounts statement?
+            </Typography>
+
+            {/* Action Buttons */}
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
+              <Button
+                variant="contained"
+                fullWidth
+                startIcon={<WhatsApp />}
+                onClick={() => window.open(waUrl, '_blank')}
+                sx={{
+                  bgcolor: '#25D366',
+                  color: '#FFFFFF',
+                  fontWeight: 800,
+                  py: 1.2,
+                  borderRadius: 2.5,
+                  textTransform: 'none',
+                  boxShadow: '0 4px 14px rgba(37, 211, 102, 0.4)',
+                  '&:hover': { bgcolor: '#1EBE5D' }
+                }}
+              >
+                Request Copy via WhatsApp
+              </Button>
+              <Button
+                variant="outlined"
+                fullWidth
+                startIcon={<Phone />}
+                onClick={() => window.open(`tel:${cleanPhone}`, '_self')}
+                sx={{
+                  borderColor: 'divider',
+                  color: 'text.primary',
+                  fontWeight: 700,
+                  py: 1.2,
+                  borderRadius: 2.5,
+                  textTransform: 'none',
+                  '&:hover': { borderColor: 'text.primary', bgcolor: 'action.hover' }
+                }}
+              >
+                Call Boutique Desk
+              </Button>
+            </Stack>
+
+            <Divider sx={{ my: 3 }} />
+
+            <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.72rem' }}>
+              {storeName} • {profile?.address || 'Baba Jaan Chawk, Pune, Maharashtra'}
+            </Typography>
+          </Paper>
+        </Container>
+      </Box>
     );
   }
 
@@ -452,9 +630,25 @@ const PublicBillView = () => {
               <Receipt sx={{ color: '#FFFFFF' }} />
             </Box>
             <Box>
-              <Typography variant="subtitle1" sx={{ fontWeight: 800, lineHeight: 1.2 }}>
-                Official E-Invoice #{invoice.invoiceNumber || invoice.id}
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 800, lineHeight: 1.2 }}>
+                  Official E-Invoice #{invoice.invoiceNumber || invoice.id}
+                </Typography>
+                {expiryDateFormatted && (
+                  <Chip
+                    icon={<AccessTime sx={{ fontSize: '13px !important', color: '#FEF08A !important' }} />}
+                    label={`Valid until ${expiryDateFormatted} (${daysRemaining} ${daysRemaining === 1 ? 'day' : 'days'} left)`}
+                    size="small"
+                    sx={{
+                      bgcolor: 'rgba(255, 255, 255, 0.16)',
+                      color: '#FEF08A',
+                      fontWeight: 700,
+                      fontSize: '0.68rem',
+                      height: 22
+                    }}
+                  />
+                )}
+              </Box>
               <Typography variant="caption" sx={{ opacity: 0.85 }}>
                 Tap below to download your official PDF invoice
               </Typography>
