@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel, CircularProgress, Alert, Snackbar, InputAdornment, List } from '@mui/material';
 import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, FilterList, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, ShoppingCart } from '@mui/icons-material';
 import { Html5Qrcode } from 'html5-qrcode';
@@ -23,6 +24,8 @@ import InvoiceWhatsAppDialog from '../components/InvoiceWhatsAppDialog';
 import { printInvoiceElement } from '../utils/printInvoice';
 
 const Invoices = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { inventory, invoices, addInvoice, deleteInvoice, profile, customers, addCustomer, loading } = useData();
   const { mode } = useThemeContext();
@@ -208,6 +211,33 @@ const Invoices = () => {
   const lastKeyTimeRef = useRef(0);
   const lastRemoteScanTimestampRef = useRef(Date.now());
   const quickAddInputRef = useRef(null);
+
+  // Handle Quick Bill CTA from header navigation or Alt+N shortcut
+  useEffect(() => {
+    const triggerNewBill = () => {
+      setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0 }]);
+      setCustomer('');
+      setPhone('+91');
+      setDiscountPercent('');
+      setDiscountAmount('');
+      setTax('');
+      setOpen(true);
+    };
+
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('action') === 'new' || location.state?.openNewBill) {
+      triggerNewBill();
+      // Remove query param and route state to keep history clean
+      navigate('/invoices', { replace: true, state: {} });
+    }
+
+    const handleCustomEvent = () => {
+      triggerNewBill();
+    };
+
+    window.addEventListener('open-quick-bill', handleCustomEvent);
+    return () => window.removeEventListener('open-quick-bill', handleCustomEvent);
+  }, [location.search, location.state, navigate]);
 
   const [networkHost] = useState(() => {
     if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {

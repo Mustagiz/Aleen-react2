@@ -87,18 +87,32 @@ export default function Layout() {
     });
   };
 
-  // Global search keyboard shortcut (Ctrl+K or Cmd+K)
+  const canQuickBill = !user || user.role === 'admin' || user.role === 'cashier' || !user.permissions || user.permissions.invoices;
+
+  const handleQuickBill = () => {
+    if (!canQuickBill) return;
+    if (location.pathname === '/invoices') {
+      window.dispatchEvent(new CustomEvent('open-quick-bill'));
+    } else {
+      navigate('/invoices?action=new', { state: { openNewBill: true, timestamp: Date.now() } });
+    }
+  };
+
+  // Global keyboard shortcuts: Search (Ctrl/Cmd+K) & Quick Bill (Alt+N or F2)
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      if ((e.ctrlKey || e.metaKey) && e.key?.toLowerCase() === 'k') {
         e.preventDefault();
         setSearchOpen(true);
+      } else if ((e.altKey && e.key?.toLowerCase() === 'n') || e.key === 'F2') {
+        e.preventDefault();
+        handleQuickBill();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [location.pathname, canQuickBill]);
 
   const getInitials = (name) => {
     return name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'AL';
@@ -565,23 +579,27 @@ export default function Layout() {
             />
 
             {/* Champagne Gold "+ Quick Bill" CTA */}
-            <Button
-              variant="contained"
-              color="secondary"
-              size="small"
-              startIcon={<Add fontSize="small" />}
-              onClick={() => navigate('/invoices')}
-              sx={{
-                height: 36,
-                px: 2,
-                borderRadius: '9999px',
-                fontWeight: 800,
-                fontSize: '0.825rem',
-                boxShadow: '0 4px 14px rgba(217, 119, 6, 0.3)'
-              }}
-            >
-              Quick Bill
-            </Button>
+            {canQuickBill && (
+              <Button
+                variant="contained"
+                color="secondary"
+                size="small"
+                startIcon={<Add fontSize="small" />}
+                onClick={handleQuickBill}
+                title="Create Retail Invoice (Alt + N or F2)"
+                sx={{
+                  height: 36,
+                  px: 2,
+                  borderRadius: '9999px',
+                  fontWeight: 800,
+                  fontSize: '0.825rem',
+                  boxShadow: '0 4px 14px rgba(217, 119, 6, 0.3)',
+                  cursor: 'pointer'
+                }}
+              >
+                Quick Bill
+              </Button>
+            )}
 
             {/* Notification Center */}
             <NotificationCenter />
