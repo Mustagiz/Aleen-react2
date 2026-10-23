@@ -47,7 +47,9 @@ import {
   Straighten,
   LocalOffer,
   Close,
-  CheckCircle
+  CheckCircle,
+  RestartAlt,
+  FilterList
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -95,6 +97,7 @@ const Inventory = () => {
   const [editItem, setEditItem] = useState(null);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [stockFilter, setStockFilter] = useState('all'); // 'all', 'low_or_out', 'low', 'out', 'in', 'surplus'
   const [newCategory, setNewCategory] = useState('');
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
   const [form, setForm] = useState({
@@ -118,6 +121,11 @@ const Inventory = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
+  // Reset page when filters change
+  React.useEffect(() => {
+    setPage(0);
+  }, [search, categoryFilter, stockFilter]);
+
   // Sorting State
   const [orderBy, setOrderBy] = useState('name');
   const [order, setOrder] = useState('asc');
@@ -140,10 +148,28 @@ const Inventory = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  // Safe numerical KPIs
+  // Safe numerical KPIs & Stock Counts
   const totalItems = inventory?.length || 0;
   const totalValue = (inventory || []).reduce((sum, item) => sum + ((Number(item?.price) || 0) * (Number(item?.quantity) || 0)), 0);
-  const lowStockItems = (inventory || []).filter(item => (Number(item?.quantity) || 0) < 2).length;
+  const totalUnits = (inventory || []).reduce((sum, item) => sum + (Number(item?.quantity) || 0), 0);
+
+  const lowStockCount = (inventory || []).filter(item => {
+    const qty = Number(item?.quantity) || 0;
+    const min = Number(item?.minStockLevel) || 2;
+    return qty > 0 && qty <= min;
+  }).length;
+
+  const outOfStockCount = (inventory || []).filter(item => (Number(item?.quantity) || 0) <= 0).length;
+  const lowOrOutCount = lowStockCount + outOfStockCount;
+
+  const inStockCount = (inventory || []).filter(item => {
+    const qty = Number(item?.quantity) || 0;
+    const min = Number(item?.minStockLevel) || 2;
+    return qty > min;
+  }).length;
+
+  const surplusCount = (inventory || []).filter(item => (Number(item?.quantity) || 0) >= 10).length;
+
   const totalProfit = (inventory || []).reduce((sum, item) => sum + (((Number(item?.price) || 0) - (Number(item?.cost) || 0)) * (Number(item?.quantity) || 0)), 0);
 
   const handleAddCategory = () => {
@@ -348,7 +374,25 @@ const Inventory = () => {
       const supp = String(item.supplier || '').toLowerCase();
       const matchesSearch = !q || name.includes(q) || pId.includes(q) || supp.includes(q);
       const matchesCategory = !categoryFilter || item.category === categoryFilter;
-      return matchesSearch && matchesCategory;
+
+      // Stock Level Filter
+      let matchesStock = true;
+      const qty = Number(item.quantity) || 0;
+      const minLvl = Number(item.minStockLevel) || 2;
+
+      if (stockFilter === 'low_or_out') {
+        matchesStock = qty <= minLvl;
+      } else if (stockFilter === 'low') {
+        matchesStock = qty > 0 && qty <= minLvl;
+      } else if (stockFilter === 'out') {
+        matchesStock = qty <= 0;
+      } else if (stockFilter === 'in') {
+        matchesStock = qty > minLvl;
+      } else if (stockFilter === 'surplus') {
+        matchesStock = qty >= 10;
+      }
+
+      return matchesSearch && matchesCategory && matchesStock;
     }).sort((a, b) => {
       const isAsc = order === 'asc';
       if (orderBy === 'price' || orderBy === 'quantity') {
@@ -360,7 +404,107 @@ const Inventory = () => {
       const valB = String(b[orderBy] || '').toLowerCase();
       return isAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
     });
-  }, [inventory, search, categoryFilter, orderBy, order]);
+  }, [inventory, search, categoryFilter, stockFilter, orderBy, order]);
+
+  // Highlight stock units based on quantity & threshold
+  const renderStockBadge = (quantity, minStockLevel = 2) => {
+    const qty = Number(quantity) || 0;
+    const minLvl = Number(minStockLevel) || 2;
+
+    if (qty <= 0) {
+      return (
+        <Tooltip title="Out of stock! Urgent replenishment required.">
+          <Box sx={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 0.75,
+            px: 1.25,
+            py: 0.45,
+            borderRadius: '16px',
+            bgcolor: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.35)',
+            color: '#DC2626'
+          }}>
+            <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: '#DC2626' }} />
+            <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.72rem', letterSpacing: '0.01em' }}>
+              0 Units • Out of Stock
+            </Typography>
+          </Box>
+        </Tooltip>
+      );
+    }
+
+    if (qty <= minLvl) {
+      return (
+        <Tooltip title={`Low Stock Warning: Only ${qty} remaining in atelier (Min threshold: ${minLvl})`}>
+          <Box sx={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 0.75,
+            px: 1.25,
+            py: 0.45,
+            borderRadius: '16px',
+            bgcolor: 'rgba(217, 119, 6, 0.12)',
+            border: '1px solid rgba(217, 119, 6, 0.35)',
+            color: '#B45309'
+          }}>
+            <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: '#D97706' }} />
+            <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.72rem', letterSpacing: '0.01em' }}>
+              {qty} {qty === 1 ? 'Unit' : 'Units'} • Low Stock
+            </Typography>
+          </Box>
+        </Tooltip>
+      );
+    }
+
+    if (qty <= 5) {
+      return (
+        <Tooltip title={`Moderate inventory: ${qty} units available`}>
+          <Box sx={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 0.75,
+            px: 1.25,
+            py: 0.45,
+            borderRadius: '16px',
+            bgcolor: 'rgba(15, 118, 110, 0.08)',
+            border: '1px solid rgba(15, 118, 110, 0.22)',
+            color: '#0F766E'
+          }}>
+            <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: '#0F766E' }} />
+            <Typography variant="caption" sx={{ fontWeight: 700, fontSize: '0.72rem' }}>
+              {qty} Units • Moderate
+            </Typography>
+          </Box>
+        </Tooltip>
+      );
+    }
+
+    return (
+      <Tooltip title={`Well-stocked: ${qty} units available in atelier`}>
+        <Box sx={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 0.75,
+          px: 1.25,
+          py: 0.45,
+          borderRadius: '16px',
+          bgcolor: 'rgba(16, 185, 129, 0.1)',
+          border: '1px solid rgba(16, 185, 129, 0.28)',
+          color: '#059669'
+        }}>
+          <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: '#10B981' }} />
+          <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.72rem' }}>
+            {qty} Units • In Stock
+          </Typography>
+        </Box>
+      </Tooltip>
+    );
+  };
+
+  const isFiltered = Boolean(search || categoryFilter || stockFilter !== 'all');
+  const filteredTotalValue = filteredInventory.reduce((sum, item) => sum + ((Number(item?.price) || 0) * (Number(item?.quantity) || 0)), 0);
+  const filteredTotalUnits = filteredInventory.reduce((sum, item) => sum + (Number(item?.quantity) || 0), 0);
 
   // Calculate profit and margin dynamically for the modal form
   const sellingPrice = parseFloat(form.price) || 0;
@@ -421,7 +565,8 @@ const Inventory = () => {
             title="Total Garments"
             value={totalItems}
             icon={<Inventory2 fontSize="small" />}
-            subtitle="Catalog styles in atelier"
+            subtitle={`${totalUnits.toLocaleString('en-IN')} physical units in catalog`}
+            onClick={() => setStockFilter('all')}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
@@ -429,18 +574,19 @@ const Inventory = () => {
             title="Portfolio Value"
             value={`₹${totalValue.toLocaleString('en-IN')}`}
             icon={<AttachMoney fontSize="small" />}
-            subtitle="Estimated retail value"
+            subtitle="Estimated retail valuation"
             goldAccent={true}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <AtelierKpiCard
             title="Low Stock Alerts"
-            value={lowStockItems}
+            value={lowOrOutCount}
             icon={<Warning fontSize="small" />}
-            subtitle="Items below 2 units"
-            trend={lowStockItems > 0 ? `${lowStockItems} styles urgent` : undefined}
-            trendPositive={false}
+            subtitle={outOfStockCount > 0 ? `${outOfStockCount} out of stock • ${lowStockCount} low` : 'Items at or below 2 units'}
+            trend={lowOrOutCount > 0 ? `${lowOrOutCount} styles urgent` : 'Catalog healthy'}
+            trendPositive={lowOrOutCount === 0}
+            onClick={() => setStockFilter(prev => prev === 'low_or_out' ? 'all' : 'low_or_out')}
           />
         </Grid>
         {user?.role === 'admin' && (
@@ -457,10 +603,11 @@ const Inventory = () => {
         )}
       </Grid>
 
-      {/* Filters and Search Bar */}
-      <GlassCard sx={{ p: 2, mb: 3 }}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={6}>
+      {/* Filter and Command Toolbar */}
+      <GlassCard sx={{ p: 2.5, mb: 3, border: '1px solid rgba(15, 118, 110, 0.15)' }}>
+        {/* Row 1: Search, Collection, Sort, and Reset */}
+        <Grid container spacing={1.5} alignItems="center">
+          <Grid item xs={12} md={5}>
             <TextField
               fullWidth
               size="small"
@@ -468,19 +615,41 @@ const Inventory = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               InputProps={{
-                startAdornment: <Search sx={{ mr: 1, color: 'text.secondary', fontSize: 20 }} />
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search sx={{ color: '#0F766E', fontSize: 20 }} />
+                  </InputAdornment>
+                ),
+                endAdornment: search ? (
+                  <InputAdornment position="end">
+                    <IconButton size="small" onClick={() => setSearch('')}>
+                      <Close sx={{ fontSize: 16 }} />
+                    </IconButton>
+                  </InputAdornment>
+                ) : null
               }}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2.5,
+                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#FFFFFF'
+                }
+              }}
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={4}>
+
+          <Grid item xs={12} sm={6} md={3}>
             <TextField
               select
               fullWidth
               size="small"
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2.5,
+                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#FFFFFF'
+                }
+              }}
             >
               <MenuItem value="">All Collections & Categories</MenuItem>
               {safeCategories.map((cat) => (
@@ -490,123 +659,425 @@ const Inventory = () => {
               ))}
             </TextField>
           </Grid>
-          <Grid item xs={12} sm={6} md={2}>
-            <Button
+
+          <Grid item xs={6} sm={3} md={2}>
+            <TextField
+              select
               fullWidth
-              variant="outlined"
               size="small"
-              onClick={() => { setSearch(''); setCategoryFilter(''); }}
-              sx={{ borderRadius: 2, py: 0.9, fontWeight: 700, fontSize: '0.78rem' }}
+              value={orderBy}
+              onChange={(e) => setOrderBy(e.target.value)}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2.5,
+                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#FFFFFF'
+                }
+              }}
             >
-              Reset Filters
-            </Button>
+              <MenuItem value="name">Garment Name</MenuItem>
+              <MenuItem value="quantity">Stock Units</MenuItem>
+              <MenuItem value="price">Selling Price</MenuItem>
+              <MenuItem value="productId">Product SKU</MenuItem>
+              <MenuItem value="category">Collection</MenuItem>
+            </TextField>
+          </Grid>
+
+          <Grid item xs={6} sm={3} md={2}>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => setOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+                sx={{
+                  borderRadius: 2.5,
+                  minWidth: 44,
+                  px: 1.5,
+                  fontWeight: 700,
+                  fontSize: '0.78rem',
+                  borderColor: 'rgba(15, 118, 110, 0.3)',
+                  color: '#0F766E'
+                }}
+                title={order === 'asc' ? 'Ascending' : 'Descending'}
+              >
+                {order === 'asc' ? '↑ Asc' : '↓ Desc'}
+              </Button>
+              <Button
+                fullWidth
+                variant={isFiltered ? 'contained' : 'outlined'}
+                size="small"
+                onClick={() => { setSearch(''); setCategoryFilter(''); setStockFilter('all'); }}
+                disabled={!isFiltered}
+                startIcon={<RestartAlt fontSize="small" />}
+                sx={{
+                  borderRadius: 2.5,
+                  fontWeight: 700,
+                  fontSize: '0.75rem',
+                  ...(isFiltered ? {
+                    background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                    color: '#ffffff'
+                  } : {})
+                }}
+              >
+                Reset
+              </Button>
+            </Box>
           </Grid>
         </Grid>
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* Row 2: Stock Availability Filter Pills */}
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mr: 0.5 }}>
+              <FilterList sx={{ fontSize: 18, color: '#0F766E' }} />
+              <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'text.secondary', fontSize: '0.7rem' }}>
+                Stock Filter:
+              </Typography>
+            </Box>
+
+            {/* All Garments */}
+            <Chip
+              label={`All (${totalItems})`}
+              onClick={() => setStockFilter('all')}
+              size="small"
+              variant={stockFilter === 'all' ? 'filled' : 'outlined'}
+              sx={{
+                fontWeight: 700,
+                fontSize: '0.75rem',
+                borderRadius: 2,
+                cursor: 'pointer',
+                bgcolor: stockFilter === 'all' ? '#0F766E' : 'transparent',
+                color: stockFilter === 'all' ? '#FFFFFF' : 'text.primary',
+                borderColor: 'rgba(15, 118, 110, 0.25)',
+                '&:hover': { bgcolor: stockFilter === 'all' ? '#0F766E' : 'rgba(15, 118, 110, 0.08)' }
+              }}
+            />
+
+            {/* Low & Out Combined (Urgent Restock) */}
+            <Chip
+              label={`⚠️ Urgent Restock (${lowOrOutCount})`}
+              onClick={() => setStockFilter('low_or_out')}
+              size="small"
+              variant={stockFilter === 'low_or_out' ? 'filled' : 'outlined'}
+              sx={{
+                fontWeight: 800,
+                fontSize: '0.75rem',
+                borderRadius: 2,
+                cursor: 'pointer',
+                bgcolor: stockFilter === 'low_or_out' ? '#D97706' : 'rgba(217, 119, 6, 0.08)',
+                color: stockFilter === 'low_or_out' ? '#FFFFFF' : '#B45309',
+                borderColor: 'rgba(217, 119, 6, 0.4)',
+                '&:hover': { bgcolor: stockFilter === 'low_or_out' ? '#B45309' : 'rgba(217, 119, 6, 0.16)' }
+              }}
+            />
+
+            {/* Out of Stock (0 units) */}
+            <Chip
+              label={`🔴 Out of Stock (${outOfStockCount})`}
+              onClick={() => setStockFilter('out')}
+              size="small"
+              variant={stockFilter === 'out' ? 'filled' : 'outlined'}
+              sx={{
+                fontWeight: 800,
+                fontSize: '0.75rem',
+                borderRadius: 2,
+                cursor: 'pointer',
+                bgcolor: stockFilter === 'out' ? '#DC2626' : 'rgba(239, 68, 68, 0.08)',
+                color: stockFilter === 'out' ? '#FFFFFF' : '#DC2626',
+                borderColor: 'rgba(239, 68, 68, 0.35)',
+                '&:hover': { bgcolor: stockFilter === 'out' ? '#B91C1C' : 'rgba(239, 68, 68, 0.16)' }
+              }}
+            />
+
+            {/* Low Stock (1-2 units) */}
+            <Chip
+              label={`🟡 Low Stock (${lowStockCount})`}
+              onClick={() => setStockFilter('low')}
+              size="small"
+              variant={stockFilter === 'low' ? 'filled' : 'outlined'}
+              sx={{
+                fontWeight: 700,
+                fontSize: '0.75rem',
+                borderRadius: 2,
+                cursor: 'pointer',
+                bgcolor: stockFilter === 'low' ? '#F59E0B' : 'rgba(245, 158, 11, 0.08)',
+                color: stockFilter === 'low' ? '#FFFFFF' : '#D97706',
+                borderColor: 'rgba(245, 158, 11, 0.35)',
+                '&:hover': { bgcolor: stockFilter === 'low' ? '#D97706' : 'rgba(245, 158, 11, 0.16)' }
+              }}
+            />
+
+            {/* In Stock (>2 units) */}
+            <Chip
+              label={`🟢 In Stock (${inStockCount})`}
+              onClick={() => setStockFilter('in')}
+              size="small"
+              variant={stockFilter === 'in' ? 'filled' : 'outlined'}
+              sx={{
+                fontWeight: 700,
+                fontSize: '0.75rem',
+                borderRadius: 2,
+                cursor: 'pointer',
+                bgcolor: stockFilter === 'in' ? '#059669' : 'rgba(16, 185, 129, 0.08)',
+                color: stockFilter === 'in' ? '#FFFFFF' : '#059669',
+                borderColor: 'rgba(16, 185, 129, 0.35)',
+                '&:hover': { bgcolor: stockFilter === 'in' ? '#047857' : 'rgba(16, 185, 129, 0.16)' }
+              }}
+            />
+
+            {/* Surplus (10+ units) */}
+            <Chip
+              label={`📦 Surplus 10+ (${surplusCount})`}
+              onClick={() => setStockFilter('surplus')}
+              size="small"
+              variant={stockFilter === 'surplus' ? 'filled' : 'outlined'}
+              sx={{
+                fontWeight: 700,
+                fontSize: '0.75rem',
+                borderRadius: 2,
+                cursor: 'pointer',
+                bgcolor: stockFilter === 'surplus' ? '#6366F1' : 'rgba(99, 102, 241, 0.08)',
+                color: stockFilter === 'surplus' ? '#FFFFFF' : '#4F46E5',
+                borderColor: 'rgba(99, 102, 241, 0.35)',
+                '&:hover': { bgcolor: stockFilter === 'surplus' ? '#4F46E5' : 'rgba(99, 102, 241, 0.16)' }
+              }}
+            />
+          </Box>
+
+          {/* Active summary counter */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+              Showing <strong style={{ color: '#0F766E' }}>{filteredInventory.length}</strong> of {totalItems} styles ({filteredTotalUnits.toLocaleString('en-IN')} units • ₹{filteredTotalValue.toLocaleString('en-IN')})
+            </Typography>
+          </Box>
+        </Box>
       </GlassCard>
 
       {/* Inventory Table or Grid */}
       {isMobile ? (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {filteredInventory.map((item) => {
-            const price = Number(item.price) || 0;
-            const cost = Number(item.cost) || 0;
-            const profitVal = price - cost;
-            const profitMarginVal = (cost > 0 && price > 0) ? (((profitVal / price) * 100).toFixed(1)) : '0.0';
-            const qty = Number(item.quantity) || 0;
+          {filteredInventory.length === 0 ? (
+            <GlassCard sx={{ p: 4, textAlign: 'center' }}>
+              <Inventory2 sx={{ fontSize: 44, opacity: 0.3, mb: 1, display: 'block', mx: 'auto', color: '#0F766E' }} />
+              <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>No garments found</Typography>
+              <Typography variant="caption" color="text.secondary">
+                Try adjusting your search query, stock level, or collection filter.
+              </Typography>
+            </GlassCard>
+          ) : (
+            filteredInventory.map((item) => {
+              const price = Number(item.price) || 0;
+              const cost = Number(item.cost) || 0;
+              const profitVal = price - cost;
+              const profitMarginVal = (cost > 0 && price > 0) ? (((profitVal / price) * 100).toFixed(1)) : '0.0';
+              const qty = Number(item.quantity) || 0;
+              const isOutOfStock = qty <= 0;
+              const isLowStock = !isOutOfStock && qty <= (Number(item.minStockLevel) || 2);
 
-            return (
-              <GlassCard key={item.id} sx={{ p: 2 }}>
-                <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                    <Box>
-                      <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 800 }}>
-                        #{item.productId || 'NO-SKU'}
-                      </Typography>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 800, mt: 0.25 }}>
-                        {item.name || 'Unnamed Garment'}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {item.supplier || 'No Supplier'}
-                      </Typography>
-                    </Box>
-                    <Chip label={item.category || 'General'} size="small" variant="outlined" sx={{ fontWeight: 700, fontSize: '0.65rem' }} />
-                  </Box>
-                  <Divider sx={{ my: 1.5 }} />
-                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, textAlign: 'center', mb: 2 }}>
-                    <Box>
-                      <Typography variant="body2" sx={{ fontWeight: 800 }}>₹{price.toLocaleString('en-IN')}</Typography>
-                      <Typography variant="caption" color="text.secondary">Price</Typography>
-                    </Box>
-                    {user?.role === 'admin' && (
+              return (
+                <GlassCard
+                  key={item.id}
+                  sx={{
+                    p: 2.2,
+                    borderLeft: isOutOfStock ? '4px solid #DC2626' : isLowStock ? '4px solid #D97706' : '4px solid transparent'
+                  }}
+                >
+                  <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
                       <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 800, color: profitVal > 0 ? '#059669' : '#DC2626' }}>
-                          ₹{profitVal.toFixed(0)}
+                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 800 }}>
+                          #{item.productId || 'NO-SKU'}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">{profitMarginVal}% margin</Typography>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mt: 0.25 }}>
+                          {item.name || 'Unnamed Garment'}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {item.supplier || 'In-House Atelier'}
+                        </Typography>
                       </Box>
-                    )}
-                    <Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
-                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: qty < 2 ? '#ef4444' : qty < 50 ? '#f59e0b' : '#10b981' }} />
-                        <Typography variant="body2" sx={{ fontWeight: 700 }}>{qty}</Typography>
-                      </Box>
-                      <Typography variant="caption" color="text.secondary">Stock</Typography>
+                      <Chip
+                        label={item.category || 'General'}
+                        size="small"
+                        variant="outlined"
+                        sx={{ fontWeight: 700, fontSize: '0.68rem', borderRadius: 1.5, borderColor: 'rgba(15, 118, 110, 0.3)' }}
+                      />
                     </Box>
-                  </Box>
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Button fullWidth variant="outlined" color="primary" size="small" startIcon={<Edit />} onClick={() => handleOpen(item)} disabled={user?.role !== 'admin'}>Edit</Button>
-                    <Button fullWidth variant="outlined" color="error" size="small" startIcon={<Delete />} onClick={() => openDeleteDialog(item.id)} disabled={user?.role !== 'admin'}>Delete</Button>
-                  </Box>
-                </CardContent>
-              </GlassCard>
-            );
-          })}
+
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                          {item.size || 'Free Size'}
+                        </Typography>
+                        {item.color && (
+                          <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: typeof item.color === 'string' ? item.color.toLowerCase() : '#ccc', border: '1px solid rgba(0,0,0,0.1)' }} />
+                        )}
+                      </Box>
+                      {renderStockBadge(qty, item.minStockLevel)}
+                    </Box>
+
+                    <Divider sx={{ my: 1.5 }} />
+
+                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, textAlign: 'center', mb: 2 }}>
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 800 }}>₹{price.toLocaleString('en-IN')}</Typography>
+                        <Typography variant="caption" color="text.secondary">Selling Price</Typography>
+                      </Box>
+                      {user?.role === 'admin' ? (
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 800, color: profitVal > 0 ? '#059669' : '#DC2626' }}>
+                            ₹{profitVal.toFixed(0)}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">{profitMarginVal}% margin</Typography>
+                        </Box>
+                      ) : (
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 800 }}>{item.category || 'Apparel'}</Typography>
+                          <Typography variant="caption" color="text.secondary">Collection</Typography>
+                        </Box>
+                      )}
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 800 }}>{qty}</Typography>
+                        <Typography variant="caption" color="text.secondary">Units in Stock</Typography>
+                      </Box>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => navigate('/barcodes', { state: { product: item } })}
+                        startIcon={<QrCode />}
+                        sx={{ borderRadius: 2, color: '#D97706', borderColor: 'rgba(217, 119, 6, 0.4)' }}
+                      >
+                        Tag
+                      </Button>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        color="primary"
+                        size="small"
+                        startIcon={<Edit />}
+                        onClick={() => handleOpen(item)}
+                        disabled={user?.role !== 'admin'}
+                        sx={{ borderRadius: 2 }}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        color="error"
+                        size="small"
+                        startIcon={<Delete />}
+                        onClick={() => openDeleteDialog(item.id)}
+                        disabled={user?.role !== 'admin'}
+                        sx={{ borderRadius: 2 }}
+                      >
+                        Delete
+                      </Button>
+                    </Box>
+                  </CardContent>
+                </GlassCard>
+              );
+            })
+          )}
         </Box>
       ) : (
-        <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
+        <GlassCard sx={{ p: 0, overflow: 'hidden', border: '1px solid rgba(15, 118, 110, 0.15)' }}>
           <TableContainer>
             <Table>
-              <TableHead sx={{ bgcolor: 'action.hover' }}>
+              <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(15, 118, 110, 0.1)' : 'rgba(15, 118, 110, 0.05)' }}>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 800 }}>
-                    <TableSortLabel active={orderBy === 'productId'} direction={orderBy === 'productId' ? order : 'asc'} onClick={() => handleRequestSort('productId')}>
+                  <TableCell sx={{ fontWeight: 800, width: 130 }}>
+                    <TableSortLabel
+                      active={orderBy === 'productId'}
+                      direction={orderBy === 'productId' ? order : 'asc'}
+                      onClick={() => handleRequestSort('productId')}
+                      sx={{ textTransform: 'uppercase', fontSize: '0.72rem', letterSpacing: '0.04em' }}
+                    >
                       Product SKU / ID
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sx={{ fontWeight: 800 }}>
-                    <TableSortLabel active={orderBy === 'name'} direction={orderBy === 'name' ? order : 'asc'} onClick={() => handleRequestSort('name')}>
+                  <TableCell sx={{ fontWeight: 800, minWidth: 200 }}>
+                    <TableSortLabel
+                      active={orderBy === 'name'}
+                      direction={orderBy === 'name' ? order : 'asc'}
+                      onClick={() => handleRequestSort('name')}
+                      sx={{ textTransform: 'uppercase', fontSize: '0.72rem', letterSpacing: '0.04em' }}
+                    >
                       Garment Details
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sx={{ fontWeight: 800, display: { xs: 'none', sm: 'table-cell' } }}>
-                    <TableSortLabel active={orderBy === 'category'} direction={orderBy === 'category' ? order : 'asc'} onClick={() => handleRequestSort('category')}>
+                  <TableCell sx={{ fontWeight: 800, width: 140, display: { xs: 'none', sm: 'table-cell' } }}>
+                    <TableSortLabel
+                      active={orderBy === 'category'}
+                      direction={orderBy === 'category' ? order : 'asc'}
+                      onClick={() => handleRequestSort('category')}
+                      sx={{ textTransform: 'uppercase', fontSize: '0.72rem', letterSpacing: '0.04em' }}
+                    >
                       Collection
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sx={{ fontWeight: 800, display: { xs: 'none', md: 'table-cell' } }}>Size & Color</TableCell>
-                  <TableCell sx={{ fontWeight: 800 }}>
-                    <TableSortLabel active={orderBy === 'price'} direction={orderBy === 'price' ? order : 'asc'} onClick={() => handleRequestSort('price')}>
-                      {user?.role === 'admin' ? 'Cost & Selling Price' : 'Price'}
+                  <TableCell sx={{ fontWeight: 800, width: 140, display: { xs: 'none', md: 'table-cell' }, textTransform: 'uppercase', fontSize: '0.72rem', letterSpacing: '0.04em' }}>
+                    Size & Color
+                  </TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 800, width: 160 }}>
+                    <TableSortLabel
+                      active={orderBy === 'price'}
+                      direction={orderBy === 'price' ? order : 'asc'}
+                      onClick={() => handleRequestSort('price')}
+                      sx={{ textTransform: 'uppercase', fontSize: '0.72rem', letterSpacing: '0.04em' }}
+                    >
+                      {user?.role === 'admin' ? 'Cost & Selling Price' : 'Selling Price'}
                     </TableSortLabel>
                   </TableCell>
-                  {user?.role === 'admin' && <TableCell sx={{ fontWeight: 800 }}>Margin</TableCell>}
-                  <TableCell sx={{ fontWeight: 800 }}>
-                    <TableSortLabel active={orderBy === 'quantity'} direction={orderBy === 'quantity' ? order : 'asc'} onClick={() => handleRequestSort('quantity')}>
+                  {user?.role === 'admin' && (
+                    <TableCell align="right" sx={{ fontWeight: 800, width: 140, textTransform: 'uppercase', fontSize: '0.72rem', letterSpacing: '0.04em' }}>
+                      Margin
+                    </TableCell>
+                  )}
+                  <TableCell align="center" sx={{ fontWeight: 800, width: 210 }}>
+                    <TableSortLabel
+                      active={orderBy === 'quantity'}
+                      direction={orderBy === 'quantity' ? order : 'asc'}
+                      onClick={() => handleRequestSort('quantity')}
+                      sx={{ textTransform: 'uppercase', fontSize: '0.72rem', letterSpacing: '0.04em' }}
+                    >
                       Inventory Stock
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 800 }}>Actions</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 800, width: 120, textTransform: 'uppercase', fontSize: '0.72rem', letterSpacing: '0.04em' }}>
+                    Actions
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {loading ? (
-                  <TableSkeleton rows={rowsPerPage} columns={8} />
+                  <TableSkeleton rows={rowsPerPage} columns={user?.role === 'admin' ? 8 : 7} />
                 ) : filteredInventory.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} sx={{ textAlign: 'center', py: 5, color: 'text.secondary' }}>
-                      <Inventory2 sx={{ fontSize: 40, opacity: 0.3, mb: 1, display: 'block', mx: 'auto' }} />
-                      <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>No garments found</Typography>
-                      <Typography variant="caption">Try adjusting search filters or click "Add Garment" to catalog new styles.</Typography>
+                    <TableCell colSpan={user?.role === 'admin' ? 8 : 7} sx={{ textAlign: 'center', py: 6, color: 'text.secondary' }}>
+                      <Inventory2 sx={{ fontSize: 44, opacity: 0.35, mb: 1.5, display: 'block', mx: 'auto', color: '#0F766E' }} />
+                      <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5 }}>
+                        No garments match current criteria
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 420, mx: 'auto', mb: 2 }}>
+                        {stockFilter !== 'all'
+                          ? `No items found under the selected stock category. Try resetting the filter to inspect other stock tiers.`
+                          : 'Try adjusting your search query, collection filter, or catalog a new luxury garment.'}
+                      </Typography>
+                      {isFiltered && (
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          startIcon={<RestartAlt />}
+                          onClick={() => { setSearch(''); setCategoryFilter(''); setStockFilter('all'); }}
+                          sx={{ borderRadius: 2, fontWeight: 700, borderColor: '#0F766E', color: '#0F766E' }}
+                        >
+                          Clear All Filters
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -616,73 +1087,221 @@ const Inventory = () => {
                     const profitVal = price - cost;
                     const profitMarginVal = (cost > 0 && price > 0) ? (((profitVal / price) * 100).toFixed(1)) : '0.0';
                     const qty = Number(item.quantity) || 0;
+                    const minLvl = Number(item.minStockLevel) || 2;
+                    const isOutOfStock = qty <= 0;
+                    const isLowStock = !isOutOfStock && qty <= minLvl;
 
                     return (
-                      <TableRow key={item.id} hover>
+                      <TableRow
+                        key={item.id}
+                        hover
+                        sx={{
+                          bgcolor: isOutOfStock
+                            ? (t) => t.palette.mode === 'dark' ? 'rgba(239, 68, 68, 0.08)' : 'rgba(239, 68, 68, 0.025)'
+                            : isLowStock
+                              ? (t) => t.palette.mode === 'dark' ? 'rgba(217, 119, 6, 0.08)' : 'rgba(217, 119, 6, 0.025)'
+                              : 'inherit',
+                          borderLeft: isOutOfStock
+                            ? '3px solid #DC2626'
+                            : isLowStock
+                              ? '3px solid #D97706'
+                              : '3px solid transparent',
+                          transition: 'background-color 0.15s ease'
+                        }}
+                      >
+                        {/* Product SKU */}
                         <TableCell>
-                          <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F766E', fontFamily: 'monospace' }}>
-                            {item.productId || 'N/A'}
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              fontWeight: 800,
+                              color: '#0F766E',
+                              fontFamily: 'monospace',
+                              fontSize: '0.85rem',
+                              letterSpacing: '0.02em'
+                            }}
+                          >
+                            #{item.productId || 'N/A'}
                           </Typography>
                         </TableCell>
+
+                        {/* Garment Details */}
                         <TableCell>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary' }}>{item.name || 'Unnamed Garment'}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                              {item.name || 'Unnamed Garment'}
+                            </Typography>
                             {item.hasVariants && (
-                              <Tooltip title={`${item.variants?.length || 0} Variants`}>
-                                <Layers sx={{ fontSize: 16, color: 'primary.main' }} />
+                              <Tooltip title={`${item.variants?.length || 0} Size/Color Variants`}>
+                                <Chip
+                                  label={`${item.variants?.length || 0} Var`}
+                                  size="small"
+                                  sx={{
+                                    height: 18,
+                                    fontSize: '0.62rem',
+                                    fontWeight: 700,
+                                    bgcolor: 'rgba(15, 118, 110, 0.1)',
+                                    color: '#0F766E',
+                                    borderRadius: 1
+                                  }}
+                                />
                               </Tooltip>
                             )}
                           </Box>
-                          <Typography variant="caption" color="text.secondary">{item.supplier || 'In-House Atelier'}</Typography>
+                          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}>
+                            {item.supplier || 'In-House Atelier'}
+                          </Typography>
                         </TableCell>
+
+                        {/* Collection */}
                         <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                          <Chip label={item.category || 'General'} size="small" variant="outlined" sx={{ fontWeight: 700, fontSize: '0.68rem', borderRadius: 1 }} />
+                          <Chip
+                            label={item.category || 'General'}
+                            size="small"
+                            variant="outlined"
+                            sx={{
+                              fontWeight: 700,
+                              fontSize: '0.72rem',
+                              borderRadius: '12px',
+                              borderColor: 'rgba(15, 118, 110, 0.25)',
+                              color: '#0F766E',
+                              bgcolor: 'rgba(15, 118, 110, 0.04)'
+                            }}
+                          />
                         </TableCell>
+
+                        {/* Size & Color */}
                         <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Typography variant="caption" sx={{ fontWeight: 600 }}>{item.size || 'Free Size'}</Typography>
+                            <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                              {item.size || 'Free Size'}
+                            </Typography>
                             {item.color && (
-                              <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: typeof item.color === 'string' ? item.color.toLowerCase() : 'transparent', border: '1px solid rgba(0,0,0,0.1)' }} />
+                              <Tooltip title={`Color: ${item.color}`}>
+                                <Box
+                                  sx={{
+                                    width: 14,
+                                    height: 14,
+                                    borderRadius: '50%',
+                                    bgcolor: typeof item.color === 'string' ? item.color.toLowerCase() : '#ccc',
+                                    border: '1.5px solid rgba(0,0,0,0.15)',
+                                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                                  }}
+                                />
+                              </Tooltip>
                             )}
                           </Box>
                         </TableCell>
-                        <TableCell>
-                          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                            <Typography variant="body2" sx={{ fontWeight: 800 }}>₹{price.toLocaleString('en-IN')}</Typography>
-                            {user?.role === 'admin' && <Typography variant="caption" color="text.secondary">Cost: ₹{cost.toLocaleString('en-IN')}</Typography>}
+
+                        {/* Cost & Selling Price */}
+                        <TableCell align="right">
+                          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                fontWeight: 800,
+                                fontVariantNumeric: 'tabular-nums',
+                                color: 'text.primary',
+                                fontSize: '0.88rem'
+                              }}
+                            >
+                              ₹{price.toLocaleString('en-IN')}
+                            </Typography>
+                            {user?.role === 'admin' && (
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  color: 'text.secondary',
+                                  fontVariantNumeric: 'tabular-nums',
+                                  fontSize: '0.72rem'
+                                }}
+                              >
+                                Cost: ₹{cost.toLocaleString('en-IN')}
+                              </Typography>
+                            )}
                           </Box>
                         </TableCell>
+
+                        {/* Margin (Admin Only) */}
                         {user?.role === 'admin' && (
-                          <TableCell>
-                            <Typography variant="body2" sx={{ fontWeight: 800, color: profitVal > 0 ? '#059669' : profitVal < 0 ? '#DC2626' : 'text.primary' }}>
-                              ₹{profitVal.toFixed(0)}
-                            </Typography>
-                            <Typography variant="caption" sx={{ color: profitVal > 0 ? '#059669' : profitVal < 0 ? '#DC2626' : 'text.secondary', fontWeight: 600 }}>
-                              {profitMarginVal}% margin
-                            </Typography>
+                          <TableCell align="right">
+                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  fontWeight: 800,
+                                  color: profitVal > 0 ? '#059669' : profitVal < 0 ? '#DC2626' : 'text.primary',
+                                  fontVariantNumeric: 'tabular-nums',
+                                  fontSize: '0.88rem'
+                                }}
+                              >
+                                ₹{profitVal.toFixed(0)}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  color: profitVal > 0 ? '#059669' : profitVal < 0 ? '#DC2626' : 'text.secondary',
+                                  fontWeight: 700,
+                                  fontSize: '0.72rem'
+                                }}
+                              >
+                                {profitMarginVal}% margin
+                              </Typography>
+                            </Box>
                           </TableCell>
                         )}
-                        <TableCell>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: qty < 2 ? '#ef4444' : qty < 50 ? '#f59e0b' : '#10b981' }} />
-                            <Typography variant="body2" sx={{ fontWeight: 700 }}>{qty} Units</Typography>
+
+                        {/* Inventory Stock Highlight */}
+                        <TableCell align="center">
+                          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                            {renderStockBadge(qty, item.minStockLevel)}
                           </Box>
                         </TableCell>
+
+                        {/* Actions */}
                         <TableCell align="right">
                           <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
                             <Tooltip title="Print Barcode Tag">
-                              <IconButton size="small" onClick={() => navigate('/barcodes', { state: { product: item } })} sx={{ color: '#D97706' }}>
+                              <IconButton
+                                size="small"
+                                onClick={() => navigate('/barcodes', { state: { product: item } })}
+                                sx={{
+                                  color: '#D97706',
+                                  bgcolor: 'rgba(217, 119, 6, 0.08)',
+                                  '&:hover': { bgcolor: 'rgba(217, 119, 6, 0.18)' }
+                                }}
+                              >
                                 <QrCode fontSize="small" />
                               </IconButton>
                             </Tooltip>
                             {user?.role === 'admin' && (
                               <>
-                                <IconButton size="small" onClick={() => handleOpen(item)} sx={{ color: '#0F766E' }}>
-                                  <Edit fontSize="small" />
-                                </IconButton>
-                                <IconButton size="small" onClick={() => openDeleteDialog(item.id)} sx={{ color: 'error.main' }}>
-                                  <Delete fontSize="small" />
-                                </IconButton>
+                                <Tooltip title="Edit Garment">
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => handleOpen(item)}
+                                    sx={{
+                                      color: '#0F766E',
+                                      bgcolor: 'rgba(15, 118, 110, 0.08)',
+                                      '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.18)' }
+                                    }}
+                                  >
+                                    <Edit fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Delete Garment">
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => openDeleteDialog(item.id)}
+                                    sx={{
+                                      color: '#DC2626',
+                                      bgcolor: 'rgba(220, 38, 38, 0.08)',
+                                      '&:hover': { bgcolor: 'rgba(220, 38, 38, 0.18)' }
+                                    }}
+                                  >
+                                    <Delete fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
                               </>
                             )}
                           </Box>
@@ -695,7 +1314,7 @@ const Inventory = () => {
             </Table>
           </TableContainer>
           <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
+            rowsPerPageOptions={[5, 10, 25, 50]}
             component="div"
             count={filteredInventory.length}
             rowsPerPage={rowsPerPage}
