@@ -29,7 +29,10 @@ import {
   ContentCopy,
   Tune,
   PictureAsPdf,
-  Chat
+  Chat,
+  Sms,
+  Link as LinkIcon,
+  OpenInNew
 } from '@mui/icons-material';
 import { INVOICE_WHATSAPP_TEMPLATES, generateInvoiceWhatsAppText } from './InvoiceWhatsAppDialog';
 
@@ -56,17 +59,12 @@ const BillSuccessModal = ({
 }) => {
   const theme = useTheme();
 
-  // Preferred WhatsApp share mode: 'pdf' (default) or 'text'
-  const [whatsappMode, setWhatsappMode] = useState(() => {
-    return localStorage.getItem('aleen_preferred_whatsapp_format') || 'pdf';
-  });
-
   // Editable customer phone for WhatsApp dispatch
   const [customerPhone, setCustomerPhone] = useState('');
   const [phoneError, setPhoneError] = useState('');
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [isSendingWhatsApp, setIsSendingWhatsApp] = useState(false);
-  const [isSharingPDF, setIsSharingPDF] = useState(false);
+  const [isSendingSMS, setIsSendingSMS] = useState(false);
 
   // Synchronize phone whenever invoice changes
   useEffect(() => {
@@ -104,12 +102,12 @@ const BillSuccessModal = ({
     return digitsOnly;
   };
 
-  const handleModeChange = (mode) => {
-    setWhatsappMode(mode);
-    localStorage.setItem('aleen_preferred_whatsapp_format', mode);
+  const getCustomerBillLink = () => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    return invoice?.id ? `${origin}/bill/${invoice.id}` : `${origin}/invoices`;
   };
 
-  // Compile WhatsApp text template
+  // Compile WhatsApp text template (now includes direct PDF download link)
   const getCompiledMessageText = () => {
     const lastTemplateId = localStorage.getItem('aleen_last_whatsapp_template') || 'atelier_luxury';
     const templateObj = INVOICE_WHATSAPP_TEMPLATES.find(t => t.id === lastTemplateId) || INVOICE_WHATSAPP_TEMPLATES[0];
@@ -122,7 +120,58 @@ const BillSuccessModal = ({
     );
   };
 
-  // 1. Send Text Bill on WhatsApp
+  // 1. Send SMS / Text Message with direct PDF bill download link
+  const handleSendSMS = async () => {
+    const cleanPhone = (customerPhone || '').replace(/[^0-9]/g, '');
+
+    if (!cleanPhone) {
+      setPhoneError('Please enter customer mobile number');
+      return;
+    }
+
+    if (cleanPhone.length < 10) {
+      setPhoneError('Please enter a valid 10-digit mobile number');
+      return;
+    }
+
+    setPhoneError('');
+    setIsSendingSMS(true);
+
+    try {
+      if (onUpdateInvoicePhone && customerPhone !== invoice.phone) {
+        await onUpdateInvoicePhone(invoice.id, customerPhone);
+      }
+
+      const billUrl = getCustomerBillLink();
+      const customerName = invoice.customer ? invoice.customer.trim() : 'Valued Patron';
+      const storeName = profile?.businessName || 'Aleen Clothing';
+
+      const smsBody = `Dear ${customerName}, thank you for shopping at ${storeName}! Your bill of ₹${totalAmount} (#${invoice.id}) is generated. View & download your official PDF bill here: ${billUrl}`;
+
+      const isIOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const separator = isIOS ? '&' : '?';
+      const smsUrl = `sms:${cleanPhone}${separator}body=${encodeURIComponent(smsBody)}`;
+
+      window.location.href = smsUrl;
+
+      setSnackbar({
+        open: true,
+        message: `Opening Messages to send PDF download link to ${customerPhone}...`,
+        severity: 'success'
+      });
+    } catch (err) {
+      console.error('Error dispatching SMS bill link:', err);
+      setSnackbar({
+        open: true,
+        message: 'Could not open SMS app. Please copy bill link instead.',
+        severity: 'error'
+      });
+    } finally {
+      setIsSendingSMS(false);
+    }
+  };
+
+  // 2. Send on WhatsApp with pre-filled breakdown + PDF download link
   const handleSendTextWhatsApp = async () => {
     const formattedPhone = getFormattedPhone();
 
@@ -152,11 +201,11 @@ const BillSuccessModal = ({
 
       setSnackbar({
         open: true,
-        message: `Opening WhatsApp chat with ${customerPhone} (Text Bill)...`,
+        message: `Opening WhatsApp chat with ${customerPhone} (with PDF download link)...`,
         severity: 'success'
       });
     } catch (err) {
-      console.error('Error dispatching text WhatsApp bill:', err);
+      console.error('Error dispatching WhatsApp bill:', err);
       setSnackbar({
         open: true,
         message: 'Could not open WhatsApp. Please check number and try again.',
@@ -167,66 +216,14 @@ const BillSuccessModal = ({
     }
   };
 
-  // 2. Send PDF Bill on WhatsApp
-  const handleSendPDFWhatsApp = async () => {
-    const formattedPhone = getFormattedPhone();
-
-    if (!formattedPhone) {
-      setPhoneError('Please enter customer mobile number');
-      return;
-    }
-
-    if (formattedPhone.length < 10) {
-      setPhoneError('Please enter a valid 10-digit mobile number');
-      return;
-    }
-
-    setPhoneError('');
-    setIsSharingPDF(true);
-
+  // Copy direct PDF bill link
+  const handleCopyBillLink = async () => {
     try {
-      if (onUpdateInvoicePhone && customerPhone !== invoice.phone) {
-        await onUpdateInvoicePhone(invoice.id, customerPhone);
-      }
-
-      const messageText = getCompiledMessageText();
-
-      if (onSharePDF) {
-        const result = await onSharePDF(invoice, customerPhone, messageText);
-        if (result?.method === 'native-share') {
-          setSnackbar({
-            open: true,
-            message: 'Opening share sheet — select WhatsApp to send PDF bill!',
-            severity: 'success'
-          });
-        } else {
-          setSnackbar({
-            open: true,
-            message: `PDF downloaded to device & WhatsApp chat opened for ${customerPhone}!`,
-            severity: 'success'
-          });
-        }
-      } else {
-        // Fallback: download PDF and open WhatsApp text
-        if (onDownloadPDF) onDownloadPDF(invoice);
-        const encodedText = encodeURIComponent(messageText);
-        const waUrl = `https://wa.me/${formattedPhone}?text=${encodedText}`;
-        window.open(waUrl, '_blank');
-        setSnackbar({
-          open: true,
-          message: 'PDF downloaded & WhatsApp opened. Attach the PDF file in chat.',
-          severity: 'info'
-        });
-      }
-    } catch (err) {
-      console.error('Error sharing PDF bill on WhatsApp:', err);
-      setSnackbar({
-        open: true,
-        message: 'Error generating PDF. Please try sending Text bill instead.',
-        severity: 'error'
-      });
-    } finally {
-      setIsSharingPDF(false);
+      const billUrl = getCustomerBillLink();
+      await navigator.clipboard.writeText(billUrl);
+      setSnackbar({ open: true, message: 'PDF Bill download link copied to clipboard!', severity: 'success' });
+    } catch {
+      setSnackbar({ open: true, message: 'Failed to copy link', severity: 'error' });
     }
   };
 
@@ -391,15 +388,15 @@ const BillSuccessModal = ({
             </Box>
           </Paper>
 
-          {/* Section 1: Customer WhatsApp Share Box with Text vs PDF Option */}
+          {/* Section 1: Customer Digital Bill Link & Messaging (SMS & WhatsApp) */}
           <Paper
             elevation={0}
             sx={{
               p: 2.25,
               borderRadius: 3,
               border: '1.5px solid',
-              borderColor: '#25D366',
-              bgcolor: theme.palette.mode === 'dark' ? 'rgba(37, 211, 102, 0.05)' : '#F0FDF4',
+              borderColor: '#0F766E',
+              bgcolor: theme.palette.mode === 'dark' ? 'rgba(15, 118, 110, 0.08)' : '#F0FDFA',
               display: 'flex',
               flexDirection: 'column',
               gap: 1.75
@@ -412,21 +409,21 @@ const BillSuccessModal = ({
                     width: 32,
                     height: 32,
                     borderRadius: '50%',
-                    bgcolor: '#25D366',
+                    bgcolor: '#0F766E',
                     color: '#FFFFFF',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}
                 >
-                  <WhatsApp sx={{ fontSize: 20 }} />
+                  <Sms sx={{ fontSize: 18 }} />
                 </Box>
                 <Box>
                   <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.2 }}>
-                    Share Bill on Customer WhatsApp
+                    Send Bill Link to Customer
                   </Typography>
                   <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem' }}>
-                    Choose between official PDF document or itemized text receipt
+                    Customer receives a direct link to view & download their official PDF bill
                   </Typography>
                 </Box>
               </Box>
@@ -466,18 +463,18 @@ const BillSuccessModal = ({
                 if (phoneError) setPhoneError('');
               }}
               error={!!phoneError}
-              helperText={phoneError || 'Default 10-digit mobile number with or without +91'}
+              helperText={phoneError || '10-digit mobile number for sending bill link via SMS or WhatsApp'}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Phone sx={{ color: '#25D366', fontSize: 20 }} />
+                    <Phone sx={{ color: '#0F766E', fontSize: 20 }} />
                   </InputAdornment>
                 ),
-                endAdornment: customerPhone && (
+                endAdornment: (
                   <InputAdornment position="end">
-                    <Tooltip title="Copy formatted text to clipboard">
-                      <IconButton size="small" onClick={handleCopyReceiptText}>
-                        <ContentCopy fontSize="small" sx={{ fontSize: 16 }} />
+                    <Tooltip title="Copy direct customer PDF bill link">
+                      <IconButton size="small" onClick={handleCopyBillLink} sx={{ color: '#0F766E' }}>
+                        <LinkIcon fontSize="small" sx={{ fontSize: 18 }} />
                       </IconButton>
                     </Tooltip>
                   </InputAdornment>
@@ -491,50 +488,50 @@ const BillSuccessModal = ({
               }}
             />
 
-            {/* Direct WhatsApp Share Actions: Both PDF and Text directly available */}
+            {/* Direct Messaging Actions: SMS with PDF Link & WhatsApp with PDF Link */}
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.25 }}>
-              {/* Option 1: Share Official PDF Bill on WhatsApp */}
+              {/* Primary 1: Send Text Message / SMS with direct PDF download link */}
               <Button
                 variant="contained"
                 fullWidth
-                disabled={isSharingPDF}
-                startIcon={isSharingPDF ? <CircularProgress size={18} color="inherit" /> : <PictureAsPdf sx={{ fontSize: 20 }} />}
-                onClick={handleSendPDFWhatsApp}
+                disabled={isSendingSMS}
+                startIcon={isSendingSMS ? <CircularProgress size={18} color="inherit" /> : <Sms sx={{ fontSize: 20 }} />}
+                onClick={handleSendSMS}
                 sx={{
                   py: 1.35,
                   px: 2.5,
-                  bgcolor: '#0F766E',
+                  bgcolor: '#1D4ED8',
                   color: '#FFFFFF',
                   fontWeight: 800,
                   fontSize: { xs: '0.86rem', sm: '0.92rem' },
                   borderRadius: 2.5,
                   textTransform: 'none',
-                  boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
+                  boxShadow: '0 4px 14px rgba(29, 78, 216, 0.35)',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   '&:hover': {
-                    bgcolor: '#0D6861',
-                    boxShadow: '0 6px 18px rgba(15, 118, 110, 0.45)'
+                    bgcolor: '#1E40AF',
+                    boxShadow: '0 6px 18px rgba(29, 78, 216, 0.45)'
                   }
                 }}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, textAlign: 'left' }}>
                   <Box>
                     <Typography sx={{ fontWeight: 800, fontSize: { xs: '0.86rem', sm: '0.92rem' }, lineHeight: 1.2 }}>
-                      {isSharingPDF ? 'Generating & Attaching PDF...' : 'Share PDF Bill on WhatsApp'}
+                      {isSendingSMS ? 'Opening Messages App...' : 'Send Text Message / SMS (with PDF Link)'}
                     </Typography>
                     <Typography sx={{ fontSize: '0.7rem', opacity: 0.9, fontWeight: 500 }}>
-                      Official branded PDF document sent directly to customer
+                      Customer directly opens link to view & download official PDF bill
                     </Typography>
                   </Box>
                 </Box>
                 <Chip
-                  icon={<WhatsApp sx={{ fontSize: '14px !important', color: '#25D366 !important' }} />}
-                  label="PDF Direct"
+                  icon={<Sms sx={{ fontSize: '13px !important', color: '#FFFFFF !important' }} />}
+                  label="SMS Link"
                   size="small"
                   sx={{
-                    bgcolor: 'rgba(255, 255, 255, 0.15)',
+                    bgcolor: 'rgba(255, 255, 255, 0.2)',
                     color: '#FFFFFF',
                     fontWeight: 700,
                     fontSize: '0.68rem',
@@ -543,7 +540,7 @@ const BillSuccessModal = ({
                 />
               </Button>
 
-              {/* Option 2: Share Itemized Text Summary on WhatsApp */}
+              {/* Primary 2: Send on WhatsApp with pre-filled items + direct PDF download link */}
               <Button
                 variant="outlined"
                 fullWidth
@@ -572,15 +569,16 @@ const BillSuccessModal = ({
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, textAlign: 'left' }}>
                   <Box>
                     <Typography sx={{ fontWeight: 800, fontSize: { xs: '0.84rem', sm: '0.9rem' }, lineHeight: 1.2, color: theme.palette.mode === 'dark' ? '#34D399' : '#042F2E' }}>
-                      {isSendingWhatsApp ? 'Opening WhatsApp...' : 'Send Text Bill on WhatsApp'}
+                      {isSendingWhatsApp ? 'Opening WhatsApp...' : 'Send on WhatsApp (with PDF Link)'}
                     </Typography>
                     <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary', fontWeight: 500 }}>
-                      Itemized breakdown with items, subtotal, discount & totals
+                      Itemized summary + direct link to download official PDF bill
                     </Typography>
                   </Box>
                 </Box>
                 <Chip
-                  label="Text Receipt"
+                  icon={<WhatsApp sx={{ fontSize: '13px !important', color: '#25D366 !important' }} />}
+                  label="WhatsApp"
                   size="small"
                   sx={{
                     bgcolor: 'rgba(37, 211, 102, 0.15)',
@@ -591,6 +589,69 @@ const BillSuccessModal = ({
                   }}
                 />
               </Button>
+
+              {/* Utility Row: Copy Bill Link, Preview in New Tab, Copy Receipt Text */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, pt: 0.5 }}>
+                <Button
+                  size="small"
+                  variant="text"
+                  startIcon={<LinkIcon sx={{ fontSize: 16 }} />}
+                  onClick={handleCopyBillLink}
+                  sx={{
+                    flex: 1,
+                    textTransform: 'none',
+                    fontWeight: 700,
+                    fontSize: '0.74rem',
+                    color: '#0F766E',
+                    bgcolor: 'rgba(15, 118, 110, 0.06)',
+                    borderRadius: 1.5,
+                    py: 0.6,
+                    '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.12)' }
+                  }}
+                >
+                  Copy Bill Link
+                </Button>
+
+                <Button
+                  size="small"
+                  variant="text"
+                  startIcon={<OpenInNew sx={{ fontSize: 15 }} />}
+                  onClick={() => window.open(getCustomerBillLink(), '_blank')}
+                  sx={{
+                    flex: 1,
+                    textTransform: 'none',
+                    fontWeight: 700,
+                    fontSize: '0.74rem',
+                    color: 'text.secondary',
+                    bgcolor: 'action.hover',
+                    borderRadius: 1.5,
+                    py: 0.6,
+                    '&:hover': { bgcolor: 'action.selected' }
+                  }}
+                >
+                  Preview Bill
+                </Button>
+
+                <Button
+                  size="small"
+                  variant="text"
+                  startIcon={<ContentCopy sx={{ fontSize: 15 }} />}
+                  onClick={handleCopyReceiptText}
+                  sx={{
+                    flex: 1,
+                    textTransform: 'none',
+                    fontWeight: 700,
+                    fontSize: '0.74rem',
+                    color: 'text.secondary',
+                    bgcolor: 'action.hover',
+                    borderRadius: 1.5,
+                    py: 0.6,
+                    '&:hover': { bgcolor: 'action.selected' }
+                  }}
+                >
+                  Copy Text
+                </Button>
+              </Box>
             </Box>
           </Paper>
 

@@ -69,6 +69,9 @@ Thank you for gracing our boutique with your presence. Here is your official e-i
 💳 *Payment Mode:* {paymentMethod} ({paymentStatus})
 ──────────────────
 
+📥 *Download PDF Bill:*
+{billLink}
+
 💫 *Care & Service Guarantee:*
 Every garment is curated with timeless elegance. We offer complimentary fitting adjustments within 7 days.
 
@@ -90,6 +93,7 @@ Hi *{customer}*, thank you for shopping with us today!
 • *Subtotal:* ₹{subtotal}
 • *Discount:* {discount}
 • *Grand Total:* *₹{total}* (Paid via {paymentMethod})
+• *Download PDF Bill:* {billLink}
 
 📍 *Boutique:* {address}
 📞 *Helpdesk:* {businessPhone}
@@ -118,6 +122,9 @@ It is our distinct privilege curating timeless aesthetics for you.
 🏷️ *VIP Privilege Discount:* {discount}
 ✨ *Final Investment:* *₹{total}* via {paymentMethod}
 
+📥 *Download PDF Bill:*
+{billLink}
+
 🎁 *VIP Privileges Included:*
 • Priority fitting sessions & bespoke adjustments
 • Exclusive first-look preview of upcoming festive arrivals
@@ -145,6 +152,7 @@ Please find the billing details for your recent purchase:
 • *Total Bill Value:* *₹{total}*
 • *Payment Mode:* {paymentMethod}
 • *Settlement Status:* *{paymentStatus}*
+• *Download PDF Bill:* {billLink}
 
 🛍️ *Items Accounted:*
 {itemList}
@@ -176,6 +184,9 @@ Your bespoke festive trousseau order is recorded under:
 🏷️ *Festive Discount:* {discount}
 ✨ *Grand Total:* *₹{total}*
 💳 *Tender:* {paymentMethod}
+
+📥 *Download PDF Bill:*
+{billLink}
 
 🕊️ *Complimentary Concierge:*
 We offer complimentary garment steaming, trial re-fitting, and bridal preservation styling.
@@ -241,6 +252,9 @@ export const generateInvoiceWhatsAppText = (templateText, invoice, profile) => {
   const businessName = profile?.businessName || 'Aleen Clothing';
   const address = profile?.address || 'Pune, Maharashtra';
   const businessPhone = profile?.phone || '+91 98765 43210';
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const billLink = invoiceId && invoiceId !== 'N/A' ? `${origin}/bill/${invoiceId}` : `${origin}/invoices`;
+  const downloadPdfLink = invoiceId && invoiceId !== 'N/A' ? `${origin}/bill/${invoiceId}?download=true` : '';
 
   return templateText
     .replace(/{customer}/g, customerName)
@@ -261,7 +275,9 @@ export const generateInvoiceWhatsAppText = (templateText, invoice, profile) => {
     .replace(/{paymentStatus}/g, paymentStatus)
     .replace(/{businessName}/g, businessName)
     .replace(/{address}/g, address)
-    .replace(/{businessPhone}/g, businessPhone);
+    .replace(/{businessPhone}/g, businessPhone)
+    .replace(/{billLink}/g, billLink)
+    .replace(/{downloadPdfLink}/g, downloadPdfLink);
 };
 
 // Render WhatsApp formatted text into safe styled HTML for preview
@@ -662,6 +678,16 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
                   size="small"
                   onClick={() => handleInsertVariable('💫 Complimentary trial refitting included within 7 days.')}
                   sx={{ cursor: 'pointer', height: 22, fontSize: '0.7rem', fontWeight: 700 }}
+                />
+                <Chip
+                  label="+ PDF Bill Link"
+                  size="small"
+                  onClick={() => {
+                    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+                    const link = invoice.id ? `${origin}/bill/${invoice.id}` : '';
+                    handleInsertVariable(`📥 *Download PDF Bill:* ${link}`);
+                  }}
+                  sx={{ cursor: 'pointer', height: 22, fontSize: '0.7rem', fontWeight: 700, bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E' }}
                 />
                 <Chip
                   label="+ Boutique Phone"

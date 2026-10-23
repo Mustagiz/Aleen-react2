@@ -1206,6 +1206,46 @@ const Inventory = () => {
                   page={page}
                   onPageChange={handleChangePage}
                   onRowsPerPageChange={handleChangeRowsPerPage}
+                  labelRowsPerPage="Cards per page:"
+                  sx={{
+                    width: '100%',
+                    '& .MuiTablePagination-toolbar': {
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      justifyContent: { xs: 'center', sm: 'space-between', md: 'flex-end' },
+                      alignItems: 'center',
+                      minHeight: { xs: 56, sm: 52 },
+                      px: { xs: 1, sm: 2 },
+                      gap: { xs: 1, sm: 1.5 }
+                    },
+                    '& .MuiTablePagination-selectLabel': {
+                      display: 'inline-block !important',
+                      fontSize: { xs: '0.75rem', sm: '0.82rem' },
+                      fontWeight: 700,
+                      color: 'text.secondary',
+                      m: 0
+                    },
+                    '& .MuiTablePagination-input': {
+                      display: 'inline-flex !important',
+                      fontSize: { xs: '0.75rem', sm: '0.82rem' },
+                      fontWeight: 700,
+                      mr: { xs: 1, sm: 2 },
+                      ml: 0.5
+                    },
+                    '& .MuiTablePagination-select': {
+                      paddingLeft: '8px !important',
+                      paddingRight: '24px !important'
+                    },
+                    '& .MuiTablePagination-displayedRows': {
+                      fontSize: { xs: '0.75rem', sm: '0.82rem' },
+                      fontWeight: 600,
+                      color: 'text.secondary',
+                      m: 0
+                    },
+                    '& .MuiTablePagination-actions': {
+                      ml: { xs: 0.5, sm: 1.5 }
+                    }
+                  }}
                 />
               </GlassCard>
             </>
@@ -1550,6 +1590,50 @@ const Inventory = () => {
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Rows per page:"
+            sx={{
+              borderTop: '1px solid',
+              borderColor: 'divider',
+              width: '100%',
+              bgcolor: 'background.paper',
+              '& .MuiTablePagination-toolbar': {
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: { xs: 'center', sm: 'space-between', md: 'flex-end' },
+                alignItems: 'center',
+                minHeight: { xs: 56, sm: 52 },
+                px: { xs: 1, sm: 2 },
+                py: { xs: 1, sm: 0 },
+                gap: { xs: 1, sm: 1.5 }
+              },
+              '& .MuiTablePagination-selectLabel': {
+                display: 'inline-block !important',
+                fontSize: { xs: '0.75rem', sm: '0.82rem' },
+                fontWeight: 700,
+                color: 'text.secondary',
+                m: 0
+              },
+              '& .MuiTablePagination-input': {
+                display: 'inline-flex !important',
+                fontSize: { xs: '0.75rem', sm: '0.82rem' },
+                fontWeight: 700,
+                mr: { xs: 1, sm: 2 },
+                ml: 0.5
+              },
+              '& .MuiTablePagination-select': {
+                paddingLeft: '8px !important',
+                paddingRight: '24px !important'
+              },
+              '& .MuiTablePagination-displayedRows': {
+                fontSize: { xs: '0.75rem', sm: '0.82rem' },
+                fontWeight: 600,
+                color: 'text.secondary',
+                m: 0
+              },
+              '& .MuiTablePagination-actions': {
+                ml: { xs: 0.5, sm: 1.5 }
+              }
+            }}
           />
         </GlassCard>
       )}
