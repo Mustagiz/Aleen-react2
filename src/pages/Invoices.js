@@ -941,9 +941,9 @@ const Invoices = () => {
         }
       ]
     };
-    await addInvoice(invoice);
+    const savedInvoice = await addInvoice(invoice);
     setOpen(false);
-    setSuccessInvoice(invoice); // Show success dialog instead of just closing
+    setSuccessInvoice(savedInvoice || invoice); // Show success dialog with persisted invoice
     setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0 }]);
     setDiscountPercent('');
     setDiscountAmount('');

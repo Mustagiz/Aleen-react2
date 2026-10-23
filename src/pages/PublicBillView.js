@@ -28,7 +28,7 @@ import {
   Receipt,
   Security
 } from '@mui/icons-material';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebase';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -70,21 +70,77 @@ const PublicBillView = () => {
           return;
         }
 
+        const cleanId = String(id).trim();
         let foundInvoice = null;
+
+        // Strategy A: Direct document ID lookup
         try {
-          const invoiceSnap = await getDoc(doc(db, 'invoices', id));
+          const invoiceSnap = await getDoc(doc(db, 'invoices', cleanId));
           if (invoiceSnap.exists()) {
             foundInvoice = { id: invoiceSnap.id, ...invoiceSnap.data() };
           }
         } catch (dbErr) {
-          console.warn('Firestore fetch failed, checking local storage:', dbErr);
+          console.warn('Direct Firestore fetch warning:', dbErr);
         }
 
-        // Fallback: check localStorage for recent invoices
+        // Strategy B: Query by 'invoiceNumber' field (e.g. INV26100012)
+        if (!foundInvoice) {
+          try {
+            const qInvNum = query(collection(db, 'invoices'), where('invoiceNumber', '==', cleanId));
+            const snapInvNum = await getDocs(qInvNum);
+            if (!snapInvNum.empty) {
+              const d = snapInvNum.docs[0];
+              foundInvoice = { id: d.id, ...d.data() };
+            }
+          } catch (qErr) {
+            console.warn('Query by invoiceNumber warning:', qErr);
+          }
+        }
+
+        // Strategy C: Query by 'id' field
+        if (!foundInvoice) {
+          try {
+            const qId = query(collection(db, 'invoices'), where('id', '==', cleanId));
+            const snapId = await getDocs(qId);
+            if (!snapId.empty) {
+              const d = snapId.docs[0];
+              foundInvoice = { id: d.id, ...d.data() };
+            }
+          } catch (qErr) {
+            console.warn('Query by id warning:', qErr);
+          }
+        }
+
+        // Strategy D: Flexible scan of collection (handles case differences, timestamp vs INV prefixes)
+        if (!foundInvoice) {
+          try {
+            const allSnap = await getDocs(collection(db, 'invoices'));
+            const lowerId = cleanId.toLowerCase();
+            allSnap.forEach(d => {
+              if (foundInvoice) return;
+              const data = d.data();
+              const docId = String(d.id).toLowerCase();
+              const invNo = String(data.invoiceNumber || '').toLowerCase();
+              const fieldId = String(data.id || '').toLowerCase();
+              if (docId === lowerId || invNo === lowerId || fieldId === lowerId) {
+                foundInvoice = { id: d.id, ...data };
+              }
+            });
+          } catch (scanErr) {
+            console.warn('All invoices scan warning:', scanErr);
+          }
+        }
+
+        // Strategy E: Fallback to localStorage (for offline or local testing)
         if (!foundInvoice) {
           try {
             const localInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-            foundInvoice = localInvoices.find(inv => String(inv.id) === String(id));
+            const lowerId = cleanId.toLowerCase();
+            foundInvoice = localInvoices.find(inv => {
+              const docId = String(inv.id || '').toLowerCase();
+              const invNo = String(inv.invoiceNumber || '').toLowerCase();
+              return docId === lowerId || invNo === lowerId;
+            });
           } catch (localErr) {
             console.warn('Local storage invoice check failed:', localErr);
           }
@@ -93,7 +149,7 @@ const PublicBillView = () => {
         if (foundInvoice) {
           setInvoice(foundInvoice);
         } else {
-          setError(`Invoice #${id} could not be found. Please check your link or contact the store.`);
+          setError(`Invoice #${cleanId} could not be found. Please check your link or contact the store.`);
         }
       } catch (err) {
         console.error('Error loading invoice:', err);
@@ -121,7 +177,7 @@ const PublicBillView = () => {
       const address = profile?.address || 'Baba Jaan Chawk, Pune, Maharashtra 411001';
       const phone = profile?.phone || '+91 98765 43210';
       const gstin = profile?.gstin || '27XXXXX1234X1ZX';
-      const invoiceNumber = `INV-${invoice.id}`;
+      const invoiceNumber = invoice.invoiceNumber || (String(invoice.id).startsWith('INV') ? invoice.id : `INV-${invoice.id}`);
       const invoiceDate = invoice.date
         ? new Date(invoice.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
         : new Date().toLocaleDateString('en-IN');
@@ -397,7 +453,7 @@ const PublicBillView = () => {
             </Box>
             <Box>
               <Typography variant="subtitle1" sx={{ fontWeight: 800, lineHeight: 1.2 }}>
-                Official E-Invoice #{invoice.id}
+                Official E-Invoice #{invoice.invoiceNumber || invoice.id}
               </Typography>
               <Typography variant="caption" sx={{ opacity: 0.85 }}>
                 Tap below to download your official PDF invoice
@@ -486,7 +542,7 @@ const PublicBillView = () => {
                 sx={{ fontWeight: 800, fontSize: '0.78rem', mb: 1 }}
               />
               <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#042F2E' }}>
-                Invoice #{invoice.id}
+                Invoice #{invoice.invoiceNumber || invoice.id}
               </Typography>
               <Typography variant="caption" color="text.secondary" display="block">
                 Date: {invoice.date ? new Date(invoice.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }) : new Date().toLocaleDateString('en-IN')}

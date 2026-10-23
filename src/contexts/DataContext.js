@@ -444,7 +444,9 @@ export const DataProvider = ({ children }) => {
   };
 
   const addInvoice = async (invoice) => {
-    const id = Date.now().toString();
+    // Keep custom or generated invoice ID if provided, otherwise generate timestamp
+    const id = (invoice && invoice.id) ? String(invoice.id) : Date.now().toString();
+    const invoiceNumber = (invoice && invoice.invoiceNumber) ? String(invoice.invoiceNumber) : id;
 
     // Calculate total paid across all payment methods provided
     const totalPaid = invoice.payments?.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0) || 0;
@@ -454,6 +456,7 @@ export const DataProvider = ({ children }) => {
     const newInvoice = {
       ...invoice,
       id,
+      invoiceNumber,
       totalPaid,
       balanceDue,
       paymentStatus: invoice.paymentStatus || calculatedStatus
@@ -523,6 +526,7 @@ export const DataProvider = ({ children }) => {
     }
 
     await batch.commit();
+    return newInvoice;
   };
 
   const addPaymentRecord = async (invoiceId, paymentData) => {
