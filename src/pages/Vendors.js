@@ -739,11 +739,16 @@ const Vendors = () => {
                             borderRadius: 2,
                             fontWeight: 700,
                             textTransform: 'none',
-                            background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
+                            background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
                             color: '#ffffff',
-                            boxShadow: '0 4px 12px rgba(217,119,6,0.3)',
+                            boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, #b45309 0%, #92400e 100%)',
+                                background: 'linear-gradient(135deg, #115E59 0%, #02201E 100%)',
+                                boxShadow: '0 6px 18px rgba(15, 118, 110, 0.45)'
+                            },
+                            '&.Mui-disabled': {
+                                background: 'rgba(0, 0, 0, 0.12)',
+                                color: 'rgba(0, 0, 0, 0.26)'
                             }
                         }}
                     >
