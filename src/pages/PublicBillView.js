@@ -424,14 +424,14 @@ const PublicBillView = () => {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#F1F5F9', py: { xs: 2, sm: 4 }, px: { xs: 1, sm: 3 } }}>
-      <Container maxWidth="md">
+    <Box sx={{ minHeight: '100vh', bgcolor: '#F1F5F9', py: { xs: 2, sm: 4 }, px: { xs: 1.5, sm: 3 } }}>
+      <Box sx={{ maxWidth: activeTemplate === 'boutique-slip' ? 480 : 840, mx: 'auto', width: '100%' }}>
         {/* Top Floating Download Bar */}
         <Paper
           elevation={2}
           className="no-print"
           sx={{
-            p: 2,
+            p: { xs: 2, sm: 2.5 },
             mb: 3,
             borderRadius: 3,
             display: 'flex',
@@ -441,16 +441,17 @@ const PublicBillView = () => {
             gap: 2,
             background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
             color: '#FFFFFF',
+            boxShadow: '0 8px 24px rgba(4, 47, 46, 0.2)',
             '@media print': {
               display: 'none !important'
             }
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, width: { xs: '100%', sm: 'auto' } }}>
-            <Box sx={{ width: 42, height: 42, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, width: { xs: '100%', sm: 'auto' }, flex: 1, minWidth: 0 }}>
+            <Box sx={{ width: 42, height: 42, minWidth: 42, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Receipt sx={{ color: '#FFFFFF' }} />
             </Box>
-            <Box>
+            <Box sx={{ minWidth: 0 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 800, lineHeight: 1.2 }}>
                   Official E-Invoice #{invoice.invoiceNumber || invoice.id}
@@ -470,16 +471,24 @@ const PublicBillView = () => {
                   />
                 )}
               </Box>
-              <Typography variant="caption" sx={{ opacity: 0.85 }}>
+              <Typography variant="caption" sx={{ opacity: 0.85, display: 'block', mt: 0.25 }}>
                 Matches current boutique invoice template • Tap below to download PDF
               </Typography>
             </Box>
           </Box>
 
-          <Stack direction="row" spacing={1.5} sx={{ width: { xs: '100%', sm: 'auto' }, justifyContent: { xs: 'stretch', sm: 'flex-end' } }}>
+          <Stack
+            direction="row"
+            spacing={1.5}
+            alignItems="center"
+            sx={{
+              width: { xs: '100%', sm: 'auto' },
+              justifyContent: { xs: 'stretch', sm: 'flex-end' },
+              flexShrink: 0
+            }}
+          >
             <Button
               variant="contained"
-              fullWidth
               startIcon={downloading ? <CircularProgress size={18} color="inherit" /> : <Download />}
               onClick={handleDownloadPDF}
               disabled={downloading}
@@ -487,12 +496,15 @@ const PublicBillView = () => {
                 bgcolor: '#D97706',
                 color: '#FFFFFF',
                 fontWeight: 800,
-                px: 3,
-                py: 1,
+                fontSize: '0.84rem',
+                whiteSpace: 'nowrap',
+                height: 42,
+                px: 2.5,
                 borderRadius: 2.5,
                 textTransform: 'none',
                 boxShadow: '0 4px 12px rgba(217, 119, 6, 0.4)',
-                '&:hover': { bgcolor: '#B45309' }
+                '&:hover': { bgcolor: '#B45309' },
+                flex: { xs: 1, sm: 'none' }
               }}
             >
               {downloading ? 'Generating PDF...' : 'Download PDF Bill'}
@@ -505,11 +517,15 @@ const PublicBillView = () => {
                 borderColor: 'rgba(255,255,255,0.4)',
                 color: '#FFFFFF',
                 fontWeight: 700,
+                fontSize: '0.84rem',
+                whiteSpace: 'nowrap',
+                height: 42,
                 borderRadius: 2.5,
                 textTransform: 'none',
                 minWidth: 'auto',
-                px: 2,
-                '&:hover': { borderColor: '#FFFFFF', bgcolor: 'rgba(255,255,255,0.1)' }
+                px: 2.5,
+                '&:hover': { borderColor: '#FFFFFF', bgcolor: 'rgba(255,255,255,0.1)' },
+                flexShrink: 0
               }}
             >
               Print
@@ -519,7 +535,7 @@ const PublicBillView = () => {
 
         {/* Pixel-Perfect CRM Invoice Component */}
         {/* Renders the exact template active in the CRM (Atelier Emerald, Champagne Gold, Minimal Haute, or Boutique Slip) */}
-        <Box sx={{ maxWidth: activeTemplate === 'boutique-slip' ? 520 : 880, mx: 'auto' }}>
+        <Box sx={{ width: '100%' }}>
           <InvoicePrint
             ref={printRef}
             invoice={invoice}
@@ -528,7 +544,7 @@ const PublicBillView = () => {
             profile={profile}
           />
         </Box>
-      </Container>
+      </Box>
     </Box>
   );
 };
