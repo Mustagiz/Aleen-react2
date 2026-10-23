@@ -9,6 +9,14 @@ class ErrorBoundary extends React.Component {
   }
 
   static getDerivedStateFromError(error) {
+    const msg = error?.message || String(error || '');
+    // Ignore benign ResizeObserver loop/notification errors that can happen on WebKit/Safari
+    if (
+      msg.includes('ResizeObserver loop') ||
+      msg.includes('undelivered notifications')
+    ) {
+      return { hasError: false, error: null };
+    }
     return { hasError: true, error };
   }
 
