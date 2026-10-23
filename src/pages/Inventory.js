@@ -532,13 +532,13 @@ const Inventory = () => {
         subtitle="Track stock levels, size variants, costs, profit margins, and manage your luxury apparel catalog"
         breadcrumbs={[{ label: 'Aleen Clothing', path: '/' }, { label: 'Inventory' }]}
         actions={
-          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', width: { xs: '100%', sm: 'auto' } }}>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', width: { xs: '100%', md: 'auto' } }}>
             <Button
               variant="outlined"
               component="label"
               startIcon={<Upload />}
               sx={{
-                flex: { xs: 1, sm: 'none' },
+                flex: { xs: 1, sm: 1, md: 'none' },
                 borderRadius: 2,
                 fontWeight: 700,
                 fontSize: { xs: '0.75rem', sm: '0.82rem' },
@@ -553,7 +553,7 @@ const Inventory = () => {
               startIcon={<Download />}
               onClick={downloadInventory}
               sx={{
-                flex: { xs: 1, sm: 'none' },
+                flex: { xs: 1, sm: 1, md: 'none' },
                 borderRadius: 2,
                 fontWeight: 700,
                 fontSize: { xs: '0.75rem', sm: '0.82rem' },
@@ -569,7 +569,7 @@ const Inventory = () => {
               onClick={() => handleOpen()}
               disabled={user?.role !== 'admin'}
               sx={{
-                flex: { xs: '100%', sm: 'none' },
+                flex: { xs: '100%', sm: 1.2, md: 'none' },
                 borderRadius: 2,
                 fontWeight: 800,
                 fontSize: { xs: '0.8rem', sm: '0.85rem' },
@@ -585,9 +585,9 @@ const Inventory = () => {
         }
       />
 
-      {/* KPI Cards: Responsive 2x2 Grid on Mobile & Tablet, 4 Columns on Desktop */}
+      {/* KPI Cards: Responsive 2x2 Grid on Mobile, Tablet & iPad, 4 Columns on Desktop */}
       <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} sx={{ mb: { xs: 2.5, sm: 3.5 } }}>
-        <Grid item xs={6} sm={6} md={3}>
+        <Grid item xs={6} sm={6} md={6} lg={3}>
           <AtelierKpiCard
             title="Total Garments"
             value={totalItems}
@@ -596,7 +596,7 @@ const Inventory = () => {
             onClick={() => setStockFilter('all')}
           />
         </Grid>
-        <Grid item xs={6} sm={6} md={3}>
+        <Grid item xs={6} sm={6} md={6} lg={3}>
           <AtelierKpiCard
             title="Portfolio Value"
             value={`₹${totalValue.toLocaleString('en-IN')}`}
@@ -605,7 +605,7 @@ const Inventory = () => {
             goldAccent={true}
           />
         </Grid>
-        <Grid item xs={6} sm={6} md={3}>
+        <Grid item xs={6} sm={6} md={6} lg={3}>
           <AtelierKpiCard
             title="Low Stock Alerts"
             value={lowOrOutCount}
@@ -617,7 +617,7 @@ const Inventory = () => {
           />
         </Grid>
         {user?.role === 'admin' && (
-          <Grid item xs={6} sm={6} md={3}>
+          <Grid item xs={6} sm={6} md={6} lg={3}>
             <AtelierKpiCard
               title="Profit Margin"
               value={`₹${totalProfit.toLocaleString('en-IN')}`}
@@ -635,8 +635,8 @@ const Inventory = () => {
         {/* Tier 1: Search & Controls Layout */}
         <Box sx={{
           display: 'flex',
-          flexDirection: { xs: 'column', md: 'row' },
-          alignItems: { xs: 'stretch', md: 'center' },
+          flexDirection: { xs: 'column', lg: 'row' },
+          alignItems: { xs: 'stretch', lg: 'center' },
           gap: 1.5,
           mb: 2
         }}>
@@ -662,8 +662,8 @@ const Inventory = () => {
               ) : null
             }}
             sx={{
-              flex: { md: 2 },
-              minWidth: { md: 240 },
+              flex: { lg: 2 },
+              minWidth: { lg: 260 },
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2.5,
                 bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#FFFFFF'
@@ -677,7 +677,8 @@ const Inventory = () => {
             alignItems: 'center',
             gap: 1.25,
             flexWrap: { xs: 'wrap', sm: 'nowrap' },
-            flex: { md: 3 }
+            flex: { lg: 3 },
+            width: { xs: '100%', lg: 'auto' }
           }}>
             {/* Collection Filter */}
             <TextField
@@ -1103,27 +1104,27 @@ const Inventory = () => {
                           borderRadius: 2,
                           border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(15, 118, 110, 0.12)'}`
                         }}>
-                          <Box sx={{ px: 0.5 }}>
-                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 700 }}>
+                          <Box sx={{ px: 0.5, overflow: 'hidden' }}>
+                            <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.65rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 700 }}>
                               Price
                             </Typography>
-                            <Typography variant="body2" sx={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', mt: 0.25 }}>
+                            <Typography variant="body2" noWrap sx={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', mt: 0.25 }}>
                               ₹{price.toLocaleString('en-IN')}
                             </Typography>
                           </Box>
-                          <Box sx={{ px: 0.5, borderLeft: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(15, 118, 110, 0.12)'}`, borderRight: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(15, 118, 110, 0.12)'}` }}>
-                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 700 }}>
+                          <Box sx={{ px: 0.5, overflow: 'hidden', borderLeft: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(15, 118, 110, 0.12)'}`, borderRight: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(15, 118, 110, 0.12)'}` }}>
+                            <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.65rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 700 }}>
                               {user?.role === 'admin' ? 'Margin' : 'Category'}
                             </Typography>
-                            <Typography variant="body2" sx={{ fontWeight: 800, color: user?.role === 'admin' ? (profitVal > 0 ? '#059669' : '#DC2626') : 'text.primary', fontVariantNumeric: 'tabular-nums', mt: 0.25 }}>
+                            <Typography variant="body2" noWrap sx={{ fontWeight: 800, color: user?.role === 'admin' ? (profitVal > 0 ? '#059669' : '#DC2626') : 'text.primary', fontVariantNumeric: 'tabular-nums', mt: 0.25 }}>
                               {user?.role === 'admin' ? `${profitMarginVal}%` : (item.category || 'Apparel')}
                             </Typography>
                           </Box>
-                          <Box sx={{ px: 0.5 }}>
-                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 700 }}>
+                          <Box sx={{ px: 0.5, overflow: 'hidden' }}>
+                            <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.65rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 700 }}>
                               Stock
                             </Typography>
-                            <Typography variant="body2" sx={{ fontWeight: 800, mt: 0.25 }}>
+                            <Typography variant="body2" noWrap sx={{ fontWeight: 800, mt: 0.25 }}>
                               {qty} Units
                             </Typography>
                           </Box>
@@ -1144,7 +1145,9 @@ const Inventory = () => {
                               fontSize: '0.75rem',
                               height: 36,
                               px: 1.25,
-                              minWidth: 'auto'
+                              minWidth: 'auto',
+                              whiteSpace: 'nowrap',
+                              flexShrink: 0
                             }}
                           >
                             Tag
@@ -1157,7 +1160,14 @@ const Inventory = () => {
                             startIcon={<Edit fontSize="small" />}
                             onClick={() => handleOpen(item)}
                             disabled={user?.role !== 'admin'}
-                            sx={{ borderRadius: 2, fontWeight: 700, fontSize: '0.75rem', height: 36 }}
+                            sx={{
+                              borderRadius: 2,
+                              fontWeight: 700,
+                              fontSize: '0.75rem',
+                              height: 36,
+                              whiteSpace: 'nowrap',
+                              flex: 1
+                            }}
                           >
                             Edit
                           </Button>
@@ -1169,7 +1179,14 @@ const Inventory = () => {
                             startIcon={<Delete fontSize="small" />}
                             onClick={() => openDeleteDialog(item.id)}
                             disabled={user?.role !== 'admin'}
-                            sx={{ borderRadius: 2, fontWeight: 700, fontSize: '0.75rem', height: 36 }}
+                            sx={{
+                              borderRadius: 2,
+                              fontWeight: 700,
+                              fontSize: '0.75rem',
+                              height: 36,
+                              whiteSpace: 'nowrap',
+                              flex: 1
+                            }}
                           >
                             Delete
                           </Button>
@@ -1197,7 +1214,7 @@ const Inventory = () => {
       ) : (
         <GlassCard sx={{ p: 0, overflow: 'hidden', border: '1px solid rgba(15, 118, 110, 0.15)' }}>
           <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-            <Table sx={{ minWidth: 920 }}>
+            <Table sx={{ minWidth: user?.role === 'admin' ? 1160 : 1030 }}>
               <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(15, 118, 110, 0.1)' : 'rgba(15, 118, 110, 0.05)' }}>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 800, width: 120, whiteSpace: 'nowrap' }}>

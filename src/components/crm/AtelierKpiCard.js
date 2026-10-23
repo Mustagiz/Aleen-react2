@@ -130,29 +130,8 @@ export default function AtelierKpiCard({
           {value}
         </Typography>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap', mt: 'auto', pt: 0.5 }}>
-          {trendLabel ? (
-            <Chip
-              size="small"
-              icon={isTrendPositive ? <TrendingUp fontSize="small" /> : <TrendingDown fontSize="small" />}
-              label={trendLabel}
-              sx={{
-                height: 20,
-                fontSize: '0.68rem',
-                fontWeight: 700,
-                backgroundColor: isTrendPositive
-                  ? isDark ? 'rgba(16, 185, 129, 0.18)' : '#DCFCE7'
-                  : isDark ? 'rgba(239, 68, 68, 0.18)' : '#FEE2E2',
-                color: isTrendPositive ? '#059669' : '#DC2626',
-                '& .MuiChip-icon': {
-                  color: 'inherit',
-                  fontSize: '0.78rem'
-                }
-              }}
-            />
-          ) : null}
-
-          {subtitle && (
+        <Box sx={{ mt: 'auto', pt: 0.75 }}>
+          {subtitle ? (
             <Typography
               variant="caption"
               noWrap
@@ -162,12 +141,38 @@ export default function AtelierKpiCard({
                 fontSize: { xs: '0.68rem', sm: '0.72rem' },
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                flex: 1
+                display: 'block',
+                mb: 0.5
               }}
             >
               {subtitle}
             </Typography>
+          ) : (
+            <Box sx={{ height: '1.1rem', mb: 0.5 }} />
           )}
+
+          <Box sx={{ minHeight: 22, display: 'flex', alignItems: 'center' }}>
+            {trendLabel ? (
+              <Chip
+                size="small"
+                icon={isTrendPositive ? <TrendingUp fontSize="small" /> : <TrendingDown fontSize="small" />}
+                label={trendLabel}
+                sx={{
+                  height: 20,
+                  fontSize: '0.68rem',
+                  fontWeight: 700,
+                  backgroundColor: isTrendPositive
+                    ? isDark ? 'rgba(16, 185, 129, 0.18)' : '#DCFCE7'
+                    : isDark ? 'rgba(239, 68, 68, 0.18)' : '#FEE2E2',
+                  color: isTrendPositive ? '#059669' : '#DC2626',
+                  '& .MuiChip-icon': {
+                    color: 'inherit',
+                    fontSize: '0.78rem'
+                  }
+                }}
+              />
+            ) : null}
+          </Box>
         </Box>
       </CardContent>
     </Card>

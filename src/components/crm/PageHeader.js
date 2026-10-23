@@ -59,12 +59,12 @@ export default function PageHeader({
       {/* Title & Action Buttons Row */}
       <Box sx={{ 
         display: 'flex', 
-        alignItems: { xs: 'flex-start', sm: 'center' }, 
+        alignItems: { xs: 'flex-start', md: 'center' }, 
         justifyContent: 'space-between', 
-        flexDirection: { xs: 'column', sm: 'row' },
-        gap: 2
+        flexDirection: { xs: 'column', md: 'row' },
+        gap: { xs: 2, md: 2.5 }
       }}>
-        <Box>
+        <Box sx={{ minWidth: 0, flex: 1 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
             <Typography 
               variant="h3" 
@@ -101,8 +101,8 @@ export default function PageHeader({
               alignItems: 'center', 
               flexWrap: 'wrap',
               gap: 1.25,
-              width: { xs: '100%', sm: 'auto' },
-              justifyContent: { xs: 'flex-start', sm: 'flex-end' }
+              width: { xs: '100%', md: 'auto' },
+              justifyContent: { xs: 'flex-start', md: 'flex-end' }
             }}
           >
             {actions}
