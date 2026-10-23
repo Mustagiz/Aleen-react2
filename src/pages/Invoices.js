@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel, CircularProgress, Alert, Snackbar, InputAdornment, List } from '@mui/material';
-import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, FilterList, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, ShoppingCart } from '@mui/icons-material';
+import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, ShoppingCart, RestartAlt } from '@mui/icons-material';
 import { Html5Qrcode } from 'html5-qrcode';
 import { db } from '../firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -185,9 +185,61 @@ const Invoices = () => {
   const [paymentMethod, setPaymentMethod] = useState('Cash');
   const [searchTerm, setSearchTerm] = useState('');
   const [itemSearchTerm, setItemSearchTerm] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
+  // Date & Filter States
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [datePreset, setDatePreset] = useState('all');
   const [paymentFilter, setPaymentFilter] = useState('All');
-  const [showFilters, setShowFilters] = useState(false);
+
+  // Quick Date Range Preset Handler
+  const handleDatePreset = (preset) => {
+    setDatePreset(preset);
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const toYMD = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+    if (preset === 'today') {
+      const todayStr = toYMD(now);
+      setDateFrom(todayStr);
+      setDateTo(todayStr);
+    } else if (preset === 'yesterday') {
+      const y = new Date(now);
+      y.setDate(y.getDate() - 1);
+      const yStr = toYMD(y);
+      setDateFrom(yStr);
+      setDateTo(yStr);
+    } else if (preset === 'this_week') {
+      const start = new Date(now);
+      start.setDate(start.getDate() - 6);
+      setDateFrom(toYMD(start));
+      setDateTo(toYMD(now));
+    } else if (preset === 'this_month') {
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      setDateFrom(toYMD(start));
+      setDateTo(toYMD(now));
+    } else if (preset === 'last_month') {
+      const start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const end = new Date(now.getFullYear(), now.getMonth(), 0);
+      setDateFrom(toYMD(start));
+      setDateTo(toYMD(end));
+    } else if (preset === 'last_30_days') {
+      const start = new Date(now);
+      start.setDate(start.getDate() - 29);
+      setDateFrom(toYMD(start));
+      setDateTo(toYMD(now));
+    } else if (preset === 'all') {
+      setDateFrom('');
+      setDateTo('');
+    }
+  };
+
+  const handleClearFilters = () => {
+    setSearchTerm('');
+    setDateFrom('');
+    setDateTo('');
+    setDatePreset('all');
+    setPaymentFilter('All');
+  };
   // Split Payment State
   const [isSplitPayment, setIsSplitPayment] = useState(false);
   const [splitAmount, setSplitAmount] = useState(0);
@@ -648,26 +700,77 @@ const Invoices = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const printRef = useRef();
 
-  const totalInvoices = invoices.length;
-  const totalAmount = invoices.reduce((sum, inv) => sum + inv.total, 0);
-  const todayInvoices = invoices.filter(inv => new Date(inv.date).toDateString() === new Date().toDateString()).length;
-  const avgAmount = totalInvoices > 0 ? totalAmount / totalInvoices : 0;
+  const isFiltered = Boolean(dateFrom || dateTo || searchTerm || paymentFilter !== 'All');
 
   const filteredInvoices = useMemo(() => {
-    const s = (searchTerm || '').toLowerCase();
+    const s = (searchTerm || '').trim().toLowerCase();
+
+    // From date boundary (start of day local time 00:00:00.000)
+    let fromBoundary = null;
+    if (dateFrom) {
+      const parts = dateFrom.split('-').map(Number);
+      if (parts.length === 3) {
+        fromBoundary = new Date(parts[0], parts[1] - 1, parts[2], 0, 0, 0, 0).getTime();
+      }
+    }
+
+    // To date boundary (end of day local time 23:59:59.999)
+    let toBoundary = null;
+    if (dateTo) {
+      const parts = dateTo.split('-').map(Number);
+      if (parts.length === 3) {
+        toBoundary = new Date(parts[0], parts[1] - 1, parts[2], 23, 59, 59, 999).getTime();
+      }
+    }
+
     return invoices.filter(inv => {
-      const matchesSearch = !s ||
-        (inv.id && inv.id.toLowerCase().includes(s)) ||
-        (inv.customer && inv.customer.toLowerCase().includes(s)) ||
-        (inv.phone && inv.phone.includes(s));
+      // 1. Text Search matching invoice ID, customer name, phone
+      if (s) {
+        const matchesSearch =
+          (inv.id && inv.id.toLowerCase().includes(s)) ||
+          (inv.customer && inv.customer.toLowerCase().includes(s)) ||
+          (inv.phone && String(inv.phone).includes(s));
+        if (!matchesSearch) return false;
+      }
 
-      const matchesDate = !dateFilter || new Date(inv.date).toLocaleDateString() === new Date(dateFilter).toLocaleDateString();
+      // 2. Payment Method Filter
+      if (paymentFilter !== 'All') {
+        const method = inv.paymentMethod || 'Cash';
+        if (method !== paymentFilter) return false;
+      }
 
-      const matchesPayment = paymentFilter === 'All' || inv.paymentMethod === paymentFilter;
+      // 3. Selected Dates Filter
+      if (fromBoundary !== null || toBoundary !== null) {
+        if (!inv.date) return false;
+        const invTime = new Date(inv.date).getTime();
+        if (isNaN(invTime)) return false;
 
-      return matchesSearch && matchesDate && matchesPayment;
+        if (fromBoundary !== null && invTime < fromBoundary) {
+          return false;
+        }
+        if (toBoundary !== null && invTime > toBoundary) {
+          return false;
+        }
+      }
+
+      return true;
     });
-  }, [invoices, searchTerm, dateFilter, paymentFilter]);
+  }, [invoices, searchTerm, dateFrom, dateTo, paymentFilter]);
+
+  // Reset pagination to first page whenever search or date filters change
+  useEffect(() => {
+    setPage(0);
+  }, [searchTerm, dateFrom, dateTo, paymentFilter]);
+
+  const totalInvoices = invoices.length;
+  const totalAmount = invoices.reduce((sum, inv) => sum + (inv.total || 0), 0);
+  const avgAmount = totalInvoices > 0 ? totalAmount / totalInvoices : 0;
+
+  const displayCount = isFiltered ? filteredInvoices.length : totalInvoices;
+  const displayRevenue = isFiltered
+    ? filteredInvoices.reduce((sum, inv) => sum + (inv.total || 0), 0)
+    : totalAmount;
+  const displayAvgAmount = displayCount > 0 ? displayRevenue / displayCount : 0;
 
   // Sorting State
   const [orderBy, setOrderBy] = useState('date');
@@ -1442,111 +1545,274 @@ const Invoices = () => {
         }
       />
 
-      {/* Atelier KPI Cards */}
-      <Grid container spacing={2.5} sx={{ mb: 4 }}>
+      {/* Atelier KPI Cards - Reflects Selected Date Range */}
+      <Grid container spacing={2.5} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={4}>
           <AtelierKpiCard
-            title="Total Invoices"
-            value={totalInvoices}
+            title={isFiltered ? "Filtered Invoices" : "Total Invoices"}
+            value={displayCount}
             icon={<Receipt fontSize="small" />}
-            subtitle="Generated records"
+            subtitle={isFiltered ? `Filtered count (${totalInvoices} total)` : "Generated records"}
           />
         </Grid>
         <Grid item xs={12} sm={4}>
           <AtelierKpiCard
-            title="Total Revenue"
-            value={`₹${totalAmount.toLocaleString('en-IN')}`}
+            title={isFiltered ? "Filtered Revenue" : "Total Revenue"}
+            value={`₹${displayRevenue.toLocaleString('en-IN')}`}
             icon={<AttachMoney fontSize="small" />}
             goldAccent={true}
-            subtitle="Total invoiced gross"
+            subtitle={isFiltered ? "For selected dates / filters" : "Total invoiced gross"}
           />
         </Grid>
         <Grid item xs={12} sm={4}>
           <AtelierKpiCard
             title="Average Ticket"
-            value={`₹${avgAmount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
+            value={`₹${displayAvgAmount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
             icon={<TrendingUp fontSize="small" />}
-            subtitle="Per completed invoice"
+            subtitle={isFiltered ? "Average of selected invoices" : "Per completed invoice"}
           />
         </Grid>
       </Grid>
 
+      {/* Date Range Selection & Filter Studio */}
+      <GlassCard sx={{ p: 2.5, mb: 3, border: '1px solid', borderColor: isFiltered ? 'primary.light' : 'divider' }}>
+        {/* Row 1: Search Capsule + Quick Date Range Presets */}
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} md={5}>
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
+              px: 2,
+              py: 0.6,
+              borderRadius: 2.5,
+              border: '1px solid',
+              borderColor: 'divider',
+              bgcolor: 'background.paper'
+            }}>
+              <Search sx={{ color: 'text.secondary', fontSize: 20 }} />
+              <TextField
+                placeholder="Search invoice #, customer, phone..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                variant="standard"
+                fullWidth
+                InputProps={{ disableUnderline: true }}
+                sx={{ fontSize: '0.85rem' }}
+              />
+              {searchTerm && (
+                <IconButton size="small" onClick={() => setSearchTerm('')} sx={{ p: 0.5 }}>
+                  <Close fontSize="small" />
+                </IconButton>
+              )}
+            </Box>
+          </Grid>
 
-      {/* Search and Filter Bar */}
-      <GlassCard sx={{ p: 3, mb: 4 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: showFilters ? 2 : 0 }}>
-          <Search sx={{ color: 'text.secondary' }} />
+          {/* Quick Date Presets */}
+          <Grid item xs={12} md={7}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 0.75 }}>
+              <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', mr: 0.5, display: { xs: 'none', sm: 'inline' } }}>
+                Filter Dates:
+              </Typography>
+              {[
+                { id: 'all', label: 'All Dates' },
+                { id: 'today', label: 'Today' },
+                { id: 'yesterday', label: 'Yesterday' },
+                { id: 'this_week', label: 'Last 7 Days' },
+                { id: 'this_month', label: 'This Month' },
+                { id: 'last_30_days', label: 'Last 30 Days' }
+              ].map(p => {
+                const isSelected = datePreset === p.id && (!dateFrom || p.id !== 'all');
+                const isAllSelected = datePreset === 'all' && !dateFrom && !dateTo && p.id === 'all';
+                const active = isSelected || isAllSelected;
+                return (
+                  <Chip
+                    key={p.id}
+                    label={p.label}
+                    size="small"
+                    clickable
+                    onClick={() => handleDatePreset(p.id)}
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: '0.72rem',
+                      height: 28,
+                      borderRadius: 1.5,
+                      bgcolor: active ? '#0F766E' : 'action.hover',
+                      color: active ? '#FFFFFF' : 'text.primary',
+                      border: '1px solid',
+                      borderColor: active ? '#0F766E' : 'divider',
+                      '&:hover': {
+                        bgcolor: active ? '#042F2E' : 'action.selected'
+                      }
+                    }}
+                  />
+                );
+              })}
+            </Box>
+          </Grid>
+        </Grid>
+
+        {/* Row 2: Selected Dates (From - To), Payment Method, Sorting & Actions */}
+        <Box sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          gap: 1.5,
+          pt: 2,
+          mt: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider'
+        }}>
+          {/* From Date Picker */}
           <TextField
-            placeholder="Search by invoice ID or customer name..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            variant="standard"
-            fullWidth
-            InputProps={{ disableUnderline: true }}
+            label="From Date"
+            type="date"
+            size="small"
+            value={dateFrom}
+            onChange={(e) => {
+              setDateFrom(e.target.value);
+              setDatePreset('custom');
+            }}
+            InputLabelProps={{ shrink: true }}
+            sx={{ width: { xs: '100%', sm: 165 } }}
           />
-          <IconButton onClick={() => setShowFilters(!showFilters)} sx={{ bgcolor: showFilters ? 'primary.main' : 'action.hover', color: showFilters ? 'white' : 'text.secondary' }}>
-            <FilterList />
-          </IconButton>
-        </Box>
-        {showFilters && (
-          <Box sx={{ display: 'flex', gap: 2, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-            <TextField
-              label="Filter by Date"
-              type="date"
-              value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-              size="small"
-              sx={{ flex: 1 }}
-            />
-            <TextField
-              select
-              label="Payment Method"
-              value={paymentFilter}
-              onChange={(e) => setPaymentFilter(e.target.value)}
-              size="small"
-              sx={{ flex: 1 }}
-            >
-              <MenuItem value="All">All Methods</MenuItem>
-              <MenuItem value="Cash">Cash</MenuItem>
-              <MenuItem value="Card">Card</MenuItem>
-              <MenuItem value="UPI">UPI</MenuItem>
-              <MenuItem value="Net Banking">Net Banking</MenuItem>
-            </TextField>
-            <Button
-              variant="outlined"
-              onClick={() => { setSearchTerm(''); setDateFilter(''); setPaymentFilter('All'); }}
-              sx={{
-                height: 40,
-                borderRadius: '20px',
-                px: 2.5,
-                border: '1.5px solid rgba(15, 118, 110, 0.3)',
-                color: '#0F766E',
-                textTransform: 'none',
-                fontWeight: 700,
-                fontSize: '0.82rem',
-                '&:hover': {
-                  border: '1.5px solid #0F766E',
-                  bgcolor: 'rgba(15, 118, 110, 0.05)'
-                }
-              }}
-            >
-              Clear
-            </Button>
-          </Box>
-        )}
-        <Box sx={{ display: 'flex', gap: 2, pt: 2, borderTop: showFilters ? 'none' : '1px solid', borderColor: 'divider', mt: 2 }}>
-          <TextField select size="small" label="Sort By" value={orderBy} onChange={(e) => setOrderBy(e.target.value)} sx={{ minWidth: 120 }}>
+
+          {/* To Date Picker */}
+          <TextField
+            label="To Date"
+            type="date"
+            size="small"
+            value={dateTo}
+            onChange={(e) => {
+              setDateTo(e.target.value);
+              setDatePreset('custom');
+            }}
+            InputLabelProps={{ shrink: true }}
+            sx={{ width: { xs: '100%', sm: 165 } }}
+          />
+
+          {/* Payment Method Filter */}
+          <TextField
+            select
+            size="small"
+            label="Payment Method"
+            value={paymentFilter}
+            onChange={(e) => setPaymentFilter(e.target.value)}
+            sx={{ minWidth: 145 }}
+          >
+            <MenuItem value="All">All Payment Methods</MenuItem>
+            <MenuItem value="Cash">Cash</MenuItem>
+            <MenuItem value="Card">Card</MenuItem>
+            <MenuItem value="UPI">UPI</MenuItem>
+            <MenuItem value="Net Banking">Net Banking</MenuItem>
+            <MenuItem value="Credit">Credit / Due</MenuItem>
+          </TextField>
+
+          {/* Sort Column */}
+          <TextField
+            select
+            size="small"
+            label="Sort By"
+            value={orderBy}
+            onChange={(e) => setOrderBy(e.target.value)}
+            sx={{ minWidth: 120 }}
+          >
             <MenuItem value="date">Date</MenuItem>
             <MenuItem value="total">Amount</MenuItem>
             <MenuItem value="customer">Customer</MenuItem>
             <MenuItem value="paymentMethod">Payment</MenuItem>
           </TextField>
-          <TextField select size="small" label="Order" value={order} onChange={(e) => setOrder(e.target.value)} sx={{ minWidth: 100 }}>
-            <MenuItem value="asc">Asc</MenuItem>
-            <MenuItem value="desc">Desc</MenuItem>
+
+          {/* Sort Direction */}
+          <TextField
+            select
+            size="small"
+            label="Order"
+            value={order}
+            onChange={(e) => setOrder(e.target.value)}
+            sx={{ minWidth: 125 }}
+          >
+            <MenuItem value="desc">Newest First</MenuItem>
+            <MenuItem value="asc">Oldest First</MenuItem>
           </TextField>
+
+          {/* Reset Filters CTA */}
+          {isFiltered && (
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<RestartAlt fontSize="small" />}
+              onClick={handleClearFilters}
+              sx={{
+                height: 38,
+                borderRadius: 2,
+                px: 2,
+                borderColor: '#0F766E',
+                color: '#0F766E',
+                textTransform: 'none',
+                fontWeight: 700,
+                fontSize: '0.8rem',
+                ml: { sm: 'auto' },
+                '&:hover': {
+                  borderColor: '#042F2E',
+                  bgcolor: 'rgba(15, 118, 110, 0.05)'
+                }
+              }}
+            >
+              Reset Filters
+            </Button>
+          )}
         </Box>
+
+        {/* Row 3: Active Date Filter Summary Badge */}
+        {isFiltered && (
+          <Box sx={{
+            mt: 2,
+            p: 1.25,
+            px: 2,
+            borderRadius: 2,
+            bgcolor: 'rgba(15, 118, 110, 0.06)',
+            border: '1px solid rgba(15, 118, 110, 0.2)',
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 1
+          }}>
+            <Typography variant="body2" sx={{ fontWeight: 700, color: '#042F2E', fontSize: '0.82rem' }}>
+              Showing <strong>{filteredInvoices.length}</strong> {filteredInvoices.length === 1 ? 'invoice' : 'invoices'}
+              {(dateFrom || dateTo) && (
+                <span>
+                  {' '}for <strong>{dateFrom ? new Date(dateFrom.split('-')[0], dateFrom.split('-')[1]-1, dateFrom.split('-')[2]).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'All prior dates'}</strong>
+                  {' to '}
+                  <strong>{dateTo ? new Date(dateTo.split('-')[0], dateTo.split('-')[1]-1, dateTo.split('-')[2]).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Present'}</strong>
+                </span>
+              )}
+              {paymentFilter !== 'All' && <span> • Payment: <strong>{paymentFilter}</strong></span>}
+              {searchTerm && <span> • Search: "<em>{searchTerm}</em>"</span>}
+              {' • Total Value: '}
+              <strong style={{ color: '#0F766E' }}>₹{displayRevenue.toLocaleString('en-IN')}</strong>
+            </Typography>
+
+            <Chip
+              label="Reset Dates"
+              size="small"
+              onDelete={handleClearFilters}
+              onClick={handleClearFilters}
+              sx={{
+                height: 24,
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                bgcolor: '#0F766E',
+                color: '#FFFFFF',
+                '& .MuiChip-deleteIcon': {
+                  color: '#FFFFFF',
+                  '&:hover': { color: '#FEE2E2' }
+                }
+              }}
+            />
+          </Box>
+        )}
       </GlassCard>
 
       {/* Invoice List (Mobile) or Table (Desktop) */}
@@ -1775,9 +2041,33 @@ const Invoices = () => {
                     ))) : (
                     <TableRow>
                       <TableCell colSpan={6} sx={{ textAlign: 'center', py: 8 }}>
-                        <Receipt sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
-                        <Typography variant="h6" color="text.secondary">No invoices found</Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>Create your first invoice to get started</Typography>
+                        <Receipt sx={{ fontSize: 56, color: 'text.disabled', mb: 1.5 }} />
+                        <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.secondary' }}>
+                          {isFiltered ? 'No invoices found for selected dates' : 'No invoices found'}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, maxWidth: 400, mx: 'auto' }}>
+                          {isFiltered
+                            ? 'No invoice records match your active date range or search query. Try picking different dates or reset your filters.'
+                            : 'Create your first invoice to get started.'}
+                        </Typography>
+                        {isFiltered && (
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            startIcon={<RestartAlt />}
+                            onClick={handleClearFilters}
+                            sx={{
+                              mt: 2,
+                              borderRadius: 2,
+                              borderColor: '#0F766E',
+                              color: '#0F766E',
+                              fontWeight: 700,
+                              textTransform: 'none'
+                            }}
+                          >
+                            Reset Date Range
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   )}
