@@ -21,13 +21,14 @@ import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import { TableSkeleton } from '../components/crm/AtelierSkeleton';
 import InvoiceWhatsAppDialog from '../components/InvoiceWhatsAppDialog';
+import BillSuccessModal from '../components/BillSuccessModal';
 import { printInvoiceElement } from '../utils/printInvoice';
 
 const Invoices = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { inventory, invoices, addInvoice, deleteInvoice, profile, customers, addCustomer, loading } = useData();
+  const { inventory, invoices, addInvoice, updateInvoice, deleteInvoice, profile, customers, addCustomer, loading } = useData();
   const { mode } = useThemeContext();
   const [open, setOpen] = useState(false);
   const [viewInvoice, setViewInvoice] = useState(null);
@@ -1363,15 +1364,31 @@ const Invoices = () => {
       return;
     }
 
-    // Otherwise load it into viewInvoice and trigger isolated print
-    setViewInvoice(invoice);
+    // Render offscreen and print seamlessly without popping open full viewInvoice modal
+    setOffscreenInvoice(invoice);
     setTimeout(() => {
-      if (printRef.current) {
+      if (offscreenInvoiceRef.current) {
+        printInvoiceElement(offscreenInvoiceRef.current, isSlip);
+      } else if (printRef.current) {
         printInvoiceElement(printRef.current, isSlip);
       } else {
         window.print();
       }
+      setTimeout(() => setOffscreenInvoice(null), 1000);
     }, 280);
+  };
+
+  const handleUpdateInvoicePhone = async (invoiceId, newPhone) => {
+    if (!invoiceId) return;
+    try {
+      if (updateInvoice) {
+        await updateInvoice(invoiceId, { phone: newPhone });
+      }
+      setSuccessInvoice(prev => prev && prev.id === invoiceId ? { ...prev, phone: newPhone } : prev);
+    } catch (err) {
+      console.warn('Could not update invoice phone in db:', err);
+      setSuccessInvoice(prev => prev && prev.id === invoiceId ? { ...prev, phone: newPhone } : prev);
+    }
   };
 
   const sendWhatsApp = (invoice) => {
@@ -3275,54 +3292,22 @@ const Invoices = () => {
         content="Are you sure you want to delete this invoice? This action cannot be undone."
       />
 
-      {/* Invoice Success Dialog */}
-      <Dialog
+      {/* Post-Billing Instant Dispatch & WhatsApp Pop-up Modal */}
+      <BillSuccessModal
         open={!!successInvoice}
         onClose={() => setSuccessInvoice(null)}
-        PaperProps={{ sx: { borderRadius: 4, maxWidth: 400 } }}
-      >
-        <DialogContent sx={{ textAlign: 'center', p: 4 }}>
-          <Box sx={{
-            width: 60, height: 60, borderRadius: '50%', bgcolor: 'success.light',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            mx: 'auto', mb: 2, color: 'white'
-          }}>
-            <TrendingUp fontSize="large" />
-          </Box>
-          <Typography variant="h5" sx={{ fontWeight: 800, mb: 1 }}>Invoice Saved!</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Invoice #{successInvoice?.id} has been successfully created and saved to your records.
-          </Typography>
-
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-            <Button
-              variant="contained"
-              fullWidth
-              startIcon={<WhatsApp />}
-              onClick={() => { sendWhatsApp(successInvoice); setSuccessInvoice(null); }}
-              sx={{ py: 1.5, bgcolor: '#25D366', '&:hover': { bgcolor: '#128C7E' }, borderRadius: 2, fontWeight: 700 }}
-            >
-              Share on WhatsApp
-            </Button>
-            <Button
-              variant="outlined"
-              fullWidth
-              startIcon={<Print />}
-              onClick={() => { handlePrint(successInvoice); setSuccessInvoice(null); }}
-              sx={{ py: 1.5, borderRadius: 2, fontWeight: 700 }}
-            >
-              Print Invoice
-            </Button>
-            <Button
-              fullWidth
-              onClick={() => setSuccessInvoice(null)}
-              sx={{ py: 1.5, borderRadius: 2, fontWeight: 600, color: 'text.secondary' }}
-            >
-              Done
-            </Button>
-          </Box>
-        </DialogContent>
-      </Dialog>
+        invoice={successInvoice}
+        profile={profile}
+        onPrint={handlePrint}
+        onDownloadPDF={downloadPDF}
+        isDownloadingPDF={isExportingPDF}
+        onOpenAdvancedWhatsApp={(inv) => sendWhatsApp(inv)}
+        onNewBill={() => {
+          setSuccessInvoice(null);
+          setOpen(true);
+        }}
+        onUpdateInvoicePhone={handleUpdateInvoicePhone}
+      />
 
       {/* Parked Carts / On-Hold POS Tickets Dialog */}
       <Dialog
