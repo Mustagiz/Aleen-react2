@@ -343,8 +343,10 @@ const GlobalSearch = ({ open, onClose }) => {
         sx: {
           borderRadius: 3.5,
           position: 'fixed',
-          top: { xs: 40, sm: 80 },
-          m: 0,
+          top: { xs: 20, sm: 60, md: 80 },
+          m: { xs: '0 auto', sm: '0 auto' },
+          width: { xs: 'calc(100% - 24px)', sm: '85vw', md: 680 },
+          maxWidth: '100%',
           bgcolor: 'background.paper',
           backgroundImage: 'linear-gradient(180deg, rgba(15, 118, 110, 0.03) 0%, rgba(0, 0, 0, 0) 100%)',
           boxShadow: '0 25px 50px -12px rgba(4, 47, 46, 0.35), 0 0 0 1px rgba(15, 118, 110, 0.2)',

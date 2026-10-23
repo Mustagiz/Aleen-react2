@@ -47,7 +47,8 @@ import {
   Insights,
   BarChart,
   FactCheck,
-  QrCodeScanner
+  QrCodeScanner,
+  Close
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
@@ -217,228 +218,254 @@ export default function Layout() {
   const sidebarWidth = isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_EXPANDED_WIDTH;
 
   // Sidebar Content Component
-  const renderSidebarContent = () => (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-      {/* Brand Header with Luxury Monogram */}
-      <Box sx={{
-        p: isCollapsed ? 2 : 2.5,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: isCollapsed ? 'center' : 'space-between',
-        borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.1)',
-        minHeight: 70
-      }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, overflow: 'hidden' }}>
-          {/* Emerald & Gold Crest Monogram */}
-          <Box sx={{
-            width: 40,
-            height: 40,
-            borderRadius: '12px',
-            background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
-            border: '1.5px solid rgba(217, 119, 6, 0.4)',
-            boxShadow: '0 4px 12px rgba(15, 118, 110, 0.3)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-            cursor: 'pointer'
-          }} onClick={() => navigate('/')}>
-            <Typography sx={{ 
-              fontFamily: 'var(--font-serif, "Playfair Display", serif)', 
-              fontWeight: 800, 
-              color: '#F59E0B', 
-              fontSize: '1.15rem',
-              lineHeight: 1
-            }}>
-              A
-            </Typography>
-          </Box>
+  const renderSidebarContent = () => {
+    // Collapsed state only applies to desktop sidebar; mobile/tablet drawer is always full width
+    const showCollapsed = isCollapsed && !isMobile;
 
-          {!isCollapsed && (
-            <Box sx={{ overflow: 'hidden' }}>
-              <Typography sx={{
-                fontFamily: 'var(--font-serif, "Playfair Display", serif)',
-                fontWeight: 800,
-                color: 'text.primary',
-                fontSize: '1.05rem',
-                letterSpacing: '-0.02em',
-                lineHeight: 1.2,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis'
-              }}>
-                {profile.businessName || 'Aleen Clothing'}
-              </Typography>
-              <Typography sx={{ 
-                fontSize: '0.68rem', 
-                fontWeight: 700, 
-                color: '#D97706',
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em'
-              }}>
-                Haute Couture CRM
-              </Typography>
-            </Box>
-          )}
-        </Box>
-      </Box>
-
-      {/* Navigation List */}
-      <Box sx={{ 
-        flex: 1, 
-        overflowY: 'auto', 
-        overflowX: 'hidden',
-        py: 1.5,
-        px: isCollapsed ? 1 : 1.5
-      }}>
-        {workflowSections.map((section, sIdx) => (
-          <Box key={section.title} sx={{ mb: 1.5 }}>
-            {!isCollapsed && (
-              <ListSubheader sx={{
-                bgcolor: 'transparent',
-                color: isDark ? '#14B8A6' : '#0F766E',
-                fontSize: '0.7rem',
-                fontWeight: 800,
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                px: 1.5,
-                py: 0.5,
-                lineHeight: '1.6rem'
-              }}>
-                {section.title}
-              </ListSubheader>
-            )}
-
-            <List disablePadding>
-              {section.items.map((item) => {
-                const isActive = location.pathname === item.path;
-                const linkButton = (
-                  <ListItem
-                    button
-                    key={item.text}
-                    onClick={() => {
-                      navigate(item.path);
-                      if (isMobile) setMobileOpen(false);
-                    }}
-                    sx={{
-                      borderRadius: '10px',
-                      mb: 0.5,
-                      py: 1,
-                      px: isCollapsed ? 1 : 1.5,
-                      justifyContent: isCollapsed ? 'center' : 'flex-start',
-                      bgcolor: isActive 
-                        ? (isDark ? 'rgba(20, 184, 166, 0.16)' : '#F0FDFA') 
-                        : 'transparent',
-                      color: isActive ? 'primary.main' : 'text.secondary',
-                      borderLeft: isActive ? '3px solid #0F766E' : '3px solid transparent',
-                      transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-                      '&:hover': {
-                        bgcolor: isActive 
-                          ? (isDark ? 'rgba(20, 184, 166, 0.22)' : '#E6FFFA') 
-                          : (isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(15, 118, 110, 0.04)'),
-                        color: 'primary.main',
-                        transform: isCollapsed ? 'none' : 'translateX(3px)'
-                      }
-                    }}
-                  >
-                    <ListItemIcon sx={{
-                      minWidth: isCollapsed ? 'auto' : 34,
-                      justifyContent: 'center',
-                      color: isActive ? (isDark ? '#14B8A6' : '#0F766E') : 'inherit',
-                      '& .MuiSvgIcon-root': {
-                        fontSize: 20
-                      }
-                    }}>
-                      {item.icon}
-                    </ListItemIcon>
-                    {!isCollapsed && (
-                      <ListItemText
-                        primary={item.text}
-                        primaryTypographyProps={{
-                          fontWeight: isActive ? 800 : 500,
-                          fontSize: '0.84rem',
-                          letterSpacing: '-0.01em',
-                          color: isActive ? (isDark ? '#F8FAFC' : '#042F2E') : 'inherit'
-                        }}
-                      />
-                    )}
-                  </ListItem>
-                );
-
-                return isCollapsed ? (
-                  <Tooltip key={item.text} title={item.text} placement="right" arrow>
-                    {linkButton}
-                  </Tooltip>
-                ) : linkButton;
-              })}
-            </List>
-          </Box>
-        ))}
-      </Box>
-
-      {/* Footer Profile Capsule */}
-      <Box sx={{
-        p: isCollapsed ? 1.5 : 2,
-        borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.1)',
-        bgcolor: isDark ? 'rgba(0, 0, 0, 0.2)' : 'rgba(15, 118, 110, 0.02)'
-      }}>
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+        {/* Brand Header with Luxury Monogram & Mobile Close Button */}
         <Box sx={{
+          p: showCollapsed ? 2 : 2.5,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: isCollapsed ? 'center' : 'space-between',
-          gap: 1.5
+          justifyContent: showCollapsed ? 'center' : 'space-between',
+          borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.1)',
+          minHeight: 70
         }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, overflow: 'hidden' }}>
-            <Avatar sx={{
-              width: 34,
-              height: 34,
-              fontSize: '0.8rem',
-              fontWeight: 800,
-              bgcolor: 'primary.main',
-              color: 'white',
-              boxShadow: '0 2px 8px rgba(15, 118, 110, 0.3)'
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, overflow: 'hidden' }}>
+            {/* Emerald & Gold Crest Monogram */}
+            <Box sx={{
+              width: 40,
+              height: 40,
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+              border: '1.5px solid rgba(217, 119, 6, 0.4)',
+              boxShadow: '0 4px 12px rgba(15, 118, 110, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              cursor: 'pointer'
+            }} onClick={() => {
+              navigate('/');
+              if (isMobile) setMobileOpen(false);
             }}>
-              {getInitials(user?.email || profile.businessName)}
-            </Avatar>
+              <Typography sx={{ 
+                fontFamily: 'var(--font-serif, "Playfair Display", serif)', 
+                fontWeight: 800, 
+                color: '#F59E0B', 
+                fontSize: '1.15rem',
+                lineHeight: 1
+              }}>
+                A
+              </Typography>
+            </Box>
 
-            {!isCollapsed && (
+            {!showCollapsed && (
               <Box sx={{ overflow: 'hidden' }}>
-                <Typography sx={{ 
-                  fontSize: '0.825rem', 
-                  fontWeight: 700, 
+                <Typography sx={{
+                  fontFamily: 'var(--font-serif, "Playfair Display", serif)',
+                  fontWeight: 800,
                   color: 'text.primary',
+                  fontSize: '1.05rem',
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1.2,
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis'
                 }}>
-                  {user?.displayName || (user?.role === 'admin' ? 'Store Manager' : 'Sales Stylist')}
+                  {profile.businessName || 'Aleen Clothing'}
                 </Typography>
-                <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary', fontWeight: 500 }}>
-                  {user?.role === 'admin' ? 'Administrator' : 'Staff Access'}
+                <Typography sx={{ 
+                  fontSize: '0.68rem', 
+                  fontWeight: 700, 
+                  color: '#D97706',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em'
+                }}>
+                  Haute Couture CRM
                 </Typography>
               </Box>
             )}
           </Box>
 
-          {!isCollapsed && (
-            <Tooltip title="Log out">
-              <IconButton 
-                onClick={handleLogout} 
-                size="small"
-                sx={{ 
-                  color: 'error.main',
-                  p: 0.75,
-                  '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.1)' }
-                }}
-              >
-                <Logout fontSize="small" />
-              </IconButton>
-            </Tooltip>
+          {isMobile && (
+            <IconButton
+              size="small"
+              onClick={() => setMobileOpen(false)}
+              sx={{
+                color: 'text.secondary',
+                p: 0.75,
+                borderRadius: '9px',
+                border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(15,118,110,0.15)',
+                '&:hover': { bgcolor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(15,118,110,0.06)' }
+              }}
+              title="Close navigation"
+            >
+              <Close fontSize="small" />
+            </IconButton>
           )}
         </Box>
+
+        {/* Navigation List */}
+        <Box sx={{ 
+          flex: 1, 
+          overflowY: 'auto', 
+          overflowX: 'hidden',
+          py: 1.5,
+          px: showCollapsed ? 1 : 1.5
+        }}>
+          {workflowSections.map((section) => (
+            <Box key={section.title} sx={{ mb: 1.5 }}>
+              {!showCollapsed && (
+                <ListSubheader sx={{
+                  bgcolor: 'transparent',
+                  color: isDark ? '#14B8A6' : '#0F766E',
+                  fontSize: '0.7rem',
+                  fontWeight: 800,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  px: 1.5,
+                  py: 0.5,
+                  lineHeight: '1.6rem'
+                }}>
+                  {section.title}
+                </ListSubheader>
+              )}
+
+              <List disablePadding>
+                {section.items.map((item) => {
+                  const isActive = location.pathname === item.path;
+                  const linkButton = (
+                    <ListItem
+                      button
+                      key={item.text}
+                      onClick={() => {
+                        navigate(item.path);
+                        if (isMobile) setMobileOpen(false);
+                      }}
+                      sx={{
+                        borderRadius: '10px',
+                        mb: 0.5,
+                        py: { xs: 1.1, sm: 1 },
+                        minHeight: { xs: 44, sm: 40 },
+                        px: showCollapsed ? 1 : 1.5,
+                        justifyContent: showCollapsed ? 'center' : 'flex-start',
+                        bgcolor: isActive 
+                          ? (isDark ? 'rgba(20, 184, 166, 0.16)' : '#F0FDFA') 
+                          : 'transparent',
+                        color: isActive ? 'primary.main' : 'text.secondary',
+                        borderLeft: isActive ? '3px solid #0F766E' : '3px solid transparent',
+                        transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+                        '&:hover': {
+                          bgcolor: isActive 
+                            ? (isDark ? 'rgba(20, 184, 166, 0.22)' : '#E6FFFA') 
+                            : (isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(15, 118, 110, 0.04)'),
+                          color: 'primary.main',
+                          transform: showCollapsed ? 'none' : 'translateX(3px)'
+                        }
+                      }}
+                    >
+                      <ListItemIcon sx={{
+                        minWidth: showCollapsed ? 'auto' : 34,
+                        justifyContent: 'center',
+                        color: isActive ? (isDark ? '#14B8A6' : '#0F766E') : 'inherit',
+                        '& .MuiSvgIcon-root': {
+                          fontSize: 20
+                        }
+                      }}>
+                        {item.icon}
+                      </ListItemIcon>
+                      {!showCollapsed && (
+                        <ListItemText
+                          primary={item.text}
+                          primaryTypographyProps={{
+                            fontWeight: isActive ? 800 : 500,
+                            fontSize: '0.84rem',
+                            letterSpacing: '-0.01em',
+                            color: isActive ? (isDark ? '#F8FAFC' : '#042F2E') : 'inherit'
+                          }}
+                        />
+                      )}
+                    </ListItem>
+                  );
+
+                  return showCollapsed ? (
+                    <Tooltip key={item.text} title={item.text} placement="right" arrow>
+                      {linkButton}
+                    </Tooltip>
+                  ) : linkButton;
+                })}
+              </List>
+            </Box>
+          ))}
+        </Box>
+
+        {/* Footer Profile Capsule */}
+        <Box sx={{
+          p: showCollapsed ? 1.5 : 2,
+          borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.1)',
+          bgcolor: isDark ? 'rgba(0, 0, 0, 0.2)' : 'rgba(15, 118, 110, 0.02)'
+        }}>
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: showCollapsed ? 'center' : 'space-between',
+            gap: 1.5
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, overflow: 'hidden' }}>
+              <Avatar sx={{
+                width: 34,
+                height: 34,
+                fontSize: '0.8rem',
+                fontWeight: 800,
+                bgcolor: 'primary.main',
+                color: 'white',
+                boxShadow: '0 2px 8px rgba(15, 118, 110, 0.3)'
+              }}>
+                {getInitials(user?.email || profile.businessName)}
+              </Avatar>
+
+              {!showCollapsed && (
+                <Box sx={{ overflow: 'hidden' }}>
+                  <Typography sx={{ 
+                    fontSize: '0.825rem', 
+                    fontWeight: 700, 
+                    color: 'text.primary',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}>
+                    {user?.displayName || (user?.role === 'admin' ? 'Store Manager' : 'Sales Stylist')}
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary', fontWeight: 500 }}>
+                    {user?.role === 'admin' ? 'Administrator' : 'Staff Access'}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+
+            {!showCollapsed && (
+              <Tooltip title="Log out">
+                <IconButton 
+                  onClick={handleLogout} 
+                  size="small"
+                  sx={{ 
+                    color: 'error.main',
+                    p: 0.75,
+                    '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.1)' }
+                  }}
+                >
+                  <Logout fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
+        </Box>
       </Box>
-    </Box>
-  );
+    );
+  };
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: 'background.default' }}>
@@ -460,17 +487,23 @@ export default function Layout() {
         </Box>
       )}
 
-      {/* Mobile Drawer */}
+      {/* Mobile & Tablet Drawer */}
       {isMobile && (
         <Drawer
           anchor="left"
           open={mobileOpen}
           onClose={() => setMobileOpen(false)}
+          ModalProps={{
+            keepMounted: true // Improves performance on mobile and tablets
+          }}
           PaperProps={{
             sx: {
-              width: 280,
+              width: { xs: 280, sm: 300 },
+              maxWidth: '85vw',
               bgcolor: 'background.paper',
-              borderRight: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.1)'
+              backgroundImage: 'none',
+              borderRight: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.1)',
+              boxShadow: '0 20px 45px rgba(0, 0, 0, 0.35)'
             }
           }}
         >
@@ -484,25 +517,27 @@ export default function Layout() {
         <Box
           component="header"
           sx={{
-            height: 64,
-            px: { xs: 2, sm: 3 },
+            height: { xs: 58, sm: 64 },
+            px: { xs: 1.5, sm: 2.5, md: 3 },
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             bgcolor: 'background.paper',
             borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.1)',
             zIndex: 10,
-            flexShrink: 0
+            flexShrink: 0,
+            gap: 1
           }}
         >
           {/* Left: Collapse Toggle + Breadcrumbs */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 }, minWidth: 0 }}>
             <IconButton
               onClick={isMobile ? () => setMobileOpen(true) : toggleSidebarCollapse}
               size="small"
               sx={{
                 width: 36,
                 height: 36,
+                flexShrink: 0,
                 borderRadius: '9px',
                 border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(15, 118, 110, 0.15)',
                 color: 'text.primary',
@@ -513,19 +548,53 @@ export default function Layout() {
               {isMobile ? <Menu fontSize="small" /> : (isCollapsed ? <ChevronRight fontSize="small" /> : <ChevronLeft fontSize="small" />)}
             </IconButton>
 
-            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-              <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary', fontWeight: 600 }}>
+            {/* Mobile View: Compact active page title */}
+            <Typography
+              noWrap
+              sx={{
+                display: { xs: 'block', sm: 'none' },
+                fontSize: '0.88rem',
+                fontWeight: 800,
+                color: 'text.primary',
+                letterSpacing: '-0.01em',
+                maxWidth: { xs: 130, xxs: 100 }
+              }}
+            >
+              {getBreadcrumbTitle()}
+            </Typography>
+
+            {/* Tablet / iPad / Desktop Breadcrumbs */}
+            <Box sx={{ display: { xs: 'none', sm: 'block' }, minWidth: 0 }}>
+              <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary', fontWeight: 600, lineHeight: 1.2 }}>
                 Aleen Clothing CRM
               </Typography>
-              <Typography sx={{ fontSize: '0.95rem', color: 'text.primary', fontWeight: 800, letterSpacing: '-0.015em' }}>
+              <Typography sx={{ fontSize: '0.95rem', color: 'text.primary', fontWeight: 800, letterSpacing: '-0.015em', lineHeight: 1.2 }} noWrap>
                 {getBreadcrumbTitle()}
               </Typography>
             </Box>
           </Box>
 
           {/* Right: Actions, Search Capsule, Register Status, Quick Bill, Theme Toggle */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            {/* Cmd+K Global Search Capsule */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.75, sm: 1.25, md: 1.5 }, flexShrink: 0 }}>
+            {/* Mobile / Tablet Quick Search Icon Button (<900px) */}
+            <IconButton
+              onClick={() => setSearchOpen(true)}
+              size="small"
+              sx={{
+                display: { xs: 'inline-flex', md: 'none' },
+                width: 36,
+                height: 36,
+                borderRadius: '9px',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(15, 118, 110, 0.15)',
+                color: 'text.secondary',
+                '&:hover': { bgcolor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(15, 118, 110, 0.06)' }
+              }}
+              title="Search CRM (⌘K)"
+            >
+              <Search fontSize="small" />
+            </IconButton>
+
+            {/* Desktop Cmd+K Global Search Capsule (>=900px) */}
             <Button
               onClick={() => setSearchOpen(true)}
               variant="outlined"
@@ -562,7 +631,7 @@ export default function Layout() {
               />
             </Button>
 
-            {/* Live Register Active Pill */}
+            {/* Live Register Active Pill (Desktop/Large Tablet) */}
             <Chip
               icon={<Circle sx={{ fontSize: '8px !important', color: '#10B981 !important' }} />}
               label="Register: Active"
@@ -584,20 +653,27 @@ export default function Layout() {
                 variant="contained"
                 color="secondary"
                 size="small"
-                startIcon={<Add fontSize="small" />}
+                startIcon={<Add fontSize="small" sx={{ mr: { xs: -0.25, sm: 0.5 } }} />}
                 onClick={handleQuickBill}
                 title="Create Retail Invoice (Alt + N or F2)"
                 sx={{
                   height: 36,
-                  px: 2,
+                  px: { xs: 1.25, sm: 2 },
                   borderRadius: '9999px',
                   fontWeight: 800,
-                  fontSize: '0.825rem',
+                  fontSize: { xs: '0.75rem', sm: '0.825rem' },
                   boxShadow: '0 4px 14px rgba(217, 119, 6, 0.3)',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  minWidth: { xs: 36, sm: 'auto' },
+                  whiteSpace: 'nowrap'
                 }}
               >
-                Quick Bill
+                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                  Quick Bill
+                </Box>
+                <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>
+                  Bill
+                </Box>
               </Button>
             )}
 
@@ -630,15 +706,19 @@ export default function Layout() {
                 startIcon={<Logout fontSize="small" />}
                 sx={{
                   height: 36,
-                  borderRadius: '9px',
+                  borderRadius: '9999px',
                   textTransform: 'none',
                   fontWeight: 700,
                   fontSize: '0.78rem',
                   borderColor: isDark ? 'rgba(239, 68, 68, 0.35)' : 'rgba(239, 68, 68, 0.25)',
                   color: isDark ? '#FCA5A5' : '#DC2626',
                   bgcolor: isDark ? 'rgba(239, 68, 68, 0.08)' : 'rgba(254, 242, 242, 0.7)',
-                  px: { xs: 1.2, sm: 1.6 },
+                  px: { xs: 1, sm: 1.6 },
                   minWidth: { xs: 36, sm: 'auto' },
+                  '& .MuiButton-startIcon': {
+                    mr: { xs: 0, sm: 1 },
+                    ml: { xs: 0, sm: -0.5 }
+                  },
                   '&:hover': {
                     borderColor: 'error.main',
                     bgcolor: isDark ? 'rgba(239, 68, 68, 0.18)' : '#FEE2E2'
