@@ -28,7 +28,7 @@ const Invoices = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { inventory, invoices, addInvoice, updateInvoice, deleteInvoice, profile, customers, addCustomer, loading } = useData();
+  const { inventory, invoices, addInvoice, updateInvoice, deleteInvoice, profile, customers, addCustomer, loading, invoiceTemplateSettings, updateInvoiceTemplateSettings } = useData();
   const { mode } = useThemeContext();
   const [open, setOpen] = useState(false);
   const [viewInvoice, setViewInvoice] = useState(null);
@@ -41,11 +41,17 @@ const Invoices = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [successInvoice, setSuccessInvoice] = useState(null);
-  const [invoiceSettings, setInvoiceSettings] = useState(() => getStoredInvoiceSettings());
+  const [invoiceSettings, setInvoiceSettings] = useState(() => invoiceTemplateSettings || getStoredInvoiceSettings());
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [offscreenInvoice, setOffscreenInvoice] = useState(null);
   const offscreenInvoiceRef = useRef(null);
+
+  useEffect(() => {
+    if (invoiceTemplateSettings) {
+      setInvoiceSettings(invoiceTemplateSettings);
+    }
+  }, [invoiceTemplateSettings]);
 
 
   const toSentenceCase = (text) => {
@@ -3214,12 +3220,19 @@ const Invoices = () => {
                   key={tmpl.id}
                   label={tmpl.name}
                   size="small"
-                  onClick={() => {
+                  onClick={async () => {
                     const updated = { ...invoiceSettings, template: tmpl.id };
                     setInvoiceSettings(updated);
                     try {
                       localStorage.setItem('aleen_invoice_template_settings', JSON.stringify(updated));
                     } catch (e) {}
+                    if (updateInvoiceTemplateSettings) {
+                      try {
+                        await updateInvoiceTemplateSettings(updated);
+                      } catch (err) {
+                        console.error('Failed to sync invoice template:', err);
+                      }
+                    }
                   }}
                   sx={{
                     fontWeight: 700,
@@ -3448,8 +3461,16 @@ const Invoices = () => {
       <InvoiceTemplateDialog
         open={templateModalOpen}
         onClose={() => setTemplateModalOpen(false)}
-        settings={invoiceSettings}
-        onSaveSettings={(newSettings) => setInvoiceSettings(newSettings)}
+        onSaveSettings={async (newSettings) => {
+          setInvoiceSettings(newSettings);
+          if (updateInvoiceTemplateSettings) {
+            try {
+              await updateInvoiceTemplateSettings(newSettings);
+            } catch (err) {
+              console.error('Failed to sync invoice settings:', err);
+            }
+          }
+        }}
       />
 
       {/* Invoice WhatsApp Dispatch Studio & Custom Templates Dialog */}

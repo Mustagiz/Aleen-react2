@@ -205,7 +205,7 @@ export const generateInvoiceWhatsAppText = (templateText, invoice, profile) => {
   if (!invoice || !templateText) return '';
 
   const customerName = invoice.customer ? invoice.customer.trim() : 'Valued Patron';
-  const invoiceId = invoice.id || 'N/A';
+  const invoiceId = invoice.invoiceNumber || invoice.id || 'N/A';
   const invoiceDate = invoice.date
     ? new Date(invoice.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
     : new Date().toLocaleDateString('en-IN');
@@ -696,7 +696,8 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
                   size="small"
                   onClick={() => {
                     const origin = typeof window !== 'undefined' ? window.location.origin : '';
-                    const link = invoice.id ? `${origin}/bill/${invoice.id}` : '';
+                    const invRef = invoice.invoiceNumber || invoice.id;
+                    const link = invRef ? `${origin}/bill/${invRef}` : '';
                     handleInsertVariable(`📥 *Download PDF Bill:* ${link}`);
                   }}
                   sx={{ cursor: 'pointer', height: 22, fontSize: '0.7rem', fontWeight: 700, bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E' }}

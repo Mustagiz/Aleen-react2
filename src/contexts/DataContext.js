@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { collection, query, onSnapshot, doc, setDoc, updateDoc, deleteDoc, writeBatch, getDoc, where, getDocs } from 'firebase/firestore';
+import { DEFAULT_INVOICE_SETTINGS, getStoredInvoiceSettings } from '../constants/invoiceTemplates';
 
 const capitalizeName = (name) => {
   return name.replace(/\b\w/g, (l) => l.toUpperCase());
@@ -33,6 +34,7 @@ export const DataProvider = ({ children }) => {
   const [purchases, setPurchases] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [expenseCategories, setExpenseCategories] = useState(['General', 'Rent', 'Electricity', 'Water', 'Repairs', 'Staff Welfare', 'Marketing', 'Courier', 'Stationery', 'Others']);
+  const [invoiceTemplateSettings, setInvoiceTemplateSettings] = useState(() => getStoredInvoiceSettings());
   const [loading, setLoading] = useState(true);
 
   // Real-time synchronization
@@ -105,6 +107,16 @@ export const DataProvider = ({ children }) => {
       }
     }, onError('expense_categories'));
 
+    const unsubInvoiceTemplate = onSnapshot(doc(db, 'settings', 'invoiceTemplate'), (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        setInvoiceTemplateSettings(prev => ({ ...prev, ...data }));
+        try {
+          localStorage.setItem('aleen_invoice_template_settings', JSON.stringify(data));
+        } catch (e) {}
+      }
+    }, onError('invoiceTemplate'));
+
     return () => {
       if (unsubInventory) unsubInventory();
       if (unsubInvoices) unsubInvoices();
@@ -117,6 +129,7 @@ export const DataProvider = ({ children }) => {
       if (unsubCategories) unsubCategories();
       if (unsubExpenseCategories) unsubExpenseCategories();
       if (unsubMarketingTemplates) unsubMarketingTemplates();
+      if (unsubInvoiceTemplate) unsubInvoiceTemplate();
       clearTimeout(safetyTimer);
     };
   }, []);
@@ -453,10 +466,12 @@ export const DataProvider = ({ children }) => {
     const balanceDue = Math.max(0, invoice.total - totalPaid);
     const calculatedStatus = balanceDue === 0 ? 'paid' : (totalPaid > 0 ? 'partial' : 'pending');
 
+    const activeTemplate = invoice?.template || invoiceTemplateSettings?.template || 'atelier-emerald';
     const newInvoice = {
       ...invoice,
       id,
       invoiceNumber,
+      template: activeTemplate,
       totalPaid,
       balanceDue,
       paymentStatus: invoice.paymentStatus || calculatedStatus
@@ -607,6 +622,20 @@ export const DataProvider = ({ children }) => {
 
   const updateProfile = async (updates) => {
     await setDoc(doc(db, 'settings', 'profile'), { ...profile, ...updates });
+  };
+
+  const updateInvoiceTemplateSettings = async (updates) => {
+    try {
+      const merged = { ...invoiceTemplateSettings, ...updates };
+      setInvoiceTemplateSettings(merged);
+      try {
+        localStorage.setItem('aleen_invoice_template_settings', JSON.stringify(merged));
+      } catch (e) {}
+      await setDoc(doc(db, 'settings', 'invoiceTemplate'), merged, { merge: true });
+    } catch (e) {
+      console.error('Error saving invoice template settings:', e);
+      throw e;
+    }
   };
 
   const addCustomer = async (customer) => {
@@ -798,6 +827,8 @@ export const DataProvider = ({ children }) => {
       deleteInvoice,
       profile,
       updateProfile,
+      invoiceTemplateSettings,
+      updateInvoiceTemplateSettings,
       updateCategories,
       updateExpenseCategories,
       customers,

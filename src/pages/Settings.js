@@ -61,7 +61,7 @@ import PageHeader from '../components/crm/PageHeader';
 import { INVOICE_TEMPLATES, DEFAULT_INVOICE_SETTINGS, getStoredInvoiceSettings } from '../constants/invoiceTemplates';
 
 export default function Settings() {
-  const { profile, updateProfile } = useData();
+  const { profile, updateProfile, updateInvoiceTemplateSettings } = useData();
   const {
     user,
     changePassword,
@@ -205,6 +205,9 @@ export default function Settings() {
         customFooterNote: formProfile.customFooterNote
       };
       localStorage.setItem('aleen_invoice_template_settings', JSON.stringify(updatedInvoiceSettings));
+      if (updateInvoiceTemplateSettings) {
+        await updateInvoiceTemplateSettings(updatedInvoiceSettings);
+      }
 
       showToast('Boutique configuration saved! Invoices will now reflect these details.', 'success');
     } catch (err) {

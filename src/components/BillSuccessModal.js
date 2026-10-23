@@ -104,7 +104,8 @@ const BillSuccessModal = ({
 
   const getCustomerBillLink = () => {
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    return invoice?.id ? `${origin}/bill/${invoice.id}` : `${origin}/invoices`;
+    const invRef = invoice?.invoiceNumber || invoice?.id;
+    return invRef ? `${origin}/bill/${invRef}` : `${origin}/invoices`;
   };
 
   // Compile WhatsApp text template (now includes direct PDF download link)

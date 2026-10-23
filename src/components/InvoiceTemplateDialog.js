@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -32,6 +32,7 @@ import {
   Visibility
 } from '@mui/icons-material';
 import { INVOICE_TEMPLATES, DEFAULT_INVOICE_SETTINGS } from '../constants/invoiceTemplates';
+import { useData } from '../contexts/DataContext';
 import InvoicePrint from './InvoicePrint';
 
 const SAMPLE_INVOICE = {
@@ -55,10 +56,21 @@ const SAMPLE_INVOICE = {
 };
 
 export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveSettings }) {
+  const dataCtx = useData() || {};
+  const { updateInvoiceTemplateSettings } = dataCtx;
+
   const [tabIndex, setTabIndex] = useState(0);
-  const [localSettings, setLocalSettings] = useState(settings || DEFAULT_INVOICE_SETTINGS);
+  const [localSettings, setLocalSettings] = useState(() => settings || dataCtx.invoiceTemplateSettings || DEFAULT_INVOICE_SETTINGS);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    if (settings) {
+      setLocalSettings(settings);
+    } else if (dataCtx.invoiceTemplateSettings) {
+      setLocalSettings(dataCtx.invoiceTemplateSettings);
+    }
+  }, [settings, dataCtx.invoiceTemplateSettings]);
 
   const handleTemplateSelect = (templateId) => {
     setLocalSettings(prev => ({ ...prev, template: templateId }));
@@ -93,14 +105,21 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const handleSave = () => {
-    localStorage.setItem('aleen_invoice_template_settings', JSON.stringify(localSettings));
-    if (onSaveSettings) onSaveSettings(localSettings);
-    setSaveSuccess(true);
-    setTimeout(() => {
-      setSaveSuccess(false);
-      onClose();
-    }, 600);
+  const handleSave = async () => {
+    try {
+      localStorage.setItem('aleen_invoice_template_settings', JSON.stringify(localSettings));
+      if (updateInvoiceTemplateSettings) {
+        await updateInvoiceTemplateSettings(localSettings);
+      }
+      if (onSaveSettings) onSaveSettings(localSettings);
+      setSaveSuccess(true);
+      setTimeout(() => {
+        setSaveSuccess(false);
+        onClose();
+      }, 600);
+    } catch (err) {
+      console.error('Error saving template settings:', err);
+    }
   };
 
   return (

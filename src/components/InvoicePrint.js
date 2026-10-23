@@ -13,12 +13,14 @@ import {
 import { useData } from '../contexts/DataContext';
 import { getStoredInvoiceSettings } from '../constants/invoiceTemplates';
 
-const InvoicePrint = forwardRef(({ invoice, template, settings }, ref) => {
-  const { profile = {} } = useData();
+const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profileProp }, ref) => {
+  const dataCtx = useData() || {};
+  const profile = profileProp || dataCtx.profile || {};
+  const contextSettings = dataCtx.invoiceTemplateSettings;
 
-  // Load settings if not passed
-  const activeSettings = settings || getStoredInvoiceSettings();
-  const activeTemplate = template || activeSettings.template || 'atelier-emerald';
+  // Load settings: prop settings -> context settings -> stored settings
+  const activeSettings = settings || contextSettings || getStoredInvoiceSettings();
+  const activeTemplate = template || activeSettings?.template || invoice?.template || 'atelier-emerald';
 
   // Template Theme Colors & Styles
   const getThemeStyles = () => {
