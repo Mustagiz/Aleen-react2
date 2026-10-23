@@ -535,7 +535,16 @@ const PublicBillView = () => {
 
         {/* Pixel-Perfect CRM Invoice Component */}
         {/* Renders the exact template active in the CRM (Atelier Emerald, Champagne Gold, Minimal Haute, or Boutique Slip) */}
-        <Box sx={{ width: '100%' }}>
+        <Box
+          sx={{
+            width: '100%',
+            overflowX: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            pb: 2,
+            '&::-webkit-scrollbar': { height: 6 },
+            '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(0,0,0,0.15)', borderRadius: 3 }
+          }}
+        >
           <InvoicePrint
             ref={printRef}
             invoice={invoice}

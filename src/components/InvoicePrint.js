@@ -92,11 +92,12 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
       id="printable-invoice"
       className="printable-area"
       sx={{
-        p: isSlip ? { xs: 2, sm: 2.5 } : { xs: 2.5, sm: 4 },
+        p: isSlip ? 2.5 : 4,
         bgcolor: '#FFFFFF',
         color: '#0F172A',
-        maxWidth: isSlip ? 480 : 840,
-        width: '100%',
+        maxWidth: isSlip ? 480 : 800,
+        minWidth: isSlip ? 360 : 760,
+        width: isSlip ? '100%' : '800px',
         mx: 'auto',
         position: 'relative',
         boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
@@ -109,6 +110,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
         '@media print': {
           p: isSlip ? '3mm 2mm' : '6mm 6mm 10mm 6mm',
           maxWidth: isSlip ? '80mm' : '100%',
+          minWidth: 'auto',
           width: '100%',
           boxShadow: 'none',
           borderRadius: 0,
@@ -125,7 +127,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
             top: '48%',
             left: '50%',
             transform: 'translate(-50%, -50%) rotate(-30deg)',
-            fontSize: { xs: '3.5rem', sm: '6.5rem' },
+            fontSize: '6.5rem',
             fontWeight: 900,
             color: theme.watermarkColor,
             letterSpacing: '0.2em',
@@ -170,7 +172,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
             Ph: {profile.phone} | GST: {profile.gstin}
           </Typography>
           <Box sx={{ mt: 1.5, display: 'inline-block', px: 2, py: 0.5, bgcolor: '#f1f5f9', borderRadius: 1, fontWeight: 800, fontSize: '0.8rem' }}>
-            RETAIL SLIP #{invoice.id}
+            RETAIL SLIP #{invoice.invoiceNumber || invoice.id}
           </Box>
         </Box>
       ) : (
@@ -192,9 +194,9 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
             zIndex: 1,
             boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
             display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
+            flexDirection: 'row',
             justifyContent: 'space-between',
-            alignItems: { xs: 'flex-start', sm: 'center' },
+            alignItems: 'center',
             gap: 2,
             pageBreakInside: 'avoid',
             breakInside: 'avoid',
@@ -202,13 +204,13 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
             printColorAdjust: 'exact'
           }}
         >
-          <Box sx={{ flex: 1, pr: { sm: 2 } }}>
+          <Box sx={{ flex: 1, pr: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography variant="caption" sx={{ letterSpacing: 2, color: '#FDE68A', fontWeight: 800, textTransform: 'uppercase' }}>
                 ✂️ {profile.tagline || activeSettings.tagline || 'Haute Couture & Bespoke Craft'}
               </Typography>
             </Box>
-            <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: -0.5, mt: 0.5, color: '#FFFFFF', fontSize: { xs: '1.4rem', sm: '1.75rem' } }}>
+            <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: -0.5, mt: 0.5, color: '#FFFFFF', fontSize: '1.75rem' }}>
               {profile.businessName || 'Aleen Clothing'}
             </Typography>
             <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)', mt: 0.5, fontSize: '0.82rem' }}>
@@ -219,7 +221,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
             </Typography>
           </Box>
 
-          <Box sx={{ textAlign: { xs: 'left', sm: 'right' }, minWidth: { sm: 220 } }}>
+          <Box sx={{ textAlign: 'right', minWidth: 220 }}>
             <Typography
               variant="h3"
               sx={{
@@ -227,14 +229,14 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                 letterSpacing: 2,
                 color: '#FFFFFF',
                 opacity: 0.95,
-                fontSize: { xs: '1.5rem', sm: '2rem' }
+                fontSize: '2rem'
               }}
             >
               TAX INVOICE
             </Typography>
             <Box sx={{ display: 'inline-block', bgcolor: 'rgba(255,255,255,0.18)', px: 1.5, py: 0.4, borderRadius: 1, mt: 0.5 }}>
               <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#FDE68A', letterSpacing: 0.5 }}>
-                #{invoice.id}
+                #{invoice.invoiceNumber || invoice.id}
               </Typography>
             </Box>
             <Typography variant="caption" sx={{ display: 'block', color: 'rgba(255,255,255,0.8)', mt: 0.8 }}>
@@ -256,9 +258,9 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
           position: 'relative',
           zIndex: 1,
           display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
+          flexDirection: 'row',
           justifyContent: 'space-between',
-          alignItems: { xs: 'flex-start', sm: 'flex-start' },
+          alignItems: 'flex-start',
           gap: 2,
           pageBreakInside: 'avoid',
           breakInside: 'avoid'
@@ -278,7 +280,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
           )}
         </Box>
 
-        <Box sx={{ textAlign: { xs: 'left', sm: 'right' } }}>
+        <Box sx={{ textAlign: 'right' }}>
           <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
             Payment Method: <b>{invoice.paymentMethod || 'Cash'}</b>
           </Typography>
@@ -524,7 +526,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
         </Box>
 
         {!isSlip && (profile.showSignatureStamp ?? activeSettings.showSignatureStamp) && (
-          <Box sx={{ textAlign: 'center', width: { xs: '100%', sm: '30%' }, minWidth: 160 }}>
+          <Box sx={{ textAlign: 'center', width: '30%', minWidth: 160 }}>
             {(profile.signatureImage || activeSettings.signatureImage) ? (
               <Box sx={{ minHeight: 46, maxHeight: 60, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', mb: 0.5 }}>
                 <img
