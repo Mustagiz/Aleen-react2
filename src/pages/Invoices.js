@@ -1310,7 +1310,7 @@ const Invoices = () => {
     }
   };
 
-  const sharePDF = async (invoice) => {
+  const sharePDF = async (invoice, customPhone = null, customMessage = null) => {
     if (!invoice) return;
     try {
       setIsExportingPDF(true);
@@ -1335,19 +1335,32 @@ const Invoices = () => {
 
       const pdfBlob = doc.output('blob');
       const file = new File([pdfBlob], `invoice-${invoice.id}.pdf`, { type: 'application/pdf' });
+      const businessName = profile?.businessName || 'Aleen Clothing';
+      const shareText = customMessage || `Official Boutique Invoice #${invoice.id} from ${businessName}`;
 
-      if (navigator.share && navigator.canShare({ files: [file] })) {
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
           title: `Invoice #${invoice.id}`,
-          text: `Invoice from ${profile.businessName}`
+          text: shareText
         });
+        return { success: true, method: 'native-share' };
       } else {
+        // Desktop / non-WebShare browser fallback: save PDF and open WhatsApp chat
         doc.save(`invoice-${invoice.id}.pdf`);
-        alert('Sharing is not supported on this browser. The invoice has been downloaded instead.');
+        const targetPhone = (customPhone || invoice.phone || '').replace(/[^0-9]/g, '');
+        let formattedPhone = targetPhone;
+        if (formattedPhone && !formattedPhone.startsWith('91') && formattedPhone.length === 10) {
+          formattedPhone = '91' + formattedPhone;
+        }
+        const encodedText = encodeURIComponent(shareText);
+        const waUrl = formattedPhone ? `https://wa.me/${formattedPhone}?text=${encodedText}` : `https://wa.me/?text=${encodedText}`;
+        window.open(waUrl, '_blank');
+        return { success: true, method: 'download-and-open-whatsapp' };
       }
     } catch (error) {
       console.error('Error sharing PDF:', error);
+      throw error;
     } finally {
       setOffscreenInvoice(null);
       setIsExportingPDF(false);
@@ -3300,6 +3313,7 @@ const Invoices = () => {
         profile={profile}
         onPrint={handlePrint}
         onDownloadPDF={downloadPDF}
+        onSharePDF={sharePDF}
         isDownloadingPDF={isExportingPDF}
         onOpenAdvancedWhatsApp={(inv) => sendWhatsApp(inv)}
         onNewBill={() => {
@@ -3444,6 +3458,7 @@ const Invoices = () => {
         }}
         invoice={whatsAppInvoice}
         profile={profile}
+        onSharePDF={sharePDF}
       />
 
       {/* Hidden offscreen container for pixel-perfect PDF export */}

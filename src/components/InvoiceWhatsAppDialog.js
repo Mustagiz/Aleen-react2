@@ -37,7 +37,8 @@ import {
   FormatListBulleted,
   Storefront,
   CurrencyRupee,
-  DoneAll
+  DoneAll,
+  PictureAsPdf
 } from '@mui/icons-material';
 
 export const INVOICE_WHATSAPP_TEMPLATES = [
@@ -257,7 +258,7 @@ const renderWhatsAppFormattedText = (rawText) => {
   });
 };
 
-const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile }) => {
+const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -339,6 +340,22 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile }) => {
 
     window.open(url, '_blank');
     onClose();
+  };
+
+  const handleSendPDFWhatsApp = async () => {
+    if (!invoice) return;
+    try {
+      if (onSharePDF) {
+        await onSharePDF(invoice, recipientPhone, messageText);
+        onClose();
+      } else {
+        handleSendWhatsApp();
+      }
+    } catch (err) {
+      console.error('Error sharing PDF on WhatsApp:', err);
+      setSnackbar({ open: true, message: 'Failed to share PDF. Opening text bill instead.', severity: 'error' });
+      handleSendWhatsApp();
+    }
   };
 
   if (!invoice) return null;
@@ -738,7 +755,7 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile }) => {
           Copy Message
         </Button>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
           <Button
             onClick={onClose}
             sx={{ fontWeight: 600, color: 'text.secondary', px: 2 }}
@@ -747,12 +764,35 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile }) => {
           </Button>
 
           <Button
+            onClick={handleSendPDFWhatsApp}
+            variant="outlined"
+            size="large"
+            startIcon={<PictureAsPdf sx={{ fontSize: 20, color: '#0F766E' }} />}
+            sx={{
+              px: 3,
+              py: 1.1,
+              borderRadius: '24px',
+              fontWeight: 800,
+              fontSize: '0.9rem',
+              borderColor: '#0F766E',
+              color: '#0F766E',
+              textTransform: 'none',
+              '&:hover': {
+                borderColor: '#0D6861',
+                bgcolor: 'rgba(15, 118, 110, 0.08)'
+              }
+            }}
+          >
+            Send PDF Bill
+          </Button>
+
+          <Button
             onClick={handleSendWhatsApp}
             variant="contained"
             size="large"
             startIcon={<WhatsApp sx={{ fontSize: 22 }} />}
             sx={{
-              px: 4,
+              px: 3.5,
               py: 1.1,
               borderRadius: '24px',
               fontWeight: 800,
@@ -768,7 +808,7 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile }) => {
               }
             }}
           >
-            Send via WhatsApp
+            Send Text Bill
           </Button>
         </Box>
       </DialogActions>
