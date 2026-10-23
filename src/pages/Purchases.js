@@ -928,7 +928,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
             {tabValue === 0 && (
                 <>
                     {/* Atelier KPI Summary Cards (4-Card Procurement Suite) */}
-                    <Grid container spacing={2.5} sx={{ mb: 3 }}>
+                    <Grid container spacing={2.5} sx={{ mb: 3 }} alignItems="stretch">
                         <Grid item xs={12} sm={6} md={3}>
                             <AtelierKpiCard
                                 title="Total Procurement Orders"
@@ -947,36 +947,13 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                             />
                         </Grid>
                         <Grid item xs={12} sm={6} md={3}>
-                            <Paper
-                                elevation={0}
-                                sx={{
-                                    p: 2.5,
-                                    borderRadius: 3,
-                                    border: '1px solid',
-                                    borderColor: overdueCount > 0 ? 'rgba(239, 68, 68, 0.4)' : 'divider',
-                                    bgcolor: overdueCount > 0 
-                                        ? (theme.palette.mode === 'dark' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(239, 68, 68, 0.05)')
-                                        : (theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'background.paper'),
-                                    transition: 'all 0.2s ease',
-                                    position: 'relative',
-                                    overflow: 'hidden'
-                                }}
-                            >
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                                    <Typography variant="overline" sx={{ fontWeight: 800, color: overdueCount > 0 ? '#DC2626' : 'text.secondary', letterSpacing: '0.08em' }}>
-                                        Overdue Deliveries
-                                    </Typography>
-                                    <Avatar sx={{ bgcolor: overdueCount > 0 ? 'rgba(239, 68, 68, 0.15)' : 'rgba(100, 116, 139, 0.1)', color: overdueCount > 0 ? '#DC2626' : '#64748B', width: 34, height: 34 }}>
-                                        <Warning sx={{ fontSize: '1.1rem' }} />
-                                    </Avatar>
-                                </Box>
-                                <Typography variant="h4" sx={{ fontWeight: 900, color: overdueCount > 0 ? '#DC2626' : 'text.primary', mb: 0.5 }}>
-                                    {overdueCount}
-                                </Typography>
-                                <Typography variant="caption" sx={{ color: overdueCount > 0 ? '#DC2626' : 'text.secondary', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                    {overdueCount > 0 ? '⚠️ Mill shipments past scheduled delivery' : 'All pending orders on schedule'}
-                                </Typography>
-                            </Paper>
+                            <AtelierKpiCard
+                                title="Overdue Deliveries"
+                                value={overdueCount}
+                                icon={<Warning fontSize="small" />}
+                                redAccent={overdueCount > 0}
+                                subtitle={overdueCount > 0 ? 'Mill shipments past scheduled delivery' : 'All pending orders on schedule'}
+                            />
                         </Grid>
                         <Grid item xs={12} sm={6} md={3}>
                             <AtelierKpiCard

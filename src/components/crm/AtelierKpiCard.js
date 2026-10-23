@@ -10,6 +10,7 @@ export default function AtelierKpiCard({
   trend,
   trendPositive = true,
   goldAccent = false,
+  redAccent = false,
   onClick
 }) {
   const theme = useTheme();
@@ -24,6 +25,42 @@ export default function AtelierKpiCard({
     ? Boolean(trend.isPositive)
     : Boolean(trendPositive);
 
+  const getBorderColor = () => {
+    if (redAccent) return '1px solid rgba(239, 68, 68, 0.3)';
+    if (goldAccent) return '1px solid rgba(217, 119, 6, 0.3)';
+    return isDark ? '1px solid rgba(20, 184, 166, 0.15)' : '1px solid rgba(15, 118, 110, 0.12)';
+  };
+
+  const getTopGradient = () => {
+    if (redAccent) return 'linear-gradient(90deg, #DC2626 0%, #EF4444 100%)';
+    if (goldAccent) return 'linear-gradient(90deg, #D97706 0%, #F59E0B 100%)';
+    return 'linear-gradient(90deg, #0F766E 0%, #14B8A6 100%)';
+  };
+
+  const getHoverBorderColor = () => {
+    if (redAccent) return '#DC2626';
+    if (goldAccent) return '#D97706';
+    return '#0F766E';
+  };
+
+  const getHoverShadow = () => {
+    if (redAccent) return '0 8px 25px rgba(239, 68, 68, 0.18)';
+    if (goldAccent) return '0 8px 25px rgba(217, 119, 6, 0.18)';
+    return '0 8px 25px rgba(15, 118, 110, 0.14)';
+  };
+
+  const getIconBg = () => {
+    if (redAccent) return isDark ? 'rgba(239, 68, 68, 0.15)' : '#FEE2E2';
+    if (goldAccent) return isDark ? 'rgba(217, 119, 6, 0.15)' : '#FEF3C7';
+    return isDark ? 'rgba(15, 118, 110, 0.18)' : '#F0FDFA';
+  };
+
+  const getIconColor = () => {
+    if (redAccent) return '#DC2626';
+    if (goldAccent) return '#D97706';
+    return '#0F766E';
+  };
+
   return (
     <Card
       onClick={onClick}
@@ -36,20 +73,14 @@ export default function AtelierKpiCard({
         background: isDark
           ? 'linear-gradient(135deg, rgba(16, 32, 32, 0.95) 0%, rgba(8, 18, 18, 0.98) 100%)'
           : '#FFFFFF',
-        border: goldAccent
-          ? '1px solid rgba(217, 119, 6, 0.3)'
-          : isDark
-            ? '1px solid rgba(20, 184, 166, 0.15)'
-            : '1px solid rgba(15, 118, 110, 0.12)',
+        border: getBorderColor(),
         boxShadow: isDark
           ? '0 4px 20px rgba(0, 0, 0, 0.5)'
           : '0 4px 20px -2px rgba(15, 118, 110, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02)',
         '&:hover': onClick ? {
           transform: 'translateY(-3px)',
-          boxShadow: goldAccent
-            ? '0 8px 25px rgba(217, 119, 6, 0.18)'
-            : '0 8px 25px rgba(15, 118, 110, 0.14)',
-          borderColor: goldAccent ? '#D97706' : '#0F766E'
+          boxShadow: getHoverShadow(),
+          borderColor: getHoverBorderColor()
         } : {}
       }}
     >
@@ -61,9 +92,7 @@ export default function AtelierKpiCard({
           left: 0,
           right: 0,
           height: '3px',
-          background: goldAccent
-            ? 'linear-gradient(90deg, #D97706 0%, #F59E0B 100%)'
-            : 'linear-gradient(90deg, #0F766E 0%, #14B8A6 100%)'
+          background: getTopGradient()
         }}
       />
 
@@ -102,10 +131,8 @@ export default function AtelierKpiCard({
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                background: goldAccent
-                  ? isDark ? 'rgba(217, 119, 6, 0.15)' : '#FEF3C7'
-                  : isDark ? 'rgba(15, 118, 110, 0.18)' : '#F0FDFA',
-                color: goldAccent ? '#D97706' : '#0F766E'
+                background: getIconBg(),
+                color: getIconColor()
               }}
             >
               {icon}
