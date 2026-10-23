@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Breadcrumbs, Link, Stack, useTheme } from '@mui/material';
+import { Box, Typography, Breadcrumbs, Link } from '@mui/material';
 import { NavigateNext } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,7 +10,6 @@ export default function PageHeader({
   actions, 
   badge 
 }) {
-  const theme = useTheme();
   const navigate = useNavigate();
 
   return (
@@ -96,18 +95,18 @@ export default function PageHeader({
         </Box>
 
         {actions && (
-          <Stack 
-            direction="row" 
-            spacing={1.5} 
+          <Box 
             sx={{ 
+              display: 'flex',
               alignItems: 'center', 
               flexWrap: 'wrap',
+              gap: 1.25,
               width: { xs: '100%', sm: 'auto' },
               justifyContent: { xs: 'flex-start', sm: 'flex-end' }
             }}
           >
             {actions}
-          </Stack>
+          </Box>
         )}
       </Box>
     </Box>
