@@ -24,6 +24,7 @@ import InvoiceWhatsAppDialog from '../components/InvoiceWhatsAppDialog';
 import BillSuccessModal from '../components/BillSuccessModal';
 import { printInvoiceElement } from '../utils/printInvoice';
 import CashDrawerShiftModal from '../components/crm/CashDrawerShiftModal';
+import { calculateInvoiceTotals, calculateTenderSettlement } from '../engine/billingEngine';
 
 const Invoices = () => {
   const location = useLocation();
@@ -819,26 +820,13 @@ const Invoices = () => {
   };
 
   const calculateTotal = () => {
-    const subtotal = selectedItems.reduce((sum, item) => {
-      if (item.isCustom) {
-        return sum + (parseFloat(item.customPrice || 0) * item.quantity);
-      }
-      const invItem = inventory.find(i => i.id === item.id);
-      if (invItem && invItem.hasVariants && item.variantSku) {
-        const variant = invItem.variants.find(v => v.sku === item.variantSku);
-        return sum + (variant ? (parseFloat(variant.price) || invItem.price) * item.quantity : invItem.price * item.quantity);
-      }
-      return sum + (invItem ? invItem.price * item.quantity : 0);
-      return sum + (invItem ? invItem.price * item.quantity : 0);
-    }, 0);
-    const taxValue = parseFloat(tax) || 0;
-    const taxAmount = subtotal * (taxValue / 100);
-
-    const percentDisc = subtotal * ((parseFloat(discountPercent) || 0) / 100);
-    const absDiscount = percentDisc + (parseFloat(discountAmount) || 0);
-
-    const total = subtotal + taxAmount - absDiscount;
-    return { subtotal, taxAmount, total, absDiscount };
+    return calculateInvoiceTotals({
+      items: selectedItems,
+      inventory,
+      taxPercent: tax,
+      discountPercent,
+      discountAmount
+    });
   };
 
   const handleSaveInvoice = async () => {
@@ -857,7 +845,6 @@ const Invoices = () => {
     }
 
     let finalCustomerId = selectedCustomerId;
-
     const finalCustomerName = toSentenceCase(customer.trim()) || 'Walk-in';
 
     // Auto-Customer logic: If no customer ID but we have name/phone, check if exists or add
@@ -882,33 +869,21 @@ const Invoices = () => {
       startDate: new Date().toISOString()
     } : null;
 
-    const tender1Amount = isSplitPayment ? Number(splitAmount || 0) : total;
-    const tender2Amount = isSplitPayment ? Math.max(0, Number((total - (Number(splitAmount) || 0)).toFixed(2))) : 0;
-    
-    let calculatedPaidAmount = total;
-    let computedPaymentStatus = paymentStatus;
-    if (isSplitPayment) {
-      const t1Paid = paymentMethod === 'Credit' ? 0 : tender1Amount;
-      const t2Paid = paymentMethod2 === 'Credit' ? 0 : tender2Amount;
-      calculatedPaidAmount = t1Paid + t2Paid;
-      if (calculatedPaidAmount >= total) {
-        computedPaymentStatus = 'paid';
-      } else if (calculatedPaidAmount > 0) {
-        computedPaymentStatus = 'partial';
-      } else {
-        computedPaymentStatus = 'pending';
-      }
-    } else {
-      if (paymentMethod === 'Credit' || paymentStatus === 'pending') {
-        calculatedPaidAmount = 0;
-        computedPaymentStatus = 'pending';
-      } else if (paymentStatus === 'partial') {
-        calculatedPaidAmount = Number(splitAmount || 0);
-      } else {
-        calculatedPaidAmount = total;
-        computedPaymentStatus = 'paid';
-      }
-    }
+    const {
+      tender1Amount,
+      tender2Amount,
+      calculatedPaidAmount,
+      balanceDue,
+      computedPaymentStatus,
+      payments
+    } = calculateTenderSettlement({
+      total,
+      isSplitPayment,
+      paymentMethod,
+      paymentMethod2,
+      splitAmount,
+      paymentStatus
+    });
 
     const invoice = {
       id: invoiceNumber,
@@ -951,7 +926,7 @@ const Invoices = () => {
       total,
       paymentStatus: computedPaymentStatus,
       paidAmount: calculatedPaidAmount,
-      balanceDue: Math.max(0, Number((total - calculatedPaidAmount).toFixed(2))),
+      balanceDue,
       isSplitPayment: Boolean(isSplitPayment),
       splitDetails: isSplitPayment ? {
         tender1: { method: paymentMethod, amount: tender1Amount },

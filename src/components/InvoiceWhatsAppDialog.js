@@ -40,6 +40,7 @@ import {
   DoneAll,
   PictureAsPdf
 } from '@mui/icons-material';
+import { dispatchMessage, normalizePhoneNumber } from '../services/messageDispatcher';
 
 export const INVOICE_WHATSAPP_TEMPLATES = [
   {
@@ -390,18 +391,11 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
 
   const handleSendWhatsApp = () => {
     if (!messageText) return;
-    const cleanPhone = (recipientPhone || '').replace(/[^0-9]/g, '');
-    let formattedPhone = cleanPhone;
-    if (formattedPhone && !formattedPhone.startsWith('91') && formattedPhone.length === 10) {
-      formattedPhone = '91' + formattedPhone;
-    }
-
-    const encodedText = encodeURIComponent(messageText);
-    const url = formattedPhone
-      ? `https://wa.me/${formattedPhone}?text=${encodedText}`
-      : `https://wa.me/?text=${encodedText}`;
-
-    window.open(url, '_blank');
+    dispatchMessage({
+      channel: 'whatsapp',
+      phone: recipientPhone,
+      message: messageText
+    });
     onClose();
   };
 

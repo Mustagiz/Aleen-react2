@@ -48,6 +48,8 @@ import { collection, addDoc, getDocs, query, orderBy, limit, serverTimestamp } f
 import { db } from '../../firebase';
 import { useData } from '../../contexts/DataContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { SalesRepository } from '../../repositories/salesRepository';
+import { dispatchMessage } from '../../services/messageDispatcher';
 
 const DENOMINATIONS = [
   { value: 500, label: '₹500 Note' },
@@ -231,16 +233,7 @@ export default function CashDrawerShiftModal({ open, onClose }) {
         notes: shiftNotes.trim()
       };
 
-      try {
-        await addDoc(collection(db, 'cash_shifts'), shiftDoc);
-      } catch (dbErr) {
-        console.warn('Writing to Firestore failed, saving locally:', dbErr);
-      }
-
-      // Also persist to localStorage
-      const local = JSON.parse(localStorage.getItem('aleen_past_shifts') || '[]');
-      local.unshift({ id: `local_${Date.now()}`, ...shiftDoc, timestamp: new Date().toISOString() });
-      localStorage.setItem('aleen_past_shifts', JSON.stringify(local.slice(0, 30)));
+      await SalesRepository.recordCashShift(shiftDoc);
       localStorage.setItem('aleen_opening_float', String(openingFloat));
 
       setSaveSuccess(true);
@@ -301,10 +294,11 @@ ${shiftNotes ? `\n📝 *Notes:* ${shiftNotes}` : ''}
 
   const handleSendWhatsAppEod = () => {
     localStorage.setItem('aleen_owner_whatsapp', ownerPhone);
-    const cleanPhone = ownerPhone.replace(/[^0-9]/g, '');
-    const encodedText = encodeURIComponent(generateWhatsAppEodText());
-    const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodedText}` : `https://wa.me/?text=${encodedText}`;
-    window.open(waUrl, '_blank');
+    dispatchMessage({
+      channel: 'whatsapp',
+      phone: ownerPhone,
+      message: generateWhatsAppEodText()
+    });
   };
 
   return (

@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { useData } from '../contexts/DataContext';
 import { getStoredInvoiceSettings } from '../constants/invoiceTemplates';
+import { numberToWordsRupees } from '../models/documentModel';
 
 const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profileProp }, ref) => {
   const dataCtx = useData() || {};
@@ -556,6 +557,11 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                 </Box>
               </>
             )}
+          </Box>
+          <Box sx={{ mt: 1, py: 0.6, px: 1.25, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 1.5, border: '1px dashed #CBD5E1' }}>
+            <Typography variant="caption" sx={{ fontSize: '0.72rem', color: 'text.secondary', display: 'block' }}>
+              <b>Amount in Words:</b> {numberToWordsRupees(invoice.total || 0)}
+            </Typography>
           </Box>
         </Box>
       </Box>
