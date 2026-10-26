@@ -3405,23 +3405,34 @@ const Invoices = () => {
         </DialogContent>
 
         <DialogActions sx={{
-          p: { xs: 2, sm: 2.5 },
+          p: { xs: 1.5, sm: 2.5 },
           bgcolor: 'background.paper',
           borderTop: '1px solid',
           borderColor: 'divider',
           display: 'flex',
-          justifyContent: 'space-between',
+          justifyContent: { xs: 'stretch', sm: 'space-between' },
           alignItems: 'center'
         }}>
           <Button
             onClick={() => setOpen(false)}
             variant="text"
-            sx={{ fontWeight: 700, color: 'text.secondary', px: 2 }}
+            sx={{
+              fontWeight: 700,
+              color: 'text.secondary',
+              px: 2,
+              display: { xs: 'none', sm: 'inline-flex' }
+            }}
           >
             Cancel
           </Button>
 
-          <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+          <Box sx={{
+            display: 'flex',
+            gap: { xs: 1, sm: 1.5 },
+            alignItems: 'center',
+            width: { xs: '100%', sm: 'auto' },
+            justifyContent: { xs: 'space-between', sm: 'flex-end' }
+          }}>
             <Button
               onClick={handleParkCart}
               variant="outlined"
@@ -3429,11 +3440,13 @@ const Invoices = () => {
               startIcon={<PauseCircleOutline sx={{ fontSize: 17 }} />}
               sx={{
                 borderRadius: '8px',
-                px: 2,
-                py: 0.75,
+                px: { xs: 1.5, sm: 2 },
+                py: 0.85,
                 fontWeight: 700,
                 fontSize: '0.82rem',
                 textTransform: 'none',
+                whiteSpace: 'nowrap',
+                flex: { xs: 1, sm: 'initial' },
                 color: mode === 'dark' ? '#FBBF24' : '#92400E',
                 borderColor: mode === 'dark' ? 'rgba(251, 191, 36, 0.35)' : 'rgba(217, 119, 6, 0.35)',
                 bgcolor: mode === 'dark' ? 'rgba(251, 191, 36, 0.06)' : 'rgba(217, 119, 6, 0.04)',
@@ -3453,16 +3466,19 @@ const Invoices = () => {
               size="small"
               startIcon={<ReceiptLong sx={{ fontSize: 17 }} />}
               sx={{
-                px: 2.2,
-                py: 0.75,
+                px: { xs: 2, sm: 2.2 },
+                py: 0.85,
                 borderRadius: '8px',
                 fontWeight: 800,
                 fontSize: '0.82rem',
+                whiteSpace: 'nowrap',
+                flex: { xs: 1.4, sm: 'initial' },
                 background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
                 color: '#ffffff',
                 boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
                 display: 'inline-flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: 0.8,
                 '&:hover': {
                   background: 'linear-gradient(135deg, #115E59 0%, #022c22 100%)'
