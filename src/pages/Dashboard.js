@@ -1,29 +1,102 @@
-import React from 'react';
-import { Grid, Typography, Box, CardContent, Button, Chip, IconButton, useTheme, Avatar } from '@mui/material';
-import { TrendingUp, TrendingDown, Inventory2, Warning, AttachMoney, Receipt, Assessment, ArrowForward, MoreVert, Circle, People, ShoppingCart, AccountBalanceWallet } from '@mui/icons-material';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+import React, { useState, useMemo, useEffect } from 'react';
+import {
+  Grid,
+  Typography,
+  Box,
+  Button,
+  Chip,
+  useTheme,
+  Avatar,
+  Paper,
+  Stack
+} from '@mui/material';
+import {
+  TrendingUp,
+  Inventory2,
+  Warning,
+  AttachMoney,
+  Receipt,
+  Assessment,
+  ArrowForward,
+  Circle,
+  ShoppingCart,
+  AccountBalanceWallet,
+  Straighten,
+  PointOfSale,
+  Add
+} from '@mui/icons-material';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  ArcElement,
+  Title,
+  ChartTooltip,
+  Legend,
+  Filler
+} from 'chart.js';
 import { Bar, Line, Doughnut } from 'react-chartjs-2';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { DateRange, CalendarMonth, History, ViewWeek } from '@mui/icons-material';
 import GlassCard from '../components/GlassCard';
-import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
+import CashDrawerShiftModal from '../components/crm/CashDrawerShiftModal';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  ArcElement,
+  Title,
+  ChartTooltip,
+  Legend,
+  Filler
+);
 
 const Dashboard = () => {
-  // ... logic remains same ...
   const { user } = useAuth();
-  const { inventory, invoices, purchases, vendors, expenses, getLowStockItems } = useData();
+  const { inventory = [], invoices = [], purchases = [], vendors = [], expenses = [], getLowStockItems, profile = {} } = useData();
   const navigate = useNavigate();
   const theme = useTheme();
-  const [dateRange, setDateRange] = React.useState('7days');
+  const isDark = theme.palette.mode === 'dark';
 
-  const today = new Date();
-  today.setHours(23, 59, 59, 999);
+  const [dateRange, setDateRange] = useState('7days');
+  const [drawerModalOpen, setDrawerModalOpen] = useState(false);
 
+  // Live bespoke tailoring orders from localStorage
+  const [tailoringOrders, setTailoringOrders] = useState(() => {
+    try {
+      const saved = localStorage.getItem('aleen_tailoring_orders');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    const handleStorage = () => {
+      try {
+        const saved = localStorage.getItem('aleen_tailoring_orders');
+        if (saved) setTailoringOrders(JSON.parse(saved));
+      } catch (e) {}
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
+
+  const today = useMemo(() => {
+    const d = new Date();
+    d.setHours(23, 59, 59, 999);
+    return d;
+  }, []);
+
+  // Filtered dataset according to timeframe
   const getFilteredData = () => {
     const invList = invoices || [];
     const purList = purchases || [];
@@ -63,44 +136,41 @@ const Dashboard = () => {
   const { filteredInvoices = [], filteredPurchases = [], filteredExpenses = [] } = getFilteredData();
   const yesterday = new Date(Date.now() - 86400000).toDateString();
 
-  const todaySales = invoices.filter(inv => new Date(inv.date).toDateString() === today.toDateString())
+  const todaySales = invoices
+    .filter(inv => new Date(inv.date).toDateString() === today.toDateString())
     .reduce((sum, inv) => sum + (Number(inv.total) || 0), 0);
 
-  const yesterdaySales = invoices.filter(inv => new Date(inv.date).toDateString() === yesterday)
+  const yesterdaySales = invoices
+    .filter(inv => new Date(inv.date).toDateString() === yesterday)
     .reduce((sum, inv) => sum + (Number(inv.total) || 0), 0);
 
   const salesTrend = yesterdaySales === 0 ? 100 : Math.round(((todaySales - yesterdaySales) / yesterdaySales) * 100);
 
   // Dynamic Sales Title & Subtitle based on active timeframe
-  const salesKpiInfo = React.useMemo(() => {
+  const salesKpiInfo = useMemo(() => {
     switch (dateRange) {
       case '7days':
-        return { title: '7 Days Sales', subtitle: 'Past 7 days revenue' };
+        return { title: '7 Days Revenue', subtitle: 'Past 7 days collections' };
       case '30days':
-        return { title: '30 Days Sales', subtitle: 'Past 30 days revenue' };
+        return { title: '30 Days Revenue', subtitle: 'Past 30 days collections' };
       case 'thisMonth':
-        return { title: 'Month Sales', subtitle: 'This month revenue' };
+        return { title: 'Month Revenue', subtitle: 'This calendar month' };
       case 'all':
-        return { title: 'All-Time Sales', subtitle: 'All registered revenue' };
+        return { title: 'All-Time Revenue', subtitle: 'Lifetime registered revenue' };
       default:
-        return { title: "Today's Sales", subtitle: 'vs yesterday' };
+        return { title: "Today's Revenue", subtitle: 'vs yesterday' };
     }
   }, [dateRange]);
 
   const lowStockItemsList = getLowStockItems ? getLowStockItems() : [];
   const lowStockCount = lowStockItemsList.length;
-  const recentInvoices = invoices.slice(-6).reverse();
+  const recentInvoices = invoices.slice(-5).reverse();
 
   // Financial Calculations
   const totalRevenue = filteredInvoices.reduce((sum, inv) => sum + (Number(inv.total) || 0), 0);
   const totalPurchasesCost = filteredPurchases.reduce((sum, p) => sum + p.total, 0);
   const totalPaidPurchases = filteredPurchases.reduce((sum, p) => sum + (p.amountPaid || 0), 0);
-
-  // Net Cash = Sales (Cash In) - Vendor Payments (Cash Out)
   const netCash = totalRevenue - totalPaidPurchases;
-
-  // Outstanding Vendor Payments (Global, not just filtered)
-  const totalVendorPayables = vendors.reduce((sum, v) => sum + (v.balance || 0), 0);
 
   const totalCostOfGoods = filteredInvoices.reduce((sum, inv) => {
     return sum + (inv.items?.reduce((itemSum, item) => {
@@ -110,10 +180,17 @@ const Dashboard = () => {
   }, 0);
 
   const grossProfit = totalRevenue - totalCostOfGoods;
-  const totalItems = inventory.reduce((sum, item) => sum + item.quantity, 0);
-
+  const totalItems = inventory.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
   const totalInventoryValue = inventory.reduce((sum, item) => sum + (Number(item.quantity) || 0) * (Number(item.cost) || 0), 0);
   const atv = filteredInvoices.length > 0 ? (totalRevenue / filteredInvoices.length) : 0;
+
+  // Tailoring / Bespoke Atelier Order Stats
+  const activeTailoringJobs = tailoringOrders.filter(o => o.status !== 'delivered');
+  const urgentFittingsToday = tailoringOrders.filter(o => {
+    if (!o.trialDate && !o.deliveryDate) return false;
+    const targetDate = new Date(o.trialDate || o.deliveryDate).toDateString();
+    return targetDate === today.toDateString();
+  });
 
   // Top Products Calculation
   const productSales = {};
@@ -127,7 +204,7 @@ const Dashboard = () => {
   const top5ProductsData = Object.entries(productSales)
     .map(([id, qty]) => {
       const product = inventory.find(p => p.id === id);
-      return { name: product?.name || 'Unknown', quantity: qty, price: product?.price || 0 };
+      return { name: product?.name || 'Garment Item', quantity: qty, price: product?.price || 0 };
     })
     .sort((a, b) => b.quantity - a.quantity)
     .slice(0, 5);
@@ -135,64 +212,13 @@ const Dashboard = () => {
   const topProductsChartData = {
     labels: top5ProductsData.map(p => p.name),
     datasets: [{
-      label: 'Units Sold',
+      label: 'Pieces Sold',
       data: top5ProductsData.map(p => p.quantity),
-      backgroundColor: '#d97706', // Warm Amber
-      borderRadius: 8,
-      barThickness: 30,
+      backgroundColor: '#0F766E',
+      borderRadius: 6,
+      barThickness: 24,
     }]
   };
-
-  const getDateLabels = () => {
-    if (dateRange === '7days') {
-      return Array.from({ length: 7 }, (_, i) => {
-        const d = new Date();
-        d.setDate(d.getDate() - (6 - i));
-        return d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
-      });
-    } else if (dateRange === '30days') {
-      return Array.from({ length: 4 }, (_, i) => {
-        const d = new Date();
-        d.setDate(d.getDate() - (21 - i * 7));
-        return `Week ${i + 1} `;
-      });
-    } else {
-      return ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-    }
-  };
-
-  const labels = getDateLabels();
-
-  const getSalesData = () => {
-    if (dateRange === '7days') {
-      return labels.map(dayText => {
-        return filteredInvoices
-          .filter(inv => {
-            const invDate = new Date(inv.date);
-            return invDate.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) === dayText;
-          })
-          .reduce((sum, inv) => sum + inv.total, 0);
-      });
-    } else {
-      const weekStarts = Array.from({ length: 4 }, (_, i) => {
-        const d = new Date();
-        d.setDate(d.getDate() - (28 - i * 7));
-        return d;
-      });
-      return weekStarts.map((start, i) => {
-        const end = new Date(start);
-        end.setDate(end.getDate() + 7);
-        return filteredInvoices
-          .filter(inv => {
-            const d = new Date(inv.date);
-            return d >= start && d < end;
-          })
-          .reduce((sum, inv) => sum + inv.total, 0);
-      });
-    }
-  };
-
-  const salesByPeriod = getSalesData();
 
   // Financial Trends Data (Daily/Monthly)
   const getTrendData = () => {
@@ -220,11 +246,9 @@ const Dashboard = () => {
       expMap[key] = (expMap[key] || 0) + (Number(exp.amount) || 0);
     });
 
-    // Merge labels keeping chronological order
     const rawKeys = [...new Set([...Object.keys(salesMap), ...Object.keys(expMap)])];
     const sortedKeys = rawKeys.sort((a, b) => new Date(a) - new Date(b));
-
-    const finalLabels = sortedKeys.length > 0 ? sortedKeys : ['No Data'];
+    const finalLabels = sortedKeys.length > 0 ? sortedKeys : ['Today'];
 
     return {
       labels: finalLabels,
@@ -239,66 +263,53 @@ const Dashboard = () => {
     labels: trend.labels,
     datasets: [
       {
-        label: 'Revenue',
+        label: 'Gross Sales (Revenue)',
         data: trend.sales,
-        borderColor: '#E11D48',
-        backgroundColor: 'rgba(225, 29, 72, 0.1)',
+        borderColor: '#0F766E',
+        backgroundColor: 'rgba(15, 118, 110, 0.12)',
         fill: true,
         tension: 0.4,
+        pointBackgroundColor: '#0F766E',
+        pointRadius: 4,
+        borderWidth: 2.5
       },
       {
-        label: 'Expenses',
+        label: 'Store Operating Expenses',
         data: trend.expenses,
-        borderColor: '#F59E0B',
-        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+        borderColor: '#D97706',
+        backgroundColor: 'rgba(217, 119, 6, 0.08)',
         fill: true,
         tension: 0.4,
+        pointBackgroundColor: '#D97706',
+        pointRadius: 4,
+        borderWidth: 2
       }
     ]
   };
 
-  const categorySales = filteredInvoices.reduce((acc, inv) => {
-    inv.items?.forEach(item => {
-      const category = item.category || 'General';
-      acc[category] = (acc[category] || 0) + (item.price * item.quantity);
-    });
-    return acc;
-  }, {});
-
-  const categoryChartData = {
-    labels: Object.keys(categorySales),
-    datasets: [{
-      label: 'Revenue by Category',
-      data: Object.values(categorySales),
-      backgroundColor: ['#d97706', '#f59e0b', '#fbbf24', '#fcd34d', '#78350f', '#92400e'],
-      borderWidth: 0,
-    }]
-  };
-
   const stockData = {
-    labels: ['Low', 'Medium', 'High'],
+    labels: ['Critical (≤1)', 'Optimal (2-50)', 'Surplus (>50)'],
     datasets: [{
       data: [
-        inventory.filter(i => i.quantity <= 1).length,
-        inventory.filter(i => i.quantity > 1 && i.quantity < 50).length,
-        inventory.filter(i => i.quantity >= 50).length
+        inventory.filter(i => (Number(i.quantity) || 0) <= 1).length,
+        inventory.filter(i => (Number(i.quantity) || 0) > 1 && (Number(i.quantity) || 0) < 50).length,
+        inventory.filter(i => (Number(i.quantity) || 0) >= 50).length
       ],
-      backgroundColor: ['#e53935', '#fb8c00', '#43a047'],
+      backgroundColor: ['#EF4444', '#0F766E', '#10B981'],
       borderWidth: 0,
     }]
   };
 
   const commonChartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
-      legend: {
-        display: false,
-      },
+      legend: { display: false },
       tooltip: {
-        backgroundColor: 'rgba(0,0,0,0.8)',
+        backgroundColor: 'rgba(4, 47, 46, 0.92)',
         padding: 12,
-        titleFont: { family: "'Inter', sans-serif", size: 14 },
-        bodyFont: { family: "'Inter', sans-serif", size: 13 },
+        titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 13, weight: '700' },
+        bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12 },
         cornerRadius: 8,
         displayColors: false,
       }
@@ -306,120 +317,182 @@ const Dashboard = () => {
     scales: {
       x: {
         grid: { display: false },
-        ticks: { font: { family: "'Inter', sans-serif" }, color: '#9ca3af' }
+        ticks: { font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 }, color: '#94A3B8' }
       },
       y: {
-        grid: { borderDash: [4, 4], color: '#f3f4f6', drawBorder: false },
-        ticks: { font: { family: "'Inter', sans-serif" }, color: '#9ca3af' }
+        grid: { borderDash: [4, 4], color: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(15, 118, 110, 0.08)', drawBorder: false },
+        ticks: { font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 }, color: '#94A3B8' }
       }
     }
   };
 
-  const StatCard = ({ title, value, icon, color, trend, onClick, subtitle }) => (
-    <GlassCard
-      onClick={onClick}
-      sx={{
-        height: '100%',
-        p: 0,
-        '&:hover': onClick ? {
-          transform: 'translateY(-8px)',
-          boxShadow: `0 20px 40px -8px ${color}35`,
-        } : {},
-        // Enhanced indicator
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '4px',
-          height: '100%',
-          background: `linear-gradient(180deg, ${color} 0%, ${color}80 100%)`,
-        }
-      }}
-    >
-      <CardContent sx={{ p: 2.5 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-          <Box sx={{
-            p: 1.5,
-            borderRadius: 3,
-            bgcolor: color + '15',
-            color: color,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-            {React.cloneElement(icon, { sx: { fontSize: 28 } })}
-          </Box>
-          {trend !== undefined && (
-            <Chip
-              icon={trend >= 0 ? <TrendingUp sx={{ fontSize: '14px !important' }} /> : <TrendingDown sx={{ fontSize: '14px !important' }} />}
-              label={`${Math.abs(trend)}%`}
-              size="small"
-              sx={{
-                height: 24,
-                bgcolor: trend >= 0 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                color: trend >= 0 ? '#10B981' : '#EF4444',
-                fontWeight: 700,
-                borderRadius: 1.5,
-              }}
-            />
-          )}
-        </Box>
-        <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5, letterSpacing: '-0.02em' }}>
-          {value}
-        </Typography>
-        <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.1em' }}>
-          {title}
-        </Typography>
-        {subtitle && (
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, opacity: 0.7 }}>
-            {subtitle}
-          </Typography>
-        )}
-      </CardContent>
-    </GlassCard>
-  );
-
   return (
     <Box sx={{ maxWidth: 1600, mx: 'auto' }}>
-      {/* Atelier Page Header with Breadcrumbs & Timeframe Switcher */}
-      <PageHeader
-        title="Boutique Intelligence & Overview"
-        subtitle="Real-time atelier revenue, stock health, and financial ledger"
-        breadcrumbs={[
-          { label: 'Aleen Clothing', path: '/' },
-          { label: 'Executive Dashboard' }
-        ]}
-        actions={
-          <GlassCard sx={{ p: 0.5, borderRadius: '9999px', display: 'flex', gap: 0.5 }}>
-            {[
-              { id: '7days', label: '7 Days' },
-              { id: '30days', label: '30 Days' },
-              { id: 'thisMonth', label: 'Month' },
-              { id: 'all', label: 'All' }
-            ].map((item) => (
-              <Button
-                key={item.id}
-                onClick={() => setDateRange(item.id)}
-                variant={dateRange === item.id ? 'contained' : 'text'}
+      {/* ============================================================== */}
+      {/* 1. HAUTE COUTURE EXECUTIVE WELCOME CREST                      */}
+      {/* ============================================================== */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: { xs: 2.5, sm: 3.5 },
+          mb: 3.5,
+          borderRadius: 3.5,
+          background: isDark
+            ? 'linear-gradient(135deg, #071E1C 0%, #041211 100%)'
+            : 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+          color: '#FFFFFF',
+          border: '1.5px solid rgba(217, 119, 6, 0.35)',
+          boxShadow: '0 12px 32px rgba(4, 47, 46, 0.25)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}
+      >
+        <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: { xs: 'flex-start', md: 'center' }, justifyContent: 'space-between', gap: 2.5 }}>
+          <Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.8, flexWrap: 'wrap' }}>
+              <Chip
+                label="HAUTE COUTURE ATELIER"
                 size="small"
                 sx={{
-                  px: 2,
-                  py: 0.5,
-                  borderRadius: '9999px',
-                  fontSize: '0.78rem',
-                  fontWeight: 700
+                  bgcolor: 'rgba(217, 119, 6, 0.25)',
+                  color: '#FEF08A',
+                  fontWeight: 900,
+                  fontSize: '0.66rem',
+                  letterSpacing: '0.1em',
+                  border: '1px solid rgba(217, 119, 6, 0.4)',
+                  height: 22
                 }}
-              >
-                {item.label}
-              </Button>
-            ))}
-          </GlassCard>
-        }
-      />
+              />
+              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.75)', fontWeight: 600 }}>
+                {profile.businessName || 'Aleen Clothing'} • Pune
+              </Typography>
+            </Box>
 
-      {/* KPI Cards Row 1 & 2 */}
-      <Grid container spacing={2.5} sx={{ mb: 4 }}>
+            <Typography
+              variant="h3"
+              sx={{
+                fontFamily: '"Playfair Display", Georgia, serif',
+                fontWeight: 900,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.15,
+                color: '#FFFFFF'
+              }}
+            >
+              Executive Command & Overview
+            </Typography>
+
+            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.82)', mt: 0.8, maxWidth: 650, fontSize: '0.86rem' }}>
+              Welcome back, <strong>{user?.name || user?.email?.split('@')[0] || 'Store Stylist'}</strong>. Live pulse of retail billing, custom bridal tailoring, and garment inventory.
+            </Typography>
+          </Box>
+
+          {/* Quick Action Navigation Dock */}
+          <Stack direction={{ xs: 'row' }} spacing={1} flexWrap="wrap" useFlexGap sx={{ alignSelf: { xs: 'stretch', md: 'center' } }}>
+            <Button
+              variant="contained"
+              startIcon={<Add />}
+              onClick={() => navigate('/invoices?action=new', { state: { openNewBill: true } })}
+              sx={{
+                bgcolor: '#D97706',
+                color: '#FFFFFF',
+                fontWeight: 800,
+                fontSize: '0.82rem',
+                borderRadius: '24px',
+                height: 40,
+                px: 2.2,
+                textTransform: 'none',
+                boxShadow: '0 4px 14px rgba(217, 119, 6, 0.4)',
+                '&:hover': { bgcolor: '#B45309' }
+              }}
+            >
+              New Bill
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<PointOfSale />}
+              onClick={() => setDrawerModalOpen(true)}
+              sx={{
+                borderColor: 'rgba(255, 255, 255, 0.35)',
+                color: '#FFFFFF',
+                fontWeight: 700,
+                fontSize: '0.82rem',
+                borderRadius: '24px',
+                height: 40,
+                px: 2,
+                textTransform: 'none',
+                bgcolor: 'rgba(255, 255, 255, 0.08)',
+                '&:hover': { borderColor: '#FFFFFF', bgcolor: 'rgba(255, 255, 255, 0.16)' }
+              }}
+            >
+              Shift & Z-Report
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<Straighten />}
+              onClick={() => navigate('/tailoring')}
+              sx={{
+                borderColor: 'rgba(255, 255, 255, 0.35)',
+                color: '#FFFFFF',
+                fontWeight: 700,
+                fontSize: '0.82rem',
+                borderRadius: '24px',
+                height: 40,
+                px: 2,
+                textTransform: 'none',
+                bgcolor: 'rgba(255, 255, 255, 0.08)',
+                '&:hover': { borderColor: '#FFFFFF', bgcolor: 'rgba(255, 255, 255, 0.16)' }
+              }}
+            >
+              Tailoring Board
+            </Button>
+          </Stack>
+        </Box>
+      </Paper>
+
+      {/* ============================================================== */}
+      {/* 2. TIMEFRAME SELECTOR FILTER BAR                               */}
+      {/* ============================================================== */}
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5, fontSize: '0.78rem' }}>
+          Atelier Financial Metrics ({dateRange === '7days' ? 'Last 7 Days' : dateRange === '30days' ? 'Last 30 Days' : dateRange === 'thisMonth' ? 'This Month' : 'All-Time'})
+        </Typography>
+
+        <GlassCard sx={{ p: 0.4, borderRadius: '9999px', display: 'flex', gap: 0.5 }}>
+          {[
+            { id: '7days', label: '7 Days' },
+            { id: '30days', label: '30 Days' },
+            { id: 'thisMonth', label: 'Month' },
+            { id: 'all', label: 'All' }
+          ].map((item) => (
+            <Button
+              key={item.id}
+              onClick={() => setDateRange(item.id)}
+              variant={dateRange === item.id ? 'contained' : 'text'}
+              size="small"
+              sx={{
+                px: 2,
+                py: 0.4,
+                borderRadius: '9999px',
+                fontSize: '0.76rem',
+                fontWeight: 800,
+                bgcolor: dateRange === item.id ? '#0F766E' : 'transparent',
+                color: dateRange === item.id ? '#FFFFFF' : 'text.secondary',
+                '&:hover': {
+                  bgcolor: dateRange === item.id ? '#042F2E' : 'action.hover'
+                }
+              }}
+            >
+              {item.label}
+            </Button>
+          ))}
+        </GlassCard>
+      </Box>
+
+      {/* ============================================================== */}
+      {/* 3. EDITORIAL KPI METRICS GRID                                  */}
+      {/* ============================================================== */}
+      <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
+        {/* Sales Revenue */}
         <Grid item xs={12} sm={6} lg={3}>
           <AtelierKpiCard
             title={salesKpiInfo.title}
@@ -433,54 +506,58 @@ const Dashboard = () => {
           />
         </Grid>
 
+        {/* Total Stock Units */}
         <Grid item xs={12} sm={6} lg={3}>
           <AtelierKpiCard
-            title="Total Stock Units"
-            value={totalItems.toLocaleString('en-IN')}
+            title="Garment Vault Stock"
+            value={`${totalItems.toLocaleString('en-IN')} pcs`}
             icon={<Inventory2 fontSize="small" />}
             onClick={() => navigate('/inventory')}
-            subtitle="Available garments"
+            subtitle="Available boutique pieces"
           />
         </Grid>
 
+        {/* Low Stock Warning */}
         <Grid item xs={12} sm={6} lg={3}>
           <AtelierKpiCard
-            title="Low Stock Items"
+            title="Low Stock Reorders"
             value={lowStockCount}
             icon={<Warning fontSize="small" />}
-            trend={lowStockCount > 0 ? `${lowStockCount} critical` : null}
+            trend={lowStockCount > 0 ? `${lowStockCount} items low` : 'Stock Healthy'}
             trendPositive={lowStockCount === 0}
             onClick={() => navigate('/inventory')}
-            subtitle="Below reorder threshold"
+            subtitle="Below threshold alert"
           />
         </Grid>
 
+        {/* Average Transaction Value (ATV) */}
         <Grid item xs={12} sm={6} lg={3}>
           <AtelierKpiCard
-            title="Avg Transaction Value"
+            title="Avg Ticket Value (ATV)"
             value={`₹${atv.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`}
             icon={<ShoppingCart fontSize="small" />}
             onClick={() => navigate('/sales-reports')}
-            subtitle="Per checkout ticket"
+            subtitle={`${filteredInvoices.length} invoices registered`}
           />
         </Grid>
 
+        {/* Admin Exclusive Financial Ledger KPIs */}
         {user?.role === 'admin' && (
           <>
             <Grid item xs={12} sm={6} lg={3}>
               <AtelierKpiCard
-                title="Gross Profit"
+                title="Gross Trading Profit"
                 value={`₹${grossProfit.toLocaleString('en-IN')}`}
                 icon={<Assessment fontSize="small" />}
                 goldAccent={true}
                 onClick={() => navigate('/profit-loss')}
-                subtitle="Revenue minus COGS"
+                subtitle="Revenue minus garment cost"
               />
             </Grid>
 
             <Grid item xs={12} sm={6} lg={3}>
               <AtelierKpiCard
-                title="Net Cash Flow"
+                title="Net Cash Position"
                 value={`₹${netCash.toLocaleString('en-IN')}`}
                 icon={<TrendingUp fontSize="small" />}
                 onClick={() => navigate('/profit-loss')}
@@ -490,144 +567,180 @@ const Dashboard = () => {
 
             <Grid item xs={12} sm={6} lg={3}>
               <AtelierKpiCard
-                title="Inventory Valuation"
+                title="Inventory Capital"
                 value={`₹${totalInventoryValue.toLocaleString('en-IN')}`}
                 icon={<AccountBalanceWallet fontSize="small" />}
                 onClick={() => navigate('/inventory')}
-                subtitle="Total purchase cost basis"
+                subtitle="Cost basis asset valuation"
               />
             </Grid>
 
             <Grid item xs={12} sm={6} lg={3}>
               <AtelierKpiCard
-                title="Total Purchases"
+                title="Vendor Procurement"
                 value={`₹${totalPurchasesCost.toLocaleString('en-IN')}`}
                 icon={<Receipt fontSize="small" />}
                 onClick={() => navigate('/purchases')}
-                subtitle="Vendor procurement"
+                subtitle="Mill & fabric purchases"
               />
             </Grid>
           </>
         )}
       </Grid>
 
-      {user?.role === 'admin' && (
-        <Grid container spacing={3} sx={{ mb: 6 }}>
-          <Grid item xs={12} lg={8}>
-            <GlassCard sx={{ p: 4, height: '100%' }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
-                <Box>
-                  <Typography variant="h6" sx={{ fontWeight: 800 }}>Revenue vs Expenses</Typography>
-                  <Typography variant="body2" color="text.secondary">Financial performance tracking</Typography>
-                </Box>
-                <IconButton size="small"><MoreVert /></IconButton>
-              </Box>
-              <Box sx={{ height: 350 }}>
-                <Line data={salesChartData} options={{ ...commonChartOptions, maintainAspectRatio: false }} />
-              </Box>
-            </GlassCard>
-          </Grid>
-          <Grid item xs={12} lg={4}>
-            <GlassCard sx={{
-              p: 4,
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column'
-            }}>
-              <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>Inventory Health</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>Distribution by stock level</Typography>
-              <Box sx={{ flexGrow: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Doughnut data={stockData} options={{
-                  responsive: true,
-                  cutout: '75%',
-                  plugins: { legend: { display: false } }
-                }} />
-                <Box sx={{ position: 'absolute', textAlign: 'center' }}>
-                  <Typography variant="h4" sx={{ fontWeight: 900 }}>{totalItems}</Typography>
-                  <Typography variant="caption" color="text.secondary">Total Items</Typography>
-                </Box>
-              </Box>
-              <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', gap: 3 }}>
-                {stockData.labels.map((label, i) => (
-                  <Box key={label} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Circle sx={{ fontSize: 10, color: stockData.datasets[0].backgroundColor[i] }} />
-                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>{label}</Typography>
-                  </Box>
-                ))}
-              </Box>
-            </GlassCard>
-          </Grid>
-        </Grid>
-      )}
-
-      {user?.role !== 'admin' && (
-        <Grid container spacing={3} sx={{ mb: 6 }}>
-          <Grid item xs={12}>
-            <GlassCard sx={{
-              p: 4,
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column'
-            }}>
-              <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>Inventory Health</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>Distribution by stock level</Typography>
-              <Box sx={{ height: 300, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Doughnut data={stockData} options={{
-                  responsive: true,
-                  cutout: '75%',
-                  plugins: { legend: { display: false } }
-                }} />
-                <Box sx={{ position: 'absolute', textAlign: 'center' }}>
-                  <Typography variant="h4" sx={{ fontWeight: 900 }}>{totalItems}</Typography>
-                  <Typography variant="caption" color="text.secondary">Total Items</Typography>
-                </Box>
-              </Box>
-            </GlassCard>
-          </Grid>
-        </Grid>
-      )}
-
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} lg={7}>
-          <GlassCard sx={{ p: 4 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4, alignItems: 'center' }}>
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 800 }}>Top Products</Typography>
-                <Typography variant="body2" color="text.secondary">Best selling items by quantity</Typography>
-              </Box>
-              <Button endIcon={<ArrowForward />} onClick={() => navigate('/sales-reports')}>Full Report</Button>
+      {/* ============================================================== */}
+      {/* 4. WORKSHOP PULSE & FITTINGS DUE TODAY                         */}
+      {/* ============================================================== */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 2.5,
+          mb: 3.5,
+          borderRadius: 3,
+          border: '1.5px solid #CBD5E1',
+          bgcolor: isDark ? 'rgba(15, 118, 110, 0.06)' : '#FFFFFF'
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, flexWrap: 'wrap', gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+            <Straighten sx={{ color: '#0F766E' }} />
+            <Box>
+              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.2 }}>
+                Bespoke Atelier Workshop Pulse
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                Active custom tailoring jobs, fittings, and patron deliveries
+              </Typography>
             </Box>
-            <Bar data={topProductsChartData} options={{ ...commonChartOptions, indexAxis: 'y' }} />
+          </Box>
+          <Button
+            size="small"
+            variant="outlined"
+            endIcon={<ArrowForward />}
+            onClick={() => navigate('/tailoring')}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 800,
+              fontSize: '0.78rem',
+              borderRadius: 2,
+              borderColor: '#0F766E',
+              color: '#0F766E'
+            }}
+          >
+            Open Tailoring Board ({activeTailoringJobs.length} Active)
+          </Button>
+        </Box>
+
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={4}>
+            <Box sx={{ p: 2, borderRadius: 2, bgcolor: isDark ? 'rgba(0,0,0,0.2)' : '#F8FAFC', border: '1px solid #E2E8F0' }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, textTransform: 'uppercase' }}>
+                Active Garments on Board
+              </Typography>
+              <Typography variant="h5" sx={{ fontWeight: 900, color: '#0F766E', mt: 0.5 }}>
+                {activeTailoringJobs.length} Orders
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}>
+                In cutting, stitching & trials
+              </Typography>
+            </Box>
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            <Box
+              sx={{
+                p: 2,
+                borderRadius: 2,
+                bgcolor: urgentFittingsToday.length > 0 ? 'rgba(217, 119, 6, 0.08)' : (isDark ? 'rgba(0,0,0,0.2)' : '#F8FAFC'),
+                border: '1px solid',
+                borderColor: urgentFittingsToday.length > 0 ? '#D97706' : '#E2E8F0'
+              }}
+            >
+              <Typography variant="caption" sx={{ color: urgentFittingsToday.length > 0 ? '#B45309' : 'text.secondary', fontWeight: 800, textTransform: 'uppercase' }}>
+                Trials & Deliveries Due Today
+              </Typography>
+              <Typography variant="h5" sx={{ fontWeight: 900, color: urgentFittingsToday.length > 0 ? '#D97706' : '#0F172A', mt: 0.5 }}>
+                {urgentFittingsToday.length} Fittings
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}>
+                {urgentFittingsToday.length > 0 ? 'Urgent patron appointments' : 'No urgent trials pending today'}
+              </Typography>
+            </Box>
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            <Box sx={{ p: 2, borderRadius: 2, bgcolor: isDark ? 'rgba(0,0,0,0.2)' : '#F8FAFC', border: '1px solid #E2E8F0' }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, textTransform: 'uppercase' }}>
+                Register Cash Status
+              </Typography>
+              <Typography variant="h5" sx={{ fontWeight: 900, color: '#10B981', mt: 0.5 }}>
+                Active & Balanced
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}>
+                Shift ready for Day-End Z-Report
+              </Typography>
+            </Box>
+          </Grid>
+        </Grid>
+      </Paper>
+
+      {/* ============================================================== */}
+      {/* 5. CHARTS ROW: REVENUE TRENDS & STOCK HEALTH                   */}
+      {/* ============================================================== */}
+      <Grid container spacing={3} sx={{ mb: 3.5 }}>
+        {/* Left: Financial Performance Trajectory */}
+        <Grid item xs={12} lg={8}>
+          <GlassCard sx={{ p: 3, height: '100%' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 800 }}>Financial Trajectory & Inflow</Typography>
+                <Typography variant="caption" color="text.secondary">Gross Sales vs Operating Cash Expenses</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                  <Circle sx={{ fontSize: 10, color: '#0F766E' }} />
+                  <Typography variant="caption" sx={{ fontWeight: 700 }}>Gross Sales</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                  <Circle sx={{ fontSize: 10, color: '#D97706' }} />
+                  <Typography variant="caption" sx={{ fontWeight: 700 }}>Expenses</Typography>
+                </Box>
+              </Box>
+            </Box>
+            <Box sx={{ height: 320 }}>
+              <Line data={salesChartData} options={commonChartOptions} />
+            </Box>
           </GlassCard>
         </Grid>
-        <Grid item xs={12} lg={5}>
-          <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
-            <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
-              <Typography variant="h6" sx={{ fontWeight: 800 }}>Recent Activity</Typography>
+
+        {/* Right: Garment Stock Distribution */}
+        <Grid item xs={12} lg={4}>
+          <GlassCard sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Typography variant="h6" sx={{ fontWeight: 800, mb: 0.5 }}>Garment Vault Health</Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ mb: 3 }}>Distribution by inventory tier</Typography>
+
+            <Box sx={{ flexGrow: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Doughnut
+                data={stockData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  cutout: '72%',
+                  plugins: { legend: { display: false } }
+                }}
+              />
+              <Box sx={{ position: 'absolute', textAlign: 'center' }}>
+                <Typography variant="h4" sx={{ fontWeight: 900, color: '#0F766E' }}>{totalItems}</Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>Total Pieces</Typography>
+              </Box>
             </Box>
-            <Box sx={{ p: 0 }}>
-              {recentInvoices.map((inv, index) => (
-                <Box key={inv.id} sx={{
-                  p: 2.5,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 2,
-                  borderBottom: index !== recentInvoices.length - 1 ? '1px solid' : 'none',
-                  borderColor: 'divider',
-                  transition: 'background 0.2s',
-                  '&:hover': { bgcolor: 'action.hover' }
-                }}>
-                  <Avatar sx={{ bgcolor: 'primary.light', color: 'primary.contrastText', borderRadius: 2 }}>
-                    <Receipt fontSize="small" />
-                  </Avatar>
-                  <Box sx={{ flexGrow: 1 }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Invoice #{inv.id}</Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {new Date(inv.date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} • {inv.items?.length || 0} items
-                    </Typography>
-                  </Box>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 900, color: 'primary.main' }}>
-                    ₹{inv.total.toLocaleString('en-IN')}
+
+            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
+              {stockData.labels.map((label, i) => (
+                <Box key={label} sx={{ display: 'flex', alignItems: 'center', gap: 0.7 }}>
+                  <Circle sx={{ fontSize: 9, color: stockData.datasets[0].backgroundColor[i] }} />
+                  <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.72rem' }}>
+                    {label}
                   </Typography>
                 </Box>
               ))}
@@ -635,6 +748,96 @@ const Dashboard = () => {
           </GlassCard>
         </Grid>
       </Grid>
+
+      {/* ============================================================== */}
+      {/* 6. BOTTOM ROW: TOP GARMENTS & RECENT CHECKOUT STREAM          */}
+      {/* ============================================================== */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        {/* Left: Top Products Bar Chart */}
+        <Grid item xs={12} lg={7}>
+          <GlassCard sx={{ p: 3, height: '100%' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3, alignItems: 'center' }}>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 800 }}>Top Couture & Garment Silhouettes</Typography>
+                <Typography variant="caption" color="text.secondary">Best-selling pieces by units sold</Typography>
+              </Box>
+              <Button
+                size="small"
+                endIcon={<ArrowForward />}
+                onClick={() => navigate('/sales-reports')}
+                sx={{ textTransform: 'none', fontWeight: 800, fontSize: '0.76rem', color: '#0F766E' }}
+              >
+                Full Analytics
+              </Button>
+            </Box>
+            <Box sx={{ height: 280 }}>
+              <Bar data={topProductsChartData} options={{ ...commonChartOptions, indexAxis: 'y' }} />
+            </Box>
+          </GlassCard>
+        </Grid>
+
+        {/* Right: Live Checkout Stream */}
+        <Grid item xs={12} lg={5}>
+          <GlassCard sx={{ p: 0, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="h6" sx={{ fontWeight: 800 }}>Recent Patron Checkouts</Typography>
+              <Button
+                size="small"
+                onClick={() => navigate('/invoices')}
+                sx={{ textTransform: 'none', fontWeight: 800, fontSize: '0.76rem', color: '#0F766E' }}
+              >
+                All Invoices
+              </Button>
+            </Box>
+            <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
+              {recentInvoices.length === 0 ? (
+                <Box sx={{ p: 4, textAlign: 'center' }}>
+                  <Typography variant="body2" color="text.secondary">No invoices issued yet.</Typography>
+                </Box>
+              ) : (
+                recentInvoices.map((inv, index) => (
+                  <Box
+                    key={inv.id}
+                    sx={{
+                      p: 2,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1.5,
+                      borderBottom: index !== recentInvoices.length - 1 ? '1px solid' : 'none',
+                      borderColor: 'divider',
+                      transition: 'background 0.2s',
+                      cursor: 'pointer',
+                      '&:hover': { bgcolor: 'action.hover' }
+                    }}
+                    onClick={() => navigate('/invoices')}
+                  >
+                    <Avatar sx={{ bgcolor: 'rgba(15, 118, 110, 0.12)', color: '#0F766E', borderRadius: 2, width: 38, height: 38 }}>
+                      <Receipt sx={{ fontSize: 20 }} />
+                    </Avatar>
+                    <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 800, fontSize: '0.82rem' }} noWrap>
+                        {inv.customer || 'Walk-in Patron'} • #{inv.invoiceNumber || inv.id}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.72rem' }}>
+                        {inv.date ? new Date(inv.date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : 'Recent'} • {inv.items?.length || 1} pieces • <span style={{ color: '#0F766E', fontWeight: 700 }}>{inv.paymentMethod || 'Cash'}</span>
+                      </Typography>
+                    </Box>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#0F766E', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                      ₹{Number(inv.total || 0).toLocaleString('en-IN')}
+                    </Typography>
+                  </Box>
+                ))
+              )}
+            </Box>
+          </GlassCard>
+        </Grid>
+      </Grid>
+
+      {/* Cash Drawer Shift Modal */}
+      <CashDrawerShiftModal
+        open={drawerModalOpen}
+        onClose={() => setDrawerModalOpen(false)}
+      />
     </Box>
   );
 };

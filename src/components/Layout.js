@@ -57,8 +57,9 @@ import NotificationCenter from './NotificationCenter';
 import GlobalSearch from './GlobalSearch';
 import NetworkStatus from './NetworkStatus';
 import AtelierFooter from './crm/AtelierFooter';
+import CashDrawerShiftModal from './crm/CashDrawerShiftModal';
 
-const SIDEBAR_EXPANDED_WIDTH = 260;
+const SIDEBAR_EXPANDED_WIDTH = 265;
 const SIDEBAR_COLLAPSED_WIDTH = 74;
 
 export default function Layout() {
@@ -79,6 +80,7 @@ export default function Layout() {
   // Mobile drawer state
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [cashDrawerOpen, setCashDrawerOpen] = useState(false);
 
   const toggleSidebarCollapse = () => {
     setIsCollapsed(prev => {
@@ -631,21 +633,33 @@ export default function Layout() {
               />
             </Button>
 
-            {/* Live Register Active Pill (Desktop/Large Tablet) */}
-            <Chip
-              icon={<Circle sx={{ fontSize: '8px !important', color: '#10B981 !important' }} />}
-              label="Register: Active"
-              size="small"
-              sx={{
-                height: 28,
-                fontSize: '0.72rem',
-                fontWeight: 700,
-                bgcolor: isDark ? 'rgba(16, 185, 129, 0.12)' : '#DCFCE7',
-                color: '#059669',
-                border: '1px solid rgba(16, 185, 129, 0.25)',
-                display: { xs: 'none', lg: 'inline-flex' }
-              }}
-            />
+            {/* Live Register & Cash Drawer Quick Console */}
+            <Tooltip title="View Cash Drawer & Close Shift (Z-Report)">
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<PointOfSale sx={{ fontSize: '15px !important', color: '#10B981' }} />}
+                onClick={() => setCashDrawerOpen(true)}
+                sx={{
+                  height: 32,
+                  fontSize: '0.74rem',
+                  fontWeight: 800,
+                  bgcolor: isDark ? 'rgba(16, 185, 129, 0.12)' : '#DCFCE7',
+                  color: '#047857',
+                  borderColor: 'rgba(16, 185, 129, 0.35)',
+                  borderRadius: '20px',
+                  px: 1.5,
+                  display: { xs: 'none', lg: 'inline-flex' },
+                  textTransform: 'none',
+                  '&:hover': {
+                    bgcolor: isDark ? 'rgba(16, 185, 129, 0.2)' : '#BBF7D0',
+                    borderColor: '#10B981'
+                  }
+                }}
+              >
+                Drawer & Z-Report
+              </Button>
+            </Tooltip>
 
             {/* Champagne Gold "+ Quick Bill" CTA */}
             {canQuickBill && (
@@ -754,6 +768,7 @@ export default function Layout() {
 
       {/* Global Dialogs & Alerts */}
       <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <CashDrawerShiftModal open={cashDrawerOpen} onClose={() => setCashDrawerOpen(false)} />
       <NetworkStatus />
     </Box>
   );
