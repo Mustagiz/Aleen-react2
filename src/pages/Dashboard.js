@@ -34,7 +34,7 @@ import {
   PointElement,
   ArcElement,
   Title,
-  ChartTooltip,
+  Tooltip,
   Legend,
   Filler
 } from 'chart.js';
@@ -54,7 +54,7 @@ ChartJS.register(
   PointElement,
   ArcElement,
   Title,
-  ChartTooltip,
+  Tooltip,
   Legend,
   Filler
 );
