@@ -284,6 +284,15 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
           <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
             Payment Method: <b>{invoice.paymentMethod || 'Cash'}</b>
           </Typography>
+          {invoice.payments && invoice.payments.length > 1 && (
+            <Box sx={{ mt: 0.3, mb: 0.5 }}>
+              {invoice.payments.map((p, pIdx) => (
+                <Typography key={pIdx} variant="caption" sx={{ display: 'block', fontSize: '0.68rem', color: theme.primaryColor, fontWeight: 700 }}>
+                  • {p.method}: ₹{Number(p.amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                </Typography>
+              ))}
+            </Box>
+          )}
           <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
             Invoice Date: <b>{new Date(invoice.date).toLocaleDateString('en-IN')}</b>
           </Typography>
@@ -494,6 +503,24 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                 ₹{Number(invoice.total || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </Typography>
             </Box>
+
+            {invoice.paymentStatus !== 'paid' && invoice.paidAmount !== undefined && (
+              <>
+                <Divider sx={{ my: 0.8, borderColor: theme.totalBoxBorder, borderStyle: 'dashed' }} />
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 0.2, color: '#16A34A' }}>
+                  <Typography variant="caption" sx={{ fontWeight: 700 }}>Amount Received:</Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
+                    ₹{Number(invoice.paidAmount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 0.2, color: '#DC2626' }}>
+                  <Typography variant="caption" sx={{ fontWeight: 800 }}>Balance Due:</Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 900, fontVariantNumeric: 'tabular-nums' }}>
+                    ₹{Math.max(0, Number(invoice.total || 0) - Number(invoice.paidAmount || 0)).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </Typography>
+                </Box>
+              </>
+            )}
           </Box>
         </Box>
       </Box>

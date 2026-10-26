@@ -29,7 +29,8 @@ import {
     TrendingUp,
     CalendarToday,
     Search,
-    Close
+    Close,
+    PointOfSale
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import jsPDF from 'jspdf';
@@ -39,10 +40,12 @@ import GlassCard from '../components/GlassCard';
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import FinanceNavTabs from '../components/crm/FinanceNavTabs';
+import CashDrawerShiftModal from '../components/crm/CashDrawerShiftModal';
 
 const PaymentSummary = () => {
     const { invoices } = useData();
     const theme = useTheme();
+    const [cashDrawerModalOpen, setCashDrawerModalOpen] = useState(false);
     const [dateRange, setDateRange] = useState('today');
 
     // Search and Table Filter State
@@ -299,6 +302,35 @@ const PaymentSummary = () => {
                 ]}
                 actions={
                     <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
+                        <Button
+                            variant="outlined"
+                            startIcon={<PointOfSale sx={{ fontSize: 19, color: '#0F766E' }} />}
+                            onClick={() => setCashDrawerModalOpen(true)}
+                            sx={{
+                                height: 42,
+                                minHeight: 42,
+                                px: 2.75,
+                                borderRadius: '24px',
+                                border: '1.5px solid #0F766E',
+                                color: '#0F766E',
+                                bgcolor: 'background.paper',
+                                fontWeight: 700,
+                                fontSize: '0.84rem',
+                                textTransform: 'none',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxSizing: 'border-box',
+                                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                                '&:hover': {
+                                    border: '1.5px solid #042F2E',
+                                    bgcolor: 'rgba(15, 118, 110, 0.05)',
+                                    transform: 'translateY(-1px)'
+                                }
+                            }}
+                        >
+                            Shift Close & Z-Report
+                        </Button>
                         <Button
                             variant="outlined"
                             startIcon={<Download sx={{ fontSize: 19, color: '#0F766E' }} />}
@@ -759,6 +791,12 @@ const PaymentSummary = () => {
                     sx={{ borderTop: '1px solid', borderColor: 'divider' }}
                 />
             </GlassCard>
+
+            {/* Daily Shift & Cash Drawer Reconciliation Console (Z-Report) */}
+            <CashDrawerShiftModal
+                open={cashDrawerModalOpen}
+                onClose={() => setCashDrawerModalOpen(false)}
+            />
         </Box>
     );
 };

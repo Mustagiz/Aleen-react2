@@ -10,7 +10,10 @@ import {
   Chip,
   CircularProgress,
   Alert,
-  Stack
+  Stack,
+  Dialog,
+  DialogContent,
+  IconButton
 } from '@mui/material';
 import {
   Download,
@@ -19,7 +22,13 @@ import {
   Receipt,
   AccessTime,
   WhatsApp,
-  TimerOff
+  TimerOff,
+  QrCode2,
+  FlashOn,
+  ContentCopy,
+  CheckCircle,
+  Close,
+  AccountBalanceWallet
 } from '@mui/icons-material';
 import { doc, getDoc, collection, getDocs, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -42,6 +51,8 @@ const PublicBillView = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [downloading, setDownloading] = useState(false);
+  const [upiModalOpen, setUpiModalOpen] = useState(false);
+  const [copiedVpa, setCopiedVpa] = useState(false);
 
   const printRef = useRef(null);
 
@@ -242,6 +253,49 @@ const PublicBillView = () => {
       return () => clearTimeout(timer);
     }
   }, [autoDownload, invoice, loading, isExpired]);
+
+  // 6. Dynamic UPI & Outstanding Balance Calculations
+  const totalAmount = Number(invoice?.total || invoice?.grandTotal || 0);
+  const isPaidInFull = invoice?.paymentStatus === 'paid';
+  const rawPaidAmount = Number(invoice?.paidAmount ?? (isPaidInFull ? totalAmount : 0));
+  const paidAmount = isPaidInFull ? totalAmount : Math.min(totalAmount, rawPaidAmount);
+  const balanceDue = isPaidInFull ? 0 : Math.max(0, totalAmount - paidAmount);
+  const hasPendingBalance = balanceDue > 0.01;
+
+  const storeVpa = profile?.bankDetails?.upiId || profile?.upiId || invoiceSettings?.bankDetails?.upiId || 'aleenclothing@hdfcbank';
+  const storeName = profile?.businessName || 'Aleen Clothing';
+  const invNumber = invoice?.invoiceNumber || invoice?.id || 'INV';
+
+  // Clean UPI Deep Link for Google Pay / PhonePe / Paytm / BHIM
+  const upiPayUrl = `upi://pay?pa=${encodeURIComponent(storeVpa)}&pn=${encodeURIComponent(storeName)}&am=${balanceDue.toFixed(2)}&cu=INR&tr=${encodeURIComponent(invNumber)}&tn=${encodeURIComponent(`Bill ${invNumber} ${storeName}`)}`;
+
+  // High-res Dynamic QR Code generated for the UPI payment URL
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=8&data=${encodeURIComponent(upiPayUrl)}`;
+
+  const handleCopyVpa = () => {
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(storeVpa);
+      setCopiedVpa(true);
+      setTimeout(() => setCopiedVpa(false), 2500);
+    }
+  };
+
+  const handlePayClick = () => {
+    const isMobile = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+    if (isMobile) {
+      window.location.href = upiPayUrl;
+      setTimeout(() => setUpiModalOpen(true), 1200);
+    } else {
+      setUpiModalOpen(true);
+    }
+  };
+
+  const storePhone = profile?.phone || '+91 98765 43210';
+  const cleanPhone = storePhone.replace(/[^0-9]/g, '');
+  const waReceiptText = encodeURIComponent(
+    `Hello ${storeName}, I have completed UPI payment of ₹${balanceDue.toFixed(2)} for Invoice #${invNumber}. Please confirm my receipt.`
+  );
+  const waReceiptUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${waReceiptText}` : `https://wa.me/?text=${waReceiptText}`;
 
   // Loading Screen
   if (loading) {
@@ -533,6 +587,142 @@ const PublicBillView = () => {
           </Stack>
         </Paper>
 
+        {/* Dynamic UPI Payment Settlement Banner (Shown for Pending / Partial / Unpaid Bills) */}
+        {hasPendingBalance ? (
+          <Paper
+            elevation={1}
+            className="no-print"
+            sx={{
+              p: { xs: 2, sm: 2.2 },
+              mb: 3,
+              borderRadius: 3,
+              border: '1.5px solid rgba(217, 119, 6, 0.4)',
+              bgcolor: '#FFFBEB',
+              display: 'flex',
+              flexDirection: { xs: 'column', md: 'row' },
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 2,
+              boxShadow: '0 4px 16px rgba(217, 119, 6, 0.12)',
+              '@media print': { display: 'none !important' }
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, width: { xs: '100%', md: 'auto' } }}>
+              <Box
+                sx={{
+                  width: 44,
+                  height: 44,
+                  minWidth: 44,
+                  borderRadius: '50%',
+                  bgcolor: 'rgba(217, 119, 6, 0.15)',
+                  color: '#D97706',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <FlashOn sx={{ fontSize: 26 }} />
+              </Box>
+              <Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                  <Typography variant="caption" sx={{ fontWeight: 800, color: '#B45309', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    Outstanding Balance Due
+                  </Typography>
+                  <Chip
+                    label="Instant UPI Settlement"
+                    size="small"
+                    sx={{
+                      bgcolor: 'rgba(217, 119, 6, 0.15)',
+                      color: '#B45309',
+                      fontWeight: 800,
+                      fontSize: '0.65rem',
+                      height: 20
+                    }}
+                  />
+                </Box>
+                <Typography variant="h5" sx={{ fontWeight: 900, color: '#92400E', lineHeight: 1.2, mt: 0.2 }}>
+                  ₹{balanceDue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#78350F', display: 'block', mt: 0.3 }}>
+                  Tap below to pay via GPay, PhonePe, Paytm, or BHIM UPI
+                </Typography>
+              </Box>
+            </Box>
+
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ width: { xs: '100%', md: 'auto' }, flexShrink: 0 }}>
+              <Button
+                variant="contained"
+                startIcon={<FlashOn />}
+                onClick={handlePayClick}
+                sx={{
+                  bgcolor: '#0F766E',
+                  color: '#FFFFFF',
+                  fontWeight: 800,
+                  fontSize: '0.86rem',
+                  height: 42,
+                  px: 2.8,
+                  borderRadius: 2.5,
+                  textTransform: 'none',
+                  boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
+                  '&:hover': { bgcolor: '#042F2E' }
+                }}
+              >
+                Pay via UPI App
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<QrCode2 />}
+                onClick={() => setUpiModalOpen(true)}
+                sx={{
+                  borderColor: '#D97706',
+                  color: '#B45309',
+                  fontWeight: 800,
+                  fontSize: '0.86rem',
+                  height: 42,
+                  px: 2.5,
+                  borderRadius: 2.5,
+                  textTransform: 'none',
+                  bgcolor: 'rgba(255, 255, 255, 0.8)',
+                  '&:hover': { borderColor: '#92400E', bgcolor: '#FEF3C7' }
+                }}
+              >
+                Scan QR Code
+              </Button>
+            </Stack>
+          </Paper>
+        ) : (
+          <Box
+            className="no-print"
+            sx={{
+              mb: 2.5,
+              p: 1.5,
+              px: 2,
+              borderRadius: 2.5,
+              bgcolor: 'rgba(15, 118, 110, 0.08)',
+              border: '1px solid rgba(15, 118, 110, 0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: 1,
+              '@media print': { display: 'none !important' }
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <CheckCircle sx={{ color: '#0F766E', fontSize: 20 }} />
+              <Typography variant="body2" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                Payment Settled in Full
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                • Official Boutique Tax Receipt
+              </Typography>
+            </Box>
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+              Settled via: <b>{invoice.paymentMethod || 'Cash'}</b>
+            </Typography>
+          </Box>
+        )}
+
         {/* Pixel-Perfect CRM Invoice Component */}
         {/* Renders the exact template active in the CRM (Atelier Emerald, Champagne Gold, Minimal Haute, or Boutique Slip) */}
         <Box
@@ -553,6 +743,189 @@ const PublicBillView = () => {
             profile={profile}
           />
         </Box>
+
+        {/* Interactive Dynamic UPI QR Modal */}
+        <Dialog
+          open={upiModalOpen}
+          onClose={() => setUpiModalOpen(false)}
+          maxWidth="xs"
+          fullWidth
+          PaperProps={{
+            sx: {
+              borderRadius: 3.5,
+              overflow: 'hidden',
+              p: 0,
+              boxShadow: '0 24px 60px rgba(4, 47, 46, 0.3)'
+            }
+          }}
+        >
+          {/* Modal Header */}
+          <Box
+            sx={{
+              p: 2.5,
+              background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+              color: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+              <AccountBalanceWallet sx={{ color: '#FEF08A', fontSize: 24 }} />
+              <Box>
+                <Typography variant="subtitle1" sx={{ fontWeight: 900, lineHeight: 1.2 }}>
+                  Instant UPI Settlement
+                </Typography>
+                <Typography variant="caption" sx={{ opacity: 0.85 }}>
+                  {storeName} • Invoice #{invNumber}
+                </Typography>
+              </Box>
+            </Box>
+            <IconButton onClick={() => setUpiModalOpen(false)} sx={{ color: 'rgba(255,255,255,0.8)', '&:hover': { color: '#FFFFFF' } }}>
+              <Close />
+            </IconButton>
+          </Box>
+
+          <DialogContent sx={{ p: 3, textAlign: 'center' }}>
+            {/* Amount Badge */}
+            <Box sx={{ mb: 2.5 }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
+                Outstanding Amount
+              </Typography>
+              <Typography variant="h4" sx={{ fontWeight: 900, color: '#0F766E', mt: 0.5 }}>
+                ₹{balanceDue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </Typography>
+            </Box>
+
+            {/* Dynamic QR Code Frame */}
+            <Box
+              sx={{
+                width: 240,
+                height: 240,
+                mx: 'auto',
+                p: 1.5,
+                borderRadius: 3,
+                bgcolor: '#FFFFFF',
+                border: '2px solid #0F766E',
+                boxShadow: '0 10px 30px rgba(15, 118, 110, 0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                mb: 2.5
+              }}
+            >
+              <img
+                src={qrCodeUrl}
+                alt={`UPI QR for ${storeName}`}
+                style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 8 }}
+              />
+            </Box>
+
+            {/* Supported UPI Apps Pills */}
+            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 1, fontWeight: 700 }}>
+              Scan with Any UPI App:
+            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 0.8, flexWrap: 'wrap', mb: 2.5 }}>
+              {['Google Pay', 'PhonePe', 'Paytm', 'BHIM', 'Cred'].map((appName) => (
+                <Chip
+                  key={appName}
+                  label={appName}
+                  size="small"
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: '0.68rem',
+                    bgcolor: '#F1F5F9',
+                    color: '#334155',
+                    border: '1px solid #E2E8F0'
+                  }}
+                />
+              ))}
+            </Box>
+
+            {/* UPI ID Copy Card */}
+            <Paper
+              elevation={0}
+              sx={{
+                p: 1.5,
+                borderRadius: 2,
+                bgcolor: '#F8FAFC',
+                border: '1px dashed #CBD5E1',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                mb: 2.5
+              }}
+            >
+              <Box sx={{ textAlign: 'left', minWidth: 0, pr: 1 }}>
+                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', fontSize: '0.7rem' }}>
+                  Store UPI ID (VPA):
+                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 800, color: '#0F172A', wordBreak: 'break-all' }}>
+                  {storeVpa}
+                </Typography>
+              </Box>
+              <Button
+                size="small"
+                variant={copiedVpa ? 'contained' : 'outlined'}
+                startIcon={copiedVpa ? <CheckCircle sx={{ fontSize: 16 }} /> : <ContentCopy sx={{ fontSize: 16 }} />}
+                onClick={handleCopyVpa}
+                sx={{
+                  flexShrink: 0,
+                  textTransform: 'none',
+                  fontWeight: 800,
+                  fontSize: '0.74rem',
+                  borderRadius: 2,
+                  bgcolor: copiedVpa ? '#0F766E' : 'transparent',
+                  borderColor: '#0F766E',
+                  color: copiedVpa ? '#FFFFFF' : '#0F766E',
+                  '&:hover': { bgcolor: copiedVpa ? '#042F2E' : 'rgba(15, 118, 110, 0.08)' }
+                }}
+              >
+                {copiedVpa ? 'Copied!' : 'Copy'}
+              </Button>
+            </Paper>
+
+            {/* Direct Open UPI Link for Mobile */}
+            <Button
+              variant="contained"
+              fullWidth
+              startIcon={<FlashOn />}
+              onClick={() => { window.location.href = upiPayUrl; }}
+              sx={{
+                bgcolor: '#0F766E',
+                color: '#FFFFFF',
+                fontWeight: 800,
+                py: 1.2,
+                borderRadius: 2.5,
+                textTransform: 'none',
+                mb: 1.5,
+                boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
+                '&:hover': { bgcolor: '#042F2E' }
+              }}
+            >
+              Launch UPI App Now
+            </Button>
+
+            <Button
+              variant="outlined"
+              fullWidth
+              startIcon={<WhatsApp />}
+              onClick={() => window.open(waReceiptUrl, '_blank')}
+              sx={{
+                borderColor: '#25D366',
+                color: '#16A34A',
+                fontWeight: 800,
+                py: 1.1,
+                borderRadius: 2.5,
+                textTransform: 'none',
+                '&:hover': { borderColor: '#16A34A', bgcolor: 'rgba(37, 211, 102, 0.08)' }
+              }}
+            >
+              Send Payment Screenshot on WhatsApp
+            </Button>
+          </DialogContent>
+        </Dialog>
       </Box>
     </Box>
   );

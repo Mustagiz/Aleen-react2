@@ -23,6 +23,7 @@ import { TableSkeleton } from '../components/crm/AtelierSkeleton';
 import InvoiceWhatsAppDialog from '../components/InvoiceWhatsAppDialog';
 import BillSuccessModal from '../components/BillSuccessModal';
 import { printInvoiceElement } from '../utils/printInvoice';
+import CashDrawerShiftModal from '../components/crm/CashDrawerShiftModal';
 
 const Invoices = () => {
   const location = useLocation();
@@ -43,6 +44,7 @@ const Invoices = () => {
   const [successInvoice, setSuccessInvoice] = useState(null);
   const [invoiceSettings, setInvoiceSettings] = useState(() => invoiceTemplateSettings || getStoredInvoiceSettings());
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
+  const [cashDrawerModalOpen, setCashDrawerModalOpen] = useState(false);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [offscreenInvoice, setOffscreenInvoice] = useState(null);
   const offscreenInvoiceRef = useRef(null);
@@ -880,6 +882,34 @@ const Invoices = () => {
       startDate: new Date().toISOString()
     } : null;
 
+    const tender1Amount = isSplitPayment ? Number(splitAmount || 0) : total;
+    const tender2Amount = isSplitPayment ? Math.max(0, Number((total - (Number(splitAmount) || 0)).toFixed(2))) : 0;
+    
+    let calculatedPaidAmount = total;
+    let computedPaymentStatus = paymentStatus;
+    if (isSplitPayment) {
+      const t1Paid = paymentMethod === 'Credit' ? 0 : tender1Amount;
+      const t2Paid = paymentMethod2 === 'Credit' ? 0 : tender2Amount;
+      calculatedPaidAmount = t1Paid + t2Paid;
+      if (calculatedPaidAmount >= total) {
+        computedPaymentStatus = 'paid';
+      } else if (calculatedPaidAmount > 0) {
+        computedPaymentStatus = 'partial';
+      } else {
+        computedPaymentStatus = 'pending';
+      }
+    } else {
+      if (paymentMethod === 'Credit' || paymentStatus === 'pending') {
+        calculatedPaidAmount = 0;
+        computedPaymentStatus = 'pending';
+      } else if (paymentStatus === 'partial') {
+        calculatedPaidAmount = Number(splitAmount || 0);
+      } else {
+        calculatedPaidAmount = total;
+        computedPaymentStatus = 'paid';
+      }
+    }
+
     const invoice = {
       id: invoiceNumber,
       date: new Date(invoiceDate).toISOString(),
@@ -919,20 +949,27 @@ const Invoices = () => {
       discountPercent: parseFloat(discountPercent) || 0,
       discountAmount: parseFloat(discountAmount) || 0,
       total,
-      paymentStatus,
+      paymentStatus: computedPaymentStatus,
+      paidAmount: calculatedPaidAmount,
+      balanceDue: Math.max(0, Number((total - calculatedPaidAmount).toFixed(2))),
+      isSplitPayment: Boolean(isSplitPayment),
+      splitDetails: isSplitPayment ? {
+        tender1: { method: paymentMethod, amount: tender1Amount },
+        tender2: { method: paymentMethod2, amount: tender2Amount }
+      } : null,
       isEMI,
       emiDetails,
       payments: isSplitPayment ? [
         {
           method: paymentMethod,
-          amount: total - splitAmount,
+          amount: tender1Amount,
           transactionId: (paymentMethod === 'UPI' || paymentMethod === 'Card') ? upiTransactionId : '',
           upiProvider: paymentMethod === 'UPI' ? upiProvider : null,
           timestamp: new Date().toISOString()
         },
         {
           method: paymentMethod2,
-          amount: splitAmount,
+          amount: tender2Amount,
           transactionId: (paymentMethod2 === 'UPI' || paymentMethod2 === 'Card') ? upiTransactionId2 : '',
           upiProvider: paymentMethod2 === 'UPI' ? upiProvider2 : null,
           timestamp: new Date().toISOString()
@@ -940,7 +977,7 @@ const Invoices = () => {
       ] : [
         {
           method: paymentMethod,
-          amount: paymentMethod === 'Credit' ? 0 : total,
+          amount: calculatedPaidAmount,
           transactionId: (paymentMethod === 'UPI' || paymentMethod === 'Card') ? upiTransactionId : '',
           upiProvider: paymentMethod === 'UPI' ? upiProvider : null,
           timestamp: new Date().toISOString()
@@ -1475,6 +1512,35 @@ const Invoices = () => {
               }}
             >
               Templates & Letterhead
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<PointOfSale sx={{ fontSize: 19, color: '#0F766E' }} />}
+              onClick={() => setCashDrawerModalOpen(true)}
+              sx={{
+                height: 42,
+                minHeight: 42,
+                px: 2.75,
+                borderRadius: '24px',
+                border: '1.5px solid #0F766E',
+                color: '#0F766E',
+                bgcolor: 'background.paper',
+                fontWeight: 700,
+                fontSize: '0.84rem',
+                textTransform: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxSizing: 'border-box',
+                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                '&:hover': {
+                  border: '1.5px solid #042F2E',
+                  bgcolor: 'rgba(15, 118, 110, 0.05)',
+                  transform: 'translateY(-1px)'
+                }
+              }}
+            >
+              Shift Close & Z-Report
             </Button>
             <Button
               variant="outlined"
@@ -3483,6 +3549,12 @@ const Invoices = () => {
         invoice={whatsAppInvoice}
         profile={profile}
         onSharePDF={sharePDF}
+      />
+
+      {/* Cash Drawer & Daily Shift Reconciliation Console (Z-Report) */}
+      <CashDrawerShiftModal
+        open={cashDrawerModalOpen}
+        onClose={() => setCashDrawerModalOpen(false)}
       />
 
       {/* Hidden offscreen container for pixel-perfect PDF export */}
