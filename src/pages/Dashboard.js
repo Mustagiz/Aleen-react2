@@ -512,6 +512,7 @@ const Dashboard = () => {
             title="Garment Vault Stock"
             value={`${totalItems.toLocaleString('en-IN')} pcs`}
             icon={<Inventory2 fontSize="small" />}
+            sapphireAccent={true}
             onClick={() => navigate('/inventory')}
             subtitle="Available boutique pieces"
           />
@@ -525,6 +526,7 @@ const Dashboard = () => {
             icon={<Warning fontSize="small" />}
             trend={lowStockCount > 0 ? `${lowStockCount} items low` : 'Stock Healthy'}
             trendPositive={lowStockCount === 0}
+            redAccent={lowStockCount > 0}
             onClick={() => navigate('/inventory')}
             subtitle="Below threshold alert"
           />
@@ -560,6 +562,7 @@ const Dashboard = () => {
                 title="Net Cash Position"
                 value={`₹${netCash.toLocaleString('en-IN')}`}
                 icon={<TrendingUp fontSize="small" />}
+                sapphireAccent={true}
                 onClick={() => navigate('/profit-loss')}
                 subtitle="Sales minus vendor payouts"
               />
@@ -580,6 +583,7 @@ const Dashboard = () => {
                 title="Vendor Procurement"
                 value={`₹${totalPurchasesCost.toLocaleString('en-IN')}`}
                 icon={<Receipt fontSize="small" />}
+                redAccent={true}
                 onClick={() => navigate('/purchases')}
                 subtitle="Mill & fabric purchases"
               />
@@ -690,7 +694,7 @@ const Dashboard = () => {
       <Grid container spacing={3} sx={{ mb: 3.5 }}>
         {/* Left: Financial Performance Trajectory */}
         <Grid item xs={12} lg={8}>
-          <GlassCard sx={{ p: 3, height: '100%' }}>
+          <GlassCard sx={{ p: 3, height: '100%' }} glowColor="emerald">
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 800 }}>Financial Trajectory & Inflow</Typography>
@@ -715,7 +719,7 @@ const Dashboard = () => {
 
         {/* Right: Garment Stock Distribution */}
         <Grid item xs={12} lg={4}>
-          <GlassCard sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <GlassCard sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }} glowColor="sapphire">
             <Typography variant="h6" sx={{ fontWeight: 800, mb: 0.5 }}>Garment Vault Health</Typography>
             <Typography variant="caption" color="text.secondary" sx={{ mb: 3 }}>Distribution by inventory tier</Typography>
 
@@ -755,7 +759,7 @@ const Dashboard = () => {
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {/* Left: Top Products Bar Chart */}
         <Grid item xs={12} lg={7}>
-          <GlassCard sx={{ p: 3, height: '100%' }}>
+          <GlassCard sx={{ p: 3, height: '100%' }} glowColor="gold">
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3, alignItems: 'center' }}>
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 800 }}>Top Couture & Garment Silhouettes</Typography>
@@ -778,7 +782,7 @@ const Dashboard = () => {
 
         {/* Right: Live Checkout Stream */}
         <Grid item xs={12} lg={5}>
-          <GlassCard sx={{ p: 0, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <GlassCard sx={{ p: 0, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }} glowColor="aurora">
             <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography variant="h6" sx={{ fontWeight: 800 }}>Recent Patron Checkouts</Typography>
               <Button

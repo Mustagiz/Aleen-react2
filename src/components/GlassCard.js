@@ -3,9 +3,52 @@ import { Paper, Box } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useTheme } from '@mui/material/styles';
 
-const GlassCard = ({ children, sx = {}, hover = true, ...props }) => {
+const GLOW_PRESETS = {
+    emerald: {
+        border: (isDark) => isDark ? '#2DD4BF' : '#0F766E',
+        shadow: (isDark) => isDark
+            ? '0 18px 40px -4px rgba(0, 0, 0, 0.65), 0 0 28px rgba(20, 184, 166, 0.35)'
+            : '0 16px 36px -4px rgba(15, 118, 110, 0.24), 0 0 22px rgba(15, 118, 110, 0.18)'
+    },
+    gold: {
+        border: (isDark) => isDark ? '#F59E0B' : '#D97706',
+        shadow: (isDark) => isDark
+            ? '0 18px 40px -4px rgba(0, 0, 0, 0.65), 0 0 28px rgba(217, 119, 6, 0.38)'
+            : '0 16px 36px -4px rgba(217, 119, 6, 0.24), 0 0 22px rgba(245, 158, 11, 0.2)'
+    },
+    sapphire: {
+        border: (isDark) => isDark ? '#38BDF8' : '#0284C7',
+        shadow: (isDark) => isDark
+            ? '0 18px 40px -4px rgba(0, 0, 0, 0.65), 0 0 28px rgba(2, 132, 199, 0.38)'
+            : '0 16px 36px -4px rgba(2, 132, 199, 0.24), 0 0 22px rgba(56, 189, 248, 0.2)'
+    },
+    ruby: {
+        border: (isDark) => isDark ? '#F87171' : '#DC2626',
+        shadow: (isDark) => isDark
+            ? '0 18px 40px -4px rgba(0, 0, 0, 0.65), 0 0 28px rgba(239, 68, 68, 0.38)'
+            : '0 16px 36px -4px rgba(239, 68, 68, 0.24), 0 0 22px rgba(248, 113, 113, 0.2)'
+    },
+    violet: {
+        border: (isDark) => isDark ? '#C084FC' : '#7C3AED',
+        shadow: (isDark) => isDark
+            ? '0 18px 40px -4px rgba(0, 0, 0, 0.65), 0 0 28px rgba(124, 58, 237, 0.38)'
+            : '0 16px 36px -4px rgba(124, 58, 237, 0.24), 0 0 22px rgba(192, 132, 252, 0.2)'
+    },
+    aurora: {
+        border: (isDark) => isDark ? '#2DD4BF' : '#0F766E',
+        shadow: (isDark) => isDark
+            ? '0 18px 40px -4px rgba(0, 0, 0, 0.65), 0 0 30px rgba(20, 184, 166, 0.32), 0 0 16px rgba(217, 119, 6, 0.22)'
+            : '0 16px 36px -4px rgba(15, 118, 110, 0.22), 0 0 24px rgba(15, 118, 110, 0.16), 0 0 14px rgba(217, 119, 6, 0.14)'
+    }
+};
+
+const GlassCard = ({ children, sx = {}, hover = true, glowColor = 'aurora', ...props }) => {
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
+
+    const preset = GLOW_PRESETS[glowColor] || GLOW_PRESETS.aurora;
+    const hoverBorder = typeof preset.border === 'function' ? preset.border(isDark) : (glowColor || '#0F766E');
+    const hoverShadow = typeof preset.shadow === 'function' ? preset.shadow(isDark) : `0 16px 36px -4px rgba(0,0,0,0.3), 0 0 25px ${glowColor}40`;
 
     return (
         <Box
@@ -13,7 +56,7 @@ const GlassCard = ({ children, sx = {}, hover = true, ...props }) => {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            whileHover={hover ? { y: -4, transition: { duration: 0.2, ease: 'easeOut' } } : undefined}
+            whileHover={hover ? { y: -5, transition: { duration: 0.2, ease: 'easeOut' } } : undefined}
             sx={{ height: '100%' }}
         >
             <Paper
@@ -33,13 +76,11 @@ const GlassCard = ({ children, sx = {}, hover = true, ...props }) => {
                         ? 'inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 8px 30px rgba(0, 0, 0, 0.45)'
                         : 'inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 4px 20px -2px rgba(15, 118, 110, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02)',
                     overflow: 'hidden',
-                    transition: 'border-color 0.22s ease, box-shadow 0.22s ease',
+                    transition: 'border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
                     ...(hover ? {
                         '&:hover': {
-                            borderColor: isDark ? 'rgba(45, 212, 191, 0.45)' : 'rgba(15, 118, 110, 0.32)',
-                            boxShadow: isDark
-                                ? 'inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 20px rgba(20, 184, 166, 0.12)'
-                                : 'inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 14px 32px -4px rgba(15, 118, 110, 0.14), 0 4px 12px rgba(0, 0, 0, 0.03)'
+                            borderColor: hoverBorder,
+                            boxShadow: hoverShadow
                         }
                     } : {}),
                     ...sx

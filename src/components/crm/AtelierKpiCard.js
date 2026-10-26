@@ -12,6 +12,7 @@ export default function AtelierKpiCard({
   trendPositive = true,
   goldAccent = false,
   redAccent = false,
+  sapphireAccent = false,
   onClick
 }) {
   const theme = useTheme();
@@ -29,42 +30,63 @@ export default function AtelierKpiCard({
   const getBorderColor = () => {
     if (redAccent) return isDark ? '1px solid rgba(239, 68, 68, 0.35)' : '1px solid rgba(239, 68, 68, 0.22)';
     if (goldAccent) return isDark ? '1px solid rgba(217, 119, 6, 0.35)' : '1px solid rgba(217, 119, 6, 0.22)';
+    if (sapphireAccent) return isDark ? '1px solid rgba(56, 189, 248, 0.35)' : '1px solid rgba(2, 132, 199, 0.22)';
     return isDark ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.12)';
   };
 
   const getTopGradient = () => {
     if (redAccent) return 'linear-gradient(90deg, #DC2626 0%, #EF4444 50%, #F87171 100%)';
     if (goldAccent) return 'linear-gradient(90deg, #B45309 0%, #D97706 50%, #F59E0B 100%)';
+    if (sapphireAccent) return 'linear-gradient(90deg, #0F172A 0%, #1E3A8A 50%, #38BDF8 100%)';
     return 'linear-gradient(90deg, #042F2E 0%, #0F766E 50%, #14B8A6 100%)';
   };
 
   const getHoverBorderColor = () => {
-    if (redAccent) return isDark ? '#EF4444' : '#DC2626';
+    if (redAccent) return isDark ? '#F87171' : '#DC2626';
     if (goldAccent) return isDark ? '#F59E0B' : '#D97706';
+    if (sapphireAccent) return isDark ? '#38BDF8' : '#0284C7';
     return isDark ? '#2DD4BF' : '#0F766E';
   };
 
   const getHoverShadow = () => {
-    if (redAccent) return isDark ? '0 14px 36px rgba(239, 68, 68, 0.3)' : '0 12px 30px rgba(239, 68, 68, 0.18)';
-    if (goldAccent) return isDark ? '0 14px 36px rgba(217, 119, 6, 0.3)' : '0 12px 30px rgba(217, 119, 6, 0.18)';
-    return isDark ? '0 14px 36px rgba(20, 184, 166, 0.25), 0 0 16px rgba(20, 184, 166, 0.1)' : '0 12px 30px rgba(15, 118, 110, 0.16)';
+    if (redAccent) {
+      return isDark
+        ? '0 18px 40px -4px rgba(0, 0, 0, 0.65), 0 0 32px rgba(239, 68, 68, 0.42)'
+        : '0 16px 36px -4px rgba(239, 68, 68, 0.28), 0 0 24px rgba(248, 113, 113, 0.24)';
+    }
+    if (goldAccent) {
+      return isDark
+        ? '0 18px 40px -4px rgba(0, 0, 0, 0.65), 0 0 32px rgba(217, 119, 6, 0.42)'
+        : '0 16px 36px -4px rgba(217, 119, 6, 0.28), 0 0 24px rgba(245, 158, 11, 0.24)';
+    }
+    if (sapphireAccent) {
+      return isDark
+        ? '0 18px 40px -4px rgba(0, 0, 0, 0.65), 0 0 32px rgba(2, 132, 199, 0.42)'
+        : '0 16px 36px -4px rgba(2, 132, 199, 0.28), 0 0 24px rgba(56, 189, 248, 0.24)';
+    }
+    return isDark
+      ? '0 18px 40px -4px rgba(0, 0, 0, 0.65), 0 0 32px rgba(20, 184, 166, 0.4)'
+      : '0 16px 36px -4px rgba(15, 118, 110, 0.28), 0 0 24px rgba(15, 118, 110, 0.22)';
   };
 
   const getIconBg = () => {
     if (redAccent) return isDark ? 'rgba(239, 68, 68, 0.16)' : 'rgba(254, 226, 226, 0.85)';
     if (goldAccent) return isDark ? 'rgba(217, 119, 6, 0.16)' : 'rgba(254, 243, 199, 0.85)';
+    if (sapphireAccent) return isDark ? 'rgba(2, 132, 199, 0.16)' : 'rgba(224, 242, 254, 0.85)';
     return isDark ? 'rgba(15, 118, 110, 0.2)' : 'rgba(240, 253, 250, 0.9)';
   };
 
   const getIconBorder = () => {
     if (redAccent) return isDark ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(239, 68, 68, 0.15)';
     if (goldAccent) return isDark ? '1px solid rgba(217, 119, 6, 0.3)' : '1px solid rgba(217, 119, 6, 0.15)';
+    if (sapphireAccent) return isDark ? '1px solid rgba(56, 189, 248, 0.3)' : '1px solid rgba(2, 132, 199, 0.15)';
     return isDark ? '1px solid rgba(20, 184, 166, 0.3)' : '1px solid rgba(15, 118, 110, 0.15)';
   };
 
   const getIconColor = () => {
     if (redAccent) return isDark ? '#F87171' : '#DC2626';
     if (goldAccent) return isDark ? '#FBBF24' : '#D97706';
+    if (sapphireAccent) return isDark ? '#38BDF8' : '#0284C7';
     return isDark ? '#2DD4BF' : '#0F766E';
   };
 
@@ -85,7 +107,7 @@ export default function AtelierKpiCard({
           overflow: 'hidden',
           borderRadius: '16px',
           cursor: onClick ? 'pointer' : 'default',
-          transition: 'box-shadow 0.22s ease, border-color 0.22s ease',
+          transition: 'box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease',
           background: isDark
             ? 'radial-gradient(ellipse at 85% 0%, rgba(20, 184, 166, 0.08) 0%, rgba(13, 27, 27, 0.96) 75%)'
             : 'radial-gradient(ellipse at 85% 0%, rgba(15, 118, 110, 0.035) 0%, #FFFFFF 75%)',
