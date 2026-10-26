@@ -159,6 +159,22 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
       ) : isSlip ? (
         /* Slip Header */
         <Box sx={{ textAlign: 'center', pb: 2, mb: 2, borderBottom: '1px dashed #64748B', position: 'relative', zIndex: 1, pageBreakInside: 'avoid', breakInside: 'avoid' }}>
+          {profile.logoUrl && (
+            <Box
+              component="img"
+              src={profile.logoUrl}
+              alt={profile.businessName || 'Store Logo'}
+              sx={{
+                width: 48,
+                height: 48,
+                borderRadius: 1.5,
+                objectFit: 'contain',
+                mx: 'auto',
+                mb: 1,
+                display: 'block'
+              }}
+            />
+          )}
           <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: 1 }}>
             {profile.businessName?.toUpperCase() || 'ALEEN CLOTHING'}
           </Typography>
@@ -204,21 +220,40 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
             printColorAdjust: 'exact'
           }}
         >
-          <Box sx={{ flex: 1, pr: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="caption" sx={{ letterSpacing: 2, color: '#FDE68A', fontWeight: 800, textTransform: 'uppercase' }}>
-                ✂️ {profile.tagline || activeSettings.tagline || 'Haute Couture & Bespoke Craft'}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, flex: 1, pr: 2 }}>
+            {profile.logoUrl && (
+              <Box
+                component="img"
+                src={profile.logoUrl}
+                alt={profile.businessName || 'Store Logo'}
+                sx={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: 2,
+                  objectFit: 'contain',
+                  bgcolor: '#FFFFFF',
+                  p: 0.5,
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                  flexShrink: 0
+                }}
+              />
+            )}
+            <Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="caption" sx={{ letterSpacing: 2, color: '#FDE68A', fontWeight: 800, textTransform: 'uppercase' }}>
+                  ✂️ {profile.tagline || activeSettings.tagline || 'Haute Couture & Bespoke Craft'}
+                </Typography>
+              </Box>
+              <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: -0.5, mt: 0.5, color: '#FFFFFF', fontSize: '1.75rem' }}>
+                {profile.businessName || 'Aleen Clothing'}
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)', mt: 0.5, fontSize: '0.82rem' }}>
+                {profile.address}
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.75)', display: 'block', mt: 0.3 }}>
+                Phone: {profile.phone} | GSTIN: {profile.gstin}
               </Typography>
             </Box>
-            <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: -0.5, mt: 0.5, color: '#FFFFFF', fontSize: '1.75rem' }}>
-              {profile.businessName || 'Aleen Clothing'}
-            </Typography>
-            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)', mt: 0.5, fontSize: '0.82rem' }}>
-              {profile.address}
-            </Typography>
-            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.75)', display: 'block', mt: 0.3 }}>
-              Phone: {profile.phone} | GSTIN: {profile.gstin}
-            </Typography>
           </Box>
 
           <Box sx={{ textAlign: 'right', minWidth: 220 }}>

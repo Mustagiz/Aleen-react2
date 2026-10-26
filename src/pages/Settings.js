@@ -52,13 +52,15 @@ import {
   Security,
   ColorLens,
   CloudUpload,
-  Draw
+  Draw,
+  AutoAwesome
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useFeedback } from '../contexts/FeedbackContext';
 import PageHeader from '../components/crm/PageHeader';
 import { INVOICE_TEMPLATES, DEFAULT_INVOICE_SETTINGS, getStoredInvoiceSettings } from '../constants/invoiceTemplates';
+import { PREDEFINED_LOGOS } from '../constants/predefinedLogos';
 
 export default function Settings() {
   const { profile, updateProfile, updateInvoiceTemplateSettings } = useData();
@@ -81,6 +83,7 @@ export default function Settings() {
   const [formProfile, setFormProfile] = useState({
     businessName: profile.businessName || 'Aleen Clothing',
     tagline: profile.tagline || 'Bespoke Measurement & Craft Studio',
+    logoUrl: profile.logoUrl || '',
     ownerName: profile.ownerName || 'Admin',
     email: profile.email || 'admin@aleen.com',
     phone: profile.phone || '+91 98765 43210',
@@ -119,6 +122,7 @@ export default function Settings() {
       setFormProfile(prev => ({
         ...prev,
         ...profile,
+        logoUrl: profile.logoUrl || prev.logoUrl || '',
         bankDetails: {
           ...prev.bankDetails,
           ...(profile.bankDetails || {})
@@ -130,9 +134,45 @@ export default function Settings() {
   // Saving indicator
   const [isSaving, setIsSaving] = useState(false);
 
-  // File input refs for signature & letterhead
+  // File input refs for logo, signature & letterhead
+  const logoInputRef = useRef(null);
   const signatureInputRef = useRef(null);
   const letterheadInputRef = useRef(null);
+  const [logoModalOpen, setLogoModalOpen] = useState(false);
+
+  // Upload handler for custom store logo
+  const handleLogoUpload = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (file.size > 3 * 1024 * 1024) {
+      showToast('Logo file size should be under 3MB.', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setFormProfile(prev => ({
+        ...prev,
+        logoUrl: event.target.result
+      }));
+      showToast('Store logo loaded! Click "Save Brand Details" to confirm.', 'success');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSelectPredefinedLogo = (logoUri, logoName) => {
+    setFormProfile(prev => ({
+      ...prev,
+      logoUrl: logoUri
+    }));
+    setLogoModalOpen(false);
+    showToast(`Applied ${logoName}! Click "Save Brand Details" to confirm.`, 'success');
+  };
+
+  const handleRemoveLogo = () => {
+    setFormProfile(prev => ({ ...prev, logoUrl: '' }));
+    if (logoInputRef.current) logoInputRef.current.value = '';
+    showToast('Logo removed. Monogram crest will be displayed.', 'info');
+  };
 
   // Upload handler for custom signature (converted to base64 Data URL)
   const handleSignatureUpload = (e) => {
@@ -192,6 +232,7 @@ export default function Settings() {
         ...currentStored,
         template: formProfile.defaultTemplate || currentStored.template,
         tagline: formProfile.tagline,
+        logoUrl: formProfile.logoUrl,
         showBankDetails: formProfile.showBankDetails,
         bankDetails: formProfile.bankDetails,
         useCustomLetterhead: formProfile.useCustomLetterhead,
@@ -531,23 +572,125 @@ export default function Settings() {
                 boxShadow: '0 4px 20px rgba(0,0,0,0.03)'
               }}
             >
-              <Box
-                sx={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: 3,
-                  mx: 'auto',
-                  mb: 2,
-                  background: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#F59E0B',
-                  border: '2px solid rgba(217, 119, 6, 0.4)',
-                  boxShadow: '0 8px 24px rgba(15, 118, 110, 0.25)'
-                }}
-              >
-                <Store sx={{ fontSize: 42 }} />
+              {/* Hidden File Input for Custom Store Logo */}
+              <input
+                type="file"
+                ref={logoInputRef}
+                onChange={handleLogoUpload}
+                accept="image/*"
+                style={{ display: 'none' }}
+              />
+
+              {/* Dynamic Brand Logo or Monogram Avatar */}
+              <Box sx={{ position: 'relative', width: 90, height: 90, mx: 'auto', mb: 2 }}>
+                {formProfile.logoUrl ? (
+                  <Box
+                    component="img"
+                    src={formProfile.logoUrl}
+                    alt={formProfile.businessName || 'Store Logo'}
+                    sx={{
+                      width: 90,
+                      height: 90,
+                      borderRadius: 3.5,
+                      objectFit: 'contain',
+                      bgcolor: '#FFFFFF',
+                      border: '2px solid rgba(217, 119, 6, 0.45)',
+                      boxShadow: '0 8px 24px rgba(15, 118, 110, 0.2)',
+                      p: 0.5
+                    }}
+                  />
+                ) : (
+                  <Box
+                    sx={{
+                      width: 90,
+                      height: 90,
+                      borderRadius: 3.5,
+                      background: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#F59E0B',
+                      border: '2px solid rgba(217, 119, 6, 0.45)',
+                      boxShadow: '0 8px 24px rgba(15, 118, 110, 0.25)'
+                    }}
+                  >
+                    <Typography sx={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 900, fontSize: '2.5rem', color: '#F59E0B' }}>
+                      {(formProfile.businessName || 'A').charAt(0).toUpperCase()}
+                    </Typography>
+                  </Box>
+                )}
+
+                {/* Edit overlay icon button */}
+                <Tooltip title="Upload or change logo">
+                  <IconButton
+                    size="small"
+                    onClick={() => logoInputRef.current?.click()}
+                    sx={{
+                      position: 'absolute',
+                      bottom: -6,
+                      right: -6,
+                      bgcolor: '#0F766E',
+                      color: '#FFFFFF',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                      '&:hover': { bgcolor: '#042F2E' }
+                    }}
+                  >
+                    <Edit sx={{ fontSize: 15 }} />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+
+              {/* Logo Action Pills */}
+              <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', mb: 2, flexWrap: 'wrap' }}>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  startIcon={<CloudUpload sx={{ fontSize: '15px !important' }} />}
+                  onClick={() => logoInputRef.current?.click()}
+                  sx={{
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    borderRadius: '20px',
+                    py: 0.4,
+                    px: 1.25,
+                    textTransform: 'none',
+                    borderColor: '#0F766E',
+                    color: '#0F766E'
+                  }}
+                >
+                  Upload Logo
+                </Button>
+                <Button
+                  size="small"
+                  variant="contained"
+                  startIcon={<AutoAwesome sx={{ fontSize: '15px !important', color: '#F59E0B' }} />}
+                  onClick={() => setLogoModalOpen(true)}
+                  sx={{
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    borderRadius: '20px',
+                    py: 0.4,
+                    px: 1.25,
+                    textTransform: 'none',
+                    bgcolor: '#042F2E',
+                    color: '#FFFFFF',
+                    '&:hover': { bgcolor: '#0F766E' }
+                  }}
+                >
+                  Choose Predefined
+                </Button>
+                {formProfile.logoUrl && (
+                  <Button
+                    size="small"
+                    variant="text"
+                    color="error"
+                    startIcon={<Delete sx={{ fontSize: '14px !important' }} />}
+                    onClick={handleRemoveLogo}
+                    sx={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'none', py: 0.3 }}
+                  >
+                    Remove
+                  </Button>
+                )}
               </Box>
 
               <Typography variant="h5" sx={{ fontWeight: 900, color: '#042F2E', letterSpacing: '-0.02em', mb: 0.5 }}>
@@ -1907,6 +2050,188 @@ export default function Settings() {
             }}
           >
             Update Password
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Predefined Luxury Atelier Logos Selection Modal */}
+      <Dialog
+        open={logoModalOpen}
+        onClose={() => setLogoModalOpen(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3.5,
+            p: 1
+          }
+        }}
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+            <Box
+              sx={{
+                width: 38,
+                height: 38,
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                color: '#F59E0B',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 12px rgba(15, 118, 110, 0.25)'
+              }}
+            >
+              <AutoAwesome fontSize="small" />
+            </Box>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 800, color: '#042F2E', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+                Predefined Luxury Atelier Logos
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                Select an exclusive vector crest crafted for haute couture & bridal studios
+              </Typography>
+            </Box>
+          </Box>
+          <IconButton size="small" onClick={() => setLogoModalOpen(false)}>
+            <Block fontSize="small" />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent sx={{ pt: 3, pb: 3 }}>
+          <Grid container spacing={2.5}>
+            {PREDEFINED_LOGOS.map((logo) => {
+              const isSelected = formProfile.logoUrl === logo.dataUri;
+              return (
+                <Grid item xs={12} sm={6} md={4} key={logo.id}>
+                  <Paper
+                    elevation={0}
+                    onClick={() => handleSelectPredefinedLogo(logo.dataUri, logo.name)}
+                    sx={{
+                      p: 2.5,
+                      borderRadius: 3,
+                      border: '2px solid',
+                      borderColor: isSelected ? '#0F766E' : 'divider',
+                      bgcolor: isSelected ? 'rgba(15, 118, 110, 0.05)' : 'background.paper',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      '&:hover': {
+                        transform: 'translateY(-3px)',
+                        boxShadow: '0 10px 25px rgba(15, 118, 110, 0.15)',
+                        borderColor: '#0F766E'
+                      }
+                    }}
+                  >
+                    {isSelected && (
+                      <Chip
+                        icon={<CheckCircle sx={{ fontSize: '14px !important', color: '#FFFFFF !important' }} />}
+                        label="Active Logo"
+                        size="small"
+                        sx={{
+                          position: 'absolute',
+                          top: 10,
+                          right: 10,
+                          bgcolor: '#0F766E',
+                          color: '#FFFFFF',
+                          fontWeight: 800,
+                          fontSize: '0.68rem',
+                          height: 22
+                        }}
+                      />
+                    )}
+
+                    {/* Logo SVG Preview */}
+                    <Box
+                      component="img"
+                      src={logo.dataUri}
+                      alt={logo.name}
+                      sx={{
+                        width: 90,
+                        height: 90,
+                        borderRadius: 3,
+                        mx: 'auto',
+                        mb: 1.5,
+                        display: 'block',
+                        boxShadow: '0 6px 18px rgba(0,0,0,0.12)'
+                      }}
+                    />
+
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#042F2E', mb: 0.5 }}>
+                      {logo.name}
+                    </Typography>
+
+                    <Chip
+                      label={logo.category}
+                      size="small"
+                      sx={{
+                        height: 20,
+                        fontSize: '0.65rem',
+                        fontWeight: 700,
+                        bgcolor: 'rgba(217, 119, 6, 0.12)',
+                        color: '#B45309',
+                        mb: 1
+                      }}
+                    />
+
+                    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', fontSize: '0.72rem', minHeight: 32 }}>
+                      {logo.description}
+                    </Typography>
+
+                    <Button
+                      fullWidth
+                      size="small"
+                      variant={isSelected ? 'contained' : 'outlined'}
+                      sx={{
+                        mt: 1.5,
+                        borderRadius: '20px',
+                        fontWeight: 700,
+                        fontSize: '0.75rem',
+                        textTransform: 'none',
+                        bgcolor: isSelected ? '#0F766E' : 'transparent',
+                        borderColor: '#0F766E',
+                        color: isSelected ? '#FFFFFF' : '#0F766E',
+                        '&:hover': {
+                          bgcolor: isSelected ? '#042F2E' : 'rgba(15, 118, 110, 0.08)'
+                        }
+                      }}
+                    >
+                      {isSelected ? 'Active Selection' : 'Use This Logo'}
+                    </Button>
+                  </Paper>
+                </Grid>
+              );
+            })}
+          </Grid>
+        </DialogContent>
+
+        <DialogActions sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider', justifyContent: 'space-between' }}>
+          <Button
+            startIcon={<CloudUpload />}
+            onClick={() => {
+              setLogoModalOpen(false);
+              logoInputRef.current?.click();
+            }}
+            sx={{ fontWeight: 700, textTransform: 'none', color: '#0F766E' }}
+          >
+            Or Upload Custom File from Device
+          </Button>
+          <Button
+            onClick={() => setLogoModalOpen(false)}
+            variant="contained"
+            sx={{
+              bgcolor: '#042F2E',
+              color: '#FFFFFF',
+              fontWeight: 800,
+              borderRadius: 2,
+              textTransform: 'none',
+              px: 3,
+              '&:hover': { bgcolor: '#0F766E' }
+            }}
+          >
+            Done
           </Button>
         </DialogActions>
       </Dialog>
