@@ -365,9 +365,9 @@ const Expenses = () => {
             {/* Finance & Audit Suite Sub-Nav Tabs */}
             <FinanceNavTabs />
 
-            {/* Atelier KPI Cards */}
-            <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
-                <Grid item xs={12} sm={4}>
+            {/* Atelier KPI Cards: Responsive Grid on Mobile, 3 Columns on Tablet/Desktop */}
+            <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} sx={{ mb: { xs: 2.5, sm: 3.5 } }}>
+                <Grid item xs={6} sm={4}>
                     <AtelierKpiCard
                         title="This Month's Overhead"
                         value={`₹${thisMonthExpense.toLocaleString('en-IN')}`}
@@ -376,7 +376,7 @@ const Expenses = () => {
                         subtitle="Operating costs current month"
                     />
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={6} sm={4}>
                     <AtelierKpiCard
                         title="Total Recorded Expenses"
                         value={`₹${totalExpense.toLocaleString('en-IN')}`}

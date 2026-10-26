@@ -489,11 +489,11 @@ const Dashboard = () => {
       </Box>
 
       {/* ============================================================== */}
-      {/* 3. EDITORIAL KPI METRICS GRID                                  */}
+      {/* 3. EDITORIAL KPI METRICS GRID: Responsive 2x2 Grid on Mobile   */}
       {/* ============================================================== */}
-      <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
+      <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} sx={{ mb: { xs: 2.5, sm: 3.5 } }}>
         {/* Sales Revenue */}
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid item xs={6} sm={6} lg={3}>
           <AtelierKpiCard
             title={salesKpiInfo.title}
             value={`₹${totalRevenue.toLocaleString('en-IN')}`}
@@ -507,7 +507,7 @@ const Dashboard = () => {
         </Grid>
 
         {/* Total Stock Units */}
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid item xs={6} sm={6} lg={3}>
           <AtelierKpiCard
             title="Garment Inventory Stock"
             value={`${totalItems.toLocaleString('en-IN')} pcs`}
@@ -519,7 +519,7 @@ const Dashboard = () => {
         </Grid>
 
         {/* Low Stock Warning */}
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid item xs={6} sm={6} lg={3}>
           <AtelierKpiCard
             title="Low Stock Reorders"
             value={lowStockCount}
@@ -533,7 +533,7 @@ const Dashboard = () => {
         </Grid>
 
         {/* Average Transaction Value (ATV) */}
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid item xs={6} sm={6} lg={3}>
           <AtelierKpiCard
             title="Avg Ticket Value (ATV)"
             value={`₹${atv.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`}
@@ -546,7 +546,7 @@ const Dashboard = () => {
         {/* Admin Exclusive Financial Ledger KPIs */}
         {user?.role === 'admin' && (
           <>
-            <Grid item xs={12} sm={6} lg={3}>
+            <Grid item xs={6} sm={6} lg={3}>
               <AtelierKpiCard
                 title="Gross Trading Profit"
                 value={`₹${grossProfit.toLocaleString('en-IN')}`}
@@ -557,7 +557,7 @@ const Dashboard = () => {
               />
             </Grid>
 
-            <Grid item xs={12} sm={6} lg={3}>
+            <Grid item xs={6} sm={6} lg={3}>
               <AtelierKpiCard
                 title="Net Cash Position"
                 value={`₹${netCash.toLocaleString('en-IN')}`}
@@ -568,7 +568,7 @@ const Dashboard = () => {
               />
             </Grid>
 
-            <Grid item xs={12} sm={6} lg={3}>
+            <Grid item xs={6} sm={6} lg={3}>
               <AtelierKpiCard
                 title="Inventory Capital"
                 value={`₹${totalInventoryValue.toLocaleString('en-IN')}`}
@@ -578,7 +578,7 @@ const Dashboard = () => {
               />
             </Grid>
 
-            <Grid item xs={12} sm={6} lg={3}>
+            <Grid item xs={6} sm={6} lg={3}>
               <AtelierKpiCard
                 title="Vendor Procurement"
                 value={`₹${totalPurchasesCost.toLocaleString('en-IN')}`}

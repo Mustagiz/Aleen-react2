@@ -554,9 +554,9 @@ export default function TailoringKanban() {
         }
       />
 
-      {/* KPI Cards */}
-      <Grid container spacing={2.5} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
+      {/* KPI Cards: Responsive 2x2 Grid on Mobile, 4 Columns on Desktop */}
+      <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} sx={{ mb: { xs: 2.5, sm: 4 } }}>
+        <Grid item xs={6} sm={6} md={3}>
           <AtelierKpiCard
             title="In-Progress Alterations"
             value={activeOrders}
@@ -564,7 +564,7 @@ export default function TailoringKanban() {
             subtitle="Active on workshop floor"
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={6} sm={6} md={3}>
           <AtelierKpiCard
             title="Ready for Pick-Up"
             value={readyOrders}
@@ -573,7 +573,7 @@ export default function TailoringKanban() {
             subtitle="Awaiting client trial or collection"
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={6} sm={6} md={3}>
           <AtelierKpiCard
             title="Rush / Urgent Orders"
             value={urgentOrders}
@@ -583,7 +583,7 @@ export default function TailoringKanban() {
             subtitle="Requires same-day or priority craft"
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={6} sm={6} md={3}>
           <AtelierKpiCard
             title="Delivered & Handed Over"
             value={deliveredOrders.length}

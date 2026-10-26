@@ -336,9 +336,9 @@ const Customers = () => {
             {/* Clientele & CRM Tab Switcher */}
             <ClienteleNavTabs />
 
-            {/* 4 Atelier KPIs */}
-            <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
-                <Grid item xs={12} sm={6} md={3}>
+            {/* 4 Atelier KPIs: Responsive 2x2 Grid on Mobile, 4 Columns on Desktop */}
+            <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} sx={{ mb: { xs: 2.5, sm: 3.5 } }}>
+                <Grid item xs={6} sm={6} md={3}>
                     <AtelierKpiCard
                         title="Registered Clientele"
                         value={totalCustomers.toLocaleString()}
@@ -347,7 +347,7 @@ const Customers = () => {
                         color="primary"
                     />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={6} sm={6} md={3}>
                     <AtelierKpiCard
                         title="Repeat Clientele"
                         value={repeatCount.toLocaleString()}
@@ -360,7 +360,7 @@ const Customers = () => {
                         }}
                     />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={6} sm={6} md={3}>
                     <AtelierKpiCard
                         title="Active This Month"
                         value={activeThisMonth.toLocaleString()}
@@ -369,7 +369,7 @@ const Customers = () => {
                         color="warning"
                     />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={6} sm={6} md={3}>
                     <AtelierKpiCard
                         title="Outstanding Due"
                         value={`₹${totalReceivables.toLocaleString('en-IN')}`}

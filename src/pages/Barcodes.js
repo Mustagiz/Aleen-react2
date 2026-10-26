@@ -686,9 +686,9 @@ export default function BarcodeGenerator() {
                 }
             />
 
-            {/* KPI Cards Ribbon */}
-            <Grid container spacing={2.5} sx={{ mb: 3 }}>
-                <Grid item xs={12} sm={4}>
+            {/* KPI Cards Ribbon: Responsive Grid on Mobile, 3 Columns on Tablet/Desktop */}
+            <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} sx={{ mb: { xs: 2.5, sm: 3 } }}>
+                <Grid item xs={6} sm={4}>
                     <AtelierKpiCard
                         title="Selected Garments"
                         value={selectedProducts.length}
@@ -696,7 +696,7 @@ export default function BarcodeGenerator() {
                         subtitle="Distinct styles in print queue"
                     />
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={6} sm={4}>
                     <AtelierKpiCard
                         title="Total Stickers to Print"
                         value={totalLabelsCount}

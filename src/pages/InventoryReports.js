@@ -197,9 +197,9 @@ const InventoryReports = () => {
       {/* Finance & Audit Tab Switcher */}
       <FinanceNavTabs activeTab="/inventory-reports" />
 
-      {/* 4 Atelier KPIs */}
-      <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
-        <Grid item xs={12} sm={6} md={3}>
+      {/* 4 Atelier KPIs: Responsive 2x2 Grid on Mobile, 4 Columns on Desktop */}
+      <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} sx={{ mb: { xs: 2.5, sm: 3.5 } }}>
+        <Grid item xs={6} sm={6} md={3}>
           <AtelierKpiCard
             title="Total Stock Valuation"
             value={`₹${totalValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
@@ -208,7 +208,7 @@ const InventoryReports = () => {
             color="success"
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={6} sm={6} md={3}>
           <AtelierKpiCard
             title="Active Catalog SKUs"
             value={filteredInventory.length}
@@ -217,7 +217,7 @@ const InventoryReports = () => {
             color="primary"
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={6} sm={6} md={3}>
           <AtelierKpiCard
             title="Low Stock Warning"
             value={lowStockCount}
@@ -226,7 +226,7 @@ const InventoryReports = () => {
             color={lowStockCount > 0 ? "warning" : "success"}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={6} sm={6} md={3}>
           <AtelierKpiCard
             title="Slow Moving SKUs"
             value={slowMovingItems.length}

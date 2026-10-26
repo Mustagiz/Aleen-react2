@@ -147,9 +147,9 @@ const Loyalty = () => {
             {/* Clientele & CRM Tab Switcher */}
             <ClienteleNavTabs />
 
-            {/* 4 Atelier Intelligence KPIs */}
-            <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
-                <Grid item xs={12} sm={6} md={3}>
+            {/* 4 Atelier Intelligence KPIs: Responsive 2x2 Grid on Mobile, 4 Columns on Desktop */}
+            <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} sx={{ mb: { xs: 2.5, sm: 3.5 } }}>
+                <Grid item xs={6} sm={6} md={3}>
                     <AtelierKpiCard
                         title="Circulating Points"
                         value={totalPoints.toLocaleString()}
@@ -159,7 +159,7 @@ const Loyalty = () => {
                     />
                 </Grid>
 
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={6} sm={6} md={3}>
                     <AtelierKpiCard
                         title="Active Privilege Members"
                         value={activeMembers.toLocaleString()}
@@ -173,7 +173,7 @@ const Loyalty = () => {
                     />
                 </Grid>
 
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={6} sm={6} md={3}>
                     <AtelierKpiCard
                         title="Platinum Haute Tier"
                         value={tierStats.Platinum.toLocaleString()}
@@ -183,7 +183,7 @@ const Loyalty = () => {
                     />
                 </Grid>
 
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={6} sm={6} md={3}>
                     <AtelierKpiCard
                         title="Gold Privilege Tier"
                         value={tierStats.Gold.toLocaleString()}

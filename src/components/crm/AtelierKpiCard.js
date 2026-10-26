@@ -137,7 +137,7 @@ export default function AtelierKpiCard({
         />
 
         <CardContent sx={{
-          p: { xs: '14px 16px !important', sm: '18px 20px !important', md: '22px 24px !important' },
+          p: { xs: '12px 13px !important', sm: '18px 20px !important', md: '22px 24px !important' },
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
@@ -145,16 +145,16 @@ export default function AtelierKpiCard({
           boxSizing: 'border-box'
         }}>
           {/* Header: Title and Icon Jewel */}
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1.5, mb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1, mb: 0.75 }}>
             <Typography
               variant="subtitle2"
               noWrap
               sx={{
                 color: isDark ? 'rgba(203, 213, 225, 0.85)' : '#475569',
                 fontWeight: 700,
-                fontSize: { xs: '0.7rem', sm: '0.74rem', md: '0.78rem' },
+                fontSize: { xs: '0.64rem', sm: '0.74rem', md: '0.78rem' },
                 textTransform: 'uppercase',
-                letterSpacing: '0.06em',
+                letterSpacing: '0.04em',
                 flex: 1,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
@@ -167,9 +167,9 @@ export default function AtelierKpiCard({
               <Box
                 className="kpi-icon-jewel"
                 sx={{
-                  width: { xs: 32, sm: 36, md: 40 },
-                  height: { xs: 32, sm: 36, md: 40 },
-                  borderRadius: '10px',
+                  width: { xs: 28, sm: 36, md: 40 },
+                  height: { xs: 28, sm: 36, md: 40 },
+                  borderRadius: '8px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -178,7 +178,10 @@ export default function AtelierKpiCard({
                   border: getIconBorder(),
                   color: getIconColor(),
                   boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 6px rgba(15, 118, 110, 0.08)',
-                  transition: 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                  transition: 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                  '& svg': {
+                    fontSize: { xs: '1rem', sm: '1.15rem', md: '1.25rem' }
+                  }
                 }}
               >
                 {icon}
@@ -195,8 +198,8 @@ export default function AtelierKpiCard({
               fontWeight: 800,
               color: 'text.primary',
               letterSpacing: '-0.025em',
-              my: { xs: 0.25, sm: 0.5 },
-              fontSize: { xs: '1.25rem', sm: '1.45rem', md: '1.85rem' },
+              my: { xs: 0.2, sm: 0.5 },
+              fontSize: { xs: '1.15rem', sm: '1.45rem', md: '1.85rem' },
               fontVariantNumeric: 'tabular-nums',
               overflow: 'hidden',
               textOverflow: 'ellipsis'
