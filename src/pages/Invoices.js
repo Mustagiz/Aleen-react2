@@ -1900,14 +1900,54 @@ const Invoices = () => {
         isMobile ? (
           <Box>
             {sortedInvoices.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(inv => (
-              <GlassCard key={inv.id} sx={{ mb: 2, p: 0 }}>
-                <CardContent sx={{ p: 2.5 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+              <GlassCard
+                key={inv.id}
+                hover
+                sx={{
+                  mb: 2,
+                  p: 0,
+                  borderRadius: '16px',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.18)' : '1px solid rgba(15, 118, 110, 0.12)',
+                  boxShadow: (t) => t.palette.mode === 'dark'
+                    ? 'inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 4px 16px rgba(0, 0, 0, 0.35)'
+                    : 'inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 2px 12px rgba(15, 118, 110, 0.04)'
+                }}
+              >
+                {/* Top Metallic Accent Bar */}
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '3px',
+                    background: 'linear-gradient(90deg, #042F2E 0%, #0F766E 50%, #14B8A6 100%)'
+                  }}
+                />
+
+                <CardContent sx={{ p: 2.25, pt: 2.5 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
                     <Box>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'primary.main' }}>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontFamily: '"JetBrains Mono", monospace',
+                          fontWeight: 700,
+                          color: '#0F766E',
+                          fontSize: '0.78rem',
+                          px: 0.8,
+                          py: 0.2,
+                          borderRadius: '6px',
+                          bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(15, 118, 110, 0.08)',
+                          display: 'inline-block',
+                          mb: 0.5
+                        }}
+                      >
                         #{inv.id}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.73rem' }}>
                         {new Date(inv.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                       </Typography>
                     </Box>
@@ -1915,31 +1955,73 @@ const Invoices = () => {
                       label={inv.paymentMethod}
                       size="small"
                       sx={{
-                        bgcolor: 'primary.light',
-                        color: 'primary.contrastText',
+                        borderRadius: '6px',
                         fontWeight: 700,
-                        fontSize: '0.65rem'
+                        fontSize: '0.68rem',
+                        height: 22,
+                        bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.18)' : 'rgba(15, 118, 110, 0.12)',
+                        color: (t) => t.palette.mode === 'dark' ? '#2DD4BF' : '#0F766E',
+                        border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.3)' : 'rgba(15, 118, 110, 0.2)'}`
                       }}
                     />
                   </Box>
 
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                      {inv.customer || 'Walk-in Customer'}
-                    </Typography>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 900, color: 'primary.main' }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                      <Box
+                        sx={{
+                          width: 22,
+                          height: 22,
+                          borderRadius: '50%',
+                          bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
+                          color: '#0F766E',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '0.65rem',
+                          fontWeight: 800,
+                          flexShrink: 0
+                        }}
+                      >
+                        {(inv.customer || 'W').charAt(0).toUpperCase()}
+                      </Box>
+                      <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.82rem' }}>
+                        {inv.customer || 'Walk-in Customer'}
+                      </Typography>
+                    </Box>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{
+                        fontFamily: '"Plus Jakarta Sans", sans-serif',
+                        fontWeight: 900,
+                        color: 'text.primary',
+                        fontSize: '1.05rem',
+                        fontVariantNumeric: 'tabular-nums'
+                      }}
+                    >
                       ₹{inv.total.toLocaleString('en-IN')}
                     </Typography>
                   </Box>
 
-                  <Divider sx={{ my: 1.5 }} />
+                  <Divider sx={{ my: 1.25, borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' }} />
 
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>
-                      {inv.items?.length || 0} Items
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontWeight: 700,
+                        color: 'text.secondary',
+                        fontSize: '0.72rem',
+                        bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+                        px: 1,
+                        py: 0.3,
+                        borderRadius: '6px'
+                      }}
+                    >
+                      {inv.items?.length || 0} {inv.items?.length === 1 ? 'Item' : 'Items'}
                     </Typography>
                     <Box sx={{ display: 'flex' }}>
-                      <IconButton size="small" onClick={(e) => handleMenuClick(e, inv.id)}>
+                      <IconButton size="small" onClick={(e) => handleMenuClick(e, inv.id)} sx={{ borderRadius: '8px' }}>
                         <MoreVert fontSize="small" />
                       </IconButton>
                     </Box>

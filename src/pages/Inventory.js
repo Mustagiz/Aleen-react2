@@ -1017,39 +1017,88 @@ const Inventory = () => {
                   return (
                     <GlassCard
                       key={item.id}
+                      hover
                       sx={{
                         p: { xs: 2, sm: 2.25 },
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'space-between',
-                        borderLeft: isOutOfStock ? '4px solid #DC2626' : isLowStock ? '4px solid #D97706' : '4px solid transparent',
-                        transition: 'transform 0.18s ease, box-shadow 0.18s ease',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        borderRadius: '16px',
+                        border: (t) => isOutOfStock
+                          ? (t.palette.mode === 'dark' ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(239, 68, 68, 0.28)')
+                          : isLowStock
+                            ? (t.palette.mode === 'dark' ? '1px solid rgba(217, 119, 6, 0.4)' : '1px solid rgba(217, 119, 6, 0.28)')
+                            : (t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.18)' : '1px solid rgba(15, 118, 110, 0.12)'),
+                        boxShadow: (t) => t.palette.mode === 'dark'
+                          ? 'inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 8px 24px rgba(0, 0, 0, 0.4)'
+                          : 'inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 4px 20px -2px rgba(15, 118, 110, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02)',
+                        transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease',
                         '&:hover': {
-                          transform: 'translateY(-2px)',
-                          boxShadow: '0 8px 24px rgba(15, 118, 110, 0.12)'
+                          transform: 'translateY(-3px)',
+                          boxShadow: (t) => isOutOfStock
+                            ? '0 12px 28px rgba(239, 68, 68, 0.18)'
+                            : isLowStock
+                              ? '0 12px 28px rgba(217, 119, 6, 0.18)'
+                              : '0 12px 28px rgba(15, 118, 110, 0.14)',
+                          borderColor: (t) => isOutOfStock ? '#EF4444' : isLowStock ? '#D97706' : (t.palette.mode === 'dark' ? '#2DD4BF' : '#0F766E')
                         }
                       }}
                     >
+                      {/* Top Metallic Accent Bar */}
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          height: '3.5px',
+                          background: isOutOfStock
+                            ? 'linear-gradient(90deg, #DC2626 0%, #EF4444 100%)'
+                            : isLowStock
+                              ? 'linear-gradient(90deg, #B45309 0%, #D97706 50%, #F59E0B 100%)'
+                              : 'linear-gradient(90deg, #042F2E 0%, #0F766E 50%, #14B8A6 100%)'
+                        }}
+                      />
+
                       <CardContent sx={{ p: 0, '&:last-child': { pb: 0 }, display: 'flex', flexDirection: 'column', height: '100%' }}>
                         {/* Header: SKU, Name, Collection */}
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1, mb: 1.5 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1, mb: 1.5, pt: 0.5 }}>
                           <Box sx={{ minWidth: 0, flex: 1 }}>
-                            <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 800, fontSize: '0.8rem' }}>
-                              #{item.productId || 'NO-SKU'}
-                            </Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.5 }}>
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  fontFamily: '"JetBrains Mono", monospace',
+                                  color: '#0F766E',
+                                  fontWeight: 700,
+                                  fontSize: '0.72rem',
+                                  px: 0.8,
+                                  py: 0.2,
+                                  borderRadius: '6px',
+                                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(15, 118, 110, 0.08)',
+                                  border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.25)' : 'rgba(15, 118, 110, 0.15)'}`
+                                }}
+                              >
+                                #{item.productId || 'NO-SKU'}
+                              </Typography>
+                            </Box>
                             <Typography
                               variant="subtitle1"
                               noWrap
                               sx={{
+                                fontFamily: '"Plus Jakarta Sans", sans-serif',
                                 fontWeight: 800,
                                 mt: 0.25,
-                                fontSize: { xs: '0.95rem', sm: '1rem' },
+                                fontSize: { xs: '0.95rem', sm: '1.02rem' },
+                                letterSpacing: '-0.015em',
                                 lineHeight: 1.25
                               }}
                             >
                               {item.name || 'Unnamed Garment'}
                             </Typography>
-                            <Typography variant="caption" noWrap sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}>
+                            <Typography variant="caption" noWrap sx={{ color: 'text.secondary', display: 'block', mt: 0.25, fontSize: '0.73rem' }}>
                               {item.supplier || 'In-House Atelier'}
                             </Typography>
                           </Box>
@@ -1060,9 +1109,10 @@ const Inventory = () => {
                             sx={{
                               fontWeight: 700,
                               fontSize: '0.68rem',
-                              borderRadius: 1.5,
-                              borderColor: 'rgba(15, 118, 110, 0.3)',
-                              color: '#0F766E',
+                              borderRadius: '8px',
+                              borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.3)' : 'rgba(15, 118, 110, 0.22)',
+                              color: (t) => t.palette.mode === 'dark' ? '#2DD4BF' : '#0F766E',
+                              bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.06)' : 'rgba(15, 118, 110, 0.04)',
                               flexShrink: 0
                             }}
                           />
@@ -1071,18 +1121,30 @@ const Inventory = () => {
                         {/* Middle: Size, Color and Stock Badge */}
                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, gap: 1 }}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                            <Typography variant="caption" sx={{ fontWeight: 700, bgcolor: 'action.hover', px: 1, py: 0.35, borderRadius: 1 }}>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                fontWeight: 700,
+                                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+                                px: 1,
+                                py: 0.35,
+                                borderRadius: '6px',
+                                border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}`,
+                                fontSize: '0.72rem'
+                              }}
+                            >
                               {item.size || 'Free Size'}
                             </Typography>
                             {item.color && (
                               <Tooltip title={`Color: ${item.color}`}>
                                 <Box
                                   sx={{
-                                    width: 14,
-                                    height: 14,
+                                    width: 16,
+                                    height: 16,
                                     borderRadius: '50%',
                                     bgcolor: typeof item.color === 'string' ? item.color.toLowerCase() : '#ccc',
-                                    border: '1.5px solid rgba(0,0,0,0.15)',
+                                    border: '1.5px solid rgba(0,0,0,0.2)',
+                                    boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
                                     flexShrink: 0
                                   }}
                                 />
@@ -1099,33 +1161,33 @@ const Inventory = () => {
                           gap: 0,
                           textAlign: 'center',
                           mb: 2,
-                          bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(15, 118, 110, 0.03)',
+                          bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.04)' : 'rgba(15, 118, 110, 0.03)',
                           py: 1.25,
-                          borderRadius: 2,
-                          border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(15, 118, 110, 0.12)'}`
+                          borderRadius: '12px',
+                          border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(15, 118, 110, 0.12)'}`
                         }}>
                           <Box sx={{ px: 0.5, overflow: 'hidden' }}>
-                            <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.65rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 700 }}>
+                            <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.65rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                               Price
                             </Typography>
-                            <Typography variant="body2" noWrap sx={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', mt: 0.25 }}>
+                            <Typography variant="body2" noWrap sx={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 800, fontVariantNumeric: 'tabular-nums', mt: 0.25, fontSize: '0.88rem' }}>
                               ₹{price.toLocaleString('en-IN')}
                             </Typography>
                           </Box>
-                          <Box sx={{ px: 0.5, overflow: 'hidden', borderLeft: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(15, 118, 110, 0.12)'}`, borderRight: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(15, 118, 110, 0.12)'}` }}>
-                            <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.65rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 700 }}>
+                          <Box sx={{ px: 0.5, overflow: 'hidden', borderLeft: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(15, 118, 110, 0.12)'}`, borderRight: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(15, 118, 110, 0.12)'}` }}>
+                            <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.65rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                               {user?.role === 'admin' ? 'Margin' : 'Category'}
                             </Typography>
-                            <Typography variant="body2" noWrap sx={{ fontWeight: 800, color: user?.role === 'admin' ? (profitVal > 0 ? '#059669' : '#DC2626') : 'text.primary', fontVariantNumeric: 'tabular-nums', mt: 0.25 }}>
+                            <Typography variant="body2" noWrap sx={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 800, color: user?.role === 'admin' ? (profitVal > 0 ? '#059669' : '#DC2626') : 'text.primary', fontVariantNumeric: 'tabular-nums', mt: 0.25, fontSize: '0.88rem' }}>
                               {user?.role === 'admin' ? `${profitMarginVal}%` : (item.category || 'Apparel')}
                             </Typography>
                           </Box>
                           <Box sx={{ px: 0.5, overflow: 'hidden' }}>
-                            <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.65rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 700 }}>
+                            <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.65rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                               Stock
                             </Typography>
-                            <Typography variant="body2" noWrap sx={{ fontWeight: 800, mt: 0.25 }}>
-                              {qty} Units
+                            <Typography variant="body2" noWrap sx={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 800, fontVariantNumeric: 'tabular-nums', mt: 0.25, fontSize: '0.88rem' }}>
+                              {qty} <Typography component="span" variant="caption" sx={{ fontSize: '0.68rem', fontWeight: 600, color: 'text.secondary' }}>pcs</Typography>
                             </Typography>
                           </Box>
                         </Box>
@@ -1138,7 +1200,7 @@ const Inventory = () => {
                             onClick={() => navigate('/barcodes', { state: { product: item } })}
                             startIcon={<QrCode fontSize="small" />}
                             sx={{
-                              borderRadius: 2,
+                              borderRadius: '10px',
                               color: '#D97706',
                               borderColor: 'rgba(217, 119, 6, 0.4)',
                               fontWeight: 700,
@@ -1147,7 +1209,11 @@ const Inventory = () => {
                               px: 1.25,
                               minWidth: 'auto',
                               whiteSpace: 'nowrap',
-                              flexShrink: 0
+                              flexShrink: 0,
+                              '&:hover': {
+                                borderColor: '#D97706',
+                                bgcolor: 'rgba(217, 119, 6, 0.08)'
+                              }
                             }}
                           >
                             Tag
@@ -1161,7 +1227,7 @@ const Inventory = () => {
                             onClick={() => handleOpen(item)}
                             disabled={user?.role !== 'admin'}
                             sx={{
-                              borderRadius: 2,
+                              borderRadius: '10px',
                               fontWeight: 700,
                               fontSize: '0.75rem',
                               height: 36,
@@ -1180,7 +1246,7 @@ const Inventory = () => {
                             onClick={() => openDeleteDialog(item.id)}
                             disabled={user?.role !== 'admin'}
                             sx={{
-                              borderRadius: 2,
+                              borderRadius: '10px',
                               fontWeight: 700,
                               fontSize: '0.75rem',
                               height: 36,

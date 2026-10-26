@@ -677,21 +677,57 @@ export default function TailoringKanban() {
                     colOrders.map((order) => (
                       <GlassCard
                         key={order.id}
+                        hover
                         sx={{
                           p: 2,
-                          borderRadius: 2.5,
-                          border: '1px solid',
-                          borderColor: order.urgent ? 'warning.main' : 'divider',
-                          transition: 'all 0.15s ease-in-out',
+                          borderRadius: '14px',
+                          position: 'relative',
+                          overflow: 'hidden',
+                          border: (t) => order.urgent
+                            ? (t.palette.mode === 'dark' ? '1px solid rgba(217, 119, 6, 0.4)' : '1px solid rgba(217, 119, 6, 0.35)')
+                            : (t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.18)' : '1px solid rgba(15, 118, 110, 0.12)'),
+                          boxShadow: (t) => t.palette.mode === 'dark'
+                            ? 'inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 4px 16px rgba(0, 0, 0, 0.35)'
+                            : 'inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 2px 12px rgba(15, 118, 110, 0.04)',
+                          transition: 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease, border-color 0.18s ease',
                           '&:hover': {
-                            borderColor: '#0F766E',
-                            boxShadow: '0 6px 16px rgba(15,118,110,0.1)'
+                            transform: 'translateY(-2px)',
+                            borderColor: order.urgent ? '#D97706' : '#0F766E',
+                            boxShadow: (t) => order.urgent
+                              ? '0 8px 24px rgba(217, 119, 6, 0.15)'
+                              : '0 8px 24px rgba(15, 118, 110, 0.12)'
                           }
                         }}
                       >
-                        {/* Card Header */}
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                          <Typography variant="caption" sx={{ fontFamily: 'monospace', fontWeight: 800, color: '#0F766E' }}>
+                        {/* Top Metallic Accent Line */}
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            height: '3px',
+                            background: order.urgent
+                              ? 'linear-gradient(90deg, #D97706 0%, #EF4444 100%)'
+                              : 'linear-gradient(90deg, #042F2E 0%, #0F766E 50%, #14B8A6 100%)'
+                          }}
+                        />
+
+                        {/* Card Header: Docket # and Rush Flag */}
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1, pt: 0.25 }}>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              fontFamily: '"JetBrains Mono", monospace',
+                              fontWeight: 700,
+                              color: '#0F766E',
+                              fontSize: '0.72rem',
+                              px: 0.8,
+                              py: 0.2,
+                              borderRadius: '6px',
+                              bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(15, 118, 110, 0.08)'
+                            }}
+                          >
                             #{order.id}
                           </Typography>
                           {order.urgent && (
@@ -699,35 +735,67 @@ export default function TailoringKanban() {
                               label="RUSH"
                               size="small"
                               sx={{
-                                height: 18,
+                                height: 20,
                                 fontSize: '0.62rem',
                                 fontWeight: 900,
-                                bgcolor: 'rgba(239, 68, 68, 0.1)',
-                                color: 'error.main',
-                                border: '1px solid rgba(239, 68, 68, 0.3)'
+                                bgcolor: 'rgba(239, 68, 68, 0.12)',
+                                color: '#EF4444',
+                                border: '1px solid rgba(239, 68, 68, 0.35)',
+                                borderRadius: '6px',
+                                letterSpacing: '0.05em'
                               }}
                             />
                           )}
                         </Box>
 
                         {/* Garment Title */}
-                        <Typography variant="body2" sx={{ fontWeight: 800, lineHeight: 1.3, mb: 0.5 }}>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontFamily: '"Plus Jakarta Sans", sans-serif',
+                            fontWeight: 800,
+                            fontSize: '0.92rem',
+                            lineHeight: 1.3,
+                            mb: 0.75,
+                            letterSpacing: '-0.01em'
+                          }}
+                        >
                           {order.garment}
                         </Typography>
 
-                        {/* Customer Info */}
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-                          👤 {order.customerName}
-                        </Typography>
+                        {/* Customer Info with Monogram Badge */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1 }}>
+                          <Box
+                            sx={{
+                              width: 22,
+                              height: 22,
+                              borderRadius: '50%',
+                              bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.18)' : 'rgba(15, 118, 110, 0.12)',
+                              color: '#0F766E',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '0.65rem',
+                              fontWeight: 800,
+                              flexShrink: 0
+                            }}
+                          >
+                            {(order.customerName || 'C').charAt(0).toUpperCase()}
+                          </Box>
+                          <Typography variant="caption" color="text.secondary" noWrap sx={{ fontWeight: 600, fontSize: '0.73rem' }}>
+                            {order.customerName}
+                          </Typography>
+                        </Box>
 
                         {/* Specs */}
                         {order.specs && (
                           <Box
                             sx={{
                               p: 1,
-                              borderRadius: 1.5,
-                              bgcolor: 'action.hover',
-                              mb: 1.5
+                              borderRadius: '8px',
+                              bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(15, 118, 110, 0.035)',
+                              border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(15, 118, 110, 0.08)'}`,
+                              mb: 1.25
                             }}
                           >
                             <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.secondary', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
@@ -738,16 +806,16 @@ export default function TailoringKanban() {
 
                         {/* Tailor & Meta */}
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.8 }}>
-                          <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.secondary', fontWeight: 600 }}>
+                          <Typography variant="caption" sx={{ fontSize: '0.7rem', color: 'text.secondary', fontWeight: 600 }}>
                             ✂️ {order.tailor || 'Master Tailor'}
                           </Typography>
-                          <Typography variant="caption" sx={{ fontWeight: 800, color: '#D97706' }}>
+                          <Typography variant="caption" sx={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 800, color: '#D97706', fontSize: '0.8rem', fontVariantNumeric: 'tabular-nums' }}>
                             ₹{order.price}
                           </Typography>
                         </Box>
 
                         {order.artisanWage > 0 && (
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1, px: 0.8, py: 0.3, bgcolor: 'rgba(15, 118, 110, 0.05)', borderRadius: 1 }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1, px: 1, py: 0.4, bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.06)' : 'rgba(15, 118, 110, 0.05)', borderRadius: '6px' }}>
                             <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.secondary' }}>
                               Labor: ₹{order.artisanWage}
                             </Typography>
@@ -758,10 +826,10 @@ export default function TailoringKanban() {
                         )}
 
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                          <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 700, color: 'text.secondary' }}>
-                            <AccessTime sx={{ fontSize: 12 }} /> Due: {order.targetDate}
+                          <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 700, color: 'text.secondary', fontSize: '0.7rem' }}>
+                            <AccessTime sx={{ fontSize: 13, color: '#0F766E' }} /> Due: {order.targetDate}
                           </Typography>
-                          <Typography variant="caption" sx={{ fontSize: '0.68rem', color: order.advance >= order.price ? 'success.main' : 'warning.main', fontWeight: 700 }}>
+                          <Typography variant="caption" sx={{ fontSize: '0.7rem', color: order.advance >= order.price ? 'success.main' : 'warning.main', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
                             {order.advance >= order.price ? 'Fully Paid' : `Bal: ₹${(order.price || 0) - (order.advance || 0)}`}
                           </Typography>
                         </Box>
