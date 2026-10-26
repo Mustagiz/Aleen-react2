@@ -640,36 +640,83 @@ const Inventory = () => {
           gap: 1.5,
           mb: 2
         }}>
-          {/* Search Bar */}
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="Search garments by name, SKU, or supplier..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search sx={{ color: '#0F766E', fontSize: 20 }} />
-                </InputAdornment>
-              ),
-              endAdornment: search ? (
-                <InputAdornment position="end">
-                  <IconButton size="small" onClick={() => setSearch('')}>
-                    <Close sx={{ fontSize: 16 }} />
-                  </IconButton>
-                </InputAdornment>
-              ) : null
-            }}
-            sx={{
-              flex: { lg: 2 },
-              minWidth: { lg: 260 },
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 2.5,
-                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#FFFFFF'
-              }
-            }}
-          />
+          {/* Search Bar & Instant View Mode Switcher */}
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.25,
+            flex: { lg: 2 },
+            minWidth: { lg: 320 },
+            width: { xs: '100%', lg: 'auto' }
+          }}>
+            <TextField
+              fullWidth
+              size="small"
+              placeholder="Search garments by name, SKU, or supplier..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search sx={{ color: '#0F766E', fontSize: 20 }} />
+                  </InputAdornment>
+                ),
+                endAdornment: search ? (
+                  <InputAdornment position="end">
+                    <IconButton size="small" onClick={() => setSearch('')}>
+                      <Close sx={{ fontSize: 16 }} />
+                    </IconButton>
+                  </InputAdornment>
+                ) : null
+              }}
+              sx={{
+                flex: 1,
+                minWidth: 0,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2.5,
+                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#FFFFFF'
+                }
+              }}
+            />
+
+            {/* View Switcher: Cards vs Table - Prominent on mobile, tablet & desktop */}
+            <ToggleButtonGroup
+              size="small"
+              value={viewMode}
+              exclusive
+              onChange={(e, next) => next && setViewMode(next)}
+              sx={{
+                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : '#FFFFFF',
+                border: '1px solid rgba(15, 118, 110, 0.2)',
+                borderRadius: 2,
+                height: 38,
+                flexShrink: 0
+              }}
+            >
+              <ToggleButton
+                value="cards"
+                title="Card Grid View"
+                sx={{
+                  px: { xs: 1.1, sm: 1.5 },
+                  border: 'none',
+                  '&.Mui-selected': { bgcolor: 'rgba(15, 118, 110, 0.15)', color: '#0F766E' }
+                }}
+              >
+                <GridView sx={{ fontSize: 18 }} />
+              </ToggleButton>
+              <ToggleButton
+                value="table"
+                title="Table View"
+                sx={{
+                  px: { xs: 1.1, sm: 1.5 },
+                  border: 'none',
+                  '&.Mui-selected': { bgcolor: 'rgba(15, 118, 110, 0.15)', color: '#0F766E' }
+                }}
+              >
+                <ViewList sx={{ fontSize: 18 }} />
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
 
           {/* Controls Cluster */}
           <Box sx={{
@@ -727,7 +774,7 @@ const Inventory = () => {
               <MenuItem value="category">Sort: Collection</MenuItem>
             </TextField>
 
-            {/* Asc/Desc, Reset, and View Mode cluster */}
+            {/* Asc/Desc and Reset cluster */}
             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', width: { xs: '100%', sm: 'auto' }, justifyContent: 'space-between' }}>
               <Tooltip title={order === 'asc' ? 'Ascending Order' : 'Descending Order'}>
                 <IconButton
@@ -771,44 +818,6 @@ const Inventory = () => {
               >
                 Reset
               </Button>
-
-              {/* View Switcher: Cards vs Table */}
-              <ToggleButtonGroup
-                size="small"
-                value={viewMode}
-                exclusive
-                onChange={(e, next) => next && setViewMode(next)}
-                sx={{
-                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : '#FFFFFF',
-                  border: '1px solid rgba(15, 118, 110, 0.2)',
-                  borderRadius: 2,
-                  height: 38,
-                  flexShrink: 0
-                }}
-              >
-                <ToggleButton
-                  value="cards"
-                  title="Card Grid View"
-                  sx={{
-                    px: 1.25,
-                    border: 'none',
-                    '&.Mui-selected': { bgcolor: 'rgba(15, 118, 110, 0.15)', color: '#0F766E' }
-                  }}
-                >
-                  <GridView sx={{ fontSize: 18 }} />
-                </ToggleButton>
-                <ToggleButton
-                  value="table"
-                  title="Table View"
-                  sx={{
-                    px: 1.25,
-                    border: 'none',
-                    '&.Mui-selected': { bgcolor: 'rgba(15, 118, 110, 0.15)', color: '#0F766E' }
-                  }}
-                >
-                  <ViewList sx={{ fontSize: 18 }} />
-                </ToggleButton>
-              </ToggleButtonGroup>
             </Box>
           </Box>
         </Box>

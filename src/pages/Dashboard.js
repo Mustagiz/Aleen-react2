@@ -509,7 +509,7 @@ const Dashboard = () => {
         {/* Total Stock Units */}
         <Grid item xs={12} sm={6} lg={3}>
           <AtelierKpiCard
-            title="Garment Vault Stock"
+            title="Garment Inventory Stock"
             value={`${totalItems.toLocaleString('en-IN')} pcs`}
             icon={<Inventory2 fontSize="small" />}
             sapphireAccent={true}
@@ -720,7 +720,7 @@ const Dashboard = () => {
         {/* Right: Garment Stock Distribution */}
         <Grid item xs={12} md={5} lg={4}>
           <GlassCard sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Typography variant="h6" sx={{ fontWeight: 800, mb: 0.5 }}>Garment Vault Health</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 800, mb: 0.5 }}>Garment Inventory Health</Typography>
             <Typography variant="caption" color="text.secondary" sx={{ mb: 3 }}>Distribution by inventory tier</Typography>
 
             <Box sx={{ flexGrow: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

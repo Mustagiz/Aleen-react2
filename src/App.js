@@ -103,6 +103,8 @@ const AnimatedRoutes = () => {
           <Route index element={<PageWrapper><Dashboard /></PageWrapper>} />
           <Route path="inventory" element={<PageWrapper><Inventory /></PageWrapper>} />
           <Route path="tailoring" element={<PageWrapper><TailoringKanban /></PageWrapper>} />
+          <Route path="kanban" element={<Navigate to="/tailoring" replace />} />
+          <Route path="workshop" element={<Navigate to="/tailoring" replace />} />
           <Route path="invoices" element={<PageWrapper><Invoices /></PageWrapper>} />
           <Route path="customers" element={<PageWrapper><Customers /></PageWrapper>} />
           <Route path="sales-reports" element={<PageWrapper><SalesReports /></PageWrapper>} />

@@ -580,11 +580,11 @@ export default function Layout() {
               noWrap
               sx={{
                 display: { xs: 'block', sm: 'none' },
-                fontSize: '0.88rem',
+                fontSize: '0.86rem',
                 fontWeight: 800,
                 color: 'text.primary',
-                letterSpacing: '-0.01em',
-                maxWidth: { xs: 130, xxs: 100 }
+                letterSpacing: '-0.015em',
+                maxWidth: { xs: 150, xxs: 110 }
               }}
             >
               {getBreadcrumbTitle()}
@@ -688,31 +688,48 @@ export default function Layout() {
 
             {/* Champagne Gold "+ Quick Bill" CTA */}
             {canQuickBill && (
+              <Tooltip title="Quick POS Bill (Alt + N or F2)">
+                <IconButton
+                  onClick={handleQuickBill}
+                  size="small"
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    display: { xs: 'inline-flex', sm: 'none' },
+                    borderRadius: '9px',
+                    background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
+                    color: '#ffffff',
+                    boxShadow: '0 2px 8px rgba(217, 119, 6, 0.35)',
+                    '&:hover': {
+                      background: 'linear-gradient(135deg, #B45309 0%, #92400E 100%)'
+                    }
+                  }}
+                >
+                  <Add fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
+            {canQuickBill && (
               <Button
                 variant="contained"
                 color="secondary"
                 size="small"
-                startIcon={<Add fontSize="small" sx={{ mr: { xs: -0.25, sm: 0.5 } }} />}
+                startIcon={<Add fontSize="small" />}
                 onClick={handleQuickBill}
                 title="Create Retail Invoice (Alt + N or F2)"
                 sx={{
                   height: 36,
-                  px: { xs: 1.25, sm: 2 },
+                  px: 2,
                   borderRadius: '9999px',
                   fontWeight: 800,
-                  fontSize: { xs: '0.75rem', sm: '0.825rem' },
+                  fontSize: '0.825rem',
                   boxShadow: '0 4px 14px rgba(217, 119, 6, 0.3)',
                   cursor: 'pointer',
-                  minWidth: { xs: 36, sm: 'auto' },
-                  whiteSpace: 'nowrap'
+                  whiteSpace: 'nowrap',
+                  display: { xs: 'none', sm: 'inline-flex' }
                 }}
               >
-                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
-                  Quick Bill
-                </Box>
-                <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>
-                  Bill
-                </Box>
+                Quick Bill
               </Button>
             )}
 
@@ -735,7 +752,7 @@ export default function Layout() {
               {mode === 'dark' ? <Brightness7 fontSize="small" sx={{ color: '#F59E0B' }} /> : <Brightness4 fontSize="small" sx={{ color: '#0F766E' }} />}
             </IconButton>
 
-            {/* Top Right Logout Button */}
+            {/* Top Right Logout Button - Hidden on phone screens to eliminate clutter; accessible via drawer */}
             <Tooltip title="Log out of Aleen Clothing">
               <Button
                 onClick={handleLogout}
@@ -753,7 +770,7 @@ export default function Layout() {
                   color: isDark ? '#FCA5A5' : '#DC2626',
                   bgcolor: isDark ? 'rgba(239, 68, 68, 0.08)' : 'rgba(254, 242, 242, 0.7)',
                   px: { xs: 1, sm: 1.6 },
-                  minWidth: { xs: 36, sm: 'auto' },
+                  display: { xs: 'none', sm: 'inline-flex' },
                   '& .MuiButton-startIcon': {
                     mr: { xs: 0, sm: 1 },
                     ml: { xs: 0, sm: -0.5 }
@@ -764,9 +781,7 @@ export default function Layout() {
                   }
                 }}
               >
-                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
-                  Logout
-                </Box>
+                <span>Logout</span>
               </Button>
             </Tooltip>
           </Box>
@@ -816,11 +831,12 @@ export default function Layout() {
         {[
           { label: 'Overview', icon: <Dashboard sx={{ fontSize: 20 }} />, path: '/' },
           { label: 'Billing', icon: <Receipt sx={{ fontSize: 20 }} />, path: '/invoices' },
-          { label: 'Workshop', icon: <Straighten sx={{ fontSize: 20 }} />, path: '/kanban' },
-          { label: 'Vault', icon: <Inventory sx={{ fontSize: 20 }} />, path: '/inventory' },
+          { label: 'Workshop', icon: <Straighten sx={{ fontSize: 20 }} />, path: '/tailoring' },
+          { label: 'Inventory', icon: <Inventory sx={{ fontSize: 20 }} />, path: '/inventory' },
           { label: 'Guests', icon: <People sx={{ fontSize: 20 }} />, path: '/customers' }
         ].map((tab) => {
-          const isActive = location.pathname === tab.path;
+          const isActive = location.pathname === tab.path ||
+            (tab.path === '/tailoring' && (location.pathname === '/kanban' || location.pathname === '/workshop'));
           return (
             <Box
               key={tab.path}

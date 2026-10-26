@@ -23,7 +23,9 @@ import {
   TableContainer,
   TablePagination,
   Alert,
-  InputAdornment
+  InputAdornment,
+  ToggleButton,
+  ToggleButtonGroup
 } from '@mui/material';
 import {
   Add,
@@ -47,7 +49,9 @@ import {
   Phone,
   Close,
   PersonAdd,
-  CalendarMonth
+  CalendarMonth,
+  GridView,
+  ViewList
 } from '@mui/icons-material';
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
@@ -250,6 +254,8 @@ export default function TailoringKanban() {
   const [search, setSearch] = useState('');
   const [completedSearch, setCompletedSearch] = useState('');
   const [deliveredPage, setDeliveredPage] = useState(0);
+  const [workshopViewMode, setWorkshopViewMode] = useState('board');
+  const [workshopListPage, setWorkshopListPage] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedSilhouette, setSelectedSilhouette] = useState('blouse');
   const [measurementData, setMeasurementData] = useState({});
@@ -592,7 +598,7 @@ export default function TailoringKanban() {
 
       {/* Kanban Board Container (5 Active Workshop Stages) */}
       <Box sx={{ mb: 6 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, justifyContent: 'space-between', gap: 1.5, mb: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <Typography variant="h6" sx={{ fontWeight: 800, letterSpacing: '-0.01em' }}>
               Workshop Craft Floor
@@ -603,20 +609,213 @@ export default function TailoringKanban() {
               sx={{ fontWeight: 800, bgcolor: 'primary.light', color: 'primary.contrastText' }}
             />
           </Box>
-          <Typography variant="caption" color="text.secondary">
-            Use arrows or "Deliver" to progress jobs across stages
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, width: { xs: '100%', sm: 'auto' }, justifyContent: { xs: 'space-between', sm: 'flex-end' } }}>
+            <Typography variant="caption" color="text.secondary" sx={{ display: { xs: 'none', md: 'block' } }}>
+              Use arrows or "Deliver" to progress jobs across stages
+            </Typography>
+            <ToggleButtonGroup
+              size="small"
+              value={workshopViewMode}
+              exclusive
+              onChange={(e, next) => next && setWorkshopViewMode(next)}
+              sx={{
+                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : '#FFFFFF',
+                border: '1px solid rgba(15, 118, 110, 0.2)',
+                borderRadius: 2,
+                height: 34
+              }}
+            >
+              <ToggleButton
+                value="board"
+                title="Board / Card View"
+                sx={{
+                  px: 1.25,
+                  border: 'none',
+                  '&.Mui-selected': { bgcolor: 'rgba(15, 118, 110, 0.15)', color: '#0F766E' }
+                }}
+              >
+                <GridView sx={{ fontSize: 17, mr: { xs: 0, sm: 0.5 } }} />
+                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' }, fontSize: '0.74rem', fontWeight: 700 }}>Board</Box>
+              </ToggleButton>
+              <ToggleButton
+                value="list"
+                title="List View"
+                sx={{
+                  px: 1.25,
+                  border: 'none',
+                  '&.Mui-selected': { bgcolor: 'rgba(15, 118, 110, 0.15)', color: '#0F766E' }
+                }}
+              >
+                <ViewList sx={{ fontSize: 17, mr: { xs: 0, sm: 0.5 } }} />
+                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' }, fontSize: '0.74rem', fontWeight: 700 }}>List</Box>
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
         </Box>
 
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)', lg: 'repeat(5, 1fr)' },
-            gap: 2,
-            overflowX: 'auto',
-            pb: 1.5
-          }}
-        >
+        {workshopViewMode === 'list' ? (
+          <GlassCard sx={{ p: 0, overflow: 'hidden', borderRadius: 3, border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.14)' }}>
+            <TableContainer>
+              <Table size="small">
+                <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)', borderBottom: '2px solid rgba(15, 118, 110, 0.16)' }}>
+                  <TableRow>
+                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Job ID</TableCell>
+                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Client</TableCell>
+                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Garment & Specs</TableCell>
+                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Active Phase</TableCell>
+                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Master Tailor</TableCell>
+                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Target Due Date</TableCell>
+                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'right' }}>Fee & Balance</TableCell>
+                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'center' }}>Progress</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredOrders.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={8} sx={{ py: 5, textAlign: 'center', color: 'text.secondary' }}>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>No active jobs matching search</Typography>
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredOrders
+                      .slice(workshopListPage * 10, workshopListPage * 10 + 10)
+                      .map((order) => {
+                        const colIndex = KANBAN_COLUMNS.findIndex(c => c.id === order.status);
+                        const currentCol = KANBAN_COLUMNS[colIndex] || KANBAN_COLUMNS[0];
+                        const bal = (order.price || 0) - (order.advance || 0);
+
+                        return (
+                          <TableRow key={order.id} hover sx={{ '&:hover': { bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(15, 118, 110, 0.03)' } }}>
+                            <TableCell>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                                <Typography
+                                  variant="caption"
+                                  sx={{
+                                    fontFamily: '"JetBrains Mono", monospace',
+                                    fontWeight: 800,
+                                    color: '#0F766E',
+                                    fontSize: '0.74rem',
+                                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(15, 118, 110, 0.08)',
+                                    px: 0.8,
+                                    py: 0.25,
+                                    borderRadius: '6px',
+                                    border: '1px solid rgba(15, 118, 110, 0.2)',
+                                    whiteSpace: 'nowrap'
+                                  }}
+                                >
+                                  #{order.id}
+                                </Typography>
+                                <GarmentSilhouetteBadge type={order.garment || order.silhouette} size="small" />
+                                {order.urgent && (
+                                  <Chip label="RUSH" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 900, bgcolor: 'rgba(239, 68, 68, 0.12)', color: '#EF4444' }} />
+                                )}
+                              </Box>
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.84rem' }}>{order.customerName}</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', fontFamily: 'monospace', fontSize: '0.72rem' }}>{order.phone}</Typography>
+                            </TableCell>
+                            <TableCell sx={{ maxWidth: 260 }}>
+                              <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.84rem' }} noWrap>{order.garment}</Typography>
+                              {order.specs && (
+                                <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block', fontSize: '0.7rem' }}>{order.specs}</Typography>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <Chip
+                                label={currentCol.label}
+                                size="small"
+                                sx={{
+                                  fontWeight: 800,
+                                  fontSize: '0.68rem',
+                                  bgcolor: (t) => t.palette.mode === 'dark' ? `${currentCol.color}25` : `${currentCol.color}15`,
+                                  color: currentCol.color,
+                                  border: `1px solid ${currentCol.color}40`,
+                                  borderRadius: '6px'
+                                }}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="body2" sx={{ fontSize: '0.82rem', fontWeight: 600 }}>✂️ {order.tailor || 'Master Tailor'}</Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="caption" sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
+                                <AccessTime sx={{ fontSize: 13, color: '#0F766E' }} /> {order.targetDate}
+                              </Typography>
+                            </TableCell>
+                            <TableCell sx={{ textAlign: 'right' }}>
+                              <Typography variant="body2" sx={{ fontWeight: 800, color: '#0F766E', fontVariantNumeric: 'tabular-nums' }}>₹{Number(order.price || 0).toLocaleString('en-IN')}</Typography>
+                              <Typography variant="caption" sx={{ fontWeight: 700, color: bal <= 0 ? 'success.main' : 'warning.main', fontSize: '0.68rem', display: 'block' }}>
+                                {bal <= 0 ? 'Paid' : `Bal: ₹${bal}`}
+                              </Typography>
+                            </TableCell>
+                            <TableCell sx={{ textAlign: 'center' }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => moveOrder(order.id, 'prev')}
+                                  disabled={colIndex === 0}
+                                  sx={{ p: 0.5 }}
+                                >
+                                  <ArrowBack fontSize="small" sx={{ fontSize: 16 }} />
+                                </IconButton>
+                                <Tooltip title="Send WhatsApp Update">
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => sendWhatsAppUpdate(order)}
+                                    sx={{ color: '#25D366', p: 0.5 }}
+                                  >
+                                    <WhatsApp fontSize="small" sx={{ fontSize: 16 }} />
+                                  </IconButton>
+                                </Tooltip>
+                                {colIndex < KANBAN_COLUMNS.length - 1 ? (
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => moveOrder(order.id, 'next')}
+                                    sx={{ p: 0.5, color: '#0F766E' }}
+                                  >
+                                    <ArrowForward fontSize="small" sx={{ fontSize: 16 }} />
+                                  </IconButton>
+                                ) : (
+                                  <Tooltip title="Deliver to Client">
+                                    <IconButton
+                                      size="small"
+                                      onClick={() => markAsDelivered(order.id)}
+                                      sx={{ p: 0.5, color: '#059669' }}
+                                    >
+                                      <DoneAll fontSize="small" sx={{ fontSize: 16 }} />
+                                    </IconButton>
+                                  </Tooltip>
+                                )}
+                              </Box>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <TablePagination
+              rowsPerPageOptions={[10]}
+              component="div"
+              count={filteredOrders.length}
+              rowsPerPage={10}
+              page={workshopListPage}
+              onPageChange={(e, newPage) => setWorkshopListPage(newPage)}
+              sx={{ borderTop: '1px solid', borderColor: 'divider', '& .MuiTablePagination-toolbar': { minHeight: 48 } }}
+            />
+          </GlassCard>
+        ) : (
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)', lg: 'repeat(5, 1fr)' },
+              gap: 2,
+              overflowX: 'auto',
+              pb: 1.5
+            }}
+          >
           {KANBAN_COLUMNS.map((col, colIndex) => {
             const colOrders = filteredOrders.filter(o => o.status === col.id);
             return (
@@ -969,6 +1168,7 @@ export default function TailoringKanban() {
             );
           })}
         </Box>
+        )}
       </Box>
 
       {/* Dedicated Completed & Delivered Garments Section (Down the board) */}
