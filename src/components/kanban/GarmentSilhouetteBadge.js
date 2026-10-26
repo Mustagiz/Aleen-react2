@@ -10,9 +10,13 @@ import {
 const SILHOUETTES = {
   suit: { label: 'Bespoke Suit', icon: DryCleaning, color: '#0284C7' },
   tuxedo: { label: 'Tuxedo', icon: DryCleaning, color: '#0F172A' },
-  sherwani: { label: 'Royal Sherwani', icon: AccessibilityNew, color: '#D97706' },
+  sherwani: { label: 'Sherwani', icon: AccessibilityNew, color: '#D97706' },
   gown: { label: 'Evening Gown', icon: Face3, color: '#E11D48' },
+  kurti: { label: 'Kurti Set', icon: Checkroom, color: '#059669' },
   kurta: { label: 'Kurta Set', icon: Checkroom, color: '#059669' },
+  blouse: { label: 'Blouse', icon: Checkroom, color: '#DB2777' },
+  lehenga: { label: 'Lehenga', icon: Face3, color: '#D97706' },
+  shawl: { label: 'Shawl', icon: Checkroom, color: '#059669' },
   abaya: { label: 'Haute Abaya', icon: Checkroom, color: '#7C3AED' },
   blazer: { label: 'Couture Blazer', icon: DryCleaning, color: '#0F766E' },
   shirt: { label: 'Tailored Shirt', icon: Checkroom, color: '#2563EB' }
@@ -42,10 +46,12 @@ export default function GarmentSilhouetteBadge({
         sx={{
           display: 'inline-flex',
           alignItems: 'center',
-          gap: 0.6,
-          px: isSmall ? 0.9 : 1.2,
-          py: isSmall ? 0.3 : 0.45,
+          gap: 0.5,
+          px: isSmall ? 0.75 : 1.2,
+          py: isSmall ? 0.25 : 0.45,
           borderRadius: '8px',
+          whiteSpace: 'nowrap',
+          flexShrink: 0,
           background: isDark
             ? 'rgba(255, 255, 255, 0.05)'
             : 'rgba(15, 118, 110, 0.04)',
@@ -59,7 +65,8 @@ export default function GarmentSilhouetteBadge({
         <IconComponent
           sx={{
             fontSize: isSmall ? 14 : 17,
-            color: isDark ? '#2DD4BF' : '#0F766E'
+            color: isDark ? '#2DD4BF' : '#0F766E',
+            flexShrink: 0
           }}
         />
         {showLabel && (
@@ -70,7 +77,8 @@ export default function GarmentSilhouetteBadge({
               fontSize: isSmall ? '0.68rem' : '0.74rem',
               color: isDark ? 'rgba(241, 245, 249, 0.9)' : '#1E293B',
               letterSpacing: '0.02em',
-              textTransform: 'capitalize'
+              textTransform: 'capitalize',
+              whiteSpace: 'nowrap'
             }}
           >
             {displayLabel}

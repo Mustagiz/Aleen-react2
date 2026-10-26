@@ -810,7 +810,7 @@ export default function TailoringKanban() {
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)', lg: 'repeat(5, 1fr)' },
+              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(260px, 1fr))', md: 'repeat(3, minmax(260px, 1fr))', lg: 'repeat(5, minmax(240px, 1fr))' },
               gap: 2,
               overflowX: 'auto',
               pb: 1.5
@@ -829,7 +829,7 @@ export default function TailoringKanban() {
                   p: 1.5,
                   display: 'flex',
                   flexDirection: 'column',
-                  minWidth: { xs: '100%', sm: 260, lg: 220 },
+                  minWidth: { xs: '100%', sm: 260, md: 260, lg: 240 },
                   maxHeight: 'calc(100vh - 280px)'
                 }}
               >
@@ -885,7 +885,7 @@ export default function TailoringKanban() {
                       <GlassCard
                         key={order.id}
                         sx={{
-                          p: 2,
+                          p: 1.75,
                           borderRadius: '14px',
                           position: 'relative',
                           overflow: 'hidden',
@@ -915,8 +915,8 @@ export default function TailoringKanban() {
                         />
 
                         {/* Card Header: Docket #, Silhouette Badge, and Rush Flag */}
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1, pt: 0.25, gap: 1 }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, minWidth: 0, flexShrink: 1 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1, pt: 0.25, gap: 0.75, minHeight: 24 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, minWidth: 0, flexShrink: 1 }}>
                             <Typography
                               variant="caption"
                               sx={{
@@ -924,7 +924,7 @@ export default function TailoringKanban() {
                                 fontWeight: 700,
                                 color: '#0F766E',
                                 fontSize: '0.72rem',
-                                px: 0.8,
+                                px: 0.75,
                                 py: 0.2,
                                 borderRadius: '6px',
                                 bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(15, 118, 110, 0.08)',

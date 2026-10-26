@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel, CircularProgress, Alert, Snackbar, InputAdornment, List } from '@mui/material';
-import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, ShoppingCart, RestartAlt, CalendarMonth, Phone } from '@mui/icons-material';
+import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, PauseCircleOutline, ShoppingCart, RestartAlt, CalendarMonth, Phone } from '@mui/icons-material';
 import { Html5Qrcode } from 'html5-qrcode';
 import { db } from '../firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -2403,8 +2403,15 @@ const Invoices = () => {
           borderBottom: '1px solid rgba(217, 119, 6, 0.2)'
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <Avatar sx={{ bgcolor: 'rgba(217, 119, 6, 0.2)', color: '#D97706', width: 40, height: 40, border: '1px solid rgba(217, 119, 6, 0.4)' }}>
-              <PointOfSale fontSize="small" />
+            <Avatar sx={{
+              bgcolor: 'rgba(255, 255, 255, 0.15)',
+              color: '#FBBF24',
+              width: 42,
+              height: 42,
+              border: '1px solid rgba(251, 191, 36, 0.45)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
+            }}>
+              <PointOfSale sx={{ fontSize: 22 }} />
             </Avatar>
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -2432,22 +2439,26 @@ const Invoices = () => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Button
               size="small"
+              variant="outlined"
               onClick={handleParkCart}
-              startIcon={<PauseCircle sx={{ fontSize: 18 }} />}
+              startIcon={<PauseCircleOutline sx={{ fontSize: 17 }} />}
               sx={{
-                color: '#FBBF24',
-                borderColor: 'rgba(251, 191, 36, 0.45)',
-                border: '1px solid',
-                borderRadius: '16px',
-                px: 1.5,
-                py: 0.4,
+                color: '#FEF3C7',
+                borderColor: 'rgba(254, 243, 199, 0.35)',
+                bgcolor: 'rgba(255, 255, 255, 0.08)',
+                backdropFilter: 'blur(4px)',
+                borderRadius: '8px',
+                px: 1.8,
+                py: 0.55,
                 textTransform: 'none',
                 fontWeight: 700,
-                fontSize: '0.78rem',
-                bgcolor: 'rgba(251, 191, 36, 0.12)',
+                fontSize: '0.8rem',
+                letterSpacing: '0.02em',
+                transition: 'all 0.2s ease',
                 '&:hover': {
-                  bgcolor: 'rgba(251, 191, 36, 0.22)',
-                  borderColor: '#FBBF24'
+                  bgcolor: 'rgba(255, 255, 255, 0.16)',
+                  borderColor: '#FEF3C7',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
                 }
               }}
             >
@@ -2491,7 +2502,7 @@ const Invoices = () => {
 
                 <Box sx={{ mb: 2 }}>
                   <TextField
-                    label="Customer Name *"
+                    label="Customer Name"
                     fullWidth
                     size="small"
                     required
@@ -2540,7 +2551,7 @@ const Invoices = () => {
 
                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
                   <TextField
-                    label="Phone Number *"
+                    label="Phone Number"
                     size="small"
                     required
                     error={clientValidationErrors.phone}
@@ -3414,17 +3425,23 @@ const Invoices = () => {
             <Button
               onClick={handleParkCart}
               variant="outlined"
-              size="medium"
-              startIcon={<PauseCircle />}
+              size="small"
+              startIcon={<PauseCircleOutline sx={{ fontSize: 17 }} />}
               sx={{
-                borderRadius: '10px',
+                borderRadius: '8px',
+                px: 2,
+                py: 0.75,
                 fontWeight: 700,
-                color: '#D97706',
-                borderColor: '#D97706',
-                bgcolor: 'rgba(217, 119, 6, 0.06)',
+                fontSize: '0.82rem',
+                textTransform: 'none',
+                color: mode === 'dark' ? '#FBBF24' : '#92400E',
+                borderColor: mode === 'dark' ? 'rgba(251, 191, 36, 0.35)' : 'rgba(217, 119, 6, 0.35)',
+                bgcolor: mode === 'dark' ? 'rgba(251, 191, 36, 0.06)' : 'rgba(217, 119, 6, 0.04)',
+                transition: 'all 0.2s ease',
                 '&:hover': {
-                  borderColor: '#B45309',
-                  bgcolor: 'rgba(217, 119, 6, 0.14)'
+                  borderColor: '#D97706',
+                  bgcolor: mode === 'dark' ? 'rgba(251, 191, 36, 0.12)' : 'rgba(217, 119, 6, 0.08)',
+                  boxShadow: '0 2px 8px rgba(217, 119, 6, 0.12)'
                 }
               }}
             >
@@ -3452,7 +3469,7 @@ const Invoices = () => {
                 }
               }}
             >
-              <span>Generate Bill • ₹{total.toFixed(0).toLocaleString('en-IN')}</span>
+              <span>Generate Bill</span>
               <Chip
                 label="F4"
                 size="small"
