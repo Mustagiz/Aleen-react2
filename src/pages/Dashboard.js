@@ -694,7 +694,7 @@ const Dashboard = () => {
       <Grid container spacing={3} sx={{ mb: 3.5 }}>
         {/* Left: Financial Performance Trajectory */}
         <Grid item xs={12} lg={8}>
-          <GlassCard sx={{ p: 3, height: '100%' }} glowColor="emerald">
+          <GlassCard sx={{ p: 3, height: '100%' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 800 }}>Financial Trajectory & Inflow</Typography>
@@ -719,7 +719,7 @@ const Dashboard = () => {
 
         {/* Right: Garment Stock Distribution */}
         <Grid item xs={12} lg={4}>
-          <GlassCard sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }} glowColor="sapphire">
+          <GlassCard sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
             <Typography variant="h6" sx={{ fontWeight: 800, mb: 0.5 }}>Garment Vault Health</Typography>
             <Typography variant="caption" color="text.secondary" sx={{ mb: 3 }}>Distribution by inventory tier</Typography>
 
@@ -759,7 +759,7 @@ const Dashboard = () => {
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {/* Left: Top Products Bar Chart */}
         <Grid item xs={12} lg={7}>
-          <GlassCard sx={{ p: 3, height: '100%' }} glowColor="gold">
+          <GlassCard sx={{ p: 3, height: '100%' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3, alignItems: 'center' }}>
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 800 }}>Top Couture & Garment Silhouettes</Typography>
@@ -782,7 +782,7 @@ const Dashboard = () => {
 
         {/* Right: Live Checkout Stream */}
         <Grid item xs={12} lg={5}>
-          <GlassCard sx={{ p: 0, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }} glowColor="aurora">
+          <GlassCard sx={{ p: 0, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography variant="h6" sx={{ fontWeight: 800 }}>Recent Patron Checkouts</Typography>
               <Button

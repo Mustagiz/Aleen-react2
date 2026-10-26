@@ -1017,8 +1017,6 @@ const Inventory = () => {
                   return (
                     <GlassCard
                       key={item.id}
-                      hover
-                      glowColor={isOutOfStock ? 'ruby' : isLowStock ? 'gold' : 'emerald'}
                       sx={{
                         p: { xs: 2, sm: 2.25 },
                         display: 'flex',

@@ -677,8 +677,6 @@ export default function TailoringKanban() {
                     colOrders.map((order) => (
                       <GlassCard
                         key={order.id}
-                        hover
-                        glowColor={order.urgent ? 'ruby' : 'emerald'}
                         sx={{
                           p: 2,
                           borderRadius: '14px',

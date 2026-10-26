@@ -42,7 +42,7 @@ const GLOW_PRESETS = {
     }
 };
 
-const GlassCard = ({ children, sx = {}, hover = true, glowColor = 'aurora', ...props }) => {
+const GlassCard = ({ children, sx = {}, hover = false, glowColor = 'aurora', ...props }) => {
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
 
@@ -52,11 +52,10 @@ const GlassCard = ({ children, sx = {}, hover = true, glowColor = 'aurora', ...p
 
     return (
         <Box
-            component={motion.div}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            whileHover={hover ? { y: -5, transition: { duration: 0.2, ease: 'easeOut' } } : undefined}
+            component={hover ? motion.div : 'div'}
+            {...(hover ? {
+                whileHover: { y: -4, transition: { duration: 0.2, ease: 'easeOut' } }
+            } : {})}
             sx={{ height: '100%' }}
         >
             <Paper
@@ -76,7 +75,7 @@ const GlassCard = ({ children, sx = {}, hover = true, glowColor = 'aurora', ...p
                         ? 'inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 8px 30px rgba(0, 0, 0, 0.45)'
                         : 'inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 4px 20px -2px rgba(15, 118, 110, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02)',
                     overflow: 'hidden',
-                    transition: 'border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                    transition: hover ? 'border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1)' : 'none',
                     ...(hover ? {
                         '&:hover': {
                             borderColor: hoverBorder,
