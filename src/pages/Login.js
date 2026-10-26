@@ -118,7 +118,7 @@ export default function Login() {
               <Typography
                 variant="h5"
                 sx={{
-                  fontFamily: '"Playfair Display", serif',
+                  fontFamily: '"Outfit", "Inter", sans-serif',
                   fontWeight: 900,
                   letterSpacing: '0.08em',
                   color: '#FFFFFF',
@@ -162,7 +162,7 @@ export default function Login() {
           <Typography
             variant="h2"
             sx={{
-              fontFamily: '"Playfair Display", serif',
+              fontFamily: '"Outfit", "Inter", sans-serif',
               fontWeight: 800,
               lineHeight: 1.15,
               mb: 2.5,
@@ -292,10 +292,10 @@ export default function Login() {
               <Typography
                 variant="h4"
                 sx={{
-                  fontFamily: '"Playfair Display", serif',
-                  fontWeight: 900,
+                  fontFamily: '"Outfit", "Inter", sans-serif',
+                  fontWeight: 800,
                   color: '#042F2E',
-                  letterSpacing: '-0.02em',
+                  letterSpacing: '-0.025em',
                   mb: 0.5
                 }}
               >

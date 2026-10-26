@@ -50,18 +50,18 @@ export const ThemeProvider = ({ children }) => {
                 divider: mode === 'light' ? 'rgba(15, 118, 110, 0.12)' : 'rgba(255, 255, 255, 0.08)'
             },
             typography: {
-                fontFamily: '"Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                h1: { fontFamily: '"Playfair Display", Georgia, serif', fontWeight: 800, fontSize: '2.4rem', letterSpacing: '-0.02em' },
-                h2: { fontFamily: '"Playfair Display", Georgia, serif', fontWeight: 800, fontSize: '1.9rem', letterSpacing: '-0.015em' },
-                h3: { fontFamily: '"Playfair Display", Georgia, serif', fontWeight: 700, fontSize: '1.5rem', letterSpacing: '-0.01em' },
-                h4: { fontFamily: '"Playfair Display", Georgia, serif', fontWeight: 700, fontSize: '1.3rem', letterSpacing: '-0.005em' },
-                h5: { fontWeight: 700, fontSize: '1.15rem', letterSpacing: '-0.01em' },
-                h6: { fontWeight: 700, fontSize: '1rem' },
-                subtitle1: { fontSize: '0.95rem', fontWeight: 600 },
-                subtitle2: { fontSize: '0.85rem', fontWeight: 700 },
-                body1: { fontSize: '0.925rem', lineHeight: 1.6 },
-                body2: { fontSize: '0.85rem', lineHeight: 1.5 },
-                button: { textTransform: 'none', fontWeight: 700, letterSpacing: '0.01em' }
+                fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                h1: { fontFamily: '"Outfit", "Inter", sans-serif', fontWeight: 800, fontSize: '2.3rem', letterSpacing: '-0.025em' },
+                h2: { fontFamily: '"Outfit", "Inter", sans-serif', fontWeight: 700, fontSize: '1.85rem', letterSpacing: '-0.02em' },
+                h3: { fontFamily: '"Outfit", "Inter", sans-serif', fontWeight: 700, fontSize: '1.45rem', letterSpacing: '-0.015em' },
+                h4: { fontFamily: '"Outfit", "Inter", sans-serif', fontWeight: 700, fontSize: '1.25rem', letterSpacing: '-0.01em' },
+                h5: { fontFamily: '"Outfit", "Inter", sans-serif', fontWeight: 600, fontSize: '1.1rem', letterSpacing: '-0.005em' },
+                h6: { fontFamily: '"Outfit", "Inter", sans-serif', fontWeight: 600, fontSize: '0.98rem' },
+                subtitle1: { fontSize: '0.925rem', fontWeight: 600 },
+                subtitle2: { fontSize: '0.84rem', fontWeight: 600 },
+                body1: { fontSize: '0.9rem', lineHeight: 1.55 },
+                body2: { fontSize: '0.825rem', lineHeight: 1.5 },
+                button: { textTransform: 'none', fontWeight: 600, letterSpacing: '0.01em' }
             },
             shape: { borderRadius: 12 },
             components: {
