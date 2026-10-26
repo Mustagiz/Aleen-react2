@@ -110,12 +110,20 @@ export const ThemeProvider = ({ children }) => {
                 MuiCard: {
                     styleOverrides: {
                         root: {
-                            borderRadius: 14,
+                            borderRadius: 16,
                             boxShadow: mode === 'light' 
                                 ? '0 4px 20px -2px rgba(15, 118, 110, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04)' 
                                 : '0 4px 24px rgba(0, 0, 0, 0.5)',
                             backgroundImage: 'none',
-                            border: mode === 'light' ? '1px solid rgba(15, 118, 110, 0.1)' : '1px solid rgba(255, 255, 255, 0.07)'
+                            border: mode === 'light' ? '1px solid rgba(15, 118, 110, 0.12)' : '1px solid rgba(255, 255, 255, 0.08)',
+                            transition: 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, border-color 0.22s ease',
+                            '&:hover': {
+                                transform: 'translateY(-3px)',
+                                borderColor: mode === 'light' ? 'rgba(15, 118, 110, 0.35)' : 'rgba(20, 184, 166, 0.35)',
+                                boxShadow: mode === 'light'
+                                    ? '0 12px 28px -4px rgba(15, 118, 110, 0.14), 0 2px 8px rgba(0, 0, 0, 0.04)'
+                                    : '0 14px 32px rgba(0, 0, 0, 0.6), 0 0 16px rgba(20, 184, 166, 0.12)'
+                            }
                         }
                     }
                 },
