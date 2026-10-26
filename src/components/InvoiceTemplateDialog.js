@@ -201,9 +201,23 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
         {/* TAB 0: Choose Template Style */}
         {tabIndex === 0 && (
           <Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.secondary', mb: 2, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-              Choose Atelier Invoice Template
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                Choose Atelier Invoice Template
+              </Typography>
+              <Chip
+                label={`${INVOICE_TEMPLATES.length} Luxury Templates`}
+                size="small"
+                sx={{
+                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.15)' : 'rgba(15, 118, 110, 0.1)',
+                  color: (t) => t.palette.mode === 'dark' ? '#2DD4BF' : '#0F766E',
+                  fontWeight: 800,
+                  fontSize: '0.72rem',
+                  borderRadius: '6px',
+                  border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.3)' : 'rgba(15, 118, 110, 0.2)'}`
+                }}
+              />
+            </Box>
 
             <Grid container spacing={2.5}>
               {INVOICE_TEMPLATES.map((tmpl) => {

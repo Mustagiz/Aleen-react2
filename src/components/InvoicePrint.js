@@ -39,6 +39,58 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
           borderStyle: 'double 3px #D97706',
           headerBg: 'linear-gradient(135deg, #78350F 0%, #D97706 100%)'
         };
+      case 'royal-sapphire':
+        return {
+          primaryColor: '#1E3A8A',
+          darkColor: '#0F172A',
+          accentColor: '#0284C7',
+          tableHeadBg: '#1E3A8A',
+          tableHeadText: '#FFFFFF',
+          totalBoxBg: '#F0F9FF',
+          totalBoxBorder: '#0284C7',
+          watermarkColor: 'rgba(30, 58, 138, 0.035)',
+          borderStyle: '1px solid rgba(30, 58, 138, 0.3)',
+          headerBg: 'linear-gradient(135deg, #0F172A 0%, #1E3A8A 50%, #2563EB 100%)'
+        };
+      case 'rose-plum':
+        return {
+          primaryColor: '#701A75',
+          darkColor: '#4A044E',
+          accentColor: '#DB2777',
+          tableHeadBg: '#701A75',
+          tableHeadText: '#FFFFFF',
+          totalBoxBg: '#FDF2F8',
+          totalBoxBorder: '#DB2777',
+          watermarkColor: 'rgba(112, 26, 117, 0.035)',
+          borderStyle: '1px solid rgba(112, 26, 117, 0.25)',
+          headerBg: 'linear-gradient(135deg, #4A044E 0%, #701A75 60%, #9D174D 100%)'
+        };
+      case 'heritage-crimson':
+        return {
+          primaryColor: '#9F1239',
+          darkColor: '#4C0519',
+          accentColor: '#D97706',
+          tableHeadBg: '#9F1239',
+          tableHeadText: '#FFFFFF',
+          totalBoxBg: '#FFF1F2',
+          totalBoxBorder: '#BE123C',
+          watermarkColor: 'rgba(159, 18, 57, 0.035)',
+          borderStyle: 'double 3px #9F1239',
+          headerBg: 'linear-gradient(135deg, #4C0519 0%, #881337 50%, #9F1239 100%)'
+        };
+      case 'executive-slate':
+        return {
+          primaryColor: '#1E293B',
+          darkColor: '#0F172A',
+          accentColor: '#059669',
+          tableHeadBg: '#1E293B',
+          tableHeadText: '#FFFFFF',
+          totalBoxBg: '#F8FAFC',
+          totalBoxBorder: '#059669',
+          watermarkColor: 'rgba(30, 41, 59, 0.035)',
+          borderStyle: '1px solid #334155',
+          headerBg: 'linear-gradient(135deg, #0F172A 0%, #1E293B 70%, #334155 100%)'
+        };
       case 'minimal-haute':
         return {
           primaryColor: '#18181B',

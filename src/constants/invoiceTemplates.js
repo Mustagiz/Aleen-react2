@@ -22,6 +22,50 @@ export const INVOICE_TEMPLATES = [
     description: 'Warm gold double-line borders, boutique crest, and classical luxury typography.'
   },
   {
+    id: 'royal-sapphire',
+    name: 'Royal Velvet Sapphire',
+    tagline: 'Aristocratic Prestige & Seal',
+    primaryColor: '#1E3A8A',
+    secondaryColor: '#38BDF8',
+    darkColor: '#0F172A',
+    headerBg: 'linear-gradient(135deg, #0F172A 0%, #1E3A8A 50%, #2563EB 100%)',
+    badge: 'Prestige',
+    description: 'Midnight navy with platinum sapphire accents, aristocratic seal header, and sharp dual-tone financial columns.'
+  },
+  {
+    id: 'rose-plum',
+    name: 'Rose Gold & Dusty Plum',
+    tagline: 'Haute Bridal Trousseau',
+    primaryColor: '#701A75',
+    secondaryColor: '#F472B6',
+    darkColor: '#4A044E',
+    headerBg: 'linear-gradient(135deg, #4A044E 0%, #701A75 60%, #9D174D 100%)',
+    badge: 'Bridal',
+    description: 'Imperial velvet plum with warm rose gold hairline dividers, designed for luxury bridal suites & couture bespoke orders.'
+  },
+  {
+    id: 'heritage-crimson',
+    name: 'Kashmiri Heritage Crimson',
+    tagline: 'Pashmina & Royal Tilla',
+    primaryColor: '#9F1239',
+    secondaryColor: '#D97706',
+    darkColor: '#4C0519',
+    headerBg: 'linear-gradient(135deg, #4C0519 0%, #881337 50%, #9F1239 100%)',
+    badge: 'Heritage',
+    description: 'Deep Kashmiri ruby crimson with antique brass gold highlights, ornamental frame, and artisanal lineage typography.'
+  },
+  {
+    id: 'executive-slate',
+    name: 'Executive Monolith Slate',
+    tagline: 'Architectural Minimalist Luxury',
+    primaryColor: '#1E293B',
+    secondaryColor: '#059669',
+    darkColor: '#0F172A',
+    headerBg: 'linear-gradient(135deg, #0F172A 0%, #1E293B 70%, #334155 100%)',
+    badge: 'Executive',
+    description: 'High-precision titanium graphite layout with razor-crisp grid dividers, clean mint accents, and modern high-end data tables.'
+  },
+  {
     id: 'minimal-haute',
     name: 'Modern Minimalist Haute',
     tagline: 'High-Fashion Monochromatic',
