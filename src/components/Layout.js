@@ -236,33 +236,55 @@ export default function Layout() {
           minHeight: 70
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, overflow: 'hidden' }}>
-            {/* Emerald & Gold Crest Monogram */}
-            <Box sx={{
-              width: 40,
-              height: 40,
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
-              border: '1.5px solid rgba(217, 119, 6, 0.4)',
-              boxShadow: '0 4px 12px rgba(15, 118, 110, 0.3)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-              cursor: 'pointer'
-            }} onClick={() => {
-              navigate('/');
-              if (isMobile) setMobileOpen(false);
-            }}>
-              <Typography sx={{ 
-                fontFamily: '"Plus Jakarta Sans", sans-serif', 
-                fontWeight: 800, 
-                color: '#F59E0B', 
-                fontSize: '1.2rem',
-                lineHeight: 1
+            {/* Emerald & Gold Crest Monogram or Custom Logo */}
+            {profile?.logoUrl ? (
+              <Box
+                component="img"
+                src={profile.logoUrl}
+                alt={profile.businessName || 'Logo'}
+                sx={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: '12px',
+                  objectFit: 'contain',
+                  border: '1.5px solid rgba(217, 119, 6, 0.4)',
+                  boxShadow: '0 4px 12px rgba(15, 118, 110, 0.2)',
+                  flexShrink: 0,
+                  cursor: 'pointer'
+                }}
+                onClick={() => {
+                  navigate('/');
+                  if (isMobile) setMobileOpen(false);
+                }}
+              />
+            ) : (
+              <Box sx={{
+                width: 40,
+                height: 40,
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                border: '1.5px solid rgba(217, 119, 6, 0.4)',
+                boxShadow: '0 4px 12px rgba(15, 118, 110, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                cursor: 'pointer'
+              }} onClick={() => {
+                navigate('/');
+                if (isMobile) setMobileOpen(false);
               }}>
-                A
-              </Typography>
-            </Box>
+                <Typography sx={{ 
+                  fontFamily: '"Plus Jakarta Sans", sans-serif', 
+                  fontWeight: 800, 
+                  color: '#F59E0B', 
+                  fontSize: '1.2rem',
+                  lineHeight: 1
+                }}>
+                  {(profile?.businessName || 'A').charAt(0).toUpperCase()}
+                </Typography>
+              </Box>
+            )}
 
             {!showCollapsed && (
               <Box sx={{ overflow: 'hidden' }}>
@@ -277,16 +299,19 @@ export default function Layout() {
                   overflow: 'hidden',
                   textOverflow: 'ellipsis'
                 }}>
-                  {profile.businessName || 'Aleen Clothing'}
+                  {profile?.businessName || 'Aleen Clothing'}
                 </Typography>
                 <Typography sx={{ 
                   fontSize: '0.68rem', 
                   fontWeight: 700, 
                   color: '#D97706',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.08em'
+                  letterSpacing: '0.08em',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
                 }}>
-                  Haute Couture CRM
+                  {profile?.tagline || 'Haute Couture CRM'}
                 </Typography>
               </Box>
             )}
@@ -567,8 +592,8 @@ export default function Layout() {
 
             {/* Tablet / iPad / Desktop Breadcrumbs */}
             <Box sx={{ display: { xs: 'none', sm: 'block' }, minWidth: 0 }}>
-              <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary', fontWeight: 600, lineHeight: 1.2 }}>
-                Aleen Clothing CRM
+              <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary', fontWeight: 600, lineHeight: 1.2 }} noWrap>
+                {profile?.businessName || 'Aleen Clothing'}{profile?.tagline ? ` • ${profile.tagline}` : ' • Atelier CRM'}
               </Typography>
               <Typography sx={{ fontSize: '0.95rem', color: 'text.primary', fontWeight: 800, letterSpacing: '-0.015em', lineHeight: 1.2 }} noWrap>
                 {getBreadcrumbTitle()}
