@@ -110,26 +110,47 @@ export default function NeedleThreadTracker({
                   transition: 'all 0.3s ease'
                 }}
               />
-              <Typography
-                variant="caption"
-                sx={{
-                  mt: 0.5,
-                  fontSize: '0.62rem',
-                  fontWeight: isCurrent ? 800 : isPassed ? 600 : 500,
-                  color: isCurrent
-                    ? (isDark ? '#FBBF24' : '#D97706')
-                    : isPassed
-                      ? (isDark ? '#2DD4BF' : '#0F766E')
-                      : 'text.secondary',
-                  letterSpacing: '0.02em',
-                  whiteSpace: 'nowrap'
-                }}
-              >
-                {stage.label}
-              </Typography>
             </Box>
           );
         })}
+      </Box>
+
+      {/* Clean, Non-Overlapping Phase Status */}
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mt: 0.85,
+          px: 0.5
+        }}
+      >
+        <Typography
+          variant="caption"
+          sx={{
+            fontSize: '0.68rem',
+            fontWeight: 800,
+            color: isDark ? '#FBBF24' : '#0F766E',
+            letterSpacing: '0.01em',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}
+        >
+          {STAGES[activeIdx]?.label || 'Stage'}
+        </Typography>
+        <Typography
+          variant="caption"
+          sx={{
+            fontSize: '0.62rem',
+            fontWeight: 700,
+            color: 'text.secondary',
+            fontVariantNumeric: 'tabular-nums',
+            whiteSpace: 'nowrap'
+          }}
+        >
+          Phase {activeIdx + 1} of {STAGES.length}
+        </Typography>
       </Box>
     </Box>
   );

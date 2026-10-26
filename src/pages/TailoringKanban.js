@@ -21,6 +21,7 @@ import {
   TableRow,
   TableCell,
   TableContainer,
+  TablePagination,
   Alert,
   InputAdornment
 } from '@mui/material';
@@ -248,6 +249,7 @@ export default function TailoringKanban() {
 
   const [search, setSearch] = useState('');
   const [completedSearch, setCompletedSearch] = useState('');
+  const [deliveredPage, setDeliveredPage] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedSilhouette, setSelectedSilhouette] = useState('blouse');
   const [measurementData, setMeasurementData] = useState({});
@@ -715,7 +717,7 @@ export default function TailoringKanban() {
 
                         {/* Card Header: Docket #, Silhouette Badge, and Rush Flag */}
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1, pt: 0.25, gap: 1 }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, minWidth: 0, flexShrink: 1 }}>
                             <Typography
                               variant="caption"
                               sx={{
@@ -726,7 +728,9 @@ export default function TailoringKanban() {
                                 px: 0.8,
                                 py: 0.2,
                                 borderRadius: '6px',
-                                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(15, 118, 110, 0.08)'
+                                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(15, 118, 110, 0.08)',
+                                whiteSpace: 'nowrap',
+                                flexShrink: 0
                               }}
                             >
                               #{order.id}
@@ -745,13 +749,14 @@ export default function TailoringKanban() {
                                 color: '#EF4444',
                                 border: '1px solid rgba(239, 68, 68, 0.35)',
                                 borderRadius: '6px',
-                                letterSpacing: '0.05em'
+                                letterSpacing: '0.05em',
+                                flexShrink: 0
                               }}
                             />
                           )}
                         </Box>
 
-                        {/* Garment Title */}
+                        {/* Garment Title - Consistent Min Height so 1-line and 2-line titles align */}
                         <Typography
                           variant="body2"
                           sx={{
@@ -760,7 +765,12 @@ export default function TailoringKanban() {
                             fontSize: '0.92rem',
                             lineHeight: 1.3,
                             mb: 0.75,
-                            letterSpacing: '-0.01em'
+                            letterSpacing: '-0.01em',
+                            minHeight: 38,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden'
                           }}
                         >
                           {order.garment}
@@ -790,21 +800,26 @@ export default function TailoringKanban() {
                           </Typography>
                         </Box>
 
-                        {/* Specs */}
-                        {order.specs && (
+                        {/* Specs with consistent box sizing */}
+                        {order.specs ? (
                           <Box
                             sx={{
                               p: 1,
                               borderRadius: '8px',
                               bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(15, 118, 110, 0.035)',
                               border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(15, 118, 110, 0.08)'}`,
-                              mb: 1.25
+                              mb: 1.25,
+                              minHeight: 44,
+                              display: 'flex',
+                              alignItems: 'center'
                             }}
                           >
                             <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.secondary', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                               {order.specs}
                             </Typography>
                           </Box>
+                        ) : (
+                          <Box sx={{ mb: 1.25, minHeight: 44 }} />
                         )}
 
                         {/* Tailor & Meta */}
@@ -980,7 +995,10 @@ export default function TailoringKanban() {
               size="small"
               placeholder="Filter delivered garments..."
               value={completedSearch}
-              onChange={(e) => setCompletedSearch(e.target.value)}
+              onChange={(e) => {
+                setCompletedSearch(e.target.value);
+                setDeliveredPage(0);
+              }}
               InputProps={{
                 startAdornment: <Search sx={{ mr: 1, color: 'text.secondary', fontSize: 18 }} />
               }}
@@ -1021,7 +1039,9 @@ export default function TailoringKanban() {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredDelivered.map((order) => {
+                filteredDelivered
+                  .slice(deliveredPage * 10, deliveredPage * 10 + 10)
+                  .map((order) => {
                   const isFullyPaid = (order.advance || 0) >= (order.price || 0);
                   return (
                     <TableRow
@@ -1101,6 +1121,19 @@ export default function TailoringKanban() {
             </TableBody>
           </Table>
         </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[10]}
+          component="div"
+          count={filteredDelivered.length}
+          rowsPerPage={10}
+          page={deliveredPage}
+          onPageChange={(e, newPage) => setDeliveredPage(newPage)}
+          sx={{
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            '& .MuiTablePagination-toolbar': { minHeight: 48 }
+          }}
+        />
       </GlassCard>
 
       {/* Bespoke Visual Silhouette & Measurement Studio Dialog */}

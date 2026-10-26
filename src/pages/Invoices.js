@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel, CircularProgress, Alert, Snackbar, InputAdornment, List } from '@mui/material';
-import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, ShoppingCart, RestartAlt } from '@mui/icons-material';
+import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, ShoppingCart, RestartAlt, CalendarMonth, Phone } from '@mui/icons-material';
 import { Html5Qrcode } from 'html5-qrcode';
 import { db } from '../firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -49,6 +49,7 @@ const Invoices = () => {
   const [cashDrawerModalOpen, setCashDrawerModalOpen] = useState(false);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [offscreenInvoice, setOffscreenInvoice] = useState(null);
+  const [clientValidationErrors, setClientValidationErrors] = useState({ customer: false, phone: false });
   const offscreenInvoiceRef = useRef(null);
 
   useEffect(() => {
@@ -832,6 +833,28 @@ const Invoices = () => {
   };
 
   const handleSaveInvoice = async () => {
+    // Validate mandatory customer name and 10-digit phone number
+    const isCustomerValid = Boolean(customer && customer.trim());
+    const cleanDigits = (phone || '').replace(/[^0-9]/g, '');
+    const phoneWithout91 = cleanDigits.startsWith('91') ? cleanDigits.slice(2) : cleanDigits;
+    const isPhoneValid = Boolean(phoneWithout91 && phoneWithout91.length === 10);
+
+    if (!isCustomerValid || !isPhoneValid) {
+      setClientValidationErrors({
+        customer: !isCustomerValid,
+        phone: !isPhoneValid
+      });
+      if (!isCustomerValid && !isPhoneValid) {
+        alert('Customer Name and a valid 10-digit Phone Number are mandatory before generating a bill.');
+      } else if (!isCustomerValid) {
+        alert('Customer Name is mandatory before generating a bill.');
+      } else {
+        alert('A valid 10-digit mobile number is mandatory before generating a bill.');
+      }
+      return;
+    }
+    setClientValidationErrors({ customer: false, phone: false });
+
     const validItems = selectedItems.filter(item => item.id || (item.isCustom && item.customName && item.customPrice > 0));
     if (validItems.length === 0) {
       alert('Please add at least one item');
@@ -2072,37 +2095,37 @@ const Invoices = () => {
             />
           </Box>
         ) : (
-          <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
+          <GlassCard sx={{ p: 0, overflow: 'hidden', borderRadius: 3, border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.14)' }}>
             <TableContainer>
               <Table>
-                <TableHead sx={{ bgcolor: 'action.hover' }}>
+                <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)', borderBottom: '2px solid rgba(15, 118, 110, 0.16)' }}>
                   <TableRow>
-                    <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       <TableSortLabel active={orderBy === 'id'} direction={orderBy === 'id' ? order : 'asc'} onClick={() => handleRequestSort('id')}>
                         Invoice Details
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       <TableSortLabel active={orderBy === 'date'} direction={orderBy === 'date' ? order : 'asc'} onClick={() => handleRequestSort('date')}>
                         Date
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: { xs: 'none', sm: 'table-cell' } }}>
+                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em', display: { xs: 'none', sm: 'table-cell' } }}>
                       <TableSortLabel active={orderBy === 'customer'} direction={orderBy === 'customer' ? order : 'asc'} onClick={() => handleRequestSort('customer')}>
                         Customer
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: { xs: 'none', md: 'table-cell' } }}>
+                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em', display: { xs: 'none', md: 'table-cell' } }}>
                       <TableSortLabel active={orderBy === 'paymentMethod'} direction={orderBy === 'paymentMethod' ? order : 'asc'} onClick={() => handleRequestSort('paymentMethod')}>
                         Payment
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       <TableSortLabel active={orderBy === 'total'} direction={orderBy === 'total' ? order : 'asc'} onClick={() => handleRequestSort('total')}>
                         Amount
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ color: 'text.primary', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Actions</TableCell>
+                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -2114,38 +2137,131 @@ const Invoices = () => {
                     .map((inv, idx) => (
                       <TableRow
                         key={inv.id}
+                        hover
                         sx={{
-                          '&:hover': { bgcolor: 'action.hover' },
-                          transition: 'all 0.2s'
+                          '&:hover': { bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(15, 118, 110, 0.03)' },
+                          transition: 'background-color 0.15s ease'
                         }}
                       >
                         <TableCell>
-                          <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>#{inv.id}</Typography>
-                          <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>{inv.items?.length || 0} Items</Typography>
+                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                            <Box sx={{ display: 'inline-flex', alignItems: 'center' }}>
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  fontFamily: '"JetBrains Mono", monospace',
+                                  fontWeight: 800,
+                                  color: '#0F766E',
+                                  fontSize: '0.76rem',
+                                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(15, 118, 110, 0.08)',
+                                  px: 0.85,
+                                  py: 0.25,
+                                  borderRadius: '6px',
+                                  border: '1px solid',
+                                  borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.25)' : 'rgba(15, 118, 110, 0.15)',
+                                  letterSpacing: '0.02em',
+                                  whiteSpace: 'nowrap'
+                                }}
+                              >
+                                #{inv.id}
+                              </Typography>
+                            </Box>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <ShoppingBagOutlined sx={{ fontSize: 13, color: 'text.secondary' }} /> {inv.items?.length || 0} {inv.items?.length === 1 ? 'Item' : 'Items'}
+                            </Typography>
+                          </Box>
                         </TableCell>
-                        <TableCell sx={{ fontSize: '0.875rem', fontWeight: 500 }}>
-                          {new Date(inv.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                            <CalendarMonth sx={{ fontSize: 16, color: '#0F766E', opacity: 0.7 }} />
+                            <Box>
+                              <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.84rem' }}>
+                                {new Date(inv.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', fontWeight: 500 }}>
+                                {new Date(inv.date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                              </Typography>
+                            </Box>
+                          </Box>
                         </TableCell>
-                        <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' }, fontWeight: 700 }}>
-                          {inv.customer || 'Walk-in'}
-                          {inv.phone && <Typography variant="caption" display="block" color="text.secondary">{inv.phone}</Typography>}
+                        <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.1 }}>
+                            <Avatar
+                              sx={{
+                                width: 32,
+                                height: 32,
+                                fontSize: '0.75rem',
+                                fontWeight: 800,
+                                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.18)' : 'rgba(15, 118, 110, 0.12)',
+                                color: '#0F766E',
+                                border: '1.5px solid rgba(15, 118, 110, 0.22)'
+                              }}
+                            >
+                              {(inv.customer || 'W').charAt(0).toUpperCase()}
+                            </Avatar>
+                            <Box>
+                              <Typography variant="body2" sx={{ fontWeight: 800, fontSize: '0.86rem', letterSpacing: '-0.01em', textTransform: 'capitalize' }}>
+                                {inv.customer || 'Walk-in Client'}
+                              </Typography>
+                              {inv.phone && (
+                                <Typography variant="caption" sx={{ color: 'text.secondary', fontFamily: 'monospace', fontWeight: 600, fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: 0.4 }}>
+                                  <Phone sx={{ fontSize: 11, opacity: 0.6 }} /> {inv.phone}
+                                </Typography>
+                              )}
+                            </Box>
+                          </Box>
                         </TableCell>
                         <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                          <Chip
-                            label={inv.paymentMethod}
-                            size="small"
-                            sx={{
-                              bgcolor: 'primary.light',
-                              color: 'primary.contrastText',
-                              fontWeight: 700,
-                              fontSize: '0.65rem',
-                              textTransform: 'uppercase',
-                              borderRadius: 1
-                            }}
-                          />
+                          {(() => {
+                            const pMethod = String(inv.paymentMethod || 'Cash').toLowerCase();
+                            const isCash = pMethod.includes('cash');
+                            const isUpi = pMethod.includes('upi');
+                            const isCard = pMethod.includes('card');
+                            const isSplit = pMethod.includes('split');
+
+                            const colorConfig = isCash
+                              ? { bg: 'rgba(5, 150, 105, 0.12)', color: '#059669', border: 'rgba(5, 150, 105, 0.3)', dot: '#10B981', label: 'CASH' }
+                              : isUpi
+                              ? { bg: 'rgba(217, 119, 6, 0.12)', color: '#D97706', border: 'rgba(217, 119, 6, 0.3)', dot: '#F59E0B', label: 'UPI' }
+                              : isCard
+                              ? { bg: 'rgba(37, 99, 235, 0.12)', color: '#2563EB', border: 'rgba(37, 99, 235, 0.3)', dot: '#3B82F6', label: 'CARD' }
+                              : { bg: 'rgba(147, 51, 234, 0.12)', color: '#7C3AED', border: 'rgba(147, 51, 234, 0.3)', dot: '#8B5CF6', label: inv.paymentMethod || 'SPLIT' };
+
+                            return (
+                              <Box
+                                sx={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: 0.7,
+                                  px: 1.1,
+                                  py: 0.35,
+                                  borderRadius: '8px',
+                                  bgcolor: colorConfig.bg,
+                                  border: `1px solid ${colorConfig.border}`,
+                                  color: colorConfig.color
+                                }}
+                              >
+                                <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: colorConfig.dot, boxShadow: `0 0 6px ${colorConfig.dot}` }} />
+                                <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.68rem', letterSpacing: '0.04em' }}>
+                                  {colorConfig.label}
+                                </Typography>
+                              </Box>
+                            );
+                          })()}
                         </TableCell>
-                        <TableCell sx={{ fontWeight: 900, fontSize: '0.95rem', color: 'primary.main' }}>
-                          ₹{inv.total.toLocaleString('en-IN')}
+                        <TableCell>
+                          <Typography
+                            variant="body1"
+                            sx={{
+                              fontWeight: 900,
+                              fontSize: '0.96rem',
+                              color: '#0F766E',
+                              fontFamily: '"Plus Jakarta Sans", sans-serif',
+                              fontVariantNumeric: 'tabular-nums'
+                            }}
+                          >
+                            ₹{Number(inv.total || 0).toLocaleString('en-IN')}
+                          </Typography>
                         </TableCell>
                         <TableCell>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
@@ -2168,7 +2284,7 @@ const Invoices = () => {
                               size="small"
                               onClick={(e) => handleMenuClick(e, inv.id)}
                               sx={{
-                                color: 'primary.main',
+                                color: '#0F766E',
                                 bgcolor: 'action.hover',
                                 '&:hover': { bgcolor: 'primary.light', color: 'primary.contrastText' }
                               }}
@@ -2375,14 +2491,19 @@ const Invoices = () => {
 
                 <Box sx={{ mb: 2 }}>
                   <TextField
-                    label="Customer Name"
+                    label="Customer Name *"
                     fullWidth
                     size="small"
+                    required
+                    error={clientValidationErrors.customer}
                     value={customer}
                     placeholder="e.g. Saira banu"
                     onChange={(e) => {
                       const val = toSentenceCase(e.target.value);
                       setCustomer(val);
+                      if (clientValidationErrors.customer) {
+                        setClientValidationErrors(prev => ({ ...prev, customer: false }));
+                      }
                       if (selectedCustomerId) setSelectedCustomerId(null);
                     }}
                     onBlur={() => {
@@ -2413,14 +2534,17 @@ const Invoices = () => {
                         }
                       }
                     }}
-                    helperText="Type customer name in sentence case. Auto-formats on type and lookup."
+                    helperText={clientValidationErrors.customer ? "Customer Name is mandatory before generating a bill" : "Type customer name in sentence case. Auto-formats on type and lookup."}
                   />
                 </Box>
 
                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
                   <TextField
-                    label="Phone Number"
+                    label="Phone Number *"
                     size="small"
+                    required
+                    error={clientValidationErrors.phone}
+                    helperText={clientValidationErrors.phone ? "Valid 10-digit mobile number is mandatory" : undefined}
                     value={phone}
                     onChange={(e) => {
                       const val = e.target.value;
@@ -2435,6 +2559,9 @@ const Invoices = () => {
                       const cleanedSuffix = suffix.replace(/[^0-9]/g, '').slice(0, 10);
                       const newPhone = `+91${cleanedSuffix}`;
                       setPhone(newPhone);
+                      if (clientValidationErrors.phone) {
+                        setClientValidationErrors(prev => ({ ...prev, phone: false }));
+                      }
 
                       if (newPhone.length === 13) {
                         const matched = customers.find(c => c.phone === newPhone || c.phone === cleanedSuffix);
@@ -3306,36 +3433,36 @@ const Invoices = () => {
             <Button
               onClick={handleSaveInvoice}
               variant="contained"
-              size="large"
-              startIcon={<ReceiptLong />}
+              size="small"
+              startIcon={<ReceiptLong sx={{ fontSize: 17 }} />}
               sx={{
-                px: 3.5,
-                py: 1.2,
-                borderRadius: '10px',
+                px: 2.2,
+                py: 0.75,
+                borderRadius: '8px',
                 fontWeight: 800,
-                fontSize: '0.92rem',
+                fontSize: '0.82rem',
                 background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
                 color: '#ffffff',
                 boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 1,
+                gap: 0.8,
                 '&:hover': {
                   background: 'linear-gradient(135deg, #115E59 0%, #022c22 100%)'
                 }
               }}
             >
-              <span>Issue Retail Invoice • ₹{total.toFixed(0).toLocaleString('en-IN')}</span>
+              <span>Generate Bill • ₹{total.toFixed(0).toLocaleString('en-IN')}</span>
               <Chip
                 label="F4"
                 size="small"
                 sx={{
-                  height: 20,
-                  fontSize: '0.68rem',
+                  height: 18,
+                  fontSize: '0.62rem',
                   fontWeight: 800,
                   bgcolor: 'rgba(255, 255, 255, 0.25)',
                   color: '#FFFFFF',
-                  borderRadius: '6px'
+                  borderRadius: '4px'
                 }}
               />
             </Button>
