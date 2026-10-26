@@ -25,6 +25,7 @@ import BillSuccessModal from '../components/BillSuccessModal';
 import { printInvoiceElement } from '../utils/printInvoice';
 import CashDrawerShiftModal from '../components/crm/CashDrawerShiftModal';
 import { calculateInvoiceTotals, calculateTenderSettlement } from '../engine/billingEngine';
+import AtelierStitchDivider from '../components/common/AtelierStitchDivider';
 
 const Invoices = () => {
   const location = useLocation();
@@ -1654,6 +1655,9 @@ const Invoices = () => {
         </Grid>
       </Grid>
 
+      {/* Atelier Basting Stitch Divider */}
+      <AtelierStitchDivider label="Atelier Invoicing & Financial Studio" gold={true} sx={{ my: 2.5 }} />
+
       {/* Date Range Selection & Filter Studio */}
       <GlassCard sx={{ p: 2.5, mb: 3, border: '1px solid', borderColor: isFiltered ? 'primary.light' : 'divider' }}>
         {/* Row 1: Search Capsule + Quick Date Range Presets */}
@@ -3015,6 +3019,52 @@ const Invoices = () => {
                       );
                     })}
                   </Box>
+
+                  {/* Tactile Quick Cash & Exact Denomination Pills */}
+                  {paymentMethod === 'Cash' && !isSplitPayment && (
+                    <Box sx={{ display: 'flex', gap: 0.8, flexWrap: 'wrap', mb: 2 }}>
+                      <Typography variant="caption" sx={{ width: '100%', fontWeight: 700, fontSize: '0.68rem', color: 'text.secondary', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                        Quick Denomination:
+                      </Typography>
+                      {[
+                        { label: `Exact (₹${Math.round(total).toLocaleString('en-IN')})`, amount: Math.round(total) },
+                        { label: '₹500', amount: 500 },
+                        { label: '₹1,000', amount: 1000 },
+                        { label: '₹2,000', amount: 2000 },
+                        { label: '₹5,000', amount: 5000 }
+                      ].map((denom) => (
+                        <Button
+                          key={denom.label}
+                          size="small"
+                          variant="outlined"
+                          onClick={() => {
+                            setReceivedAmount(denom.amount);
+                          }}
+                          sx={{
+                            px: 1.2,
+                            py: 0.35,
+                            fontSize: '0.7rem',
+                            fontWeight: 700,
+                            borderRadius: '8px',
+                            textTransform: 'none',
+                            color: '#0F766E',
+                            borderColor: 'rgba(15, 118, 110, 0.25)',
+                            bgcolor: 'rgba(15, 118, 110, 0.04)',
+                            transition: 'all 0.15s ease',
+                            '&:active': {
+                              transform: 'scale(0.95)'
+                            },
+                            '&:hover': {
+                              borderColor: '#0F766E',
+                              bgcolor: 'rgba(15, 118, 110, 0.1)'
+                            }
+                          }}
+                        >
+                          {denom.label}
+                        </Button>
+                      ))}
+                    </Box>
+                  )}
                 </Box>
 
                 {!isSplitPayment ? (

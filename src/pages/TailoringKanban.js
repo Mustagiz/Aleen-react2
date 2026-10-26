@@ -51,6 +51,9 @@ import {
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import GlassCard from '../components/GlassCard';
+import GarmentSilhouetteBadge from '../components/kanban/GarmentSilhouetteBadge';
+import NeedleThreadTracker from '../components/kanban/NeedleThreadTracker';
+import AtelierStitchDivider from '../components/common/AtelierStitchDivider';
 
 
 const SILHOUETTE_CONFIG = {
@@ -582,6 +585,9 @@ export default function TailoringKanban() {
         </Grid>
       </Grid>
 
+      {/* Atelier Basting Stitch Divider */}
+      <AtelierStitchDivider label="Atelier Craft Production Pipeline" gold={true} sx={{ my: 2.5 }} />
+
       {/* Kanban Board Container (5 Active Workshop Stages) */}
       <Box sx={{ mb: 6 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
@@ -688,14 +694,9 @@ export default function TailoringKanban() {
                           boxShadow: (t) => t.palette.mode === 'dark'
                             ? 'inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 4px 16px rgba(0, 0, 0, 0.35)'
                             : 'inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 2px 12px rgba(15, 118, 110, 0.04)',
-                          transition: 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease, border-color 0.18s ease',
-                          '&:hover': {
-                            transform: 'translateY(-2px)',
-                            borderColor: order.urgent ? '#D97706' : '#0F766E',
-                            boxShadow: (t) => order.urgent
-                              ? '0 8px 24px rgba(217, 119, 6, 0.15)'
-                              : '0 8px 24px rgba(15, 118, 110, 0.12)'
-                          }
+                          borderColor: (t) => order.urgent
+                            ? (t.palette.mode === 'dark' ? '#D97706' : '#B45309')
+                            : (t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.25)' : 'rgba(15, 118, 110, 0.18)')
                         }}
                       >
                         {/* Top Metallic Accent Line */}
@@ -712,23 +713,26 @@ export default function TailoringKanban() {
                           }}
                         />
 
-                        {/* Card Header: Docket # and Rush Flag */}
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1, pt: 0.25 }}>
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              fontFamily: '"JetBrains Mono", monospace',
-                              fontWeight: 700,
-                              color: '#0F766E',
-                              fontSize: '0.72rem',
-                              px: 0.8,
-                              py: 0.2,
-                              borderRadius: '6px',
-                              bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(15, 118, 110, 0.08)'
-                            }}
-                          >
-                            #{order.id}
-                          </Typography>
+                        {/* Card Header: Docket #, Silhouette Badge, and Rush Flag */}
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1, pt: 0.25, gap: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                fontFamily: '"JetBrains Mono", monospace',
+                                fontWeight: 700,
+                                color: '#0F766E',
+                                fontSize: '0.72rem',
+                                px: 0.8,
+                                py: 0.2,
+                                borderRadius: '6px',
+                                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(15, 118, 110, 0.08)'
+                              }}
+                            >
+                              #{order.id}
+                            </Typography>
+                            <GarmentSilhouetteBadge type={order.garment || order.silhouette} size="small" />
+                          </Box>
                           {order.urgent && (
                             <Chip
                               label="RUSH"
@@ -823,6 +827,9 @@ export default function TailoringKanban() {
                             </Typography>
                           </Box>
                         )}
+
+                        {/* Needle & Thread Atelier Stage Tracker */}
+                        <NeedleThreadTracker currentStage={col.id} sx={{ mb: 1.2 }} />
 
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
                           <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 700, color: 'text.secondary', fontSize: '0.7rem' }}>

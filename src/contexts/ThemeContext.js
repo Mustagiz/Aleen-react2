@@ -50,18 +50,18 @@ export const ThemeProvider = ({ children }) => {
                 divider: mode === 'light' ? 'rgba(15, 118, 110, 0.12)' : 'rgba(255, 255, 255, 0.08)'
             },
             typography: {
-                fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                h1: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', fontWeight: 800, fontSize: '2.2rem', letterSpacing: '-0.03em' },
-                h2: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', fontWeight: 700, fontSize: '1.75rem', letterSpacing: '-0.025em' },
-                h3: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', fontWeight: 700, fontSize: '1.4rem', letterSpacing: '-0.02em' },
-                h4: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', fontWeight: 700, fontSize: '1.2rem', letterSpacing: '-0.015em' },
-                h5: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', fontWeight: 600, fontSize: '1.05rem', letterSpacing: '-0.01em' },
-                h6: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', fontWeight: 600, fontSize: '0.95rem', letterSpacing: '-0.005em' },
-                subtitle1: { fontSize: '0.925rem', fontWeight: 600, letterSpacing: '-0.01em' },
-                subtitle2: { fontSize: '0.84rem', fontWeight: 600, letterSpacing: '-0.005em' },
-                body1: { fontSize: '0.885rem', lineHeight: 1.55 },
-                body2: { fontSize: '0.82rem', lineHeight: 1.5 },
-                button: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', textTransform: 'none', fontWeight: 600, letterSpacing: '0.01em' }
+                fontFamily: '"Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                h1: { fontFamily: '"Cormorant Garamond", "Playfair Display", Georgia, serif', fontWeight: 700, fontSize: '2.5rem', letterSpacing: '-0.015em' },
+                h2: { fontFamily: '"Cormorant Garamond", "Playfair Display", Georgia, serif', fontWeight: 700, fontSize: '2.0rem', letterSpacing: '-0.01em' },
+                h3: { fontFamily: '"Cormorant Garamond", "Playfair Display", Georgia, serif', fontWeight: 600, fontSize: '1.6rem', letterSpacing: '-0.01em' },
+                h4: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', fontWeight: 700, fontSize: '1.25rem', letterSpacing: '-0.015em' },
+                h5: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', fontWeight: 700, fontSize: '1.08rem', letterSpacing: '-0.01em' },
+                h6: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', fontWeight: 700, fontSize: '0.96rem', letterSpacing: '-0.005em' },
+                subtitle1: { fontSize: '0.925rem', fontWeight: 600, letterSpacing: '0.01em' },
+                subtitle2: { fontSize: '0.82rem', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' },
+                body1: { fontSize: '0.885rem', lineHeight: 1.55, fontFeatureSettings: '"tnum"' },
+                body2: { fontSize: '0.82rem', lineHeight: 1.5, fontFeatureSettings: '"tnum"' },
+                button: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', textTransform: 'none', fontWeight: 700, letterSpacing: '0.02em' }
             },
             shape: { borderRadius: 12 },
             components: {

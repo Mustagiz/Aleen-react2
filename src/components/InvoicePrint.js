@@ -13,6 +13,7 @@ import {
 import { useData } from '../contexts/DataContext';
 import { getStoredInvoiceSettings } from '../constants/invoiceTemplates';
 import { numberToWordsRupees } from '../models/documentModel';
+import WaxSealStamp from './common/WaxSealStamp';
 
 const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profileProp }, ref) => {
   const dataCtx = useData() || {};
@@ -667,6 +668,43 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
             </Typography>
           </Box>
         )}
+
+        {/* Optional Wax Seal Stamp for Paid Invoices */}
+        {(invoice?.paymentStatus === 'paid' || invoice?.status === 'paid' || (invoice?.paidAmount && Number(invoice?.paidAmount) >= Number(invoice?.total))) && (
+          <Box sx={{ position: 'absolute', right: 180, bottom: 24, zIndex: 3, display: { xs: 'none', sm: 'block' } }}>
+            <WaxSealStamp
+              label="PAID"
+              subtitle="ATELIER ALEEN"
+              variant={activeTemplate === 'champagne-gold' ? 'gold' : activeTemplate === 'heritage-crimson' ? 'crimson' : 'emerald'}
+              size={68}
+              animate={false}
+            />
+          </Box>
+        )}
+      </Box>
+
+      {/* Perforated Bottom Tear-Edge */}
+      <Box sx={{
+        mt: 2.5,
+        pt: 1,
+        borderTop: '2px dashed #CBD5E1',
+        position: 'relative',
+        textAlign: 'center',
+        userSelect: 'none'
+      }}>
+        <Typography
+          variant="caption"
+          sx={{
+            fontFamily: '"Plus Jakarta Sans", sans-serif',
+            fontSize: '0.64rem',
+            fontWeight: 700,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: '#94A3B8'
+          }}
+        >
+          ✂ ┈┈┈ ATELIER CLIENT COPY • RETAIN FOR COMPLIMENTARY ALTERATIONS ┈┈┈ ✂
+        </Typography>
       </Box>
     </Box>
   );
