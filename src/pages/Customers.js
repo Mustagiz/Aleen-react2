@@ -25,7 +25,9 @@ import {
     Select, 
     FormControl, 
     InputLabel,
-    InputAdornment
+    InputAdornment,
+    useMediaQuery,
+    useTheme
 } from '@mui/material';
 import { 
     Add, 
@@ -54,6 +56,9 @@ import ClienteleNavTabs from '../components/crm/ClienteleNavTabs';
 import { useFeedback } from '../contexts/FeedbackContext';
 
 const Customers = () => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const isTablet = useMediaQuery(theme.breakpoints.down('md'));
     const { customers, addCustomer, updateCustomer, deleteCustomer, invoices, profile, addPaymentRecord } = useData();
     const { showToast, showConfirm } = useFeedback();
     const [open, setOpen] = useState(false);
@@ -457,8 +462,8 @@ const Customers = () => {
                     boxShadow: '0 4px 20px -4px rgba(15, 118, 110, 0.08)'
                 }}
             >
-                <TableContainer>
-                    <Table>
+                <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                    <Table sx={{ minWidth: 680 }}>
                         <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Guest & Contact Details</TableCell>
@@ -678,7 +683,8 @@ const Customers = () => {
                 onClose={() => setOpen(false)} 
                 maxWidth="sm" 
                 fullWidth 
-                PaperProps={{ sx: { borderRadius: 4 } }}
+                fullScreen={isTablet}
+                PaperProps={{ sx: { borderRadius: isTablet ? 0 : 4 } }}
             >
                 <DialogTitle sx={{ 
                     fontWeight: 800, 
@@ -759,7 +765,8 @@ const Customers = () => {
                 onClose={() => setPaymentDialogOpen(false)} 
                 maxWidth="xs" 
                 fullWidth 
-                PaperProps={{ sx: { borderRadius: 4 } }}
+                fullScreen={isMobile}
+                PaperProps={{ sx: { borderRadius: isMobile ? 0 : 4 } }}
             >
                 <DialogTitle sx={{ 
                     fontWeight: 800, 

@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { 
     Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, 
     Table, TableBody, TableCell, TableHead, TableRow, IconButton, MenuItem, 
-    Typography, TableContainer, Chip, Grid, useTheme, TablePagination, 
+    Typography, TableContainer, Chip, Grid, useTheme, useMediaQuery, TablePagination, 
     TableSortLabel, InputAdornment, Tooltip, Avatar 
 } from '@mui/material';
 import { 
@@ -43,6 +43,7 @@ const Expenses = () => {
     };
 
     const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const handleAddCategory = () => {
         if (newCategory.trim() && !expenseCategories.includes(newCategory.trim())) {
@@ -483,8 +484,8 @@ const Expenses = () => {
 
             {/* Expenses Table with Proper Column Alignment */}
             <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
-                <TableContainer>
-                    <Table size="small">
+                <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                    <Table size="small" sx={{ minWidth: 680 }}>
                         <TableHead sx={{ bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(15, 118, 110, 0.04)' }}>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
@@ -626,7 +627,8 @@ const Expenses = () => {
                 onClose={() => setOpen(false)} 
                 maxWidth="sm" 
                 fullWidth 
-                PaperProps={{ sx: { borderRadius: 3.5, overflow: 'hidden' } }}
+                fullScreen={isMobile}
+                PaperProps={{ sx: { borderRadius: isMobile ? 0 : 3.5, overflow: 'hidden' } }}
             >
                 <DialogTitle 
                     sx={{ 

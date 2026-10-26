@@ -609,7 +609,7 @@ export default function TailoringKanban() {
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(5, 1fr)' },
+            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)', lg: 'repeat(5, 1fr)' },
             gap: 2,
             overflowX: 'auto',
             pb: 1.5
@@ -628,7 +628,7 @@ export default function TailoringKanban() {
                   p: 1.5,
                   display: 'flex',
                   flexDirection: 'column',
-                  minWidth: { xs: '100%', lg: 220 },
+                  minWidth: { xs: '100%', sm: 260, lg: 220 },
                   maxHeight: 'calc(100vh - 280px)'
                 }}
               >

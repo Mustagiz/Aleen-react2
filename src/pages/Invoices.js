@@ -709,6 +709,7 @@ const Invoices = () => {
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
   const printRef = useRef();
 
   const isFiltered = Boolean(dateFrom || dateTo || searchTerm || paymentFilter !== 'All');
@@ -2266,12 +2267,12 @@ const Invoices = () => {
         onClose={() => setOpen(false)}
         maxWidth="lg"
         fullWidth
-        fullScreen={isMobile}
+        fullScreen={isTablet}
         PaperProps={{
           sx: {
-            borderRadius: isMobile ? 0 : 3.5,
+            borderRadius: isTablet ? 0 : 3.5,
             overflow: 'hidden',
-            maxHeight: isMobile ? '100%' : '92vh',
+            maxHeight: isTablet ? '100%' : '92vh',
             boxShadow: '0 24px 60px rgba(15, 118, 110, 0.22)'
           }
         }}

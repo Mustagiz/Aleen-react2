@@ -45,7 +45,9 @@ import {
     RadioGroup,
     FormControl,
     FormLabel,
-    Pagination
+    Pagination,
+    useMediaQuery,
+    useTheme
 } from '@mui/material';
 import {
     WhatsApp,
@@ -168,6 +170,8 @@ const DEFAULT_KEYWORDS = [
 ];
 
 const Marketing = () => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const {
         customers,
         invoices,
@@ -856,7 +860,7 @@ const Marketing = () => {
     };
 
     return (
-        <Box sx={{ maxWidth: 1440, mx: 'auto', p: { xs: 2, md: 3.5 } }}>
+        <Box sx={{ maxWidth: 1440, mx: 'auto', p: { xs: 1.5, sm: 2.5, md: 3.5 } }}>
             {/* Atelier Page Header */}
             <PageHeader
                 title="WhatsApp Marketing & Automation Suite"
@@ -2911,7 +2915,8 @@ const Marketing = () => {
                 }}
                 maxWidth="sm"
                 fullWidth
-                PaperProps={{ sx: { borderRadius: 4, overflow: 'hidden' } }}
+                fullScreen={isMobile}
+                PaperProps={{ sx: { borderRadius: isMobile ? 0 : 4, overflow: 'hidden' } }}
             >
                 <DialogTitle
                     sx={{
@@ -3119,7 +3124,8 @@ const Marketing = () => {
                 onClose={() => setGatewayModalOpen(false)}
                 maxWidth="sm"
                 fullWidth
-                PaperProps={{ sx: { borderRadius: 4 } }}
+                fullScreen={isMobile}
+                PaperProps={{ sx: { borderRadius: isMobile ? 0 : 4 } }}
             >
                 <DialogTitle
                     sx={{
@@ -3335,7 +3341,8 @@ const Marketing = () => {
                 onClose={() => setEditKeywordDialogOpen(false)}
                 maxWidth="sm"
                 fullWidth
-                PaperProps={{ sx: { borderRadius: 4 } }}
+                fullScreen={isMobile}
+                PaperProps={{ sx: { borderRadius: isMobile ? 0 : 4 } }}
             >
                 <DialogTitle
                     sx={{
@@ -3414,7 +3421,8 @@ const Marketing = () => {
                 onClose={() => setEditTemplateDialogOpen(false)}
                 maxWidth="sm"
                 fullWidth
-                PaperProps={{ sx: { borderRadius: 4 } }}
+                fullScreen={isMobile}
+                PaperProps={{ sx: { borderRadius: isMobile ? 0 : 4 } }}
             >
                 <DialogTitle
                     sx={{
@@ -3570,9 +3578,10 @@ const Marketing = () => {
                 onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
                 maxWidth="xs"
                 fullWidth
+                fullScreen={isMobile}
                 PaperProps={{
                     sx: {
-                        borderRadius: 3.5,
+                        borderRadius: isMobile ? 0 : 3.5,
                         p: 1,
                         boxShadow: '0 20px 60px rgba(0,0,0,0.2)'
                     }

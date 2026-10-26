@@ -29,7 +29,9 @@ import {
     Tooltip,
     Stack,
     Collapse,
-    Badge
+    Badge,
+    useMediaQuery,
+    useTheme
 } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import {
@@ -262,6 +264,8 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
 };
 
 export default function BarcodeGenerator() {
+    const theme = useTheme();
+    const isTablet = useMediaQuery(theme.breakpoints.down('md'));
     const { inventory, profile } = useData();
     const { showToast, showConfirm } = useFeedback();
     const location = useLocation();
@@ -1525,7 +1529,14 @@ export default function BarcodeGenerator() {
             </GlassCard>
 
             {/* Bulk Select Dialog */}
-            <Dialog open={isBulkSelectOpen} onClose={() => setIsBulkSelectOpen(false)} maxWidth="md" fullWidth>
+            <Dialog 
+                open={isBulkSelectOpen} 
+                onClose={() => setIsBulkSelectOpen(false)} 
+                maxWidth="md" 
+                fullWidth
+                fullScreen={isTablet}
+                PaperProps={{ sx: { borderRadius: isTablet ? 0 : 3.5 } }}
+            >
                 <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 800 }}>
                     Bulk Select Products for Barcode Batch
                     <IconButton onClick={() => setIsBulkSelectOpen(false)} size="small"><Close /></IconButton>
@@ -1555,8 +1566,8 @@ export default function BarcodeGenerator() {
                         </TextField>
                     </Box>
 
-                    <TableContainer sx={{ maxHeight: 420 }}>
-                        <Table stickyHeader size="small">
+                    <TableContainer sx={{ maxHeight: 420, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                        <Table stickyHeader size="small" sx={{ minWidth: 540 }}>
                             <TableHead>
                                 <TableRow>
                                     <TableCell padding="checkbox">

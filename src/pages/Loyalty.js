@@ -22,7 +22,9 @@ import {
     Alert,
     IconButton,
     Tooltip,
-    TablePagination
+    TablePagination,
+    useMediaQuery,
+    useTheme
 } from '@mui/material';
 import {
     EmojiEvents,
@@ -42,6 +44,8 @@ import ClienteleNavTabs from '../components/crm/ClienteleNavTabs';
 import { useFeedback } from '../contexts/FeedbackContext';
 
 const Loyalty = () => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const { customers, redeemLoyaltyPoints, addBirthdayBonus } = useData();
     const { showToast } = useFeedback();
     const [redeemDialog, setRedeemDialog] = useState(false);
@@ -133,7 +137,7 @@ const Loyalty = () => {
         .sort((a, b) => (b.loyaltyPoints || 0) - (a.loyaltyPoints || 0));
 
     return (
-        <Box sx={{ maxWidth: 1400, mx: 'auto', p: { xs: 2, md: 3 } }}>
+        <Box sx={{ maxWidth: 1400, mx: 'auto', p: { xs: 1.5, sm: 2.5, md: 3 } }}>
             {/* Atelier Page Header */}
             <PageHeader
                 title="VIP Loyalty & Atelier Privileges"
@@ -336,8 +340,8 @@ const Loyalty = () => {
                     </Typography>
                 </Box>
 
-                <TableContainer>
-                    <Table>
+                <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                    <Table sx={{ minWidth: 680 }}>
                         <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 800, color: '#042F2E', width: 70 }} align="center">Rank</TableCell>
@@ -513,7 +517,8 @@ const Loyalty = () => {
                 onClose={() => setRedeemDialog(false)} 
                 maxWidth="xs" 
                 fullWidth
-                PaperProps={{ sx: { borderRadius: 4 } }}
+                fullScreen={isMobile}
+                PaperProps={{ sx: { borderRadius: isMobile ? 0 : 4 } }}
             >
                 <DialogTitle sx={{ 
                     fontWeight: 800, 

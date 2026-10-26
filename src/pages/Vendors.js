@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { 
     Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, 
     Table, TableBody, TableCell, TableHead, TableRow, IconButton, Typography, 
-    TableContainer, Grid, Chip, TablePagination, useTheme, Avatar, Tooltip, 
+    TableContainer, Grid, Chip, TablePagination, useTheme, useMediaQuery, Avatar, Tooltip, 
     InputAdornment, MenuItem, Rating
 } from '@mui/material';
 import { 
@@ -27,6 +27,7 @@ const VENDOR_CATEGORIES = [
 
 const Vendors = () => {
     const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const { vendors, addVendor, updateVendor, deleteVendor } = useData();
     const [open, setOpen] = useState(false);
     const [editItem, setEditItem] = useState(null);
@@ -314,8 +315,8 @@ const Vendors = () => {
 
             {/* Vendors Table with Aligned Columns */}
             <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
-                <TableContainer>
-                    <Table>
+                <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                    <Table sx={{ minWidth: 680 }}>
                         <TableHead sx={{ bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(15, 118, 110, 0.04)' }}>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
@@ -569,9 +570,10 @@ const Vendors = () => {
                 onClose={() => setOpen(false)} 
                 maxWidth="sm" 
                 fullWidth 
+                fullScreen={isMobile}
                 PaperProps={{ 
                     sx: { 
-                        borderRadius: 3.5,
+                        borderRadius: isMobile ? 0 : 3.5,
                         overflow: 'hidden',
                         boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
                     } 

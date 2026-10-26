@@ -87,6 +87,7 @@ const Purchases = () => {
 
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const isTablet = useMediaQuery(theme.breakpoints.down('md'));
 
     // Pagination State
     const [page, setPage] = useState(0);
@@ -1536,10 +1537,10 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                 onClose={() => setOpen(false)}
                 maxWidth="md"
                 fullWidth
-                fullScreen={isMobile}
+                fullScreen={isTablet}
                 PaperProps={{ 
                     sx: { 
-                        borderRadius: isMobile ? 0 : 3.5,
+                        borderRadius: isTablet ? 0 : 3.5,
                         overflow: 'hidden',
                         boxShadow: '0 20px 40px rgba(0,0,0,0.25)'
                     } 
@@ -2035,10 +2036,10 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                 onClose={() => setViewPoModalOpen(false)}
                 maxWidth="md"
                 fullWidth
-                fullScreen={isMobile}
+                fullScreen={isTablet}
                 PaperProps={{
                     sx: {
-                        borderRadius: isMobile ? 0 : 3.5,
+                        borderRadius: isTablet ? 0 : 3.5,
                         overflow: 'hidden',
                         boxShadow: '0 24px 48px rgba(0,0,0,0.25)'
                     }

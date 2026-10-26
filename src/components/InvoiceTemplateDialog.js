@@ -18,7 +18,9 @@ import {
   Chip,
   Tabs,
   Tab,
-  Alert
+  Alert,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import {
   Close,
@@ -56,6 +58,8 @@ const SAMPLE_INVOICE = {
 };
 
 export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveSettings }) {
+  const theme = useTheme();
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
   const dataCtx = useData() || {};
   const { updateInvoiceTemplateSettings } = dataCtx;
 
@@ -128,11 +132,12 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
       onClose={onClose}
       maxWidth="lg"
       fullWidth
+      fullScreen={isTablet}
       PaperProps={{
         sx: {
-          borderRadius: 3,
+          borderRadius: isTablet ? 0 : 3,
           overflow: 'hidden',
-          maxHeight: '92vh'
+          maxHeight: isTablet ? '100%' : '92vh'
         }
       }}
     >

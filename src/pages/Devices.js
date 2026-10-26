@@ -28,7 +28,9 @@ import {
     Select,
     MenuItem,
     FormControl,
-    InputLabel
+    InputLabel,
+    useMediaQuery,
+    useTheme
 } from '@mui/material';
 import {
     QrCodeScanner,
@@ -67,6 +69,9 @@ import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 
 export default function Devices() {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const isTablet = useMediaQuery(theme.breakpoints.down('md'));
     const navigate = useNavigate();
     const { inventory } = useData();
     const { showToast, showConfirm } = useFeedback();
@@ -1155,7 +1160,8 @@ export default function Devices() {
                 onClose={() => setBluetoothModalOpen(false)}
                 maxWidth="sm"
                 fullWidth
-                PaperProps={{ sx: { borderRadius: 4 } }}
+                fullScreen={isMobile}
+                PaperProps={{ sx: { borderRadius: isMobile ? 0 : 4 } }}
             >
                 <DialogTitle sx={{
                     fontWeight: 800,
@@ -1394,7 +1400,8 @@ export default function Devices() {
                 onClose={() => setPhoneModalOpen(false)}
                 maxWidth="sm"
                 fullWidth
-                PaperProps={{ sx: { borderRadius: 4 } }}
+                fullScreen={isTablet}
+                PaperProps={{ sx: { borderRadius: isTablet ? 0 : 4 } }}
             >
                 <DialogTitle sx={{
                     fontWeight: 800,
@@ -1540,7 +1547,8 @@ export default function Devices() {
                 onClose={() => setCameraScannerOpen(false)}
                 maxWidth="sm"
                 fullWidth
-                PaperProps={{ sx: { borderRadius: 4 } }}
+                fullScreen={isMobile}
+                PaperProps={{ sx: { borderRadius: isMobile ? 0 : 4 } }}
             >
                 <DialogTitle sx={{
                     fontWeight: 800,

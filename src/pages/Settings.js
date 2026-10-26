@@ -29,7 +29,9 @@ import {
   FormControl,
   InputLabel,
   Tabs,
-  Tab
+  Tab,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import {
   Store,
@@ -63,6 +65,9 @@ import { INVOICE_TEMPLATES, DEFAULT_INVOICE_SETTINGS, getStoredInvoiceSettings }
 import { PREDEFINED_LOGOS } from '../constants/predefinedLogos';
 
 export default function Settings() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
   const { profile, updateProfile, updateInvoiceTemplateSettings } = useData();
   const {
     user,
@@ -484,7 +489,7 @@ export default function Settings() {
   }
 
   return (
-    <Box sx={{ maxWidth: 1400, mx: 'auto', p: { xs: 2, md: 3 } }}>
+    <Box sx={{ maxWidth: 1400, mx: 'auto', p: { xs: 1.5, sm: 2.5, md: 3 } }}>
       {/* Page Header */}
       <PageHeader
         title="Boutique Configuration"
@@ -1781,7 +1786,8 @@ export default function Settings() {
         onClose={() => setStaffModalOpen(false)}
         maxWidth="sm"
         fullWidth
-        PaperProps={{ sx: { borderRadius: 4 } }}
+        fullScreen={isMobile}
+        PaperProps={{ sx: { borderRadius: isMobile ? 0 : 4 } }}
       >
         <DialogTitle sx={{ fontWeight: 800, color: '#042F2E', borderBottom: '1px solid', borderColor: 'divider' }}>
           {editingStaffId ? 'Edit Staff Member & Permissions' : 'Register New Staff Member'}
@@ -2013,7 +2019,8 @@ export default function Settings() {
         onClose={() => setResetPwdModalOpen(false)}
         maxWidth="xs"
         fullWidth
-        PaperProps={{ sx: { borderRadius: 3.5 } }}
+        fullScreen={isMobile}
+        PaperProps={{ sx: { borderRadius: isMobile ? 0 : 3.5 } }}
       >
         <DialogTitle sx={{ fontWeight: 800, color: '#042F2E', display: 'flex', alignItems: 'center', gap: 1 }}>
           <VpnKey sx={{ color: '#D97706' }} /> Reset Staff Password
@@ -2060,9 +2067,10 @@ export default function Settings() {
         onClose={() => setLogoModalOpen(false)}
         maxWidth="md"
         fullWidth
+        fullScreen={isTablet}
         PaperProps={{
           sx: {
-            borderRadius: 3.5,
+            borderRadius: isTablet ? 0 : 3.5,
             p: 1
           }
         }}

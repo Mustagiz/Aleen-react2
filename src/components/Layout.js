@@ -778,7 +778,8 @@ export default function Layout() {
           sx={{
             flex: 1,
             overflowY: 'auto',
-            p: { xs: 2, sm: 3, md: 3.5 },
+            p: { xs: 1.5, sm: 2.5, md: 3.5 },
+            pb: { xs: 'calc(env(safe-area-inset-bottom, 0px) + 72px)', sm: 3, md: 3.5 },
             bgcolor: 'background.default',
             display: 'flex',
             flexDirection: 'column'
@@ -789,6 +790,89 @@ export default function Layout() {
           </Box>
           <AtelierFooter />
         </Box>
+      </Box>
+
+      {/* Mobile Haute Couture Bottom Navigation Dock (Phones Only <600px) */}
+      <Box
+        component="nav"
+        aria-label="Mobile Navigation"
+        sx={{
+          display: { xs: 'flex', sm: 'none' },
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 60,
+          bgcolor: isDark ? 'rgba(8, 20, 20, 0.94)' : 'rgba(255, 255, 255, 0.94)',
+          backdropFilter: 'blur(14px)',
+          borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.12)',
+          zIndex: (theme) => theme.zIndex.appBar,
+          alignItems: 'center',
+          justifyContent: 'space-around',
+          px: 1,
+          pb: 'env(safe-area-inset-bottom, 0px)'
+        }}
+      >
+        {[
+          { label: 'Overview', icon: <Dashboard sx={{ fontSize: 20 }} />, path: '/' },
+          { label: 'Billing', icon: <Receipt sx={{ fontSize: 20 }} />, path: '/invoices' },
+          { label: 'Workshop', icon: <Straighten sx={{ fontSize: 20 }} />, path: '/kanban' },
+          { label: 'Vault', icon: <Inventory sx={{ fontSize: 20 }} />, path: '/inventory' },
+          { label: 'Guests', icon: <People sx={{ fontSize: 20 }} />, path: '/customers' }
+        ].map((tab) => {
+          const isActive = location.pathname === tab.path;
+          return (
+            <Box
+              key={tab.path}
+              onClick={() => navigate(tab.path)}
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flex: 1,
+                py: 0.5,
+                cursor: 'pointer',
+                color: isActive ? '#0F766E' : 'text.secondary',
+                transition: 'all 0.15s ease',
+                position: 'relative'
+              }}
+            >
+              <Box
+                sx={{
+                  color: isActive ? (isDark ? '#2DD4BF' : '#0F766E') : 'inherit',
+                  transform: isActive ? 'scale(1.08)' : 'scale(1)',
+                  transition: 'transform 0.15s ease'
+                }}
+              >
+                {tab.icon}
+              </Box>
+              <Typography
+                sx={{
+                  fontSize: '0.68rem',
+                  fontWeight: isActive ? 800 : 500,
+                  color: isActive ? (isDark ? '#2DD4BF' : '#0F766E') : 'text.secondary',
+                  letterSpacing: '-0.01em',
+                  mt: 0.25
+                }}
+              >
+                {tab.label}
+              </Typography>
+              {isActive && (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 2,
+                    width: 18,
+                    height: 2.5,
+                    borderRadius: '2px',
+                    bgcolor: isDark ? '#2DD4BF' : '#0F766E'
+                  }}
+                />
+              )}
+            </Box>
+          );
+        })}
       </Box>
 
       {/* Global Dialogs & Alerts */}
