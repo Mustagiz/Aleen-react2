@@ -371,7 +371,7 @@ const Dashboard = () => {
             <Typography
               variant="h3"
               sx={{
-                fontFamily: '"Outfit", "Inter", sans-serif',
+                fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
                 fontWeight: 800,
                 letterSpacing: '-0.025em',
                 lineHeight: 1.15,

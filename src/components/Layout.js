@@ -254,10 +254,10 @@ export default function Layout() {
               if (isMobile) setMobileOpen(false);
             }}>
               <Typography sx={{ 
-                fontFamily: '"Cinzel", serif', 
+                fontFamily: '"Plus Jakarta Sans", sans-serif', 
                 fontWeight: 800, 
                 color: '#F59E0B', 
-                fontSize: '1.25rem',
+                fontSize: '1.2rem',
                 lineHeight: 1
               }}>
                 A
@@ -267,7 +267,7 @@ export default function Layout() {
             {!showCollapsed && (
               <Box sx={{ overflow: 'hidden' }}>
                 <Typography sx={{
-                  fontFamily: '"Outfit", "Inter", sans-serif',
+                  fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
                   fontWeight: 800,
                   color: 'text.primary',
                   fontSize: '1.05rem',

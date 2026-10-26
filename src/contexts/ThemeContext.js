@@ -51,17 +51,17 @@ export const ThemeProvider = ({ children }) => {
             },
             typography: {
                 fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                h1: { fontFamily: '"Outfit", "Inter", sans-serif', fontWeight: 800, fontSize: '2.3rem', letterSpacing: '-0.025em' },
-                h2: { fontFamily: '"Outfit", "Inter", sans-serif', fontWeight: 700, fontSize: '1.85rem', letterSpacing: '-0.02em' },
-                h3: { fontFamily: '"Outfit", "Inter", sans-serif', fontWeight: 700, fontSize: '1.45rem', letterSpacing: '-0.015em' },
-                h4: { fontFamily: '"Outfit", "Inter", sans-serif', fontWeight: 700, fontSize: '1.25rem', letterSpacing: '-0.01em' },
-                h5: { fontFamily: '"Outfit", "Inter", sans-serif', fontWeight: 600, fontSize: '1.1rem', letterSpacing: '-0.005em' },
-                h6: { fontFamily: '"Outfit", "Inter", sans-serif', fontWeight: 600, fontSize: '0.98rem' },
-                subtitle1: { fontSize: '0.925rem', fontWeight: 600 },
-                subtitle2: { fontSize: '0.84rem', fontWeight: 600 },
-                body1: { fontSize: '0.9rem', lineHeight: 1.55 },
-                body2: { fontSize: '0.825rem', lineHeight: 1.5 },
-                button: { textTransform: 'none', fontWeight: 600, letterSpacing: '0.01em' }
+                h1: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', fontWeight: 800, fontSize: '2.2rem', letterSpacing: '-0.03em' },
+                h2: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', fontWeight: 700, fontSize: '1.75rem', letterSpacing: '-0.025em' },
+                h3: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', fontWeight: 700, fontSize: '1.4rem', letterSpacing: '-0.02em' },
+                h4: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', fontWeight: 700, fontSize: '1.2rem', letterSpacing: '-0.015em' },
+                h5: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', fontWeight: 600, fontSize: '1.05rem', letterSpacing: '-0.01em' },
+                h6: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', fontWeight: 600, fontSize: '0.95rem', letterSpacing: '-0.005em' },
+                subtitle1: { fontSize: '0.925rem', fontWeight: 600, letterSpacing: '-0.01em' },
+                subtitle2: { fontSize: '0.84rem', fontWeight: 600, letterSpacing: '-0.005em' },
+                body1: { fontSize: '0.885rem', lineHeight: 1.55 },
+                body2: { fontSize: '0.82rem', lineHeight: 1.5 },
+                button: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', textTransform: 'none', fontWeight: 600, letterSpacing: '0.01em' }
             },
             shape: { borderRadius: 12 },
             components: {

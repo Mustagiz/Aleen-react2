@@ -118,7 +118,7 @@ export default function Login() {
               <Typography
                 variant="h5"
                 sx={{
-                  fontFamily: '"Outfit", "Inter", sans-serif',
+                  fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
                   fontWeight: 900,
                   letterSpacing: '0.08em',
                   color: '#FFFFFF',
@@ -162,7 +162,7 @@ export default function Login() {
           <Typography
             variant="h2"
             sx={{
-              fontFamily: '"Outfit", "Inter", sans-serif',
+              fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
               fontWeight: 800,
               lineHeight: 1.15,
               mb: 2.5,
@@ -292,7 +292,7 @@ export default function Login() {
               <Typography
                 variant="h4"
                 sx={{
-                  fontFamily: '"Outfit", "Inter", sans-serif',
+                  fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
                   fontWeight: 800,
                   color: '#042F2E',
                   letterSpacing: '-0.025em',
