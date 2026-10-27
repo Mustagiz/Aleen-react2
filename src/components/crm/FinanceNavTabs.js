@@ -36,22 +36,25 @@ export default function FinanceNavTabs() {
                 variant="scrollable"
                 scrollButtons="auto"
                 sx={{
-                    minHeight: 46,
+                    minHeight: 44,
                     '& .MuiTab-root': {
                         textTransform: 'none',
                         fontWeight: 700,
-                        fontSize: '0.875rem',
-                        minHeight: 46,
+                        fontSize: '0.86rem',
+                        minHeight: 44,
                         mr: 1.5,
-                        px: 2,
+                        px: 2.25,
+                        borderRadius: '10px 10px 0 0',
                         color: 'text.secondary',
-                        transition: 'color 0.2s ease',
+                        transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                         '&:hover': {
-                            color: '#0F766E'
+                            color: '#0F766E',
+                            bgcolor: 'rgba(15, 118, 110, 0.05)'
                         }
                     },
                     '& .Mui-selected': {
-                        color: '#0F766E !important'
+                        color: '#0F766E !important',
+                        bgcolor: 'rgba(15, 118, 110, 0.08)'
                     },
                     '& .MuiTabs-indicator': {
                         backgroundColor: '#0F766E',

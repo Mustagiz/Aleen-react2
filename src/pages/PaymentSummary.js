@@ -307,10 +307,10 @@ const PaymentSummary = () => {
                             startIcon={<PointOfSale sx={{ fontSize: 19, color: '#0F766E' }} />}
                             onClick={() => setCashDrawerModalOpen(true)}
                             sx={{
-                                height: 42,
-                                minHeight: 42,
-                                px: 2.75,
-                                borderRadius: '24px',
+                                height: 40,
+                                minHeight: 40,
+                                px: 2.25,
+                                borderRadius: '10px',
                                 border: '1.5px solid #0F766E',
                                 color: '#0F766E',
                                 bgcolor: 'background.paper',
@@ -336,10 +336,10 @@ const PaymentSummary = () => {
                             startIcon={<Download sx={{ fontSize: 19, color: '#0F766E' }} />}
                             onClick={exportToExcel}
                             sx={{
-                                height: 42,
-                                minHeight: 42,
-                                px: 2.75,
-                                borderRadius: '24px',
+                                height: 40,
+                                minHeight: 40,
+                                px: 2.25,
+                                borderRadius: '10px',
                                 border: '1.5px solid #0F766E',
                                 color: '#0F766E',
                                 bgcolor: 'background.paper',
@@ -365,10 +365,10 @@ const PaymentSummary = () => {
                             startIcon={<Print sx={{ fontSize: 19, color: '#0F766E' }} />}
                             onClick={handlePrint}
                             sx={{
-                                height: 42,
-                                minHeight: 42,
-                                px: 2.75,
-                                borderRadius: '24px',
+                                height: 40,
+                                minHeight: 40,
+                                px: 2.25,
+                                borderRadius: '10px',
                                 border: '1.5px solid #0F766E',
                                 color: '#0F766E',
                                 bgcolor: 'background.paper',
@@ -394,10 +394,10 @@ const PaymentSummary = () => {
                             startIcon={<Download sx={{ fontSize: 19, color: '#FFFFFF !important' }} />}
                             onClick={exportToPDF}
                             sx={{
-                                height: 42,
-                                minHeight: 42,
-                                px: 3,
-                                borderRadius: '24px',
+                                height: 40,
+                                minHeight: 40,
+                                px: 2.5,
+                                borderRadius: '10px',
                                 textTransform: 'none',
                                 fontWeight: 700,
                                 fontSize: '0.84rem',
@@ -439,11 +439,11 @@ const PaymentSummary = () => {
                 <Box sx={{
                     display: 'flex',
                     alignItems: 'center',
-                    bgcolor: 'background.paper',
+                    bgcolor: theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.25)' : 'background.paper',
                     p: '3px',
-                    height: 42,
+                    height: 40,
                     boxSizing: 'border-box',
-                    borderRadius: '24px',
+                    borderRadius: '10px',
                     border: '1.5px solid rgba(15, 118, 110, 0.25)',
                     boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
                 }}>
@@ -462,15 +462,17 @@ const PaymentSummary = () => {
                                     setPage(0);
                                 }}
                                 sx={{
-                                    height: 34,
+                                    height: 32,
+                                    minHeight: 32,
                                     px: 2,
-                                    borderRadius: '20px',
+                                    borderRadius: '8px',
                                     textTransform: 'none',
                                     fontWeight: 700,
                                     fontSize: '0.82rem',
                                     color: isSelected ? '#FFFFFF' : 'text.secondary',
                                     bgcolor: isSelected ? '#0F766E' : 'transparent',
-                                    transition: 'all 0.15s ease',
+                                    boxShadow: isSelected ? '0 2px 8px rgba(15, 118, 110, 0.28)' : 'none',
+                                    transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                                     '&:hover': {
                                         bgcolor: isSelected ? '#042F2E' : 'rgba(15, 118, 110, 0.08)'
                                     }
@@ -599,8 +601,8 @@ const PaymentSummary = () => {
                             }}
                             sx={{
                                 '& .MuiOutlinedInput-root': {
-                                    height: 42,
-                                    borderRadius: '24px',
+                                    height: 40,
+                                    borderRadius: '10px',
                                     bgcolor: 'background.paper',
                                     fontSize: '0.84rem',
                                     '& fieldset': { borderColor: 'rgba(15, 118, 110, 0.25)' },
@@ -623,8 +625,8 @@ const PaymentSummary = () => {
                             }}
                             sx={{
                                 '& .MuiOutlinedInput-root': {
-                                    height: 42,
-                                    borderRadius: '24px',
+                                    height: 40,
+                                    borderRadius: '10px',
                                     bgcolor: 'background.paper',
                                     fontSize: '0.84rem',
                                     '& fieldset': { borderColor: 'rgba(15, 118, 110, 0.25)' },
@@ -651,8 +653,9 @@ const PaymentSummary = () => {
                                     setPage(0);
                                 }}
                                 sx={{
-                                    height: 38,
-                                    borderRadius: '20px',
+                                    height: 40,
+                                    minHeight: 40,
+                                    borderRadius: '10px',
                                     px: 2,
                                     border: '1.5px solid rgba(15, 118, 110, 0.3)',
                                     color: '#0F766E',
@@ -676,9 +679,18 @@ const PaymentSummary = () => {
 
             {/* Transaction Audit Details Table */}
             <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
-                <TableContainer>
-                    <Table size="small">
-                        <TableHead sx={{ bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(15, 118, 110, 0.04)' }}>
+                <TableContainer sx={{ maxHeight: 680 }}>
+                    <Table size="small" stickyHeader>
+                        <TableHead sx={{
+                            position: 'sticky',
+                            top: 0,
+                            zIndex: 2,
+                            '& th': {
+                                backdropFilter: 'blur(10px)',
+                                bgcolor: theme.palette.mode === 'dark' ? 'rgba(16, 32, 32, 0.92)' : 'rgba(255, 255, 255, 0.92)',
+                                borderBottom: theme.palette.mode === 'dark' ? '1.5px solid rgba(255, 255, 255, 0.1)' : '1.5px solid rgba(15, 118, 110, 0.15)'
+                            }
+                        }}>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
                                     Invoice Ref
