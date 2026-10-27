@@ -96,7 +96,8 @@ export default function AtelierKpiCard({
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-      whileHover={{ y: -5, transition: { duration: 0.2, ease: 'easeOut' } }}
+      whileHover={{ y: -3, transition: { type: 'spring', stiffness: 360, damping: 24 } }}
+      whileTap={{ scale: 0.99 }}
       sx={{ height: '100%' }}
     >
       <Card
@@ -240,7 +241,7 @@ export default function AtelierKpiCard({
                     height: 22,
                     fontSize: '0.68rem',
                     fontWeight: 700,
-                    borderRadius: '6px',
+                    borderRadius: '8px',
                     backgroundColor: isTrendPositive
                       ? isDark ? 'rgba(16, 185, 129, 0.18)' : '#ECFDF5'
                       : isDark ? 'rgba(239, 68, 68, 0.18)' : '#FEF2F2',

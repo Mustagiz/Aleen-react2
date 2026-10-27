@@ -54,7 +54,8 @@ const GlassCard = ({ children, sx = {}, hover = false, glowColor = 'aurora', ...
         <Box
             component={hover ? motion.div : 'div'}
             {...(hover ? {
-                whileHover: { y: -4, transition: { duration: 0.2, ease: 'easeOut' } }
+                whileHover: { y: -3, transition: { type: 'spring', stiffness: 360, damping: 24 } },
+                whileTap: { scale: 0.99 }
             } : {})}
             sx={{ height: '100%' }}
         >
