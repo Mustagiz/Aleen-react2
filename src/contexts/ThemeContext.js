@@ -63,21 +63,28 @@ export const ThemeProvider = ({ children }) => {
                 body2: { fontSize: '0.82rem', lineHeight: 1.5, fontFeatureSettings: '"tnum"' },
                 button: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', textTransform: 'none', fontWeight: 700, letterSpacing: '0.02em' }
             },
-            shape: { borderRadius: 12 },
+            shape: { borderRadius: 10 },
             components: {
                 MuiButton: {
+                    defaultProps: {
+                        disableElevation: true
+                    },
                     styleOverrides: {
                         root: {
                             borderRadius: 10,
+                            minHeight: 40,
                             padding: '8px 20px',
                             boxShadow: 'none',
+                            fontWeight: 700,
+                            fontSize: '0.84rem',
+                            letterSpacing: '0.015em',
                             transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                             '&:hover': {
                                 transform: 'translateY(-1px)',
                                 boxShadow: mode === 'light' ? '0 4px 14px rgba(15, 118, 110, 0.18)' : '0 4px 14px rgba(0, 0, 0, 0.4)'
                             },
                             '&:active': {
-                                transform: 'translateY(0) scale(0.98)'
+                                transform: 'translateY(0) scale(0.985)'
                             }
                         },
                         containedPrimary: {
@@ -98,7 +105,7 @@ export const ThemeProvider = ({ children }) => {
                 MuiPaper: {
                     styleOverrides: {
                         root: {
-                            borderRadius: 14,
+                            borderRadius: 16,
                             boxShadow: mode === 'light' 
                                 ? '0 4px 20px -2px rgba(15, 118, 110, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04)' 
                                 : '0 4px 24px rgba(0, 0, 0, 0.5)',
@@ -110,7 +117,7 @@ export const ThemeProvider = ({ children }) => {
                 MuiCard: {
                     styleOverrides: {
                         root: {
-                            borderRadius: 14,
+                            borderRadius: 16,
                             boxShadow: mode === 'light' 
                                 ? '0 4px 20px -2px rgba(15, 118, 110, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04)' 
                                 : '0 4px 24px rgba(0, 0, 0, 0.5)',
@@ -138,6 +145,7 @@ export const ThemeProvider = ({ children }) => {
                     styleOverrides: {
                         root: {
                             padding: '12px 16px',
+                            fontFeatureSettings: '"tnum"',
                             borderColor: mode === 'light' ? 'rgba(15, 118, 110, 0.08)' : 'rgba(255, 255, 255, 0.06)'
                         }
                     }
@@ -155,6 +163,7 @@ export const ThemeProvider = ({ children }) => {
                     styleOverrides: {
                         root: {
                             borderRadius: 10,
+                            minHeight: 40,
                             '&:hover .MuiOutlinedInput-notchedOutline': {
                                 borderColor: '#0F766E'
                             },

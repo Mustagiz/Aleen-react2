@@ -3,11 +3,18 @@
 :root {
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-display: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
   --font-crest: 'Plus Jakarta Sans', sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
   --emerald-primary: #0F766E;
+  --emerald-light: #14B8A6;
   --emerald-dark: #042F2E;
   --gold-accent: #D97706;
+  --radius-card: 16px;
+  --radius-control: 10px;
+  --radius-inner: 8px;
+  --control-height: 40px;
+  --control-height-compact: 32px;
 }
 
 body {
