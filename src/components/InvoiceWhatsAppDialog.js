@@ -19,8 +19,7 @@ import {
   Alert,
   Snackbar,
   InputAdornment,
-  Grid,
-  CircularProgress
+  Grid
 } from '@mui/material';
 import {
   Close,
@@ -39,13 +38,9 @@ import {
   Storefront,
   CurrencyRupee,
   DoneAll,
-  PictureAsPdf,
-  Bolt,
-  Settings
+  PictureAsPdf
 } from '@mui/icons-material';
 import { dispatchMessage, normalizePhoneNumber } from '../services/messageDispatcher';
-import { getStoredOpenWASettings, sendOpenWATextMessage, checkOpenWASessionStatus } from '../services/openwaService';
-import OpenWASessionModal from './crm/OpenWASessionModal';
 
 export const INVOICE_WHATSAPP_TEMPLATES = [
   {
@@ -380,23 +375,6 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
   // Editable text state
   const [messageText, setMessageText] = useState('');
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-  const [openWASettings, setOpenWASettings] = useState(getStoredOpenWASettings);
-  const [openWAStatus, setOpenWAStatus] = useState('idle');
-  const [openWAModalOpen, setOpenWAModalOpen] = useState(false);
-  const [isSendingOpenWA, setIsSendingOpenWA] = useState(false);
-
-  // Check OpenWA status whenever dialog opens
-  useEffect(() => {
-    if (open) {
-      const cfg = getStoredOpenWASettings();
-      setOpenWASettings(cfg);
-      if (cfg.enabled) {
-        checkOpenWASessionStatus(cfg).then(res => {
-          setOpenWAStatus(res.status);
-        });
-      }
-    }
-  }, [open]);
 
   // Whenever invoice or template changes, populate the phone and message
   useEffect(() => {
@@ -446,39 +424,8 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
     }
   };
 
-  const handleSendWhatsApp = async (forceWeb = false) => {
+  const handleSendWhatsApp = () => {
     if (!messageText) return;
-
-    if (openWASettings.enabled && !forceWeb) {
-      setIsSendingOpenWA(true);
-      const res = await sendOpenWATextMessage({
-        phone: recipientPhone,
-        message: messageText,
-        overrideSettings: openWASettings
-      });
-      setIsSendingOpenWA(false);
-
-      if (res.success) {
-        setSnackbar({ open: true, message: '✓ Dispatched instantly via OpenWA Gateway!', severity: 'success' });
-        setTimeout(() => onClose(), 600);
-        return;
-      }
-
-      if (openWASettings.autoFallbackToWeb) {
-        setSnackbar({ open: true, message: `OpenWA notice: ${res.error || 'Server offline'}. Opening WhatsApp Web fallback.`, severity: 'warning' });
-        dispatchMessage({
-          channel: 'whatsapp',
-          phone: recipientPhone,
-          message: messageText
-        });
-        onClose();
-        return;
-      } else {
-        setSnackbar({ open: true, message: `OpenWA error: ${res.error}`, severity: 'error' });
-        return;
-      }
-    }
-
     dispatchMessage({
       channel: 'whatsapp',
       phone: recipientPhone,
@@ -556,26 +503,9 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
             </Typography>
           </Box>
         </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Chip
-            icon={<Bolt sx={{ '&&': { color: openWASettings.enabled && (openWAStatus === 'ready' || openWAStatus === 'connected') ? '#34D399' : '#FBBF24', fontSize: 16 } }} />}
-            label={openWASettings.enabled ? (openWAStatus === 'ready' || openWAStatus === 'connected' ? 'OpenWA Active' : 'OpenWA Configured') : 'OpenWA Setup'}
-            size="small"
-            clickable
-            onClick={() => setOpenWAModalOpen(true)}
-            sx={{
-              bgcolor: 'rgba(255, 255, 255, 0.15)',
-              color: '#FFFFFF',
-              fontWeight: 700,
-              fontSize: '0.72rem',
-              height: 24,
-              '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.25)' }
-            }}
-          />
-          <IconButton onClick={onClose} sx={{ color: 'rgba(255, 255, 255, 0.85)', '&:hover': { color: '#FFFFFF', bgcolor: 'rgba(255, 255, 255, 0.12)' } }}>
-            <Close />
-          </IconButton>
-        </Box>
+        <IconButton onClick={onClose} sx={{ color: 'rgba(255, 255, 255, 0.85)', '&:hover': { color: '#FFFFFF', bgcolor: 'rgba(255, 255, 255, 0.12)' } }}>
+          <Close />
+        </IconButton>
       </DialogTitle>
 
       <DialogContent sx={{ p: { xs: 2, sm: 3 }, bgcolor: 'background.default' }}>
@@ -975,58 +905,29 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
             Send PDF Bill
           </Button>
 
-          {openWASettings.enabled && (
-            <Button
-              onClick={() => handleSendWhatsApp(false)}
-              variant="contained"
-              size="large"
-              disabled={isSendingOpenWA}
-              startIcon={isSendingOpenWA ? <CircularProgress size={18} sx={{ color: '#fff' }} /> : <Bolt sx={{ fontSize: 20 }} />}
-              sx={{
-                px: 3.5,
-                py: 1.1,
-                borderRadius: '24px',
-                fontWeight: 800,
-                fontSize: '0.92rem',
-                bgcolor: '#0F766E !important',
-                color: '#FFFFFF !important',
-                boxShadow: '0 4px 16px rgba(15, 118, 110, 0.4)',
-                textTransform: 'none',
-                '&:hover': {
-                  bgcolor: '#042F2E !important',
-                  boxShadow: '0 6px 20px rgba(15, 118, 110, 0.55)',
-                  transform: 'translateY(-1px)'
-                }
-              }}
-            >
-              {isSendingOpenWA ? 'Sending via OpenWA...' : '⚡ Send via OpenWA'}
-            </Button>
-          )}
-
           <Button
-            onClick={() => handleSendWhatsApp(true)}
-            variant={openWASettings.enabled ? 'outlined' : 'contained'}
+            onClick={handleSendWhatsApp}
+            variant="contained"
             size="large"
             startIcon={<WhatsApp sx={{ fontSize: 22 }} />}
             sx={{
-              px: openWASettings.enabled ? 2.5 : 3.5,
+              px: 3.5,
               py: 1.1,
               borderRadius: '24px',
               fontWeight: 800,
               fontSize: '0.92rem',
-              bgcolor: openWASettings.enabled ? 'transparent' : '#25D366 !important',
-              color: openWASettings.enabled ? '#25D366 !important' : '#FFFFFF !important',
-              borderColor: openWASettings.enabled ? '#25D366' : 'transparent',
-              boxShadow: openWASettings.enabled ? 'none' : '0 4px 16px rgba(37, 211, 102, 0.4)',
+              bgcolor: '#25D366 !important',
+              color: '#FFFFFF !important',
+              boxShadow: '0 4px 16px rgba(37, 211, 102, 0.4)',
               textTransform: 'none',
               '&:hover': {
-                bgcolor: openWASettings.enabled ? 'rgba(37, 211, 102, 0.08) !important' : '#1EBE5D !important',
-                borderColor: '#25D366',
+                bgcolor: '#1EBE5D !important',
+                boxShadow: '0 6px 20px rgba(37, 211, 102, 0.55)',
                 transform: 'translateY(-1px)'
               }
             }}
           >
-            {openWASettings.enabled ? 'WhatsApp Web' : 'Send Text Bill'}
+            Send Text Bill
           </Button>
         </Box>
       </DialogActions>
@@ -1046,13 +947,6 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
           {snackbar.message}
         </Alert>
       </Snackbar>
-
-      {/* OpenWA Gateway Session Configuration Modal */}
-      <OpenWASessionModal
-        open={openWAModalOpen}
-        onClose={() => setOpenWAModalOpen(false)}
-        onSettingsUpdated={(newSettings) => setOpenWASettings(newSettings)}
-      />
     </Dialog>
   );
 };

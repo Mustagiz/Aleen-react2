@@ -32,13 +32,11 @@ import {
   Chat,
   Sms,
   Link as LinkIcon,
-  OpenInNew,
-  Bolt
+  OpenInNew
 } from '@mui/icons-material';
 import { INVOICE_WHATSAPP_TEMPLATES, generateInvoiceWhatsAppText } from './InvoiceWhatsAppDialog';
 import ThermalReceipt from './ThermalReceipt';
 import { printInvoiceElement } from '../utils/printInvoice';
-import { getStoredOpenWASettings, sendOpenWATextMessage } from '../services/openwaService';
 
 /**
  * BillSuccessModal
@@ -205,35 +203,6 @@ const BillSuccessModal = ({
       }
 
       const messageText = getCompiledMessageText();
-
-      // Check if OpenWA direct gateway is active
-      const openWACfg = getStoredOpenWASettings();
-      if (openWACfg.enabled) {
-        const res = await sendOpenWATextMessage({
-          phone: formattedPhone,
-          message: messageText,
-          overrideSettings: openWACfg
-        });
-
-        if (res.success) {
-          setSnackbar({
-            open: true,
-            message: `✓ E-Bill delivered directly to ${customerPhone} via OpenWA!`,
-            severity: 'success'
-          });
-          return;
-        }
-
-        if (!openWACfg.autoFallbackToWeb) {
-          setSnackbar({
-            open: true,
-            message: `OpenWA Gateway delivery failed: ${res.error}`,
-            severity: 'error'
-          });
-          return;
-        }
-      }
-
       const encodedText = encodeURIComponent(messageText);
       const waUrl = `https://wa.me/${formattedPhone}?text=${encodedText}`;
 

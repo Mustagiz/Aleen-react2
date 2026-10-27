@@ -46,8 +46,7 @@ import {
     Visibility,
     Clear,
     Stars,
-    WarningAmber,
-    Bolt
+    WarningAmber
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import PageHeader from '../components/crm/PageHeader';
@@ -56,7 +55,6 @@ import Customer360Drawer from '../components/crm/Customer360Drawer';
 import ClienteleNavTabs from '../components/crm/ClienteleNavTabs';
 import { useFeedback } from '../contexts/FeedbackContext';
 import CustomerMeasurementModal from '../components/crm/CustomerMeasurementModal';
-import { getStoredOpenWASettings, sendOpenWATextMessage } from '../services/openwaService';
 
 const Customers = () => {
     const theme = useTheme();
@@ -80,7 +78,6 @@ const Customers = () => {
     const [whatsAppCustomer, setWhatsAppCustomer] = useState(null);
     const [whatsAppTemplate, setWhatsAppTemplate] = useState('loyalty');
     const [whatsAppCustomText, setWhatsAppCustomText] = useState('');
-    const [isSendingOpenWA, setIsSendingOpenWA] = useState(false);
     const [paymentData, setPaymentData] = useState({
         amount: '',
         method: 'Cash',
@@ -247,32 +244,8 @@ const Customers = () => {
         setWhatsAppModalOpen(true);
     };
 
-    const handleSendWhatsApp = async (forceWeb = false) => {
+    const handleSendWhatsApp = () => {
         if (!whatsAppCustomer) return;
-        const cfg = getStoredOpenWASettings();
-        if (cfg.enabled && !forceWeb) {
-            setIsSendingOpenWA(true);
-            const res = await sendOpenWATextMessage({
-                phone: whatsAppCustomer.phone,
-                message: whatsAppCustomText,
-                overrideSettings: cfg
-            });
-            setIsSendingOpenWA(false);
-
-            if (res.success) {
-                showToast(`✓ Message dispatched to ${whatsAppCustomer.name} via OpenWA!`, 'success');
-                setWhatsAppModalOpen(false);
-                return;
-            }
-
-            if (cfg.autoFallbackToWeb) {
-                showToast(`OpenWA notice: ${res.error || 'Server offline'}. Opening WhatsApp Web fallback.`, 'info');
-            } else {
-                showToast(`OpenWA Error: ${res.error}`, 'error');
-                return;
-            }
-        }
-
         const phone = whatsAppCustomer.phone.replace(/\D/g, '');
         const cleanPhone = phone.startsWith('91') ? phone : `91${phone}`;
         const url = `https://wa.me/${cleanPhone}/?text=${encodeURIComponent(whatsAppCustomText)}`;
@@ -1035,39 +1008,20 @@ const Customers = () => {
                     <Button onClick={() => setWhatsAppModalOpen(false)} sx={{ fontWeight: 700, color: 'text.secondary' }}>
                         Cancel
                     </Button>
-                    {getStoredOpenWASettings().enabled && (
-                        <Button
-                            variant="contained"
-                            disabled={isSendingOpenWA}
-                            onClick={() => handleSendWhatsApp(false)}
-                            startIcon={<Bolt />}
-                            sx={{
-                                px: 2.5,
-                                borderRadius: 2,
-                                fontWeight: 700,
-                                bgcolor: '#0F766E',
-                                color: '#fff',
-                                '&:hover': { bgcolor: '#042F2E' }
-                            }}
-                        >
-                            {isSendingOpenWA ? 'Sending via OpenWA...' : '⚡ Send via OpenWA'}
-                        </Button>
-                    )}
                     <Button
-                        variant={getStoredOpenWASettings().enabled ? 'outlined' : 'contained'}
-                        onClick={() => handleSendWhatsApp(true)}
+                        variant="contained"
+                        onClick={handleSendWhatsApp}
                         startIcon={<WhatsApp />}
                         sx={{
-                            px: 2.5,
+                            px: 3,
                             borderRadius: 2,
                             fontWeight: 700,
-                            bgcolor: getStoredOpenWASettings().enabled ? 'transparent' : '#25D366',
-                            color: getStoredOpenWASettings().enabled ? '#25D366' : '#fff',
-                            borderColor: getStoredOpenWASettings().enabled ? '#25D366' : 'transparent',
-                            '&:hover': { bgcolor: getStoredOpenWASettings().enabled ? 'rgba(37, 211, 102, 0.08)' : '#128C7E' }
+                            bgcolor: '#25D366',
+                            color: '#fff',
+                            '&:hover': { bgcolor: '#128C7E' }
                         }}
                     >
-                        {getStoredOpenWASettings().enabled ? 'WhatsApp Web' : 'Send via WhatsApp'}
+                        Send via WhatsApp
                     </Button>
                 </DialogActions>
             </Dialog>

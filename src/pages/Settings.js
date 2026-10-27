@@ -55,8 +55,7 @@ import {
   ColorLens,
   CloudUpload,
   Draw,
-  AutoAwesome,
-  WhatsApp
+  AutoAwesome
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -64,7 +63,6 @@ import { useFeedback } from '../contexts/FeedbackContext';
 import PageHeader from '../components/crm/PageHeader';
 import { INVOICE_TEMPLATES, DEFAULT_INVOICE_SETTINGS, getStoredInvoiceSettings } from '../constants/invoiceTemplates';
 import { PREDEFINED_LOGOS } from '../constants/predefinedLogos';
-import OpenWASettingsSection from '../components/crm/OpenWASettingsSection';
 
 export default function Settings() {
   const theme = useTheme();
@@ -559,7 +557,6 @@ export default function Settings() {
           <Tab icon={<ColorLens fontSize="small" />} iconPosition="start" label="Invoice Print & Letterhead" />
           <Tab icon={<People fontSize="small" />} iconPosition="start" label={`Staff & Permissions (${staffList.length})`} />
           <Tab icon={<Lock fontSize="small" />} iconPosition="start" label="Admin Security" />
-          <Tab icon={<WhatsApp fontSize="small" />} iconPosition="start" label="WhatsApp Gateway (OpenWA)" />
         </Tabs>
       </Paper>
 
@@ -1781,11 +1778,6 @@ export default function Settings() {
             </Paper>
           </Grid>
         </Grid>
-      )}
-
-      {/* TAB 5: WHATSAPP GATEWAY (OPENWA) */}
-      {activeTab === 5 && (
-        <OpenWASettingsSection />
       )}
 
       {/* MODAL 1: ADD OR EDIT STAFF MEMBER */}
