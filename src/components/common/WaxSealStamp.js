@@ -4,17 +4,151 @@ import { motion } from 'framer-motion';
 
 /**
  * WaxSealStamp
- * An animated couture wax seal / atelier stamp ("PAID", "BESPOKE", "APPROVED", "DISPATCHED")
- * Provides a tactile, satisfying seal of craftsmanship.
+ * An animated couture wax seal or retro rubber-stamp watermark ("PAID", "BESPOKE", "APPROVED", "DISPATCHED")
+ * Provides a tactile, satisfying seal of craftsmanship and vintage accounting authority.
  */
 export default function WaxSealStamp({
   label = 'PAID',
   subtitle = 'ATELIER ALEEN',
-  variant = 'crimson', // 'crimson' | 'gold' | 'emerald'
+  variant = 'emerald', // 'crimson' | 'gold' | 'emerald'
   size = 72,
   animate = true,
+  isWatermark = false,
   sx = {}
 }) {
+  const watermarkColors = {
+    crimson: {
+      ink: '#991B1B',
+      border: '#B91C1C',
+      innerRing: '#DC2626'
+    },
+    gold: {
+      ink: '#92400E',
+      border: '#B45309',
+      innerRing: '#D97706'
+    },
+    emerald: {
+      ink: '#064E3B',
+      border: '#0F766E',
+      innerRing: '#14B8A6'
+    }
+  };
+
+  if (isWatermark) {
+    const wmScheme = watermarkColors[variant] || watermarkColors.emerald;
+    return (
+      <Box
+        component={animate ? motion.div : 'div'}
+        {...(animate ? {
+          initial: { scale: 1.25, opacity: 0, rotate: -18 },
+          animate: { scale: 1, opacity: 0.28, rotate: -13 },
+          transition: { type: 'spring', stiffness: 220, damping: 18 }
+        } : {})}
+        sx={{
+          width: size,
+          height: size,
+          borderRadius: '50%',
+          backgroundColor: 'transparent',
+          border: `2.5px solid ${wmScheme.border}`,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          userSelect: 'none',
+          position: 'relative',
+          boxSizing: 'border-box',
+          opacity: 0.28,
+          mixBlendMode: 'multiply',
+          transform: 'rotate(-13deg)',
+          pointerEvents: 'none',
+          ...sx
+        }}
+      >
+        {/* Outer subtle concentric decorative dashed border */}
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: '3.5px',
+            borderRadius: '50%',
+            border: `1.5px dashed ${wmScheme.innerRing}`,
+            pointerEvents: 'none'
+          }}
+        />
+
+        {/* Vintage Top Subtitle Ribbon */}
+        {subtitle && (
+          <Typography
+            sx={{
+              fontFamily: '"Cinzel", "Cormorant Garamond", Georgia, serif',
+              fontWeight: 800,
+              fontSize: `${Math.max(7.5, size * 0.082)}px`,
+              letterSpacing: '0.18em',
+              color: wmScheme.ink,
+              textTransform: 'uppercase',
+              lineHeight: 1,
+              mb: 0.3
+            }}
+          >
+            ★ {subtitle} ★
+          </Typography>
+        )}
+
+        {/* Vintage Top Divider Rule */}
+        <Box
+          sx={{
+            width: `${size * 0.62}px`,
+            height: '1.2px',
+            backgroundColor: wmScheme.innerRing,
+            opacity: 0.85,
+            mb: 0.3
+          }}
+        />
+
+        {/* Center Main PAID Stamp */}
+        <Typography
+          sx={{
+            fontFamily: '"Cinzel", "Cormorant Garamond", Georgia, serif',
+            fontWeight: 900,
+            fontSize: `${size * 0.27}px`,
+            letterSpacing: '0.14em',
+            lineHeight: 1,
+            color: wmScheme.ink,
+            textTransform: 'uppercase'
+          }}
+        >
+          {label}
+        </Typography>
+
+        {/* Vintage Bottom Divider Rule */}
+        <Box
+          sx={{
+            width: `${size * 0.62}px`,
+            height: '1.2px',
+            backgroundColor: wmScheme.innerRing,
+            opacity: 0.85,
+            mt: 0.3
+          }}
+        />
+
+        {/* Bottom Vintage Verification Text */}
+        <Typography
+          sx={{
+            fontFamily: '"Plus Jakarta Sans", sans-serif',
+            fontWeight: 800,
+            fontSize: `${Math.max(6.5, size * 0.068)}px`,
+            letterSpacing: '0.15em',
+            color: wmScheme.ink,
+            textTransform: 'uppercase',
+            mt: 0.35
+          }}
+        >
+          AUTHENTICATED
+        </Typography>
+      </Box>
+    );
+  }
+
+  // Original solid wax seal stamp
   const colorMap = {
     crimson: {
       bg: 'radial-gradient(circle at 35% 35%, #EF4444 0%, #B91C1C 65%, #7F1D1D 100%)',

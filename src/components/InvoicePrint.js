@@ -647,9 +647,32 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
         </Box>
 
         {!isSlip && (profile.showSignatureStamp ?? activeSettings.showSignatureStamp) && (
-          <Box sx={{ textAlign: 'center', width: '30%', minWidth: 160 }}>
+          <Box sx={{ textAlign: 'center', width: '32%', minWidth: 170, position: 'relative' }}>
+            {/* Retro Watermark Stamp centered directly behind the signature */}
+            {(invoice?.paymentStatus === 'paid' || invoice?.status === 'paid' || (invoice?.paidAmount && Number(invoice?.paidAmount) >= Number(invoice?.total))) && (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: '36%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 1,
+                  pointerEvents: 'none'
+                }}
+              >
+                <WaxSealStamp
+                  label="PAID"
+                  subtitle="ATELIER ALEEN"
+                  variant={activeTemplate === 'champagne-gold' ? 'gold' : activeTemplate === 'heritage-crimson' ? 'crimson' : 'emerald'}
+                  isWatermark={true}
+                  size={105}
+                  animate={false}
+                />
+              </Box>
+            )}
+
             {(profile.signatureImage || activeSettings.signatureImage) ? (
-              <Box sx={{ minHeight: 46, maxHeight: 60, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', mb: 0.5 }}>
+              <Box sx={{ minHeight: 46, maxHeight: 60, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', mb: 0.5, position: 'relative', zIndex: 2 }}>
                 <img
                   src={profile.signatureImage || activeSettings.signatureImage}
                   alt="Authorized Signature"
@@ -657,26 +680,27 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                 />
               </Box>
             ) : (
-              <Box sx={{ height: 40 }} />
+              <Box sx={{ height: 40, position: 'relative', zIndex: 2 }} />
             )}
-            <Box sx={{ borderBottom: '1px solid #94A3B8', mb: 0.5 }} />
-            <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', fontSize: '0.7rem' }}>
+            <Box sx={{ borderBottom: '1px solid #94A3B8', mb: 0.5, position: 'relative', zIndex: 2 }} />
+            <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', fontSize: '0.7rem', position: 'relative', zIndex: 2 }}>
               {profile.signatureLabel || activeSettings.signatureLabel || 'Authorized Signatory'}
             </Typography>
-            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.65rem' }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.65rem', position: 'relative', zIndex: 2 }}>
               {profile.businessName || 'Aleen Clothing'}
             </Typography>
           </Box>
         )}
 
-        {/* Optional Wax Seal Stamp for Paid Invoices */}
-        {(invoice?.paymentStatus === 'paid' || invoice?.status === 'paid' || (invoice?.paidAmount && Number(invoice?.paidAmount) >= Number(invoice?.total))) && (
-          <Box sx={{ position: 'absolute', right: 180, bottom: 24, zIndex: 3, display: { xs: 'none', sm: 'block' } }}>
+        {/* Fallback if signature block is disabled */}
+        {(!profile.showSignatureStamp && !activeSettings.showSignatureStamp) && (invoice?.paymentStatus === 'paid' || invoice?.status === 'paid' || (invoice?.paidAmount && Number(invoice?.paidAmount) >= Number(invoice?.total))) && (
+          <Box sx={{ position: 'absolute', right: 30, bottom: 20, zIndex: 1, pointerEvents: 'none' }}>
             <WaxSealStamp
               label="PAID"
               subtitle="ATELIER ALEEN"
               variant={activeTemplate === 'champagne-gold' ? 'gold' : activeTemplate === 'heritage-crimson' ? 'crimson' : 'emerald'}
-              size={68}
+              isWatermark={true}
+              size={96}
               animate={false}
             />
           </Box>
