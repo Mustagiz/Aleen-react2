@@ -15,6 +15,7 @@ import { getStoredInvoiceSettings } from '../constants/invoiceTemplates';
 import { numberToWordsRupees } from '../models/documentModel';
 import WaxSealStamp from './common/WaxSealStamp';
 import { generateUpiPaymentUrl } from '../engine/billingEngine';
+import instagramQrImg from '../assets/instagram_qr.jpg';
 
 const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profileProp }, ref) => {
   const dataCtx = useData() || {};
@@ -553,18 +554,18 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
 
                   <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
                     {qrImageUrl && (
-                      <Box sx={{ textAlign: 'center', minWidth: 70 }}>
+                      <Box sx={{ textAlign: 'center', minWidth: 64 }}>
                         <Box
                           component="img"
                           src={qrImageUrl}
                           alt="UPI QR"
                           sx={{
-                            width: 66,
-                            height: 66,
+                            width: 62,
+                            height: 62,
                             display: 'block',
                             borderRadius: 1.2,
                             border: '1.5px solid rgba(0,0,0,0.1)',
-                            p: 0.3,
+                            p: 0.25,
                             bgcolor: '#FFFFFF',
                             boxShadow: '0 2px 5px rgba(0,0,0,0.06)'
                           }}
@@ -576,27 +577,46 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                     )}
 
                     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0.35 }}>
-                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', lineHeight: 1.3 }}>
+                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.67rem', lineHeight: 1.3 }}>
                         <b style={{ color: '#D97706' }}>🎁 Loyalty Club:</b> +{Math.max(1, Math.floor(Number(invoice.total || 0) / 100))} reward pts accrued
                       </Typography>
 
-                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', lineHeight: 1.3 }}>
+                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.67rem', lineHeight: 1.3 }}>
                         <b style={{ color: '#0F766E' }}>✂️ Tailoring:</b> 30-Day complimentary alterations
                       </Typography>
 
-                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', lineHeight: 1.3 }}>
+                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.67rem', lineHeight: 1.3 }}>
                         <b style={{ color: '#4B5563' }}>✨ Garment Care:</b> Dry Clean Only • Hand-Finished
                       </Typography>
 
-                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', lineHeight: 1.3 }}>
-                        <b style={{ color: '#0F766E' }}>💬 Concierge:</b> WhatsApp & IG: <b>@aleenclothing</b>
-                      </Typography>
-
                       {storeVpa && (
-                        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.64rem', mt: 0.2 }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.64rem', mt: 0.1 }}>
                           UPI VPA: <b style={{ color: theme.primaryColor }}>{storeVpa}</b>
                         </Typography>
                       )}
+                    </Box>
+
+                    {/* Instagram QR Code (Pic 3) replacing text-only handle */}
+                    <Box sx={{ textAlign: 'center', minWidth: 64 }}>
+                      <Box
+                        component="img"
+                        src={instagramQrImg}
+                        alt="Instagram QR"
+                        sx={{
+                          width: 62,
+                          height: 62,
+                          objectFit: 'contain',
+                          display: 'block',
+                          borderRadius: 1.2,
+                          border: '1.5px solid rgba(225, 48, 108, 0.3)',
+                          p: 0.2,
+                          bgcolor: '#FFFFFF',
+                          boxShadow: '0 2px 5px rgba(0,0,0,0.06)'
+                        }}
+                      />
+                      <Typography variant="caption" sx={{ display: 'block', fontSize: '0.58rem', fontWeight: 800, color: '#E1306C', mt: 0.3, lineHeight: 1.1 }}>
+                        📸 Instagram
+                      </Typography>
                     </Box>
                   </Box>
                 </Box>
@@ -686,19 +706,39 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                   <Typography variant="caption" sx={{ fontWeight: 800, color: theme.primaryColor, textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', mb: 1 }}>
                     💬 VIP Social & Concierge Connect
                   </Typography>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem' }}>
-                      📱 <b>WhatsApp VIP:</b> {profile?.phone || '+91 98765 43210'}
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem' }}>
-                      📸 <b>Instagram:</b> @aleenclothing (Tag us in your couture stories!)
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem' }}>
-                      📍 <b>Atelier Studio:</b> {profile?.address || 'Baba Jaan Chawk, Pune, Maharashtra'}
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.66rem', mt: 0.3 }}>
-                      UPI ID: <b style={{ color: theme.primaryColor }}>{storeVpa}</b>
-                    </Typography>
+                  <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem' }}>
+                        📱 <b>WhatsApp VIP:</b> {profile?.phone || '+91 98765 43210'}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem' }}>
+                        📍 <b>Atelier Studio:</b> {profile?.address || 'Baba Jaan Chawk, Pune, Maharashtra'}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.66rem', mt: 0.3 }}>
+                        UPI ID: <b style={{ color: theme.primaryColor }}>{storeVpa}</b>
+                      </Typography>
+                    </Box>
+                    <Box sx={{ textAlign: 'center', minWidth: 64 }}>
+                      <Box
+                        component="img"
+                        src={instagramQrImg}
+                        alt="Instagram QR"
+                        sx={{
+                          width: 64,
+                          height: 64,
+                          objectFit: 'contain',
+                          display: 'block',
+                          borderRadius: 1.2,
+                          border: '1.5px solid rgba(225, 48, 108, 0.3)',
+                          p: 0.25,
+                          bgcolor: '#FFFFFF',
+                          boxShadow: '0 2px 5px rgba(0,0,0,0.06)'
+                        }}
+                      />
+                      <Typography variant="caption" sx={{ display: 'block', fontSize: '0.58rem', fontWeight: 800, color: '#E1306C', mt: 0.3, lineHeight: 1.1 }}>
+                        📸 Instagram
+                      </Typography>
+                    </Box>
                   </Box>
                 </Box>
               )}
@@ -849,13 +889,13 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
         </Box>
 
         {!isSlip && (profile.showSignatureStamp ?? activeSettings.showSignatureStamp) && (
-          <Box sx={{ textAlign: 'center', width: '32%', minWidth: 170, position: 'relative' }}>
+          <Box sx={{ textAlign: 'center', width: '35%', minWidth: 190, position: 'relative' }}>
             {/* Retro Watermark Stamp centered directly behind the signature */}
             {(invoice?.paymentStatus === 'paid' || invoice?.status === 'paid' || (invoice?.paidAmount && Number(invoice?.paidAmount) >= Number(invoice?.total))) && (
               <Box
                 sx={{
                   position: 'absolute',
-                  top: '36%',
+                  top: '42%',
                   left: '50%',
                   transform: 'translate(-50%, -50%)',
                   zIndex: 1,
@@ -867,28 +907,28 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                   subtitle="ATELIER ALEEN"
                   variant={activeTemplate === 'champagne-gold' ? 'gold' : activeTemplate === 'heritage-crimson' ? 'crimson' : 'emerald'}
                   isWatermark={true}
-                  size={105}
+                  size={120}
                   animate={false}
                 />
               </Box>
             )}
 
             {(profile.signatureImage || activeSettings.signatureImage) ? (
-              <Box sx={{ minHeight: 46, maxHeight: 60, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', mb: 0.5, position: 'relative', zIndex: 2 }}>
+              <Box sx={{ minHeight: 68, maxHeight: 85, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', mb: 0.5, position: 'relative', zIndex: 2 }}>
                 <img
                   src={profile.signatureImage || activeSettings.signatureImage}
                   alt="Authorized Signature"
-                  style={{ maxHeight: 52, maxWidth: 150, objectFit: 'contain' }}
+                  style={{ maxHeight: 75, maxWidth: 210, objectFit: 'contain' }}
                 />
               </Box>
             ) : (
-              <Box sx={{ height: 40, position: 'relative', zIndex: 2 }} />
+              <Box sx={{ height: 55, position: 'relative', zIndex: 2 }} />
             )}
             <Box sx={{ borderBottom: '1px solid #94A3B8', mb: 0.5, position: 'relative', zIndex: 2 }} />
-            <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', fontSize: '0.7rem', position: 'relative', zIndex: 2 }}>
+            <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', fontSize: '0.72rem', position: 'relative', zIndex: 2 }}>
               {profile.signatureLabel || activeSettings.signatureLabel || 'Authorized Signatory'}
             </Typography>
-            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.65rem', position: 'relative', zIndex: 2 }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.66rem', position: 'relative', zIndex: 2 }}>
               {profile.businessName || 'Aleen Clothing'}
             </Typography>
           </Box>

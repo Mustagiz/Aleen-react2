@@ -64,6 +64,7 @@ import { useFeedback } from '../contexts/FeedbackContext';
 import PageHeader from '../components/crm/PageHeader';
 import { INVOICE_TEMPLATES, DEFAULT_INVOICE_SETTINGS, getStoredInvoiceSettings } from '../constants/invoiceTemplates';
 import { PREDEFINED_LOGOS } from '../constants/predefinedLogos';
+import instagramQrImg from '../assets/instagram_qr.jpg';
 
 export default function Settings() {
   const theme = useTheme();
@@ -1072,14 +1073,18 @@ export default function Settings() {
                     </Box>
                     <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
                       <Box sx={{ p: 0.5, bgcolor: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 1.5, textAlign: 'center' }}>
-                        <QrCode2 sx={{ fontSize: 44, color: '#0F766E' }} />
+                        <QrCode2 sx={{ fontSize: 40, color: '#0F766E' }} />
                         <Typography variant="caption" sx={{ display: 'block', fontSize: '0.55rem', fontWeight: 800, color: '#0F766E' }}>Scan to Pay</Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.4, fontSize: '0.72rem' }}>
-                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>🎁 <b>Loyalty Club:</b> Reward points accrued</Typography>
-                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>✂️ <b>Tailoring:</b> 30-Day complimentary alterations</Typography>
-                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>✨ <b>Care:</b> Dry Clean Only • Hand-Finished</Typography>
-                        <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 800 }}>UPI VPA: {formProfile.bankDetails.upiId || 'aleenclothing@hdfcbank'}</Typography>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.35, fontSize: '0.72rem', flex: 1 }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>🎁 <b>Loyalty Club:</b> Reward points</Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>✂️ <b>Tailoring:</b> 30-Day alterations</Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>✨ <b>Care:</b> Dry Clean Only</Typography>
+                        <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 800 }}>UPI: {formProfile.bankDetails.upiId || 'aleenclothing@hdfcbank'}</Typography>
+                      </Box>
+                      <Box sx={{ p: 0.5, bgcolor: '#FFFFFF', border: '1px solid rgba(225, 48, 108, 0.25)', borderRadius: 1.5, textAlign: 'center' }}>
+                        <Box component="img" src={instagramQrImg} alt="Instagram QR" sx={{ width: 40, height: 40, objectFit: 'contain', display: 'block' }} />
+                        <Typography variant="caption" sx={{ display: 'block', fontSize: '0.55rem', fontWeight: 800, color: '#E1306C' }}>Instagram</Typography>
                       </Box>
                     </Box>
                   </Box>
