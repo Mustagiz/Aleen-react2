@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel, CircularProgress, Alert, Snackbar, InputAdornment, List } from '@mui/material';
-import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, PauseCircleOutline, ShoppingCart, RestartAlt, CalendarMonth, Phone, Straighten, Clear, Stars, Redeem, AccountBalanceWallet } from '@mui/icons-material';
+import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, QrCode2, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, PauseCircleOutline, ShoppingCart, RestartAlt, CalendarMonth, Phone, Straighten, Clear, Stars, Redeem, AccountBalanceWallet } from '@mui/icons-material';
 import { Html5Qrcode } from 'html5-qrcode';
 import { db } from '../firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -28,6 +28,7 @@ import { calculateInvoiceTotals, calculateTenderSettlement, calculateCashChange,
 import AtelierStitchDivider from '../components/common/AtelierStitchDivider';
 import ThermalReceipt from '../components/ThermalReceipt';
 import CustomerMeasurementModal from '../components/crm/CustomerMeasurementModal';
+import UpiPaymentQrModal from '../components/pos/UpiPaymentQrModal';
 
 const Invoices = () => {
   const location = useLocation();
@@ -49,6 +50,7 @@ const Invoices = () => {
   const [invoiceSettings, setInvoiceSettings] = useState(() => invoiceTemplateSettings || getStoredInvoiceSettings());
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [cashDrawerModalOpen, setCashDrawerModalOpen] = useState(false);
+  const [upiQrModalOpen, setUpiQrModalOpen] = useState(false);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [offscreenInvoice, setOffscreenInvoice] = useState(null);
   const [clientValidationErrors, setClientValidationErrors] = useState({ customer: false, phone: false });
@@ -527,6 +529,18 @@ const Invoices = () => {
     let timeout = null;
     const handleGlobalKeyDown = (e) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+      if (e.key === 'F2') {
+        e.preventDefault();
+        quickAddInputRef.current?.focus();
+        return;
+      }
+
+      if (e.key === 'F8') {
+        e.preventDefault();
+        setIsSplitPayment(prev => !prev);
+        return;
+      }
 
       const activeEl = document.activeElement;
       const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
@@ -3395,12 +3409,32 @@ const Invoices = () => {
                     </TextField>
 
                     {paymentMethod === 'UPI' && (
-                      <TextField select label="UPI App / Gateway" value={upiProvider} onChange={(e) => setUpiProvider(e.target.value)} fullWidth size="small">
-                        <MenuItem value="PhonePe">PhonePe Business</MenuItem>
-                        <MenuItem value="GPay">Google Pay (GPay)</MenuItem>
-                        <MenuItem value="Paytm">Paytm Soundbox / QR</MenuItem>
-                        <MenuItem value="BHIM">BHIM / Static Standee QR</MenuItem>
-                      </TextField>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          startIcon={<QrCode2 />}
+                          onClick={() => setUpiQrModalOpen(true)}
+                          sx={{
+                            py: 0.9,
+                            fontWeight: 800,
+                            background: 'linear-gradient(135deg, #C28D4B 0%, #B45309 100%)',
+                            color: '#FFFFFF',
+                            boxShadow: '0 4px 14px rgba(194, 141, 75, 0.35)',
+                            '&:hover': {
+                              background: 'linear-gradient(135deg, #B45309 0%, #78350F 100%)'
+                            }
+                          }}
+                        >
+                          Show Dynamic UPI QR (₹{Number(total || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })})
+                        </Button>
+                        <TextField select label="UPI App / Gateway" value={upiProvider} onChange={(e) => setUpiProvider(e.target.value)} fullWidth size="small">
+                          <MenuItem value="PhonePe">PhonePe Business</MenuItem>
+                          <MenuItem value="GPay">Google Pay (GPay)</MenuItem>
+                          <MenuItem value="Paytm">Paytm Soundbox / QR</MenuItem>
+                          <MenuItem value="BHIM">BHIM / Static Standee QR</MenuItem>
+                        </TextField>
+                      </Box>
                     )}
 
                     {paymentMethod === 'EMI' && (
@@ -4173,6 +4207,19 @@ const Invoices = () => {
           setMeasurementCustomer(null);
         }}
         customer={measurementCustomer}
+      />
+
+      {/* Dynamic UPI Payment QR Modal */}
+      <UpiPaymentQrModal
+        open={upiQrModalOpen}
+        onClose={() => setUpiQrModalOpen(false)}
+        amount={total}
+        invoiceNumber={generateInvoiceNumber(invoices?.length || 0)}
+        profile={profile}
+        onPaymentConfirmed={() => {
+          setPaymentStatus('paid');
+          setReceivedAmount(total);
+        }}
       />
 
       {/* Hidden offscreen container for pixel-perfect PDF export */}

@@ -269,3 +269,79 @@ export const calculateCashShiftImpact = (invoice) => {
 
   return 0;
 };
+
+/**
+ * Generates standard UPI payment intent link for QR code rendering
+ */
+export const generateUpiPaymentUrl = ({
+  vpa = '',
+  payeeName = 'Aleen Clothing',
+  amount = 0,
+  invoiceNumber = '',
+  currency = 'INR'
+}) => {
+  const numericAmount = parseFloat(amount);
+  if (!vpa || !vpa.trim() || isNaN(numericAmount) || numericAmount <= 0) {
+    return '';
+  }
+
+  const cleanVpa = String(vpa).trim();
+  const cleanName = String(payeeName || 'Aleen Boutique').trim();
+  const cleanAmount = numericAmount.toFixed(2);
+  const note = invoiceNumber ? `Bill-${invoiceNumber}` : 'Boutique Purchase';
+
+  return `upi://pay?pa=${encodeURIComponent(cleanVpa)}&pn=${encodeURIComponent(cleanName)}&am=${cleanAmount}&cu=${currency}&tn=${encodeURIComponent(note)}`;
+};
+
+const HELD_CARTS_STORAGE_KEY = 'aleen_pos_held_carts';
+
+/**
+ * Retrieves all held carts from storage
+ */
+export const getHeldCarts = () => {
+  try {
+    const raw = localStorage.getItem(HELD_CARTS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (err) {
+    console.error('Failed to load held carts:', err);
+    return {};
+  }
+};
+
+/**
+ * Saves a drafted cart into a numbered slot (e.g. 1, 2, 3)
+ */
+export const saveHeldCartSlot = (slotId, cartData, note = '') => {
+  try {
+    const all = getHeldCarts();
+    all[String(slotId)] = {
+      ...cartData,
+      note: note || `Basket #${slotId}`,
+      heldAt: new Date().toISOString()
+    };
+    localStorage.setItem(HELD_CARTS_STORAGE_KEY, JSON.stringify(all));
+    return all;
+  } catch (err) {
+    console.error('Failed to save held cart:', err);
+    return {};
+  }
+};
+
+/**
+ * Releases/restores a held cart slot and clears it from storage
+ */
+export const releaseHeldCartSlot = (slotId) => {
+  try {
+    const all = getHeldCarts();
+    const target = all[String(slotId)];
+    if (target) {
+      delete all[String(slotId)];
+      localStorage.setItem(HELD_CARTS_STORAGE_KEY, JSON.stringify(all));
+    }
+    return target || null;
+  } catch (err) {
+    console.error('Failed to release held cart:', err);
+    return null;
+  }
+};
+

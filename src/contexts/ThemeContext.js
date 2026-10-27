@@ -24,30 +24,30 @@ export const ThemeProvider = ({ children }) => {
             palette: {
                 mode,
                 primary: {
-                    main: '#0F766E', // Deep Emerald
-                    light: '#14B8A6', // Luminous Emerald
-                    dark: '#042F2E',  // Royal Forest
+                    main: '#0A4D46', // Velvet Atelier Emerald
+                    light: '#14B8A6', // Luminous Jade
+                    dark: '#042F2E',  // Deep Royal Forest
                     contrastText: '#FFFFFF'
                 },
                 secondary: {
-                    main: '#D97706', // Champagne Gold
-                    light: '#F59E0B',
+                    main: '#C28D4B', // Burnished Imperial Gold
+                    light: '#F59E0B', // Radiant Gold
                     dark: '#92400E',
                     contrastText: '#FFFFFF'
                 },
                 background: {
-                    default: mode === 'light' ? '#F8FAFC' : '#081212', // Porcelain vs Midnight Atelier
-                    paper: mode === 'light' ? '#FFFFFF' : '#102020'
+                    default: mode === 'light' ? '#FBFBF9' : '#081212', // Warm Alabaster Porcelain vs Midnight Obsidian
+                    paper: mode === 'light' ? '#FFFFFF' : '#0F1E1D'
                 },
                 success: { main: '#10B981', light: '#D1FAE5', dark: '#047857' },
-                error: { main: '#EF4444', light: '#FEE2E2', dark: '#B91C1C' },
+                error: { main: '#9F1239', light: '#FFE4E6', dark: '#881337' }, // Velvet Rose-Wine
                 warning: { main: '#D97706', light: '#FEF3C7', dark: '#B45309' },
                 info: { main: '#0284C7', light: '#E0F2FE', dark: '#0369A1' },
                 text: {
                     primary: mode === 'light' ? '#0F172A' : '#F8FAFC',
-                    secondary: mode === 'light' ? '#64748B' : '#94A3B8'
+                    secondary: mode === 'light' ? '#5A6A80' : '#94A3B8'
                 },
-                divider: mode === 'light' ? 'rgba(15, 118, 110, 0.12)' : 'rgba(255, 255, 255, 0.08)'
+                divider: mode === 'light' ? 'rgba(10, 77, 70, 0.08)' : 'rgba(255, 255, 255, 0.08)'
             },
             typography: {
                 fontFamily: '"Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',

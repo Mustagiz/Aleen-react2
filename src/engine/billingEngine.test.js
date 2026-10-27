@@ -4,7 +4,11 @@ import {
   calculateCashShiftImpact,
   calculateLineItem,
   calculateCashChange,
-  generateQuickCashPresets
+  generateQuickCashPresets,
+  generateUpiPaymentUrl,
+  getHeldCarts,
+  saveHeldCartSlot,
+  releaseHeldCartSlot
 } from './billingEngine';
 
 describe('BillingEngine Module Tests', () => {
@@ -142,4 +146,43 @@ describe('BillingEngine Module Tests', () => {
     expect(presets).toContain(1700); // Next 100
     expect(presets).toContain(2000); // Standard note
   });
+
+  test('generateUpiPaymentUrl formats standard UPI payment intent correctly', () => {
+    const url = generateUpiPaymentUrl({
+      vpa: 'aleen@icici',
+      payeeName: 'Aleen Luxury Couture',
+      amount: 14500,
+      invoiceNumber: 'INV-2026-004'
+    });
+    expect(url).toContain('upi://pay?');
+    expect(url).toContain('pa=aleen%40icici');
+    expect(url).toContain('pn=Aleen%20Luxury%20Couture');
+    expect(url).toContain('am=14500.00');
+    expect(url).toContain('tn=Bill-INV-2026-004');
+  });
+
+  test('generateUpiPaymentUrl returns empty string if vpa or amount is missing/invalid', () => {
+    expect(generateUpiPaymentUrl({ vpa: '', amount: 100 })).toBe('');
+    expect(generateUpiPaymentUrl({ vpa: 'aleen@upi', amount: 0 })).toBe('');
+    expect(generateUpiPaymentUrl({ vpa: 'aleen@upi', amount: -50 })).toBe('');
+  });
+
+  test('Hold Cart slots manage multi-basket checkout states in storage', () => {
+    const mockCart = {
+      items: [{ id: 'item-1', quantity: 2 }],
+      customer: { name: 'Zoya Khan', phone: '9876543210' },
+      discountAmount: 500
+    };
+
+    saveHeldCartSlot(1, mockCart, 'Fitting Trial Dress');
+    const allHeld = getHeldCarts();
+    expect(allHeld['1']).toBeDefined();
+    expect(allHeld['1'].customer.name).toBe('Zoya Khan');
+    expect(allHeld['1'].note).toBe('Fitting Trial Dress');
+
+    const released = releaseHeldCartSlot(1);
+    expect(released.customer.name).toBe('Zoya Khan');
+    expect(getHeldCarts()['1']).toBeUndefined();
+  });
 });
+
