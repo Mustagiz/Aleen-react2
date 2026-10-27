@@ -25,6 +25,7 @@ import {
     TableRow,
     TableContainer,
     TableSortLabel,
+    TablePagination,
     MenuItem,
     Tooltip,
     Stack,
@@ -281,6 +282,21 @@ export default function BarcodeGenerator() {
     const [categoryFilter, setCategoryFilter] = useState('');
     const [stockFilter, setStockFilter] = useState('all');
     const [showAdvancedSettings, setShowAdvancedSettings] = useState(true);
+
+    // Preview zoom scale (Pic 1: make preview bigger, default 1.35x)
+    const [previewZoom, setPreviewZoom] = useState(1.35);
+
+    // Pagination for Garments Selection Table (Pic 2: 10 entries on 1 page)
+    const [inventoryPage, setInventoryPage] = useState(0);
+    const [inventoryRowsPerPage, setInventoryRowsPerPage] = useState(10);
+
+    // Pagination for Active Print Queue (Pic 2: 10 entries on 1 page)
+    const [queuePage, setQueuePage] = useState(0);
+    const [queueRowsPerPage, setQueueRowsPerPage] = useState(10);
+
+    // Pagination for Bulk Select Dialog (10 entries on 1 page)
+    const [dialogPage, setDialogPage] = useState(0);
+    const [dialogRowsPerPage, setDialogRowsPerPage] = useState(10);
 
     // Dialog state for bulk select
     const [dialogSearch, setDialogSearch] = useState('');
@@ -606,6 +622,66 @@ export default function BarcodeGenerator() {
         }
         return isAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
     });
+
+    // Reset inventory pagination on search or filter change
+    useEffect(() => {
+        setInventoryPage(0);
+    }, [productSearch, categoryFilter, stockFilter, sortOption]);
+
+    // Reset dialog pagination on search or filter change
+    useEffect(() => {
+        setDialogPage(0);
+    }, [dialogSearch, dialogCategory]);
+
+    // Ensure queuePage does not exceed valid page boundaries
+    useEffect(() => {
+        const maxQueuePage = Math.max(0, Math.ceil(selectedProducts.length / queueRowsPerPage) - 1);
+        if (queuePage > maxQueuePage) {
+            setQueuePage(maxQueuePage);
+        }
+    }, [selectedProducts.length, queueRowsPerPage, queuePage]);
+
+    // Paginated slices for 10 entries on 1 page (Pic 2)
+    const paginatedInventory = useMemo(() => {
+        return filteredAndSortedInventory.slice(
+            inventoryPage * inventoryRowsPerPage,
+            (inventoryPage + 1) * inventoryRowsPerPage
+        );
+    }, [filteredAndSortedInventory, inventoryPage, inventoryRowsPerPage]);
+
+    const paginatedQueue = useMemo(() => {
+        return selectedProducts.slice(
+            queuePage * queueRowsPerPage,
+            (queuePage + 1) * queueRowsPerPage
+        );
+    }, [selectedProducts, queuePage, queueRowsPerPage]);
+
+    const paginatedDialogInventory = useMemo(() => {
+        return dialogFilteredInventory.slice(
+            dialogPage * dialogRowsPerPage,
+            (dialogPage + 1) * dialogRowsPerPage
+        );
+    }, [dialogFilteredInventory, dialogPage, dialogRowsPerPage]);
+
+    // Toggle garment selection in the 10-entries table
+    const handleToggleProduct = (item) => {
+        const isSelected = selectedProducts.some(p => p.id === item.id);
+        if (isSelected) {
+            setSelectedProducts(prev => prev.filter(p => p.id !== item.id));
+        } else {
+            const selling = Number(item.price) || 0;
+            const defaultMrp = Number(item.mrp) || Math.round(selling * (settings.mrpMultiplier || 1.25));
+            setSelectedProducts(prev => [
+                ...prev,
+                {
+                    ...item,
+                    customPrice: selling,
+                    customMrp: defaultMrp,
+                    labelCount: Math.max(1, item.quantity || 1)
+                }
+            ]);
+        }
+    };
 
     return (
         <Box>
@@ -1011,29 +1087,99 @@ export default function BarcodeGenerator() {
                                     flexDirection: 'column',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    minHeight: 180
+                                    minHeight: 220
                                 }}
                             >
-                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', mb: 1 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', mb: 1, flexWrap: 'wrap', gap: 0.5 }}>
                                     <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>
                                         ✨ Live Sticker Preview:
                                     </Typography>
-                                    {selectedProducts.length > 1 && (
-                                        <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 700 }}>
-                                            Item {previewIndex + 1} of {selectedProducts.length}
-                                        </Typography>
-                                    )}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        {selectedProducts.length > 1 && (
+                                            <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 700, mr: 0.5 }}>
+                                                {previewIndex + 1}/{selectedProducts.length}
+                                            </Typography>
+                                        )}
+                                        <Chip
+                                            label="1x"
+                                            size="small"
+                                            clickable
+                                            onClick={() => setPreviewZoom(1.0)}
+                                            sx={{
+                                                height: 19,
+                                                fontSize: '0.62rem',
+                                                fontWeight: previewZoom === 1.0 ? 800 : 500,
+                                                bgcolor: previewZoom === 1.0 ? '#0F766E' : 'background.paper',
+                                                color: previewZoom === 1.0 ? '#FFFFFF' : 'text.secondary',
+                                                border: '1px solid',
+                                                borderColor: previewZoom === 1.0 ? '#0F766E' : 'divider'
+                                            }}
+                                        />
+                                        <Chip
+                                            label="1.35x"
+                                            size="small"
+                                            clickable
+                                            onClick={() => setPreviewZoom(1.35)}
+                                            sx={{
+                                                height: 19,
+                                                fontSize: '0.62rem',
+                                                fontWeight: previewZoom === 1.35 ? 800 : 500,
+                                                bgcolor: previewZoom === 1.35 ? '#0F766E' : 'background.paper',
+                                                color: previewZoom === 1.35 ? '#FFFFFF' : 'text.secondary',
+                                                border: '1px solid',
+                                                borderColor: previewZoom === 1.35 ? '#0F766E' : 'divider'
+                                            }}
+                                        />
+                                        <Chip
+                                            label="1.6x"
+                                            size="small"
+                                            clickable
+                                            onClick={() => setPreviewZoom(1.6)}
+                                            sx={{
+                                                height: 19,
+                                                fontSize: '0.62rem',
+                                                fontWeight: previewZoom === 1.6 ? 800 : 500,
+                                                bgcolor: previewZoom === 1.6 ? '#0F766E' : 'background.paper',
+                                                color: previewZoom === 1.6 ? '#FFFFFF' : 'text.secondary',
+                                                border: '1px solid',
+                                                borderColor: previewZoom === 1.6 ? '#0F766E' : 'divider'
+                                            }}
+                                        />
+                                    </Box>
                                 </Box>
 
-                                <BarcodeItem
-                                    value={sampleProduct.productId || 'PRD-1001'}
-                                    businessName={profile?.businessName || 'Aleen Clothing'}
-                                    product={sampleProduct}
-                                    settings={settings}
-                                />
+                                {/* Scaled Live Sticker Container (Pic 1: Lil Bigger) */}
+                                <Box
+                                    sx={{
+                                        py: 2.5,
+                                        px: 1,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        width: '100%',
+                                        overflow: 'visible'
+                                    }}
+                                >
+                                    <Box
+                                        sx={{
+                                            transform: `scale(${previewZoom})`,
+                                            transformOrigin: 'center center',
+                                            boxShadow: '0 8px 22px rgba(0,0,0,0.08)',
+                                            borderRadius: 0.8,
+                                            transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+                                        }}
+                                    >
+                                        <BarcodeItem
+                                            value={sampleProduct.productId || 'PRD-1001'}
+                                            businessName={profile?.businessName || 'Aleen Clothing'}
+                                            product={sampleProduct}
+                                            settings={settings}
+                                        />
+                                    </Box>
+                                </Box>
 
                                 {/* Live Price Readout */}
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1.25 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1.5 }}>
                                     <Chip
                                         size="small"
                                         label={`Sale: ${settings.currencySymbol || '₹'}${(sampleProduct.customPrice !== undefined ? sampleProduct.customPrice : sampleProduct.price || 0).toLocaleString('en-IN')}`}
@@ -1340,14 +1486,193 @@ export default function BarcodeGenerator() {
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                         />
                     )}
-                    sx={{ mb: 3 }}
+                    sx={{ mb: 2 }}
                 />
 
+                {/* Garments Catalog Table: 10 entries on 1 page (Pic 2) */}
+                <Box sx={{ mb: 3 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1, flexWrap: 'wrap', gap: 0.5 }}>
+                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                            📋 Browse Catalog Garments (10 entries on 1 page)
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 700 }}>
+                            Page {inventoryPage + 1} of {Math.max(1, Math.ceil(filteredAndSortedInventory.length / inventoryRowsPerPage))} • {filteredAndSortedInventory.length} items
+                        </Typography>
+                    </Box>
+
+                    <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2.5, overflow: 'hidden' }}>
+                        <Table size="small">
+                            <TableHead sx={{ bgcolor: 'action.hover' }}>
+                                <TableRow>
+                                    <TableCell padding="checkbox">
+                                        <Checkbox
+                                            size="small"
+                                            indeterminate={
+                                                paginatedInventory.some(item => selectedProducts.some(p => p.id === item.id)) &&
+                                                !paginatedInventory.every(item => selectedProducts.some(p => p.id === item.id))
+                                            }
+                                            checked={
+                                                paginatedInventory.length > 0 &&
+                                                paginatedInventory.every(item => selectedProducts.some(p => p.id === item.id))
+                                            }
+                                            onChange={() => {
+                                                const allPageSelected = paginatedInventory.every(item => selectedProducts.some(p => p.id === item.id));
+                                                if (allPageSelected) {
+                                                    const pageIds = new Set(paginatedInventory.map(i => i.id));
+                                                    setSelectedProducts(prev => prev.filter(p => !pageIds.has(p.id)));
+                                                } else {
+                                                    const newToAdd = paginatedInventory
+                                                        .filter(item => !selectedProducts.some(p => p.id === item.id))
+                                                        .map(item => {
+                                                            const selling = Number(item.price) || 0;
+                                                            const defaultMrp = Number(item.mrp) || Math.round(selling * (settings.mrpMultiplier || 1.25));
+                                                            return {
+                                                                ...item,
+                                                                customPrice: selling,
+                                                                customMrp: defaultMrp,
+                                                                labelCount: Math.max(1, item.quantity || 1)
+                                                            };
+                                                        });
+                                                    setSelectedProducts(prev => [...prev, ...newToAdd]);
+                                                }
+                                            }}
+                                            sx={{ color: '#0F766E', '&.Mui-checked': { color: '#0F766E' } }}
+                                        />
+                                    </TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem' }}>Garment Style</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem' }}>SKU / Product ID</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem' }}>Category</TableCell>
+                                    <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.75rem' }}>Price</TableCell>
+                                    <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.75rem' }}>Stock</TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: 800, fontSize: '0.75rem' }}>Queue Status</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {paginatedInventory.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={7} sx={{ textAlign: 'center', py: 3, color: 'text.secondary' }}>
+                                            No matching garments found for current filters.
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    paginatedInventory.map(item => {
+                                        const queued = selectedProducts.find(p => p.id === item.id);
+                                        const isSelected = Boolean(queued);
+
+                                        return (
+                                            <TableRow
+                                                key={item.id}
+                                                hover
+                                                sx={{
+                                                    bgcolor: isSelected ? 'rgba(15, 118, 110, 0.04)' : 'transparent',
+                                                    cursor: 'pointer'
+                                                }}
+                                                onClick={() => handleToggleProduct(item)}
+                                            >
+                                                <TableCell padding="checkbox" onClick={e => e.stopPropagation()}>
+                                                    <Checkbox
+                                                        size="small"
+                                                        checked={isSelected}
+                                                        onChange={() => handleToggleProduct(item)}
+                                                        sx={{ color: '#0F766E', '&.Mui-checked': { color: '#0F766E' } }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell sx={{ fontWeight: 700, fontSize: '0.8rem' }}>
+                                                    {item.name}
+                                                    {item.variantName && (
+                                                        <Chip
+                                                            label={item.variantName}
+                                                            size="small"
+                                                            sx={{ ml: 1, height: 18, fontSize: '0.62rem', fontWeight: 600 }}
+                                                        />
+                                                    )}
+                                                </TableCell>
+                                                <TableCell sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 700, fontSize: '0.75rem' }}>
+                                                    #{item.productId || 'NO-SKU'}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Chip
+                                                        label={item.category || 'General'}
+                                                        size="small"
+                                                        variant="outlined"
+                                                        sx={{ height: 20, fontSize: '0.68rem' }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell align="right" sx={{ fontWeight: 800, color: '#D97706', fontSize: '0.8rem' }}>
+                                                    ₹{(item.price || 0).toLocaleString('en-IN')}
+                                                </TableCell>
+                                                <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.75rem', color: (item.quantity || 0) > 0 ? 'text.primary' : 'error.main' }}>
+                                                    {item.quantity || 0} pcs
+                                                </TableCell>
+                                                <TableCell align="center" onClick={e => e.stopPropagation()}>
+                                                    {isSelected ? (
+                                                        <Chip
+                                                            label={`✓ In Queue (${queued.labelCount || 1}x)`}
+                                                            size="small"
+                                                            color="primary"
+                                                            onDelete={() => handleRemove(item.id)}
+                                                            sx={{
+                                                                height: 22,
+                                                                fontSize: '0.68rem',
+                                                                fontWeight: 700,
+                                                                bgcolor: '#0F766E'
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        <Button
+                                                            size="small"
+                                                            variant="outlined"
+                                                            onClick={() => handleToggleProduct(item)}
+                                                            sx={{
+                                                                py: 0.1,
+                                                                px: 1.2,
+                                                                fontSize: '0.68rem',
+                                                                borderRadius: 1.2,
+                                                                fontWeight: 700,
+                                                                minWidth: 64,
+                                                                textTransform: 'none'
+                                                            }}
+                                                        >
+                                                            + Queue
+                                                        </Button>
+                                                    )}
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })
+                                )}
+                            </TableBody>
+                        </Table>
+                        <TablePagination
+                            rowsPerPageOptions={[10, 20, 50]}
+                            component="div"
+                            count={filteredAndSortedInventory.length}
+                            rowsPerPage={inventoryRowsPerPage}
+                            page={inventoryPage}
+                            onPageChange={(e, newPage) => setInventoryPage(newPage)}
+                            onRowsPerPageChange={(e) => {
+                                setInventoryRowsPerPage(parseInt(e.target.value, 10));
+                                setInventoryPage(0);
+                            }}
+                            sx={{
+                                borderTop: '1px solid',
+                                borderColor: 'divider',
+                                '& .MuiTablePagination-toolbar': { minHeight: 44 }
+                            }}
+                        />
+                    </TableContainer>
+                </Box>
+
                 {/* Queue Summary Badge */}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5, flexWrap: 'wrap', gap: 1 }}>
                     <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
                         Active Print Queue ({selectedProducts.length} garments • {totalLabelsCount} stickers)
                     </Typography>
+                    {selectedProducts.length > 10 && (
+                        <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 700 }}>
+                            Showing page {queuePage + 1} of {Math.max(1, Math.ceil(selectedProducts.length / queueRowsPerPage))} (10 entries per page)
+                        </Typography>
+                    )}
                 </Box>
 
                 {/* Selected Products Cards Grid */}
@@ -1360,8 +1685,9 @@ export default function BarcodeGenerator() {
                     </Box>
                 ) : (
                     <Grid container spacing={2}>
-                        {selectedProducts.map((product, idx) => {
-                            const isCurrentPreview = idx === previewIndex;
+                        {paginatedQueue.map((product, idx) => {
+                            const globalIdx = queuePage * queueRowsPerPage + idx;
+                            const isCurrentPreview = globalIdx === previewIndex;
                             const selling = product.customPrice !== undefined ? product.customPrice : (product.price || 0);
                             const mrp = product.customMrp !== undefined ? product.customMrp : Math.round((product.price || 0) * (settings.mrpMultiplier || 1.25));
 
@@ -1419,7 +1745,7 @@ export default function BarcodeGenerator() {
                                                     <Tooltip title="Preview this sticker">
                                                         <IconButton
                                                             size="small"
-                                                            onClick={() => setPreviewIndex(idx)}
+                                                            onClick={() => setPreviewIndex(globalIdx)}
                                                             sx={{ color: isCurrentPreview ? '#0F766E' : 'text.disabled' }}
                                                         >
                                                             <Visibility fontSize="small" />
@@ -1526,6 +1852,30 @@ export default function BarcodeGenerator() {
                         })}
                     </Grid>
                 )}
+
+                {/* Active Queue Pagination: 10 entries per page (Pic 2) */}
+                {selectedProducts.length > 10 && (
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                        <TablePagination
+                            rowsPerPageOptions={[10, 20, 50]}
+                            component="div"
+                            count={selectedProducts.length}
+                            rowsPerPage={queueRowsPerPage}
+                            page={queuePage}
+                            onPageChange={(e, newPage) => setQueuePage(newPage)}
+                            onRowsPerPageChange={(e) => {
+                                setQueueRowsPerPage(parseInt(e.target.value, 10));
+                                setQueuePage(0);
+                            }}
+                            sx={{
+                                borderTop: '1px solid',
+                                borderColor: 'divider',
+                                width: '100%',
+                                '& .MuiTablePagination-toolbar': { minHeight: 44 }
+                            }}
+                        />
+                    </Box>
+                )}
             </GlassCard>
 
             {/* Bulk Select Dialog */}
@@ -1621,7 +1971,7 @@ export default function BarcodeGenerator() {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {dialogFilteredInventory.map((item) => (
+                                {paginatedDialogInventory.map((item) => (
                                     <TableRow
                                         key={item.id}
                                         hover
@@ -1652,6 +2002,24 @@ export default function BarcodeGenerator() {
                             </TableBody>
                         </Table>
                     </TableContainer>
+
+                    <TablePagination
+                        rowsPerPageOptions={[10, 20, 50]}
+                        component="div"
+                        count={dialogFilteredInventory.length}
+                        rowsPerPage={dialogRowsPerPage}
+                        page={dialogPage}
+                        onPageChange={(e, newPage) => setDialogPage(newPage)}
+                        onRowsPerPageChange={(e) => {
+                            setDialogRowsPerPage(parseInt(e.target.value, 10));
+                            setDialogPage(0);
+                        }}
+                        sx={{
+                            borderTop: '1px solid',
+                            borderColor: 'divider',
+                            '& .MuiTablePagination-toolbar': { minHeight: 44 }
+                        }}
+                    />
                 </DialogContent>
                 <DialogActions sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider' }}>
                     <Typography variant="body2" sx={{ flexGrow: 1, ml: 1, fontWeight: 700 }}>
