@@ -53,14 +53,16 @@ export const calculateLineItem = (item, inventory = []) => {
 };
 
 /**
- * Computes subtotal, taxes, discounts, and final total for an invoice cart
+ * Computes subtotal, taxes, discounts, loyalty points, and final total for an invoice cart
  */
 export const calculateInvoiceTotals = ({
   items = [],
   inventory = [],
   taxPercent = 0,
   discountPercent = 0,
-  discountAmount = 0
+  discountAmount = 0,
+  loyaltyPointsRedeemed = 0,
+  customerTier = 'Bronze'
 }) => {
   const processedItems = items.map(item => calculateLineItem(item, inventory));
   
@@ -74,11 +76,24 @@ export const calculateInvoiceTotals = ({
 
   const pctDiscount = Number((subtotal * ((parseFloat(discountPercent) || 0) / 100)).toFixed(2));
   const flatDiscount = parseFloat(discountAmount) || 0;
-  const absDiscount = Number((pctDiscount + flatDiscount).toFixed(2));
+  const pointsRedeemed = Math.max(0, parseInt(loyaltyPointsRedeemed, 10) || 0);
+  const loyaltyDiscount = Number(pointsRedeemed.toFixed(2)); // 1 Point = ₹1
+
+  const absDiscount = Number((pctDiscount + flatDiscount + loyaltyDiscount).toFixed(2));
 
   const rawTotal = Math.max(0, subtotal + taxAmount - absDiscount);
   const roundedTotal = Math.round(rawTotal);
   const roundOff = Number((roundedTotal - rawTotal).toFixed(2));
+
+  // Loyalty Points Accrual: 1 pt per ₹100 spent, scaled by VIP Tier
+  const tierMultipliers = {
+    Bronze: 1.0,
+    Silver: 1.25,
+    Gold: 1.5,
+    Platinum: 2.0
+  };
+  const multiplier = tierMultipliers[customerTier] || 1.0;
+  const loyaltyPointsEarned = Math.floor((roundedTotal / 100) * multiplier);
 
   return {
     subtotal: Number(subtotal.toFixed(2)),
@@ -88,11 +103,60 @@ export const calculateInvoiceTotals = ({
     absDiscount,
     percentDiscount: pctDiscount,
     flatDiscount,
+    loyaltyPointsRedeemed: pointsRedeemed,
+    loyaltyDiscount,
+    loyaltyPointsEarned,
     rawTotal: Number(rawTotal.toFixed(2)),
     total: roundedTotal,
     roundOff,
     processedItems
   };
+};
+
+/**
+ * Calculates physical cash tendered, change due, and balance
+ */
+export const calculateCashChange = ({ total = 0, cashTendered = 0 }) => {
+  const tendered = Math.max(0, Number(cashTendered) || 0);
+  const net = Math.max(0, Number(total) || 0);
+  const changeDue = Math.max(0, Number((tendered - net).toFixed(2)));
+  const shortAmount = Math.max(0, Number((net - tendered).toFixed(2)));
+
+  return {
+    cashTendered: tendered,
+    changeDue,
+    shortAmount,
+    isFullyCovered: tendered >= net
+  };
+};
+
+/**
+ * Generates quick cash tender preset denominations for rapid 1-click POS cashier selection
+ */
+export const generateQuickCashPresets = (total = 0) => {
+  const net = Math.round(Number(total) || 0);
+  if (net <= 0) return [100, 200, 500, 1000];
+
+  const presets = new Set();
+  // Exact amount
+  presets.add(net);
+
+  // Next round 100
+  if (net % 100 !== 0) {
+    presets.add(Math.ceil(net / 100) * 100);
+  }
+
+  // Next round 500
+  if (net % 500 !== 0) {
+    presets.add(Math.ceil(net / 500) * 500);
+  }
+
+  // Standard Indian currency note denominations above net
+  [500, 1000, 2000, 5000].forEach(note => {
+    if (note > net) presets.add(note);
+  });
+
+  return Array.from(presets).sort((a, b) => a - b).slice(0, 5);
 };
 
 /**

@@ -35,6 +35,8 @@ import {
   OpenInNew
 } from '@mui/icons-material';
 import { INVOICE_WHATSAPP_TEMPLATES, generateInvoiceWhatsAppText } from './InvoiceWhatsAppDialog';
+import ThermalReceipt from './ThermalReceipt';
+import { printInvoiceElement } from '../utils/printInvoice';
 
 /**
  * BillSuccessModal
@@ -662,68 +664,160 @@ const BillSuccessModal = ({
             </Box>
           </Paper>
 
-          {/* Section 2: Print & Download Quick Bar */}
+          {/* Section 2: Print & Offline Invoices (Thermal & A4) */}
           <Box>
             <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.06em', mb: 1, display: 'block', fontSize: '0.7rem' }}>
               Print & Offline Invoices
             </Typography>
 
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
-              {/* Print Receipt Button */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', sm: '1fr 1fr 1fr 1fr' }, gap: 1 }}>
+              {/* 80mm Thermal Roll Button */}
               <Button
                 variant="outlined"
-                fullWidth
-                startIcon={<Print sx={{ color: '#0F766E' }} />}
+                size="small"
+                startIcon={<Print sx={{ color: '#0F766E', fontSize: 16 }} />}
                 onClick={() => {
-                  if (onPrint) onPrint(invoice);
+                  const el = document.getElementById('bill-success-thermal-80mm');
+                  if (el) {
+                    printInvoiceElement(el, '80mm');
+                    setSnackbar({ open: true, message: 'Printing 80mm Thermal Receipt...', severity: 'success' });
+                  } else if (onPrint) {
+                    onPrint(invoice);
+                  }
                 }}
                 sx={{
-                  py: 1.25,
-                  borderRadius: 2.25,
+                  py: 1,
+                  px: 1,
+                  borderRadius: 2,
                   border: '1.5px solid',
                   borderColor: 'divider',
                   fontWeight: 700,
-                  fontSize: '0.84rem',
+                  fontSize: '0.74rem',
                   textTransform: 'none',
                   color: 'text.primary',
                   bgcolor: 'background.paper',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 0.3,
                   '&:hover': {
                     borderColor: '#0F766E',
                     bgcolor: 'rgba(15, 118, 110, 0.05)'
                   }
                 }}
               >
-                Print Receipt / Slip
+                <span>80mm Thermal</span>
+                <span style={{ fontSize: '0.62rem', color: '#64748B', fontWeight: 500 }}>POS Roll</span>
               </Button>
 
-              {/* Download PDF Button */}
+              {/* 58mm Mini Roll Button */}
               <Button
                 variant="outlined"
-                fullWidth
-                disabled={isDownloadingPDF}
-                startIcon={isDownloadingPDF ? <CircularProgress size={18} color="inherit" /> : <Download sx={{ color: '#D97706' }} />}
+                size="small"
+                startIcon={<Print sx={{ color: '#0D9488', fontSize: 16 }} />}
                 onClick={() => {
-                  if (onDownloadPDF) onDownloadPDF(invoice);
+                  const el = document.getElementById('bill-success-thermal-58mm');
+                  if (el) {
+                    printInvoiceElement(el, '58mm');
+                    setSnackbar({ open: true, message: 'Printing 58mm Mini Thermal Receipt...', severity: 'success' });
+                  } else if (onPrint) {
+                    onPrint(invoice);
+                  }
                 }}
                 sx={{
-                  py: 1.25,
-                  borderRadius: 2.25,
+                  py: 1,
+                  px: 1,
+                  borderRadius: 2,
                   border: '1.5px solid',
                   borderColor: 'divider',
                   fontWeight: 700,
-                  fontSize: '0.84rem',
+                  fontSize: '0.74rem',
                   textTransform: 'none',
                   color: 'text.primary',
                   bgcolor: 'background.paper',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 0.3,
+                  '&:hover': {
+                    borderColor: '#0D9488',
+                    bgcolor: 'rgba(13, 148, 136, 0.05)'
+                  }
+                }}
+              >
+                <span>58mm Mini</span>
+                <span style={{ fontSize: '0.62rem', color: '#64748B', fontWeight: 500 }}>Mobile Roll</span>
+              </Button>
+
+              {/* A4 Full Sheet Print */}
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<Print sx={{ color: '#D97706', fontSize: 16 }} />}
+                onClick={() => {
+                  if (onPrint) onPrint(invoice);
+                }}
+                sx={{
+                  py: 1,
+                  px: 1,
+                  borderRadius: 2,
+                  border: '1.5px solid',
+                  borderColor: 'divider',
+                  fontWeight: 700,
+                  fontSize: '0.74rem',
+                  textTransform: 'none',
+                  color: 'text.primary',
+                  bgcolor: 'background.paper',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 0.3,
                   '&:hover': {
                     borderColor: '#D97706',
                     bgcolor: 'rgba(217, 119, 6, 0.05)'
                   }
                 }}
               >
-                {isDownloadingPDF ? 'Generating PDF...' : 'Download PDF Bill'}
+                <span>A4 Official</span>
+                <span style={{ fontSize: '0.62rem', color: '#64748B', fontWeight: 500 }}>Tax Sheet</span>
+              </Button>
+
+              {/* Download PDF Button */}
+              <Button
+                variant="outlined"
+                size="small"
+                disabled={isDownloadingPDF}
+                startIcon={isDownloadingPDF ? <CircularProgress size={14} color="inherit" /> : <Download sx={{ color: '#D97706', fontSize: 16 }} />}
+                onClick={() => {
+                  if (onDownloadPDF) onDownloadPDF(invoice);
+                }}
+                sx={{
+                  py: 1,
+                  px: 1,
+                  borderRadius: 2,
+                  border: '1.5px solid',
+                  borderColor: 'divider',
+                  fontWeight: 700,
+                  fontSize: '0.74rem',
+                  textTransform: 'none',
+                  color: 'text.primary',
+                  bgcolor: 'background.paper',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 0.3,
+                  '&:hover': {
+                    borderColor: '#D97706',
+                    bgcolor: 'rgba(217, 119, 6, 0.05)'
+                  }
+                }}
+              >
+                <span>Download</span>
+                <span style={{ fontSize: '0.62rem', color: '#64748B', fontWeight: 500 }}>PDF Bill</span>
               </Button>
             </Box>
+
+            {/* Hidden Thermal Receipt Containers for Direct Printing */}
+            <div style={{ display: 'none' }}>
+              <ThermalReceipt invoice={invoice} profile={profile} width="80mm" id="bill-success-thermal-80mm" />
+              <ThermalReceipt invoice={invoice} profile={profile} width="58mm" id="bill-success-thermal-58mm" />
+            </div>
           </Box>
 
           <Divider sx={{ my: 0.5 }} />

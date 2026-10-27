@@ -3,11 +3,18 @@
  * Creates an isolated print context with all styles, fonts, and template colors intact,
  * guaranteeing correct page margins, column alignments, and background rendering.
  */
-export const printInvoiceElement = (element, isSlip = false) => {
+export const printInvoiceElement = (element, format = false) => {
   if (!element) {
     window.print();
     return;
   }
+
+  const is58mm = format === '58mm';
+  const is80mm = format === '80mm' || format === true;
+  const isThermal = is58mm || is80mm;
+  const pageSize = is58mm ? '58mm auto' : (is80mm ? '80mm auto' : 'A4 portrait');
+  const pageMargin = is58mm ? '2mm 2mm' : (is80mm ? '3mm 2mm' : '14mm 16mm 14mm 16mm');
+  const maxContentWidth = is58mm ? '54mm' : (is80mm ? '76mm' : '100%');
 
   // Remove any stale print frame from previous prints
   const existingFrame = document.getElementById('aleen-print-iframe');
@@ -65,8 +72,8 @@ export const printInvoiceElement = (element, isSlip = false) => {
           ${allStyles}
 
           @page {
-            size: ${isSlip ? '80mm auto' : 'A4 portrait'};
-            margin: ${isSlip ? '4mm 3mm' : '14mm 16mm 14mm 16mm'};
+            size: ${pageSize};
+            margin: ${pageMargin};
           }
           * {
             box-sizing: border-box !important;
@@ -82,11 +89,11 @@ export const printInvoiceElement = (element, isSlip = false) => {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
             -webkit-font-smoothing: antialiased;
           }
-          .printable-area, #printable-invoice {
+          .printable-area, #printable-invoice, #aleen-thermal-receipt {
             width: 100% !important;
-            max-width: ${isSlip ? '80mm' : '100%'} !important;
+            max-width: ${maxContentWidth} !important;
             margin: 0 auto !important;
-            padding: ${isSlip ? '3mm 2mm' : '6mm 6mm 10mm 6mm'} !important;
+            padding: ${isThermal ? '2mm 2mm' : '6mm 6mm 10mm 6mm'} !important;
             box-shadow: none !important;
             border-radius: 0 !important;
             background: #ffffff !important;

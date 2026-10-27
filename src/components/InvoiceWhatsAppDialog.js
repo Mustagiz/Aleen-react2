@@ -199,6 +199,34 @@ We offer complimentary garment steaming, trial re-fitting, and bridal preservati
 
 Celebrating your memorable milestones,
 *{businessName}*`
+  },
+  {
+    id: 'loyalty_rewards_bill',
+    name: 'Loyalty Rewards & Points',
+    badge: 'Points Perks',
+    icon: '💎',
+    description: 'Highlights loyalty points earned on this bill and updated balance',
+    template: `✨ *{businessName} | ATELIER REWARDS* ✨
+Dear *{customer}*,
+Thank you for gracing our boutique with your visit!
+
+🧾 *Invoice #{invoiceId}*
+📅 *Date:* {date}
+🛍️ *Purchased ({itemCount} items):* {itemSummary}
+💰 *Total Paid:* *₹{total}* ({paymentMethod})
+
+⭐ *LOYALTY REWARDS SUMMARY:*
+• Points Earned Today: *+{loyaltyPointsEarned} Points*
+• Points Redeemed: {loyaltyPointsRedeemed} Points
+💎 *Your New Rewards Balance: {loyaltyBalance} Points*
+_(Every point = ₹1 discount on your upcoming couture & bespoke fittings!)_
+
+📥 *View & Download Official E-Bill:*
+{billLink}
+⏰ _(Direct link active for 7 days until {expiryDate})_
+
+Warmest regards,
+*{businessName}*`
   }
 ];
 
@@ -268,6 +296,10 @@ export const generateInvoiceWhatsAppText = (templateText, invoice, profile) => {
     ? expiryRawDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
     : '7 days from issue';
 
+  const loyaltyPointsEarned = String(invoice.loyaltyPointsEarned || 0);
+  const loyaltyPointsRedeemed = String(invoice.loyaltyPointsRedeemed || 0);
+  const loyaltyBalance = String(invoice.customerLoyaltyBalance ?? (invoice.loyaltyPointsEarned || 0));
+
   return templateText
     .replace(/{customer}/g, customerName)
     .replace(/{invoiceId}/g, invoiceId)
@@ -281,6 +313,9 @@ export const generateInvoiceWhatsAppText = (templateText, invoice, profile) => {
     .replace(/{discountSection}/g, discountSection)
     .replace(/{discountAmount}/g, totalDiscountVal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
     .replace(/{discountPercent}/g, String(percentVal))
+    .replace(/{loyaltyPointsEarned}/g, loyaltyPointsEarned)
+    .replace(/{loyaltyPointsRedeemed}/g, loyaltyPointsRedeemed)
+    .replace(/{loyaltyBalance}/g, loyaltyBalance)
     .replace(/{gst}/g, String(gst))
     .replace(/{tax}/g, tax)
     .replace(/{total}/g, total)

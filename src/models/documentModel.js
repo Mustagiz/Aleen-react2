@@ -104,12 +104,22 @@ export const prepareDocumentModel = ({
       sgst,
       discount,
       discountPercent: Number(invoice.discountPercent || 0),
+      loyaltyDiscount: Number(invoice.loyaltyDiscount || 0),
       total,
       paidAmount,
       balanceDue,
       isSettled: balanceDue === 0,
       totalInWords: numberToWordsRupees(total),
       balanceInWords: balanceDue > 0 ? numberToWordsRupees(balanceDue) : null
+    },
+    loyalty: {
+      pointsRedeemed: Number(invoice.loyaltyPointsRedeemed || 0),
+      loyaltyDiscount: Number(invoice.loyaltyDiscount || 0),
+      pointsEarned: Number(invoice.loyaltyPointsEarned || 0)
+    },
+    cashTender: {
+      tendered: Number(invoice.cashTendered || 0),
+      changeDue: Number(invoice.changeDue || 0)
     },
     settlement: {
       paymentMethod: invoice.paymentMethod || 'Cash',

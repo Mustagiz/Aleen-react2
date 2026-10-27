@@ -2,7 +2,9 @@ import {
   calculateInvoiceTotals,
   calculateTenderSettlement,
   calculateCashShiftImpact,
-  calculateLineItem
+  calculateLineItem,
+  calculateCashChange,
+  generateQuickCashPresets
 } from './billingEngine';
 
 describe('BillingEngine Module Tests', () => {
@@ -96,5 +98,48 @@ describe('BillingEngine Module Tests', () => {
       paidAmount: 5000
     };
     expect(calculateCashShiftImpact(upiInvoice)).toBe(0);
+  });
+
+  test('calculateInvoiceTotals supports loyalty points redemption and accrual by tier', () => {
+    const items = [{ id: 'item-1', quantity: 1 }]; // 15,000
+
+    const result = calculateInvoiceTotals({
+      items,
+      inventory: mockInventory,
+      taxPercent: 0,
+      loyaltyPointsRedeemed: 250, // ₹250 discount
+      customerTier: 'Gold' // 1.5x points multiplier
+    });
+
+    expect(result.subtotal).toBe(15000);
+    expect(result.loyaltyDiscount).toBe(250);
+    expect(result.absDiscount).toBe(250);
+    expect(result.total).toBe(14750);
+    // Gold: Math.floor((14750 / 100) * 1.5) = Math.floor(147.5 * 1.5) = Math.floor(221.25) = 221 points
+    expect(result.loyaltyPointsEarned).toBe(221);
+  });
+
+  test('calculateCashChange computes tender, change due, and shortages', () => {
+    const exact = calculateCashChange({ total: 1450, cashTendered: 1450 });
+    expect(exact.changeDue).toBe(0);
+    expect(exact.shortAmount).toBe(0);
+    expect(exact.isFullyCovered).toBe(true);
+
+    const change = calculateCashChange({ total: 1450, cashTendered: 2000 });
+    expect(change.changeDue).toBe(550);
+    expect(change.shortAmount).toBe(0);
+    expect(change.isFullyCovered).toBe(true);
+
+    const short = calculateCashChange({ total: 1450, cashTendered: 1000 });
+    expect(short.changeDue).toBe(0);
+    expect(short.shortAmount).toBe(450);
+    expect(short.isFullyCovered).toBe(false);
+  });
+
+  test('generateQuickCashPresets suggests intuitive currency denominations', () => {
+    const presets = generateQuickCashPresets(1680);
+    expect(presets[0]).toBe(1680); // Exact
+    expect(presets).toContain(1700); // Next 100
+    expect(presets).toContain(2000); // Standard note
   });
 });

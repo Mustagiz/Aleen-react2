@@ -54,6 +54,7 @@ import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import Customer360Drawer from '../components/crm/Customer360Drawer';
 import ClienteleNavTabs from '../components/crm/ClienteleNavTabs';
 import { useFeedback } from '../contexts/FeedbackContext';
+import CustomerMeasurementModal from '../components/crm/CustomerMeasurementModal';
 
 const Customers = () => {
     const theme = useTheme();
@@ -71,6 +72,12 @@ const Customers = () => {
     const [selectedCustomerForPayment, setSelectedCustomerForPayment] = useState(null);
     const [selected360Customer, setSelected360Customer] = useState(null);
     const [is360Open, setIs360Open] = useState(false);
+    const [measurementModalOpen, setMeasurementModalOpen] = useState(false);
+    const [selectedMeasurementCustomer, setSelectedMeasurementCustomer] = useState(null);
+    const [whatsAppModalOpen, setWhatsAppModalOpen] = useState(false);
+    const [whatsAppCustomer, setWhatsAppCustomer] = useState(null);
+    const [whatsAppTemplate, setWhatsAppTemplate] = useState('loyalty');
+    const [whatsAppCustomText, setWhatsAppCustomText] = useState('');
     const [paymentData, setPaymentData] = useState({
         amount: '',
         method: 'Cash',
@@ -212,12 +219,38 @@ const Customers = () => {
         setPaymentDialogOpen(true);
     };
 
-    const sendWhatsAppMessage = (cust) => {
-        const phone = cust.phone.replace(/\D/g, '');
+    const getWhatsAppTemplateText = (cust, templateId) => {
+        if (!cust) return '';
+        const bName = profile?.businessName || 'Aleen Haute Couture';
+        switch (templateId) {
+            case 'loyalty':
+                return `✨ Dear ${cust.name}, greetings from ${bName}! You currently have ${cust.loyaltyPoints || 0} VIP Loyalty Points (worth ₹${cust.loyaltyPoints || 0}). Visit our atelier to redeem them on your next bespoke piece!`;
+            case 'fitting':
+                return `✨ Dear ${cust.name}, greetings from ${bName}! Your bespoke attire is fitted and ready for trial & pickup. Please visit our boutique at your convenience.`;
+            case 'festive':
+                return `🌟 Exclusive VIP Preview for ${cust.name} | ${bName}\n\nAs a valued ${cust.loyaltyTier || 'Bronze'} VIP patron, we are pleased to invite you for an exclusive first-look at our latest seasonal festive collection!`;
+            case 'due':
+                return `✨ Dear ${cust.name}, this is a gentle reminder regarding the outstanding balance of ₹${cust.totalDue || 0} on your account with ${bName}. Kindly clear via UPI or in-store at your convenience.`;
+            case 'greeting':
+            default:
+                return `Hello ${cust.name}, greetings from ${bName}! We hope you love your bespoke attire. Let us know if you need any styling adjustments or would like to explore our latest arrivals!`;
+        }
+    };
+
+    const handleOpenWhatsAppModal = (cust, initialTemplate = 'loyalty') => {
+        setWhatsAppCustomer(cust);
+        setWhatsAppTemplate(initialTemplate);
+        setWhatsAppCustomText(getWhatsAppTemplateText(cust, initialTemplate));
+        setWhatsAppModalOpen(true);
+    };
+
+    const handleSendWhatsApp = () => {
+        if (!whatsAppCustomer) return;
+        const phone = whatsAppCustomer.phone.replace(/\D/g, '');
         const cleanPhone = phone.startsWith('91') ? phone : `91${phone}`;
-        const message = `Hello ${cust.name}, greetings from ${profile?.businessName || 'Aleen Haute Couture'}! We hope you love your bespoke attire. Let us know if you need any styling adjustments or would like to explore our latest arrivals!`;
-        const url = `https://wa.me/${cleanPhone}/?text=${encodeURIComponent(message)}`;
+        const url = `https://wa.me/${cleanPhone}/?text=${encodeURIComponent(whatsAppCustomText)}`;
         window.open(url, '_blank');
+        setWhatsAppModalOpen(false);
     };
 
     const downloadCustomers = () => {
@@ -606,6 +639,18 @@ const Customers = () => {
                                                                 <Visibility fontSize="small" />
                                                             </IconButton>
                                                         </Tooltip>
+                                                        <Tooltip title="Bespoke Measurements & Tailoring Specs">
+                                                            <IconButton
+                                                                size="small"
+                                                                onClick={() => {
+                                                                    setSelectedMeasurementCustomer(cust);
+                                                                    setMeasurementModalOpen(true);
+                                                                }}
+                                                                sx={{ color: '#D97706', bgcolor: 'rgba(217, 119, 6, 0.08)' }}
+                                                            >
+                                                                <Straighten fontSize="small" />
+                                                            </IconButton>
+                                                        </Tooltip>
                                                         {hasDue && (
                                                             <Tooltip title="Settle Outstanding Balance">
                                                                 <IconButton
@@ -617,10 +662,10 @@ const Customers = () => {
                                                                 </IconButton>
                                                             </Tooltip>
                                                         )}
-                                                        <Tooltip title="Message on WhatsApp">
+                                                        <Tooltip title="WhatsApp Loyalty / Fitting Dispatch">
                                                             <IconButton
                                                                 size="small"
-                                                                onClick={() => sendWhatsAppMessage(cust)}
+                                                                onClick={() => handleOpenWhatsAppModal(cust, hasDue ? 'due' : 'loyalty')}
                                                                 sx={{ color: '#25D366', bgcolor: 'rgba(37, 211, 102, 0.08)' }}
                                                             >
                                                                 <WhatsApp fontSize="small" />
@@ -861,6 +906,125 @@ const Customers = () => {
                     handleOpen(c);
                 }}
             />
+
+            {/* Customer Bespoke Measurement Specs Dialog */}
+            <CustomerMeasurementModal
+                open={measurementModalOpen}
+                onClose={() => {
+                    setMeasurementModalOpen(false);
+                    setSelectedMeasurementCustomer(null);
+                }}
+                customer={selectedMeasurementCustomer}
+            />
+
+            {/* WhatsApp Client Messaging & Automation Studio */}
+            <Dialog
+                open={whatsAppModalOpen}
+                onClose={() => setWhatsAppModalOpen(false)}
+                maxWidth="sm"
+                fullWidth
+                PaperProps={{
+                    sx: { borderRadius: 3 }
+                }}
+            >
+                <DialogTitle sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between',
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                    pb: 2
+                }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+                        <Box sx={{
+                            width: 38,
+                            height: 38,
+                            borderRadius: '50%',
+                            bgcolor: 'rgba(37, 211, 102, 0.12)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: '#25D366'
+                        }}>
+                            <WhatsApp />
+                        </Box>
+                        <Box>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
+                                WhatsApp Client Dispatch
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                                {whatsAppCustomer?.name} • {whatsAppCustomer?.phone}
+                            </Typography>
+                        </Box>
+                    </Box>
+                    <IconButton size="small" onClick={() => setWhatsAppModalOpen(false)}>
+                        <Clear fontSize="small" />
+                    </IconButton>
+                </DialogTitle>
+
+                <DialogContent sx={{ pt: 2.5 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', color: 'text.secondary', letterSpacing: '0.04em', mb: 1, display: 'block' }}>
+                        Select Campaign / Message Template
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2.5 }}>
+                        {[
+                            { id: 'loyalty', label: '🎁 Loyalty Rewards', desc: 'Points balance & tier' },
+                            { id: 'fitting', label: '📏 Fitting Ready', desc: 'Trial pickup alert' },
+                            { id: 'festive', label: '🌟 Festive VIP', desc: 'New collection preview' },
+                            { id: 'due', label: '📋 Balance Due', desc: 'Pending settlement' },
+                            { id: 'greeting', label: '💬 General Note', desc: 'Styling check-in' },
+                        ].map((tpl) => (
+                            <Chip
+                                key={tpl.id}
+                                label={tpl.label}
+                                clickable
+                                color={whatsAppTemplate === tpl.id ? 'primary' : 'default'}
+                                variant={whatsAppTemplate === tpl.id ? 'filled' : 'outlined'}
+                                onClick={() => {
+                                    setWhatsAppTemplate(tpl.id);
+                                    setWhatsAppCustomText(getWhatsAppTemplateText(whatsAppCustomer, tpl.id));
+                                }}
+                                sx={{
+                                    fontWeight: 700,
+                                    fontSize: '0.75rem',
+                                    borderRadius: 2
+                                }}
+                            />
+                        ))}
+                    </Box>
+
+                    <TextField
+                        label="Message Preview (Editable)"
+                        fullWidth
+                        multiline
+                        rows={5}
+                        value={whatsAppCustomText}
+                        onChange={(e) => setWhatsAppCustomText(e.target.value)}
+                        helperText="Will open directly in WhatsApp Web or desktop/mobile app."
+                    />
+                </DialogContent>
+
+                <DialogActions sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider' }}>
+                    <Button onClick={() => setWhatsAppModalOpen(false)} sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleSendWhatsApp}
+                        startIcon={<WhatsApp />}
+                        sx={{
+                            px: 3,
+                            borderRadius: 2,
+                            fontWeight: 700,
+                            bgcolor: '#25D366',
+                            color: '#fff',
+                            '&:hover': { bgcolor: '#128C7E' }
+                        }}
+                    >
+                        Send via WhatsApp
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 };

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel, CircularProgress, Alert, Snackbar, InputAdornment, List } from '@mui/material';
-import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, PauseCircleOutline, ShoppingCart, RestartAlt, CalendarMonth, Phone } from '@mui/icons-material';
+import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, PauseCircleOutline, ShoppingCart, RestartAlt, CalendarMonth, Phone, Straighten, Clear, Stars, Redeem, AccountBalanceWallet } from '@mui/icons-material';
 import { Html5Qrcode } from 'html5-qrcode';
 import { db } from '../firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -24,14 +24,16 @@ import InvoiceWhatsAppDialog from '../components/InvoiceWhatsAppDialog';
 import BillSuccessModal from '../components/BillSuccessModal';
 import { printInvoiceElement } from '../utils/printInvoice';
 import CashDrawerShiftModal from '../components/crm/CashDrawerShiftModal';
-import { calculateInvoiceTotals, calculateTenderSettlement } from '../engine/billingEngine';
+import { calculateInvoiceTotals, calculateTenderSettlement, calculateCashChange, generateQuickCashPresets } from '../engine/billingEngine';
 import AtelierStitchDivider from '../components/common/AtelierStitchDivider';
+import ThermalReceipt from '../components/ThermalReceipt';
+import CustomerMeasurementModal from '../components/crm/CustomerMeasurementModal';
 
 const Invoices = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { inventory, invoices, addInvoice, updateInvoice, deleteInvoice, profile, customers, addCustomer, loading, invoiceTemplateSettings, updateInvoiceTemplateSettings } = useData();
+  const { inventory, invoices, addInvoice, updateInvoice, deleteInvoice, profile, customers, addCustomer, loading, invoiceTemplateSettings, updateInvoiceTemplateSettings, redeemLoyaltyPoints, updateCustomer } = useData();
   const { mode } = useThemeContext();
   const [open, setOpen] = useState(false);
   const [viewInvoice, setViewInvoice] = useState(null);
@@ -194,6 +196,10 @@ const Invoices = () => {
   const [customer, setCustomer] = useState('');
   const [phone, setPhone] = useState('+91');
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
+  const [loyaltyPointsToRedeem, setLoyaltyPointsToRedeem] = useState(0);
+  const [cashTendered, setCashTendered] = useState('');
+  const [measurementModalOpen, setMeasurementModalOpen] = useState(false);
+  const [measurementCustomer, setMeasurementCustomer] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('Cash');
   const [searchTerm, setSearchTerm] = useState('');
   const [itemSearchTerm, setItemSearchTerm] = useState('');
@@ -492,7 +498,7 @@ const Invoices = () => {
         message: `✓ Added: "${product.name}" (${variantSku || product.productId || cleanCode}) via ${source}`
       });
     } else {
-      playBeep();
+      playBeep('error');
       const codeToShow = matchResult?.resolvedCode || cleanCode;
       setUnrecognizedScan(codeToShow);
       setScanFeedback({
@@ -822,13 +828,19 @@ const Invoices = () => {
     setSelectedItems(updated);
   };
 
+  const matchedCustomer = selectedCustomerId
+    ? customers.find(c => c.id === selectedCustomerId)
+    : customers.find(c => c.phone && (c.phone === phone || c.phone.replace(/\D/g, '') === (phone || '').replace(/\D/g, '')));
+
   const calculateTotal = () => {
     return calculateInvoiceTotals({
       items: selectedItems,
       inventory,
       taxPercent: tax,
       discountPercent,
-      discountAmount
+      discountAmount,
+      loyaltyPointsRedeemed: loyaltyPointsToRedeem,
+      customerTier: matchedCustomer?.loyaltyTier || 'Bronze'
     });
   };
 
@@ -861,7 +873,7 @@ const Invoices = () => {
       return;
     }
 
-    const { subtotal, taxAmount, total, absDiscount } = calculateTotal();
+    const { subtotal, taxAmount, total, absDiscount, loyaltyDiscount, loyaltyPointsEarned } = calculateTotal();
     const invoiceNumber = generateInvoiceNumber(invoices.length);
 
     let finalPaymentMethod = paymentMethod;
@@ -883,8 +895,43 @@ const Invoices = () => {
           name: finalCustomerName,
           phone: phone,
           email: '', // Default empty
-          address: '' // Default empty
+          address: '', // Default empty
+          loyaltyTier: 'Bronze',
+          loyaltyPoints: 0
         });
+      }
+    }
+
+    // Process Loyalty Points Redemption
+    if (loyaltyPointsToRedeem > 0 && finalCustomerId && redeemLoyaltyPoints) {
+      try {
+        await redeemLoyaltyPoints(finalCustomerId, loyaltyPointsToRedeem);
+      } catch (err) {
+        console.warn('Failed to redeem loyalty points:', err);
+      }
+    }
+
+    // Accrue New Loyalty Points on this purchase
+    let updatedCustomerLoyalty = matchedCustomer?.loyaltyPoints || 0;
+    if (finalCustomerId && loyaltyPointsEarned > 0 && updateCustomer) {
+      updatedCustomerLoyalty = Math.max(0, updatedCustomerLoyalty - loyaltyPointsToRedeem) + loyaltyPointsEarned;
+      try {
+        const history = matchedCustomer?.pointsHistory || [];
+        await updateCustomer(finalCustomerId, {
+          loyaltyPoints: updatedCustomerLoyalty,
+          pointsHistory: [
+            ...history,
+            {
+              date: new Date().toISOString(),
+              points: loyaltyPointsEarned,
+              type: 'earned',
+              reason: `Earned on Bill #${invoiceNumber}`,
+              invoiceId: invoiceNumber
+            }
+          ]
+        });
+      } catch (err) {
+        console.warn('Failed to accrue customer loyalty points:', err);
       }
     }
 
@@ -909,6 +956,10 @@ const Invoices = () => {
       splitAmount,
       paymentStatus
     });
+
+    // Cash tender & change due
+    const cashTenderNum = parseFloat(cashTendered) || (paymentMethod === 'Cash' ? total : 0);
+    const cashChange = calculateCashChange({ total, cashTendered: cashTenderNum });
 
     const invoice = {
       id: invoiceNumber,
@@ -948,6 +999,12 @@ const Invoices = () => {
       discount: absDiscount,
       discountPercent: parseFloat(discountPercent) || 0,
       discountAmount: parseFloat(discountAmount) || 0,
+      loyaltyPointsRedeemed: loyaltyPointsToRedeem,
+      loyaltyDiscount: loyaltyDiscount || 0,
+      loyaltyPointsEarned: loyaltyPointsEarned || 0,
+      customerLoyaltyBalance: updatedCustomerLoyalty,
+      cashTendered: cashChange.cashTendered,
+      changeDue: cashChange.changeDue,
       total,
       paymentStatus: computedPaymentStatus,
       paidAmount: calculatedPaidAmount,
@@ -995,6 +1052,8 @@ const Invoices = () => {
     setPhone('+91');
     setInvoiceDate(getCurrentDateTime());
     setSelectedCustomerId(null);
+    setLoyaltyPointsToRedeem(0);
+    setCashTendered('');
     setPaymentMethod('Cash');
     setIsSplitPayment(false);
     setSplitAmount(0);
@@ -1469,7 +1528,7 @@ const Invoices = () => {
     setDeleteDialogOpen(true);
   };
 
-  const { subtotal, taxAmount, total, absDiscount } = calculateTotal();
+  const { subtotal, taxAmount, total, absDiscount, loyaltyDiscount, loyaltyPointsEarned } = calculateTotal();
 
   return (
     <Box>
@@ -2522,68 +2581,136 @@ const Invoices = () => {
                 borderColor: 'divider',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
               }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1, mb: 2 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <PersonOutline sx={{ color: '#0F766E', fontSize: 20 }} />
                     <Typography variant="subtitle2" sx={{ fontWeight: 800, letterSpacing: '0.02em', textTransform: 'uppercase', fontSize: '0.78rem' }}>
                       Client Details
                     </Typography>
                   </Box>
-                  {selectedCustomerId && (
-                    <Chip
-                      size="small"
-                      label={`VIP Client • ${customers.find(c => c.id === selectedCustomerId)?.loyaltyPoints || 0} pts`}
-                      sx={{ bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E', fontWeight: 700, height: 22 }}
-                    />
-                  )}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    {matchedCustomer && (
+                      <>
+                        <Chip
+                          size="small"
+                          icon={<Stars sx={{ '&&': { color: matchedCustomer.loyaltyTier === 'Platinum' ? '#7C3AED' : matchedCustomer.loyaltyTier === 'Gold' ? '#D97706' : '#0F766E', fontSize: 16 } }} />}
+                          label={`${matchedCustomer.loyaltyTier || 'Bronze'} VIP • ${matchedCustomer.loyaltyPoints || 0} pts`}
+                          sx={{
+                            bgcolor: matchedCustomer.loyaltyTier === 'Platinum' ? 'rgba(124, 58, 237, 0.1)' : matchedCustomer.loyaltyTier === 'Gold' ? 'rgba(217, 119, 6, 0.12)' : 'rgba(15, 118, 110, 0.1)',
+                            color: matchedCustomer.loyaltyTier === 'Platinum' ? '#7C3AED' : matchedCustomer.loyaltyTier === 'Gold' ? '#D97706' : '#0F766E',
+                            fontWeight: 700,
+                            height: 24,
+                            border: '1px solid',
+                            borderColor: matchedCustomer.loyaltyTier === 'Platinum' ? 'rgba(124, 58, 237, 0.25)' : matchedCustomer.loyaltyTier === 'Gold' ? 'rgba(217, 119, 6, 0.25)' : 'rgba(15, 118, 110, 0.25)'
+                          }}
+                        />
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          startIcon={<Straighten sx={{ fontSize: 15 }} />}
+                          onClick={() => {
+                            setMeasurementCustomer(matchedCustomer);
+                            setMeasurementModalOpen(true);
+                          }}
+                          sx={{
+                            textTransform: 'none',
+                            borderRadius: 1.5,
+                            fontWeight: 700,
+                            fontSize: '0.72rem',
+                            py: 0.2,
+                            px: 1,
+                            borderColor: '#0F766E',
+                            color: '#0F766E',
+                            '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.08)', borderColor: '#0F766E' }
+                          }}
+                        >
+                          {matchedCustomer.measurements ? 'Fitted' : 'Measure'}
+                        </Button>
+                        <Tooltip title="Reset patron to walk-in">
+                          <IconButton
+                            size="small"
+                            onClick={() => {
+                              setCustomer('');
+                              setPhone('+91');
+                              setSelectedCustomerId(null);
+                              setLoyaltyPointsToRedeem(0);
+                            }}
+                            sx={{ color: 'text.secondary', p: 0.5 }}
+                          >
+                            <Clear sx={{ fontSize: 16 }} />
+                          </IconButton>
+                        </Tooltip>
+                      </>
+                    )}
+                  </Box>
                 </Box>
 
                 <Box sx={{ mb: 2 }}>
-                  <TextField
-                    label="Customer Name"
-                    fullWidth
+                  <Autocomplete
+                    freeSolo
                     size="small"
-                    required
-                    error={clientValidationErrors.customer}
-                    value={customer}
-                    placeholder="e.g. Saira banu"
-                    onChange={(e) => {
-                      const val = toSentenceCase(e.target.value);
-                      setCustomer(val);
-                      if (clientValidationErrors.customer) {
-                        setClientValidationErrors(prev => ({ ...prev, customer: false }));
-                      }
-                      if (selectedCustomerId) setSelectedCustomerId(null);
+                    options={customers}
+                    getOptionLabel={(option) => {
+                      if (typeof option === 'string') return option;
+                      return `${option.name || ''} (${option.phone || ''})`;
                     }}
-                    onBlur={() => {
-                      const formatted = toSentenceCase(customer.trim());
-                      setCustomer(formatted);
-                      const searchTerm = formatted.toLowerCase();
-                      if (searchTerm) {
-                        const matched = customers.find(c => c.name && c.name.toLowerCase() === searchTerm);
-                        if (matched) {
-                          setCustomer(toSentenceCase(matched.name));
-                          setPhone(matched.phone || '+91');
-                          setSelectedCustomerId(matched.id);
+                    value={matchedCustomer || customer}
+                    onChange={(event, newValue) => {
+                      if (typeof newValue === 'object' && newValue !== null) {
+                        setCustomer(toSentenceCase(newValue.name || ''));
+                        setPhone(newValue.phone || '+91');
+                        setSelectedCustomerId(newValue.id);
+                        if (clientValidationErrors.customer) {
+                          setClientValidationErrors(prev => ({ ...prev, customer: false }));
+                        }
+                      } else if (typeof newValue === 'string') {
+                        setCustomer(toSentenceCase(newValue));
+                        setSelectedCustomerId(null);
+                      } else {
+                        setCustomer('');
+                        setPhone('+91');
+                        setSelectedCustomerId(null);
+                        setLoyaltyPointsToRedeem(0);
+                      }
+                    }}
+                    onInputChange={(event, newInputValue, reason) => {
+                      if (reason === 'input') {
+                        setCustomer(toSentenceCase(newInputValue));
+                        setSelectedCustomerId(null);
+                        if (clientValidationErrors.customer) {
+                          setClientValidationErrors(prev => ({ ...prev, customer: false }));
                         }
                       }
                     }}
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        const formatted = toSentenceCase(customer.trim());
-                        setCustomer(formatted);
-                        const searchTerm = formatted.toLowerCase();
-                        if (searchTerm) {
-                          const matched = customers.find(c => c.name && c.name.toLowerCase() === searchTerm);
-                          if (matched) {
-                            setCustomer(toSentenceCase(matched.name));
-                            setPhone(matched.phone || '+91');
-                            setSelectedCustomerId(matched.id);
-                          }
-                        }
-                      }
-                    }}
-                    helperText={clientValidationErrors.customer ? "Customer Name is mandatory before generating a bill" : "Type customer name in sentence case. Auto-formats on type and lookup."}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Customer Name / Lookup Patron"
+                        fullWidth
+                        required
+                        error={clientValidationErrors.customer}
+                        placeholder="e.g. Saira banu or search phone"
+                        helperText={clientValidationErrors.customer ? "Customer Name is mandatory before generating a bill" : "Type client name or select existing patron from records"}
+                      />
+                    )}
+                    renderOption={(props, option) => (
+                      <Box component="li" {...props} key={option.id} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', py: 0.8 }}>
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 700 }}>{option.name}</Typography>
+                          <Typography variant="caption" sx={{ color: 'text.secondary', fontFamily: 'monospace' }}>{option.phone}</Typography>
+                        </Box>
+                        <Chip
+                          size="small"
+                          label={`${option.loyaltyTier || 'Bronze'} • ${option.loyaltyPoints || 0} pts`}
+                          sx={{
+                            fontSize: '0.68rem',
+                            fontWeight: 700,
+                            bgcolor: option.loyaltyTier === 'Platinum' ? 'rgba(124, 58, 237, 0.1)' : option.loyaltyTier === 'Gold' ? 'rgba(217, 119, 6, 0.1)' : 'rgba(15, 118, 110, 0.1)',
+                            color: option.loyaltyTier === 'Platinum' ? '#7C3AED' : option.loyaltyTier === 'Gold' ? '#D97706' : '#0F766E'
+                          }}
+                        />
+                      </Box>
+                    )}
                   />
                 </Box>
 
@@ -3374,6 +3501,154 @@ const Invoices = () => {
                   </Box>
                 )}
 
+                {/* Cash Tendered & Change Due Module */}
+                {(() => {
+                  const targetCashAmount = !isSplitPayment
+                    ? (paymentMethod === 'Cash' ? total : 0)
+                    : (paymentMethod === 'Cash' ? (Number(splitAmount) || 0) : (paymentMethod2 === 'Cash' ? Math.max(0, total - (Number(splitAmount) || 0)) : 0));
+                  
+                  if (targetCashAmount <= 0) return null;
+
+                  return (
+                    <Box sx={{
+                      p: 1.8,
+                      mb: 2,
+                      borderRadius: 2,
+                      bgcolor: 'rgba(15, 118, 110, 0.04)',
+                      border: '1px solid rgba(15, 118, 110, 0.2)'
+                    }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.2 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                          <AccountBalanceWallet sx={{ color: '#0F766E', fontSize: 18 }} />
+                          <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E', textTransform: 'uppercase' }}>
+                            Cash Tender & Change Due
+                          </Typography>
+                        </Box>
+                        {cashTendered > 0 && (
+                          <Chip
+                            size="small"
+                            label={
+                              cashTendered >= targetCashAmount
+                                ? `Change Due: ₹${(cashTendered - targetCashAmount).toFixed(2)}`
+                                : `Short: ₹${(targetCashAmount - cashTendered).toFixed(2)}`
+                            }
+                            color={cashTendered >= targetCashAmount ? 'success' : 'error'}
+                            sx={{ fontWeight: 800, height: 22, fontSize: '0.72rem' }}
+                          />
+                        )}
+                      </Box>
+
+                      <TextField
+                        label="Cash Received (₹)"
+                        type="number"
+                        size="small"
+                        fullWidth
+                        value={cashTendered || ''}
+                        onChange={(e) => setCashTendered(parseFloat(e.target.value) || 0)}
+                        placeholder={`Due: ₹${targetCashAmount.toFixed(2)}`}
+                        InputProps={{
+                          startAdornment: <InputAdornment position="start">₹</InputAdornment>
+                        }}
+                        sx={{ mb: 1 }}
+                      />
+
+                      {/* Quick Cash Tender Presets */}
+                      <Box sx={{ display: 'flex', gap: 0.8, flexWrap: 'wrap', alignItems: 'center' }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem' }}>
+                          Presets:
+                        </Typography>
+                        {generateQuickCashPresets(targetCashAmount).map((preset) => (
+                          <Chip
+                            key={preset.label}
+                            label={preset.label}
+                            clickable
+                            size="small"
+                            onClick={() => setCashTendered(preset.amount)}
+                            variant={cashTendered === preset.amount ? 'filled' : 'outlined'}
+                            color={cashTendered === preset.amount ? 'primary' : 'default'}
+                            sx={{ fontWeight: 700, fontSize: '0.7rem' }}
+                          />
+                        ))}
+                        {cashTendered > 0 && (
+                          <Chip
+                            label="Clear"
+                            size="small"
+                            onClick={() => setCashTendered(0)}
+                            sx={{ fontSize: '0.7rem' }}
+                          />
+                        )}
+                      </Box>
+                    </Box>
+                  );
+                })()}
+
+                {/* Loyalty Rewards & Points Redemption Card */}
+                {matchedCustomer && (
+                  <Box sx={{
+                    p: 1.8,
+                    mb: 2,
+                    borderRadius: 2,
+                    bgcolor: 'rgba(217, 119, 6, 0.05)',
+                    border: '1px solid rgba(217, 119, 6, 0.25)'
+                  }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                        <Redeem sx={{ color: '#D97706', fontSize: 18 }} />
+                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#D97706', textTransform: 'uppercase' }}>
+                          Loyalty Rewards ({matchedCustomer.loyaltyTier || 'Bronze'})
+                        </Typography>
+                      </Box>
+                      <Typography variant="caption" sx={{ fontWeight: 700, color: '#475569' }}>
+                        Avail: <strong style={{ color: '#D97706' }}>{matchedCustomer.loyaltyPoints || 0} pts</strong> (₹{(matchedCustomer.loyaltyPoints || 0).toFixed(0)})
+                      </Typography>
+                    </Box>
+
+                    {(matchedCustomer.loyaltyPoints || 0) > 0 ? (
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                          <TextField
+                            label="Redeem Points (1 pt = ₹1)"
+                            type="number"
+                            size="small"
+                            fullWidth
+                            value={loyaltyPointsToRedeem || ''}
+                            onChange={(e) => {
+                              const val = Math.max(0, Math.min(matchedCustomer.loyaltyPoints || 0, Math.floor(subtotal), parseInt(e.target.value) || 0));
+                              setLoyaltyPointsToRedeem(val);
+                            }}
+                            placeholder={`Max: ${Math.min(matchedCustomer.loyaltyPoints || 0, Math.floor(subtotal))} pts`}
+                          />
+                          <Button
+                            size="small"
+                            variant={loyaltyPointsToRedeem > 0 ? 'contained' : 'outlined'}
+                            color="warning"
+                            onClick={() => {
+                              const maxPoints = Math.min(matchedCustomer.loyaltyPoints || 0, Math.floor(subtotal));
+                              if (loyaltyPointsToRedeem > 0) {
+                                setLoyaltyPointsToRedeem(0);
+                              } else {
+                                setLoyaltyPointsToRedeem(maxPoints);
+                              }
+                            }}
+                            sx={{ textTransform: 'none', fontWeight: 700, whiteSpace: 'nowrap', minWidth: '90px' }}
+                          >
+                            {loyaltyPointsToRedeem > 0 ? 'Clear' : 'Use Max'}
+                          </Button>
+                        </Box>
+                        {loyaltyPointsToRedeem > 0 && (
+                          <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 700 }}>
+                            ✓ ₹{loyaltyPointsToRedeem} discount applied from loyalty points.
+                          </Typography>
+                        )}
+                      </Box>
+                    ) : (
+                      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
+                        Patron will earn points automatically on this bill ({matchedCustomer.loyaltyTier === 'Platinum' ? '2.0x' : matchedCustomer.loyaltyTier === 'Gold' ? '1.5x' : matchedCustomer.loyaltyTier === 'Silver' ? '1.25x' : '1.0x'} VIP multiplier).
+                      </Typography>
+                    )}
+                  </Box>
+                )}
+
                 {/* Taxes & Discounts */}
                 <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 1, mb: 2 }}>
                   <TextField label="GST (%)" type="number" size="small" value={tax} onChange={(e) => setTax(e.target.value)} fullWidth />
@@ -3411,12 +3686,34 @@ const Invoices = () => {
                     <Typography variant="body2" color="text.secondary">GST ({(parseFloat(tax) || 0)}%):</Typography>
                     <Typography variant="body2" sx={{ fontWeight: 700 }}>₹{taxAmount.toFixed(2).toLocaleString('en-IN')}</Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                     <Typography variant="body2" color="text.secondary">Discount Applied:</Typography>
                     <Typography variant="body2" sx={{ fontWeight: 800, color: 'error.main' }}>
                       - ₹{absDiscount.toFixed(2).toLocaleString('en-IN')}
                     </Typography>
                   </Box>
+
+                  {loyaltyDiscount > 0 && (
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                      <Typography variant="body2" sx={{ color: '#D97706', fontWeight: 600 }}>
+                        Loyalty Redemption ({loyaltyPointsToRedeem} pts):
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 800, color: '#D97706' }}>
+                        - ₹{loyaltyDiscount.toFixed(2).toLocaleString('en-IN')}
+                      </Typography>
+                    </Box>
+                  )}
+
+                  {cashTendered > 0 && (
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, p: 0.8, borderRadius: 1.5, bgcolor: 'rgba(15, 118, 110, 0.08)' }}>
+                      <Typography variant="caption" sx={{ fontWeight: 700, color: '#0F766E' }}>
+                        Cash Tendered: ₹{cashTendered.toFixed(2)}
+                      </Typography>
+                      <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                        Change Due: ₹{Math.max(0, cashTendered - total).toFixed(2)}
+                      </Typography>
+                    </Box>
+                  )}
 
                   <Divider sx={{ my: 1.5, borderColor: 'rgba(15,118,110,0.2)' }} />
 
@@ -3428,6 +3725,11 @@ const Invoices = () => {
                       <Typography variant="h4" sx={{ fontWeight: 900, color: '#0F766E', letterSpacing: '-0.02em' }}>
                         ₹{total.toFixed(2).toLocaleString('en-IN')}
                       </Typography>
+                      {loyaltyPointsEarned > 0 && (
+                        <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 700, display: 'block', mt: 0.3 }}>
+                          ✨ +{loyaltyPointsEarned} loyalty pts will be earned
+                        </Typography>
+                      )}
                     </Box>
                     <Chip
                       label={paymentStatus.toUpperCase()}
@@ -3861,6 +4163,16 @@ const Invoices = () => {
       <CashDrawerShiftModal
         open={cashDrawerModalOpen}
         onClose={() => setCashDrawerModalOpen(false)}
+      />
+
+      {/* Client Bespoke Measurement Profile Dialog */}
+      <CustomerMeasurementModal
+        open={measurementModalOpen}
+        onClose={() => {
+          setMeasurementModalOpen(false);
+          setMeasurementCustomer(null);
+        }}
+        customer={measurementCustomer}
       />
 
       {/* Hidden offscreen container for pixel-perfect PDF export */}
