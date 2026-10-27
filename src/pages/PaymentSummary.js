@@ -519,7 +519,7 @@ const PaymentSummary = () => {
             <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 800, letterSpacing: '0.08em', display: 'block', mb: 2 }}>
                 Intake by Payment Gateway & Tender
             </Typography>
-            <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
+            <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} sx={{ mb: { xs: 2.5, sm: 3.5 } }}>
                 {Object.entries(paymentSummary)
                     .filter(([_, data]) => data.count > 0)
                     .map(([method, data]) => {
@@ -527,8 +527,8 @@ const PaymentSummary = () => {
                         const color = getPaymentColor(method);
 
                         return (
-                            <Grid item xs={12} sm={6} md={2.4} key={method}>
-                                <GlassCard sx={{ p: 2.25, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                            <Grid item xs={6} sm={6} md={2.4} key={method}>
+                                <GlassCard sx={{ p: { xs: 1.5, sm: 2.25 }, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                                     <Box>
                                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
                                             <Box sx={{ p: 1, borderRadius: 2, bgcolor: `${color}18`, color: color, display: 'flex' }}>

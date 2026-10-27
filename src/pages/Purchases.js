@@ -928,9 +928,9 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
 
             {tabValue === 0 && (
                 <>
-                    {/* Atelier KPI Summary Cards (4-Card Procurement Suite) */}
-                    <Grid container spacing={2.5} sx={{ mb: 3 }} alignItems="stretch">
-                        <Grid item xs={12} sm={6} md={3}>
+                    {/* Atelier KPI Summary Cards: Responsive 2x2 Grid on Mobile, 4 Columns on Desktop */}
+                    <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} sx={{ mb: { xs: 2.5, sm: 3 } }} alignItems="stretch">
+                        <Grid item xs={6} sm={6} md={3}>
                             <AtelierKpiCard
                                 title="Total Procurement Orders"
                                 value={totalOrders}
@@ -938,7 +938,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                 subtitle="Lifetime mill orders placed"
                             />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={3}>
+                        <Grid item xs={6} sm={6} md={3}>
                             <AtelierKpiCard
                                 title="Pending Mill Deliveries"
                                 value={pendingCount}
@@ -947,7 +947,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                 subtitle="Awaiting receipt into inventory"
                             />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={3}>
+                        <Grid item xs={6} sm={6} md={3}>
                             <AtelierKpiCard
                                 title="Overdue Deliveries"
                                 value={overdueCount}
@@ -956,7 +956,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                 subtitle={overdueCount > 0 ? 'Mill shipments past scheduled delivery' : 'All pending orders on schedule'}
                             />
                         </Grid>
-                        <Grid item xs={12} sm={6} md={3}>
+                        <Grid item xs={6} sm={6} md={3}>
                             <AtelierKpiCard
                                 title="Total Procurement Spend"
                                 value={`₹${totalSpent.toLocaleString('en-IN')}`}

@@ -198,9 +198,9 @@ const Vendors = () => {
                 }
             />
 
-            {/* Atelier KPI Summary Cards */}
-            <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
-                <Grid item xs={12} sm={4}>
+            {/* Atelier KPI Summary Cards: Responsive Grid on Mobile, 3 Columns on Tablet/Desktop */}
+            <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} sx={{ mb: { xs: 2.5, sm: 3.5 } }}>
+                <Grid item xs={6} sm={4}>
                     <AtelierKpiCard
                         title="Fabric & Mill Partners"
                         value={totalVendors}
@@ -208,7 +208,7 @@ const Vendors = () => {
                         subtitle="Active registered suppliers"
                     />
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={6} sm={4}>
                     <AtelierKpiCard
                         title="Outstanding Payables"
                         value={`₹${totalPayable.toLocaleString('en-IN')}`}

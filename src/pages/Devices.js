@@ -588,9 +588,9 @@ export default function Devices() {
                 }
             />
 
-            {/* 4 Atelier Intelligence KPIs */}
-            <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
-                <Grid item xs={12} sm={6} md={3}>
+            {/* 4 Atelier Intelligence KPIs: Responsive 2x2 Grid on Mobile, 4 Columns on Desktop */}
+            <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} sx={{ mb: { xs: 2.5, sm: 3.5 } }}>
+                <Grid item xs={6} sm={6} md={3}>
                     <AtelierKpiCard
                         title="Bluetooth Scanners"
                         value={`${activeBluetoothScanners} Active`}
@@ -603,7 +603,7 @@ export default function Devices() {
                         }}
                     />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={6} sm={6} md={3}>
                     <AtelierKpiCard
                         title="Phone Camera Bridges"
                         value={`${activePhoneBridges} Connected`}
@@ -612,7 +612,7 @@ export default function Devices() {
                         color="warning"
                     />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={6} sm={6} md={3}>
                     <AtelierKpiCard
                         title="Scan Engine Status"
                         value="Listening"
@@ -621,7 +621,7 @@ export default function Devices() {
                         color="success"
                     />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={6} sm={6} md={3}>
                     <AtelierKpiCard
                         title="Session Scans"
                         value={totalScansProcessed.toLocaleString()}

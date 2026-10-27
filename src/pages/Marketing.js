@@ -914,9 +914,9 @@ const Marketing = () => {
             {/* Clientele & CRM Navigation Tabs */}
             <ClienteleNavTabs />
 
-            {/* 4 Atelier Intelligence KPIs */}
-            <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
-                <Grid item xs={12} sm={6} md={3}>
+            {/* 4 Atelier Intelligence KPIs: Responsive 2x2 Grid on Mobile, 4 Columns on Desktop */}
+            <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} sx={{ mb: { xs: 2.5, sm: 3.5 } }}>
+                <Grid item xs={6} sm={6} md={3}>
                     <AtelierKpiCard
                         title="Audience Reach"
                         value={customers.length.toLocaleString()}
@@ -925,7 +925,7 @@ const Marketing = () => {
                         trend={{ label: `${segmentCounts.recent} Active This Month`, isPositive: true }}
                     />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={6} sm={6} md={3}>
                     <AtelierKpiCard
                         title="Dormant Winback"
                         value={(segmentCounts.dormant30 + segmentCounts.dormant60).toLocaleString()}
@@ -937,7 +937,7 @@ const Marketing = () => {
                         }}
                     />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={6} sm={6} md={3}>
                     <AtelierKpiCard
                         title="Automated Drips"
                         value={Object.values(automationRules).filter(Boolean).length.toString()}
@@ -947,7 +947,7 @@ const Marketing = () => {
                         trend={{ label: `${todayCelebrants.length} Birthdays Today`, isPositive: true }}
                     />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={6} sm={6} md={3}>
                     <AtelierKpiCard
                         title="Dispatches Logged"
                         value={dispatchHistory.length.toLocaleString()}

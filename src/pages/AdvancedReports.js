@@ -475,9 +475,9 @@ const AdvancedReports = () => {
             {/* Seamless Finance & Audit Navigation Tab Switcher */}
             <FinanceNavTabs activeTab="/advanced-reports" />
 
-            {/* 4 Atelier Intelligence KPIs */}
-            <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
-                <Grid item xs={12} sm={6} md={3}>
+            {/* 4 Atelier Intelligence KPIs: Responsive 2x2 Grid on Mobile, 4 Columns on Desktop */}
+            <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} sx={{ mb: { xs: 2.5, sm: 3.5 } }}>
+                <Grid item xs={6} sm={6} md={3}>
                     <AtelierKpiCard
                         title="Net Gross Profit"
                         value={`₹${totalProfit.toLocaleString('en-IN')}`}
@@ -490,7 +490,7 @@ const AdvancedReports = () => {
                         }}
                     />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={6} sm={6} md={3}>
                     <AtelierKpiCard
                         title="Avg Order Value (AOV)"
                         value={`₹${avgAOV.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
@@ -499,7 +499,7 @@ const AdvancedReports = () => {
                         color="primary"
                     />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={6} sm={6} md={3}>
                     <AtelierKpiCard
                         title="Top Performing Category"
                         value={profitData[0]?.category || 'N/A'}
@@ -508,7 +508,7 @@ const AdvancedReports = () => {
                         color="warning"
                     />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={6} sm={6} md={3}>
                     <AtelierKpiCard
                         title="At-Risk Clients"
                         value={atRiskCount}
