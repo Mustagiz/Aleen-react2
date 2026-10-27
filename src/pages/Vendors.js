@@ -168,10 +168,10 @@ const Vendors = () => {
                         startIcon={<Add sx={{ fontSize: 19, color: '#FFFFFF !important' }} />} 
                         onClick={() => handleOpen()} 
                         sx={{
-                            height: 42,
-                            minHeight: 42,
-                            px: 3,
-                            borderRadius: '24px',
+                            height: 40,
+                            minHeight: 40,
+                            px: 2.75,
+                            borderRadius: '10px',
                             textTransform: 'none',
                             fontWeight: 700,
                             fontSize: '0.84rem',
@@ -316,8 +316,17 @@ const Vendors = () => {
             {/* Vendors Table with Aligned Columns */}
             <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
                 <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-                    <Table sx={{ minWidth: 680 }}>
-                        <TableHead sx={{ bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(15, 118, 110, 0.04)' }}>
+                    <Table sx={{ minWidth: 680 }} stickyHeader>
+                        <TableHead sx={{
+                            position: 'sticky',
+                            top: 0,
+                            zIndex: 2,
+                            '& th': {
+                                backdropFilter: 'blur(10px)',
+                                bgcolor: theme.palette.mode === 'dark' ? 'rgba(16, 32, 32, 0.92)' : 'rgba(255, 255, 255, 0.92)',
+                                borderBottom: theme.palette.mode === 'dark' ? '1.5px solid rgba(255, 255, 255, 0.1)' : '1.5px solid rgba(15, 118, 110, 0.15)'
+                            }
+                        }}>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
                                     Vendor / Supplier
@@ -573,7 +582,7 @@ const Vendors = () => {
                 fullScreen={isMobile}
                 PaperProps={{ 
                     sx: { 
-                        borderRadius: isMobile ? 0 : 3.5,
+                        borderRadius: isMobile ? 0 : '16px',
                         overflow: 'hidden',
                         boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
                     } 

@@ -837,10 +837,10 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                             startIcon={<Download sx={{ fontSize: 19, color: '#0F766E' }} />}
                             onClick={downloadPurchases}
                             sx={{
-                                height: 42,
-                                minHeight: 42,
-                                px: 2.75,
-                                borderRadius: '24px',
+                                height: 40,
+                                minHeight: 40,
+                                px: 2.25,
+                                borderRadius: '10px',
                                 border: '1.5px solid #0F766E',
                                 color: '#0F766E',
                                 bgcolor: 'background.paper',
@@ -866,10 +866,10 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                             startIcon={<Add sx={{ fontSize: 19, color: '#FFFFFF !important' }} />} 
                             onClick={() => handleOpen()} 
                             sx={{
-                                height: 42,
-                                minHeight: 42,
-                                px: 3,
-                                borderRadius: '24px',
+                                height: 40,
+                                minHeight: 40,
+                                px: 2.75,
+                                borderRadius: '10px',
                                 textTransform: 'none',
                                 fontWeight: 700,
                                 fontSize: '0.84rem',
