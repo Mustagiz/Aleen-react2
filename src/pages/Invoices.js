@@ -2396,64 +2396,92 @@ const Invoices = () => {
         <DialogTitle sx={{
           background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
           color: 'white',
-          p: { xs: 2, sm: 2.5 },
+          px: { xs: 1.75, sm: 2.5 },
+          py: { xs: 1.25, sm: 1.75 },
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          gap: 1.5,
           borderBottom: '1px solid rgba(217, 119, 6, 0.2)'
         }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          {/* Left: Avatar + Title + Badges */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.25, sm: 1.5 }, minWidth: 0, flex: 1 }}>
             <Avatar sx={{
               bgcolor: 'rgba(255, 255, 255, 0.15)',
               color: '#FBBF24',
-              width: 42,
-              height: 42,
+              width: { xs: 34, sm: 42 },
+              height: { xs: 34, sm: 42 },
+              flexShrink: 0,
               border: '1px solid rgba(251, 191, 36, 0.45)',
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
             }}>
-              <PointOfSale sx={{ fontSize: 22 }} />
+              <PointOfSale sx={{ fontSize: { xs: 18, sm: 22 } }} />
             </Avatar>
-            <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography sx={{ fontWeight: 800, fontSize: { xs: '1.05rem', sm: '1.25rem' }, letterSpacing: '-0.01em', color: '#FFFFFF' }}>
+            <Box sx={{ minWidth: 0, flex: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap' }}>
+                <Typography sx={{ 
+                  fontWeight: 800, 
+                  fontSize: { xs: '0.94rem', sm: '1.2rem' }, 
+                  letterSpacing: '-0.01em', 
+                  color: '#FFFFFF',
+                  lineHeight: 1.2,
+                  whiteSpace: 'nowrap'
+                }}>
                   Create Retail Invoice
                 </Typography>
                 <Chip
-                  label="POS Checkout"
+                  label={isMobile ? "POS" : "POS Checkout"}
                   size="small"
                   sx={{
-                    height: 20,
-                    fontSize: '0.68rem',
+                    height: { xs: 18, sm: 20 },
+                    fontSize: { xs: '0.62rem', sm: '0.68rem' },
                     fontWeight: 800,
                     bgcolor: 'rgba(217, 119, 6, 0.25)',
                     color: '#FBBF24',
-                    border: '1px solid rgba(251, 191, 36, 0.4)'
+                    border: '1px solid rgba(251, 191, 36, 0.4)',
+                    px: { xs: 0.25, sm: 0.5 }
                   }}
                 />
               </Box>
-              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)', display: 'block' }}>
+              <Typography 
+                variant="caption" 
+                noWrap
+                sx={{ 
+                  color: 'rgba(255, 255, 255, 0.7)', 
+                  display: 'block', 
+                  fontSize: { xs: '0.68rem', sm: '0.75rem' },
+                  mt: 0.25,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
+              >
                 Aleen Clothing Luxury Billing & Client Ledger
               </Typography>
             </Box>
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+
+          {/* Right: Park Cart Action & Close Icon */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.75, sm: 1 }, flexShrink: 0 }}>
             <Button
               size="small"
               variant="outlined"
               onClick={handleParkCart}
-              startIcon={<PauseCircleOutline sx={{ fontSize: 17 }} />}
+              startIcon={<PauseCircleOutline sx={{ fontSize: { xs: 15, sm: 17 } }} />}
               sx={{
                 color: '#FEF3C7',
                 borderColor: 'rgba(254, 243, 199, 0.35)',
                 bgcolor: 'rgba(255, 255, 255, 0.08)',
                 backdropFilter: 'blur(4px)',
                 borderRadius: '8px',
-                px: 1.8,
-                py: 0.55,
+                height: { xs: 32, sm: 36 },
+                minHeight: { xs: 32, sm: 36 },
+                px: { xs: 1.2, sm: 1.8 },
+                py: 0,
                 textTransform: 'none',
                 fontWeight: 700,
-                fontSize: '0.8rem',
+                fontSize: { xs: '0.74rem', sm: '0.8rem' },
                 letterSpacing: '0.02em',
+                whiteSpace: 'nowrap',
                 transition: 'all 0.2s ease',
                 '&:hover': {
                   bgcolor: 'rgba(255, 255, 255, 0.16)',
@@ -2462,10 +2490,20 @@ const Invoices = () => {
                 }
               }}
             >
-              Park Cart
+              <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Park Cart</Box>
+              <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Park</Box>
             </Button>
-            <IconButton onClick={() => setOpen(false)} sx={{ color: 'rgba(255, 255, 255, 0.8)', '&:hover': { color: '#ffffff', bgcolor: 'rgba(255, 255, 255, 0.1)' } }}>
-              <Close />
+            <IconButton 
+              onClick={() => setOpen(false)} 
+              size="small"
+              sx={{ 
+                color: 'rgba(255, 255, 255, 0.8)', 
+                width: { xs: 32, sm: 36 },
+                height: { xs: 32, sm: 36 },
+                '&:hover': { color: '#ffffff', bgcolor: 'rgba(255, 255, 255, 0.1)' } 
+              }}
+            >
+              <Close sx={{ fontSize: { xs: 18, sm: 20 } }} />
             </IconButton>
           </Box>
         </DialogTitle>
