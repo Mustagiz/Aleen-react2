@@ -55,7 +55,8 @@ import {
   ColorLens,
   CloudUpload,
   Draw,
-  AutoAwesome
+  AutoAwesome,
+  QrCode2
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -100,6 +101,7 @@ export default function Settings() {
     
     // Bank & Settlement (reflected on invoices)
     showBankDetails: profile.showBankDetails ?? true,
+    leftBoxMode: profile.leftBoxMode || 'luxury-composite',
     bankDetails: {
       bankName: profile.bankDetails?.bankName || 'HDFC Bank Ltd',
       accountHolder: profile.bankDetails?.accountHolder || 'Aleen Clothing',
@@ -232,6 +234,7 @@ export default function Settings() {
       const cleanUpi = (formProfile.bankDetails?.upiId || '').trim();
       const updatedProfilePayload = {
         ...formProfile,
+        leftBoxMode: formProfile.leftBoxMode || 'luxury-composite',
         upiId: cleanUpi,
         bankDetails: {
           ...formProfile.bankDetails,
@@ -244,6 +247,7 @@ export default function Settings() {
       const currentStored = getStoredInvoiceSettings();
       const updatedInvoiceSettings = {
         ...currentStored,
+        leftBoxMode: formProfile.leftBoxMode || 'luxury-composite',
         template: formProfile.defaultTemplate || currentStored.template,
         tagline: formProfile.tagline,
         logoUrl: formProfile.logoUrl,
@@ -992,6 +996,28 @@ export default function Settings() {
                     helperText="Printed with payment instructions for customer online transfers."
                   />
                 </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    select
+                    fullWidth
+                    size="small"
+                    label="Invoice Settlement Card Display"
+                    value={formProfile.leftBoxMode || 'luxury-composite'}
+                    onChange={(e) => setFormProfile({
+                      ...formProfile,
+                      leftBoxMode: e.target.value
+                    })}
+                    helperText="Replaces plain bank numbers with luxury atelier cards or instant UPI QR."
+                  >
+                    <MenuItem value="luxury-composite">⚜️ Luxury Composite (UPI QR + Loyalty + Care + Concierge) [Recommended]</MenuItem>
+                    <MenuItem value="upi-qr">⚡ Dedicated Scan-to-Pay UPI QR Code</MenuItem>
+                    <MenuItem value="loyalty-privileges">👑 Patron Loyalty & Atelier Privileges</MenuItem>
+                    <MenuItem value="garment-care">✂️ Bespoke Garment Care & Alteration Promise</MenuItem>
+                    <MenuItem value="concierge">💬 VIP Social & Concierge Connect</MenuItem>
+                    <MenuItem value="banking">🏛️ Traditional Bank Transfer (A/C, IFSC & VPA)</MenuItem>
+                    <MenuItem value="none">🚫 Hidden / Blank</MenuItem>
+                  </TextField>
+                </Grid>
               </Grid>
 
               <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
@@ -1007,7 +1033,7 @@ export default function Settings() {
                     color: '#FFFFFF'
                   }}
                 >
-                  Save Bank Details
+                  Save Settlement Settings
                 </Button>
               </Box>
             </Paper>
@@ -1026,40 +1052,96 @@ export default function Settings() {
               }}
             >
               <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E', textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', mb: 1.5 }}>
-                🏛️ Invoice Settlement Box Preview
+                🏛️ Invoice Settlement Box Live Preview
               </Typography>
               <Box
                 sx={{
-                  p: 2.5,
+                  p: 2,
                   borderRadius: 2,
-                  bgcolor: '#F8FAFC',
-                  border: '1px solid #E2E8F0'
+                  bgcolor: 'rgba(15, 118, 110, 0.03)',
+                  border: '1.5px solid rgba(15, 118, 110, 0.2)'
                 }}
               >
-                <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E', textTransform: 'uppercase', display: 'block', mb: 1 }}>
-                  Settlement & Electronic Transfer Details:
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.6, fontSize: '0.8rem' }}>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    Bank: <b>{formProfile.bankDetails.bankName || 'HDFC Bank Ltd'}</b>
+                {(formProfile.leftBoxMode === 'luxury-composite' || !formProfile.leftBoxMode) && (
+                  <Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 0.8, mb: 1, borderBottom: '1px dashed rgba(15, 118, 110, 0.2)' }}>
+                      <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E', textTransform: 'uppercase', fontSize: '0.7rem' }}>
+                        ⚜️ Atelier Privileges & Quick Pay
+                      </Typography>
+                      <Chip label="✦ VIP Patron" size="small" sx={{ bgcolor: 'rgba(194, 141, 75, 0.12)', color: '#B45309', fontWeight: 800, fontSize: '0.62rem' }} />
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+                      <Box sx={{ p: 0.5, bgcolor: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 1.5, textAlign: 'center' }}>
+                        <QrCode2 sx={{ fontSize: 44, color: '#0F766E' }} />
+                        <Typography variant="caption" sx={{ display: 'block', fontSize: '0.55rem', fontWeight: 800, color: '#0F766E' }}>Scan to Pay</Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.4, fontSize: '0.72rem' }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>🎁 <b>Loyalty Club:</b> Reward points accrued</Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>✂️ <b>Tailoring:</b> 30-Day complimentary alterations</Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>✨ <b>Care:</b> Dry Clean Only • Hand-Finished</Typography>
+                        <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 800 }}>UPI VPA: {formProfile.bankDetails.upiId || 'aleenclothing@hdfcbank'}</Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                )}
+
+                {formProfile.leftBoxMode === 'upi-qr' && (
+                  <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+                    <Box sx={{ p: 0.5, bgcolor: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 1.5, textAlign: 'center' }}>
+                      <QrCode2 sx={{ fontSize: 52, color: '#0F766E' }} />
+                    </Box>
+                    <Box>
+                      <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E', display: 'block' }}>⚡ Scan & Pay via UPI</Typography>
+                      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>UPI ID: <b>{formProfile.bankDetails.upiId || 'aleenclothing@hdfcbank'}</b></Typography>
+                      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>GPay, PhonePe, Paytm, Cred</Typography>
+                    </Box>
+                  </Box>
+                )}
+
+                {formProfile.leftBoxMode === 'banking' && (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, fontSize: '0.75rem' }}>
+                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E' }}>Bank Details:</Typography>
+                    <Typography variant="caption">Bank: <b>{formProfile.bankDetails.bankName || 'HDFC Bank Ltd'}</b></Typography>
+                    <Typography variant="caption">A/C: <b>{formProfile.bankDetails.accountNumber || '50200088992211'}</b></Typography>
+                    <Typography variant="caption">IFSC: <b>{formProfile.bankDetails.ifsc || 'HDFC0001234'}</b></Typography>
+                    <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 800 }}>UPI: {formProfile.bankDetails.upiId || 'aleenclothing@hdfcbank'}</Typography>
+                  </Box>
+                )}
+
+                {formProfile.leftBoxMode === 'loyalty-privileges' && (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E' }}>👑 Atelier Patron Privileges</Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>🎁 VIP reward accruals on every purchase</Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>✂️ 30-Day complimentary fitting guarantee</Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>✦ Priority access to bespoke seasonal previews</Typography>
+                  </Box>
+                )}
+
+                {formProfile.leftBoxMode === 'garment-care' && (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E' }}>✂️ Bespoke Care & Alterations</Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>✨ Dry clean only with specialized fabric preservation</Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>✂️ Complimentary tailoring adjustments within 30 days</Typography>
+                  </Box>
+                )}
+
+                {formProfile.leftBoxMode === 'concierge' && (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E' }}>💬 VIP Social & Concierge</Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>📱 WhatsApp VIP styling concierge</Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>📸 Instagram: @aleenclothing</Typography>
+                  </Box>
+                )}
+
+                {formProfile.leftBoxMode === 'none' && (
+                  <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                    Card hidden. Box will not print on invoices.
                   </Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    A/C Name: <b>{formProfile.bankDetails.accountHolder || formProfile.businessName}</b>
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    A/C No: <b>{formProfile.bankDetails.accountNumber || '50200088992211'}</b>
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    IFSC: <b>{formProfile.bankDetails.ifsc || 'HDFC0001234'}</b>
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 800 }}>
-                    UPI VPA: {formProfile.bankDetails.upiId || 'aleenclothing@hdfcbank'}
-                  </Typography>
-                </Box>
+                )}
               </Box>
               <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1.5, fontSize: '0.72rem' }}>
                 {formProfile.showBankDetails
-                  ? '✓ This box will print on all A4 tax invoices automatically.'
+                  ? '✓ This card will print automatically on all A4 customer invoices.'
                   : '⚠️ Currently disabled. Check "Print on Invoices" above to enable.'}
               </Typography>
             </Paper>

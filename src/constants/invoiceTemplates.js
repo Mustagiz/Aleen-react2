@@ -97,6 +97,7 @@ export const DEFAULT_INVOICE_SETTINGS = {
   watermarkText: 'ALEEN CLOTHING',
   tagline: 'Haute Couture & Bespoke Craftsmanship',
   showBankDetails: true,
+  leftBoxMode: 'luxury-composite', // 'luxury-composite' | 'upi-qr' | 'loyalty-privileges' | 'garment-care' | 'concierge' | 'banking' | 'none'
   bankDetails: {
     bankName: 'HDFC Bank Ltd',
     accountNumber: '50200088992211',

@@ -14,6 +14,7 @@ import {
   Switch,
   FormControlLabel,
   TextField,
+  MenuItem,
   Divider,
   Chip,
   Tabs,
@@ -488,6 +489,25 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
 
                 {localSettings.showBankDetails && (
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+                    <TextField
+                      select
+                      label="Settlement Card Display"
+                      size="small"
+                      value={localSettings.leftBoxMode || 'luxury-composite'}
+                      onChange={(e) => setLocalSettings({
+                        ...localSettings,
+                        leftBoxMode: e.target.value
+                      })}
+                      helperText="Choose what appears in place of raw bank numbers on invoices"
+                    >
+                      <MenuItem value="luxury-composite">⚜️ Luxury Composite (UPI QR + Loyalty + Care + Concierge)</MenuItem>
+                      <MenuItem value="upi-qr">⚡ Dedicated Scan-to-Pay UPI QR Code</MenuItem>
+                      <MenuItem value="loyalty-privileges">👑 Patron Loyalty & Atelier Privileges</MenuItem>
+                      <MenuItem value="garment-care">✂️ Bespoke Garment Care & Alterations</MenuItem>
+                      <MenuItem value="concierge">💬 VIP Social & Concierge Connect</MenuItem>
+                      <MenuItem value="banking">🏛️ Traditional Bank Transfer Details (A/C & IFSC)</MenuItem>
+                      <MenuItem value="none">🚫 Hidden / Blank</MenuItem>
+                    </TextField>
                     <TextField
                       label="Bank Name & Branch"
                       size="small"

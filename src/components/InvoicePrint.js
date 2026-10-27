@@ -14,6 +14,7 @@ import { useData } from '../contexts/DataContext';
 import { getStoredInvoiceSettings } from '../constants/invoiceTemplates';
 import { numberToWordsRupees } from '../models/documentModel';
 import WaxSealStamp from './common/WaxSealStamp';
+import { generateUpiPaymentUrl } from '../engine/billingEngine';
 
 const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profileProp }, ref) => {
   const dataCtx = useData() || {};
@@ -137,6 +138,28 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
 
   const theme = getThemeStyles();
   const isSlip = activeTemplate === 'boutique-slip';
+
+  const storeVpa =
+    profile?.bankDetails?.upiId ||
+    profile?.upiId ||
+    profile?.upiVpa ||
+    activeSettings?.bankDetails?.upiId ||
+    activeSettings?.upiId ||
+    'aleenclothing@hdfcbank';
+
+  const upiPayableAmount = Number(invoice?.balanceDue > 0 ? invoice.balanceDue : (invoice?.total || 0));
+  const upiUrl = generateUpiPaymentUrl({
+    vpa: storeVpa,
+    payeeName: profile?.businessName || 'Aleen Clothing',
+    amount: upiPayableAmount,
+    invoiceNumber: invoice?.invoiceNumber || invoice?.id || ''
+  });
+
+  const qrImageUrl = upiUrl
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=6&data=${encodeURIComponent(upiUrl)}`
+    : '';
+
+  const leftBoxMode = activeSettings?.leftBoxMode || profile?.leftBoxMode || 'luxury-composite';
 
   if (!invoice) return null;
 
@@ -488,41 +511,220 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
         pageBreakInside: 'avoid',
         breakInside: 'avoid'
       }}>
-        {/* Left: Bank / UPI Details */}
+        {/* Left: Atelier Privileges / Dynamic UPI QR / Settlement Box */}
         <Box sx={{ flex: 1, width: isSlip ? '100%' : '52%' }}>
-          {(profile.showBankDetails ?? activeSettings.showBankDetails) && !isSlip ? (
+          {(profile.showBankDetails ?? activeSettings.showBankDetails ?? true) && !isSlip && leftBoxMode !== 'none' ? (
             <Box
               sx={{
-                p: 2,
-                borderRadius: 2,
-                bgcolor: 'rgba(0,0,0,0.02)',
-                border: '1px solid',
-                borderColor: 'divider',
+                p: 1.8,
+                borderRadius: 2.5,
+                bgcolor: 'rgba(15, 118, 110, 0.025)',
+                border: `1.5px solid ${theme.primaryColor || '#0A4D46'}25`,
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                boxSizing: 'border-box'
               }}
             >
-              <Box>
-                <Typography variant="caption" sx={{ fontWeight: 800, color: theme.primaryColor, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                  🏛️ Settlement & Electronic Transfer Details:
-                </Typography>
-                <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 0.4 }}>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    Bank: <b>{profile.bankDetails?.bankName || activeSettings.bankDetails?.bankName}</b>
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    A/C No: <b>{profile.bankDetails?.accountNumber || activeSettings.bankDetails?.accountNumber}</b>
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    IFSC Code: <b>{profile.bankDetails?.ifsc || activeSettings.bankDetails?.ifsc}</b>
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    UPI VPA: <b style={{ color: theme.primaryColor }}>{profile.bankDetails?.upiId || activeSettings.bankDetails?.upiId}</b>
-                  </Typography>
+              {leftBoxMode === 'luxury-composite' && (
+                <Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1, pb: 0.6, borderBottom: `1px dashed ${theme.primaryColor || '#0A4D46'}30` }}>
+                    <Typography variant="caption" sx={{ fontWeight: 800, color: theme.primaryColor, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: '0.68rem', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <span>⚜️</span> Atelier Privileges & Quick Pay
+                    </Typography>
+                    <Box
+                      sx={{
+                        px: 0.9,
+                        py: 0.15,
+                        borderRadius: 1,
+                        bgcolor: 'rgba(194, 141, 75, 0.12)',
+                        border: '1px solid rgba(194, 141, 75, 0.35)',
+                        color: '#B45309',
+                        fontWeight: 800,
+                        fontSize: '0.62rem',
+                        letterSpacing: 0.4,
+                        textTransform: 'uppercase'
+                      }}
+                    >
+                      ✦ VIP Patron
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+                    {qrImageUrl && (
+                      <Box sx={{ textAlign: 'center', minWidth: 70 }}>
+                        <Box
+                          component="img"
+                          src={qrImageUrl}
+                          alt="UPI QR"
+                          sx={{
+                            width: 66,
+                            height: 66,
+                            display: 'block',
+                            borderRadius: 1.2,
+                            border: '1.5px solid rgba(0,0,0,0.1)',
+                            p: 0.3,
+                            bgcolor: '#FFFFFF',
+                            boxShadow: '0 2px 5px rgba(0,0,0,0.06)'
+                          }}
+                        />
+                        <Typography variant="caption" sx={{ display: 'block', fontSize: '0.58rem', fontWeight: 800, color: theme.primaryColor, mt: 0.3, lineHeight: 1.1 }}>
+                          ⚡ Scan to Pay
+                        </Typography>
+                      </Box>
+                    )}
+
+                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0.35 }}>
+                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', lineHeight: 1.3 }}>
+                        <b style={{ color: '#D97706' }}>🎁 Loyalty Club:</b> +{Math.max(1, Math.floor(Number(invoice.total || 0) / 100))} reward pts accrued
+                      </Typography>
+
+                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', lineHeight: 1.3 }}>
+                        <b style={{ color: '#0F766E' }}>✂️ Tailoring:</b> 30-Day complimentary alterations
+                      </Typography>
+
+                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', lineHeight: 1.3 }}>
+                        <b style={{ color: '#4B5563' }}>✨ Garment Care:</b> Dry Clean Only • Hand-Finished
+                      </Typography>
+
+                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', lineHeight: 1.3 }}>
+                        <b style={{ color: '#0F766E' }}>💬 Concierge:</b> WhatsApp & IG: <b>@aleenclothing</b>
+                      </Typography>
+
+                      {storeVpa && (
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.64rem', mt: 0.2 }}>
+                          UPI VPA: <b style={{ color: theme.primaryColor }}>{storeVpa}</b>
+                        </Typography>
+                      )}
+                    </Box>
+                  </Box>
                 </Box>
-              </Box>
+              )}
+
+              {leftBoxMode === 'upi-qr' && (
+                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                  {qrImageUrl && (
+                    <Box sx={{ textAlign: 'center' }}>
+                      <Box
+                        component="img"
+                        src={qrImageUrl}
+                        alt="UPI QR"
+                        sx={{
+                          width: 80,
+                          height: 80,
+                          display: 'block',
+                          borderRadius: 1.5,
+                          border: '1.5px solid rgba(0,0,0,0.1)',
+                          p: 0.4,
+                          bgcolor: '#FFFFFF',
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.06)'
+                        }}
+                      />
+                    </Box>
+                  )}
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 800, color: theme.primaryColor, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: '0.72rem', display: 'block', mb: 0.5 }}>
+                      ⚡ Instant Scan & Pay via UPI
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', fontSize: '0.7rem' }}>
+                      UPI ID: <b style={{ color: theme.primaryColor }}>{storeVpa}</b>
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', fontSize: '0.68rem', mt: 0.3 }}>
+                      Payee: <b>{profile?.businessName || 'Aleen Clothing'}</b>
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', fontSize: '0.62rem', mt: 0.5, opacity: 0.85 }}>
+                      Supports Google Pay, PhonePe, Paytm, BHIM & all UPI apps
+                    </Typography>
+                  </Box>
+                </Box>
+              )}
+
+              {leftBoxMode === 'loyalty-privileges' && (
+                <Box>
+                  <Typography variant="caption" sx={{ fontWeight: 800, color: theme.primaryColor, textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', mb: 1 }}>
+                    👑 Atelier Patron Privileges & Rewards
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem' }}>
+                      🎁 <b>Loyalty Accrual:</b> +{Math.max(1, Math.floor(Number(invoice.total || 0) / 100))} points earned on this invoice
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem' }}>
+                      ✂️ <b>Fitting Guarantee:</b> 30-Day complimentary alterations & adjustments
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem' }}>
+                      ✦ <b>VIP Concierge:</b> Priority designer preview & bespoke bookings
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.66rem', mt: 0.5 }}>
+                      UPI VPA: <b style={{ color: theme.primaryColor }}>{storeVpa}</b>
+                    </Typography>
+                  </Box>
+                </Box>
+              )}
+
+              {leftBoxMode === 'garment-care' && (
+                <Box>
+                  <Typography variant="caption" sx={{ fontWeight: 800, color: theme.primaryColor, textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', mb: 1 }}>
+                    ✂️ Bespoke Tailoring & Garment Care
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem' }}>
+                      ✨ <b>Fabric Care:</b> Professional dry clean only to preserve delicate zari and embroidery.
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem' }}>
+                      ✂️ <b>Bespoke Alterations:</b> Complimentary sizing adjustments within 30 days of delivery.
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem' }}>
+                      🏷️ <b>Exchanges:</b> Unworn garments with intact tag exchangeable within 7 days.
+                    </Typography>
+                  </Box>
+                </Box>
+              )}
+
+              {leftBoxMode === 'concierge' && (
+                <Box>
+                  <Typography variant="caption" sx={{ fontWeight: 800, color: theme.primaryColor, textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', mb: 1 }}>
+                    💬 VIP Social & Concierge Connect
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem' }}>
+                      📱 <b>WhatsApp VIP:</b> {profile?.phone || '+91 98765 43210'}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem' }}>
+                      📸 <b>Instagram:</b> @aleenclothing (Tag us in your couture stories!)
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem' }}>
+                      📍 <b>Atelier Studio:</b> {profile?.address || 'Baba Jaan Chawk, Pune, Maharashtra'}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.66rem', mt: 0.3 }}>
+                      UPI ID: <b style={{ color: theme.primaryColor }}>{storeVpa}</b>
+                    </Typography>
+                  </Box>
+                </Box>
+              )}
+
+              {leftBoxMode === 'banking' && (
+                <Box>
+                  <Typography variant="caption" sx={{ fontWeight: 800, color: theme.primaryColor, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    🏛️ Settlement & Electronic Transfer Details:
+                  </Typography>
+                  <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 0.4 }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                      Bank: <b>{profile.bankDetails?.bankName || activeSettings.bankDetails?.bankName || 'HDFC Bank Ltd'}</b>
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                      A/C No: <b>{profile.bankDetails?.accountNumber || activeSettings.bankDetails?.accountNumber || '50200088992211'}</b>
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                      IFSC Code: <b>{profile.bankDetails?.ifsc || activeSettings.bankDetails?.ifsc || 'HDFC0001234'}</b>
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                      UPI VPA: <b style={{ color: theme.primaryColor }}>{storeVpa}</b>
+                    </Typography>
+                  </Box>
+                </Box>
+              )}
+
               {invoice.notes && (
                 <Box sx={{ mt: 1.5, pt: 1, borderTop: '1px dashed #e2e8f0' }}>
                   <Typography variant="caption" sx={{ color: 'text.secondary', fontStyle: 'italic' }}>
