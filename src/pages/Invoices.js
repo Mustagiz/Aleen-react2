@@ -51,6 +51,8 @@ const Invoices = () => {
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [cashDrawerModalOpen, setCashDrawerModalOpen] = useState(false);
   const [upiQrModalOpen, setUpiQrModalOpen] = useState(false);
+  const [upiQrModalAmount, setUpiQrModalAmount] = useState(0);
+  const [upiQrModalLabel, setUpiQrModalLabel] = useState('');
   const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [offscreenInvoice, setOffscreenInvoice] = useState(null);
   const [clientValidationErrors, setClientValidationErrors] = useState({ customer: false, phone: false });
@@ -3414,7 +3416,11 @@ const Invoices = () => {
                           variant="contained"
                           size="small"
                           startIcon={<QrCode2 />}
-                          onClick={() => setUpiQrModalOpen(true)}
+                          onClick={() => {
+                            setUpiQrModalAmount(total);
+                            setUpiQrModalLabel('Full Invoice Payment');
+                            setUpiQrModalOpen(true);
+                          }}
                           sx={{
                             py: 0.9,
                             fontWeight: 800,
@@ -3493,44 +3499,94 @@ const Invoices = () => {
                       </Box>
                     </Box>
 
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                      <TextField select label="Primary Method" value={paymentMethod} onChange={(e) => {
-                        setPaymentMethod(e.target.value);
-                        if (e.target.value === 'Credit') setPaymentStatus('partial');
-                      }} fullWidth size="small">
-                        <MenuItem value="Cash">💵 Cash</MenuItem>
-                        <MenuItem value="Card">💳 Card POS</MenuItem>
-                        <MenuItem value="UPI">⚡ UPI QR</MenuItem>
-                        <MenuItem value="Credit">📋 Credit / Khata</MenuItem>
-                      </TextField>
-                      <TextField
-                        label="Tender 1 Amount (₹)"
-                        type="number"
-                        value={splitAmount}
-                        onChange={(e) => setSplitAmount(parseFloat(e.target.value) || 0)}
-                        fullWidth
-                        size="small"
-                      />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <TextField select label="Primary Method" value={paymentMethod} onChange={(e) => {
+                          setPaymentMethod(e.target.value);
+                          if (e.target.value === 'Credit') setPaymentStatus('partial');
+                        }} fullWidth size="small">
+                          <MenuItem value="Cash">💵 Cash</MenuItem>
+                          <MenuItem value="Card">💳 Card POS</MenuItem>
+                          <MenuItem value="UPI">⚡ UPI QR</MenuItem>
+                          <MenuItem value="Credit">📋 Credit / Khata</MenuItem>
+                        </TextField>
+                        <TextField
+                          label="Tender 1 Amount (₹)"
+                          type="number"
+                          value={splitAmount}
+                          onChange={(e) => setSplitAmount(parseFloat(e.target.value) || 0)}
+                          fullWidth
+                          size="small"
+                        />
+                      </Box>
+                      {paymentMethod === 'UPI' && (
+                        <Button
+                          variant="contained"
+                          size="small"
+                          startIcon={<QrCode2 />}
+                          onClick={() => {
+                            const amt = Number(splitAmount) || 0;
+                            setUpiQrModalAmount(amt > 0 ? amt : total);
+                            setUpiQrModalLabel('Split Tender 1 (UPI)');
+                            setUpiQrModalOpen(true);
+                          }}
+                          sx={{
+                            py: 0.8,
+                            fontWeight: 800,
+                            background: 'linear-gradient(135deg, #C28D4B 0%, #B45309 100%)',
+                            color: '#FFFFFF',
+                            boxShadow: '0 4px 12px rgba(194, 141, 75, 0.35)',
+                            '&:hover': { background: 'linear-gradient(135deg, #B45309 0%, #78350F 100%)' }
+                          }}
+                        >
+                          ⚡ Receive Tender 1 via UPI QR (₹{Number(splitAmount || 0).toFixed(2)})
+                        </Button>
+                      )}
                     </Box>
 
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                      <TextField select label="Secondary Method" value={paymentMethod2} onChange={(e) => {
-                        setPaymentMethod2(e.target.value);
-                        if (e.target.value === 'Credit') setPaymentStatus('partial');
-                      }} fullWidth size="small">
-                        <MenuItem value="Cash">💵 Cash</MenuItem>
-                        <MenuItem value="Card">💳 Card POS</MenuItem>
-                        <MenuItem value="UPI">⚡ UPI QR</MenuItem>
-                        <MenuItem value="Credit">📋 Credit / Khata</MenuItem>
-                      </TextField>
-                      <TextField
-                        label="Tender 2 Balance (₹)"
-                        value={Math.max(0, total - (Number(splitAmount) || 0)).toFixed(2)}
-                        disabled
-                        fullWidth
-                        size="small"
-                        helperText="Calculated remainder"
-                      />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <TextField select label="Secondary Method" value={paymentMethod2} onChange={(e) => {
+                          setPaymentMethod2(e.target.value);
+                          if (e.target.value === 'Credit') setPaymentStatus('partial');
+                        }} fullWidth size="small">
+                          <MenuItem value="Cash">💵 Cash</MenuItem>
+                          <MenuItem value="Card">💳 Card POS</MenuItem>
+                          <MenuItem value="UPI">⚡ UPI QR</MenuItem>
+                          <MenuItem value="Credit">📋 Credit / Khata</MenuItem>
+                        </TextField>
+                        <TextField
+                          label="Tender 2 Balance (₹)"
+                          value={Math.max(0, total - (Number(splitAmount) || 0)).toFixed(2)}
+                          disabled
+                          fullWidth
+                          size="small"
+                          helperText="Calculated remainder"
+                        />
+                      </Box>
+                      {paymentMethod2 === 'UPI' && (
+                        <Button
+                          variant="contained"
+                          size="small"
+                          startIcon={<QrCode2 />}
+                          onClick={() => {
+                            const amt = Math.max(0, total - (Number(splitAmount) || 0));
+                            setUpiQrModalAmount(amt);
+                            setUpiQrModalLabel('Split Tender 2 (UPI)');
+                            setUpiQrModalOpen(true);
+                          }}
+                          sx={{
+                            py: 0.8,
+                            fontWeight: 800,
+                            background: 'linear-gradient(135deg, #0A4D46 0%, #0F766E 100%)',
+                            color: '#FFFFFF',
+                            boxShadow: '0 4px 12px rgba(10, 77, 70, 0.3)',
+                            '&:hover': { background: 'linear-gradient(135deg, #042F2E 0%, #0A4D46 100%)' }
+                          }}
+                        >
+                          ⚡ Receive Tender 2 via UPI QR (₹{Math.max(0, total - (Number(splitAmount) || 0)).toFixed(2)})
+                        </Button>
+                      )}
                     </Box>
                   </Box>
                 )}
@@ -4213,12 +4269,19 @@ const Invoices = () => {
       <UpiPaymentQrModal
         open={upiQrModalOpen}
         onClose={() => setUpiQrModalOpen(false)}
-        amount={total}
+        amount={upiQrModalAmount > 0 ? upiQrModalAmount : total}
+        tenderLabel={upiQrModalLabel}
         invoiceNumber={generateInvoiceNumber(invoices?.length || 0)}
         profile={profile}
         onPaymentConfirmed={() => {
-          setPaymentStatus('paid');
-          setReceivedAmount(total);
+          if (!isSplitPayment) {
+            setPaymentStatus('paid');
+            setReceivedAmount(total);
+          } else {
+            if (paymentMethod !== 'Credit' && paymentMethod2 !== 'Credit') {
+              setPaymentStatus('paid');
+            }
+          }
         }}
       />
 

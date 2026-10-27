@@ -34,6 +34,7 @@ export default function UpiPaymentQrModal({
   onClose,
   amount = 0,
   invoiceNumber = '',
+  tenderLabel = '',
   profile = {},
   onPaymentConfirmed
 }) {
@@ -131,13 +132,22 @@ export default function UpiPaymentQrModal({
               ₹{Number(amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </Typography>
           </Box>
-          {invoiceNumber && (
-            <Chip
-              label={`Invoice #${invoiceNumber}`}
-              size="small"
-              sx={{ mt: 1, bgcolor: 'rgba(15, 118, 110, 0.08)', color: 'primary.main', fontWeight: 700, fontSize: '0.72rem' }}
-            />
-          )}
+          <Box sx={{ display: 'flex', gap: 0.8, justifyContent: 'center', flexWrap: 'wrap', mt: 1 }}>
+            {invoiceNumber && (
+              <Chip
+                label={`Invoice #${invoiceNumber}`}
+                size="small"
+                sx={{ bgcolor: 'rgba(15, 118, 110, 0.08)', color: 'primary.main', fontWeight: 700, fontSize: '0.72rem' }}
+              />
+            )}
+            {tenderLabel && (
+              <Chip
+                label={tenderLabel}
+                size="small"
+                sx={{ bgcolor: 'rgba(217, 119, 6, 0.12)', color: '#B45309', fontWeight: 800, fontSize: '0.72rem', border: '1px solid rgba(217, 119, 6, 0.3)' }}
+              />
+            )}
+          </Box>
         </Box>
 
         {/* QR Code Container */}
