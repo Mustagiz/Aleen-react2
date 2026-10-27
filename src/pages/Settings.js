@@ -1071,21 +1071,21 @@ export default function Settings() {
                       </Typography>
                       <Chip label="✦ VIP Patron" size="small" sx={{ bgcolor: 'rgba(194, 141, 75, 0.12)', color: '#B45309', fontWeight: 800, fontSize: '0.62rem' }} />
                     </Box>
-                    <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
-                      <Box sx={{ p: 0.5, bgcolor: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 1.5, textAlign: 'center' }}>
-                        <QrCode2 sx={{ fontSize: 40, color: '#0F766E' }} />
+                    <Box sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', py: 0.75, mb: 1, bgcolor: '#FFFFFF', borderRadius: 1.5, border: '1px solid #E2E8F0' }}>
+                      <Box sx={{ textAlign: 'center' }}>
+                        <QrCode2 sx={{ fontSize: 48, color: '#0F766E' }} />
                         <Typography variant="caption" sx={{ display: 'block', fontSize: '0.55rem', fontWeight: 800, color: '#0F766E' }}>Scan to Pay</Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.35, fontSize: '0.72rem', flex: 1 }}>
-                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>🎁 <b>Loyalty Club:</b> Reward points</Typography>
-                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>✂️ <b>Tailoring:</b> 30-Day alterations</Typography>
-                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>✨ <b>Care:</b> Dry Clean Only</Typography>
-                        <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 800 }}>UPI: {formProfile.bankDetails.upiId || 'aleenclothing@hdfcbank'}</Typography>
-                      </Box>
-                      <Box sx={{ p: 0.5, bgcolor: '#FFFFFF', border: '1px solid rgba(225, 48, 108, 0.25)', borderRadius: 1.5, textAlign: 'center' }}>
-                        <Box component="img" src={instagramQrImg} alt="Instagram QR" sx={{ width: 40, height: 40, objectFit: 'contain', display: 'block' }} />
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Box component="img" src={instagramQrImg} alt="Instagram QR" sx={{ width: 48, height: 48, objectFit: 'contain', display: 'block', mx: 'auto' }} />
                         <Typography variant="caption" sx={{ display: 'block', fontSize: '0.55rem', fontWeight: 800, color: '#E1306C' }}>Instagram</Typography>
                       </Box>
+                    </Box>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.3, fontSize: '0.72rem', pt: 0.5, borderTop: '1px dashed #E2E8F0' }}>
+                      <Typography variant="caption" sx={{ color: 'text.secondary' }}>🎁 <b>Loyalty Club:</b> Reward points</Typography>
+                      <Typography variant="caption" sx={{ color: 'text.secondary' }}>✂️ <b>Tailoring:</b> 30-Day alterations</Typography>
+                      <Typography variant="caption" sx={{ color: 'text.secondary' }}>✨ <b>Care:</b> Dry Clean Only</Typography>
+                      <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 800 }}>UPI: {formProfile.bankDetails.upiId || 'aleenclothing@hdfcbank'}</Typography>
                     </Box>
                   </Box>
                 )}

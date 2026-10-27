@@ -552,72 +552,75 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                     </Box>
                   </Box>
 
-                  <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+                  {/* Both Barcodes / QR Codes on TOP, MORE BIG */}
+                  <Box sx={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'flex-start', py: 0.75, mb: 1, bgcolor: 'rgba(255,255,255,0.7)', borderRadius: 2, border: '1px solid rgba(0,0,0,0.05)' }}>
+                    {/* UPI QR Code */}
                     {qrImageUrl && (
-                      <Box sx={{ textAlign: 'center', minWidth: 64 }}>
+                      <Box sx={{ textAlign: 'center' }}>
                         <Box
                           component="img"
                           src={qrImageUrl}
                           alt="UPI QR"
                           sx={{
-                            width: 62,
-                            height: 62,
+                            width: 82,
+                            height: 82,
                             display: 'block',
-                            borderRadius: 1.2,
-                            border: '1.5px solid rgba(0,0,0,0.1)',
-                            p: 0.25,
+                            borderRadius: 1.5,
+                            border: '1.5px solid rgba(0,0,0,0.12)',
+                            p: 0.35,
                             bgcolor: '#FFFFFF',
-                            boxShadow: '0 2px 5px rgba(0,0,0,0.06)'
+                            boxShadow: '0 3px 8px rgba(0,0,0,0.06)'
                           }}
                         />
-                        <Typography variant="caption" sx={{ display: 'block', fontSize: '0.58rem', fontWeight: 800, color: theme.primaryColor, mt: 0.3, lineHeight: 1.1 }}>
+                        <Typography variant="caption" sx={{ display: 'block', fontSize: '0.62rem', fontWeight: 800, color: theme.primaryColor, mt: 0.4, lineHeight: 1.1 }}>
                           ⚡ Scan to Pay
                         </Typography>
                       </Box>
                     )}
 
-                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0.35 }}>
-                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.67rem', lineHeight: 1.3 }}>
-                        <b style={{ color: '#D97706' }}>🎁 Loyalty Club:</b> +{Math.max(1, Math.floor(Number(invoice.total || 0) / 100))} reward pts accrued
-                      </Typography>
-
-                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.67rem', lineHeight: 1.3 }}>
-                        <b style={{ color: '#0F766E' }}>✂️ Tailoring:</b> 30-Day complimentary alterations
-                      </Typography>
-
-                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.67rem', lineHeight: 1.3 }}>
-                        <b style={{ color: '#4B5563' }}>✨ Garment Care:</b> Dry Clean Only • Hand-Finished
-                      </Typography>
-
-                      {storeVpa && (
-                        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.64rem', mt: 0.1 }}>
-                          UPI VPA: <b style={{ color: theme.primaryColor }}>{storeVpa}</b>
-                        </Typography>
-                      )}
-                    </Box>
-
-                    {/* Instagram QR Code (Pic 3) replacing text-only handle */}
-                    <Box sx={{ textAlign: 'center', minWidth: 64 }}>
+                    {/* Instagram Barcode / QR Code */}
+                    <Box sx={{ textAlign: 'center' }}>
                       <Box
                         component="img"
                         src={instagramQrImg}
                         alt="Instagram QR"
                         sx={{
-                          width: 62,
-                          height: 62,
+                          width: 82,
+                          height: 82,
                           objectFit: 'contain',
                           display: 'block',
-                          borderRadius: 1.2,
-                          border: '1.5px solid rgba(225, 48, 108, 0.3)',
-                          p: 0.2,
+                          borderRadius: 1.5,
+                          border: '1.5px solid rgba(225, 48, 108, 0.35)',
+                          p: 0.3,
                           bgcolor: '#FFFFFF',
-                          boxShadow: '0 2px 5px rgba(0,0,0,0.06)'
+                          boxShadow: '0 3px 8px rgba(225, 48, 108, 0.08)'
                         }}
                       />
-                      <Typography variant="caption" sx={{ display: 'block', fontSize: '0.58rem', fontWeight: 800, color: '#E1306C', mt: 0.3, lineHeight: 1.1 }}>
+                      <Typography variant="caption" sx={{ display: 'block', fontSize: '0.62rem', fontWeight: 800, color: '#E1306C', mt: 0.4, lineHeight: 1.1 }}>
                         📸 Instagram
                       </Typography>
                     </Box>
+                  </Box>
+
+                  {/* All Text Lines Arranged UNDER the QR Codes */}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.4, px: 0.5, pt: 0.5, borderTop: `1px dashed ${theme.primaryColor || '#0A4D46'}20` }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', lineHeight: 1.3 }}>
+                      <b style={{ color: '#D97706' }}>🎁 Loyalty Club:</b> +{Math.max(1, Math.floor(Number(invoice.total || 0) / 100))} reward pts accrued
+                    </Typography>
+
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', lineHeight: 1.3 }}>
+                      <b style={{ color: '#0F766E' }}>✂️ Tailoring:</b> 30-Day complimentary alterations
+                    </Typography>
+
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', lineHeight: 1.3 }}>
+                      <b style={{ color: '#4B5563' }}>✨ Garment Care:</b> Dry Clean Only • Hand-Finished
+                    </Typography>
+
+                    {storeVpa && (
+                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.66rem', mt: 0.1 }}>
+                        UPI VPA: <b style={{ color: theme.primaryColor }}>{storeVpa}</b>
+                      </Typography>
+                    )}
                   </Box>
                 </Box>
               )}
