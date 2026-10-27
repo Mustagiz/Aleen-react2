@@ -4273,6 +4273,7 @@ const Invoices = () => {
         tenderLabel={upiQrModalLabel}
         invoiceNumber={generateInvoiceNumber(invoices?.length || 0)}
         profile={profile}
+        invoiceSettings={invoiceSettings}
         onPaymentConfirmed={() => {
           if (!isSplitPayment) {
             setPaymentStatus('paid');

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -12,7 +12,9 @@ import {
   Paper,
   Tooltip,
   Snackbar,
-  Alert
+  Alert,
+  TextField,
+  InputAdornment
 } from '@mui/material';
 import {
   Close,
@@ -20,10 +22,12 @@ import {
   ContentCopy,
   CheckCircle,
   AccountBalanceWallet,
-  CurrencyRupee,
-  DoneAll
+  DoneAll,
+  Edit,
+  Check
 } from '@mui/icons-material';
 import { generateUpiPaymentUrl } from '../../engine/billingEngine';
+import { getStoredInvoiceSettings } from '../../constants/invoiceTemplates';
 
 /**
  * UpiPaymentQrModal
@@ -36,13 +40,43 @@ export default function UpiPaymentQrModal({
   invoiceNumber = '',
   tenderLabel = '',
   profile = {},
+  invoiceSettings = {},
   onPaymentConfirmed
 }) {
   const [copied, setCopied] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMsg, setSnackbarMsg] = useState('');
+  const [isEditingVpa, setIsEditingVpa] = useState(false);
+  const [customVpa, setCustomVpa] = useState('');
 
-  const storeVpa = profile?.upiVpa || profile?.upiId || 'aleenclothing@icici';
-  const storeName = profile?.businessName || 'Aleen Clothing';
+  const storedSettings = getStoredInvoiceSettings();
+
+  // Robust UPI VPA discovery: checks Bank & Settlement profile settings first
+  const baseStoreVpa =
+    profile?.bankDetails?.upiId ||
+    profile?.upiId ||
+    profile?.upiVpa ||
+    invoiceSettings?.bankDetails?.upiId ||
+    invoiceSettings?.upiId ||
+    storedSettings?.bankDetails?.upiId ||
+    'aleenclothing@hdfcbank';
+
+  // Active VPA: cashier can override on-the-fly or use saved setting
+  const storeVpa = (customVpa || baseStoreVpa).trim();
+
+  // Reset custom VPA state whenever modal opens or base VPA changes
+  useEffect(() => {
+    if (open) {
+      setIsEditingVpa(false);
+      setCustomVpa('');
+    }
+  }, [open, baseStoreVpa]);
+
+  const storeName =
+    profile?.businessName ||
+    profile?.bankDetails?.accountHolder ||
+    invoiceSettings?.businessName ||
+    'Aleen Clothing';
 
   const upiUrl = generateUpiPaymentUrl({
     vpa: storeVpa,
@@ -60,6 +94,7 @@ export default function UpiPaymentQrModal({
     try {
       await navigator.clipboard.writeText(upiUrl);
       setCopied(true);
+      setSnackbarMsg('UPI payment link copied to clipboard!');
       setSnackbarOpen(true);
       setTimeout(() => setCopied(false), 2500);
     } catch (err) {
@@ -184,19 +219,91 @@ export default function UpiPaymentQrModal({
           )}
         </Paper>
 
-        {/* VPA Badge */}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-          <Chip
-            icon={<AccountBalanceWallet sx={{ fontSize: '15px !important' }} />}
-            label={storeVpa}
-            size="small"
-            sx={{ fontWeight: 600, fontSize: '0.75rem', bgcolor: 'background.paper', border: '1px solid rgba(0,0,0,0.08)' }}
-          />
-          <Tooltip title={copied ? 'Copied!' : 'Copy UPI Link'}>
-            <IconButton size="small" onClick={handleCopyLink} sx={{ color: 'primary.main' }}>
-              {copied ? <CheckCircle fontSize="small" sx={{ color: '#10B981' }} /> : <ContentCopy fontSize="small" />}
-            </IconButton>
-          </Tooltip>
+        {/* VPA Badge & Quick Customization */}
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, minHeight: 36 }}>
+          {isEditingVpa ? (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, maxWidth: 320 }}>
+              <TextField
+                size="small"
+                value={customVpa || baseStoreVpa}
+                onChange={(e) => setCustomVpa(e.target.value.toLowerCase().trim())}
+                placeholder="Enter UPI VPA (e.g. name@bank)"
+                autoFocus
+                sx={{
+                  '& .MuiInputBase-input': {
+                    fontSize: '0.78rem',
+                    py: 0.6,
+                    px: 1,
+                    fontWeight: 700
+                  }
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <AccountBalanceWallet sx={{ fontSize: '16px', color: 'primary.main' }} />
+                    </InputAdornment>
+                  )
+                }}
+              />
+              <Tooltip title="Apply Custom UPI ID">
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    setIsEditingVpa(false);
+                    setSnackbarMsg(`Using UPI ID: ${storeVpa}`);
+                    setSnackbarOpen(true);
+                  }}
+                  sx={{ bgcolor: 'rgba(15, 118, 110, 0.1)', color: 'primary.main' }}
+                >
+                  <Check fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Cancel">
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    setIsEditingVpa(false);
+                    setCustomVpa('');
+                  }}
+                  sx={{ color: 'text.secondary' }}
+                >
+                  <Close fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          ) : (
+            <>
+              <Chip
+                icon={<AccountBalanceWallet sx={{ fontSize: '15px !important' }} />}
+                label={storeVpa}
+                size="small"
+                sx={{
+                  fontWeight: 700,
+                  fontSize: '0.75rem',
+                  bgcolor: customVpa ? 'rgba(217, 119, 6, 0.12)' : 'background.paper',
+                  border: customVpa ? '1px solid rgba(217, 119, 6, 0.4)' : '1px solid rgba(0,0,0,0.08)',
+                  color: customVpa ? '#B45309' : 'text.primary'
+                }}
+              />
+              <Tooltip title={copied ? 'Copied!' : 'Copy UPI Link'}>
+                <IconButton size="small" onClick={handleCopyLink} sx={{ color: 'primary.main' }}>
+                  {copied ? <CheckCircle fontSize="small" sx={{ color: '#10B981' }} /> : <ContentCopy fontSize="small" />}
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Edit or Switch UPI ID for this invoice">
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    setCustomVpa(storeVpa);
+                    setIsEditingVpa(true);
+                  }}
+                  sx={{ color: 'text.secondary', opacity: 0.75, '&:hover': { opacity: 1, color: 'primary.main' } }}
+                >
+                  <Edit sx={{ fontSize: '15px' }} />
+                </IconButton>
+              </Tooltip>
+            </>
+          )}
         </Box>
 
         <Typography variant="caption" sx={{ display: 'block', mt: 1.5, color: 'text.secondary', fontSize: '0.72rem' }}>
@@ -234,7 +341,7 @@ export default function UpiPaymentQrModal({
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
         <Alert severity="success" sx={{ width: '100%', fontWeight: 700 }}>
-          UPI payment link copied to clipboard!
+          {snackbarMsg || 'UPI payment link copied to clipboard!'}
         </Alert>
       </Snackbar>
     </Dialog>

@@ -229,7 +229,16 @@ export default function Settings() {
     setIsSaving(true);
     try {
       // 1. Update Firestore Profile
-      await updateProfile(formProfile);
+      const cleanUpi = (formProfile.bankDetails?.upiId || '').trim();
+      const updatedProfilePayload = {
+        ...formProfile,
+        upiId: cleanUpi,
+        bankDetails: {
+          ...formProfile.bankDetails,
+          upiId: cleanUpi
+        }
+      };
+      await updateProfile(updatedProfilePayload);
 
       // 2. Synchronize localStorage for instant print reflection
       const currentStored = getStoredInvoiceSettings();
