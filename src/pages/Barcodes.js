@@ -32,7 +32,9 @@ import {
     Collapse,
     Badge,
     useMediaQuery,
-    useTheme
+    useTheme,
+    InputAdornment,
+    Menu
 } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import {
@@ -287,6 +289,24 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                     >
                         {currency}{sellingPrice.toLocaleString('en-IN')}
                     </Typography>
+                    {settings.showDiscountBadge && mrpPrice > sellingPrice && (
+                        <Typography
+                            sx={{
+                                fontSize: `${(isSmall ? 6 : 7.2) * fontScale}px`,
+                                fontWeight: 900,
+                                bgcolor: '#000000',
+                                color: '#FFFFFF',
+                                px: 0.4,
+                                py: 0.1,
+                                borderRadius: 0.25,
+                                lineHeight: 1,
+                                whiteSpace: 'nowrap',
+                                letterSpacing: '0.02em'
+                            }}
+                        >
+                            {Math.round(((mrpPrice - sellingPrice) / mrpPrice) * 100)}% OFF
+                        </Typography>
+                    )}
                 </Box>
             )}
         </Box>
@@ -343,6 +363,7 @@ export default function BarcodeGenerator() {
         showSku: true,
         showCategory: false,
         showSizeColor: true,
+        showDiscountBadge: false, // Print discount % badge on sticker tag
         barcodeHeight: 30,
         fontSize: 'normal',
         mrpMode: 'custom', // 'custom' | 'markup_20' | 'markup_25' | 'markup_30' | 'markup_40' | 'markup_50'
@@ -352,6 +373,9 @@ export default function BarcodeGenerator() {
     });
 
     const [previewIndex, setPreviewIndex] = useState(0);
+    const [previewModalOpen, setPreviewModalOpen] = useState(false);
+    const [bulkDiscountAnchor, setBulkDiscountAnchor] = useState(null);
+    const [printSingleTarget, setPrintSingleTarget] = useState(null);
 
     // Populate from navigation state if routed with specific product
     useEffect(() => {
@@ -426,9 +450,12 @@ export default function BarcodeGenerator() {
         setSelectedProducts(prev => prev.map(p => {
             if (p.id !== productId) return p;
             const updated = { ...p, customPrice: num };
-            // Auto update MRP if an auto-markup formula is active
-            if (settings.mrpMode !== 'custom' && typeof num === 'number') {
-                updated.customMrp = Math.round(num * settings.mrpMultiplier);
+            if (typeof num === 'number') {
+                if (p.customDiscount !== undefined && p.customDiscount > 0) {
+                    updated.customMrp = Math.round(num / (1 - (p.customDiscount / 100)));
+                } else if (settings.mrpMode !== 'custom') {
+                    updated.customMrp = Math.round(num * settings.mrpMultiplier);
+                }
             }
             return updated;
         }));
@@ -437,18 +464,70 @@ export default function BarcodeGenerator() {
     // Update custom MRP for a queued garment
     const handleUpdateMrp = (productId, val) => {
         const num = val === '' ? '' : Math.max(0, Number(val) || 0);
-        setSelectedProducts(prev => prev.map(p =>
-            p.id === productId ? { ...p, customMrp: num } : p
-        ));
+        setSelectedProducts(prev => prev.map(p => {
+            if (p.id !== productId) return p;
+            const selling = Number(p.customPrice !== undefined ? p.customPrice : p.price) || 0;
+            const disc = (typeof num === 'number' && num > selling && num > 0)
+                ? Math.round(((num - selling) / num) * 100)
+                : 0;
+            return { ...p, customMrp: num, customDiscount: disc };
+        }));
+    };
+
+    // Update custom discount % for a queued garment
+    const handleUpdateDiscount = (productId, discountVal) => {
+        const pct = discountVal === '' ? '' : Math.min(99, Math.max(0, Number(discountVal) || 0));
+        setSelectedProducts(prev => prev.map(p => {
+            if (p.id !== productId) return p;
+            const selling = Number(p.customPrice !== undefined ? p.customPrice : p.price) || 0;
+            let newMrp = selling;
+            if (pct !== '' && pct > 0) {
+                newMrp = Math.round(selling / (1 - (pct / 100)));
+            }
+            return {
+                ...p,
+                customDiscount: pct,
+                customMrp: newMrp
+            };
+        }));
+    };
+
+    // Bulk apply discount % to all queued garments
+    const handleApplyBulkDiscount = (pct) => {
+        const discountVal = Math.min(99, Math.max(0, Number(pct) || 0));
+        setSelectedProducts(prev => prev.map(p => {
+            const selling = Number(p.customPrice !== undefined ? p.customPrice : p.price) || 0;
+            const newMrp = discountVal > 0 ? Math.round(selling / (1 - (discountVal / 100))) : selling;
+            return {
+                ...p,
+                customDiscount: discountVal,
+                customMrp: newMrp
+            };
+        }));
+        setBulkDiscountAnchor(null);
+        showToast(discountVal > 0 ? `Applied ${discountVal}% discount to all queued garments` : 'Reset discounts for all queued garments', 'success');
+    };
+
+    // Print single sticker directly from preview dialog
+    const handlePrintSingle = (product) => {
+        if (!product) return;
+        setPrintSingleTarget(product);
+        setTimeout(() => {
+            window.print();
+            setPrintSingleTarget(null);
+        }, 200);
     };
 
     // Bulk apply MRP markup multiplier to all queued items
     const handleApplyBulkMrpMarkup = (multiplier) => {
         setSelectedProducts(prev => prev.map(p => {
             const selling = Number(p.customPrice !== undefined ? p.customPrice : p.price) || 0;
+            const newMrp = Math.round(selling * multiplier);
+            const disc = newMrp > selling && newMrp > 0 ? Math.round(((newMrp - selling) / newMrp) * 100) : 0;
             return {
                 ...p,
-                customMrp: Math.round(selling * multiplier)
+                customMrp: newMrp,
+                customDiscount: disc
             };
         }));
     };
@@ -978,6 +1057,16 @@ export default function BarcodeGenerator() {
                                         />
                                     }
                                     label={<Typography variant="body2" sx={{ fontWeight: 600 }}>Collection / Category</Typography>}
+                                />
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            size="small"
+                                            checked={settings.showDiscountBadge}
+                                            onChange={(e) => setSettings({ ...settings, showDiscountBadge: e.target.checked })}
+                                        />
+                                    }
+                                    label={<Typography variant="body2" sx={{ fontWeight: 600 }}>Discount Tag Badge (e.g. 20% OFF)</Typography>}
                                 />
                             </Box>
 
@@ -1839,15 +1928,90 @@ export default function BarcodeGenerator() {
                     </TableContainer>
                 </Box>
 
-                {/* Queue Summary Badge */}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5, flexWrap: 'wrap', gap: 1 }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
-                        Active Print Queue ({selectedProducts.length} garments • {totalLabelsCount} stickers)
-                    </Typography>
-                    {selectedProducts.length > 10 && (
-                        <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 700 }}>
-                            Showing page {queuePage + 1} of {Math.max(1, Math.ceil(selectedProducts.length / queueRowsPerPage))} (10 entries per page)
+                {/* Queue Summary Badge & Actions */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1.5 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+                            Active Print Queue ({selectedProducts.length} garments • {totalLabelsCount} stickers)
                         </Typography>
+                        {selectedProducts.length > 0 && (
+                            <Chip
+                                label="Preview Ready"
+                                size="small"
+                                color="success"
+                                variant="outlined"
+                                sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700 }}
+                            />
+                        )}
+                        {selectedProducts.length > 10 && (
+                            <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 700 }}>
+                                • Page {queuePage + 1} of {Math.max(1, Math.ceil(selectedProducts.length / queueRowsPerPage))}
+                            </Typography>
+                        )}
+                    </Box>
+
+                    {selectedProducts.length > 0 && (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                startIcon={<Visibility sx={{ fontSize: 16 }} />}
+                                onClick={() => setPreviewModalOpen(true)}
+                                sx={{
+                                    borderRadius: 2,
+                                    fontSize: '0.75rem',
+                                    fontWeight: 700,
+                                    textTransform: 'none',
+                                    color: '#0F766E',
+                                    borderColor: '#0F766E',
+                                    bgcolor: 'rgba(15, 118, 110, 0.04)',
+                                    '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.1)', borderColor: '#042F2E' }
+                                }}
+                            >
+                                Preview Stickers
+                            </Button>
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                startIcon={<Percent sx={{ fontSize: 16 }} />}
+                                onClick={(e) => setBulkDiscountAnchor(e.currentTarget)}
+                                sx={{
+                                    borderRadius: 2,
+                                    fontSize: '0.75rem',
+                                    fontWeight: 700,
+                                    textTransform: 'none',
+                                    color: '#B45309',
+                                    borderColor: '#D97706',
+                                    bgcolor: 'rgba(217, 119, 6, 0.04)',
+                                    '&:hover': { bgcolor: 'rgba(217, 119, 6, 0.1)', borderColor: '#B45309' }
+                                }}
+                            >
+                                Set Discount for All
+                            </Button>
+                            <Menu
+                                anchorEl={bulkDiscountAnchor}
+                                open={Boolean(bulkDiscountAnchor)}
+                                onClose={() => setBulkDiscountAnchor(null)}
+                                PaperProps={{ sx: { borderRadius: 2.5, minWidth: 220, p: 0.5, boxShadow: '0 8px 24px rgba(0,0,0,0.12)' } }}
+                            >
+                                <Typography variant="caption" sx={{ px: 2, py: 1, display: 'block', fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>
+                                    Set Custom Tag Discount
+                                </Typography>
+                                {[10, 15, 20, 25, 30, 40, 50].map((disc) => (
+                                    <MenuItem
+                                        key={disc}
+                                        onClick={() => handleApplyBulkDiscount(disc)}
+                                        sx={{ fontSize: '0.82rem', fontWeight: 600, py: 0.75 }}
+                                    >
+                                        Apply {disc}% Discount on All Tags
+                                    </MenuItem>
+                                ))}
+                                <Divider sx={{ my: 0.5 }} />
+                                <MenuItem onClick={() => handleApplyBulkDiscount(0)} sx={{ fontSize: '0.82rem', color: 'text.secondary', py: 0.75 }}>
+                                    Reset (0% Discount / MRP = Sale)
+                                </MenuItem>
+                            </Menu>
+                        </Box>
                     )}
                 </Box>
 
@@ -1866,6 +2030,10 @@ export default function BarcodeGenerator() {
                             const isCurrentPreview = globalIdx === previewIndex;
                             const selling = product.customPrice !== undefined ? product.customPrice : (product.price || 0);
                             const mrp = product.customMrp !== undefined ? product.customMrp : Math.round((product.price || 0) * (settings.mrpMultiplier || 1.25));
+                            const currentDiscount = (Number(mrp) > Number(selling) && Number(mrp) > 0)
+                                ? Math.round(((Number(mrp) - Number(selling)) / Number(mrp)) * 100)
+                                : 0;
+                            const savings = Number(mrp) > Number(selling) ? Number(mrp) - Number(selling) : 0;
 
                             return (
                                 <Grid item xs={12} sm={6} md={4} key={product.id}>
@@ -1918,11 +2086,18 @@ export default function BarcodeGenerator() {
                                                 </Box>
 
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                    <Tooltip title="Preview this sticker">
+                                                    <Tooltip title="Preview this sticker (Click to view full preview)">
                                                         <IconButton
                                                             size="small"
-                                                            onClick={() => setPreviewIndex(globalIdx)}
-                                                            sx={{ color: isCurrentPreview ? '#0F766E' : 'text.disabled' }}
+                                                            onClick={() => {
+                                                                setPreviewIndex(globalIdx);
+                                                                setPreviewModalOpen(true);
+                                                            }}
+                                                            sx={{
+                                                                color: '#0F766E',
+                                                                bgcolor: 'rgba(15, 118, 110, 0.08)',
+                                                                '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.2)' }
+                                                            }}
                                                         >
                                                             <Visibility fontSize="small" />
                                                         </IconButton>
@@ -1944,10 +2119,10 @@ export default function BarcodeGenerator() {
                                                 </Box>
                                             </Box>
 
-                                            {/* Price & Copies Form Inputs */}
-                                            <Grid container spacing={1.25} alignItems="center">
+                                            {/* Price, Discount & Copies Form Inputs */}
+                                            <Grid container spacing={1} alignItems="center">
                                                 {/* Custom Sales Price */}
-                                                <Grid item xs={4}>
+                                                <Grid item xs={6}>
                                                     <TextField
                                                         size="small"
                                                         type="number"
@@ -1966,7 +2141,7 @@ export default function BarcodeGenerator() {
                                                 </Grid>
 
                                                 {/* Custom MRP */}
-                                                <Grid item xs={4}>
+                                                <Grid item xs={6}>
                                                     <TextField
                                                         size="small"
                                                         type="number"
@@ -1984,8 +2159,30 @@ export default function BarcodeGenerator() {
                                                     />
                                                 </Grid>
 
+                                                {/* Custom Discount % */}
+                                                <Grid item xs={6}>
+                                                    <TextField
+                                                        size="small"
+                                                        type="number"
+                                                        label="Discount %"
+                                                        value={currentDiscount > 0 ? currentDiscount : (product.customDiscount !== undefined ? product.customDiscount : '')}
+                                                        onChange={(e) => handleUpdateDiscount(product.id, e.target.value)}
+                                                        inputProps={{ min: 0, max: 99 }}
+                                                        InputProps={{
+                                                            endAdornment: <InputAdornment position="end" sx={{ '& p': { fontSize: '0.72rem', fontWeight: 700 } }}>%</InputAdornment>
+                                                        }}
+                                                        sx={{
+                                                            '& .MuiOutlinedInput-root': {
+                                                                borderRadius: 1.5,
+                                                                fontWeight: 700,
+                                                                fontSize: '0.82rem'
+                                                            }
+                                                        }}
+                                                    />
+                                                </Grid>
+
                                                 {/* Label Copies */}
-                                                <Grid item xs={4}>
+                                                <Grid item xs={6}>
                                                     <TextField
                                                         size="small"
                                                         type="number"
@@ -1993,6 +2190,9 @@ export default function BarcodeGenerator() {
                                                         value={product.labelCount || 1}
                                                         onChange={(e) => handleUpdateCount(product.id, e.target.value)}
                                                         inputProps={{ min: 1 }}
+                                                        InputProps={{
+                                                            endAdornment: <InputAdornment position="end" sx={{ '& p': { fontSize: '0.7rem' } }}>pcs</InputAdornment>
+                                                        }}
                                                         sx={{
                                                             '& .MuiOutlinedInput-root': {
                                                                 borderRadius: 1.5,
@@ -2004,12 +2204,38 @@ export default function BarcodeGenerator() {
                                                 </Grid>
                                             </Grid>
 
+                                            {/* Quick Discount Presets Chips */}
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 1, flexWrap: 'wrap' }}>
+                                                <Typography variant="caption" sx={{ fontSize: '0.64rem', fontWeight: 700, color: 'text.secondary', mr: 0.25 }}>
+                                                    Quick Disc:
+                                                </Typography>
+                                                {[0, 10, 15, 20, 25, 30, 40, 50].map((d) => (
+                                                    <Chip
+                                                        key={d}
+                                                        label={d === 0 ? '0%' : `${d}%`}
+                                                        size="small"
+                                                        clickable
+                                                        onClick={() => handleUpdateDiscount(product.id, d)}
+                                                        sx={{
+                                                            height: 18,
+                                                            fontSize: '0.62rem',
+                                                            fontWeight: currentDiscount === d ? 800 : 600,
+                                                            bgcolor: currentDiscount === d ? '#0F766E' : 'rgba(0,0,0,0.04)',
+                                                            color: currentDiscount === d ? '#FFFFFF' : 'text.primary',
+                                                            '&:hover': {
+                                                                bgcolor: currentDiscount === d ? '#115E59' : 'rgba(15,118,110,0.1)'
+                                                            }
+                                                        }}
+                                                    />
+                                                ))}
+                                            </Box>
+
                                             {/* Price Comparison Sub-text */}
                                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
                                                 <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem' }}>
                                                     {Number(mrp) > Number(selling) && Number(mrp) > 0 ? (
-                                                        <span style={{ color: '#059669', fontWeight: 700 }}>
-                                                            {Math.round(((Number(mrp) - Number(selling)) / Number(mrp)) * 100)}% Discount on Tag
+                                                        <span style={{ color: '#059669', fontWeight: 800 }}>
+                                                            ✓ {currentDiscount}% Discount (Save ₹{savings.toLocaleString('en-IN')})
                                                         </span>
                                                     ) : (
                                                         <span style={{ color: 'text.secondary' }}>MRP = Sale Price</span>
@@ -2220,6 +2446,272 @@ export default function BarcodeGenerator() {
                 </DialogActions>
             </Dialog>
 
+            {/* Modal: Live Sticker Preview Dialog */}
+            <Dialog
+                open={previewModalOpen}
+                onClose={() => setPreviewModalOpen(false)}
+                maxWidth="sm"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        borderRadius: 3.5,
+                        overflow: 'hidden',
+                        boxShadow: '0 24px 60px rgba(0,0,0,0.2)'
+                    }
+                }}
+            >
+                <DialogTitle
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                        color: '#FFFFFF',
+                        py: 1.75,
+                        px: 2.5
+                    }}
+                >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Visibility sx={{ color: '#FCD34D', fontSize: 22 }} />
+                        <Box>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#FFFFFF', lineHeight: 1.2 }}>
+                                Price Sticker Live Preview
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.7rem' }}>
+                                {selectedProducts.length > 0 ? `Garment ${previewIndex + 1} of ${selectedProducts.length}` : 'Sample Preview'}
+                            </Typography>
+                        </Box>
+                    </Box>
+                    <IconButton onClick={() => setPreviewModalOpen(false)} size="small" sx={{ color: '#FFFFFF' }}>
+                        <Close fontSize="small" />
+                    </IconButton>
+                </DialogTitle>
+
+                <DialogContent sx={{ p: 2.5, bgcolor: '#F8FAFC' }}>
+                    {/* Preset dimension bar & Zoom controls */}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
+                        <Chip
+                            label={
+                                settings.template === 'standard' ? 'Standard Tag (50 × 25 mm)' :
+                                settings.template === 'small' ? 'Small Accessory (38 × 22 mm)' :
+                                settings.template === 'compact' ? 'Compact Barcode (30 × 20 mm)' :
+                                settings.template === 'large' ? 'Large Card (60 × 40 mm)' :
+                                settings.template === 'thermal_single' ? 'Thermal Roll' : 'A4 Sheet Label'
+                            }
+                            size="small"
+                            sx={{ bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E', fontWeight: 700, fontSize: '0.72rem' }}
+                        />
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', mr: 0.5 }}>
+                                Zoom:
+                            </Typography>
+                            {[1.0, 1.35, 1.6, 2.0].map((z) => (
+                                <Chip
+                                    key={z}
+                                    label={`${z}x`}
+                                    size="small"
+                                    clickable
+                                    onClick={() => setPreviewZoom(z)}
+                                    sx={{
+                                        height: 20,
+                                        fontSize: '0.65rem',
+                                        fontWeight: previewZoom === z ? 800 : 500,
+                                        bgcolor: previewZoom === z ? '#0F766E' : 'background.paper',
+                                        color: previewZoom === z ? '#FFFFFF' : 'text.primary',
+                                        border: '1px solid',
+                                        borderColor: previewZoom === z ? '#0F766E' : 'divider'
+                                    }}
+                                />
+                            ))}
+                        </Box>
+                    </Box>
+
+                    {/* Sticker Render Stage */}
+                    <Box
+                        sx={{
+                            p: 3,
+                            bgcolor: '#FFFFFF',
+                            borderRadius: 3,
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            boxShadow: '0 4px 18px rgba(0,0,0,0.04)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            minHeight: 180,
+                            overflow: 'visible'
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                transform: `scale(${previewZoom})`,
+                                transformOrigin: 'center center',
+                                boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                                borderRadius: 0.8,
+                                transition: 'transform 0.15s ease-out'
+                            }}
+                        >
+                            <BarcodeItem
+                                value={sampleProduct.variantSku || sampleProduct.productId || 'PRD-1001'}
+                                businessName={profile?.businessName || 'Aleen Clothing'}
+                                product={sampleProduct}
+                                settings={settings}
+                            />
+                        </Box>
+                    </Box>
+
+                    {/* Live Adjuster for Garment Pricing & Custom Discount */}
+                    {selectedProducts.length > 0 && sampleProduct.id && (
+                        <Card variant="outlined" sx={{ mt: 2, borderRadius: 2.5, bgcolor: '#FFFFFF' }}>
+                            <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                                    <Box>
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+                                            {sampleProduct.name}
+                                        </Typography>
+                                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 700 }}>
+                                            #{formatSkuWithHyphen(sampleProduct.productId)} {sampleProduct.category ? `• ${sampleProduct.category}` : ''}
+                                        </Typography>
+                                    </Box>
+                                    {sampleProduct.labelCount && (
+                                        <Chip
+                                            label={`${sampleProduct.labelCount} stickers`}
+                                            size="small"
+                                            sx={{ bgcolor: 'rgba(15,118,110,0.1)', color: '#0F766E', fontWeight: 700 }}
+                                        />
+                                    )}
+                                </Box>
+
+                                {/* Quick Discount Presets inside preview */}
+                                <Box sx={{ mb: 1 }}>
+                                    <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', display: 'block', mb: 0.5 }}>
+                                        Custom Discount for this Tag:
+                                    </Typography>
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
+                                        {[0, 10, 15, 20, 25, 30, 40, 50].map((d) => {
+                                            const s = sampleProduct.customPrice !== undefined ? sampleProduct.customPrice : (sampleProduct.price || 0);
+                                            const m = sampleProduct.customMrp !== undefined ? sampleProduct.customMrp : Math.round(s * (settings.mrpMultiplier || 1.25));
+                                            const curD = m > s && m > 0 ? Math.round(((m - s) / m) * 100) : 0;
+                                            const isSel = curD === d;
+                                            return (
+                                                <Chip
+                                                    key={d}
+                                                    label={d === 0 ? 'No Disc' : `${d}% OFF`}
+                                                    size="small"
+                                                    clickable
+                                                    onClick={() => handleUpdateDiscount(sampleProduct.id, d)}
+                                                    sx={{
+                                                        height: 24,
+                                                        fontSize: '0.72rem',
+                                                        fontWeight: isSel ? 800 : 600,
+                                                        bgcolor: isSel ? '#0F766E' : 'rgba(0,0,0,0.05)',
+                                                        color: isSel ? '#FFFFFF' : 'text.primary',
+                                                        border: '1px solid',
+                                                        borderColor: isSel ? '#0F766E' : 'divider'
+                                                    }}
+                                                />
+                                            );
+                                        })}
+                                    </Box>
+                                </Box>
+
+                                {/* Numeric inputs in preview */}
+                                <Grid container spacing={1.25} sx={{ mt: 0.5 }}>
+                                    <Grid item xs={4}>
+                                        <TextField
+                                            size="small"
+                                            type="number"
+                                            label={`Sale (${settings.currencySymbol || '₹'})`}
+                                            value={sampleProduct.customPrice !== undefined ? sampleProduct.customPrice : (sampleProduct.price || 0)}
+                                            onChange={(e) => handleUpdatePrice(sampleProduct.id, e.target.value)}
+                                            inputProps={{ min: 0 }}
+                                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 1.5, fontWeight: 700 } }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={4}>
+                                        <TextField
+                                            size="small"
+                                            type="number"
+                                            label={`MRP (${settings.currencySymbol || '₹'})`}
+                                            value={sampleProduct.customMrp !== undefined ? sampleProduct.customMrp : Math.round((sampleProduct.price || 0) * (settings.mrpMultiplier || 1.25))}
+                                            onChange={(e) => handleUpdateMrp(sampleProduct.id, e.target.value)}
+                                            inputProps={{ min: 0 }}
+                                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 1.5, fontWeight: 700 } }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={4}>
+                                        <TextField
+                                            size="small"
+                                            type="number"
+                                            label="Discount %"
+                                            value={(() => {
+                                                const s = sampleProduct.customPrice !== undefined ? sampleProduct.customPrice : (sampleProduct.price || 0);
+                                                const m = sampleProduct.customMrp !== undefined ? sampleProduct.customMrp : Math.round(s * (settings.mrpMultiplier || 1.25));
+                                                return m > s && m > 0 ? Math.round(((m - s) / m) * 100) : '';
+                                            })()}
+                                            onChange={(e) => handleUpdateDiscount(sampleProduct.id, e.target.value)}
+                                            inputProps={{ min: 0, max: 99 }}
+                                            InputProps={{ endAdornment: <InputAdornment position="end">%</InputAdornment> }}
+                                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 1.5, fontWeight: 700 } }}
+                                        />
+                                    </Grid>
+                                </Grid>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Carousel Stepper if multiple items in queue */}
+                    {selectedProducts.length > 1 && (
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+                            <Button
+                                size="small"
+                                disabled={previewIndex === 0}
+                                onClick={() => setPreviewIndex(p => Math.max(0, p - 1))}
+                                sx={{ textTransform: 'none', fontWeight: 700 }}
+                            >
+                                ← Previous Sticker
+                            </Button>
+                            <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary' }}>
+                                {previewIndex + 1} of {selectedProducts.length}
+                            </Typography>
+                            <Button
+                                size="small"
+                                disabled={previewIndex >= selectedProducts.length - 1}
+                                onClick={() => setPreviewIndex(p => Math.min(selectedProducts.length - 1, p + 1))}
+                                sx={{ textTransform: 'none', fontWeight: 700 }}
+                            >
+                                Next Sticker →
+                            </Button>
+                        </Box>
+                    )}
+                </DialogContent>
+
+                <DialogActions sx={{ p: 2, bgcolor: '#F8FAFC', borderTop: '1px solid', borderColor: 'divider', justifyContent: 'space-between' }}>
+                    <Button
+                        variant="outlined"
+                        startIcon={<Print />}
+                        onClick={() => handlePrintSingle(sampleProduct)}
+                        sx={{ borderRadius: 2, fontWeight: 700, textTransform: 'none', color: '#0F766E', borderColor: '#0F766E' }}
+                    >
+                        Print This Sticker
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={() => setPreviewModalOpen(false)}
+                        sx={{
+                            borderRadius: 2,
+                            fontWeight: 700,
+                            textTransform: 'none',
+                            bgcolor: '#0F766E',
+                            '&:hover': { bgcolor: '#042F2E' }
+                        }}
+                    >
+                        Done
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
             {/* Print Output Grid (Hidden on Screen, Active on Print) */}
             <Box className="print-only" sx={{ display: 'none', '@media print': { display: 'block' } }}>
                 <Box
@@ -2236,7 +2728,7 @@ export default function BarcodeGenerator() {
                         width: '100%'
                     }}
                 >
-                    {selectedProducts.flatMap(product =>
+                    {(printSingleTarget ? [printSingleTarget] : selectedProducts).flatMap(product =>
                         Array.from({ length: product.labelCount || 1 }).map((_, i) => (
                             <BarcodeItem
                                 key={`${product.id}-${i}`}
