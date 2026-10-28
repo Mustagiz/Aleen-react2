@@ -1421,11 +1421,11 @@ export default function Settings() {
                         {/* Signature Preview Card */}
                         {formProfile.signatureImage ? (
                           <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 2.5, p: 2, borderRadius: 2, bgcolor: '#FFFFFF', border: '1px dashed #CBD5E1' }}>
-                            <Box sx={{ p: 1, bgcolor: '#F8FAFC', borderRadius: 1.5, border: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 140, minHeight: 54 }}>
+                            <Box sx={{ p: 1, bgcolor: '#F8FAFC', borderRadius: 1.5, border: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 160, minHeight: 65 }}>
                               <img
                                 src={formProfile.signatureImage}
                                 alt="Signature preview"
-                                style={{ maxHeight: 48, maxWidth: 160, objectFit: 'contain' }}
+                                style={{ maxHeight: 60, maxWidth: 200, objectFit: 'contain' }}
                               />
                             </Box>
                             <Box>
@@ -1529,7 +1529,7 @@ export default function Settings() {
                         <img
                           src={formProfile.signatureImage}
                           alt="Signature Preview"
-                          style={{ maxHeight: 46, maxWidth: 140, objectFit: 'contain' }}
+                          style={{ maxHeight: 68, maxWidth: 200, objectFit: 'contain' }}
                         />
                       </Box>
                     )}

@@ -625,8 +625,8 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
                       )}
                     </Box>
                     {localSettings.signatureImage && (
-                      <Box sx={{ mt: 1, p: 0.5, border: '1px dashed #CBD5E1', display: 'inline-block', borderRadius: 1 }}>
-                        <img src={localSettings.signatureImage} alt="Signature" style={{ maxHeight: 36, maxWidth: 120, objectFit: 'contain' }} />
+                      <Box sx={{ mt: 1, p: 0.75, border: '1px dashed #CBD5E1', display: 'inline-block', borderRadius: 1.5, bgcolor: '#F8FAFC' }}>
+                        <img src={localSettings.signatureImage} alt="Signature" style={{ maxHeight: 54, maxWidth: 180, objectFit: 'contain' }} />
                       </Box>
                     )}
                   </Box>

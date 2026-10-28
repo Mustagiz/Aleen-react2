@@ -879,7 +879,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
         pageBreakInside: 'avoid',
         breakInside: 'avoid'
       }}>
-        <Box sx={{ flex: 1, width: isSlip ? '100%' : '65%' }}>
+        <Box sx={{ flex: 1, width: isSlip ? '100%' : '58%' }}>
           <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary', display: 'block', mb: 0.3 }}>
             Terms & Conditions:
           </Typography>
@@ -892,13 +892,13 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
         </Box>
 
         {!isSlip && (profile.showSignatureStamp ?? activeSettings.showSignatureStamp) && (
-          <Box sx={{ textAlign: 'center', width: '35%', minWidth: 190, position: 'relative' }}>
+          <Box sx={{ textAlign: 'center', width: '40%', minWidth: 240, position: 'relative' }}>
             {/* Retro Watermark Stamp centered directly behind the signature */}
             {(invoice?.paymentStatus === 'paid' || invoice?.status === 'paid' || (invoice?.paidAmount && Number(invoice?.paidAmount) >= Number(invoice?.total))) && (
               <Box
                 sx={{
                   position: 'absolute',
-                  top: '42%',
+                  top: '40%',
                   left: '50%',
                   transform: 'translate(-50%, -50%)',
                   zIndex: 1,
@@ -910,28 +910,28 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                   subtitle="ATELIER ALEEN"
                   variant={activeTemplate === 'champagne-gold' ? 'gold' : activeTemplate === 'heritage-crimson' ? 'crimson' : 'emerald'}
                   isWatermark={true}
-                  size={120}
+                  size={140}
                   animate={false}
                 />
               </Box>
             )}
 
             {(profile.signatureImage || activeSettings.signatureImage) ? (
-              <Box sx={{ minHeight: 68, maxHeight: 85, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', mb: 0.5, position: 'relative', zIndex: 2 }}>
+              <Box sx={{ minHeight: 95, maxHeight: 130, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', mb: 0.5, position: 'relative', zIndex: 2 }}>
                 <img
                   src={profile.signatureImage || activeSettings.signatureImage}
                   alt="Authorized Signature"
-                  style={{ maxHeight: 75, maxWidth: 210, objectFit: 'contain' }}
+                  style={{ maxHeight: 120, maxWidth: 280, objectFit: 'contain' }}
                 />
               </Box>
             ) : (
-              <Box sx={{ height: 55, position: 'relative', zIndex: 2 }} />
+              <Box sx={{ height: 80, position: 'relative', zIndex: 2 }} />
             )}
-            <Box sx={{ borderBottom: '1px solid #94A3B8', mb: 0.5, position: 'relative', zIndex: 2 }} />
-            <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', fontSize: '0.72rem', position: 'relative', zIndex: 2 }}>
+            <Box sx={{ borderBottom: '1.5px solid #94A3B8', mb: 0.5, position: 'relative', zIndex: 2 }} />
+            <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', fontSize: '0.75rem', position: 'relative', zIndex: 2 }}>
               {profile.signatureLabel || activeSettings.signatureLabel || 'Authorized Signatory'}
             </Typography>
-            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.66rem', position: 'relative', zIndex: 2 }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', position: 'relative', zIndex: 2 }}>
               {profile.businessName || 'Aleen Clothing'}
             </Typography>
           </Box>
