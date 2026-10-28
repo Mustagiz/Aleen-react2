@@ -2136,9 +2136,64 @@ const Invoices = () => {
                     >
                       {inv.items?.length || 0} {inv.items?.length === 1 ? 'Item' : 'Items'}
                     </Typography>
-                    <Box sx={{ display: 'flex' }}>
-                      <IconButton size="small" onClick={(e) => handleMenuClick(e, inv.id)} sx={{ borderRadius: '8px' }}>
-                        <MoreVert fontSize="small" />
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
+                      <Tooltip title="View Invoice">
+                        <IconButton
+                          size="small"
+                          onClick={() => setViewInvoice(inv)}
+                          sx={{
+                            width: 28,
+                            height: 28,
+                            color: '#0F766E',
+                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(15, 118, 110, 0.08)',
+                            border: '1px solid rgba(15, 118, 110, 0.2)'
+                          }}
+                        >
+                          <Visibility sx={{ fontSize: 14 }} />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Print Receipt">
+                        <IconButton
+                          size="small"
+                          onClick={() => handlePrint(inv)}
+                          sx={{
+                            width: 28,
+                            height: 28,
+                            color: '#0284C7',
+                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(2, 132, 199, 0.12)' : 'rgba(2, 132, 199, 0.08)',
+                            border: '1px solid rgba(2, 132, 199, 0.2)'
+                          }}
+                        >
+                          <Print sx={{ fontSize: 14 }} />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="WhatsApp E-Receipt">
+                        <IconButton
+                          size="small"
+                          onClick={() => sendWhatsApp(inv)}
+                          sx={{
+                            width: 28,
+                            height: 28,
+                            color: '#059669',
+                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(5, 150, 105, 0.15)' : 'rgba(5, 150, 105, 0.08)',
+                            border: '1px solid rgba(5, 150, 105, 0.25)'
+                          }}
+                        >
+                          <WhatsApp sx={{ fontSize: 14 }} />
+                        </IconButton>
+                      </Tooltip>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => handleMenuClick(e, inv.id)}
+                        sx={{
+                          width: 28,
+                          height: 28,
+                          borderRadius: '8px',
+                          border: '1px solid rgba(0, 0, 0, 0.08)',
+                          bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : '#FFFFFF'
+                        }}
+                      >
+                        <MoreVert sx={{ fontSize: 15 }} />
                       </IconButton>
                     </Box>
                   </Box>
@@ -2147,26 +2202,277 @@ const Invoices = () => {
                     anchorEl={anchorEl}
                     open={Boolean(anchorEl) && selectedInvoiceId === inv.id}
                     onClose={handleMenuClose}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                    transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                     PaperProps={{
-                      sx: { width: 200, borderRadius: 2, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }
+                      elevation: 0,
+                      sx: {
+                        width: 270,
+                        p: '8px',
+                        borderRadius: '16px',
+                        border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.22)' : '1px solid rgba(15, 118, 110, 0.16)',
+                        background: (t) => t.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.96)' : 'rgba(255, 255, 255, 0.96)',
+                        backdropFilter: 'blur(20px)',
+                        boxShadow: '0 20px 44px -10px rgba(15, 118, 110, 0.2), 0 8px 24px -6px rgba(0, 0, 0, 0.1)'
+                      }
                     }}
                   >
-                    <MenuItem onClick={() => { setViewInvoice(inv); handleMenuClose(); }}>
-                      <ListItemIcon><Visibility fontSize="small" /></ListItemIcon>
-                      <ListItemText>View</ListItemText>
+                    <Box
+                      sx={{
+                        px: 1.5,
+                        py: 1.1,
+                        mb: 0.75,
+                        borderRadius: '10px',
+                        bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.1)' : 'rgba(15, 118, 110, 0.05)',
+                        border: '1px solid rgba(15, 118, 110, 0.1)'
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            fontFamily: 'monospace',
+                            fontWeight: 800,
+                            fontSize: '0.74rem',
+                            color: '#0F766E'
+                          }}
+                        >
+                          #{inv.invoiceNumber || inv.id?.slice(0, 8)}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            fontWeight: 900,
+                            fontSize: '0.82rem',
+                            color: '#0F766E',
+                            fontVariantNumeric: 'tabular-nums'
+                          }}
+                        >
+                          ₹{Number(inv.total || 0).toLocaleString('en-IN')}
+                        </Typography>
+                      </Box>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          display: 'block',
+                          mt: 0.3,
+                          color: 'text.secondary',
+                          fontSize: '0.7rem',
+                          fontWeight: 600,
+                          textTransform: 'capitalize',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        {inv.customer || 'Walk-in Client'} {inv.phone ? `• ${inv.phone}` : ''}
+                      </Typography>
+                    </Box>
+
+                    <MenuItem
+                      onClick={() => { setViewInvoice(inv); handleMenuClose(); }}
+                      sx={{
+                        py: 0.9,
+                        px: 1.2,
+                        borderRadius: '10px',
+                        my: 0.25,
+                        transition: 'all 0.15s ease',
+                        '&:hover': {
+                          bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(15, 118, 110, 0.07)',
+                          transform: 'translateX(3px)'
+                        }
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          bgcolor: 'rgba(15, 118, 110, 0.1)',
+                          color: '#0F766E',
+                          mr: 1.4,
+                          flexShrink: 0
+                        }}
+                      >
+                        <Visibility sx={{ fontSize: 17 }} />
+                      </Box>
+                      <Box sx={{ flexGrow: 1 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.84rem', lineHeight: 1.2 }}>
+                          View Bill
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.69rem' }}>
+                          Inspect line items, tax & tenders
+                        </Typography>
+                      </Box>
                     </MenuItem>
-                    <MenuItem onClick={() => { downloadPDF(inv); handleMenuClose(); }}>
-                      <ListItemIcon><Download fontSize="small" /></ListItemIcon>
-                      <ListItemText>Download</ListItemText>
+
+                    <MenuItem
+                      onClick={() => { handlePrint(inv); handleMenuClose(); }}
+                      sx={{
+                        py: 0.9,
+                        px: 1.2,
+                        borderRadius: '10px',
+                        my: 0.25,
+                        transition: 'all 0.15s ease',
+                        '&:hover': {
+                          bgcolor: 'rgba(2, 132, 199, 0.07)',
+                          transform: 'translateX(3px)'
+                        }
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          bgcolor: 'rgba(2, 132, 199, 0.1)',
+                          color: '#0284C7',
+                          mr: 1.4,
+                          flexShrink: 0
+                        }}
+                      >
+                        <Print sx={{ fontSize: 17 }} />
+                      </Box>
+                      <Box sx={{ flexGrow: 1 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.84rem', lineHeight: 1.2 }}>
+                          Print Receipt
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.69rem' }}>
+                          Fast thermal slip or A4 format
+                        </Typography>
+                      </Box>
                     </MenuItem>
-                    <MenuItem onClick={() => { sendWhatsApp(inv); handleMenuClose(); }}>
-                      <ListItemIcon><WhatsApp fontSize="small" /></ListItemIcon>
-                      <ListItemText>WhatsApp</ListItemText>
+
+                    <MenuItem
+                      onClick={() => { downloadPDF(inv); handleMenuClose(); }}
+                      sx={{
+                        py: 0.9,
+                        px: 1.2,
+                        borderRadius: '10px',
+                        my: 0.25,
+                        transition: 'all 0.15s ease',
+                        '&:hover': {
+                          bgcolor: 'rgba(217, 119, 6, 0.07)',
+                          transform: 'translateX(3px)'
+                        }
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          bgcolor: 'rgba(217, 119, 6, 0.1)',
+                          color: '#D97706',
+                          mr: 1.4,
+                          flexShrink: 0
+                        }}
+                      >
+                        <Download sx={{ fontSize: 17 }} />
+                      </Box>
+                      <Box sx={{ flexGrow: 1 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.84rem', lineHeight: 1.2 }}>
+                          Download PDF
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.69rem' }}>
+                          Export official customer PDF
+                        </Typography>
+                      </Box>
                     </MenuItem>
-                    <MenuItem onClick={() => { openDeleteDialog(inv.id); handleMenuClose(); }} sx={{ color: 'error.main' }}>
-                      <ListItemIcon><Delete fontSize="small" color="error" /></ListItemIcon>
-                      <ListItemText>Delete</ListItemText>
+
+                    <MenuItem
+                      onClick={() => { sendWhatsApp(inv); handleMenuClose(); }}
+                      sx={{
+                        py: 0.9,
+                        px: 1.2,
+                        borderRadius: '10px',
+                        my: 0.25,
+                        transition: 'all 0.15s ease',
+                        '&:hover': {
+                          bgcolor: 'rgba(5, 150, 105, 0.08)',
+                          transform: 'translateX(3px)'
+                        }
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          bgcolor: 'rgba(5, 150, 105, 0.12)',
+                          color: '#059669',
+                          mr: 1.4,
+                          flexShrink: 0
+                        }}
+                      >
+                        <WhatsApp sx={{ fontSize: 17 }} />
+                      </Box>
+                      <Box sx={{ flexGrow: 1 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.84rem', lineHeight: 1.2 }}>
+                          WhatsApp Bill
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.69rem' }}>
+                          Send instant link to {inv.phone ? inv.phone : 'customer'}
+                        </Typography>
+                      </Box>
                     </MenuItem>
+
+                    {user?.role === 'admin' && (
+                      <>
+                        <Divider sx={{ my: 0.75, borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' }} />
+                        <MenuItem
+                          onClick={() => { openDeleteDialog(inv.id); handleMenuClose(); }}
+                          sx={{
+                            py: 0.9,
+                            px: 1.2,
+                            borderRadius: '10px',
+                            my: 0.25,
+                            transition: 'all 0.15s ease',
+                            '&:hover': {
+                              bgcolor: 'rgba(220, 38, 38, 0.08)',
+                              transform: 'translateX(3px)'
+                            }
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              width: 32,
+                              height: 32,
+                              borderRadius: '8px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              bgcolor: 'rgba(220, 38, 38, 0.1)',
+                              color: '#DC2626',
+                              mr: 1.4,
+                              flexShrink: 0
+                            }}
+                          >
+                            <Delete sx={{ fontSize: 17 }} />
+                          </Box>
+                          <Box sx={{ flexGrow: 1 }}>
+                            <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.84rem', lineHeight: 1.2, color: '#DC2626' }}>
+                              Delete Invoice
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: 'rgba(220, 38, 38, 0.7)', fontSize: '0.69rem' }}>
+                              Permanent ledger removal
+                            </Typography>
+                          </Box>
+                        </MenuItem>
+                      </>
+                    )}
                   </Menu>
                 </CardContent>
               </GlassCard>
@@ -2213,7 +2519,7 @@ const Invoices = () => {
                         Amount
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Actions</TableCell>
+                    <TableCell align="right" sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em', pr: 2.5 }}>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -2351,60 +2657,385 @@ const Invoices = () => {
                             ₹{Number(inv.total || 0).toLocaleString('en-IN')}
                           </Typography>
                         </TableCell>
-                        <TableCell>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                        <TableCell align="right">
+                          <Box
+                            sx={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 0.75,
+                              p: '3px 6px',
+                              borderRadius: '24px',
+                              bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)',
+                              border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.12)'
+                            }}
+                          >
+                            <Tooltip title="View Invoice">
+                              <IconButton
+                                size="small"
+                                onClick={() => setViewInvoice(inv)}
+                                sx={{
+                                  width: 30,
+                                  height: 30,
+                                  color: '#0F766E',
+                                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+                                  border: '1px solid rgba(15, 118, 110, 0.16)',
+                                  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                                  transition: 'all 0.18s ease',
+                                  '&:hover': {
+                                    bgcolor: '#0F766E',
+                                    color: '#FFFFFF',
+                                    transform: 'translateY(-1px)',
+                                    boxShadow: '0 4px 10px rgba(15, 118, 110, 0.3)'
+                                  }
+                                }}
+                              >
+                                <Visibility sx={{ fontSize: 16 }} />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Print Receipt">
+                              <IconButton
+                                size="small"
+                                onClick={() => handlePrint(inv)}
+                                sx={{
+                                  width: 30,
+                                  height: 30,
+                                  color: '#0284C7',
+                                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+                                  border: '1px solid rgba(2, 132, 199, 0.18)',
+                                  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                                  transition: 'all 0.18s ease',
+                                  '&:hover': {
+                                    bgcolor: '#0284C7',
+                                    color: '#FFFFFF',
+                                    transform: 'translateY(-1px)',
+                                    boxShadow: '0 4px 10px rgba(2, 132, 199, 0.3)'
+                                  }
+                                }}
+                              >
+                                <Print sx={{ fontSize: 16 }} />
+                              </IconButton>
+                            </Tooltip>
                             <Tooltip title="Send WhatsApp E-Receipt">
                               <IconButton
                                 size="small"
                                 onClick={() => sendWhatsApp(inv)}
                                 sx={{
+                                  width: 30,
+                                  height: 30,
                                   color: '#059669',
-                                  bgcolor: 'rgba(5, 150, 105, 0.08)',
-                                  border: '1px solid rgba(5, 150, 105, 0.25)',
-                                  '&:hover': { bgcolor: 'rgba(5, 150, 105, 0.18)', transform: 'scale(1.05)' },
-                                  transition: 'all 0.15s ease'
+                                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(5, 150, 105, 0.16)' : 'rgba(5, 150, 105, 0.09)',
+                                  border: '1px solid rgba(5, 150, 105, 0.28)',
+                                  boxShadow: '0 1px 3px rgba(5, 150, 105, 0.1)',
+                                  transition: 'all 0.18s ease',
+                                  '&:hover': {
+                                    bgcolor: '#059669',
+                                    color: '#FFFFFF',
+                                    transform: 'translateY(-1px)',
+                                    boxShadow: '0 4px 12px rgba(5, 150, 105, 0.35)'
+                                  }
                                 }}
                               >
                                 <WhatsApp sx={{ fontSize: 16 }} />
                               </IconButton>
                             </Tooltip>
-                            <IconButton
-                              size="small"
-                              onClick={(e) => handleMenuClick(e, inv.id)}
-                              sx={{
-                                color: '#0F766E',
-                                bgcolor: 'action.hover',
-                                '&:hover': { bgcolor: 'primary.light', color: 'primary.contrastText' }
-                              }}
-                            >
-                              <MoreVert fontSize="small" />
-                            </IconButton>
+                            <Tooltip title="More Options">
+                              <IconButton
+                                size="small"
+                                onClick={(e) => handleMenuClick(e, inv.id)}
+                                sx={{
+                                  width: 30,
+                                  height: 30,
+                                  color: selectedInvoiceId === inv.id ? '#0F766E' : 'text.secondary',
+                                  bgcolor: selectedInvoiceId === inv.id
+                                    ? 'rgba(15, 118, 110, 0.14)'
+                                    : (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : '#FFFFFF',
+                                  border: '1px solid rgba(0, 0, 0, 0.08)',
+                                  transition: 'all 0.18s ease',
+                                  '&:hover': {
+                                    bgcolor: 'rgba(15, 118, 110, 0.1)',
+                                    color: '#0F766E',
+                                    borderColor: 'rgba(15, 118, 110, 0.25)'
+                                  }
+                                }}
+                              >
+                                <MoreVert sx={{ fontSize: 17 }} />
+                              </IconButton>
+                            </Tooltip>
                           </Box>
                           <Menu
                             anchorEl={anchorEl}
                             open={Boolean(anchorEl) && selectedInvoiceId === inv.id}
                             onClose={handleMenuClose}
+                            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                             PaperProps={{
-                              sx: { width: 200, borderRadius: 2, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }
+                              elevation: 0,
+                              sx: {
+                                width: 270,
+                                p: '8px',
+                                borderRadius: '16px',
+                                border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.22)' : '1px solid rgba(15, 118, 110, 0.16)',
+                                background: (t) => t.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.96)' : 'rgba(255, 255, 255, 0.96)',
+                                backdropFilter: 'blur(20px)',
+                                boxShadow: '0 20px 44px -10px rgba(15, 118, 110, 0.2), 0 8px 24px -6px rgba(0, 0, 0, 0.1)'
+                              }
                             }}
                           >
-                            <MenuItem onClick={() => { setViewInvoice(inv); handleMenuClose(); }}>
-                              <ListItemIcon><Visibility fontSize="small" /></ListItemIcon>
-                              <ListItemText>View</ListItemText>
+                            <Box
+                              sx={{
+                                px: 1.5,
+                                py: 1.1,
+                                mb: 0.75,
+                                borderRadius: '10px',
+                                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.1)' : 'rgba(15, 118, 110, 0.05)',
+                                border: '1px solid rgba(15, 118, 110, 0.1)'
+                              }}
+                            >
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Typography
+                                  variant="caption"
+                                  sx={{
+                                    fontFamily: 'monospace',
+                                    fontWeight: 800,
+                                    fontSize: '0.74rem',
+                                    color: '#0F766E'
+                                  }}
+                                >
+                                  #{inv.invoiceNumber || inv.id?.slice(0, 8)}
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  sx={{
+                                    fontWeight: 900,
+                                    fontSize: '0.82rem',
+                                    color: '#0F766E',
+                                    fontVariantNumeric: 'tabular-nums'
+                                  }}
+                                >
+                                  ₹{Number(inv.total || 0).toLocaleString('en-IN')}
+                                </Typography>
+                              </Box>
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  display: 'block',
+                                  mt: 0.3,
+                                  color: 'text.secondary',
+                                  fontSize: '0.7rem',
+                                  fontWeight: 600,
+                                  textTransform: 'capitalize',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap'
+                                }}
+                              >
+                                {inv.customer || 'Walk-in Client'} {inv.phone ? `• ${inv.phone}` : ''}
+                              </Typography>
+                            </Box>
+
+                            <MenuItem
+                              onClick={() => { setViewInvoice(inv); handleMenuClose(); }}
+                              sx={{
+                                py: 0.9,
+                                px: 1.2,
+                                borderRadius: '10px',
+                                my: 0.25,
+                                transition: 'all 0.15s ease',
+                                '&:hover': {
+                                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(15, 118, 110, 0.07)',
+                                  transform: 'translateX(3px)'
+                                }
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '8px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  bgcolor: 'rgba(15, 118, 110, 0.1)',
+                                  color: '#0F766E',
+                                  mr: 1.4,
+                                  flexShrink: 0
+                                }}
+                              >
+                                <Visibility sx={{ fontSize: 17 }} />
+                              </Box>
+                              <Box sx={{ flexGrow: 1 }}>
+                                <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.84rem', lineHeight: 1.2 }}>
+                                  View Bill
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.69rem' }}>
+                                  Inspect line items, tax & tenders
+                                </Typography>
+                              </Box>
                             </MenuItem>
-                            <MenuItem onClick={() => { downloadPDF(inv); handleMenuClose(); }}>
-                              <ListItemIcon><Download fontSize="small" /></ListItemIcon>
-                              <ListItemText>Download PDF</ListItemText>
+
+                            <MenuItem
+                              onClick={() => { handlePrint(inv); handleMenuClose(); }}
+                              sx={{
+                                py: 0.9,
+                                px: 1.2,
+                                borderRadius: '10px',
+                                my: 0.25,
+                                transition: 'all 0.15s ease',
+                                '&:hover': {
+                                  bgcolor: 'rgba(2, 132, 199, 0.07)',
+                                  transform: 'translateX(3px)'
+                                }
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '8px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  bgcolor: 'rgba(2, 132, 199, 0.1)',
+                                  color: '#0284C7',
+                                  mr: 1.4,
+                                  flexShrink: 0
+                                }}
+                              >
+                                <Print sx={{ fontSize: 17 }} />
+                              </Box>
+                              <Box sx={{ flexGrow: 1 }}>
+                                <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.84rem', lineHeight: 1.2 }}>
+                                  Print Receipt
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.69rem' }}>
+                                  Fast thermal slip or A4 format
+                                </Typography>
+                              </Box>
                             </MenuItem>
-                            <MenuItem onClick={() => { sendWhatsApp(inv); handleMenuClose(); }}>
-                              <ListItemIcon><WhatsApp fontSize="small" /></ListItemIcon>
-                              <ListItemText>WhatsApp</ListItemText>
+
+                            <MenuItem
+                              onClick={() => { downloadPDF(inv); handleMenuClose(); }}
+                              sx={{
+                                py: 0.9,
+                                px: 1.2,
+                                borderRadius: '10px',
+                                my: 0.25,
+                                transition: 'all 0.15s ease',
+                                '&:hover': {
+                                  bgcolor: 'rgba(217, 119, 6, 0.07)',
+                                  transform: 'translateX(3px)'
+                                }
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '8px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  bgcolor: 'rgba(217, 119, 6, 0.1)',
+                                  color: '#D97706',
+                                  mr: 1.4,
+                                  flexShrink: 0
+                                }}
+                              >
+                                <Download sx={{ fontSize: 17 }} />
+                              </Box>
+                              <Box sx={{ flexGrow: 1 }}>
+                                <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.84rem', lineHeight: 1.2 }}>
+                                  Download PDF
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.69rem' }}>
+                                  Export official customer PDF
+                                </Typography>
+                              </Box>
                             </MenuItem>
+
+                            <MenuItem
+                              onClick={() => { sendWhatsApp(inv); handleMenuClose(); }}
+                              sx={{
+                                py: 0.9,
+                                px: 1.2,
+                                borderRadius: '10px',
+                                my: 0.25,
+                                transition: 'all 0.15s ease',
+                                '&:hover': {
+                                  bgcolor: 'rgba(5, 150, 105, 0.08)',
+                                  transform: 'translateX(3px)'
+                                }
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '8px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  bgcolor: 'rgba(5, 150, 105, 0.12)',
+                                  color: '#059669',
+                                  mr: 1.4,
+                                  flexShrink: 0
+                                }}
+                              >
+                                <WhatsApp sx={{ fontSize: 17 }} />
+                              </Box>
+                              <Box sx={{ flexGrow: 1 }}>
+                                <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.84rem', lineHeight: 1.2 }}>
+                                  WhatsApp Bill
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.69rem' }}>
+                                  Send instant link to {inv.phone ? inv.phone : 'customer'}
+                                </Typography>
+                              </Box>
+                            </MenuItem>
+
                             {user?.role === 'admin' && (
-                              <MenuItem onClick={() => { openDeleteDialog(inv.id); handleMenuClose(); }} sx={{ color: 'error.main' }}>
-                                <ListItemIcon><Delete fontSize="small" color="error" /></ListItemIcon>
-                                <ListItemText>Delete</ListItemText>
-                              </MenuItem>
+                              <>
+                                <Divider sx={{ my: 0.75, borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' }} />
+                                <MenuItem
+                                  onClick={() => { openDeleteDialog(inv.id); handleMenuClose(); }}
+                                  sx={{
+                                    py: 0.9,
+                                    px: 1.2,
+                                    borderRadius: '10px',
+                                    my: 0.25,
+                                    transition: 'all 0.15s ease',
+                                    '&:hover': {
+                                      bgcolor: 'rgba(220, 38, 38, 0.08)',
+                                      transform: 'translateX(3px)'
+                                    }
+                                  }}
+                                >
+                                  <Box
+                                    sx={{
+                                      width: 32,
+                                      height: 32,
+                                      borderRadius: '8px',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      bgcolor: 'rgba(220, 38, 38, 0.1)',
+                                      color: '#DC2626',
+                                      mr: 1.4,
+                                      flexShrink: 0
+                                    }}
+                                  >
+                                    <Delete sx={{ fontSize: 17 }} />
+                                  </Box>
+                                  <Box sx={{ flexGrow: 1 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.84rem', lineHeight: 1.2, color: '#DC2626' }}>
+                                      Delete Invoice
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ color: 'rgba(220, 38, 38, 0.7)', fontSize: '0.69rem' }}>
+                                      Permanent ledger removal
+                                    </Typography>
+                                  </Box>
+                                </MenuItem>
+                              </>
                             )}
                           </Menu>
                         </TableCell>
