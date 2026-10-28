@@ -48,7 +48,8 @@ import {
   BarChart,
   FactCheck,
   QrCodeScanner,
-  Close
+  Close,
+  ViewHeadline
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
@@ -65,7 +66,7 @@ const SIDEBAR_COLLAPSED_WIDTH = 74;
 export default function Layout() {
   const { logout, user } = useAuth();
   const { profile } = useData();
-  const { mode, toggleTheme } = useThemeContext();
+  const { mode, toggleTheme, density, toggleDensity } = useThemeContext();
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
@@ -735,6 +736,28 @@ export default function Layout() {
 
             {/* Notification Center */}
             <NotificationCenter />
+
+            {/* Table Density Toggle (Comfortable vs Compact) */}
+            <Tooltip title={density === 'compact' ? "Table Layout: Compact (Click for Comfortable)" : "Table Layout: Comfortable (Click for Compact)"}>
+              <IconButton 
+                onClick={toggleDensity} 
+                size="small"
+                sx={{ 
+                  width: 36, 
+                  height: 36, 
+                  borderRadius: '9px',
+                  border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(15, 118, 110, 0.15)',
+                  color: density === 'compact' ? (isDark ? '#2DD4BF' : '#0F766E') : 'text.secondary',
+                  bgcolor: density === 'compact' ? (isDark ? 'rgba(20, 184, 166, 0.14)' : 'rgba(15, 118, 110, 0.08)') : 'transparent',
+                  display: { xs: 'none', sm: 'inline-flex' },
+                  '&:hover': {
+                    bgcolor: isDark ? 'rgba(20, 184, 166, 0.22)' : 'rgba(15, 118, 110, 0.12)'
+                  }
+                }}
+              >
+                <ViewHeadline fontSize="small" />
+              </IconButton>
+            </Tooltip>
 
             {/* Theme Toggle (Porcelain / Midnight Emerald) */}
             <IconButton 

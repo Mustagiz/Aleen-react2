@@ -11,12 +11,25 @@ export const ThemeProvider = ({ children }) => {
         return savedMode || 'light';
     });
 
+    const [density, setDensity] = useState(() => {
+        const savedDensity = localStorage.getItem('themeDensity');
+        return savedDensity || 'comfortable';
+    });
+
     useEffect(() => {
         localStorage.setItem('themeMode', mode);
     }, [mode]);
 
+    useEffect(() => {
+        localStorage.setItem('themeDensity', density);
+    }, [density]);
+
     const toggleTheme = () => {
         setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+    };
+
+    const toggleDensity = () => {
+        setDensity((prev) => (prev === 'comfortable' ? 'compact' : 'comfortable'));
     };
 
     const theme = useMemo(() =>
@@ -151,7 +164,7 @@ export const ThemeProvider = ({ children }) => {
                                 letterSpacing: '0.08em',
                                 color: mode === 'light' ? '#0F766E' : '#14B8A6',
                                 borderBottom: mode === 'light' ? '1.5px solid rgba(15, 118, 110, 0.16)' : '1.5px solid rgba(255, 255, 255, 0.1)',
-                                padding: '14px 18px'
+                                padding: density === 'compact' ? '8px 12px' : '14px 18px'
                             }
                         }
                     }
@@ -172,7 +185,7 @@ export const ThemeProvider = ({ children }) => {
                 MuiTableCell: {
                     styleOverrides: {
                         root: {
-                            padding: '14px 18px',
+                            padding: density === 'compact' ? '8px 12px' : '14px 18px',
                             fontFeatureSettings: '"tnum"',
                             borderColor: mode === 'light' ? 'rgba(15, 118, 110, 0.08)' : 'rgba(255, 255, 255, 0.06)'
                         }
@@ -203,11 +216,11 @@ export const ThemeProvider = ({ children }) => {
                     }
                 }
             }
-        }), [mode]
+        }), [mode, density]
     );
 
     return (
-        <ThemeContext.Provider value={{ mode, toggleTheme }}>
+        <ThemeContext.Provider value={{ mode, toggleTheme, density, toggleDensity, setDensity }}>
             <MUIThemeProvider theme={theme}>
                 {children}
             </MUIThemeProvider>

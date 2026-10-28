@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel, CircularProgress, Alert, Snackbar, InputAdornment, List } from '@mui/material';
-import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, QrCode2, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, PauseCircleOutline, ShoppingCart, RestartAlt, CalendarMonth, Phone, Straighten, Clear, Stars, Redeem, AccountBalanceWallet } from '@mui/icons-material';
+import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, QrCode2, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, PauseCircleOutline, ShoppingCart, RestartAlt, CalendarMonth, Phone, Straighten, Clear, Stars, Redeem, AccountBalanceWallet, Keyboard } from '@mui/icons-material';
 import { Html5Qrcode } from 'html5-qrcode';
 import { db } from '../firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -36,6 +36,7 @@ const Invoices = () => {
   const { user } = useAuth();
   const { inventory, invoices, addInvoice, updateInvoice, deleteInvoice, profile, customers, addCustomer, loading, invoiceTemplateSettings, updateInvoiceTemplateSettings, redeemLoyaltyPoints, updateCustomer } = useData();
   const { mode } = useThemeContext();
+  const isDark = mode === 'dark';
   const [open, setOpen] = useState(false);
   const [viewInvoice, setViewInvoice] = useState(null);
   const [whatsAppDialogOpen, setWhatsAppDialogOpen] = useState(false);
@@ -56,6 +57,7 @@ const Invoices = () => {
   const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [offscreenInvoice, setOffscreenInvoice] = useState(null);
   const [clientValidationErrors, setClientValidationErrors] = useState({ customer: false, phone: false });
+  const [shortcutHelpOpen, setShortcutHelpOpen] = useState(false);
   const offscreenInvoiceRef = useRef(null);
 
   useEffect(() => {
@@ -146,25 +148,48 @@ const Invoices = () => {
 
   const handleSaveInvoiceRef = useRef(null);
 
-  // Keyboard-First Hotkeys: F2 (New Bill), F4 (Pay / Issue), ESC (Close)
+  // Keyboard-First Hotkeys: F1 (Hotkeys), F2 (New Bill), F4 (Pay / Issue), F7 (Held Carts), ESC (Close)
   React.useEffect(() => {
     const handleKeyDown = (e) => {
+      const activeEl = document.activeElement;
+      const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+
+      // F1 or ? (outside input): Open Hotkeys Legend
+      if (e.key === 'F1' || (!isInput && e.key === '?')) {
+        e.preventDefault();
+        setShortcutHelpOpen(prev => !prev);
+        return;
+      }
+
       // F2 or Alt + N: New Invoice
       if (e.key === 'F2' || (e.altKey && e.key.toLowerCase() === 'n')) {
         e.preventDefault();
         setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0 }]);
         setOpen(true);
+        return;
       }
+
       // F4 or Alt + P: Issue / Pay current invoice
-      else if (e.key === 'F4' || (e.altKey && e.key.toLowerCase() === 'p')) {
+      if (e.key === 'F4' || (e.altKey && e.key.toLowerCase() === 'p')) {
         if (open && handleSaveInvoiceRef.current) {
           e.preventDefault();
           handleSaveInvoiceRef.current();
         }
+        return;
       }
+
+      // F7 or Alt + H: Held Carts
+      if (e.key === 'F7' || (e.altKey && e.key.toLowerCase() === 'h')) {
+        e.preventDefault();
+        setHeldCartsDialogOpen(prev => !prev);
+        return;
+      }
+
       // ESC: Close open modals
-      else if (e.key === 'Escape') {
-        if (heldCartsDialogOpen) {
+      if (e.key === 'Escape') {
+        if (shortcutHelpOpen) {
+          setShortcutHelpOpen(false);
+        } else if (heldCartsDialogOpen) {
           setHeldCartsDialogOpen(false);
         } else if (open) {
           setOpen(false);
@@ -173,7 +198,7 @@ const Invoices = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, heldCartsDialogOpen]);
+  }, [open, heldCartsDialogOpen, shortcutHelpOpen]);
 
   const handleMenuClick = (event, invoiceId) => {
     setAnchorEl(event.currentTarget);
@@ -1686,6 +1711,50 @@ const Invoices = () => {
                 Held Carts ({parkedCarts.length})
               </Button>
             )}
+            {/* POS Keyboard Accelerators Help */}
+            <Button
+              variant="outlined"
+              startIcon={<Keyboard sx={{ fontSize: 18, color: 'text.secondary' }} />}
+              onClick={() => setShortcutHelpOpen(true)}
+              sx={{
+                height: 42,
+                minHeight: 42,
+                px: 2,
+                borderRadius: '24px',
+                fontWeight: 700,
+                fontSize: '0.84rem',
+                textTransform: 'none',
+                display: { xs: 'none', md: 'inline-flex' },
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 0.75,
+                border: isDark ? '1.5px solid rgba(255, 255, 255, 0.12)' : '1.5px solid rgba(15, 118, 110, 0.18)',
+                color: 'text.secondary',
+                bgcolor: isDark ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
+                boxSizing: 'border-box',
+                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                '&:hover': {
+                  borderColor: isDark ? '#2DD4BF' : '#0F766E',
+                  color: isDark ? '#2DD4BF' : '#0F766E',
+                  bgcolor: isDark ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)',
+                  transform: 'translateY(-1px)'
+                }
+              }}
+            >
+              <span>Hotkeys</span>
+              <Chip
+                label="F1"
+                size="small"
+                sx={{
+                  height: 20,
+                  fontSize: '0.68rem',
+                  fontWeight: 800,
+                  bgcolor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.06)',
+                  color: 'text.secondary',
+                  borderRadius: '6px'
+                }}
+              />
+            </Button>
             <Button
               variant="contained"
               startIcon={<Add sx={{ fontSize: 19, color: '#FFFFFF !important' }} />}
@@ -4929,6 +4998,109 @@ const Invoices = () => {
           }
         }}
       />
+
+      {/* POS Keyboard Accelerators Guide Dialog */}
+      <Dialog
+        open={shortcutHelpOpen}
+        onClose={() => setShortcutHelpOpen(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3.5,
+            overflow: 'hidden',
+            bgcolor: mode === 'dark' ? '#0F1E1D' : '#FFFFFF',
+            border: mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.22)' : '1px solid rgba(15, 118, 110, 0.15)',
+            boxShadow: mode === 'dark' ? '0 24px 60px rgba(0, 0, 0, 0.75)' : '0 24px 60px rgba(10, 77, 70, 0.2)'
+          }
+        }}
+      >
+        <DialogTitle
+          sx={{
+            background: mode === 'dark'
+              ? 'linear-gradient(135deg, #042F2E 0%, #0F1E1D 100%)'
+              : 'linear-gradient(135deg, #0A4D46 0%, #0F766E 100%)',
+            color: '#FFFFFF',
+            px: 2.5,
+            py: 2,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+            <Keyboard sx={{ color: '#2DD4BF', fontSize: 22 }} />
+            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#FFFFFF' }}>
+              POS Cashier Hotkeys
+            </Typography>
+          </Box>
+          <IconButton size="small" onClick={() => setShortcutHelpOpen(false)} sx={{ color: '#FFFFFF' }}>
+            <Close fontSize="small" />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ p: 2.5, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+          {[
+            { key: 'F2', alt: 'Alt+N', label: 'Open New Retail Invoice' },
+            { key: 'F4', alt: 'Alt+P', label: 'Instant Pay & Issue Invoice' },
+            { key: 'F7', alt: 'Alt+H', label: 'Park or Recall Held Carts' },
+            { key: 'F8', alt: '', label: 'Toggle Split Dual-Payment' },
+            { key: 'Enter', alt: 'Scanner', label: 'Barcode Gun Auto-Add' },
+            { key: 'Esc', alt: '', label: 'Close Active Dialog / Modal' },
+            { key: 'F1 / ?', alt: '', label: 'Toggle Hotkeys Legend' }
+          ].map((item, idx) => (
+            <Box
+              key={idx}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                p: 1.25,
+                borderRadius: 2,
+                bgcolor: mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(15, 118, 110, 0.035)',
+                border: '1px solid',
+                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(15, 118, 110, 0.08)'
+              }}
+            >
+              <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary', fontSize: '0.84rem' }}>
+                {item.label}
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                <Chip
+                  label={item.key}
+                  size="small"
+                  sx={{
+                    fontFamily: 'monospace',
+                    fontWeight: 800,
+                    fontSize: '0.74rem',
+                    bgcolor: mode === 'dark' ? 'rgba(20, 184, 166, 0.18)' : '#CCFBF1',
+                    color: mode === 'dark' ? '#2DD4BF' : '#0F766E',
+                    border: '1px solid',
+                    borderColor: mode === 'dark' ? 'rgba(20, 184, 166, 0.35)' : 'rgba(15, 118, 110, 0.25)'
+                  }}
+                />
+                {item.alt && (
+                  <Chip
+                    label={item.alt}
+                    size="small"
+                    sx={{
+                      fontFamily: 'monospace',
+                      fontWeight: 700,
+                      fontSize: '0.68rem',
+                      bgcolor: mode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : '#F1F5F9',
+                      color: 'text.secondary'
+                    }}
+                  />
+                )}
+              </Box>
+            </Box>
+          ))}
+        </DialogContent>
+        <DialogActions sx={{ px: 2.5, py: 1.5, borderTop: '1px solid', borderColor: 'divider' }}>
+          <Button onClick={() => setShortcutHelpOpen(false)} fullWidth variant="outlined" sx={{ borderRadius: 2, fontWeight: 700 }}>
+            Got It (Esc)
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Hidden offscreen container for pixel-perfect PDF export */}
       <Box sx={{ position: 'fixed', left: '-9999px', top: '-9999px', width: invoiceSettings.template === 'boutique-slip' ? 480 : 840, zIndex: -100 }}>
