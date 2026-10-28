@@ -380,8 +380,8 @@ const InventoryReports = () => {
                               <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>
                                 {item.name}
                               </Typography>
-                              <Typography variant="caption" sx={{ color: 'text.secondary', fontFamily: 'monospace' }}>
-                                SKU: #{item.id}
+                              <Typography variant="caption" sx={{ color: 'text.secondary', fontFamily: 'monospace', textTransform: 'uppercase' }}>
+                                SKU: #{String(item.productId || item.id || '').toUpperCase()}
                               </Typography>
                             </TableCell>
                             <TableCell>
@@ -538,8 +538,8 @@ const InventoryReports = () => {
                         <TableRow key={item.id} hover sx={{ '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.02)' } }}>
                           <TableCell>
                             <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.name}</Typography>
-                            <Typography variant="caption" sx={{ color: 'text.secondary', fontFamily: 'monospace' }}>
-                              SKU #{item.id}
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontFamily: 'monospace', textTransform: 'uppercase' }}>
+                              SKU #{String(item.productId || item.id || '').toUpperCase()}
                             </Typography>
                           </TableCell>
                           <TableCell>

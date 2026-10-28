@@ -46,7 +46,8 @@ export const calculateLineItem = (item, inventory = []) => {
     quantity,
     lineTotal: Number((price * quantity).toFixed(2)),
     category: invItem?.category || 'General',
-    variantSku: item.variantSku || null,
+    variantSku: item.variantSku ? String(item.variantSku).toUpperCase() : null,
+    productId: invItem?.productId ? String(invItem.productId).toUpperCase() : undefined,
     variantDetails: variant ? `${variant.size} / ${variant.color}` : null,
     isCustom: false
   };

@@ -190,7 +190,7 @@ const Inventory = () => {
   const handleAutoGenerateSku = () => {
     const cat = form.category ? form.category.slice(0, 3).toUpperCase() : 'ALN';
     const rand = Math.floor(1000 + Math.random() * 9000);
-    setForm(prev => ({ ...prev, productId: `${cat}-${rand}` }));
+    setForm(prev => ({ ...prev, productId: `${cat}-${rand}`.toUpperCase() }));
   };
 
   const handleOpen = (item = null) => {
@@ -198,7 +198,7 @@ const Inventory = () => {
     if (item) {
       setEditItem(item);
       setForm({
-        productId: item.productId || '',
+        productId: (item.productId || '').toUpperCase(),
         name: item.name || '',
         category: item.category || safeCategories[0] || 'Sarees',
         size: item.size || 'Free Size',
@@ -232,7 +232,7 @@ const Inventory = () => {
   };
 
   const handleSave = async () => {
-    const productId = form.productId.trim() || `PRD-${Date.now()}`;
+    const productId = (form.productId.trim() || `PRD-${Date.now()}`).toUpperCase();
 
     // Validate variants if enabled
     if (form.hasVariants && (!form.variants || form.variants.length === 0)) {
@@ -259,7 +259,7 @@ const Inventory = () => {
   };
 
   const addVariant = () => {
-    const sku = `${form.productId || 'PRD'}-${(form.variants || []).length + 1}`;
+    const sku = `${(form.productId || 'PRD').toUpperCase()}-${(form.variants || []).length + 1}`.toUpperCase();
     setForm(prev => ({
       ...prev,
       variants: [...(prev.variants || []), { sku, size: prev.size || 'Free Size', color: prev.color || 'Std', quantity: 5, minStockLevel: 2, price: prev.price || 0 }]
@@ -1082,6 +1082,7 @@ const Inventory = () => {
                                   color: '#0F766E',
                                   fontWeight: 700,
                                   fontSize: '0.72rem',
+                                  textTransform: 'uppercase',
                                   px: 0.8,
                                   py: 0.2,
                                   borderRadius: '6px',
@@ -1089,7 +1090,7 @@ const Inventory = () => {
                                   border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.25)' : 'rgba(15, 118, 110, 0.15)'}`
                                 }}
                               >
-                                #{item.productId || 'NO-SKU'}
+                                #{String(item.productId || 'NO-SKU').toUpperCase()}
                               </Typography>
                             </Box>
                             <Typography
@@ -1460,10 +1461,11 @@ const Inventory = () => {
                               color: '#0F766E',
                               fontFamily: 'monospace',
                               fontSize: '0.85rem',
-                              letterSpacing: '0.02em'
+                              letterSpacing: '0.02em',
+                              textTransform: 'uppercase'
                             }}
                           >
-                            #{item.productId || 'N/A'}
+                            #{String(item.productId || 'N/A').toUpperCase()}
                           </Typography>
                         </TableCell>
 
@@ -1811,7 +1813,8 @@ const Inventory = () => {
                     label="Product SKU / ID"
                     placeholder="e.g. SAR-1002"
                     value={form.productId}
-                    onChange={(e) => setForm({ ...form, productId: e.target.value })}
+                    onChange={(e) => setForm({ ...form, productId: e.target.value.toUpperCase() })}
+                    inputProps={{ style: { textTransform: 'uppercase' } }}
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">
@@ -2177,8 +2180,8 @@ const Inventory = () => {
                         ) : (
                           form.variants.map((v, idx) => (
                             <TableRow key={idx} hover>
-                              <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.75rem', fontWeight: 700 }}>
-                                {v.sku}
+                              <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>
+                                {String(v.sku || '').toUpperCase()}
                               </TableCell>
                               <TableCell>
                                 <TextField

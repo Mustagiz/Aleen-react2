@@ -469,6 +469,11 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                   <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '0.86rem' }}>
                     {item.name}
                   </Typography>
+                  {(item.variantSku || item.productId || item.sku) && (
+                    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', fontSize: '0.67rem', fontFamily: 'monospace', textTransform: 'uppercase' }}>
+                      SKU: {String(item.variantSku || item.productId || item.sku).toUpperCase()}
+                    </Typography>
+                  )}
                   {isSlip && item.category && (
                     <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
                       {item.category}

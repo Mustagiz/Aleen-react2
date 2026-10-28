@@ -3095,8 +3095,8 @@ const Invoices = () => {
                                       <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <Box>
                                           <Typography variant="body2" sx={{ fontWeight: 700 }}>{option.name}</Typography>
-                                          <Typography variant="caption" color="text.secondary">
-                                            ID: {option.productId || option.sku || 'N/A'} • ₹{option.price}
+                                          <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase' }}>
+                                            ID: {String(option.productId || option.sku || 'N/A').toUpperCase()} • ₹{option.price}
                                           </Typography>
                                         </Box>
                                         <Chip

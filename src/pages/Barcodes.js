@@ -223,10 +223,11 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                         fontFamily: 'monospace',
                         letterSpacing: '0.08em',
                         lineHeight: 1,
-                        color: '#111827'
+                        color: '#111827',
+                        textTransform: 'uppercase'
                     }}
                 >
-                    {value}
+                    {String(value || '').toUpperCase()}
                 </Typography>
             )}
 
@@ -343,8 +344,8 @@ export default function BarcodeGenerator() {
                             const mrp = Number(variant.mrp || product.mrp) || Math.round(selling * (settings.mrpMultiplier || 1.25));
                             newProducts.push({
                                 ...product,
-                                id: `${product.id}-${variant.sku}`,
-                                productId: variant.sku,
+                                id: `${product.id}-${String(variant.sku || '').toUpperCase()}`,
+                                productId: String(variant.sku || '').toUpperCase(),
                                 name: product.name,
                                 variantName: `${variant.size || ''} ${variant.color || ''}`.trim(),
                                 price: selling,
@@ -503,10 +504,10 @@ export default function BarcodeGenerator() {
             if (item.hasVariants && item.variants?.length > 0) {
                 return item.variants.map(v => ({
                     ...item,
-                    id: `${item.id}-${v.sku}`,
+                    id: `${item.id}-${String(v.sku || '').toUpperCase()}`,
                     name: item.name,
                     variantName: `${v.size || ''} ${v.color || ''}`.trim(),
-                    productId: v.sku,
+                    productId: String(v.sku || '').toUpperCase(),
                     price: v.price || item.price,
                     quantity: v.quantity,
                     category: item.category
@@ -1452,8 +1453,8 @@ export default function BarcodeGenerator() {
                                         )}
                                     </Box>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 0.25 }}>
-                                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 700 }}>
-                                            #{option.productId || 'NO-SKU'}
+                                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 700, textTransform: 'uppercase' }}>
+                                            #{String(option.productId || 'NO-SKU').toUpperCase()}
                                         </Typography>
                                         {option.category && (
                                             <Typography variant="caption" color="text.secondary">
@@ -1587,8 +1588,8 @@ export default function BarcodeGenerator() {
                                                         />
                                                     )}
                                                 </TableCell>
-                                                <TableCell sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 700, fontSize: '0.75rem' }}>
-                                                    #{item.productId || 'NO-SKU'}
+                                                <TableCell sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase' }}>
+                                                    #{String(item.productId || 'NO-SKU').toUpperCase()}
                                                 </TableCell>
                                                 <TableCell>
                                                     <Chip
@@ -1723,8 +1724,8 @@ export default function BarcodeGenerator() {
                                                         {product.name}
                                                     </Typography>
                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.25, flexWrap: 'wrap' }}>
-                                                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 700 }}>
-                                                            #{product.productId}
+                                                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 700, textTransform: 'uppercase' }}>
+                                                            #{String(product.productId || '').toUpperCase()}
                                                         </Typography>
                                                         {product.variantName && (
                                                             <Chip
@@ -1989,7 +1990,7 @@ export default function BarcodeGenerator() {
                                             {item.name}
                                             {item.variantName && <span style={{ color: '#6b7280', fontWeight: 500 }}> ({item.variantName})</span>}
                                         </TableCell>
-                                        <TableCell sx={{ fontFamily: 'monospace' }}>{item.productId}</TableCell>
+                                        <TableCell sx={{ fontFamily: 'monospace', textTransform: 'uppercase' }}>{String(item.productId || '').toUpperCase()}</TableCell>
                                         <TableCell>
                                             <Chip label={item.category || 'General'} size="small" variant="outlined" sx={{ height: 22 }} />
                                         </TableCell>
@@ -2064,7 +2065,7 @@ export default function BarcodeGenerator() {
                         Array.from({ length: product.labelCount || 1 }).map((_, i) => (
                             <BarcodeItem
                                 key={`${product.id}-${i}`}
-                                value={product.variantSku || product.productId || product.id}
+                                value={String(product.variantSku || product.productId || product.id || '').toUpperCase()}
                                 businessName={profile?.businessName || 'Aleen Clothing'}
                                 product={product}
                                 settings={settings}
