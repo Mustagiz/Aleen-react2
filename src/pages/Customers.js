@@ -46,7 +46,9 @@ import {
     Visibility,
     Clear,
     Stars,
-    WarningAmber
+    WarningAmber,
+    CheckCircle,
+    CalendarMonth
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import PageHeader from '../components/crm/PageHeader';
@@ -100,7 +102,12 @@ const Customers = () => {
     });
 
     const getInitials = (name) => {
-        return name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'CU';
+        if (!name) return 'CU';
+        const clean = name.replace(/[^a-zA-Z\s]/g, ' ').trim();
+        const parts = clean.split(/\s+/).filter(Boolean);
+        if (parts.length === 0) return name.slice(0, 2).toUpperCase();
+        if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+        return (parts[0][0] + parts[1][0]).toUpperCase();
     };
 
     const customerStatsMap = useMemo(() => {
@@ -488,30 +495,44 @@ const Customers = () => {
             <Paper
                 elevation={0}
                 sx={{
-                    borderRadius: 3.5,
-                    border: '1px solid',
-                    borderColor: 'divider',
+                    borderRadius: '20px',
+                    border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.14)',
                     overflow: 'hidden',
-                    boxShadow: '0 4px 20px -4px rgba(15, 118, 110, 0.08)'
+                    background: (t) => t.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.95)' : '#FFFFFF',
+                    boxShadow: (t) => t.palette.mode === 'dark'
+                        ? '0 12px 36px rgba(0, 0, 0, 0.5), 0 0 24px rgba(20, 184, 166, 0.12)'
+                        : '0 12px 32px -4px rgba(15, 118, 110, 0.08), 0 2px 6px rgba(0, 0, 0, 0.02)',
+                    position: 'relative'
                 }}
             >
+                {/* Decorative Atelier Emerald Hairline */}
+                <Box
+                    sx={{
+                        height: '3.5px',
+                        background: 'linear-gradient(90deg, #042F2E 0%, #0F766E 35%, #2DD4BF 70%, #14B8A6 100%)'
+                    }}
+                />
+
                 <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-                    <Table sx={{ minWidth: 680 }}>
-                        <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
+                    <Table sx={{ minWidth: 700 }}>
+                        <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)', borderBottom: '2px solid rgba(15, 118, 110, 0.14)' }}>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Guest & Contact Details</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Lifetime Spend</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="center">Loyalty Points</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Balance Due</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="center">Last Visit</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Atelier Actions</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#0F766E', py: 1.8 }}>Guest & Contact Details</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#0F766E', py: 1.8 }} align="right">Lifetime Spend</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#0F766E', py: 1.8 }} align="center">Loyalty Points</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#0F766E', py: 1.8 }} align="right">Balance Due</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#0F766E', py: 1.8 }} align="center">Last Visit</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#0F766E', py: 1.8, pr: 2.5 }} align="right">Atelier Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {filteredCustomers.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} align="center" sx={{ py: 6, color: 'text.secondary' }}>
-                                        No guests match the selected search or filter criteria.
+                                    <TableCell colSpan={6} align="center" sx={{ py: 8, color: 'text.secondary' }}>
+                                        <People sx={{ fontSize: 48, color: 'text.disabled', mb: 1, opacity: 0.5 }} />
+                                        <Typography variant="body1" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                                            No guests match the selected search or filter criteria.
+                                        </Typography>
                                     </TableCell>
                                 </TableRow>
                             ) : (
@@ -520,123 +541,282 @@ const Customers = () => {
                                     .map(cust => {
                                         const customerStat = calculateCustomerStats(cust.id);
                                         const hasDue = (cust.totalDue || 0) > 0;
+                                        const isVip = customerStat.totalSpent >= 50000;
+                                        const isPremier = customerStat.totalSpent >= 10000 && !isVip;
+
+                                        const avatarBg = isVip
+                                            ? 'linear-gradient(135deg, #F59E0B 0%, #D97706 60%, #92400E 100%)'
+                                            : isPremier
+                                            ? 'linear-gradient(135deg, #14B8A6 0%, #0F766E 60%, #042F2E 100%)'
+                                            : 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)';
+
+                                        const avatarBorder = isVip
+                                            ? '2px solid rgba(245, 158, 11, 0.6)'
+                                            : isPremier
+                                            ? '2px solid rgba(20, 184, 166, 0.45)'
+                                            : '2px solid rgba(15, 118, 110, 0.25)';
+
+                                        const avatarShadow = isVip
+                                            ? '0 4px 12px rgba(217, 119, 6, 0.35)'
+                                            : '0 2px 8px rgba(15, 118, 110, 0.2)';
 
                                         return (
-                                            <TableRow key={cust.id} hover sx={{ '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.02)' } }}>
+                                            <TableRow 
+                                                key={cust.id} 
+                                                hover 
+                                                sx={{ 
+                                                    transition: 'all 0.18s ease',
+                                                    '&:hover': { 
+                                                        bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.04)' : 'rgba(15, 118, 110, 0.025)'
+                                                    }
+                                                }}
+                                            >
                                                 {/* Customer Name, Avatar & Specs */}
-                                                <TableCell>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                <TableCell sx={{ py: 1.5 }}>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.6 }}>
                                                         <Avatar
                                                             onClick={() => handleOpen360(cust)}
                                                             sx={{
-                                                                bgcolor: '#0F766E',
+                                                                background: avatarBg,
+                                                                border: avatarBorder,
                                                                 color: '#FFFFFF',
-                                                                width: 40,
-                                                                height: 40,
-                                                                fontSize: '0.875rem',
-                                                                fontWeight: 800,
+                                                                width: 42,
+                                                                height: 42,
+                                                                fontSize: '0.84rem',
+                                                                fontWeight: 900,
+                                                                letterSpacing: '0.04em',
                                                                 cursor: 'pointer',
-                                                                boxShadow: '0 2px 6px rgba(15, 118, 110, 0.2)'
+                                                                boxShadow: avatarShadow,
+                                                                transition: 'transform 0.2s ease',
+                                                                '&:hover': { transform: 'scale(1.08)' }
                                                             }}
                                                         >
                                                             {getInitials(cust.name)}
                                                         </Avatar>
                                                         <Box>
-                                                            <Typography
-                                                                onClick={() => handleOpen360(cust)}
-                                                                sx={{
-                                                                    fontWeight: 750,
-                                                                    color: 'text.primary',
-                                                                    cursor: 'pointer',
-                                                                    '&:hover': { color: '#0F766E', textDecoration: 'underline' }
-                                                                }}
-                                                            >
-                                                                {cust.name}
-                                                            </Typography>
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.25 }}>
-                                                                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                                    <Phone sx={{ fontSize: 12, color: '#0F766E' }} /> {cust.phone}
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                                                                <Typography
+                                                                    onClick={() => handleOpen360(cust)}
+                                                                    sx={{
+                                                                        fontWeight: 800,
+                                                                        fontSize: '0.92rem',
+                                                                        color: 'text.primary',
+                                                                        textTransform: 'capitalize',
+                                                                        cursor: 'pointer',
+                                                                        transition: 'color 0.15s ease',
+                                                                        '&:hover': { color: '#0F766E' }
+                                                                    }}
+                                                                >
+                                                                    {cust.name}
                                                                 </Typography>
-                                                                {cust.measurements?.bust ? (
+                                                                {isVip && (
                                                                     <Chip
-                                                                        icon={<Straighten sx={{ fontSize: '11px !important', color: '#D97706' }} />}
+                                                                        label="VIP"
+                                                                        size="small"
+                                                                        icon={<Stars sx={{ fontSize: '11px !important', color: '#D97706' }} />}
+                                                                        sx={{
+                                                                            height: 18,
+                                                                            fontSize: '0.62rem',
+                                                                            fontWeight: 900,
+                                                                            bgcolor: 'rgba(217, 119, 6, 0.14)',
+                                                                            color: '#B45309',
+                                                                            border: '1px solid rgba(217, 119, 6, 0.3)',
+                                                                            letterSpacing: '0.04em'
+                                                                        }}
+                                                                    />
+                                                                )}
+                                                            </Box>
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.9, mt: 0.35, flexWrap: 'wrap' }}>
+                                                                <Typography
+                                                                    variant="caption"
+                                                                    sx={{
+                                                                        color: 'text.secondary',
+                                                                        fontFamily: 'monospace',
+                                                                        fontWeight: 600,
+                                                                        fontSize: '0.74rem',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        gap: 0.4
+                                                                    }}
+                                                                >
+                                                                    <Phone sx={{ fontSize: 11, color: '#0F766E', opacity: 0.7 }} /> {cust.phone || 'No phone'}
+                                                                </Typography>
+                                                                {cust.measurements?.bust && (
+                                                                    <Chip
+                                                                        icon={<Straighten sx={{ fontSize: '11px !important', color: '#B45309' }} />}
                                                                         label={`Bust: ${cust.measurements.bust}" • ${cust.measurements.preferredFit || 'Custom'}`}
                                                                         size="small"
                                                                         sx={{
-                                                                            height: 20,
-                                                                            fontSize: '0.68rem',
-                                                                            bgcolor: 'rgba(217, 119, 6, 0.1)',
+                                                                            height: 19,
+                                                                            fontSize: '0.67rem',
+                                                                            bgcolor: 'rgba(217, 119, 6, 0.09)',
                                                                             color: '#B45309',
-                                                                            fontWeight: 700
+                                                                            fontWeight: 700,
+                                                                            border: '1px solid rgba(217, 119, 6, 0.2)'
                                                                         }}
                                                                     />
-                                                                ) : null}
+                                                                )}
                                                             </Box>
                                                         </Box>
                                                     </Box>
                                                 </TableCell>
 
-                                                {/* Purchasing Stats (Right Aligned) */}
-                                                <TableCell align="right">
-                                                    <Typography variant="body2" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                                                {/* Purchasing Stats */}
+                                                <TableCell align="right" sx={{ py: 1.5 }}>
+                                                    <Typography
+                                                        variant="body2"
+                                                        sx={{
+                                                            fontWeight: 900,
+                                                            fontSize: '0.95rem',
+                                                            color: '#0F766E',
+                                                            fontVariantNumeric: 'tabular-nums'
+                                                        }}
+                                                    >
                                                         ₹{customerStat.totalSpent.toLocaleString('en-IN')}
                                                     </Typography>
-                                                    <Typography variant="caption" color="text.secondary">
+                                                    <Typography
+                                                        variant="caption"
+                                                        sx={{
+                                                            color: 'text.secondary',
+                                                            fontWeight: 600,
+                                                            fontSize: '0.71rem',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'flex-end',
+                                                            gap: 0.4,
+                                                            mt: 0.2
+                                                        }}
+                                                    >
+                                                        <ShoppingBag sx={{ fontSize: 11, opacity: 0.6 }} />
                                                         {customerStat.visitCount} {customerStat.visitCount === 1 ? 'order' : 'orders'}
                                                     </Typography>
                                                 </TableCell>
 
                                                 {/* Loyalty Points */}
-                                                <TableCell align="center">
+                                                <TableCell align="center" sx={{ py: 1.5 }}>
                                                     <Chip
-                                                        icon={<Stars sx={{ fontSize: '14px !important', color: '#D97706' }} />}
+                                                        icon={<Stars sx={{ fontSize: '13px !important', color: (cust.loyaltyPoints || 0) > 0 ? '#D97706' : 'text.disabled' }} />}
                                                         label={`${(cust.loyaltyPoints || 0).toLocaleString()} pts`}
                                                         size="small"
                                                         sx={{
-                                                            bgcolor: 'rgba(217, 119, 6, 0.12)',
-                                                            color: '#B45309',
+                                                            bgcolor: (cust.loyaltyPoints || 0) > 0 ? 'rgba(217, 119, 6, 0.12)' : (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+                                                            color: (cust.loyaltyPoints || 0) > 0 ? '#B45309' : 'text.secondary',
+                                                            border: (cust.loyaltyPoints || 0) > 0 ? '1px solid rgba(217, 119, 6, 0.28)' : '1px solid rgba(0,0,0,0.06)',
                                                             fontWeight: 800,
-                                                            fontSize: '0.74rem'
+                                                            fontSize: '0.73rem',
+                                                            px: 0.5
                                                         }}
                                                     />
                                                 </TableCell>
 
-                                                {/* Balance Due (Right Aligned) */}
-                                                <TableCell align="right">
-                                                    <Typography
-                                                        variant="body2"
-                                                        sx={{
-                                                            fontWeight: 800,
-                                                            color: hasDue ? '#DC2626' : '#059669',
-                                                            fontSize: '0.9rem'
-                                                        }}
-                                                    >
-                                                        ₹{(cust.totalDue || 0).toLocaleString('en-IN')}
-                                                    </Typography>
-                                                    {hasDue && (
-                                                        <Typography variant="caption" sx={{ color: '#DC2626', fontWeight: 600 }}>
-                                                            Pending
-                                                        </Typography>
+                                                {/* Balance Due */}
+                                                <TableCell align="right" sx={{ py: 1.5 }}>
+                                                    {hasDue ? (
+                                                        <Box sx={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                                            <Typography
+                                                                variant="body2"
+                                                                sx={{
+                                                                    fontWeight: 900,
+                                                                    color: '#DC2626',
+                                                                    fontSize: '0.94rem',
+                                                                    fontVariantNumeric: 'tabular-nums'
+                                                                }}
+                                                            >
+                                                                ₹{(cust.totalDue || 0).toLocaleString('en-IN')}
+                                                            </Typography>
+                                                            <Chip
+                                                                label="Pending • Settle"
+                                                                size="small"
+                                                                onClick={() => handleOpenPaymentDialog(cust.id)}
+                                                                sx={{
+                                                                    height: 18,
+                                                                    fontSize: '0.62rem',
+                                                                    fontWeight: 800,
+                                                                    bgcolor: 'rgba(220, 38, 38, 0.1)',
+                                                                    color: '#DC2626',
+                                                                    border: '1px solid rgba(220, 38, 38, 0.3)',
+                                                                    cursor: 'pointer',
+                                                                    mt: 0.3,
+                                                                    '&:hover': { bgcolor: 'rgba(220, 38, 38, 0.2)' }
+                                                                }}
+                                                            />
+                                                        </Box>
+                                                    ) : (
+                                                        <Chip
+                                                            icon={<CheckCircle sx={{ fontSize: '12px !important', color: '#059669' }} />}
+                                                            label="Settled • ₹0"
+                                                            size="small"
+                                                            sx={{
+                                                                height: 22,
+                                                                fontSize: '0.72rem',
+                                                                fontWeight: 800,
+                                                                bgcolor: 'rgba(5, 150, 105, 0.08)',
+                                                                color: '#059669',
+                                                                border: '1px solid rgba(5, 150, 105, 0.22)'
+                                                            }}
+                                                        />
                                                     )}
                                                 </TableCell>
 
                                                 {/* Last Visit */}
-                                                <TableCell align="center">
-                                                    <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.84rem' }}>
-                                                        {customerStat.lastVisit}
-                                                    </Typography>
+                                                <TableCell align="center" sx={{ py: 1.5 }}>
+                                                    {customerStat.lastVisit === 'Never' ? (
+                                                        <Chip
+                                                            label="New Guest"
+                                                            size="small"
+                                                            sx={{
+                                                                height: 22,
+                                                                fontSize: '0.71rem',
+                                                                fontWeight: 600,
+                                                                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+                                                                color: 'text.secondary',
+                                                                border: '1px solid rgba(0,0,0,0.06)'
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+                                                            <CalendarMonth sx={{ fontSize: 13, color: '#0F766E', opacity: 0.7 }} />
+                                                            <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.82rem', color: 'text.primary' }}>
+                                                                {customerStat.lastVisit}
+                                                            </Typography>
+                                                        </Box>
+                                                    )}
                                                 </TableCell>
 
                                                 {/* Actions */}
-                                                <TableCell align="right">
-                                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5 }}>
+                                                <TableCell align="right" sx={{ py: 1.5, pr: 2 }}>
+                                                    <Box
+                                                        sx={{
+                                                            display: 'inline-flex',
+                                                            alignItems: 'center',
+                                                            gap: 0.65,
+                                                            p: '3px 6px',
+                                                            borderRadius: '24px',
+                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)',
+                                                            border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.12)'
+                                                        }}
+                                                    >
                                                         <Tooltip title="View 360° Profile & Sizing Specs">
                                                             <IconButton
                                                                 size="small"
                                                                 onClick={() => handleOpen360(cust)}
-                                                                sx={{ color: '#0F766E', bgcolor: 'rgba(15, 118, 110, 0.08)' }}
+                                                                sx={{
+                                                                    width: 30,
+                                                                    height: 30,
+                                                                    color: '#0F766E',
+                                                                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+                                                                    border: '1px solid rgba(15, 118, 110, 0.16)',
+                                                                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                                                                    transition: 'all 0.18s ease',
+                                                                    '&:hover': {
+                                                                        bgcolor: '#0F766E',
+                                                                        color: '#FFFFFF',
+                                                                        transform: 'translateY(-1px)',
+                                                                        boxShadow: '0 4px 10px rgba(15, 118, 110, 0.3)'
+                                                                    }
+                                                                }}
                                                             >
-                                                                <Visibility fontSize="small" />
+                                                                <Visibility sx={{ fontSize: 15 }} />
                                                             </IconButton>
                                                         </Tooltip>
                                                         <Tooltip title="Bespoke Measurements & Tailoring Specs">
@@ -646,9 +826,23 @@ const Customers = () => {
                                                                     setSelectedMeasurementCustomer(cust);
                                                                     setMeasurementModalOpen(true);
                                                                 }}
-                                                                sx={{ color: '#D97706', bgcolor: 'rgba(217, 119, 6, 0.08)' }}
+                                                                sx={{
+                                                                    width: 30,
+                                                                    height: 30,
+                                                                    color: '#D97706',
+                                                                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+                                                                    border: '1px solid rgba(217, 119, 6, 0.2)',
+                                                                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                                                                    transition: 'all 0.18s ease',
+                                                                    '&:hover': {
+                                                                        bgcolor: '#D97706',
+                                                                        color: '#FFFFFF',
+                                                                        transform: 'translateY(-1px)',
+                                                                        boxShadow: '0 4px 10px rgba(217, 119, 6, 0.3)'
+                                                                    }
+                                                                }}
                                                             >
-                                                                <Straighten fontSize="small" />
+                                                                <Straighten sx={{ fontSize: 15 }} />
                                                             </IconButton>
                                                         </Tooltip>
                                                         {hasDue && (
@@ -656,28 +850,67 @@ const Customers = () => {
                                                                 <IconButton
                                                                     size="small"
                                                                     onClick={() => handleOpenPaymentDialog(cust.id)}
-                                                                    sx={{ color: '#059669', bgcolor: 'rgba(5, 150, 105, 0.08)' }}
+                                                                    sx={{
+                                                                        width: 30,
+                                                                        height: 30,
+                                                                        color: '#059669',
+                                                                        bgcolor: 'rgba(5, 150, 105, 0.12)',
+                                                                        border: '1px solid rgba(5, 150, 105, 0.3)',
+                                                                        transition: 'all 0.18s ease',
+                                                                        '&:hover': {
+                                                                            bgcolor: '#059669',
+                                                                            color: '#FFFFFF',
+                                                                            transform: 'translateY(-1px)',
+                                                                            boxShadow: '0 4px 10px rgba(5, 150, 105, 0.3)'
+                                                                        }
+                                                                    }}
                                                                 >
-                                                                    <Payments fontSize="small" />
+                                                                    <Payments sx={{ fontSize: 15 }} />
                                                                 </IconButton>
                                                             </Tooltip>
                                                         )}
-                                                        <Tooltip title="WhatsApp Loyalty / Fitting Dispatch">
+                                                        <Tooltip title="WhatsApp Dispatch / Fitting Message">
                                                             <IconButton
                                                                 size="small"
                                                                 onClick={() => handleOpenWhatsAppModal(cust, hasDue ? 'due' : 'loyalty')}
-                                                                sx={{ color: '#25D366', bgcolor: 'rgba(37, 211, 102, 0.08)' }}
+                                                                sx={{
+                                                                    width: 30,
+                                                                    height: 30,
+                                                                    color: '#059669',
+                                                                    bgcolor: 'rgba(37, 211, 102, 0.09)',
+                                                                    border: '1px solid rgba(37, 211, 102, 0.25)',
+                                                                    transition: 'all 0.18s ease',
+                                                                    '&:hover': {
+                                                                        bgcolor: '#059669',
+                                                                        color: '#FFFFFF',
+                                                                        transform: 'translateY(-1px)',
+                                                                        boxShadow: '0 4px 12px rgba(5, 150, 105, 0.35)'
+                                                                    }
+                                                                }}
                                                             >
-                                                                <WhatsApp fontSize="small" />
+                                                                <WhatsApp sx={{ fontSize: 15 }} />
                                                             </IconButton>
                                                         </Tooltip>
                                                         <Tooltip title="Edit Guest Details">
                                                             <IconButton
                                                                 size="small"
                                                                 onClick={() => handleOpen(cust)}
-                                                                sx={{ color: '#D97706', bgcolor: 'rgba(217, 119, 6, 0.08)' }}
+                                                                sx={{
+                                                                    width: 30,
+                                                                    height: 30,
+                                                                    color: '#0284C7',
+                                                                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+                                                                    border: '1px solid rgba(2, 132, 199, 0.2)',
+                                                                    transition: 'all 0.18s ease',
+                                                                    '&:hover': {
+                                                                        bgcolor: '#0284C7',
+                                                                        color: '#FFFFFF',
+                                                                        transform: 'translateY(-1px)',
+                                                                        boxShadow: '0 4px 10px rgba(2, 132, 199, 0.3)'
+                                                                    }
+                                                                }}
                                                             >
-                                                                <Edit fontSize="small" />
+                                                                <Edit sx={{ fontSize: 15 }} />
                                                             </IconButton>
                                                         </Tooltip>
                                                         <Tooltip title="Remove Client">
@@ -695,9 +928,22 @@ const Customers = () => {
                                                                         }
                                                                     });
                                                                 }}
-                                                                sx={{ color: '#DC2626', bgcolor: 'rgba(220, 38, 38, 0.08)' }}
+                                                                sx={{
+                                                                    width: 30,
+                                                                    height: 30,
+                                                                    color: '#DC2626',
+                                                                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+                                                                    border: '1px solid rgba(220, 38, 38, 0.2)',
+                                                                    transition: 'all 0.18s ease',
+                                                                    '&:hover': {
+                                                                        bgcolor: '#DC2626',
+                                                                        color: '#FFFFFF',
+                                                                        transform: 'translateY(-1px)',
+                                                                        boxShadow: '0 4px 10px rgba(220, 38, 38, 0.3)'
+                                                                    }
+                                                                }}
                                                             >
-                                                                <Delete fontSize="small" />
+                                                                <Delete sx={{ fontSize: 15 }} />
                                                             </IconButton>
                                                         </Tooltip>
                                                     </Box>
