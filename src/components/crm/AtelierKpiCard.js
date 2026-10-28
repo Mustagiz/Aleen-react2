@@ -36,10 +36,31 @@ export default function AtelierKpiCard({
   };
 
   const getTopGradient = () => {
-    if (redAccent) return 'linear-gradient(90deg, #DC2626 0%, #EF4444 50%, #F87171 100%)';
-    if (goldAccent) return 'linear-gradient(90deg, #B45309 0%, #D97706 50%, #F59E0B 100%)';
-    if (sapphireAccent) return 'linear-gradient(90deg, #0F172A 0%, #1E3A8A 50%, #38BDF8 100%)';
-    return 'linear-gradient(90deg, #042F2E 0%, #0F766E 50%, #14B8A6 100%)';
+    if (redAccent) return 'linear-gradient(90deg, #991B1B 0%, #DC2626 35%, #F87171 70%, #EF4444 100%)';
+    if (goldAccent) return 'linear-gradient(90deg, #78350F 0%, #B45309 35%, #FBBF24 70%, #D97706 100%)';
+    if (sapphireAccent) return 'linear-gradient(90deg, #0F172A 0%, #0284C7 35%, #38BDF8 70%, #2563EB 100%)';
+    return 'linear-gradient(90deg, #042F2E 0%, #0F766E 35%, #2DD4BF 70%, #14B8A6 100%)';
+  };
+
+  const getAmbientGlow = () => {
+    if (redAccent) {
+      return isDark
+        ? 'radial-gradient(circle at 92% 82%, rgba(239, 68, 68, 0.16) 0%, rgba(220, 38, 38, 0.05) 38%, transparent 70%)'
+        : 'radial-gradient(circle at 92% 82%, rgba(239, 68, 68, 0.10) 0%, rgba(254, 226, 226, 0.45) 42%, transparent 70%)';
+    }
+    if (goldAccent) {
+      return isDark
+        ? 'radial-gradient(circle at 92% 82%, rgba(245, 158, 11, 0.16) 0%, rgba(217, 119, 6, 0.05) 38%, transparent 70%)'
+        : 'radial-gradient(circle at 92% 82%, rgba(245, 158, 11, 0.10) 0%, rgba(254, 243, 199, 0.45) 42%, transparent 70%)';
+    }
+    if (sapphireAccent) {
+      return isDark
+        ? 'radial-gradient(circle at 92% 82%, rgba(56, 189, 248, 0.16) 0%, rgba(2, 132, 199, 0.05) 38%, transparent 70%)'
+        : 'radial-gradient(circle at 92% 82%, rgba(56, 189, 248, 0.10) 0%, rgba(224, 242, 254, 0.45) 42%, transparent 70%)';
+    }
+    return isDark
+      ? 'radial-gradient(circle at 92% 82%, rgba(20, 184, 166, 0.16) 0%, rgba(15, 118, 110, 0.05) 38%, transparent 70%)'
+      : 'radial-gradient(circle at 92% 82%, rgba(20, 184, 166, 0.10) 0%, rgba(240, 253, 250, 0.5) 42%, transparent 70%)';
   };
 
   const getHoverBorderColor = () => {
@@ -52,22 +73,22 @@ export default function AtelierKpiCard({
   const getHoverShadow = () => {
     if (redAccent) {
       return isDark
-        ? '0 18px 40px -4px rgba(0, 0, 0, 0.65), 0 0 32px rgba(239, 68, 68, 0.42)'
-        : '0 16px 36px -4px rgba(239, 68, 68, 0.28), 0 0 24px rgba(248, 113, 113, 0.24)';
+        ? '0 20px 44px -4px rgba(0, 0, 0, 0.7), 0 0 32px rgba(239, 68, 68, 0.35)'
+        : '0 18px 40px -4px rgba(239, 68, 68, 0.25), 0 0 24px rgba(248, 113, 113, 0.2)';
     }
     if (goldAccent) {
       return isDark
-        ? '0 18px 40px -4px rgba(0, 0, 0, 0.65), 0 0 32px rgba(217, 119, 6, 0.42)'
-        : '0 16px 36px -4px rgba(217, 119, 6, 0.28), 0 0 24px rgba(245, 158, 11, 0.24)';
+        ? '0 20px 44px -4px rgba(0, 0, 0, 0.7), 0 0 32px rgba(217, 119, 6, 0.35)'
+        : '0 18px 40px -4px rgba(217, 119, 6, 0.25), 0 0 24px rgba(245, 158, 11, 0.2)';
     }
     if (sapphireAccent) {
       return isDark
-        ? '0 18px 40px -4px rgba(0, 0, 0, 0.65), 0 0 32px rgba(2, 132, 199, 0.42)'
-        : '0 16px 36px -4px rgba(2, 132, 199, 0.28), 0 0 24px rgba(56, 189, 248, 0.24)';
+        ? '0 20px 44px -4px rgba(0, 0, 0, 0.7), 0 0 32px rgba(2, 132, 199, 0.35)'
+        : '0 18px 40px -4px rgba(2, 132, 199, 0.25), 0 0 24px rgba(56, 189, 248, 0.2)';
     }
     return isDark
-      ? '0 18px 40px -4px rgba(0, 0, 0, 0.65), 0 0 32px rgba(20, 184, 166, 0.4)'
-      : '0 16px 36px -4px rgba(15, 118, 110, 0.28), 0 0 24px rgba(15, 118, 110, 0.22)';
+      ? '0 20px 44px -4px rgba(0, 0, 0, 0.7), 0 0 32px rgba(20, 184, 166, 0.35)'
+      : '0 18px 40px -4px rgba(15, 118, 110, 0.25), 0 0 24px rgba(15, 118, 110, 0.18)';
   };
 
   const getIconBg = () => {
@@ -97,7 +118,7 @@ export default function AtelierKpiCard({
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-      whileHover={{ y: -3, transition: { type: 'spring', stiffness: 360, damping: 24 } }}
+      whileHover={{ y: -4, transition: { type: 'spring', stiffness: 360, damping: 24 } }}
       whileTap={{ scale: 0.99 }}
       sx={{ height: '100%' }}
     >
@@ -109,23 +130,39 @@ export default function AtelierKpiCard({
           overflow: 'hidden',
           borderRadius: '16px',
           cursor: onClick ? 'pointer' : 'default',
-          transition: 'box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease',
-          background: isDark
-            ? 'radial-gradient(ellipse at 85% 0%, rgba(20, 184, 166, 0.08) 0%, rgba(13, 27, 27, 0.96) 75%)'
-            : 'radial-gradient(ellipse at 85% 0%, rgba(15, 118, 110, 0.035) 0%, #FFFFFF 75%)',
+          transition: 'box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.28s ease',
+          background: `${getAmbientGlow()}, ${isDark
+            ? 'linear-gradient(145deg, rgba(17, 24, 39, 0.98) 0%, rgba(13, 27, 27, 0.96) 100%)'
+            : 'linear-gradient(145deg, #FFFFFF 0%, #FAFCFC 100%)'}`,
           border: getBorderColor(),
           boxShadow: isDark
-            ? 'inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 8px 24px rgba(0, 0, 0, 0.45)'
-            : 'inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 4px 20px -2px rgba(15, 118, 110, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02)',
+            ? 'inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 26px rgba(0, 0, 0, 0.45)'
+            : 'inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 4px 20px -2px rgba(15, 118, 110, 0.06), 0 1px 3px rgba(0, 0, 0, 0.02)',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: '-100%',
+            width: '60%',
+            height: '100%',
+            background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent)',
+            transform: 'skewX(-25deg)',
+            transition: 'left 0.75s ease',
+            zIndex: 1,
+            pointerEvents: 'none'
+          },
           '&:hover': {
             boxShadow: getHoverShadow(),
             borderColor: getHoverBorderColor(),
+            '&::before': {
+              left: '180%'
+            },
             '& .kpi-icon-jewel': {
               transform: 'scale(1.08) rotate(3deg)'
             },
             '& .kpi-bg-watermark-icon': {
-              transform: 'rotate(-4deg) scale(1.14)',
-              opacity: isDark ? 0.16 : 0.12
+              transform: 'rotate(-4deg) scale(1.15)',
+              opacity: isDark ? 0.22 : 0.15
             }
           }
         }}
@@ -139,6 +176,7 @@ export default function AtelierKpiCard({
             right: 0,
             height: '3.5px',
             background: getTopGradient(),
+            borderRadius: '16px 16px 0 0',
             zIndex: 2
           }}
         />
@@ -149,22 +187,25 @@ export default function AtelierKpiCard({
             className="kpi-bg-watermark-icon"
             sx={{
               position: 'absolute',
-              right: { xs: -12, sm: -14, md: -16 },
-              bottom: { xs: -14, sm: -16, md: -18 },
+              right: { xs: -14, sm: -16, md: -20 },
+              bottom: { xs: -14, sm: -16, md: -20 },
               zIndex: 0,
               pointerEvents: 'none',
               userSelect: 'none',
               color: getIconColor(),
-              opacity: isDark ? 0.09 : 0.065,
-              transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
-              transform: 'rotate(-9deg)',
+              opacity: isDark ? 0.12 : 0.08,
+              transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+              transform: 'rotate(-10deg)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              filter: isDark
+                ? 'drop-shadow(0 4px 16px rgba(0, 0, 0, 0.6))'
+                : 'drop-shadow(0 4px 10px rgba(15, 118, 110, 0.12))',
               '& .MuiSvgIcon-root, & svg': {
-                width: { xs: 82, sm: 98, md: 116 },
-                height: { xs: 82, sm: 98, md: 116 },
-                fontSize: { xs: '5.2rem !important', sm: '6.2rem !important', md: '7.4rem !important' },
+                width: { xs: 90, sm: 108, md: 126 },
+                height: { xs: 90, sm: 108, md: 126 },
+                fontSize: { xs: '5.8rem !important', sm: '7rem !important', md: '8.2rem !important' },
                 display: 'block'
               }
             }}
@@ -183,17 +224,27 @@ export default function AtelierKpiCard({
           position: 'relative',
           zIndex: 1
         }}>
-          {/* Header: Title and optional Icon Jewel */}
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: 0.6 }}>
+          {/* Header: Title with glowing jewel dot indicator */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.9, mb: 0.6 }}>
+            <Box
+              sx={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                bgcolor: getIconColor(),
+                boxShadow: `0 0 6px ${getIconColor()}`,
+                flexShrink: 0
+              }}
+            />
             <Typography
               variant="subtitle2"
               noWrap
               sx={{
-                color: isDark ? 'rgba(203, 213, 225, 0.85)' : '#475569',
-                fontWeight: 700,
-                fontSize: { xs: '0.66rem', sm: '0.74rem', md: '0.78rem' },
+                color: isDark ? 'rgba(203, 213, 225, 0.9)' : '#475569',
+                fontWeight: 800,
+                fontSize: { xs: '0.67rem', sm: '0.74rem', md: '0.78rem' },
                 textTransform: 'uppercase',
-                letterSpacing: '0.04em',
+                letterSpacing: '0.06em',
                 flex: 1,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
