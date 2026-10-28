@@ -1,15 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-display: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-serif: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
   --font-crest: 'Plus Jakarta Sans', sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
-  --emerald-primary: #0F766E;
+  --emerald-primary: #0A4D46;
   --emerald-light: #14B8A6;
   --emerald-dark: #042F2E;
-  --gold-accent: #D97706;
+  --gold-accent: #C28D4B;
+  --gold-champagne: #F59E0B;
   --radius-card: 16px;
   --radius-control: 10px;
   --radius-inner: 8px;
@@ -26,6 +27,7 @@ body {
   font-variant-numeric: tabular-nums;
   background-color: #F8FAFC;
   color: #0F172A;
+  overflow-x: hidden;
 }
 
 code, pre, kbd, samp, [style*="font-family: monospace"], [style*="font-family:monospace"] {
@@ -37,11 +39,18 @@ code, pre, kbd, samp, [style*="font-family: monospace"], [style*="font-family:mo
 }
 
 ::selection {
-  background: rgba(15, 118, 110, 0.2);
+  background: rgba(20, 184, 166, 0.25);
   color: #042F2E;
 }
 
-/* Custom Sleek Scrollbar */
+/* Touch momentum scrolling for iOS/iPadOS */
+.MuiTableContainer-root,
+.atelier-touch-scroll {
+  -webkit-overflow-scrolling: touch !important;
+  scroll-behavior: smooth;
+}
+
+/* Custom Sleek Luxury Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -52,17 +61,35 @@ code, pre, kbd, samp, [style*="font-family: monospace"], [style*="font-family:mo
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(15, 118, 110, 0.18);
+  background: rgba(15, 118, 110, 0.2);
   border-radius: 9999px;
+  transition: background 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(15, 118, 110, 0.35);
+  background: rgba(15, 118, 110, 0.4);
+}
+
+/* Atelier Keyframe Animations */
+@keyframes atelierPulse {
+  0% { transform: scale(1); opacity: 0.95; }
+  50% { transform: scale(1.025); opacity: 1; filter: drop-shadow(0 0 16px rgba(20, 184, 166, 0.4)); }
+  100% { transform: scale(1); opacity: 0.95; }
+}
+
+@keyframes goldShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes strokeDraw {
+  0% { stroke-dashoffset: 400; opacity: 0.2; }
+  50% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: -400; opacity: 0.2; }
 }
 
 /* Print Utilities */
 @media print {
-  /* Delegate to print.css */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;

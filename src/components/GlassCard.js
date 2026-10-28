@@ -54,10 +54,10 @@ const GlassCard = ({ children, sx = {}, hover = false, glowColor = 'aurora', ...
         <Box
             component={hover ? motion.div : 'div'}
             {...(hover ? {
-                whileHover: { y: -3, transition: { type: 'spring', stiffness: 360, damping: 24 } },
-                whileTap: { scale: 0.99 }
+                whileHover: { y: -4, transition: { type: 'spring', stiffness: 420, damping: 26 } },
+                whileTap: { scale: 0.985, transition: { duration: 0.1 } }
             } : {})}
-            sx={{ height: '100%' }}
+            sx={{ height: '100%', transform: 'translateZ(0)' }}
         >
             <Paper
                 elevation={0}
@@ -65,18 +65,18 @@ const GlassCard = ({ children, sx = {}, hover = false, glowColor = 'aurora', ...
                     position: 'relative',
                     height: '100%',
                     background: isDark
-                        ? 'radial-gradient(ellipse at 50% 0%, rgba(20, 184, 166, 0.05) 0%, rgba(14, 28, 28, 0.95) 85%)'
-                        : 'rgba(255, 255, 255, 0.96)',
+                        ? 'radial-gradient(ellipse at 50% 0%, rgba(20, 184, 166, 0.06) 0%, rgba(12, 26, 25, 0.96) 85%)'
+                        : 'rgba(255, 255, 255, 0.97)',
                     backdropFilter: 'blur(20px)',
                     border: isDark
-                        ? '1px solid rgba(20, 184, 166, 0.16)'
-                        : '1px solid rgba(15, 118, 110, 0.12)',
+                        ? '1px solid rgba(20, 184, 166, 0.18)'
+                        : '1px solid rgba(15, 118, 110, 0.13)',
                     borderRadius: '16px',
                     boxShadow: isDark
-                        ? 'inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 8px 30px rgba(0, 0, 0, 0.45)'
-                        : 'inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 4px 20px -2px rgba(15, 118, 110, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02)',
+                        ? 'inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 32px rgba(0, 0, 0, 0.5)'
+                        : 'inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 8px 24px -4px rgba(15, 118, 110, 0.07), 0 1px 3px rgba(0, 0, 0, 0.02)',
                     overflow: 'hidden',
-                    transition: hover ? 'border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1)' : 'none',
+                    transition: hover ? 'border-color 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1)' : 'none',
                     ...(hover ? {
                         '&:hover': {
                             borderColor: hoverBorder,

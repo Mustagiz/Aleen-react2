@@ -8,6 +8,7 @@ import { FeedbackProvider } from './contexts/FeedbackContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import ErrorBoundary from './components/ErrorBoundary';
 import Layout from './components/Layout';
+import AtelierBespokeLoader from './components/common/AtelierBespokeLoader';
 
 // Eagerly loaded critical pages
 import Login from './pages/Login';
@@ -36,41 +37,15 @@ const PublicBillView = lazy(() => import('./pages/PublicBillView'));
 
 // Luxury Atelier Page Suspense Fallback
 const AtelierPageLoader = () => (
-  <Box
-    sx={{
-      minHeight: '60vh',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 2
-    }}
-  >
-    <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-      <CircularProgress size={48} thickness={3.6} sx={{ color: '#0F766E' }} />
-    </Box>
-    <Typography
-      variant="caption"
-      sx={{
-        fontWeight: 700,
-        letterSpacing: '0.12em',
-        textTransform: 'uppercase',
-        fontSize: '0.72rem',
-        color: 'text.secondary',
-        opacity: 0.8
-      }}
-    >
-      Aleen Clothing • Loading
-    </Typography>
-  </Box>
+  <AtelierBespokeLoader />
 );
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading && !user) {
     return (
-      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#0B1313' }}>
-        <CircularProgress sx={{ color: '#0F766E' }} />
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default' }}>
+        <AtelierBespokeLoader fullScreen message="Authenticating Atelier Session..." />
       </Box>
     );
   }
@@ -79,13 +54,13 @@ const PrivateRoute = ({ children }) => {
 
 const PageWrapper = ({ children }) => (
   <motion.div
-    initial={{ opacity: 0, x: 20 }}
-    animate={{ opacity: 1, x: 0 }}
-    exit={{ opacity: 0, x: -20 }}
-    transition={{ duration: 0.3, ease: 'easeInOut' }}
+    initial={{ opacity: 0, y: 8, scale: 0.998 }}
+    animate={{ opacity: 1, y: 0, scale: 1 }}
+    exit={{ opacity: 0, y: -6 }}
+    transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
     style={{ width: '100%', height: '100%' }}
   >
-    <Suspense fallback={<AtelierPageLoader />}>
+    <Suspense fallback={<AtelierBespokeLoader />}>
       {children}
     </Suspense>
   </motion.div>

@@ -118,9 +118,9 @@ export default function AtelierKpiCard({
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-      whileHover={{ y: -4, transition: { type: 'spring', stiffness: 360, damping: 24 } }}
-      whileTap={{ scale: 0.99 }}
-      sx={{ height: '100%' }}
+      whileHover={{ y: -4, transition: { type: 'spring', stiffness: 420, damping: 26 } }}
+      whileTap={{ scale: 0.985 }}
+      sx={{ height: '100%', transform: 'translateZ(0)' }}
     >
       <Card
         onClick={onClick}
