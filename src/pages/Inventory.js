@@ -1328,7 +1328,15 @@ const Inventory = () => {
           )}
         </Box>
       ) : (
-        <GlassCard sx={{ p: 0, overflow: 'hidden', border: '1px solid rgba(15, 118, 110, 0.15)' }}>
+        <GlassCard sx={{ 
+          p: 0, 
+          overflow: 'hidden', 
+          borderRadius: '20px', 
+          border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.14)',
+          boxShadow: (t) => t.palette.mode === 'dark' 
+            ? '0 10px 30px rgba(0, 0, 0, 0.4)' 
+            : '0 10px 30px -10px rgba(15, 118, 110, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
+        }}>
           <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
             <Table sx={{ minWidth: user?.role === 'admin' ? 1160 : 1030 }}>
               <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(15, 118, 110, 0.1)' : 'rgba(15, 118, 110, 0.05)' }}>
@@ -1604,20 +1612,40 @@ const Inventory = () => {
                           </Box>
                         </TableCell>
 
-                        {/* Actions */}
-                        <TableCell align="right" sx={{ width: 120, whiteSpace: 'nowrap' }}>
-                          <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
+                        {/* Actions (Atelier Action Capsule Dock) */}
+                        <TableCell align="right" sx={{ width: 140, whiteSpace: 'nowrap' }}>
+                          <Box
+                            sx={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 0.75,
+                              p: '3px 6px',
+                              borderRadius: '24px',
+                              bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)',
+                              border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.12)'
+                            }}
+                          >
                             <Tooltip title="Print Barcode Tag">
                               <IconButton
                                 size="small"
                                 onClick={() => navigate('/barcodes', { state: { product: item } })}
                                 sx={{
+                                  width: 30,
+                                  height: 30,
                                   color: '#D97706',
-                                  bgcolor: 'rgba(217, 119, 6, 0.08)',
-                                  '&:hover': { bgcolor: 'rgba(217, 119, 6, 0.18)' }
+                                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+                                  border: '1px solid rgba(217, 119, 6, 0.25)',
+                                  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                                  transition: 'all 0.18s ease',
+                                  '&:hover': {
+                                    bgcolor: '#D97706',
+                                    color: '#FFFFFF',
+                                    transform: 'translateY(-1px)',
+                                    boxShadow: '0 4px 10px rgba(217, 119, 6, 0.3)'
+                                  }
                                 }}
                               >
-                                <QrCode fontSize="small" />
+                                <QrCode sx={{ fontSize: 15 }} />
                               </IconButton>
                             </Tooltip>
                             {user?.role === 'admin' && (
@@ -1627,12 +1655,22 @@ const Inventory = () => {
                                     size="small"
                                     onClick={() => handleOpen(item)}
                                     sx={{
-                                      color: '#0F766E',
-                                      bgcolor: 'rgba(15, 118, 110, 0.08)',
-                                      '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.18)' }
+                                      width: 30,
+                                      height: 30,
+                                      color: '#0284C7',
+                                      bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+                                      border: '1px solid rgba(2, 132, 199, 0.2)',
+                                      boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                                      transition: 'all 0.18s ease',
+                                      '&:hover': {
+                                        bgcolor: '#0284C7',
+                                        color: '#FFFFFF',
+                                        transform: 'translateY(-1px)',
+                                        boxShadow: '0 4px 10px rgba(2, 132, 199, 0.3)'
+                                      }
                                     }}
                                   >
-                                    <Edit fontSize="small" />
+                                    <Edit sx={{ fontSize: 15 }} />
                                   </IconButton>
                                 </Tooltip>
                                 <Tooltip title="Delete Garment">
@@ -1640,12 +1678,22 @@ const Inventory = () => {
                                     size="small"
                                     onClick={() => openDeleteDialog(item.id)}
                                     sx={{
+                                      width: 30,
+                                      height: 30,
                                       color: '#DC2626',
-                                      bgcolor: 'rgba(220, 38, 38, 0.08)',
-                                      '&:hover': { bgcolor: 'rgba(220, 38, 38, 0.18)' }
+                                      bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+                                      border: '1px solid rgba(220, 38, 38, 0.2)',
+                                      boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                                      transition: 'all 0.18s ease',
+                                      '&:hover': {
+                                        bgcolor: '#DC2626',
+                                        color: '#FFFFFF',
+                                        transform: 'translateY(-1px)',
+                                        boxShadow: '0 4px 10px rgba(220, 38, 38, 0.3)'
+                                      }
                                     }}
                                   >
-                                    <Delete fontSize="small" />
+                                    <Delete sx={{ fontSize: 15 }} />
                                   </IconButton>
                                 </Tooltip>
                               </>

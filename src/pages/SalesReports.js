@@ -448,11 +448,12 @@ const SalesReports = () => {
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 3.5,
-          border: '1px solid',
-          borderColor: 'divider',
+          borderRadius: '20px',
+          border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.14)',
           overflow: 'hidden',
-          boxShadow: '0 4px 20px -4px rgba(15, 118, 110, 0.08)'
+          boxShadow: (t) => t.palette.mode === 'dark' 
+            ? '0 10px 30px rgba(0, 0, 0, 0.4)' 
+            : '0 10px 30px -10px rgba(15, 118, 110, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
         }}
       >
         <Box sx={{ px: 3, py: 2, bgcolor: 'rgba(15, 118, 110, 0.02)', borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

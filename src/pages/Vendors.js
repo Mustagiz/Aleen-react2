@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import { 
     Add, Edit, Delete, Store, LocalShipping, AttachMoney, Search, 
-    Phone, Email, WhatsApp, Close, AccessTime
+    Phone, Email, WhatsApp, Close, AccessTime, CheckCircle
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import GlassCard from '../components/GlassCard';
@@ -146,9 +146,15 @@ const Vendors = () => {
         Math.max(1, vendors.filter(v => v.performance?.avgLeadTime).length)
     ) || 0;
 
-    // Vendor avatar generator
+    // Vendor avatar monogram generator
     const getAvatarLetter = (name) => {
-        return (name || 'V').trim().charAt(0).toUpperCase();
+        if (!name) return 'VD';
+        const cleanName = name.replace(/[^a-zA-Z\s]/g, ' ').trim();
+        const parts = cleanName.split(/\s+/).filter(Boolean);
+        if (parts.length >= 2) {
+            return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+        }
+        return (parts[0] ? parts[0].slice(0, 2) : 'VD').toUpperCase();
     };
 
     return (
@@ -314,7 +320,16 @@ const Vendors = () => {
             </GlassCard>
 
             {/* Vendors Table with Aligned Columns */}
-            <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
+            {/* Vendors Table with Aligned Columns */}
+            <GlassCard sx={{ 
+                p: 0, 
+                overflow: 'hidden', 
+                borderRadius: '20px', 
+                border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.14)',
+                boxShadow: (t) => t.palette.mode === 'dark' 
+                    ? '0 10px 30px rgba(0, 0, 0, 0.4)' 
+                    : '0 10px 30px -10px rgba(15, 118, 110, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
+            }}>
                 <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
                     <Table sx={{ minWidth: 680 }} stickyHeader>
                         <TableHead sx={{
@@ -369,13 +384,15 @@ const Vendors = () => {
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.75 }}>
                                                     <Avatar 
                                                         sx={{ 
-                                                            bgcolor: theme.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.2)' : '#0F766E', 
+                                                            bgcolor: '#0F766E',
+                                                            background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
                                                             color: '#ffffff',
                                                             fontWeight: 800,
-                                                            width: 40,
-                                                            height: 40,
-                                                            fontSize: '1rem',
-                                                            boxShadow: '0 2px 8px rgba(15, 118, 110, 0.2)'
+                                                            width: 42,
+                                                            height: 42,
+                                                            fontSize: '0.95rem',
+                                                            boxShadow: '0 4px 14px rgba(15, 118, 110, 0.25)',
+                                                            border: '2px solid rgba(255, 255, 255, 0.9)'
                                                         }}
                                                     >
                                                         {getAvatarLetter(vendor.name)}
@@ -492,38 +509,75 @@ const Vendors = () => {
 
                                             {/* Balance Due (Right-aligned) */}
                                             <TableCell align="right" sx={{ py: 2 }}>
-                                                <Chip
-                                                    label={`₹${balance.toLocaleString('en-IN')}`}
-                                                    size="small"
-                                                    sx={{
-                                                        bgcolor: balance > 0 
-                                                            ? (theme.palette.mode === 'dark' ? 'rgba(239, 68, 68, 0.18)' : 'rgba(239, 68, 68, 0.1)') 
-                                                            : (theme.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.18)' : 'rgba(16, 185, 129, 0.1)'),
-                                                        color: balance > 0 ? '#DC2626' : '#059669',
-                                                        border: balance > 0 ? '1px solid rgba(220, 38, 38, 0.25)' : '1px solid rgba(5, 150, 105, 0.25)',
-                                                        fontWeight: 800,
-                                                        fontSize: '0.825rem',
-                                                        px: 0.75,
-                                                        py: 0.5,
-                                                        borderRadius: 1.75
-                                                    }}
-                                                />
+                                                {balance <= 0 ? (
+                                                    <Chip
+                                                        icon={<CheckCircle sx={{ fontSize: '14px !important', color: '#059669 !important' }} />}
+                                                        label="Settled • ₹0"
+                                                        size="small"
+                                                        sx={{
+                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(5, 150, 105, 0.15)' : 'rgba(5, 150, 105, 0.08)',
+                                                            color: '#059669',
+                                                            border: '1px solid rgba(5, 150, 105, 0.25)',
+                                                            fontWeight: 800,
+                                                            fontSize: '0.78rem',
+                                                            px: 0.5,
+                                                            height: 26,
+                                                            borderRadius: '14px'
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <Chip
+                                                        label={`₹${balance.toLocaleString('en-IN')}`}
+                                                        size="small"
+                                                        sx={{
+                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(239, 68, 68, 0.18)' : 'rgba(239, 68, 68, 0.1)',
+                                                            color: '#DC2626',
+                                                            border: '1px solid rgba(220, 38, 38, 0.28)',
+                                                            fontWeight: 800,
+                                                            fontSize: '0.825rem',
+                                                            px: 0.75,
+                                                            height: 26,
+                                                            borderRadius: '14px',
+                                                            boxShadow: '0 2px 8px rgba(220, 38, 38, 0.15)'
+                                                        }}
+                                                    />
+                                                )}
                                             </TableCell>
 
-                                            {/* Actions (Right-aligned) */}
+                                            {/* Actions (Right-aligned Atelier Capsule Dock) */}
                                             <TableCell align="right" sx={{ py: 2 }}>
-                                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5 }}>
+                                                <Box
+                                                    sx={{
+                                                        display: 'inline-flex',
+                                                        alignItems: 'center',
+                                                        gap: 0.75,
+                                                        p: '3px 6px',
+                                                        borderRadius: '24px',
+                                                        bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)',
+                                                        border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.12)'
+                                                    }}
+                                                >
                                                     <Tooltip title="Edit Vendor Details">
                                                         <IconButton 
                                                             size="small" 
                                                             onClick={() => handleOpen(vendor)} 
                                                             sx={{ 
-                                                                color: '#0F766E',
-                                                                bgcolor: theme.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.1)' : 'rgba(15, 118, 110, 0.08)',
-                                                                '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.18)' }
+                                                                width: 30,
+                                                                height: 30,
+                                                                color: '#0284C7',
+                                                                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+                                                                border: '1px solid rgba(2, 132, 199, 0.2)',
+                                                                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                                                                transition: 'all 0.18s ease',
+                                                                '&:hover': {
+                                                                    bgcolor: '#0284C7',
+                                                                    color: '#FFFFFF',
+                                                                    transform: 'translateY(-1px)',
+                                                                    boxShadow: '0 4px 10px rgba(2, 132, 199, 0.3)'
+                                                                }
                                                             }}
                                                         >
-                                                            <Edit fontSize="small" />
+                                                            <Edit sx={{ fontSize: 15 }} />
                                                         </IconButton>
                                                     </Tooltip>
                                                     <Tooltip title="Delete Vendor">
@@ -531,12 +585,22 @@ const Vendors = () => {
                                                             size="small" 
                                                             onClick={() => openDeleteDialog(vendor.id)} 
                                                             sx={{ 
-                                                                color: 'error.main',
-                                                                bgcolor: theme.palette.mode === 'dark' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(239, 68, 68, 0.08)',
-                                                                '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.18)' }
+                                                                width: 30,
+                                                                height: 30,
+                                                                color: '#DC2626',
+                                                                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+                                                                border: '1px solid rgba(220, 38, 38, 0.2)',
+                                                                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                                                                transition: 'all 0.18s ease',
+                                                                '&:hover': {
+                                                                    bgcolor: '#DC2626',
+                                                                    color: '#FFFFFF',
+                                                                    transform: 'translateY(-1px)',
+                                                                    boxShadow: '0 4px 10px rgba(220, 38, 38, 0.3)'
+                                                                }
                                                             }}
                                                         >
-                                                            <Delete fontSize="small" />
+                                                            <Delete sx={{ fontSize: 15 }} />
                                                         </IconButton>
                                                     </Tooltip>
                                                 </Box>

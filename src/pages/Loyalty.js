@@ -136,6 +136,17 @@ const Loyalty = () => {
     const sortedMembers = [...customers]
         .sort((a, b) => (b.loyaltyPoints || 0) - (a.loyaltyPoints || 0));
 
+    // Sanitized initials helper for boutique patrons
+    const getInitials = (name) => {
+        if (!name) return 'CL';
+        const cleanName = name.replace(/[^a-zA-Z\s]/g, ' ').trim();
+        const parts = cleanName.split(/\s+/).filter(Boolean);
+        if (parts.length >= 2) {
+            return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+        }
+        return (parts[0] ? parts[0].slice(0, 2) : 'CL').toUpperCase();
+    };
+
     return (
         <Box sx={{ maxWidth: 1400, mx: 'auto', p: { xs: 1.5, sm: 2.5, md: 3 } }}>
             {/* Atelier Page Header */}
@@ -324,17 +335,19 @@ const Loyalty = () => {
             </Grid>
 
             {/* Top Loyalty Patrons Table */}
+            {/* Top Loyalty Patrons Table */}
             <Paper
                 elevation={0}
                 sx={{
-                    borderRadius: 3.5,
-                    border: '1px solid',
-                    borderColor: 'divider',
+                    borderRadius: '20px',
+                    border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.14)',
                     overflow: 'hidden',
-                    boxShadow: '0 4px 20px -4px rgba(15, 118, 110, 0.08)'
+                    boxShadow: (t) => t.palette.mode === 'dark'
+                        ? '0 10px 30px rgba(0, 0, 0, 0.4)'
+                        : '0 10px 30px -10px rgba(15, 118, 110, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
                 }}
             >
-                <Box sx={{ px: 3, py: 2, bgcolor: 'rgba(15, 118, 110, 0.02)', borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Box sx={{ px: 3, py: 2, bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(15, 118, 110, 0.03)', borderBottom: '1px solid', borderColor: 'divider' }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
                         Clientele Loyalty Leaderboard & Privilege Balances
                     </Typography>
@@ -342,15 +355,15 @@ const Loyalty = () => {
 
                 <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
                     <Table sx={{ minWidth: 680 }}>
-                        <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
+                        <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(15, 118, 110, 0.04)' }}>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 800, color: '#042F2E', width: 70 }} align="center">Rank</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Client Details</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="center">Membership Tier</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Available Points</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Lifetime Spend</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Next Tier Target</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Privilege Actions</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', width: 70 }} align="center">Rank</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Client Details</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="center">Membership Tier</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="right">Available Points</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="right">Lifetime Spend</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Next Tier Target</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="right">Privilege Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -390,20 +403,29 @@ const Loyalty = () => {
                                                         <Avatar 
                                                             sx={{ 
                                                                 bgcolor: getTierColor(tier), 
+                                                                background: tier === 'Platinum' 
+                                                                    ? 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)' 
+                                                                    : tier === 'Gold' 
+                                                                        ? 'linear-gradient(135deg, #F59E0B 0%, #B45309 100%)' 
+                                                                        : tier === 'Silver' 
+                                                                            ? 'linear-gradient(135deg, #94A3B8 0%, #475569 100%)' 
+                                                                            : 'linear-gradient(135deg, #B45309 0%, #78350F 100%)',
                                                                 color: '#FFFFFF',
-                                                                width: 36, 
-                                                                height: 36, 
-                                                                fontSize: '0.85rem',
-                                                                fontWeight: 800 
+                                                                width: 40, 
+                                                                height: 40, 
+                                                                fontSize: '0.88rem',
+                                                                fontWeight: 800,
+                                                                boxShadow: `0 4px 12px ${getTierColor(tier)}35`,
+                                                                border: '2px solid rgba(255, 255, 255, 0.85)'
                                                             }}
                                                         >
-                                                            {customer.name?.split(' ').map(n => n[0]).join('').slice(0, 2) || 'CL'}
+                                                            {getInitials(customer.name)}
                                                         </Avatar>
                                                         <Box>
-                                                            <Typography sx={{ fontWeight: 700, color: 'text.primary' }}>
+                                                            <Typography sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.9rem' }}>
                                                                 {customer.name}
                                                             </Typography>
-                                                            <Typography variant="caption" color="text.secondary">
+                                                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
                                                                 {customer.phone}
                                                             </Typography>
                                                         </Box>
@@ -465,18 +487,42 @@ const Loyalty = () => {
                                                     </Box>
                                                 </TableCell>
 
-                                                {/* Actions */}
+                                                {/* Privilege Actions (Atelier Action Capsule Dock) */}
                                                 <TableCell align="right">
-                                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5 }}>
+                                                    <Box
+                                                        sx={{
+                                                            display: 'inline-flex',
+                                                            alignItems: 'center',
+                                                            gap: 0.75,
+                                                            p: '3px 6px',
+                                                            borderRadius: '24px',
+                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)',
+                                                            border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.12)'
+                                                        }}
+                                                    >
                                                         <Tooltip title="Redeem Available Points">
                                                             <span>
                                                                 <IconButton
                                                                     size="small"
                                                                     disabled={!customer.loyaltyPoints || customer.loyaltyPoints <= 0}
                                                                     onClick={() => handleRedeemOpen(customer)}
-                                                                    sx={{ color: '#0F766E', bgcolor: 'rgba(15, 118, 110, 0.08)' }}
+                                                                    sx={{
+                                                                        width: 30,
+                                                                        height: 30,
+                                                                        color: '#0F766E',
+                                                                        bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+                                                                        border: '1px solid rgba(15, 118, 110, 0.2)',
+                                                                        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                                                                        transition: 'all 0.18s ease',
+                                                                        '&:hover:not(:disabled)': {
+                                                                            bgcolor: '#0F766E',
+                                                                            color: '#FFFFFF',
+                                                                            transform: 'translateY(-1px)',
+                                                                            boxShadow: '0 4px 10px rgba(15, 118, 110, 0.3)'
+                                                                        }
+                                                                    }}
                                                                 >
-                                                                    <Redeem fontSize="small" />
+                                                                    <Redeem sx={{ fontSize: 15 }} />
                                                                 </IconButton>
                                                             </span>
                                                         </Tooltip>
@@ -484,9 +530,23 @@ const Loyalty = () => {
                                                             <IconButton
                                                                 size="small"
                                                                 onClick={() => handleBirthdayBonus(customer)}
-                                                                sx={{ color: '#D97706', bgcolor: 'rgba(217, 119, 6, 0.08)' }}
+                                                                sx={{
+                                                                    width: 30,
+                                                                    height: 30,
+                                                                    color: '#D97706',
+                                                                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+                                                                    border: '1px solid rgba(217, 119, 6, 0.25)',
+                                                                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                                                                    transition: 'all 0.18s ease',
+                                                                    '&:hover': {
+                                                                        bgcolor: '#D97706',
+                                                                        color: '#FFFFFF',
+                                                                        transform: 'translateY(-1px)',
+                                                                        boxShadow: '0 4px 10px rgba(217, 119, 6, 0.3)'
+                                                                    }
+                                                                }}
                                                             >
-                                                                <Cake fontSize="small" />
+                                                                <Cake sx={{ fontSize: 15 }} />
                                                             </IconButton>
                                                         </Tooltip>
                                                     </Box>

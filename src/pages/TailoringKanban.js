@@ -1211,18 +1211,25 @@ export default function TailoringKanban() {
           </Box>
         </Box>
 
-        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
+        <TableContainer component={Paper} elevation={0} sx={{ 
+          borderRadius: '20px', 
+          border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.14)',
+          boxShadow: (t) => t.palette.mode === 'dark' 
+            ? '0 10px 30px rgba(0, 0, 0, 0.4)' 
+            : '0 10px 30px -10px rgba(15, 118, 110, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)',
+          overflow: 'hidden'
+        }}>
           <Table size="small">
-            <TableHead sx={{ bgcolor: 'action.hover' }}>
+            <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(15, 118, 110, 0.04)' }}>
               <TableRow>
-                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase' }}>Job ID</TableCell>
-                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase' }}>Client</TableCell>
-                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase' }}>Garment & Specs</TableCell>
-                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase' }}>Master Tailor</TableCell>
-                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase' }}>Handover Date</TableCell>
-                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', textAlign: 'right' }}>Total Fee</TableCell>
-                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase' }}>Payment Status</TableCell>
-                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', textAlign: 'center' }}>Actions</TableCell>
+                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Job ID</TableCell>
+                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Client</TableCell>
+                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Garment & Specs</TableCell>
+                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Master Tailor</TableCell>
+                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Handover Date</TableCell>
+                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E', textAlign: 'right' }}>Total Fee</TableCell>
+                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Payment Status</TableCell>
+                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E', textAlign: 'center' }}>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -1292,14 +1299,37 @@ export default function TailoringKanban() {
                         />
                       </TableCell>
                       <TableCell sx={{ textAlign: 'center' }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 0.5 }}>
+                        <Box
+                          sx={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 0.75,
+                            p: '3px 6px',
+                            borderRadius: '24px',
+                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)',
+                            border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.12)'
+                          }}
+                        >
                           <Tooltip title="Send Thank You & Fitting WhatsApp">
                             <IconButton
                               size="small"
                               onClick={() => sendWhatsAppUpdate(order)}
-                              sx={{ color: '#25D366' }}
+                              sx={{
+                                width: 30,
+                                height: 30,
+                                color: '#059669',
+                                bgcolor: 'rgba(37, 211, 102, 0.09)',
+                                border: '1px solid rgba(37, 211, 102, 0.25)',
+                                transition: 'all 0.18s ease',
+                                '&:hover': {
+                                  bgcolor: '#059669',
+                                  color: '#FFFFFF',
+                                  transform: 'translateY(-1px)',
+                                  boxShadow: '0 4px 12px rgba(5, 150, 105, 0.35)'
+                                }
+                              }}
                             >
-                              <WhatsApp fontSize="small" />
+                              <WhatsApp sx={{ fontSize: 15 }} />
                             </IconButton>
                           </Tooltip>
 
@@ -1307,9 +1337,21 @@ export default function TailoringKanban() {
                             <IconButton
                               size="small"
                               onClick={() => reopenOrder(order.id)}
-                              sx={{ color: 'text.secondary' }}
+                              sx={{
+                                width: 30,
+                                height: 30,
+                                color: 'text.secondary',
+                                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+                                border: '1px solid rgba(0, 0, 0, 0.12)',
+                                transition: 'all 0.18s ease',
+                                '&:hover': {
+                                  bgcolor: 'text.secondary',
+                                  color: '#FFFFFF',
+                                  transform: 'translateY(-1px)'
+                                }
+                              }}
                             >
-                              <Undo fontSize="small" />
+                              <Undo sx={{ fontSize: 15 }} />
                             </IconButton>
                           </Tooltip>
                         </Box>
@@ -1894,15 +1936,22 @@ export default function TailoringKanban() {
                 </Typography>
               </Box>
             ) : (
-              <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
+              <TableContainer component={Paper} elevation={0} sx={{ 
+                borderRadius: '20px', 
+                border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.14)',
+                boxShadow: (t) => t.palette.mode === 'dark' 
+                  ? '0 10px 30px rgba(0, 0, 0, 0.4)' 
+                  : '0 10px 30px -10px rgba(15, 118, 110, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)',
+                overflow: 'hidden'
+              }}>
                 <Table size="small">
-                  <TableHead sx={{ bgcolor: 'action.hover' }}>
+                  <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(15, 118, 110, 0.04)' }}>
                     <TableRow>
-                      <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase' }}>Master Tailor</TableCell>
-                      <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase' }}>Craft Specialty</TableCell>
-                      <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase' }}>Contact</TableCell>
-                      <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase' }}>Active Jobs</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase' }}>Action</TableCell>
+                      <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Master Tailor</TableCell>
+                      <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Craft Specialty</TableCell>
+                      <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Contact</TableCell>
+                      <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Active Jobs</TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Action</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>

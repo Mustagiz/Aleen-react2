@@ -126,17 +126,45 @@ export const ThemeProvider = ({ children }) => {
                         }
                     }
                 },
+                MuiTableContainer: {
+                    styleOverrides: {
+                        root: {
+                            borderRadius: 20,
+                            border: mode === 'light' ? '1px solid rgba(15, 118, 110, 0.14)' : '1px solid rgba(255, 255, 255, 0.08)',
+                            boxShadow: mode === 'light' 
+                                ? '0 10px 30px -10px rgba(15, 118, 110, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)' 
+                                : '0 10px 30px rgba(0, 0, 0, 0.4)',
+                            backgroundImage: 'none',
+                            backgroundColor: mode === 'light' ? '#FFFFFF' : '#0F1E1D',
+                            overflow: 'hidden'
+                        }
+                    }
+                },
                 MuiTableHead: {
                     styleOverrides: {
                         root: {
                             backgroundColor: mode === 'light' ? 'rgba(15, 118, 110, 0.04)' : 'rgba(255, 255, 255, 0.03)',
                             '& .MuiTableCell-head': {
-                                fontWeight: 700,
-                                fontSize: '0.78rem',
+                                fontWeight: 800,
+                                fontSize: '0.74rem',
                                 textTransform: 'uppercase',
-                                letterSpacing: '0.06em',
+                                letterSpacing: '0.08em',
                                 color: mode === 'light' ? '#0F766E' : '#14B8A6',
-                                borderBottom: mode === 'light' ? '1.5px solid rgba(15, 118, 110, 0.15)' : '1.5px solid rgba(255, 255, 255, 0.1)'
+                                borderBottom: mode === 'light' ? '1.5px solid rgba(15, 118, 110, 0.16)' : '1.5px solid rgba(255, 255, 255, 0.1)',
+                                padding: '14px 18px'
+                            }
+                        }
+                    }
+                },
+                MuiTableRow: {
+                    styleOverrides: {
+                        root: {
+                            transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+                            '&.MuiTableRow-hover:hover, &:hover': {
+                                backgroundColor: mode === 'light' ? 'rgba(15, 118, 110, 0.025)' : 'rgba(255, 255, 255, 0.025)'
+                            },
+                            '&:last-child td, &:last-child th': {
+                                borderBottom: 0
                             }
                         }
                     }
@@ -144,7 +172,7 @@ export const ThemeProvider = ({ children }) => {
                 MuiTableCell: {
                     styleOverrides: {
                         root: {
-                            padding: '12px 16px',
+                            padding: '14px 18px',
                             fontFeatureSettings: '"tnum"',
                             borderColor: mode === 'light' ? 'rgba(15, 118, 110, 0.08)' : 'rgba(255, 255, 255, 0.06)'
                         }

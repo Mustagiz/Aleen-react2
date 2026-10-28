@@ -483,7 +483,15 @@ const Expenses = () => {
             </GlassCard>
 
             {/* Expenses Table with Proper Column Alignment */}
-            <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
+            <GlassCard sx={{ 
+                p: 0, 
+                overflow: 'hidden', 
+                borderRadius: '20px', 
+                border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.14)',
+                boxShadow: (t) => t.palette.mode === 'dark' 
+                    ? '0 10px 30px rgba(0, 0, 0, 0.4)' 
+                    : '0 10px 30px -10px rgba(15, 118, 110, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
+            }}>
                 <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
                     <Table size="small" sx={{ minWidth: 680 }}>
                         <TableHead sx={{ bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(15, 118, 110, 0.04)' }}>
@@ -562,18 +570,38 @@ const Expenses = () => {
                                             </Typography>
                                         </TableCell>
                                         <TableCell align="right" sx={{ py: 1.75, pr: 2 }}>
-                                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5 }}>
+                                            <Box
+                                                sx={{
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    gap: 0.75,
+                                                    p: '3px 6px',
+                                                    borderRadius: '24px',
+                                                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)',
+                                                    border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.12)'
+                                                }}
+                                            >
                                                 <Tooltip title="Edit Expense">
                                                     <IconButton 
                                                         size="small" 
                                                         onClick={() => handleOpen(exp)} 
                                                         sx={{ 
-                                                            color: '#0F766E',
-                                                            bgcolor: theme.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.1)' : 'rgba(15, 118, 110, 0.08)',
-                                                            '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.2)' }
+                                                            width: 30,
+                                                            height: 30,
+                                                            color: '#0284C7',
+                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+                                                            border: '1px solid rgba(2, 132, 199, 0.2)',
+                                                            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                                                            transition: 'all 0.18s ease',
+                                                            '&:hover': {
+                                                                bgcolor: '#0284C7',
+                                                                color: '#FFFFFF',
+                                                                transform: 'translateY(-1px)',
+                                                                boxShadow: '0 4px 10px rgba(2, 132, 199, 0.3)'
+                                                            }
                                                         }}
                                                     >
-                                                        <Edit fontSize="small" />
+                                                        <Edit sx={{ fontSize: 15 }} />
                                                     </IconButton>
                                                 </Tooltip>
                                                 <Tooltip title="Delete Expense">
@@ -581,12 +609,22 @@ const Expenses = () => {
                                                         size="small" 
                                                         onClick={() => openDeleteDialog(exp.id)} 
                                                         sx={{ 
-                                                            color: 'error.main',
-                                                            bgcolor: theme.palette.mode === 'dark' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(239, 68, 68, 0.08)',
-                                                            '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.2)' }
+                                                            width: 30,
+                                                            height: 30,
+                                                            color: '#DC2626',
+                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+                                                            border: '1px solid rgba(220, 38, 38, 0.2)',
+                                                            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                                                            transition: 'all 0.18s ease',
+                                                            '&:hover': {
+                                                                bgcolor: '#DC2626',
+                                                                color: '#FFFFFF',
+                                                                transform: 'translateY(-1px)',
+                                                                boxShadow: '0 4px 10px rgba(220, 38, 38, 0.3)'
+                                                            }
                                                         }}
                                                     >
-                                                        <Delete fontSize="small" />
+                                                        <Delete sx={{ fontSize: 15 }} />
                                                     </IconButton>
                                                 </Tooltip>
                                             </Box>

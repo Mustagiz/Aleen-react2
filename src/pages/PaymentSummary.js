@@ -678,7 +678,15 @@ const PaymentSummary = () => {
             </GlassCard>
 
             {/* Transaction Audit Details Table */}
-            <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
+            <GlassCard sx={{ 
+                p: 0, 
+                overflow: 'hidden', 
+                borderRadius: '20px', 
+                border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.14)',
+                boxShadow: (t) => t.palette.mode === 'dark' 
+                    ? '0 10px 30px rgba(0, 0, 0, 0.4)' 
+                    : '0 10px 30px -10px rgba(15, 118, 110, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
+            }}>
                 <TableContainer sx={{ maxHeight: 680 }}>
                     <Table size="small" stickyHeader>
                         <TableHead sx={{
