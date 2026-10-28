@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import { createTheme, ThemeProvider as MUIThemeProvider } from '@mui/material/styles';
 import { COLOR_THEMES, DEFAULT_COLOR_THEME } from '../constants/colorThemes';
+import { DESIGN_SYSTEMS, DEFAULT_DESIGN_SYSTEM } from '../constants/designSystems';
 
 const ThemeContext = createContext();
 
@@ -17,6 +18,11 @@ export const ThemeProvider = ({ children }) => {
         return savedDensity || 'comfortable';
     });
 
+    const [designSystem, setDesignSystem] = useState(() => {
+        const savedSystem = localStorage.getItem('crmDesignSystem');
+        return savedSystem || DEFAULT_DESIGN_SYSTEM;
+    });
+
     const [colorTheme, setColorTheme] = useState(() => {
         const savedTheme = localStorage.getItem('crmColorTheme');
         return savedTheme || DEFAULT_COLOR_THEME;
@@ -31,25 +37,53 @@ export const ThemeProvider = ({ children }) => {
     }, [density]);
 
     useEffect(() => {
+        localStorage.setItem('crmDesignSystem', designSystem);
+    }, [designSystem]);
+
+    useEffect(() => {
         localStorage.setItem('crmColorTheme', colorTheme);
     }, [colorTheme]);
 
+    const activeSystemConfig = useMemo(() => {
+        return DESIGN_SYSTEMS.find(s => s.id === designSystem) || DESIGN_SYSTEMS[0];
+    }, [designSystem]);
+
     const activeThemeConfig = useMemo(() => {
-        return COLOR_THEMES.find(t => t.id === colorTheme) || COLOR_THEMES[0];
+        // If user is using an ecosystem theme like Apple/Microsoft/Zoho and hasn't manually customized a color, use system palette
+        const matchingColor = COLOR_THEMES.find(t => t.id === colorTheme);
+        return matchingColor || COLOR_THEMES[0];
     }, [colorTheme]);
+
+    // Convenient helper to apply an ecosystem theme and optionally synchronize default colors
+    const selectDesignSystem = (systemId) => {
+        setDesignSystem(systemId);
+        const sys = DESIGN_SYSTEMS.find(s => s.id === systemId);
+        if (sys && sys.palette?.primary?.main) {
+            // Find if there is a matching color theme or update custom primary
+            const matchingColor = COLOR_THEMES.find(c => c.primary.main.toLowerCase() === sys.palette.primary.main.toLowerCase());
+            if (matchingColor) {
+                setColorTheme(matchingColor.id);
+            }
+        }
+    };
 
     // Synchronize CSS custom variables for non-MUI components, loaders, borders and raw CSS
     useEffect(() => {
         const root = document.documentElement;
-        if (activeThemeConfig) {
+        if (activeSystemConfig && activeThemeConfig) {
             root.style.setProperty('--emerald-primary', activeThemeConfig.primary.main);
             root.style.setProperty('--emerald-light', activeThemeConfig.primary.light);
             root.style.setProperty('--emerald-dark', activeThemeConfig.primary.dark);
             root.style.setProperty('--gold-accent', activeThemeConfig.secondary.main);
             root.style.setProperty('--gold-champagne', activeThemeConfig.secondary.light);
-            root.style.setProperty('--accent-glow', activeThemeConfig.accentGlow);
+            root.style.setProperty('--accent-glow', activeThemeConfig.accentGlow || activeSystemConfig.accentGlow);
+            root.style.setProperty('--radius-card', `${activeSystemConfig.shape.cardRadius}px`);
+            root.style.setProperty('--radius-control', `${activeSystemConfig.shape.buttonRadius}px`);
+            root.style.setProperty('--radius-inner', `${activeSystemConfig.shape.inputRadius}px`);
+            root.style.setProperty('--font-sans', activeSystemConfig.typography.fontFamily);
+            root.style.setProperty('--font-serif', activeSystemConfig.typography.h1Font);
         }
-    }, [activeThemeConfig]);
+    }, [activeSystemConfig, activeThemeConfig]);
 
     const toggleTheme = () => {
         setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
@@ -77,11 +111,11 @@ export const ThemeProvider = ({ children }) => {
                 },
                 background: {
                     default: mode === 'light' 
-                        ? (activeThemeConfig.background?.lightDefault || '#FBFBF9') 
-                        : (activeThemeConfig.background?.darkDefault || '#081212'),
+                        ? (activeSystemConfig.palette.background?.lightDefault || '#F8FAFC') 
+                        : (activeSystemConfig.palette.background?.darkDefault || '#081212'),
                     paper: mode === 'light' 
-                        ? (activeThemeConfig.background?.lightPaper || '#FFFFFF') 
-                        : (activeThemeConfig.background?.darkPaper || '#0F1E1D')
+                        ? (activeSystemConfig.palette.background?.lightPaper || '#FFFFFF') 
+                        : (activeSystemConfig.palette.background?.darkPaper || '#161618')
                 },
                 success: { main: '#10B981', light: '#D1FAE5', dark: '#047857' },
                 error: { main: '#9F1239', light: '#FFE4E6', dark: '#881337' },
@@ -94,20 +128,20 @@ export const ThemeProvider = ({ children }) => {
                 divider: mode === 'light' ? `${activeThemeConfig.primary.main}1A` : 'rgba(255, 255, 255, 0.08)'
             },
             typography: {
-                fontFamily: '"Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                h1: { fontFamily: '"Cormorant Garamond", "Playfair Display", Georgia, serif', fontWeight: 700, fontSize: '2.5rem', letterSpacing: '-0.015em' },
-                h2: { fontFamily: '"Cormorant Garamond", "Playfair Display", Georgia, serif', fontWeight: 700, fontSize: '2.0rem', letterSpacing: '-0.01em' },
-                h3: { fontFamily: '"Cormorant Garamond", "Playfair Display", Georgia, serif', fontWeight: 600, fontSize: '1.6rem', letterSpacing: '-0.01em' },
-                h4: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', fontWeight: 700, fontSize: '1.25rem', letterSpacing: '-0.015em' },
-                h5: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', fontWeight: 700, fontSize: '1.08rem', letterSpacing: '-0.01em' },
-                h6: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', fontWeight: 700, fontSize: '0.96rem', letterSpacing: '-0.005em' },
+                fontFamily: activeSystemConfig.typography.fontFamily,
+                h1: { fontFamily: activeSystemConfig.typography.h1Font, fontWeight: activeSystemConfig.typography.fontWeightBold, fontSize: '2.5rem', letterSpacing: activeSystemConfig.typography.letterSpacing },
+                h2: { fontFamily: activeSystemConfig.typography.h1Font, fontWeight: activeSystemConfig.typography.fontWeightBold, fontSize: '2.0rem', letterSpacing: activeSystemConfig.typography.letterSpacing },
+                h3: { fontFamily: activeSystemConfig.typography.h1Font, fontWeight: 600, fontSize: '1.6rem', letterSpacing: activeSystemConfig.typography.letterSpacing },
+                h4: { fontFamily: activeSystemConfig.typography.fontFamily, fontWeight: 700, fontSize: '1.25rem', letterSpacing: activeSystemConfig.typography.letterSpacing },
+                h5: { fontFamily: activeSystemConfig.typography.fontFamily, fontWeight: 700, fontSize: '1.08rem', letterSpacing: activeSystemConfig.typography.letterSpacing },
+                h6: { fontFamily: activeSystemConfig.typography.fontFamily, fontWeight: 700, fontSize: '0.96rem', letterSpacing: activeSystemConfig.typography.letterSpacing },
                 subtitle1: { fontSize: '0.925rem', fontWeight: 600, letterSpacing: '0.01em' },
                 subtitle2: { fontSize: '0.82rem', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' },
                 body1: { fontSize: '0.885rem', lineHeight: 1.55, fontFeatureSettings: '"tnum"' },
                 body2: { fontSize: '0.82rem', lineHeight: 1.5, fontFeatureSettings: '"tnum"' },
-                button: { fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', textTransform: 'none', fontWeight: 700, letterSpacing: '0.02em' }
+                button: { fontFamily: activeSystemConfig.typography.fontFamily, textTransform: 'none', fontWeight: 700, letterSpacing: '0.02em' }
             },
-            shape: { borderRadius: 10 },
+            shape: { borderRadius: activeSystemConfig.shape.borderRadius },
             components: {
                 MuiButton: {
                     defaultProps: {
@@ -115,7 +149,7 @@ export const ThemeProvider = ({ children }) => {
                     },
                     styleOverrides: {
                         root: {
-                            borderRadius: 10,
+                            borderRadius: activeSystemConfig.shape.buttonRadius,
                             minHeight: 40,
                             padding: '8px 20px',
                             boxShadow: 'none',
@@ -132,7 +166,7 @@ export const ThemeProvider = ({ children }) => {
                             }
                         },
                         containedPrimary: {
-                            background: `linear-gradient(135deg, ${activeThemeConfig.primary.light} 0%, ${activeThemeConfig.primary.main} 100%)`,
+                            background: activeSystemConfig.buttonStyle?.background || `linear-gradient(135deg, ${activeThemeConfig.primary.light} 0%, ${activeThemeConfig.primary.main} 100%)`,
                             '&:hover': {
                                 background: `linear-gradient(135deg, ${activeThemeConfig.primary.main} 0%, ${activeThemeConfig.primary.dark} 100%)`
                             }
@@ -159,7 +193,7 @@ export const ThemeProvider = ({ children }) => {
                     styleOverrides: {
                         root: {
                             backgroundImage: 'none',
-                            borderRadius: 16
+                            borderRadius: activeSystemConfig.shape.cardRadius
                         }
                     }
                 },
@@ -169,9 +203,11 @@ export const ThemeProvider = ({ children }) => {
                     },
                     styleOverrides: {
                         root: {
-                            borderRadius: 16,
-                            border: mode === 'light' ? `1px solid ${activeThemeConfig.primary.main}14` : '1px solid rgba(255, 255, 255, 0.08)',
-                            boxShadow: mode === 'light' ? '0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 10px 25px -5px rgba(0, 0, 0, 0.03)' : '0 4px 20px rgba(0, 0, 0, 0.4)'
+                            borderRadius: activeSystemConfig.shape.cardRadius,
+                            border: mode === 'light' ? activeSystemConfig.cardStyle.borderLight : activeSystemConfig.cardStyle.borderDark,
+                            boxShadow: mode === 'light' ? activeSystemConfig.cardStyle.boxShadowLight : activeSystemConfig.cardStyle.boxShadowDark,
+                            backdropFilter: activeSystemConfig.cardStyle.backdropFilter || 'none',
+                            WebkitBackdropFilter: activeSystemConfig.cardStyle.backdropFilter || 'none'
                         }
                     }
                 },
@@ -215,7 +251,7 @@ export const ThemeProvider = ({ children }) => {
                 MuiChip: {
                     styleOverrides: {
                         root: {
-                            borderRadius: 8,
+                            borderRadius: activeSystemConfig.shape.buttonRadius,
                             fontWeight: 700,
                             fontSize: '0.75rem'
                         }
@@ -224,7 +260,7 @@ export const ThemeProvider = ({ children }) => {
                 MuiOutlinedInput: {
                     styleOverrides: {
                         root: {
-                            borderRadius: 10,
+                            borderRadius: activeSystemConfig.shape.inputRadius,
                             minHeight: 40,
                             '&:hover .MuiOutlinedInput-notchedOutline': {
                                 borderColor: activeThemeConfig.primary.main
@@ -237,7 +273,7 @@ export const ThemeProvider = ({ children }) => {
                     }
                 }
             }
-        }), [mode, density, activeThemeConfig]
+        }), [mode, density, activeSystemConfig, activeThemeConfig]
     );
 
     return (
@@ -250,7 +286,12 @@ export const ThemeProvider = ({ children }) => {
             colorTheme,
             setColorTheme,
             availableThemes: COLOR_THEMES,
-            activeThemeConfig
+            activeThemeConfig,
+            designSystem,
+            setDesignSystem,
+            selectDesignSystem,
+            availableDesignSystems: DESIGN_SYSTEMS,
+            activeSystemConfig
         }}>
             <MUIThemeProvider theme={theme}>
                 {children}

@@ -375,7 +375,7 @@ export default function Layout() {
                         if (isMobile) setMobileOpen(false);
                       }}
                       sx={{
-                        borderRadius: '10px',
+                        borderRadius: 'var(--radius-control, 10px)',
                         mb: 0.5,
                         py: { xs: 1.1, sm: 1 },
                         minHeight: { xs: 44, sm: 40 },
