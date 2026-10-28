@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import { createTheme, ThemeProvider as MUIThemeProvider } from '@mui/material/styles';
-import { COLOR_THEMES, DEFAULT_COLOR_THEME } from '../constants/colorThemes';
+import { COLOR_THEMES } from '../constants/colorThemes';
 import { DESIGN_SYSTEMS, DEFAULT_DESIGN_SYSTEM } from '../constants/designSystems';
 
 const ThemeContext = createContext();
@@ -25,7 +25,7 @@ export const ThemeProvider = ({ children }) => {
 
     const [colorTheme, setColorTheme] = useState(() => {
         const savedTheme = localStorage.getItem('crmColorTheme');
-        return savedTheme || DEFAULT_COLOR_THEME;
+        return savedTheme || 'match-system';
     });
 
     useEffect(() => {
@@ -44,46 +44,96 @@ export const ThemeProvider = ({ children }) => {
         localStorage.setItem('crmColorTheme', colorTheme);
     }, [colorTheme]);
 
+    // Active ecosystem configuration
     const activeSystemConfig = useMemo(() => {
         return DESIGN_SYSTEMS.find(s => s.id === designSystem) || DESIGN_SYSTEMS[0];
     }, [designSystem]);
 
-    const activeThemeConfig = useMemo(() => {
-        // If user is using an ecosystem theme like Apple/Microsoft/Zoho and hasn't manually customized a color, use system palette
-        const matchingColor = COLOR_THEMES.find(t => t.id === colorTheme);
-        return matchingColor || COLOR_THEMES[0];
-    }, [colorTheme]);
-
-    // Convenient helper to apply an ecosystem theme and optionally synchronize default colors
-    const selectDesignSystem = (systemId) => {
-        setDesignSystem(systemId);
-        const sys = DESIGN_SYSTEMS.find(s => s.id === systemId);
-        if (sys && sys.palette?.primary?.main) {
-            // Find if there is a matching color theme or update custom primary
-            const matchingColor = COLOR_THEMES.find(c => c.primary.main.toLowerCase() === sys.palette.primary.main.toLowerCase());
-            if (matchingColor) {
-                setColorTheme(matchingColor.id);
+    // Effective primary and secondary palette:
+    // If colorTheme is 'match-system', use the ecosystem's native branding colors (Zoho Orange, Apple Blue, MS Blue, etc.)
+    // If the user selected an explicit color theme, honor that color palette.
+    const activePalette = useMemo(() => {
+        if (colorTheme && colorTheme !== 'match-system') {
+            const customColor = COLOR_THEMES.find(t => t.id === colorTheme);
+            if (customColor) {
+                return {
+                    primary: customColor.primary,
+                    secondary: customColor.secondary,
+                    accentGlow: customColor.accentGlow,
+                    name: customColor.name
+                };
             }
         }
+        return {
+            primary: activeSystemConfig.palette.primary,
+            secondary: activeSystemConfig.palette.secondary,
+            accentGlow: activeSystemConfig.accentGlow,
+            name: activeSystemConfig.name
+        };
+    }, [colorTheme, activeSystemConfig]);
+
+    // Computed sidebar styles for the active ecosystem & color
+    const computedSidebar = useMemo(() => {
+        const sysSidebar = activeSystemConfig.sidebar;
+        const isDarkSys = sysSidebar.isDarkSidebar || mode === 'dark';
+        const bg = mode === 'light' ? sysSidebar.lightBg : sysSidebar.darkBg;
+        
+        return {
+            bg,
+            isDark: isDarkSys,
+            textColor: isDarkSys ? (sysSidebar.textColor || '#CBD5E1') : (sysSidebar.textColor || '#334155'),
+            textActiveColor: sysSidebar.textActiveColor || '#FFFFFF',
+            subheadColor: sysSidebar.subheadColor || (isDarkSys ? '#94A3B8' : '#64748B'),
+            activePillBg: sysSidebar.activePillBg || activePalette.primary.main,
+            activePillText: sysSidebar.activePillText || '#FFFFFF',
+            borderColor: sysSidebar.borderColor || (mode === 'light' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)')
+        };
+    }, [activeSystemConfig, mode, activePalette]);
+
+    // Computed top navigation bar styles
+    const computedTopBar = useMemo(() => {
+        const sysTopBar = activeSystemConfig.topBar;
+        const isColored = sysTopBar.style === 'colored';
+        const bg = mode === 'light' ? sysTopBar.lightBg : sysTopBar.darkBg;
+        const textColor = (isColored && mode === 'light') 
+            ? '#FFFFFF' 
+            : (mode === 'light' ? sysTopBar.textColor || '#0F172A' : '#F8FAFC');
+
+        return {
+            bg,
+            textColor,
+            isColored,
+            borderColor: sysTopBar.borderColor || (mode === 'light' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)')
+        };
+    }, [activeSystemConfig, mode]);
+
+    // User switches design system: resets color to match system automatically for immediate drastic impact
+    const selectDesignSystem = (systemId) => {
+        setDesignSystem(systemId);
+        setColorTheme('match-system');
     };
 
     // Synchronize CSS custom variables for non-MUI components, loaders, borders and raw CSS
     useEffect(() => {
         const root = document.documentElement;
-        if (activeSystemConfig && activeThemeConfig) {
-            root.style.setProperty('--emerald-primary', activeThemeConfig.primary.main);
-            root.style.setProperty('--emerald-light', activeThemeConfig.primary.light);
-            root.style.setProperty('--emerald-dark', activeThemeConfig.primary.dark);
-            root.style.setProperty('--gold-accent', activeThemeConfig.secondary.main);
-            root.style.setProperty('--gold-champagne', activeThemeConfig.secondary.light);
-            root.style.setProperty('--accent-glow', activeThemeConfig.accentGlow || activeSystemConfig.accentGlow);
+        if (activeSystemConfig && activePalette) {
+            root.style.setProperty('--emerald-primary', activePalette.primary.main);
+            root.style.setProperty('--emerald-light', activePalette.primary.light);
+            root.style.setProperty('--emerald-dark', activePalette.primary.dark);
+            root.style.setProperty('--gold-accent', activePalette.secondary.main);
+            root.style.setProperty('--gold-champagne', activePalette.secondary.light);
+            root.style.setProperty('--accent-glow', activePalette.accentGlow);
+            root.style.setProperty('--app-sidebar-bg', computedSidebar.bg);
+            root.style.setProperty('--app-sidebar-text', computedSidebar.textColor);
+            root.style.setProperty('--app-topbar-bg', computedTopBar.bg);
+            root.style.setProperty('--app-topbar-text', computedTopBar.textColor);
             root.style.setProperty('--radius-card', `${activeSystemConfig.shape.cardRadius}px`);
             root.style.setProperty('--radius-control', `${activeSystemConfig.shape.buttonRadius}px`);
             root.style.setProperty('--radius-inner', `${activeSystemConfig.shape.inputRadius}px`);
             root.style.setProperty('--font-sans', activeSystemConfig.typography.fontFamily);
             root.style.setProperty('--font-serif', activeSystemConfig.typography.h1Font);
         }
-    }, [activeSystemConfig, activeThemeConfig]);
+    }, [activeSystemConfig, activePalette, computedSidebar, computedTopBar]);
 
     const toggleTheme = () => {
         setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
@@ -93,21 +143,21 @@ export const ThemeProvider = ({ children }) => {
         setDensity((prev) => (prev === 'comfortable' ? 'compact' : 'comfortable'));
     };
 
-    const theme = useMemo(() =>
-        createTheme({
+    const theme = useMemo(() => {
+        const muiTheme = createTheme({
             palette: {
                 mode,
                 primary: {
-                    main: activeThemeConfig.primary.main,
-                    light: activeThemeConfig.primary.light,
-                    dark: activeThemeConfig.primary.dark,
-                    contrastText: activeThemeConfig.primary.contrastText || '#FFFFFF'
+                    main: activePalette.primary.main,
+                    light: activePalette.primary.light,
+                    dark: activePalette.primary.dark,
+                    contrastText: activePalette.primary.contrastText || '#FFFFFF'
                 },
                 secondary: {
-                    main: activeThemeConfig.secondary.main,
-                    light: activeThemeConfig.secondary.light,
-                    dark: activeThemeConfig.secondary.dark,
-                    contrastText: activeThemeConfig.secondary.contrastText || '#FFFFFF'
+                    main: activePalette.secondary.main,
+                    light: activePalette.secondary.light,
+                    dark: activePalette.secondary.dark,
+                    contrastText: activePalette.secondary.contrastText || '#FFFFFF'
                 },
                 background: {
                     default: mode === 'light' 
@@ -125,7 +175,7 @@ export const ThemeProvider = ({ children }) => {
                     primary: mode === 'light' ? '#0F172A' : '#F8FAFC',
                     secondary: mode === 'light' ? '#5A6A80' : '#94A3B8'
                 },
-                divider: mode === 'light' ? `${activeThemeConfig.primary.main}1A` : 'rgba(255, 255, 255, 0.08)'
+                divider: mode === 'light' ? `${activePalette.primary.main}1A` : 'rgba(255, 255, 255, 0.08)'
             },
             typography: {
                 fontFamily: activeSystemConfig.typography.fontFamily,
@@ -159,29 +209,29 @@ export const ThemeProvider = ({ children }) => {
                             transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                             '&:hover': {
                                 transform: 'translateY(-1px)',
-                                boxShadow: mode === 'light' ? `0 4px 14px ${activeThemeConfig.accentGlow}` : '0 4px 14px rgba(0, 0, 0, 0.4)'
+                                boxShadow: mode === 'light' ? `0 4px 14px ${activePalette.accentGlow}` : '0 4px 14px rgba(0, 0, 0, 0.4)'
                             },
                             '&:active': {
                                 transform: 'translateY(0) scale(0.985)'
                             }
                         },
                         containedPrimary: {
-                            background: activeSystemConfig.buttonStyle?.background || `linear-gradient(135deg, ${activeThemeConfig.primary.light} 0%, ${activeThemeConfig.primary.main} 100%)`,
+                            background: activeSystemConfig.buttonStyle?.background || `linear-gradient(135deg, ${activePalette.primary.light} 0%, ${activePalette.primary.main} 100%)`,
                             '&:hover': {
-                                background: `linear-gradient(135deg, ${activeThemeConfig.primary.main} 0%, ${activeThemeConfig.primary.dark} 100%)`
+                                background: `linear-gradient(135deg, ${activePalette.primary.main} 0%, ${activePalette.primary.dark} 100%)`
                             }
                         },
                         containedSecondary: {
-                            background: `linear-gradient(135deg, ${activeThemeConfig.secondary.main} 0%, ${activeThemeConfig.secondary.dark} 100%)`,
+                            background: `linear-gradient(135deg, ${activePalette.secondary.main} 0%, ${activePalette.secondary.dark} 100%)`,
                             '&:hover': {
-                                background: `linear-gradient(135deg, ${activeThemeConfig.secondary.light} 0%, ${activeThemeConfig.secondary.main} 100%)`
+                                background: `linear-gradient(135deg, ${activePalette.secondary.light} 0%, ${activePalette.secondary.main} 100%)`
                             }
                         },
                         outlined: {
-                            borderColor: mode === 'light' ? `${activeThemeConfig.primary.main}2E` : 'rgba(255, 255, 255, 0.12)',
+                            borderColor: mode === 'light' ? `${activePalette.primary.main}2E` : 'rgba(255, 255, 255, 0.12)',
                             '&:hover': {
-                                borderColor: activeThemeConfig.primary.main,
-                                backgroundColor: mode === 'light' ? `${activeThemeConfig.primary.main}0A` : 'rgba(255, 255, 255, 0.04)'
+                                borderColor: activePalette.primary.main,
+                                backgroundColor: mode === 'light' ? `${activePalette.primary.main}0A` : 'rgba(255, 255, 255, 0.04)'
                             }
                         }
                     }
@@ -214,14 +264,14 @@ export const ThemeProvider = ({ children }) => {
                 MuiTableHead: {
                     styleOverrides: {
                         root: {
-                            backgroundColor: mode === 'light' ? `${activeThemeConfig.primary.main}08` : 'rgba(255, 255, 255, 0.03)',
+                            backgroundColor: mode === 'light' ? `${activePalette.primary.main}08` : 'rgba(255, 255, 255, 0.03)',
                             '& .MuiTableCell-head': {
-                                color: mode === 'light' ? activeThemeConfig.primary.dark : '#F8FAFC',
+                                color: mode === 'light' ? activePalette.primary.dark : '#F8FAFC',
                                 fontWeight: 800,
                                 fontSize: '0.78rem',
                                 textTransform: 'uppercase',
                                 letterSpacing: '0.06em',
-                                borderBottom: mode === 'light' ? `1px solid ${activeThemeConfig.primary.main}1A` : '1px solid rgba(255, 255, 255, 0.08)'
+                                borderBottom: mode === 'light' ? `1px solid ${activePalette.primary.main}1A` : '1px solid rgba(255, 255, 255, 0.08)'
                             }
                         }
                     }
@@ -231,7 +281,7 @@ export const ThemeProvider = ({ children }) => {
                         root: {
                             transition: 'background-color 0.15s ease',
                             '&:hover': {
-                                backgroundColor: mode === 'light' ? `${activeThemeConfig.primary.main}08` : 'rgba(255, 255, 255, 0.03)'
+                                backgroundColor: mode === 'light' ? `${activePalette.primary.main}08` : 'rgba(255, 255, 255, 0.03)'
                             },
                             '&:last-child td': {
                                 borderBottom: 0
@@ -244,7 +294,7 @@ export const ThemeProvider = ({ children }) => {
                         root: {
                             padding: density === 'compact' ? '8px 12px' : '14px 18px',
                             fontFeatureSettings: '"tnum"',
-                            borderColor: mode === 'light' ? `${activeThemeConfig.primary.main}12` : 'rgba(255, 255, 255, 0.06)'
+                            borderColor: mode === 'light' ? `${activePalette.primary.main}12` : 'rgba(255, 255, 255, 0.06)'
                         }
                     }
                 },
@@ -263,18 +313,28 @@ export const ThemeProvider = ({ children }) => {
                             borderRadius: activeSystemConfig.shape.inputRadius,
                             minHeight: 40,
                             '&:hover .MuiOutlinedInput-notchedOutline': {
-                                borderColor: activeThemeConfig.primary.main
+                                borderColor: activePalette.primary.main
                             },
                             '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                borderColor: activeThemeConfig.primary.main,
+                                borderColor: activePalette.primary.main,
                                 borderWidth: '1.5px'
                             }
                         }
                     }
                 }
             }
-        }), [mode, density, activeSystemConfig, activeThemeConfig]
-    );
+        });
+
+        // Attach custom layout tokens to theme object for instant access across Layout
+        muiTheme.custom = {
+            sidebar: computedSidebar,
+            topBar: computedTopBar,
+            designSystem: activeSystemConfig,
+            palette: activePalette
+        };
+
+        return muiTheme;
+    }, [mode, density, activeSystemConfig, activePalette, computedSidebar, computedTopBar]);
 
     return (
         <ThemeContext.Provider value={{ 
@@ -286,12 +346,15 @@ export const ThemeProvider = ({ children }) => {
             colorTheme,
             setColorTheme,
             availableThemes: COLOR_THEMES,
-            activeThemeConfig,
+            activePalette,
+            activeThemeConfig: activePalette,
             designSystem,
             setDesignSystem,
             selectDesignSystem,
             availableDesignSystems: DESIGN_SYSTEMS,
-            activeSystemConfig
+            activeSystemConfig,
+            computedSidebar,
+            computedTopBar
         }}>
             <MUIThemeProvider theme={theme}>
                 {children}

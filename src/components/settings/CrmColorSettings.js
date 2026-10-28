@@ -254,6 +254,67 @@ export default function CrmColorSettings() {
                           )}
                         </Box>
 
+                        {/* Mini Workspace Preview Wireframe */}
+                        <Box
+                          sx={{
+                            width: '100%',
+                            height: 64,
+                            borderRadius: '6px',
+                            border: '1px solid',
+                            borderColor: isSelected ? `${sys.palette.primary.main}4D` : 'divider',
+                            overflow: 'hidden',
+                            display: 'flex',
+                            mb: 2,
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+                          }}
+                        >
+                          {/* Mini Sidebar */}
+                          <Box
+                            sx={{
+                              width: '28%',
+                              bgcolor: mode === 'light' ? sys.sidebar.lightBg : sys.sidebar.darkBg,
+                              p: 0.75,
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: 0.5,
+                              borderRight: `1px solid ${sys.sidebar.borderColor || 'rgba(0,0,0,0.06)'}`
+                            }}
+                          >
+                            <Box sx={{ width: '60%', height: 4, borderRadius: '2px', bgcolor: isDark || sys.sidebar.isDarkSidebar ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)' }} />
+                            <Box sx={{ width: '100%', height: 6, borderRadius: `${Math.min(sys.shape.buttonRadius, 4)}px`, bgcolor: sys.sidebar.activePillBg, mt: 0.5 }} />
+                            <Box sx={{ width: '75%', height: 4, borderRadius: '2px', bgcolor: isDark || sys.sidebar.isDarkSidebar ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)' }} />
+                            <Box sx={{ width: '85%', height: 4, borderRadius: '2px', bgcolor: isDark || sys.sidebar.isDarkSidebar ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)' }} />
+                          </Box>
+
+                          {/* Mini Workspace Header & Body */}
+                          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                            {/* Mini Header */}
+                            <Box
+                              sx={{
+                                height: 16,
+                                bgcolor: mode === 'light' ? sys.topBar.lightBg : sys.topBar.darkBg,
+                                borderBottom: `1px solid ${sys.topBar.borderColor || 'rgba(0,0,0,0.06)'}`,
+                                px: 0.75,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between'
+                              }}
+                            >
+                              <Box sx={{ width: 24, height: 3, borderRadius: '2px', bgcolor: sys.topBar.style === 'colored' ? '#FFFFFF' : sys.palette.primary.main }} />
+                              <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: sys.palette.secondary.main }} />
+                            </Box>
+
+                            {/* Mini Content */}
+                            <Box sx={{ flex: 1, bgcolor: mode === 'light' ? '#F8FAFC' : '#111827', p: 0.75, display: 'flex', gap: 0.5 }}>
+                              <Box sx={{ flex: 1, borderRadius: `${Math.min(sys.shape.cardRadius, 4)}px`, bgcolor: isDark ? 'rgba(255,255,255,0.06)' : '#FFFFFF', p: 0.5, border: '1px solid', borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)' }}>
+                                <Box sx={{ width: '40%', height: 3, borderRadius: '2px', bgcolor: sys.palette.primary.main, mb: 0.5 }} />
+                                <Box sx={{ width: '80%', height: 3, borderRadius: '2px', bgcolor: 'text.secondary', opacity: 0.4 }} />
+                              </Box>
+                              <Box sx={{ width: 24, height: 14, borderRadius: `${Math.min(sys.shape.buttonRadius, 4)}px`, bgcolor: sys.palette.primary.main, alignSelf: 'flex-start' }} />
+                            </Box>
+                          </Box>
+                        </Box>
+
                         {/* Name & Company */}
                         <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.02rem', mb: 0.25, color: isSelected ? sys.palette.primary.main : 'text.primary' }}>
                           {sys.name}

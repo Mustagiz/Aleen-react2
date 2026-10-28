@@ -74,6 +74,24 @@ export default function Layout() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isDark = mode === 'dark';
 
+  const sidebarConfig = theme.custom?.sidebar || {
+    bg: isDark ? '#0F1E1D' : '#FFFFFF',
+    isDark: isDark,
+    textColor: isDark ? '#CBD5E1' : '#334155',
+    textActiveColor: '#FFFFFF',
+    subheadColor: isDark ? '#94A3B8' : '#64748B',
+    activePillBg: theme.palette.primary.main,
+    activePillText: '#FFFFFF',
+    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'
+  };
+
+  const topBarConfig = theme.custom?.topBar || {
+    bg: isDark ? 'rgba(15, 30, 29, 0.88)' : 'rgba(255, 255, 255, 0.92)',
+    textColor: isDark ? '#F8FAFC' : '#0F172A',
+    isColored: false,
+    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'
+  };
+
   // Desktop sidebar collapsed state with local storage persistence
   const [isCollapsed, setIsCollapsed] = useState(() => {
     return localStorage.getItem('aleen_sidebar_collapsed') === 'true';
@@ -234,7 +252,7 @@ export default function Layout() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: showCollapsed ? 'center' : 'space-between',
-          borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.1)',
+          borderBottom: sidebarConfig.borderColor,
           minHeight: 70
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, overflow: 'hidden' }}>
@@ -250,7 +268,7 @@ export default function Layout() {
                   borderRadius: '12px',
                   objectFit: 'contain',
                   border: '1.5px solid rgba(217, 119, 6, 0.4)',
-                  boxShadow: '0 4px 12px rgba(15, 118, 110, 0.2)',
+                  boxShadow: `0 4px 12px ${theme.palette.primary.main}40`,
                   flexShrink: 0,
                   cursor: 'pointer'
                 }}
@@ -277,9 +295,9 @@ export default function Layout() {
                 if (isMobile) setMobileOpen(false);
               }}>
                 <Typography sx={{ 
-                  fontFamily: '"Plus Jakarta Sans", sans-serif', 
+                  fontFamily: 'inherit', 
                   fontWeight: 800, 
-                  color: '#F59E0B', 
+                  color: '#FFFFFF', 
                   fontSize: '1.2rem',
                   lineHeight: 1
                 }}>
@@ -291,9 +309,9 @@ export default function Layout() {
             {!showCollapsed && (
               <Box sx={{ overflow: 'hidden' }}>
                 <Typography sx={{
-                  fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
+                  fontFamily: 'inherit',
                   fontWeight: 800,
-                  color: 'text.primary',
+                  color: sidebarConfig.isDark ? '#FFFFFF' : 'text.primary',
                   fontSize: '1.05rem',
                   letterSpacing: '-0.025em',
                   lineHeight: 1.2,
@@ -306,7 +324,7 @@ export default function Layout() {
                 <Typography sx={{ 
                   fontSize: '0.68rem', 
                   fontWeight: 700, 
-                  color: '#D97706',
+                  color: sidebarConfig.isDark ? '#F59E0B' : theme.palette.secondary.main,
                   textTransform: 'uppercase',
                   letterSpacing: '0.08em',
                   whiteSpace: 'nowrap',
@@ -324,11 +342,11 @@ export default function Layout() {
               size="small"
               onClick={() => setMobileOpen(false)}
               sx={{
-                color: 'text.secondary',
+                color: sidebarConfig.isDark ? '#FFFFFF' : 'text.secondary',
                 p: 0.75,
-                borderRadius: '9px',
-                border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(15,118,110,0.15)',
-                '&:hover': { bgcolor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(15,118,110,0.06)' }
+                borderRadius: 'var(--radius-control, 9px)',
+                border: sidebarConfig.borderColor,
+                '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.08)' }
               }}
               title="Close navigation"
             >
@@ -350,7 +368,7 @@ export default function Layout() {
               {!showCollapsed && (
                 <ListSubheader sx={{
                   bgcolor: 'transparent',
-                  color: isDark ? theme.palette.primary.light : theme.palette.primary.main,
+                  color: sidebarConfig.subheadColor,
                   fontSize: '0.7rem',
                   fontWeight: 800,
                   textTransform: 'uppercase',
@@ -382,16 +400,23 @@ export default function Layout() {
                         px: showCollapsed ? 1 : 1.5,
                         justifyContent: showCollapsed ? 'center' : 'flex-start',
                         bgcolor: isActive 
-                          ? (isDark ? `${theme.palette.primary.main}28` : `${theme.palette.primary.main}12`) 
+                          ? sidebarConfig.activePillBg 
                           : 'transparent',
-                        color: isActive ? 'primary.main' : 'text.secondary',
-                        borderLeft: isActive ? `3px solid ${theme.palette.primary.main}` : '3px solid transparent',
+                        color: isActive 
+                          ? sidebarConfig.activePillText 
+                          : (sidebarConfig.isDark ? '#CBD5E1' : 'text.secondary'),
+                        borderLeft: (isActive && !sidebarConfig.isDark) 
+                          ? `3px solid ${theme.palette.primary.main}` 
+                          : '3px solid transparent',
+                        boxShadow: isActive && sidebarConfig.isDark
+                          ? `0 2px 10px ${theme.palette.primary.main}40`
+                          : 'none',
                         transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                         '&:hover': {
                           bgcolor: isActive 
-                            ? (isDark ? `${theme.palette.primary.main}38` : `${theme.palette.primary.main}1E`) 
-                            : (isDark ? 'rgba(255, 255, 255, 0.04)' : `${theme.palette.primary.main}0A`),
-                          color: 'primary.main',
+                            ? sidebarConfig.activePillBg 
+                            : (sidebarConfig.isDark ? 'rgba(255, 255, 255, 0.08)' : `${theme.palette.primary.main}12`),
+                          color: isActive ? sidebarConfig.activePillText : (sidebarConfig.isDark ? '#FFFFFF' : 'primary.main'),
                           transform: showCollapsed ? 'none' : 'translateX(3px)'
                         }
                       }}
@@ -399,7 +424,7 @@ export default function Layout() {
                       <ListItemIcon sx={{
                         minWidth: showCollapsed ? 'auto' : 34,
                         justifyContent: 'center',
-                        color: isActive ? (isDark ? theme.palette.primary.light : theme.palette.primary.main) : 'inherit',
+                        color: isActive ? sidebarConfig.activePillText : (sidebarConfig.isDark ? '#94A3B8' : 'inherit'),
                         '& .MuiSvgIcon-root': {
                           fontSize: 20
                         }
@@ -413,7 +438,7 @@ export default function Layout() {
                             fontWeight: isActive ? 800 : 500,
                             fontSize: '0.84rem',
                             letterSpacing: '-0.01em',
-                            color: isActive ? (isDark ? '#F8FAFC' : theme.palette.primary.dark) : 'inherit'
+                            color: isActive ? sidebarConfig.activePillText : (sidebarConfig.isDark ? '#F8FAFC' : 'text.primary')
                           }}
                         />
                       )}
@@ -434,8 +459,8 @@ export default function Layout() {
         {/* Footer Profile Capsule */}
         <Box sx={{
           p: showCollapsed ? 1.5 : 2,
-          borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.1)',
-          bgcolor: isDark ? 'rgba(0, 0, 0, 0.2)' : 'rgba(15, 118, 110, 0.02)'
+          borderTop: sidebarConfig.borderColor,
+          bgcolor: sidebarConfig.isDark ? 'rgba(0, 0, 0, 0.25)' : 'rgba(0, 0, 0, 0.03)'
         }}>
           <Box sx={{
             display: 'flex',
@@ -451,7 +476,7 @@ export default function Layout() {
                 fontWeight: 800,
                 bgcolor: 'primary.main',
                 color: 'white',
-                boxShadow: '0 2px 8px rgba(15, 118, 110, 0.3)'
+                boxShadow: `0 2px 8px ${theme.palette.primary.main}40`
               }}>
                 {getInitials(user?.email || profile.businessName)}
               </Avatar>
@@ -461,14 +486,14 @@ export default function Layout() {
                   <Typography sx={{ 
                     fontSize: '0.825rem', 
                     fontWeight: 700, 
-                    color: 'text.primary',
+                    color: sidebarConfig.isDark ? '#F8FAFC' : 'text.primary',
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis'
                   }}>
                     {user?.displayName || (user?.role === 'admin' ? 'Store Manager' : 'Sales Stylist')}
                   </Typography>
-                  <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary', fontWeight: 500 }}>
+                  <Typography sx={{ fontSize: '0.7rem', color: sidebarConfig.isDark ? '#94A3B8' : 'text.secondary', fontWeight: 500 }}>
                     {user?.role === 'admin' ? 'Administrator' : 'Staff Access'}
                   </Typography>
                 </Box>
@@ -506,9 +531,9 @@ export default function Layout() {
             width: sidebarWidth,
             flexShrink: 0,
             height: '100vh',
-            bgcolor: 'background.paper',
-            borderRight: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.1)',
-            transition: 'width 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
+            bgcolor: sidebarConfig.bg,
+            borderRight: `1px solid ${sidebarConfig.borderColor}`,
+            transition: 'width 0.22s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease',
             zIndex: (theme) => theme.zIndex.drawer + 1
           }}
         >
@@ -529,9 +554,9 @@ export default function Layout() {
             sx: {
               width: { xs: 280, sm: 300 },
               maxWidth: '85vw',
-              bgcolor: 'background.paper',
+              bgcolor: sidebarConfig.bg,
               backgroundImage: 'none',
-              borderRight: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.1)',
+              borderRight: `1px solid ${sidebarConfig.borderColor}`,
               boxShadow: '0 20px 45px rgba(0, 0, 0, 0.35)'
             }
           }}
@@ -551,10 +576,12 @@ export default function Layout() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            bgcolor: isDark ? 'rgba(15, 30, 29, 0.88)' : 'rgba(255, 255, 255, 0.92)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.1)',
+            bgcolor: topBarConfig.bg,
+            color: topBarConfig.textColor,
+            backdropFilter: topBarConfig.isTranslucent ? 'blur(20px)' : 'none',
+            WebkitBackdropFilter: topBarConfig.isTranslucent ? 'blur(20px)' : 'none',
+            borderBottom: `1px solid ${topBarConfig.borderColor}`,
+            transition: 'background-color 0.25s ease, border-color 0.25s ease',
             zIndex: 10,
             flexShrink: 0,
             gap: 1
@@ -570,9 +597,9 @@ export default function Layout() {
                 height: 36,
                 flexShrink: 0,
                 borderRadius: '9px',
-                border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(15, 118, 110, 0.15)',
-                color: 'text.primary',
-                '&:hover': { bgcolor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(15, 118, 110, 0.06)' }
+                border: topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.25)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)'),
+                color: topBarConfig.textColor,
+                '&:hover': { bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.15)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)') }
               }}
               title={isMobile ? "Open menu" : (isCollapsed ? "Expand sidebar" : "Collapse sidebar")}
             >
@@ -586,7 +613,7 @@ export default function Layout() {
                 display: { xs: 'block', sm: 'none' },
                 fontSize: '0.86rem',
                 fontWeight: 800,
-                color: 'text.primary',
+                color: topBarConfig.textColor,
                 letterSpacing: '-0.015em',
                 maxWidth: { xs: 150, xxs: 110 }
               }}
@@ -596,10 +623,10 @@ export default function Layout() {
 
             {/* Tablet / iPad / Desktop Breadcrumbs */}
             <Box sx={{ display: { xs: 'none', sm: 'block' }, minWidth: 0 }}>
-              <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary', fontWeight: 600, lineHeight: 1.2 }} noWrap>
+              <Typography sx={{ fontSize: '0.72rem', color: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.75)' : 'text.secondary', fontWeight: 600, lineHeight: 1.2 }} noWrap>
                 {profile?.businessName || 'Aleen Clothing'}{profile?.tagline ? ` • ${profile.tagline}` : ' • Atelier CRM'}
               </Typography>
-              <Typography sx={{ fontSize: '0.95rem', color: 'text.primary', fontWeight: 800, letterSpacing: '-0.015em', lineHeight: 1.2 }} noWrap>
+              <Typography sx={{ fontSize: '0.95rem', color: topBarConfig.textColor, fontWeight: 800, letterSpacing: '-0.015em', lineHeight: 1.2 }} noWrap>
                 {getBreadcrumbTitle()}
               </Typography>
             </Box>
@@ -616,9 +643,9 @@ export default function Layout() {
                 width: 36,
                 height: 36,
                 borderRadius: '9px',
-                border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(15, 118, 110, 0.15)',
-                color: 'text.secondary',
-                '&:hover': { bgcolor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(15, 118, 110, 0.06)' }
+                border: topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.25)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)'),
+                color: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.9)' : 'text.secondary',
+                '&:hover': { bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.15)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)') }
               }}
               title="Search CRM (⌘K)"
             >
@@ -630,23 +657,23 @@ export default function Layout() {
               onClick={() => setSearchOpen(true)}
               variant="outlined"
               size="small"
-              startIcon={<Search fontSize="small" sx={{ color: 'text.secondary' }} />}
+              startIcon={<Search fontSize="small" sx={{ color: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.85)' : 'text.secondary' }} />}
               sx={{
                 borderRadius: '9999px',
-                borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(15, 118, 110, 0.15)',
-                color: 'text.secondary',
+                borderColor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.3)' : (isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)'),
+                color: topBarConfig.isColored ? '#FFFFFF' : 'text.secondary',
                 px: 1.75,
                 py: 0.5,
                 height: 36,
-                bgcolor: isDark ? 'rgba(0, 0, 0, 0.2)' : '#F8FAFC',
+                bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.14)' : (isDark ? 'rgba(0, 0, 0, 0.2)' : '#F8FAFC'),
                 display: { xs: 'none', md: 'inline-flex' },
                 '&:hover': {
-                  borderColor: 'primary.main',
-                  bgcolor: isDark ? 'rgba(20, 184, 166, 0.08)' : '#F0FDFA'
+                  borderColor: topBarConfig.isColored ? '#FFFFFF' : 'primary.main',
+                  bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.22)' : (isDark ? 'rgba(20, 184, 166, 0.08)' : '#F0FDFA')
                 }
               }}
             >
-              <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, mr: 1 }}>
+              <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, mr: 1, color: topBarConfig.isColored ? '#FFFFFF' : 'inherit' }}>
                 Search CRM...
               </Typography>
               <Chip 
@@ -656,8 +683,8 @@ export default function Layout() {
                   height: 18, 
                   fontSize: '0.65rem', 
                   fontWeight: 800,
-                  bgcolor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0',
-                  color: 'text.secondary'
+                  bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.2)' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'),
+                  color: topBarConfig.isColored ? '#FFFFFF' : 'text.secondary'
                 }} 
               />
             </Button>
@@ -667,22 +694,22 @@ export default function Layout() {
               <Button
                 size="small"
                 variant="outlined"
-                startIcon={<PointOfSale sx={{ fontSize: '15px !important', color: '#10B981' }} />}
+                startIcon={<PointOfSale sx={{ fontSize: '15px !important', color: topBarConfig.isColored ? '#FFFFFF' : '#10B981' }} />}
                 onClick={() => setCashDrawerOpen(true)}
                 sx={{
                   height: 32,
                   fontSize: '0.74rem',
                   fontWeight: 800,
-                  bgcolor: isDark ? 'rgba(16, 185, 129, 0.12)' : '#DCFCE7',
-                  color: '#047857',
-                  borderColor: 'rgba(16, 185, 129, 0.35)',
+                  bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.15)' : (isDark ? 'rgba(16, 185, 129, 0.12)' : '#DCFCE7'),
+                  color: topBarConfig.isColored ? '#FFFFFF' : '#047857',
+                  borderColor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.3)' : 'rgba(16, 185, 129, 0.35)',
                   borderRadius: '20px',
                   px: 1.5,
                   display: { xs: 'none', lg: 'inline-flex' },
                   textTransform: 'none',
                   '&:hover': {
-                    bgcolor: isDark ? 'rgba(16, 185, 129, 0.2)' : '#BBF7D0',
-                    borderColor: '#10B981'
+                    bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.25)' : (isDark ? 'rgba(16, 185, 129, 0.2)' : '#BBF7D0'),
+                    borderColor: topBarConfig.isColored ? '#FFFFFF' : '#10B981'
                   }
                 }}
               >
@@ -690,7 +717,7 @@ export default function Layout() {
               </Button>
             </Tooltip>
 
-            {/* Champagne Gold "+ Quick Bill" CTA */}
+            {/* Quick Bill CTA */}
             {canQuickBill && (
               <Tooltip title="Quick POS Bill (Alt + N or F2)">
                 <IconButton
@@ -701,11 +728,11 @@ export default function Layout() {
                     height: 36,
                     display: { xs: 'inline-flex', sm: 'none' },
                     borderRadius: '9px',
-                    background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
+                    background: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
                     color: '#ffffff',
-                    boxShadow: '0 2px 8px rgba(217, 119, 6, 0.35)',
+                    boxShadow: `0 2px 8px ${theme.palette.secondary.main}59`,
                     '&:hover': {
-                      background: 'linear-gradient(135deg, #B45309 0%, #92400E 100%)'
+                      filter: 'brightness(0.92)'
                     }
                   }}
                 >
@@ -727,7 +754,7 @@ export default function Layout() {
                   borderRadius: '9999px',
                   fontWeight: 800,
                   fontSize: '0.825rem',
-                  boxShadow: '0 4px 14px rgba(217, 119, 6, 0.3)',
+                  boxShadow: `0 4px 14px ${theme.palette.secondary.main}4D`,
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',
                   display: { xs: 'none', sm: 'inline-flex' }
@@ -749,12 +776,12 @@ export default function Layout() {
                   width: 36, 
                   height: 36, 
                   borderRadius: '9px',
-                  border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(15, 118, 110, 0.15)',
-                  color: density === 'compact' ? (isDark ? '#2DD4BF' : '#0F766E') : 'text.secondary',
-                  bgcolor: density === 'compact' ? (isDark ? 'rgba(20, 184, 166, 0.14)' : 'rgba(15, 118, 110, 0.08)') : 'transparent',
+                  border: topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.25)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)'),
+                  color: density === 'compact' ? (topBarConfig.isColored ? '#FFFFFF' : (isDark ? '#2DD4BF' : theme.palette.primary.main)) : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.85)' : 'text.secondary'),
+                  bgcolor: density === 'compact' ? (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.25)' : (isDark ? 'rgba(20, 184, 166, 0.14)' : `${theme.palette.primary.main}14`)) : 'transparent',
                   display: { xs: 'none', sm: 'inline-flex' },
                   '&:hover': {
-                    bgcolor: isDark ? 'rgba(20, 184, 166, 0.22)' : 'rgba(15, 118, 110, 0.12)'
+                    bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.2)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)')
                   }
                 }}
               >
@@ -771,11 +798,11 @@ export default function Layout() {
                   width: 36, 
                   height: 36, 
                   borderRadius: '9px',
-                  border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : `1px solid ${theme.palette.primary.main}26`,
-                  color: 'primary.main',
+                  border: topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.25)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : `1px solid ${theme.palette.primary.main}26`),
+                  color: topBarConfig.isColored ? '#FFFFFF' : 'primary.main',
                   display: { xs: 'none', sm: 'inline-flex' },
                   '&:hover': {
-                    bgcolor: isDark ? 'rgba(255, 255, 255, 0.05)' : `${theme.palette.primary.main}0E`
+                    bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.2)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : `${theme.palette.primary.main}0E`)
                   }
                 }}
               >
@@ -791,12 +818,15 @@ export default function Layout() {
                 width: 36, 
                 height: 36, 
                 borderRadius: '9px',
-                border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : `1px solid ${theme.palette.primary.main}26`,
-                color: 'text.primary'
+                border: topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.25)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : `1px solid ${theme.palette.primary.main}26`),
+                color: topBarConfig.textColor,
+                '&:hover': {
+                  bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.2)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)')
+                }
               }}
               title={mode === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
-              {mode === 'dark' ? <Brightness7 fontSize="small" sx={{ color: '#F59E0B' }} /> : <Brightness4 fontSize="small" sx={{ color: theme.palette.primary.main }} />}
+              {mode === 'dark' ? <Brightness7 fontSize="small" sx={{ color: '#F59E0B' }} /> : <Brightness4 fontSize="small" sx={{ color: topBarConfig.isColored ? '#FFFFFF' : theme.palette.primary.main }} />}
             </IconButton>
 
             {/* Top Right Logout Button - Hidden on phone screens to eliminate clutter; accessible via drawer */}
@@ -869,7 +899,7 @@ export default function Layout() {
           height: 60,
           bgcolor: isDark ? 'rgba(8, 20, 20, 0.94)' : 'rgba(255, 255, 255, 0.94)',
           backdropFilter: 'blur(14px)',
-          borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.12)',
+          borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : `1px solid ${theme.palette.divider}`,
           zIndex: (theme) => theme.zIndex.appBar,
           alignItems: 'center',
           justifyContent: 'space-around',
@@ -898,14 +928,14 @@ export default function Layout() {
                 flex: 1,
                 py: 0.5,
                 cursor: 'pointer',
-                color: isActive ? '#0F766E' : 'text.secondary',
+                color: isActive ? theme.palette.primary.main : 'text.secondary',
                 transition: 'all 0.15s ease',
                 position: 'relative'
               }}
             >
               <Box
                 sx={{
-                  color: isActive ? (isDark ? '#2DD4BF' : '#0F766E') : 'inherit',
+                  color: isActive ? theme.palette.primary.main : 'inherit',
                   transform: isActive ? 'scale(1.08)' : 'scale(1)',
                   transition: 'transform 0.15s ease'
                 }}
@@ -916,7 +946,7 @@ export default function Layout() {
                 sx={{
                   fontSize: '0.68rem',
                   fontWeight: isActive ? 800 : 500,
-                  color: isActive ? (isDark ? '#2DD4BF' : '#0F766E') : 'text.secondary',
+                  color: isActive ? theme.palette.primary.main : 'text.secondary',
                   letterSpacing: '-0.01em',
                   mt: 0.25
                 }}
@@ -931,7 +961,7 @@ export default function Layout() {
                     width: 18,
                     height: 2.5,
                     borderRadius: '2px',
-                    bgcolor: isDark ? '#2DD4BF' : '#0F766E'
+                    bgcolor: theme.palette.primary.main
                   }}
                 />
               )}
