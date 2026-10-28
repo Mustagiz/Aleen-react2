@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -56,7 +57,8 @@ import {
   CloudUpload,
   Draw,
   AutoAwesome,
-  QrCode2
+  QrCode2,
+  Palette
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -65,6 +67,7 @@ import PageHeader from '../components/crm/PageHeader';
 import { INVOICE_TEMPLATES, DEFAULT_INVOICE_SETTINGS, getStoredInvoiceSettings } from '../constants/invoiceTemplates';
 import { PREDEFINED_LOGOS } from '../constants/predefinedLogos';
 import instagramQrImg from '../assets/instagram_qr.jpg';
+import CrmColorSettings from '../components/settings/CrmColorSettings';
 
 export default function Settings() {
   const theme = useTheme();
@@ -83,8 +86,27 @@ export default function Settings() {
   } = useAuth();
   const { showToast, showConfirm } = useFeedback();
 
-  // Active Tab: 0 = Brand, 1 = Bank, 2 = Invoice & Print Defaults, 3 = Staff & RBAC, 4 = Security
-  const [activeTab, setActiveTab] = useState(0);
+  const location = useLocation();
+
+  // Active Tab: 0 = Brand, 1 = Bank, 2 = Invoice & Print Defaults, 3 = Staff & RBAC, 4 = Security, 5 = CRM Color & Appearance
+  const [activeTab, setActiveTab] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tabParam = params.get('tab');
+    if (tabParam === 'colors' || tabParam === 'themes' || tabParam === 'appearance') return 5;
+    if (tabParam === 'security') return 4;
+    if (tabParam === 'staff') return 3;
+    if (tabParam === 'invoice') return 2;
+    if (tabParam === 'bank') return 1;
+    return 0;
+  });
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tabParam = params.get('tab');
+    if (tabParam === 'colors' || tabParam === 'themes' || tabParam === 'appearance') {
+      setActiveTab(5);
+    }
+  }, [location.search]);
 
   // Local Brand & Invoice Profile State
   const [formProfile, setFormProfile] = useState({
@@ -557,10 +579,10 @@ export default function Settings() {
               py: 2,
               minHeight: 56,
               color: 'text.secondary',
-              '&.Mui-selected': { color: '#0F766E' }
+              '&.Mui-selected': { color: 'primary.main' }
             },
             '& .MuiTabs-indicator': {
-              backgroundColor: '#0F766E',
+              backgroundColor: 'primary.main',
               height: 3,
               borderRadius: '3px 3px 0 0'
             }
@@ -571,6 +593,7 @@ export default function Settings() {
           <Tab icon={<ColorLens fontSize="small" />} iconPosition="start" label="Invoice Print & Letterhead" />
           <Tab icon={<People fontSize="small" />} iconPosition="start" label={`Staff & Permissions (${staffList.length})`} />
           <Tab icon={<Lock fontSize="small" />} iconPosition="start" label="Admin Security" />
+          <Tab icon={<Palette fontSize="small" />} iconPosition="start" label="CRM Theme & Colors" />
         </Tabs>
       </Paper>
 
@@ -1874,6 +1897,11 @@ export default function Settings() {
             </Paper>
           </Grid>
         </Grid>
+      )}
+
+      {/* TAB 5: CRM HAUTE COUTURE COLOR PALETTE */}
+      {activeTab === 5 && (
+        <CrmColorSettings />
       )}
 
       {/* MODAL 1: ADD OR EDIT STAFF MEMBER */}

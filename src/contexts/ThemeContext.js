@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import { createTheme, ThemeProvider as MUIThemeProvider } from '@mui/material/styles';
+import { COLOR_THEMES, DEFAULT_COLOR_THEME } from '../constants/colorThemes';
 
 const ThemeContext = createContext();
 
@@ -16,6 +17,11 @@ export const ThemeProvider = ({ children }) => {
         return savedDensity || 'comfortable';
     });
 
+    const [colorTheme, setColorTheme] = useState(() => {
+        const savedTheme = localStorage.getItem('crmColorTheme');
+        return savedTheme || DEFAULT_COLOR_THEME;
+    });
+
     useEffect(() => {
         localStorage.setItem('themeMode', mode);
     }, [mode]);
@@ -23,6 +29,27 @@ export const ThemeProvider = ({ children }) => {
     useEffect(() => {
         localStorage.setItem('themeDensity', density);
     }, [density]);
+
+    useEffect(() => {
+        localStorage.setItem('crmColorTheme', colorTheme);
+    }, [colorTheme]);
+
+    const activeThemeConfig = useMemo(() => {
+        return COLOR_THEMES.find(t => t.id === colorTheme) || COLOR_THEMES[0];
+    }, [colorTheme]);
+
+    // Synchronize CSS custom variables for non-MUI components, loaders, borders and raw CSS
+    useEffect(() => {
+        const root = document.documentElement;
+        if (activeThemeConfig) {
+            root.style.setProperty('--emerald-primary', activeThemeConfig.primary.main);
+            root.style.setProperty('--emerald-light', activeThemeConfig.primary.light);
+            root.style.setProperty('--emerald-dark', activeThemeConfig.primary.dark);
+            root.style.setProperty('--gold-accent', activeThemeConfig.secondary.main);
+            root.style.setProperty('--gold-champagne', activeThemeConfig.secondary.light);
+            root.style.setProperty('--accent-glow', activeThemeConfig.accentGlow);
+        }
+    }, [activeThemeConfig]);
 
     const toggleTheme = () => {
         setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
@@ -37,30 +64,34 @@ export const ThemeProvider = ({ children }) => {
             palette: {
                 mode,
                 primary: {
-                    main: '#0A4D46', // Velvet Atelier Emerald
-                    light: '#14B8A6', // Luminous Jade
-                    dark: '#042F2E',  // Deep Royal Forest
-                    contrastText: '#FFFFFF'
+                    main: activeThemeConfig.primary.main,
+                    light: activeThemeConfig.primary.light,
+                    dark: activeThemeConfig.primary.dark,
+                    contrastText: activeThemeConfig.primary.contrastText || '#FFFFFF'
                 },
                 secondary: {
-                    main: '#C28D4B', // Burnished Imperial Gold
-                    light: '#F59E0B', // Radiant Gold
-                    dark: '#92400E',
-                    contrastText: '#FFFFFF'
+                    main: activeThemeConfig.secondary.main,
+                    light: activeThemeConfig.secondary.light,
+                    dark: activeThemeConfig.secondary.dark,
+                    contrastText: activeThemeConfig.secondary.contrastText || '#FFFFFF'
                 },
                 background: {
-                    default: mode === 'light' ? '#FBFBF9' : '#081212', // Warm Alabaster Porcelain vs Midnight Obsidian
-                    paper: mode === 'light' ? '#FFFFFF' : '#0F1E1D'
+                    default: mode === 'light' 
+                        ? (activeThemeConfig.background?.lightDefault || '#FBFBF9') 
+                        : (activeThemeConfig.background?.darkDefault || '#081212'),
+                    paper: mode === 'light' 
+                        ? (activeThemeConfig.background?.lightPaper || '#FFFFFF') 
+                        : (activeThemeConfig.background?.darkPaper || '#0F1E1D')
                 },
                 success: { main: '#10B981', light: '#D1FAE5', dark: '#047857' },
-                error: { main: '#9F1239', light: '#FFE4E6', dark: '#881337' }, // Velvet Rose-Wine
+                error: { main: '#9F1239', light: '#FFE4E6', dark: '#881337' },
                 warning: { main: '#D97706', light: '#FEF3C7', dark: '#B45309' },
                 info: { main: '#0284C7', light: '#E0F2FE', dark: '#0369A1' },
                 text: {
                     primary: mode === 'light' ? '#0F172A' : '#F8FAFC',
                     secondary: mode === 'light' ? '#5A6A80' : '#94A3B8'
                 },
-                divider: mode === 'light' ? 'rgba(10, 77, 70, 0.08)' : 'rgba(255, 255, 255, 0.08)'
+                divider: mode === 'light' ? `${activeThemeConfig.primary.main}1A` : 'rgba(255, 255, 255, 0.08)'
             },
             typography: {
                 fontFamily: '"Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
@@ -94,77 +125,67 @@ export const ThemeProvider = ({ children }) => {
                             transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                             '&:hover': {
                                 transform: 'translateY(-1px)',
-                                boxShadow: mode === 'light' ? '0 4px 14px rgba(15, 118, 110, 0.18)' : '0 4px 14px rgba(0, 0, 0, 0.4)'
+                                boxShadow: mode === 'light' ? `0 4px 14px ${activeThemeConfig.accentGlow}` : '0 4px 14px rgba(0, 0, 0, 0.4)'
                             },
                             '&:active': {
                                 transform: 'translateY(0) scale(0.985)'
                             }
                         },
                         containedPrimary: {
-                            background: 'linear-gradient(135deg, #0F766E 0%, #0D6962 100%)',
+                            background: `linear-gradient(135deg, ${activeThemeConfig.primary.light} 0%, ${activeThemeConfig.primary.main} 100%)`,
                             '&:hover': {
-                                background: 'linear-gradient(135deg, #115E59 0%, #042F2E 100%)'
+                                background: `linear-gradient(135deg, ${activeThemeConfig.primary.main} 0%, ${activeThemeConfig.primary.dark} 100%)`
                             }
                         },
                         containedSecondary: {
-                            background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
-                            color: '#FFFFFF',
+                            background: `linear-gradient(135deg, ${activeThemeConfig.secondary.main} 0%, ${activeThemeConfig.secondary.dark} 100%)`,
                             '&:hover': {
-                                background: 'linear-gradient(135deg, #B45309 0%, #78350F 100%)'
+                                background: `linear-gradient(135deg, ${activeThemeConfig.secondary.light} 0%, ${activeThemeConfig.secondary.main} 100%)`
+                            }
+                        },
+                        outlined: {
+                            borderColor: mode === 'light' ? `${activeThemeConfig.primary.main}2E` : 'rgba(255, 255, 255, 0.12)',
+                            '&:hover': {
+                                borderColor: activeThemeConfig.primary.main,
+                                backgroundColor: mode === 'light' ? `${activeThemeConfig.primary.main}0A` : 'rgba(255, 255, 255, 0.04)'
                             }
                         }
                     }
                 },
                 MuiPaper: {
+                    defaultProps: {
+                        elevation: 0
+                    },
                     styleOverrides: {
                         root: {
-                            borderRadius: 16,
-                            boxShadow: mode === 'light' 
-                                ? '0 4px 20px -2px rgba(15, 118, 110, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04)' 
-                                : '0 4px 24px rgba(0, 0, 0, 0.5)',
                             backgroundImage: 'none',
-                            border: mode === 'light' ? '1px solid rgba(15, 118, 110, 0.1)' : '1px solid rgba(255, 255, 255, 0.07)'
+                            borderRadius: 16
                         }
                     }
                 },
                 MuiCard: {
+                    defaultProps: {
+                        elevation: 0
+                    },
                     styleOverrides: {
                         root: {
                             borderRadius: 16,
-                            boxShadow: mode === 'light' 
-                                ? '0 4px 20px -2px rgba(15, 118, 110, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04)' 
-                                : '0 4px 24px rgba(0, 0, 0, 0.5)',
-                            backgroundImage: 'none',
-                            border: mode === 'light' ? '1px solid rgba(15, 118, 110, 0.1)' : '1px solid rgba(255, 255, 255, 0.07)'
-                        }
-                    }
-                },
-                MuiTableContainer: {
-                    styleOverrides: {
-                        root: {
-                            borderRadius: 20,
-                            border: mode === 'light' ? '1px solid rgba(15, 118, 110, 0.14)' : '1px solid rgba(255, 255, 255, 0.08)',
-                            boxShadow: mode === 'light' 
-                                ? '0 10px 30px -10px rgba(15, 118, 110, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)' 
-                                : '0 10px 30px rgba(0, 0, 0, 0.4)',
-                            backgroundImage: 'none',
-                            backgroundColor: mode === 'light' ? '#FFFFFF' : '#0F1E1D',
-                            overflow: 'hidden'
+                            border: mode === 'light' ? `1px solid ${activeThemeConfig.primary.main}14` : '1px solid rgba(255, 255, 255, 0.08)',
+                            boxShadow: mode === 'light' ? '0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 10px 25px -5px rgba(0, 0, 0, 0.03)' : '0 4px 20px rgba(0, 0, 0, 0.4)'
                         }
                     }
                 },
                 MuiTableHead: {
                     styleOverrides: {
                         root: {
-                            backgroundColor: mode === 'light' ? 'rgba(15, 118, 110, 0.04)' : 'rgba(255, 255, 255, 0.03)',
+                            backgroundColor: mode === 'light' ? `${activeThemeConfig.primary.main}08` : 'rgba(255, 255, 255, 0.03)',
                             '& .MuiTableCell-head': {
+                                color: mode === 'light' ? activeThemeConfig.primary.dark : '#F8FAFC',
                                 fontWeight: 800,
-                                fontSize: '0.74rem',
+                                fontSize: '0.78rem',
                                 textTransform: 'uppercase',
-                                letterSpacing: '0.08em',
-                                color: mode === 'light' ? '#0F766E' : '#14B8A6',
-                                borderBottom: mode === 'light' ? '1.5px solid rgba(15, 118, 110, 0.16)' : '1.5px solid rgba(255, 255, 255, 0.1)',
-                                padding: density === 'compact' ? '8px 12px' : '14px 18px'
+                                letterSpacing: '0.06em',
+                                borderBottom: mode === 'light' ? `1px solid ${activeThemeConfig.primary.main}1A` : '1px solid rgba(255, 255, 255, 0.08)'
                             }
                         }
                     }
@@ -172,11 +193,11 @@ export const ThemeProvider = ({ children }) => {
                 MuiTableRow: {
                     styleOverrides: {
                         root: {
-                            transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-                            '&.MuiTableRow-hover:hover, &:hover': {
-                                backgroundColor: mode === 'light' ? 'rgba(15, 118, 110, 0.025)' : 'rgba(255, 255, 255, 0.025)'
+                            transition: 'background-color 0.15s ease',
+                            '&:hover': {
+                                backgroundColor: mode === 'light' ? `${activeThemeConfig.primary.main}08` : 'rgba(255, 255, 255, 0.03)'
                             },
-                            '&:last-child td, &:last-child th': {
+                            '&:last-child td': {
                                 borderBottom: 0
                             }
                         }
@@ -187,7 +208,7 @@ export const ThemeProvider = ({ children }) => {
                         root: {
                             padding: density === 'compact' ? '8px 12px' : '14px 18px',
                             fontFeatureSettings: '"tnum"',
-                            borderColor: mode === 'light' ? 'rgba(15, 118, 110, 0.08)' : 'rgba(255, 255, 255, 0.06)'
+                            borderColor: mode === 'light' ? `${activeThemeConfig.primary.main}12` : 'rgba(255, 255, 255, 0.06)'
                         }
                     }
                 },
@@ -206,21 +227,31 @@ export const ThemeProvider = ({ children }) => {
                             borderRadius: 10,
                             minHeight: 40,
                             '&:hover .MuiOutlinedInput-notchedOutline': {
-                                borderColor: '#0F766E'
+                                borderColor: activeThemeConfig.primary.main
                             },
                             '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                borderColor: '#0F766E',
+                                borderColor: activeThemeConfig.primary.main,
                                 borderWidth: '1.5px'
                             }
                         }
                     }
                 }
             }
-        }), [mode, density]
+        }), [mode, density, activeThemeConfig]
     );
 
     return (
-        <ThemeContext.Provider value={{ mode, toggleTheme, density, toggleDensity, setDensity }}>
+        <ThemeContext.Provider value={{ 
+            mode, 
+            toggleTheme, 
+            density, 
+            toggleDensity, 
+            setDensity,
+            colorTheme,
+            setColorTheme,
+            availableThemes: COLOR_THEMES,
+            activeThemeConfig
+        }}>
             <MUIThemeProvider theme={theme}>
                 {children}
             </MUIThemeProvider>

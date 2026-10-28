@@ -49,7 +49,8 @@ import {
   FactCheck,
   QrCodeScanner,
   Close,
-  ViewHeadline
+  ViewHeadline,
+  Palette
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
@@ -263,9 +264,9 @@ export default function Layout() {
                 width: 40,
                 height: 40,
                 borderRadius: '12px',
-                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.dark} 100%)`,
                 border: '1.5px solid rgba(217, 119, 6, 0.4)',
-                boxShadow: '0 4px 12px rgba(15, 118, 110, 0.3)',
+                boxShadow: `0 4px 12px ${theme.palette.primary.main}40`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -349,7 +350,7 @@ export default function Layout() {
               {!showCollapsed && (
                 <ListSubheader sx={{
                   bgcolor: 'transparent',
-                  color: isDark ? '#14B8A6' : '#0F766E',
+                  color: isDark ? theme.palette.primary.light : theme.palette.primary.main,
                   fontSize: '0.7rem',
                   fontWeight: 800,
                   textTransform: 'uppercase',
@@ -381,15 +382,15 @@ export default function Layout() {
                         px: showCollapsed ? 1 : 1.5,
                         justifyContent: showCollapsed ? 'center' : 'flex-start',
                         bgcolor: isActive 
-                          ? (isDark ? 'rgba(20, 184, 166, 0.16)' : '#F0FDFA') 
+                          ? (isDark ? `${theme.palette.primary.main}28` : `${theme.palette.primary.main}12`) 
                           : 'transparent',
                         color: isActive ? 'primary.main' : 'text.secondary',
-                        borderLeft: isActive ? '3px solid #0F766E' : '3px solid transparent',
+                        borderLeft: isActive ? `3px solid ${theme.palette.primary.main}` : '3px solid transparent',
                         transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                         '&:hover': {
                           bgcolor: isActive 
-                            ? (isDark ? 'rgba(20, 184, 166, 0.22)' : '#E6FFFA') 
-                            : (isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(15, 118, 110, 0.04)'),
+                            ? (isDark ? `${theme.palette.primary.main}38` : `${theme.palette.primary.main}1E`) 
+                            : (isDark ? 'rgba(255, 255, 255, 0.04)' : `${theme.palette.primary.main}0A`),
                           color: 'primary.main',
                           transform: showCollapsed ? 'none' : 'translateX(3px)'
                         }
@@ -398,7 +399,7 @@ export default function Layout() {
                       <ListItemIcon sx={{
                         minWidth: showCollapsed ? 'auto' : 34,
                         justifyContent: 'center',
-                        color: isActive ? (isDark ? '#14B8A6' : '#0F766E') : 'inherit',
+                        color: isActive ? (isDark ? theme.palette.primary.light : theme.palette.primary.main) : 'inherit',
                         '& .MuiSvgIcon-root': {
                           fontSize: 20
                         }
@@ -412,7 +413,7 @@ export default function Layout() {
                             fontWeight: isActive ? 800 : 500,
                             fontSize: '0.84rem',
                             letterSpacing: '-0.01em',
-                            color: isActive ? (isDark ? '#F8FAFC' : '#042F2E') : 'inherit'
+                            color: isActive ? (isDark ? '#F8FAFC' : theme.palette.primary.dark) : 'inherit'
                           }}
                         />
                       )}
@@ -761,7 +762,28 @@ export default function Layout() {
               </IconButton>
             </Tooltip>
 
-            {/* Theme Toggle (Porcelain / Midnight Emerald) */}
+            {/* Quick CRM Color Palette Switcher */}
+            <Tooltip title="CRM Color Themes & Appearance">
+              <IconButton 
+                onClick={() => navigate('/settings?tab=colors')} 
+                size="small"
+                sx={{ 
+                  width: 36, 
+                  height: 36, 
+                  borderRadius: '9px',
+                  border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : `1px solid ${theme.palette.primary.main}26`,
+                  color: 'primary.main',
+                  display: { xs: 'none', sm: 'inline-flex' },
+                  '&:hover': {
+                    bgcolor: isDark ? 'rgba(255, 255, 255, 0.05)' : `${theme.palette.primary.main}0E`
+                  }
+                }}
+              >
+                <Palette fontSize="small" />
+              </IconButton>
+            </Tooltip>
+
+            {/* Theme Toggle (Porcelain / Dark Mode) */}
             <IconButton 
               onClick={toggleTheme} 
               size="small"
@@ -769,12 +791,12 @@ export default function Layout() {
                 width: 36, 
                 height: 36, 
                 borderRadius: '9px',
-                border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(15, 118, 110, 0.15)',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : `1px solid ${theme.palette.primary.main}26`,
                 color: 'text.primary'
               }}
-              title={mode === 'dark' ? "Switch to Porcelain Light" : "Switch to Midnight Emerald Dark"}
+              title={mode === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
-              {mode === 'dark' ? <Brightness7 fontSize="small" sx={{ color: '#F59E0B' }} /> : <Brightness4 fontSize="small" sx={{ color: '#0F766E' }} />}
+              {mode === 'dark' ? <Brightness7 fontSize="small" sx={{ color: '#F59E0B' }} /> : <Brightness4 fontSize="small" sx={{ color: theme.palette.primary.main }} />}
             </IconButton>
 
             {/* Top Right Logout Button - Hidden on phone screens to eliminate clutter; accessible via drawer */}
