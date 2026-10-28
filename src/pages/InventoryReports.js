@@ -28,7 +28,7 @@ import {
   History,
   AttachMoney
 } from '@mui/icons-material';
-import { formatCurrencyForPDF, generateReportPDF } from '../utils/helpers';
+import { formatCurrencyForPDF, generateReportPDF, formatSkuWithHyphen } from '../utils/helpers';
 import PageHeader from '../components/crm/PageHeader';
 import FinanceNavTabs from '../components/crm/FinanceNavTabs';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
@@ -381,7 +381,7 @@ const InventoryReports = () => {
                                 {item.name}
                               </Typography>
                               <Typography variant="caption" sx={{ color: 'text.secondary', fontFamily: 'monospace', textTransform: 'uppercase' }}>
-                                SKU: #{String(item.productId || item.id || '').toUpperCase()}
+                                SKU: #{formatSkuWithHyphen(item.productId || item.id || '')}
                               </Typography>
                             </TableCell>
                             <TableCell>
@@ -539,7 +539,7 @@ const InventoryReports = () => {
                           <TableCell>
                             <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.name}</Typography>
                             <Typography variant="caption" sx={{ color: 'text.secondary', fontFamily: 'monospace', textTransform: 'uppercase' }}>
-                              SKU #{String(item.productId || item.id || '').toUpperCase()}
+                              SKU #{formatSkuWithHyphen(item.productId || item.id || '')}
                             </Typography>
                           </TableCell>
                           <TableCell>

@@ -62,6 +62,34 @@ import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import GlassCard from '../components/GlassCard';
 import JsBarcode from 'jsbarcode';
 
+/**
+ * Formats SKU/Product ID in uppercase and ensures a hyphen (-) exists between alphabets and numbers
+ * e.g. ES50 -> ES-50, D000 -> D-000, DC00 -> DC-00, SAR1002 -> SAR-1002, SAR-1002 -> SAR-1002
+ */
+export const formatSkuWithHyphen = (sku) => {
+    if (!sku) return '';
+    let str = String(sku).trim().toUpperCase();
+    str = str.replace(/^#+/, '');
+    // Insert hyphen between letters and numbers if missing
+    str = str.replace(/([A-Z]+)(\d+)/g, '$1-$2');
+    str = str.replace(/(\d+)([A-Z]+)/g, '$1-$2');
+    str = str.replace(/-+/g, '-');
+    return str;
+};
+
+/**
+ * Couture category color theme palette
+ */
+export const getCategoryStyle = (category = '') => {
+    const cat = String(category || '').toLowerCase();
+    if (cat.includes('saree')) return { bg: '#FDF2F8', color: '#BE185D', border: '#FBCFE8' };
+    if (cat.includes('unstitched') || cat.includes('stitch')) return { bg: '#EFF6FF', color: '#1D4ED8', border: '#BFDBFE' };
+    if (cat.includes('lehenga')) return { bg: '#FAF5FF', color: '#7E22CE', border: '#E9D5FF' };
+    if (cat.includes('kurti')) return { bg: '#FEF3C7', color: '#B45309', border: '#FDE68A' };
+    if (cat.includes('blouse') || cat.includes('bespoke')) return { bg: '#ECFDF5', color: '#047857', border: '#A7F3D0' };
+    return { bg: '#F8FAFC', color: '#475569', border: '#E2E8F0' };
+};
+
 // Individual Barcode Label Card (Screen preview & Print item)
 const BarcodeItem = ({ value, businessName, product, settings }) => {
     const barcodeRef = useRef(null);
@@ -95,7 +123,7 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
     useEffect(() => {
         if (barcodeRef.current && value) {
             try {
-                JsBarcode(barcodeRef.current, String(value), {
+                JsBarcode(barcodeRef.current, formatSkuWithHyphen(value) || String(value), {
                     format: "CODE128",
                     width: dims.barW,
                     height: dims.barH,
@@ -227,7 +255,7 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                         textTransform: 'uppercase'
                     }}
                 >
-                    {String(value || '').toUpperCase()}
+                    {formatSkuWithHyphen(value)}
                 </Typography>
             )}
 
@@ -1385,7 +1413,7 @@ export default function BarcodeGenerator() {
                     options={filteredAndSortedInventory}
                     value={selectedProducts}
                     isOptionEqualToValue={(option, value) => option.id === value.id}
-                    getOptionLabel={(option) => `${option.name} (${option.productId || 'No ID'})`}
+                    getOptionLabel={(option) => `${option.name} (${formatSkuWithHyphen(option.productId) || 'No ID'})`}
                     onChange={(event, newValues) => {
                         const existingCountMap = new Map(selectedProducts.map(p => [p.id, p.labelCount]));
                         const updated = newValues.map(item => ({
@@ -1454,7 +1482,7 @@ export default function BarcodeGenerator() {
                                     </Box>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 0.25 }}>
                                         <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 700, textTransform: 'uppercase' }}>
-                                            #{String(option.productId || 'NO-SKU').toUpperCase()}
+                                            #{formatSkuWithHyphen(option.productId || 'NO-SKU')}
                                         </Typography>
                                         {option.category && (
                                             <Typography variant="caption" color="text.secondary">
@@ -1490,22 +1518,71 @@ export default function BarcodeGenerator() {
                     sx={{ mb: 2 }}
                 />
 
-                {/* Garments Catalog Table: 10 entries on 1 page (Pic 2) */}
+                {/* Garments Catalog Table: 10 entries on 1 page (Picture 1 Redesign) */}
                 <Box sx={{ mb: 3 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1, flexWrap: 'wrap', gap: 0.5 }}>
-                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                            📋 Browse Catalog Garments (10 entries on 1 page)
-                        </Typography>
-                        <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 700 }}>
-                            Page {inventoryPage + 1} of {Math.max(1, Math.ceil(filteredAndSortedInventory.length / inventoryRowsPerPage))} • {filteredAndSortedInventory.length} items
-                        </Typography>
+                    <Box sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        mb: 1.5,
+                        px: 0.5,
+                        flexWrap: 'wrap',
+                        gap: 1
+                    }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+                            <Box sx={{
+                                width: 34,
+                                height: 34,
+                                borderRadius: 2,
+                                bgcolor: 'rgba(15, 118, 110, 0.1)',
+                                color: '#0F766E',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                border: '1px solid rgba(15, 118, 110, 0.2)'
+                            }}>
+                                <Inventory2 sx={{ fontSize: 19 }} />
+                            </Box>
+                            <Box>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0F172A', fontSize: '0.88rem', letterSpacing: 0.2 }}>
+                                    Browse Catalog Garments
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem' }}>
+                                    Select garments to queue for barcode sticker printing
+                                </Typography>
+                            </Box>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Chip
+                                label="10 items per page"
+                                size="small"
+                                sx={{
+                                    bgcolor: 'rgba(15, 118, 110, 0.08)',
+                                    color: '#0F766E',
+                                    fontWeight: 700,
+                                    fontSize: '0.68rem',
+                                    borderRadius: 1.5
+                                }}
+                            />
+                            <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.76rem' }}>
+                                Page {inventoryPage + 1} of {Math.max(1, Math.ceil(filteredAndSortedInventory.length / inventoryRowsPerPage))} • {filteredAndSortedInventory.length} items
+                            </Typography>
+                        </Box>
                     </Box>
 
-                    <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2.5, overflow: 'hidden' }}>
+                    <TableContainer component={Paper} elevation={0} sx={{
+                        borderRadius: 3,
+                        border: '1px solid rgba(15, 118, 110, 0.16)',
+                        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)',
+                        overflow: 'hidden'
+                    }}>
                         <Table size="small">
-                            <TableHead sx={{ bgcolor: 'action.hover' }}>
+                            <TableHead sx={{
+                                background: 'linear-gradient(180deg, #F0FDF4 0%, #E6F4F1 100%)',
+                                borderBottom: '2px solid rgba(15, 118, 110, 0.15)'
+                            }}>
                                 <TableRow>
-                                    <TableCell padding="checkbox">
+                                    <TableCell padding="checkbox" sx={{ py: 1.2 }}>
                                         <Checkbox
                                             size="small"
                                             indeterminate={
@@ -1540,33 +1617,44 @@ export default function BarcodeGenerator() {
                                             sx={{ color: '#0F766E', '&.Mui-checked': { color: '#0F766E' } }}
                                         />
                                     </TableCell>
-                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem' }}>Garment Style</TableCell>
-                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem' }}>SKU / Product ID</TableCell>
-                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem' }}>Category</TableCell>
-                                    <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.75rem' }}>Price</TableCell>
-                                    <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.75rem' }}>Stock</TableCell>
-                                    <TableCell align="center" sx={{ fontWeight: 800, fontSize: '0.75rem' }}>Queue Status</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', color: '#0F766E', textTransform: 'uppercase', letterSpacing: '0.06em', py: 1.2 }}>Garment Style</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', color: '#0F766E', textTransform: 'uppercase', letterSpacing: '0.06em', py: 1.2 }}>SKU / Product ID</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', color: '#0F766E', textTransform: 'uppercase', letterSpacing: '0.06em', py: 1.2 }}>Category</TableCell>
+                                    <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.74rem', color: '#0F766E', textTransform: 'uppercase', letterSpacing: '0.06em', py: 1.2 }}>Price</TableCell>
+                                    <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.74rem', color: '#0F766E', textTransform: 'uppercase', letterSpacing: '0.06em', py: 1.2 }}>Stock</TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: 800, fontSize: '0.74rem', color: '#0F766E', textTransform: 'uppercase', letterSpacing: '0.06em', py: 1.2 }}>Queue Status</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {paginatedInventory.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={7} sx={{ textAlign: 'center', py: 3, color: 'text.secondary' }}>
-                                            No matching garments found for current filters.
+                                        <TableCell colSpan={7} sx={{ textAlign: 'center', py: 5, color: 'text.secondary' }}>
+                                            <Inventory2 sx={{ fontSize: 36, color: '#CBD5E1', mb: 1, display: 'block', mx: 'auto' }} />
+                                            <Typography variant="body2" sx={{ fontWeight: 600 }}>No matching garments found</Typography>
+                                            <Typography variant="caption">Try adjusting search filters or selecting a different category</Typography>
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    paginatedInventory.map(item => {
+                                    paginatedInventory.map((item, index) => {
                                         const queued = selectedProducts.find(p => p.id === item.id);
                                         const isSelected = Boolean(queued);
+                                        const catStyle = getCategoryStyle(item.category);
+                                        const formattedSku = formatSkuWithHyphen(item.productId || 'NO-SKU');
+                                        const qty = item.quantity || 0;
 
                                         return (
                                             <TableRow
                                                 key={item.id}
                                                 hover
                                                 sx={{
-                                                    bgcolor: isSelected ? 'rgba(15, 118, 110, 0.04)' : 'transparent',
-                                                    cursor: 'pointer'
+                                                    bgcolor: isSelected ? 'rgba(15, 118, 110, 0.05)' : index % 2 === 1 ? 'rgba(248, 250, 252, 0.7)' : '#FFFFFF',
+                                                    borderLeft: isSelected ? '4px solid #0F766E' : '4px solid transparent',
+                                                    transition: 'all 0.18s ease',
+                                                    cursor: 'pointer',
+                                                    '&:hover': {
+                                                        bgcolor: 'rgba(15, 118, 110, 0.06) !important',
+                                                        boxShadow: 'inset 0 0 0 1px rgba(15, 118, 110, 0.1)'
+                                                    }
                                                 }}
                                                 onClick={() => handleToggleProduct(item)}
                                             >
@@ -1578,63 +1666,146 @@ export default function BarcodeGenerator() {
                                                         sx={{ color: '#0F766E', '&.Mui-checked': { color: '#0F766E' } }}
                                                     />
                                                 </TableCell>
-                                                <TableCell sx={{ fontWeight: 700, fontSize: '0.8rem' }}>
-                                                    {item.name}
-                                                    {item.variantName && (
-                                                        <Chip
-                                                            label={item.variantName}
-                                                            size="small"
-                                                            sx={{ ml: 1, height: 18, fontSize: '0.62rem', fontWeight: 600 }}
-                                                        />
-                                                    )}
+                                                <TableCell sx={{ py: 1.4 }}>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+                                                        <Box sx={{
+                                                            width: 30,
+                                                            height: 30,
+                                                            borderRadius: 1.5,
+                                                            bgcolor: isSelected ? '#0F766E' : 'rgba(15, 118, 110, 0.08)',
+                                                            color: isSelected ? '#FFFFFF' : '#0F766E',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            fontSize: '0.74rem',
+                                                            fontWeight: 800,
+                                                            flexShrink: 0,
+                                                            border: '1px solid rgba(15, 118, 110, 0.15)'
+                                                        }}>
+                                                            {item.name ? item.name.charAt(0).toUpperCase() : 'G'}
+                                                        </Box>
+                                                        <Box sx={{ minWidth: 0 }}>
+                                                            <Typography sx={{ fontWeight: 700, fontSize: '0.84rem', color: '#0F172A', lineHeight: 1.3 }}>
+                                                                {item.name}
+                                                            </Typography>
+                                                            {item.variantName && (
+                                                                <Chip
+                                                                    label={item.variantName}
+                                                                    size="small"
+                                                                    sx={{ mt: 0.3, height: 18, fontSize: '0.62rem', fontWeight: 600, bgcolor: 'rgba(0,0,0,0.04)' }}
+                                                                />
+                                                            )}
+                                                        </Box>
+                                                    </Box>
                                                 </TableCell>
-                                                <TableCell sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase' }}>
-                                                    #{String(item.productId || 'NO-SKU').toUpperCase()}
+                                                <TableCell sx={{ py: 1.4 }}>
+                                                    <Box sx={{
+                                                        display: 'inline-flex',
+                                                        alignItems: 'center',
+                                                        px: 1,
+                                                        py: 0.35,
+                                                        borderRadius: 1.5,
+                                                        bgcolor: 'rgba(15, 118, 110, 0.08)',
+                                                        border: '1px solid rgba(15, 118, 110, 0.2)',
+                                                        fontFamily: '"JetBrains Mono", monospace',
+                                                        fontWeight: 800,
+                                                        fontSize: '0.76rem',
+                                                        color: '#0F766E',
+                                                        letterSpacing: '0.04em'
+                                                    }}>
+                                                        {formattedSku}
+                                                    </Box>
                                                 </TableCell>
-                                                <TableCell>
-                                                    <Chip
-                                                        label={item.category || 'General'}
-                                                        size="small"
-                                                        variant="outlined"
-                                                        sx={{ height: 20, fontSize: '0.68rem' }}
-                                                    />
+                                                <TableCell sx={{ py: 1.4 }}>
+                                                    <Box sx={{
+                                                        display: 'inline-flex',
+                                                        alignItems: 'center',
+                                                        gap: 0.6,
+                                                        px: 1,
+                                                        py: 0.3,
+                                                        borderRadius: 1.5,
+                                                        bgcolor: catStyle.bg,
+                                                        border: `1px solid ${catStyle.border}`,
+                                                        color: catStyle.color,
+                                                        fontSize: '0.7rem',
+                                                        fontWeight: 700
+                                                    }}>
+                                                        <Box sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: catStyle.color }} />
+                                                        {item.category || 'General'}
+                                                    </Box>
                                                 </TableCell>
-                                                <TableCell align="right" sx={{ fontWeight: 800, color: '#D97706', fontSize: '0.8rem' }}>
-                                                    ₹{(item.price || 0).toLocaleString('en-IN')}
+                                                <TableCell align="right" sx={{ py: 1.4 }}>
+                                                    <Typography sx={{
+                                                        fontWeight: 800,
+                                                        color: '#B45309',
+                                                        fontSize: '0.85rem',
+                                                        fontFamily: '"Plus Jakarta Sans", sans-serif'
+                                                    }}>
+                                                        ₹{(item.price || 0).toLocaleString('en-IN')}
+                                                    </Typography>
                                                 </TableCell>
-                                                <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.75rem', color: (item.quantity || 0) > 0 ? 'text.primary' : 'error.main' }}>
-                                                    {item.quantity || 0} pcs
+                                                <TableCell align="right" sx={{ py: 1.4 }}>
+                                                    <Box sx={{
+                                                        display: 'inline-flex',
+                                                        alignItems: 'center',
+                                                        gap: 0.6,
+                                                        px: 0.9,
+                                                        py: 0.25,
+                                                        borderRadius: 1.5,
+                                                        bgcolor: qty > 5 ? 'rgba(16, 185, 129, 0.1)' : qty > 0 ? 'rgba(245, 158, 11, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                                                        color: qty > 5 ? '#065F46' : qty > 0 ? '#92400E' : '#991B1B',
+                                                        fontSize: '0.72rem',
+                                                        fontWeight: 700
+                                                    }}>
+                                                        <Box sx={{
+                                                            width: 5,
+                                                            height: 5,
+                                                            borderRadius: '50%',
+                                                            bgcolor: qty > 5 ? '#10B981' : qty > 0 ? '#F59E0B' : '#EF4444'
+                                                        }} />
+                                                        {qty > 0 ? `${qty} pcs` : 'Out of stock'}
+                                                    </Box>
                                                 </TableCell>
-                                                <TableCell align="center" onClick={e => e.stopPropagation()}>
+                                                <TableCell align="center" sx={{ py: 1.4 }} onClick={e => e.stopPropagation()}>
                                                     {isSelected ? (
                                                         <Chip
-                                                            label={`✓ In Queue (${queued.labelCount || 1}x)`}
+                                                            icon={<CheckCircle sx={{ fontSize: '14px !important', color: '#FFFFFF !important' }} />}
+                                                            label={`In Queue (${queued.labelCount || 1}x)`}
                                                             size="small"
                                                             color="primary"
                                                             onDelete={() => handleRemove(item.id)}
                                                             sx={{
-                                                                height: 22,
-                                                                fontSize: '0.68rem',
+                                                                height: 24,
+                                                                fontSize: '0.7rem',
                                                                 fontWeight: 700,
-                                                                bgcolor: '#0F766E'
+                                                                bgcolor: '#0F766E',
+                                                                '& .MuiChip-deleteIcon': { color: 'rgba(255,255,255,0.8)', '&:hover': { color: '#FFFFFF' } }
                                                             }}
                                                         />
                                                     ) : (
                                                         <Button
                                                             size="small"
                                                             variant="outlined"
+                                                            startIcon={<Add sx={{ fontSize: 14 }} />}
                                                             onClick={() => handleToggleProduct(item)}
                                                             sx={{
-                                                                py: 0.1,
-                                                                px: 1.2,
-                                                                fontSize: '0.68rem',
-                                                                borderRadius: 1.2,
+                                                                py: 0.35,
+                                                                px: 1.4,
+                                                                fontSize: '0.7rem',
+                                                                borderRadius: 2,
                                                                 fontWeight: 700,
-                                                                minWidth: 64,
-                                                                textTransform: 'none'
+                                                                borderColor: 'rgba(15, 118, 110, 0.4)',
+                                                                color: '#0F766E',
+                                                                textTransform: 'none',
+                                                                transition: 'all 0.15s ease',
+                                                                '&:hover': {
+                                                                    borderColor: '#0F766E',
+                                                                    bgcolor: '#0F766E',
+                                                                    color: '#FFFFFF'
+                                                                }
                                                             }}
                                                         >
-                                                            + Queue
+                                                            Queue
                                                         </Button>
                                                     )}
                                                 </TableCell>
@@ -1656,9 +1827,13 @@ export default function BarcodeGenerator() {
                                 setInventoryPage(0);
                             }}
                             sx={{
-                                borderTop: '1px solid',
-                                borderColor: 'divider',
-                                '& .MuiTablePagination-toolbar': { minHeight: 44 }
+                                borderTop: '1px solid rgba(0,0,0,0.06)',
+                                bgcolor: '#FAFAFA',
+                                '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                                    fontSize: '0.75rem',
+                                    fontWeight: 600,
+                                    color: 'text.secondary'
+                                }
                             }}
                         />
                     </TableContainer>
@@ -1725,7 +1900,7 @@ export default function BarcodeGenerator() {
                                                     </Typography>
                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.25, flexWrap: 'wrap' }}>
                                                         <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 700, textTransform: 'uppercase' }}>
-                                                            #{String(product.productId || '').toUpperCase()}
+                                                            #{formatSkuWithHyphen(product.productId)}
                                                         </Typography>
                                                         {product.variantName && (
                                                             <Chip
@@ -1990,7 +2165,7 @@ export default function BarcodeGenerator() {
                                             {item.name}
                                             {item.variantName && <span style={{ color: '#6b7280', fontWeight: 500 }}> ({item.variantName})</span>}
                                         </TableCell>
-                                        <TableCell sx={{ fontFamily: 'monospace', textTransform: 'uppercase' }}>{String(item.productId || '').toUpperCase()}</TableCell>
+                                        <TableCell sx={{ fontFamily: 'monospace', textTransform: 'uppercase' }}>{formatSkuWithHyphen(item.productId)}</TableCell>
                                         <TableCell>
                                             <Chip label={item.category || 'General'} size="small" variant="outlined" sx={{ height: 22 }} />
                                         </TableCell>
@@ -2065,7 +2240,7 @@ export default function BarcodeGenerator() {
                         Array.from({ length: product.labelCount || 1 }).map((_, i) => (
                             <BarcodeItem
                                 key={`${product.id}-${i}`}
-                                value={String(product.variantSku || product.productId || product.id || '').toUpperCase()}
+                                value={formatSkuWithHyphen(product.variantSku || product.productId || product.id)}
                                 businessName={profile?.businessName || 'Aleen Clothing'}
                                 product={product}
                                 settings={settings}

@@ -150,3 +150,17 @@ export const generateReportPDF = (title, profile, summaryLines, tableHeaders, ta
     return false;
   }
 };
+
+/**
+ * Formats SKU/Product ID in uppercase with a hyphen (-) between letters and digits
+ * e.g. ES50 -> ES-50, D000 -> D-000, DC00 -> DC-00, SAR1002 -> SAR-1002, SAR-1002 -> SAR-1002
+ */
+export const formatSkuWithHyphen = (sku) => {
+  if (!sku) return '';
+  let str = String(sku).trim().toUpperCase();
+  str = str.replace(/^#+/, '');
+  str = str.replace(/([A-Z]+)(\d+)/g, '$1-$2');
+  str = str.replace(/(\d+)([A-Z]+)/g, '$1-$2');
+  str = str.replace(/-+/g, '-');
+  return str;
+};

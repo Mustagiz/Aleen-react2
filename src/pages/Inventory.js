@@ -63,6 +63,7 @@ import GlassCard from '../components/GlassCard';
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import { TableSkeleton } from '../components/crm/AtelierSkeleton';
+import { formatSkuWithHyphen } from '../utils/helpers';
 import Papa from 'papaparse';
 
 const SIZE_PRESETS = ['Free Size', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', 'Unstitched', 'Semi-Stitched'];
@@ -1090,7 +1091,7 @@ const Inventory = () => {
                                   border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.25)' : 'rgba(15, 118, 110, 0.15)'}`
                                 }}
                               >
-                                #{String(item.productId || 'NO-SKU').toUpperCase()}
+                                #{formatSkuWithHyphen(item.productId || 'NO-SKU')}
                               </Typography>
                             </Box>
                             <Typography
@@ -1465,7 +1466,7 @@ const Inventory = () => {
                               textTransform: 'uppercase'
                             }}
                           >
-                            #{String(item.productId || 'N/A').toUpperCase()}
+                            #{formatSkuWithHyphen(item.productId || 'N/A')}
                           </Typography>
                         </TableCell>
 
@@ -2181,7 +2182,7 @@ const Inventory = () => {
                           form.variants.map((v, idx) => (
                             <TableRow key={idx} hover>
                               <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>
-                                {String(v.sku || '').toUpperCase()}
+                                {formatSkuWithHyphen(v.sku)}
                               </TableCell>
                               <TableCell>
                                 <TextField

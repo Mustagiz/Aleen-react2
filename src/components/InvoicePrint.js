@@ -15,6 +15,7 @@ import { getStoredInvoiceSettings } from '../constants/invoiceTemplates';
 import { numberToWordsRupees } from '../models/documentModel';
 import WaxSealStamp from './common/WaxSealStamp';
 import { generateUpiPaymentUrl } from '../engine/billingEngine';
+import { formatSkuWithHyphen } from '../utils/helpers';
 import instagramQrImg from '../assets/instagram_qr.jpg';
 
 const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profileProp }, ref) => {
@@ -471,7 +472,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                   </Typography>
                   {(item.variantSku || item.productId || item.sku) && (
                     <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', fontSize: '0.67rem', fontFamily: 'monospace', textTransform: 'uppercase' }}>
-                      SKU: {String(item.variantSku || item.productId || item.sku).toUpperCase()}
+                      SKU: {formatSkuWithHyphen(item.variantSku || item.productId || item.sku)}
                     </Typography>
                   )}
                   {isSlip && item.category && (

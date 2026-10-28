@@ -8,7 +8,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
-import { generateInvoiceNumber } from '../utils/helpers';
+import { generateInvoiceNumber, formatSkuWithHyphen } from '../utils/helpers';
 import InvoicePrint from '../components/InvoicePrint';
 import InvoiceTemplateDialog from '../components/InvoiceTemplateDialog';
 import { INVOICE_TEMPLATES, getStoredInvoiceSettings } from '../constants/invoiceTemplates';
@@ -427,6 +427,19 @@ const Invoices = () => {
     // 7. Case-insensitive exact item name match fallback
     if (!product) {
       product = inventory.find(inv => inv.name && String(inv.name).trim().toLowerCase() === lower);
+    }
+
+    // 8. Hyphen-agnostic matching (e.g. barcode scanner reads "ES-50" but DB holds "Es50" or vice-versa)
+    if (!product) {
+      const strippedClean = lower.replace(/[-\s]/g, '');
+      if (strippedClean) {
+        product = inventory.find(inv => {
+          const pId = String(inv.productId || '').trim().toLowerCase().replace(/[-\s]/g, '');
+          const sId = String(inv.sku || '').trim().toLowerCase().replace(/[-\s]/g, '');
+          const bId = String(inv.barcode || '').trim().toLowerCase().replace(/[-\s]/g, '');
+          return (pId && pId === strippedClean) || (sId && sId === strippedClean) || (bId && bId === strippedClean);
+        });
+      }
     }
 
     if (product) {
@@ -3095,8 +3108,8 @@ const Invoices = () => {
                                       <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <Box>
                                           <Typography variant="body2" sx={{ fontWeight: 700 }}>{option.name}</Typography>
-                                          <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase' }}>
-                                            ID: {String(option.productId || option.sku || 'N/A').toUpperCase()} • ₹{option.price}
+                                          <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', fontFamily: 'monospace', fontWeight: 600 }}>
+                                            ID: #{formatSkuWithHyphen(option.productId || option.sku || 'N/A')} • ₹{option.price}
                                           </Typography>
                                         </Box>
                                         <Chip
