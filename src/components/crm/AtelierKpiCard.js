@@ -13,6 +13,7 @@ export default function AtelierKpiCard({
   goldAccent = false,
   redAccent = false,
   sapphireAccent = false,
+  showJewelBadge = false,
   onClick
 }) {
   const theme = useTheme();
@@ -121,6 +122,10 @@ export default function AtelierKpiCard({
             borderColor: getHoverBorderColor(),
             '& .kpi-icon-jewel': {
               transform: 'scale(1.08) rotate(3deg)'
+            },
+            '& .kpi-bg-watermark-icon': {
+              transform: 'rotate(-4deg) scale(1.14)',
+              opacity: isDark ? 0.16 : 0.12
             }
           }
         }}
@@ -133,27 +138,60 @@ export default function AtelierKpiCard({
             left: 0,
             right: 0,
             height: '3.5px',
-            background: getTopGradient()
+            background: getTopGradient(),
+            zIndex: 2
           }}
         />
 
+        {/* Ambient Oversized Watermark Icon in Card Background */}
+        {icon && (
+          <Box
+            className="kpi-bg-watermark-icon"
+            sx={{
+              position: 'absolute',
+              right: { xs: -12, sm: -14, md: -16 },
+              bottom: { xs: -14, sm: -16, md: -18 },
+              zIndex: 0,
+              pointerEvents: 'none',
+              userSelect: 'none',
+              color: getIconColor(),
+              opacity: isDark ? 0.09 : 0.065,
+              transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+              transform: 'rotate(-9deg)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              '& .MuiSvgIcon-root, & svg': {
+                width: { xs: 82, sm: 98, md: 116 },
+                height: { xs: 82, sm: 98, md: 116 },
+                fontSize: { xs: '5.2rem !important', sm: '6.2rem !important', md: '7.4rem !important' },
+                display: 'block'
+              }
+            }}
+          >
+            {icon}
+          </Box>
+        )}
+
         <CardContent sx={{
-          p: { xs: '12px 13px !important', sm: '18px 20px !important', md: '22px 24px !important' },
+          p: { xs: '14px 15px !important', sm: '18px 20px !important', md: '22px 24px !important' },
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
           height: '100%',
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          position: 'relative',
+          zIndex: 1
         }}>
-          {/* Header: Title and Icon Jewel */}
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1, mb: 0.75 }}>
+          {/* Header: Title and optional Icon Jewel */}
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: 0.6 }}>
             <Typography
               variant="subtitle2"
               noWrap
               sx={{
                 color: isDark ? 'rgba(203, 213, 225, 0.85)' : '#475569',
                 fontWeight: 700,
-                fontSize: { xs: '0.64rem', sm: '0.74rem', md: '0.78rem' },
+                fontSize: { xs: '0.66rem', sm: '0.74rem', md: '0.78rem' },
                 textTransform: 'uppercase',
                 letterSpacing: '0.04em',
                 flex: 1,
@@ -164,7 +202,7 @@ export default function AtelierKpiCard({
               {title}
             </Typography>
 
-            {icon && (
+            {icon && showJewelBadge && (
               <Box
                 className="kpi-icon-jewel"
                 sx={{
