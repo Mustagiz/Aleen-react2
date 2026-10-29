@@ -87,6 +87,25 @@ const ATELIER_COLLECTIONS = [
   }
 ];
 
+// High-fidelity celebration confetti & golden stardust particles
+const CELEBRATION_PARTICLES = [
+  { icon: '✨', xOffset: -160, yOffset: -220, size: 28, duration: 2.2, delay: 0.05, rotation: 45, finalScale: 1 },
+  { icon: '🎉', xOffset: 160, yOffset: -240, size: 34, duration: 2.5, delay: 0.15, rotation: -30, finalScale: 1.1 },
+  { icon: '💎', xOffset: -240, yOffset: -120, size: 30, duration: 2.4, delay: 0.1, rotation: 60, finalScale: 1 },
+  { icon: '🌟', xOffset: 220, yOffset: -140, size: 32, duration: 2.3, delay: 0.2, rotation: -45, finalScale: 1.2 },
+  { icon: '🎊', xOffset: -120, yOffset: -280, size: 32, duration: 2.6, delay: 0.25, rotation: 25, finalScale: 1 },
+  { icon: '⭐', xOffset: 110, yOffset: -290, size: 26, duration: 2.1, delay: 0.1, rotation: -60, finalScale: 1 },
+  { icon: '✨', xOffset: -270, yOffset: 40, size: 24, duration: 2.4, delay: 0.3, rotation: 90, finalScale: 0.9 },
+  { icon: '👗', xOffset: 250, yOffset: 50, size: 28, duration: 2.5, delay: 0.2, rotation: -20, finalScale: 1 },
+  { icon: '💎', xOffset: -70, yOffset: -320, size: 28, duration: 2.7, delay: 0.25, rotation: 40, finalScale: 1.1 },
+  { icon: '🎉', xOffset: 70, yOffset: -330, size: 32, duration: 2.6, delay: 0.25, rotation: -35, finalScale: 1 },
+  { icon: '💛', xOffset: -180, yOffset: 150, size: 26, duration: 2.8, delay: 0.35, rotation: 15, finalScale: 1 },
+  { icon: '💚', xOffset: 180, yOffset: 160, size: 26, duration: 2.8, delay: 0.35, rotation: -15, finalScale: 1 },
+  { icon: '✨', xOffset: 0, yOffset: -350, size: 36, duration: 2.5, delay: 0.1, rotation: 0, finalScale: 1.3 },
+  { icon: '💫', xOffset: -130, yOffset: 90, size: 28, duration: 2.3, delay: 0.28, rotation: 50, finalScale: 1 },
+  { icon: '💫', xOffset: 140, yOffset: 100, size: 28, duration: 2.3, delay: 0.3, rotation: -50, finalScale: 1 }
+];
+
 export default function CustomerDisplay() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -394,14 +413,36 @@ export default function CustomerDisplay() {
   const subtotal = cfdState?.subtotal || 0;
   const discount = cfdState?.discount || 0;
   const tax = cfdState?.tax || 0;
+  const taxPercent = cfdState?.taxPercent || 0;
   const total = cfdState?.total || 0;
   const customerName = (cfdState?.customerName || '').trim();
   const customerPhone = (cfdState?.customerPhone || '').trim();
   const customerTier = cfdState?.customerTier || 'Silver';
   const loyaltyPoints = cfdState?.loyaltyPoints || 0;
+  const loyaltyPointsEarned = cfdState?.loyaltyPointsEarned || Math.max(15, Math.round(total * 0.05));
   const paymentMethod = cfdState?.paymentMethod || 'Cash';
   const upiUrl = cfdState?.upiUrl || '';
   const isSettled = cfdState?.status === 'settled';
+
+  // Retain last known customer name so thank-you receipt never loses the patron name
+  const [lastKnownCustomerName, setLastKnownCustomerName] = useState('');
+  useEffect(() => {
+    if (customerName && customerName.toLowerCase() !== 'honoured patron' && customerName.toLowerCase() !== 'walk-in') {
+      setLastKnownCustomerName(customerName);
+    }
+  }, [customerName]);
+
+  const activeCustomerName = (customerName && customerName.toLowerCase() !== 'honoured patron') ? customerName : lastKnownCustomerName;
+
+  // Celebration state triggered on settlement
+  const [showCelebration, setShowCelebration] = useState(false);
+  useEffect(() => {
+    if (isSettled) {
+      setShowCelebration(true);
+      const timer = setTimeout(() => setShowCelebration(false), 6000);
+      return () => clearTimeout(timer);
+    }
+  }, [isSettled, cfdState?.updatedAt]);
 
   // NOTE: Per user requirement, NO arbitrary timeout is set on settlement.
   // The screen only refreshes once the cashier cancels or bills/starts a new invoice!
@@ -416,11 +457,11 @@ export default function CustomerDisplay() {
 
   // Patron Initials
   const patronInitials = useMemo(() => {
-    if (!customerName) return 'VIP';
-    const parts = customerName.trim().split(/\s+/);
+    if (!activeCustomerName) return 'VIP';
+    const parts = activeCustomerName.trim().split(/\s+/);
     if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  }, [customerName]);
+  }, [activeCustomerName]);
 
   // Luxury Light Theme Accent Palette
   const themeAccent = '#C5A059'; // Royal Champagne Gold
@@ -453,7 +494,7 @@ export default function CustomerDisplay() {
   };
 
   const isEmptyCart = !items.length && !isSettled;
-  const hasCustomer = Boolean(customerName);
+  const hasCustomer = Boolean(activeCustomerName);
 
   // Dynamic Patron VIP Name Renderer with selectable animation styles
   const renderPatronName = (name, customSx = {}) => {
@@ -508,13 +549,14 @@ export default function CustomerDisplay() {
     <Box
       sx={{
         width: '100vw',
-        minHeight: '100vh',
+        height: '100dvh',
+        maxHeight: '100dvh',
         background: 'linear-gradient(135deg, #FDFBF7 0%, #F5F1E8 50%, #FAF8F5 100%)',
         color: '#1E293B',
         fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         display: 'flex',
         flexDirection: 'column',
-        overflowX: 'hidden',
+        overflow: 'hidden',
         position: 'relative',
         userSelect: 'none'
       }}
@@ -799,7 +841,7 @@ export default function CustomerDisplay() {
         <Stack direction="row" alignItems="center" spacing={{ xs: 0.6, sm: 1.2 }} sx={{ minWidth: 0, flexShrink: 1, justifyContent: 'flex-end' }}>
           {/* Personalized Customer Welcome Chip in Header */}
           {hasCustomer && (
-            <Tooltip title={`${timeGreeting}, ${customerName}`}>
+            <Tooltip title={`${timeGreeting}, ${activeCustomerName}`}>
               <Chip
                 avatar={
                   <Avatar sx={{ bgcolor: themeAccentDeep, color: '#FFFFFF', fontWeight: 900, fontSize: { xs: '0.62rem', sm: '0.72rem' }, width: { xs: 22, sm: 26 }, height: { xs: 22, sm: 26 } }}>
@@ -809,7 +851,7 @@ export default function CustomerDisplay() {
                 label={
                   <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
                     <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>{timeGreeting},</Box>
-                    {renderPatronName(customerName, { fontSize: { xs: '0.72rem', sm: '0.82rem' } })}
+                    {renderPatronName(activeCustomerName, { fontSize: { xs: '0.72rem', sm: '0.82rem' } })}
                   </Box>
                 }
                 sx={{
@@ -916,7 +958,9 @@ export default function CustomerDisplay() {
           gap: { xs: 2, md: 3 },
           zIndex: 1,
           minHeight: 0,
-          overflowY: (isEmptyCart && !hasCustomer && cfdConfig.idleDisplayType === 'video') ? 'hidden' : { xs: 'auto', lg: 'hidden' }
+          overflowY: (isEmptyCart && !hasCustomer && cfdConfig.idleDisplayType === 'video') ? 'hidden' : 'auto',
+          scrollbarWidth: 'none',
+          '&::-webkit-scrollbar': { display: 'none' }
         }}
       >
         <AnimatePresence>
@@ -929,91 +973,172 @@ export default function CustomerDisplay() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                margin: 'auto'
+              }}
             >
+              {/* Celebration Confetti & Sparkles Particle Explosion */}
+              {showCelebration && (
+                <Box sx={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 100, overflow: 'hidden' }}>
+                  {CELEBRATION_PARTICLES.map((p, pIdx) => (
+                    <motion.div
+                      key={pIdx}
+                      initial={{
+                        opacity: 0,
+                        x: '50vw',
+                        y: '45vh',
+                        scale: 0.2,
+                        rotate: 0
+                      }}
+                      animate={{
+                        opacity: [0, 1, 1, 0],
+                        x: `calc(50vw + ${p.xOffset}px)`,
+                        y: `calc(45vh + ${p.yOffset}px)`,
+                        scale: [0.2, 1.4, p.finalScale],
+                        rotate: p.rotation
+                      }}
+                      transition={{
+                        duration: p.duration,
+                        delay: p.delay,
+                        ease: 'easeOut',
+                        repeat: 1,
+                        repeatDelay: 0.4
+                      }}
+                      style={{
+                        position: 'absolute',
+                        fontSize: p.size,
+                        willChange: 'transform, opacity'
+                      }}
+                    >
+                      {p.icon}
+                    </motion.div>
+                  ))}
+                </Box>
+              )}
+
               <Paper
                 elevation={0}
                 sx={{
-                  maxWidth: 780,
+                  maxWidth: 680,
                   width: '100%',
-                  p: { xs: 3, sm: 4, md: 5 },
+                  mx: 'auto',
+                  p: { xs: 2.2, sm: 3.5, md: 4.5 },
                   textAlign: 'center',
-                  borderRadius: 4.5,
+                  borderRadius: 4,
                   bgcolor: '#FFFFFF',
                   border: '1.5px solid rgba(197, 160, 89, 0.35)',
                   boxShadow: '0 25px 60px rgba(180, 140, 75, 0.15), 0 4px 20px rgba(0, 0, 0, 0.05)',
-                  maxHeight: '90vh',
-                  overflowY: 'auto'
+                  position: 'relative'
                 }}
               >
+                {/* Animated Pulsating Checkmark with Golden Halo */}
                 <Box
                   sx={{
-                    width: 88,
-                    height: 88,
+                    width: { xs: 72, sm: 84 },
+                    height: { xs: 72, sm: 84 },
                     mx: 'auto',
-                    mb: 2,
+                    mb: 1.8,
                     borderRadius: '50%',
                     background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: '0 12px 30px rgba(16, 185, 129, 0.35)'
+                    boxShadow: '0 12px 30px rgba(16, 185, 129, 0.4)',
+                    animation: 'cfdPulseGlow 2.5s infinite ease-in-out'
                   }}
                 >
-                  <CheckCircle sx={{ fontSize: 52, color: '#FFFFFF' }} />
+                  <CheckCircle sx={{ fontSize: { xs: 44, sm: 50 }, color: '#FFFFFF' }} />
                 </Box>
 
                 <Typography
                   variant="overline"
-                  sx={{ color: '#059669', letterSpacing: '0.24em', fontWeight: 900, fontSize: '0.85rem' }}
+                  sx={{
+                    color: '#059669',
+                    letterSpacing: '0.22em',
+                    fontWeight: 900,
+                    fontSize: { xs: '0.74rem', sm: '0.85rem' },
+                    display: 'block'
+                  }}
                 >
                   SETTLEMENT COMPLETE • DIGITAL RECEIPT GENERATED
                 </Typography>
 
-                {/* Animated Customer Name Highlight on Settlement */}
-                <Typography variant="h3" sx={{ fontWeight: 900, mt: 0.5, mb: 1, color: '#0F172A', fontSize: { xs: '1.8rem', md: '2.5rem' } }}>
-                  Thank You, {renderPatronName(customerName || 'Honoured Patron')}!
+                {/* Animated Customer Name Highlight on Settlement (Custom name if available) */}
+                <Typography
+                  variant="h3"
+                  sx={{
+                    fontWeight: 900,
+                    mt: 0.5,
+                    mb: 1,
+                    color: '#0F172A',
+                    fontSize: { xs: '1.6rem', sm: '2.2rem', md: '2.5rem' },
+                    lineHeight: 1.2
+                  }}
+                >
+                  Thank You, {renderPatronName(activeCustomerName || 'Honoured Patron')}!
                 </Typography>
 
-                <Typography variant="body1" sx={{ color: '#64748B', mb: 3, maxWidth: 540, mx: 'auto', fontSize: '0.95rem', lineHeight: 1.5 }}>
-                  Your bespoke ensemble is registered. Our master tailors and craftspersons thank you for choosing {storeName}.
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: '#64748B',
+                    mb: 2.8,
+                    maxWidth: 520,
+                    mx: 'auto',
+                    fontSize: { xs: '0.86rem', sm: '0.95rem' },
+                    lineHeight: 1.5
+                  }}
+                >
+                  Your bespoke ensemble is registered. Our master tailors and craftspersons cherish your patronage at {storeName}.
                 </Typography>
 
-                {/* Amount Paid & Reward Points Card */}
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 3 }}>
+                {/* Amount Paid & Reward Points Cards in Vibrant Green */}
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.8} sx={{ mb: 2.8 }}>
                   <Box
                     sx={{
                       flex: 1,
-                      p: 2.4,
+                      p: 2.2,
                       borderRadius: 3.5,
                       bgcolor: '#FAF8F5',
-                      border: '1px solid rgba(197, 160, 89, 0.25)',
+                      border: '1.5px solid rgba(197, 160, 89, 0.3)',
                       boxShadow: '0 4px 14px rgba(197, 160, 89, 0.08)'
                     }}
                   >
-                    <Typography variant="caption" sx={{ color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>
+                    <Typography variant="caption" sx={{ color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 800 }}>
                       Settled Tender ({paymentMethod})
                     </Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 900, color: '#937230', mt: 0.5, fontSize: { xs: '1.7rem', sm: '2rem' } }}>
+                    <Typography variant="h4" sx={{ fontWeight: 900, color: '#937230', mt: 0.5, fontSize: { xs: '1.6rem', sm: '1.9rem' } }}>
                       ₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: '#10B981', fontWeight: 800, display: 'block', mt: 0.3 }}>
+                      ✓ Payment Verified
                     </Typography>
                   </Box>
 
+                  {/* Highlights Points Earned in Emerald Green */}
                   <Box
                     sx={{
                       flex: 1,
-                      p: 2.4,
+                      p: 2.2,
                       borderRadius: 3.5,
-                      bgcolor: 'rgba(16, 185, 129, 0.08)',
-                      border: '1px solid rgba(16, 185, 129, 0.3)',
-                      boxShadow: '0 4px 14px rgba(16, 185, 129, 0.08)'
+                      bgcolor: 'rgba(16, 185, 129, 0.12)',
+                      border: '1.5px solid rgba(16, 185, 129, 0.45)',
+                      boxShadow: '0 4px 16px rgba(16, 185, 129, 0.15)'
                     }}
                   >
-                    <Typography variant="caption" sx={{ color: '#059669', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 800 }}>
-                      Privilege Rewards Credited
+                    <Typography variant="caption" sx={{ color: '#047857', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+                      ✨ Privilege Rewards Credited
                     </Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 900, color: '#059669', mt: 0.5, fontSize: { xs: '1.7rem', sm: '2rem' } }}>
-                      +{Math.max(15, Math.round(total * 0.05))} Points
+                    <Typography variant="h4" sx={{ fontWeight: 900, color: '#059669', mt: 0.5, fontSize: { xs: '1.6rem', sm: '1.9rem' } }}>
+                      +{loyaltyPointsEarned} Points
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: '#047857', fontWeight: 800, display: 'block', mt: 0.3 }}>
+                      💎 Added to your Loyalty Account
                     </Typography>
                   </Box>
                 </Stack>
@@ -1951,7 +2076,11 @@ export default function CustomerDisplay() {
                     <Stack direction="row" spacing={1.5} alignItems="center">
                       <LocalMall sx={{ color: '#937230', fontSize: 24 }} />
                       <Typography variant="h6" sx={{ fontWeight: 900, color: '#0F172A', fontSize: { xs: '0.98rem', sm: '1.1rem' } }}>
-                        Curated Ensemble for {renderPatronName(customerName || 'Honoured Patron', { fontSize: 'inherit' })} ({items.length} {items.length === 1 ? 'Item' : 'Items'})
+                        {activeCustomerName ? (
+                          <>Curated Ensemble for {renderPatronName(activeCustomerName, { fontSize: 'inherit' })} ({items.length} {items.length === 1 ? 'Item' : 'Items'})</>
+                        ) : (
+                          <>Curated Ensemble ({items.length} {items.length === 1 ? 'Item' : 'Items'})</>
+                        )}
                       </Typography>
                     </Stack>
 
@@ -2106,58 +2235,112 @@ export default function CustomerDisplay() {
                       boxShadow: '0 12px 35px rgba(180, 140, 75, 0.08), 0 2px 10px rgba(0, 0, 0, 0.03)'
                     }}
                   >
-                    <Typography variant="overline" sx={{ color: '#937230', letterSpacing: '0.15em', fontWeight: 900 }}>
-                      BILL SUMMARY
-                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                      <Typography variant="overline" sx={{ color: '#937230', letterSpacing: '0.15em', fontWeight: 900 }}>
+                        BILL SUMMARY
+                      </Typography>
+                      <Chip
+                        label={isSettled ? "PAID" : "LIVE"}
+                        size="small"
+                        sx={{
+                          bgcolor: isSettled ? '#059669' : '#10B981',
+                          color: '#FFFFFF',
+                          fontWeight: 900,
+                          fontSize: '0.68rem',
+                          height: 22,
+                          px: 0.5
+                        }}
+                      />
+                    </Box>
 
-                    <Stack spacing={1.2} sx={{ mt: 1.5, mb: 2 }}>
+                    <Stack spacing={1.2} sx={{ mt: 1, mb: 1.8 }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 600 }}>
-                          Subtotal
+                          Gross Subtotal:
                         </Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A' }}>
+                        <Typography variant="body2" sx={{ fontWeight: 800, color: '#0F172A' }}>
                           ₹{subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                         </Typography>
                       </Box>
 
-                      {discount > 0 && (
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" sx={{ color: '#059669', fontWeight: 700 }}>
-                            Atelier Privilege Discount
-                          </Typography>
-                          <Typography variant="body2" sx={{ fontWeight: 800, color: '#059669' }}>
-                            - ₹{discount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                          </Typography>
-                        </Box>
-                      )}
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 600 }}>
+                          GST ({taxPercent > 0 ? `${taxPercent}%` : '0%'}):
+                        </Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A' }}>
+                          ₹{tax.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                        </Typography>
+                      </Box>
 
-                      {tax > 0 && (
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 600 }}>
-                            Estimated GST / Taxes
-                          </Typography>
-                          <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A' }}>
-                            + ₹{tax.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                          </Typography>
-                        </Box>
-                      )}
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 600 }}>
+                          Discount Applied:
+                        </Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 800, color: discount > 0 ? '#DC2626' : '#64748B' }}>
+                          - ₹{discount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                        </Typography>
+                      </Box>
                     </Stack>
 
-                    <Divider sx={{ borderColor: 'rgba(197, 160, 89, 0.25)', my: 2 }} />
+                    <Divider sx={{ borderColor: 'rgba(197, 160, 89, 0.25)', my: 1.8 }} />
 
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                      <Typography variant="h6" sx={{ fontWeight: 900, color: '#0F172A' }}>
-                        Net Payable
-                      </Typography>
-                      <Typography
-                        variant="h4"
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Box>
+                        <Typography variant="caption" sx={{ color: '#D97706', fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase', display: 'block' }}>
+                          NET PAYABLE
+                        </Typography>
+                        <Typography
+                          variant="h4"
+                          sx={{
+                            fontWeight: 900,
+                            color: '#937230',
+                            fontSize: { xs: '1.8rem', md: '2.2rem' },
+                            lineHeight: 1.1
+                          }}
+                        >
+                          ₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                        </Typography>
+                      </Box>
+                      <Chip
+                        label={isSettled ? "PAID" : "DUE"}
                         sx={{
+                          bgcolor: isSettled ? 'rgba(16, 185, 129, 0.15)' : 'rgba(197, 160, 89, 0.15)',
+                          color: isSettled ? '#059669' : '#937230',
+                          border: `1.5px solid ${isSettled ? '#10B981' : '#C5A059'}`,
                           fontWeight: 900,
-                          color: '#937230',
-                          fontSize: { xs: '1.9rem', md: '2.4rem' }
+                          fontSize: '0.78rem',
+                          height: 28,
+                          px: 1
                         }}
-                      >
-                        ₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      />
+                    </Box>
+
+                    {/* Privilege Points Earned Banner in Green */}
+                    <Box
+                      sx={{
+                        mt: 2,
+                        p: 1.2,
+                        borderRadius: 2.5,
+                        bgcolor: 'rgba(16, 185, 129, 0.1)',
+                        border: '1px solid rgba(16, 185, 129, 0.35)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                      }}
+                    >
+                      <Stack direction="row" spacing={0.8} alignItems="center">
+                        <Box sx={{ fontSize: '1.1rem' }}>✨</Box>
+                        <Box>
+                          <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, color: '#065F46', lineHeight: 1.2 }}>
+                            Privilege Points {isSettled ? 'Credited' : 'To Earn'}
+                          </Typography>
+                          <Typography sx={{ fontSize: '0.65rem', color: '#047857', fontWeight: 600 }}>
+                            {customerTier} VIP Member Rewards
+                          </Typography>
+                        </Box>
+                      </Stack>
+                      <Typography sx={{ fontSize: '0.95rem', fontWeight: 900, color: '#059669' }}>
+                        +{loyaltyPointsEarned} pts
                       </Typography>
                     </Box>
                   </Paper>
@@ -2182,66 +2365,63 @@ export default function CustomerDisplay() {
                   >
                     {paymentMethod === 'UPI' && upiUrl ? (
                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-                        {/* Interactive Clickable QR Box with Zoom Badge */}
-                        <Tooltip title="Tap to expand QR code for easier camera scanning">
-                          <Box
-                            onClick={() => setQrZoomOpen(true)}
-                            sx={{
-                              p: 1.5,
-                              borderRadius: 3.5,
-                              bgcolor: '#FFFFFF',
-                              border: '1.5px solid rgba(197, 160, 89, 0.35)',
-                              boxShadow: '0 12px 35px rgba(180, 140, 75, 0.15)',
-                              display: 'inline-block',
-                              mb: 1.5,
-                              cursor: 'pointer',
-                              position: 'relative',
-                              transition: 'all 0.25s ease',
-                              '&:hover': {
-                                transform: 'scale(1.03)',
-                                borderColor: '#937230',
-                                boxShadow: '0 16px 45px rgba(180, 140, 75, 0.25)'
-                              }
-                            }}
-                          >
-                            <QRCodeSVG
-                              value={upiUrl}
-                              size={175}
-                              level="M"
-                              style={{ display: 'block' }}
-                            />
-                            {/* Tap To Zoom Overlay Indicator */}
-                            <Box
-                              sx={{
-                                position: 'absolute',
-                                bottom: 6,
-                                right: 6,
-                                bgcolor: '#0F172A',
-                                color: '#FFFFFF',
-                                borderRadius: 1.5,
-                                px: 0.8,
-                                py: 0.3,
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 0.4
-                              }}
-                            >
-                              <ZoomIn sx={{ fontSize: 14 }} />
-                              <Typography variant="caption" sx={{ fontSize: '0.62rem', fontWeight: 800 }}>
-                                TAP TO ZOOM
-                              </Typography>
-                            </Box>
-                          </Box>
-                        </Tooltip>
+                        {/* Perfect Symmetrical Square QR Frame with Uniform Quiet Zone */}
+                        <Box
+                          onClick={() => setQrZoomOpen(true)}
+                          sx={{
+                            p: 2.2,
+                            borderRadius: 3,
+                            bgcolor: '#FFFFFF',
+                            border: '2px solid rgba(197, 160, 89, 0.45)',
+                            boxShadow: '0 8px 25px rgba(180, 140, 75, 0.15)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            position: 'relative',
+                            transition: 'all 0.25s ease',
+                            '&:hover': {
+                              transform: 'scale(1.03)',
+                              borderColor: '#937230',
+                              boxShadow: '0 12px 35px rgba(180, 140, 75, 0.25)'
+                            }
+                          }}
+                        >
+                          <QRCodeSVG
+                            value={upiUrl}
+                            size={180}
+                            level="M"
+                            style={{ display: 'block' }}
+                          />
+                        </Box>
 
-                        <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+                        {/* Dedicated Tap to Zoom Chip Placed Cleanly Below (Does NOT overlap QR modules) */}
+                        <Chip
+                          icon={<ZoomIn sx={{ fontSize: '1.05rem !important', color: '#937230 !important' }} />}
+                          label="Tap QR to Expand Fullscreen"
+                          onClick={() => setQrZoomOpen(true)}
+                          size="small"
+                          sx={{
+                            mt: 1.4,
+                            mb: 1.2,
+                            bgcolor: 'rgba(197, 160, 89, 0.12)',
+                            color: '#937230',
+                            border: '1px solid rgba(197, 160, 89, 0.35)',
+                            fontWeight: 800,
+                            fontSize: '0.72rem',
+                            cursor: 'pointer',
+                            '&:hover': { bgcolor: 'rgba(197, 160, 89, 0.22)' }
+                          }}
+                        />
+
+                        <Stack direction="row" spacing={0.8} alignItems="center" sx={{ mb: 0.5 }}>
                           <QrCode2 sx={{ color: '#937230', fontSize: 20 }} />
                           <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#0F172A' }}>
-                            Scan to Pay ₹{total.toLocaleString('en-IN')} via UPI
+                            Scan to Pay ₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })} via UPI
                           </Typography>
                         </Stack>
 
-                        <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, maxWidth: 280, mb: 1.5 }}>
+                        <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, maxWidth: 300, mb: 1.5 }}>
                           Google Pay • PhonePe • Paytm • BHIM • All UPI Apps
                         </Typography>
 
@@ -2417,28 +2597,57 @@ export default function CustomerDisplay() {
         </Stack>
       </Dialog>
 
-      {/* Subtle Responsive Luxury Footer Bar (Light Theme) */}
+      {/* Responsive Luxury Footer Bar (Pinned at Screen Bottom) */}
       <Box
         sx={{
-          py: { xs: 1.2, sm: 1.5 },
-          px: { xs: 2, sm: 3, md: 4 },
+          flexShrink: 0,
+          py: { xs: 0.8, sm: 1.1 },
+          px: { xs: 1.5, sm: 3, md: 4 },
           display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
+          flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-          gap: { xs: 0.6, sm: 2 },
           borderTop: '1px solid rgba(197, 160, 89, 0.25)',
-          bgcolor: 'rgba(255, 255, 255, 0.94)',
+          bgcolor: 'rgba(255, 255, 255, 0.96)',
           backdropFilter: 'blur(20px)',
           zIndex: 10,
-          textAlign: { xs: 'center', sm: 'left' }
+          boxShadow: '0 -2px 10px rgba(180, 140, 75, 0.04)'
         }}
       >
-        <Typography variant="caption" sx={{ color: '#64748B', fontSize: { xs: '0.7rem', sm: '0.78rem' }, fontWeight: 700 }}>
-          ✨ Powered by {storeName} Atelier Engine • 0ms Dual-Screen IPC & Cloud Synchronization
+        <Typography
+          variant="caption"
+          sx={{
+            color: '#475569',
+            fontSize: { xs: '0.68rem', sm: '0.78rem' },
+            fontWeight: 800,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}
+        >
+          <Box component="span" sx={{ color: '#D97706' }}>✨</Box>
+          <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Powered by </Box>
+          {storeName} Atelier
+          <Box component="span" sx={{ color: '#94A3B8', mx: 0.5 }}>•</Box>
+          <Box component="span" sx={{ color: '#059669', fontWeight: 800 }}>Instant Live Sync</Box>
         </Typography>
-        <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: { xs: '0.64rem', sm: '0.74rem' }, fontWeight: 600 }}>
-          🔒 Strictly Confidential & Encrypted Locally
+
+        <Typography
+          variant="caption"
+          sx={{
+            color: '#64748B',
+            fontSize: { xs: '0.65rem', sm: '0.74rem' },
+            fontWeight: 700,
+            whiteSpace: 'nowrap',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.4
+          }}
+        >
+          🔒 <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Strictly Confidential & </Box>Secure
         </Typography>
       </Box>
     </Box>

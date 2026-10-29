@@ -958,9 +958,8 @@ const Invoices = () => {
 
       const isIdle = status === 'idle';
       const cfdItems = isIdle ? [] : validItems;
-      // Pass customer details when open (for VIP greeting) or when settled, but clear on cancellation
-      const cfdCustomer = (overrideStatus === 'idle' || (!open && status !== 'settled')) ? '' : (customer || '');
-      const cfdPhone = (overrideStatus === 'idle' || (!open && status !== 'settled')) ? '' : (phone || '');
+      const cfdCustomer = (overrideStatus === 'idle' || (!open && status !== 'settled')) ? '' : (customer || matchedCustomer?.name || '');
+      const cfdPhone = (overrideStatus === 'idle' || (!open && status !== 'settled')) ? '' : (phone || matchedCustomer?.phone || '');
 
       const storeVpa = profile?.bankDetails?.upiId || profile?.upiId || 'aleenclothing@hdfcbank';
       const storeName = profile?.businessName || 'Aleen Clothing';
@@ -979,10 +978,12 @@ const Invoices = () => {
         customerTier: matchedCustomer?.loyaltyTier || 'Silver',
         loyaltyPoints: matchedCustomer?.loyaltyPoints || 0,
         loyaltyDiscount: isIdle ? 0 : (totals.loyaltyDiscount || 0),
+        loyaltyPointsEarned: isIdle ? 0 : (totals.loyaltyPointsEarned || Math.max(15, Math.round((totals.total || 0) * 0.05))),
         items: cfdItems,
         subtotal: isIdle ? 0 : (totals.subtotal || 0),
         discount: isIdle ? 0 : ((totals.absDiscount || 0) + (totals.loyaltyDiscount || 0)),
         tax: isIdle ? 0 : (totals.taxAmount || 0),
+        taxPercent: isIdle ? 0 : (parseFloat(tax) || 0),
         total: isIdle ? 0 : (totals.total || 0),
         paymentMethod: isSplitPayment ? `${paymentMethod} + ${paymentMethod2}` : paymentMethod,
         upiUrl: (!isIdle && (paymentMethod === 'UPI' || (isSplitPayment && (paymentMethod === 'UPI' || paymentMethod2 === 'UPI')))) ? upiUrl : '',
