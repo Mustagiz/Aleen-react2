@@ -63,7 +63,9 @@ export const calculateInvoiceTotals = ({
   discountPercent = 0,
   discountAmount = 0,
   loyaltyPointsRedeemed = 0,
-  customerTier = 'Bronze'
+  customerTier = 'Bronze',
+  loyaltySettings = null,
+  customBonusPoints = 0
 }) => {
   const processedItems = items.map(item => calculateLineItem(item, inventory));
   
@@ -86,15 +88,21 @@ export const calculateInvoiceTotals = ({
   const roundedTotal = Math.round(rawTotal);
   const roundOff = Number((roundedTotal - rawTotal).toFixed(2));
 
-  // Loyalty Points Accrual: 1 pt per ₹100 spent, scaled by VIP Tier
+  // Loyalty Points Accrual: Configurable points per rupee, scaled by VIP Tier
+  const spendPerPoint = loyaltySettings?.spendPerPoint > 0
+    ? Number(loyaltySettings.spendPerPoint)
+    : (loyaltySettings?.pointsPerRupee > 0 ? (1 / Number(loyaltySettings.pointsPerRupee)) : 100);
+
   const tierMultipliers = {
-    Bronze: 1.0,
-    Silver: 1.25,
-    Gold: 1.5,
-    Platinum: 2.0
+    Bronze: Number(loyaltySettings?.bronzeMultiplier) || 1.0,
+    Silver: Number(loyaltySettings?.silverMultiplier) || 1.25,
+    Gold: Number(loyaltySettings?.goldMultiplier) || 1.5,
+    Platinum: Number(loyaltySettings?.platinumMultiplier) || 2.0
   };
   const multiplier = tierMultipliers[customerTier] || 1.0;
-  const loyaltyPointsEarned = Math.floor((roundedTotal / 100) * multiplier);
+  const basePointsEarned = Math.floor((roundedTotal / spendPerPoint) * multiplier);
+  const customBonus = Math.max(0, parseInt(customBonusPoints, 10) || 0);
+  const loyaltyPointsEarned = basePointsEarned + customBonus;
 
   return {
     subtotal: Number(subtotal.toFixed(2)),

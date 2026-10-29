@@ -123,6 +123,26 @@ describe('BillingEngine Module Tests', () => {
     expect(result.loyaltyPointsEarned).toBe(221);
   });
 
+  test('calculateInvoiceTotals supports custom spend per point ratio and bonus loyalty points', () => {
+    const items = [{ id: 'item-1', quantity: 1 }]; // 15,000
+
+    const result = calculateInvoiceTotals({
+      items,
+      inventory: mockInventory,
+      taxPercent: 0,
+      customerTier: 'Silver', // 1.25x
+      loyaltySettings: {
+        spendPerPoint: 50 // Spend ₹50 to get 1 point
+      },
+      customBonusPoints: 75 // 75 courtesy bonus points
+    });
+
+    expect(result.total).toBe(15000);
+    // Base: Math.floor((15000 / 50) * 1.25) = 300 * 1.25 = 375
+    // Total = 375 + 75 bonus = 450
+    expect(result.loyaltyPointsEarned).toBe(450);
+  });
+
   test('calculateCashChange computes tender, change due, and shortages', () => {
     const exact = calculateCashChange({ total: 1450, cashTendered: 1450 });
     expect(exact.changeDue).toBe(0);

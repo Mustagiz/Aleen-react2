@@ -128,6 +128,14 @@ const Invoices = () => {
     }
   };
 
+  const handleCloseInvoiceModal = () => {
+    cfdLastSettledTimeRef.current = 0;
+    setOpen(false);
+    if (syncCustomerDisplayRef.current) {
+      syncCustomerDisplayRef.current('idle', null, true);
+    }
+  };
+
   // Hold / Park Cart State
   const [parkedCarts, setParkedCarts] = useState(() => {
     try {
@@ -193,7 +201,7 @@ const Invoices = () => {
         } else if (heldCartsDialogOpen) {
           setHeldCartsDialogOpen(false);
         } else if (open) {
-          setOpen(false);
+          handleCloseInvoiceModal();
         }
       }
     };
@@ -943,15 +951,16 @@ const Invoices = () => {
       } else if (overrideStatus) {
         status = overrideStatus;
       } else if (!open) {
-        status = 'idle';
+        status = cfdLastSettledTimeRef.current > 0 ? 'settled' : 'idle';
       } else {
         status = validItems.length > 0 ? 'active' : 'idle';
       }
 
       const isIdle = status === 'idle';
       const cfdItems = isIdle ? [] : validItems;
-      const cfdCustomer = isIdle ? '' : (customer || '');
-      const cfdPhone = isIdle ? '' : (phone || '');
+      // Pass customer details when open (for VIP greeting) or when settled, but clear on cancellation
+      const cfdCustomer = (overrideStatus === 'idle' || (!open && status !== 'settled')) ? '' : (customer || '');
+      const cfdPhone = (overrideStatus === 'idle' || (!open && status !== 'settled')) ? '' : (phone || '');
 
       const storeVpa = profile?.bankDetails?.upiId || profile?.upiId || 'aleenclothing@hdfcbank';
       const storeName = profile?.businessName || 'Aleen Clothing';
@@ -1291,12 +1300,7 @@ const Invoices = () => {
     speakBillSettlement(total);
     const savedInvoice = await addInvoice(invoice);
     setOpen(false);
-    // After 2.5s celebration, return customer screen back to homepage ('idle')
-    setTimeout(() => {
-      if (syncCustomerDisplayRef.current) {
-        syncCustomerDisplayRef.current('idle', null, true);
-      }
-    }, 2500);
+    // Settlement display remains on customer display until next invoice or cancellation (no auto-timeout)
     setSuccessInvoice(savedInvoice || invoice); // Show success dialog with persisted invoice
     setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0 }]);
     setDiscountPercent('');
@@ -3426,7 +3430,7 @@ const Invoices = () => {
 
       <Dialog
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={handleCloseInvoiceModal}
         maxWidth="lg"
         fullWidth
         fullScreen={isTablet}
@@ -3655,7 +3659,7 @@ const Invoices = () => {
 
             {/* Close Button */}
             <IconButton 
-              onClick={() => setOpen(false)} 
+              onClick={handleCloseInvoiceModal} 
               size="small"
               className="header-contrast-btn"
               sx={{ 
@@ -4941,7 +4945,7 @@ const Invoices = () => {
           alignItems: 'center'
         }}>
           <Button
-            onClick={() => setOpen(false)}
+            onClick={handleCloseInvoiceModal}
             variant="text"
             sx={{
               fontWeight: 700,

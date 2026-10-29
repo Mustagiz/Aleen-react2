@@ -59,7 +59,8 @@ import {
   Draw,
   AutoAwesome,
   QrCode2,
-  Palette
+  Palette,
+  Tv
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -69,6 +70,7 @@ import { INVOICE_TEMPLATES, DEFAULT_INVOICE_SETTINGS, getStoredInvoiceSettings }
 import { PREDEFINED_LOGOS } from '../constants/predefinedLogos';
 import instagramQrImg from '../assets/instagram_qr.jpg';
 import CrmColorSettings from '../components/settings/CrmColorSettings';
+import CustomerDisplaySettings from '../components/settings/CustomerDisplaySettings';
 
 export default function Settings() {
   const theme = useTheme();
@@ -89,10 +91,11 @@ export default function Settings() {
 
   const location = useLocation();
 
-  // Active Tab: 0 = Brand, 1 = Bank, 2 = Invoice & Print Defaults, 3 = Staff & RBAC, 4 = Security, 5 = CRM Color & Appearance
+  // Active Tab: 0 = Brand, 1 = Bank, 2 = Invoice & Print Defaults, 3 = Staff & RBAC, 4 = Security, 5 = CRM Color & Appearance, 6 = Customer Display (CFD)
   const [activeTab, setActiveTab] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     const tabParam = params.get('tab');
+    if (tabParam === 'cfd' || tabParam === 'display' || tabParam === 'customer-display') return 6;
     if (tabParam === 'colors' || tabParam === 'themes' || tabParam === 'appearance') return 5;
     if (tabParam === 'security') return 4;
     if (tabParam === 'staff') return 3;
@@ -104,7 +107,9 @@ export default function Settings() {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tabParam = params.get('tab');
-    if (tabParam === 'colors' || tabParam === 'themes' || tabParam === 'appearance') {
+    if (tabParam === 'cfd' || tabParam === 'display' || tabParam === 'customer-display') {
+      setActiveTab(6);
+    } else if (tabParam === 'colors' || tabParam === 'themes' || tabParam === 'appearance') {
       setActiveTab(5);
     }
   }, [location.search]);
@@ -595,6 +600,7 @@ export default function Settings() {
           <Tab icon={<People fontSize="small" />} iconPosition="start" label={`Staff & Permissions (${staffList.length})`} />
           <Tab icon={<Lock fontSize="small" />} iconPosition="start" label="Admin Security" />
           <Tab icon={<Palette fontSize="small" />} iconPosition="start" label="CRM Theme & Colors" />
+          <Tab icon={<Tv fontSize="small" />} iconPosition="start" label="Customer Display (CFD)" />
         </Tabs>
       </Paper>
 
@@ -1903,6 +1909,11 @@ export default function Settings() {
       {/* TAB 5: CRM HAUTE COUTURE COLOR PALETTE */}
       {activeTab === 5 && (
         <CrmColorSettings />
+      )}
+
+      {/* TAB 6: CUSTOMER DISPLAY (CFD) SETTINGS */}
+      {activeTab === 6 && (
+        <CustomerDisplaySettings />
       )}
 
       {/* MODAL 1: ADD OR EDIT STAFF MEMBER */}

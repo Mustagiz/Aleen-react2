@@ -23,6 +23,8 @@ import {
     IconButton,
     Tooltip,
     TablePagination,
+    Divider,
+    InputAdornment,
     useMediaQuery,
     useTheme
 } from '@mui/material';
@@ -35,7 +37,10 @@ import {
     Close,
     Cake,
     LocalOffer,
-    WorkspacePremium
+    WorkspacePremium,
+    Settings,
+    CardGiftcard,
+    Save
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import PageHeader from '../components/crm/PageHeader';
@@ -46,7 +51,7 @@ import { useFeedback } from '../contexts/FeedbackContext';
 const Loyalty = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    const { customers, redeemLoyaltyPoints, addBirthdayBonus } = useData();
+    const { customers, redeemLoyaltyPoints, addBirthdayBonus, loyaltySettings, updateLoyaltySettings, addCustomLoyaltyPoints } = useData();
     const { showToast } = useFeedback();
     const [redeemDialog, setRedeemDialog] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -54,6 +59,21 @@ const Loyalty = () => {
     const [error, setError] = useState('');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+
+    // Settings panel state
+    const [settingsOpen, setSettingsOpen] = useState(false);
+    const [settingsForm, setSettingsForm] = useState(null); // loaded when panel opens
+    const [settingsSaving, setSettingsSaving] = useState(false);
+
+    // Award custom points dialog state
+    const [awardDialog, setAwardDialog] = useState(false);
+    const [awardCustomer, setAwardCustomer] = useState(null);
+    const [awardPoints, setAwardPoints] = useState('');
+    const [awardReason, setAwardReason] = useState('');
+    const [awardStart, setAwardStart] = useState('');
+    const [awardExpiry, setAwardExpiry] = useState('');
+    const [awardError, setAwardError] = useState('');
+    const [awardSaving, setAwardSaving] = useState(false);
 
     // Calculate tier statistics
     const tierStats = {
@@ -132,6 +152,76 @@ const Loyalty = () => {
         }
     };
 
+    // Settings panel handlers
+    const handleSettingsOpen = () => {
+        setSettingsForm({
+            spendPerPoint: loyaltySettings?.spendPerPoint ?? 100,
+            bronzeMultiplier: loyaltySettings?.bronzeMultiplier ?? 1,
+            silverMultiplier: loyaltySettings?.silverMultiplier ?? 1.25,
+            goldMultiplier: loyaltySettings?.goldMultiplier ?? 1.5,
+            platinumMultiplier: loyaltySettings?.platinumMultiplier ?? 2,
+            programStartDate: loyaltySettings?.programStartDate ?? '',
+            programExpiryDate: loyaltySettings?.programExpiryDate ?? ''
+        });
+        setSettingsOpen(true);
+    };
+
+    const handleSettingsSave = async () => {
+        if (!settingsForm.spendPerPoint || Number(settingsForm.spendPerPoint) <= 0) {
+            showToast('Spend per point must be greater than 0', 'error');
+            return;
+        }
+        setSettingsSaving(true);
+        try {
+            await updateLoyaltySettings({
+                spendPerPoint: Number(settingsForm.spendPerPoint),
+                bronzeMultiplier: Number(settingsForm.bronzeMultiplier),
+                silverMultiplier: Number(settingsForm.silverMultiplier),
+                goldMultiplier: Number(settingsForm.goldMultiplier),
+                platinumMultiplier: Number(settingsForm.platinumMultiplier),
+                programStartDate: settingsForm.programStartDate,
+                programExpiryDate: settingsForm.programExpiryDate
+            });
+            showToast('Loyalty program settings saved successfully!', 'success');
+            setSettingsOpen(false);
+        } catch (err) {
+            showToast('Error saving settings: ' + err.message, 'error');
+        }
+        setSettingsSaving(false);
+    };
+
+    // Award custom points handlers
+    const handleAwardOpen = (customer) => {
+        setAwardCustomer(customer);
+        setAwardPoints('');
+        setAwardReason('');
+        setAwardStart('');
+        setAwardExpiry('');
+        setAwardError('');
+        setAwardDialog(true);
+    };
+
+    const handleAwardPoints = async () => {
+        const pts = parseInt(awardPoints);
+        if (isNaN(pts) || pts <= 0) { setAwardError('Enter a valid points amount'); return; }
+        if (!awardReason.trim()) { setAwardError('Please enter a reason for awarding points'); return; }
+        setAwardSaving(true);
+        try {
+            await addCustomLoyaltyPoints(
+                awardCustomer.id,
+                pts,
+                awardReason.trim(),
+                awardStart || null,
+                awardExpiry || null
+            );
+            showToast(`${pts} loyalty points credited to ${awardCustomer.name}!`, 'success');
+            setAwardDialog(false);
+        } catch (err) {
+            setAwardError(err.message);
+        }
+        setAwardSaving(false);
+    };
+
     // Sorted loyalty patrons
     const sortedMembers = [...customers]
         .sort((a, b) => (b.loyaltyPoints || 0) - (a.loyaltyPoints || 0));
@@ -153,6 +243,17 @@ const Loyalty = () => {
             <PageHeader
                 title="VIP Loyalty & Atelier Privileges"
                 subtitle="Manage tier progression, reward point accruals, birthday credits, and bespoke privileges"
+                actions={
+                    <Button
+                        variant="contained"
+                        startIcon={<Settings />}
+                        onClick={handleSettingsOpen}
+                        size="small"
+                        sx={{ borderRadius: 2.5, fontWeight: 700, textTransform: 'none', px: 2.5 }}
+                    >
+                        Program Settings
+                    </Button>
+                }
             />
 
             {/* Clientele & CRM Tab Switcher */}
@@ -278,14 +379,21 @@ const Loyalty = () => {
                                 <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main }}>
                                     <LocalOffer sx={{ fontSize: 20 }} />
                                 </Box>
-                                <Box>
+                                <Box sx={{ flex: 1 }}>
                                     <Typography variant="body2" sx={{ fontWeight: 750, color: 'text.primary' }}>
                                         Reward Accrual Rate
                                     </Typography>
                                     <Typography variant="caption" color="text.secondary">
-                                        ₹100 invoiced spend = 1 Loyalty Point automatically credited to guest wallet
+                                        ₹{loyaltySettings?.spendPerPoint ?? 100} invoiced spend = 1 Loyalty Point automatically credited to guest wallet
                                     </Typography>
                                 </Box>
+                                <Chip
+                                    label={`₹${loyaltySettings?.spendPerPoint ?? 100}/pt`}
+                                    size="small"
+                                    color="primary"
+                                    variant="outlined"
+                                    sx={{ fontWeight: 700, fontSize: '0.7rem' }}
+                                />
                             </Box>
 
                             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', p: 1.5, borderRadius: 2.5, bgcolor: 'rgba(217, 119, 6, 0.04)' }}>
@@ -549,6 +657,29 @@ const Loyalty = () => {
                                                                 <Cake sx={{ fontSize: 15 }} />
                                                             </IconButton>
                                                         </Tooltip>
+                                                        <Tooltip title="Award Custom Loyalty Points">
+                                                            <IconButton
+                                                                size="small"
+                                                                onClick={() => handleAwardOpen(customer)}
+                                                                sx={{
+                                                                    width: 30,
+                                                                    height: 30,
+                                                                    color: '#059669',
+                                                                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+                                                                    border: '1px solid rgba(5, 150, 105, 0.25)',
+                                                                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                                                                    transition: 'all 0.18s ease',
+                                                                    '&:hover': {
+                                                                        bgcolor: '#059669',
+                                                                        color: '#FFFFFF',
+                                                                        transform: 'translateY(-1px)',
+                                                                        boxShadow: '0 4px 10px rgba(5, 150, 105, 0.3)'
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <CardGiftcard sx={{ fontSize: 15 }} />
+                                                            </IconButton>
+                                                        </Tooltip>
                                                     </Box>
                                                 </TableCell>
                                             </TableRow>
@@ -647,6 +778,192 @@ const Loyalty = () => {
                         }}
                     >
                         Redeem Discount
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            {/* ── Program Settings Dialog ── */}
+            <Dialog
+                open={settingsOpen}
+                onClose={() => setSettingsOpen(false)}
+                maxWidth="sm"
+                fullWidth
+                PaperProps={{ sx: { borderRadius: 4, p: 0.5 } }}
+            >
+                <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'primary.main', color: '#fff' }}><Settings sx={{ fontSize: 18 }} /></Box>
+                        <Typography sx={{ fontWeight: 800, fontSize: '1.1rem' }}>Loyalty Program Settings</Typography>
+                    </Box>
+                    <IconButton onClick={() => setSettingsOpen(false)} size="small"><Close fontSize="small" /></IconButton>
+                </DialogTitle>
+                <DialogContent dividers>
+                    {settingsForm && (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}>
+                            <Box>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1.5, color: 'text.primary' }}>Accrual Rate</Typography>
+                                <TextField
+                                    fullWidth
+                                    label="Rupees spent per 1 point earned"
+                                    type="number"
+                                    value={settingsForm.spendPerPoint}
+                                    onChange={(e) => setSettingsForm(p => ({ ...p, spendPerPoint: e.target.value }))}
+                                    InputProps={{
+                                        startAdornment: <InputAdornment position="start">₹</InputAdornment>,
+                                        endAdornment: <InputAdornment position="end">= 1 pt</InputAdornment>,
+                                        inputProps: { min: 1 }
+                                    }}
+                                    helperText="e.g. 100 means every ₹100 spent earns 1 loyalty point"
+                                />
+                            </Box>
+                            <Divider />
+                            <Box>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1.5, color: 'text.primary' }}>Tier Point Multipliers</Typography>
+                                <Grid container spacing={2}>
+                                    {[['Bronze', 'bronzeMultiplier'], ['Silver', 'silverMultiplier'], ['Gold', 'goldMultiplier'], ['Platinum', 'platinumMultiplier']].map(([label, key]) => (
+                                        <Grid item xs={6} key={key}>
+                                            <TextField
+                                                fullWidth
+                                                label={`${label} multiplier`}
+                                                type="number"
+                                                size="small"
+                                                value={settingsForm[key]}
+                                                onChange={(e) => setSettingsForm(p => ({ ...p, [key]: e.target.value }))}
+                                                InputProps={{ endAdornment: <InputAdornment position="end">×</InputAdornment>, inputProps: { min: 0.1, step: 0.25 } }}
+                                            />
+                                        </Grid>
+                                    ))}
+                                </Grid>
+                            </Box>
+                            <Divider />
+                            <Box>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1.5, color: 'text.primary' }}>Program Validity Period</Typography>
+                                <Grid container spacing={2}>
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            fullWidth
+                                            label="Program Start Date"
+                                            type="date"
+                                            size="small"
+                                            value={settingsForm.programStartDate}
+                                            onChange={(e) => setSettingsForm(p => ({ ...p, programStartDate: e.target.value }))}
+                                            InputLabelProps={{ shrink: true }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            fullWidth
+                                            label="Program Expiry Date"
+                                            type="date"
+                                            size="small"
+                                            value={settingsForm.programExpiryDate}
+                                            onChange={(e) => setSettingsForm(p => ({ ...p, programExpiryDate: e.target.value }))}
+                                            InputLabelProps={{ shrink: true }}
+                                        />
+                                    </Grid>
+                                </Grid>
+                            </Box>
+                        </Box>
+                    )}
+                </DialogContent>
+                <DialogActions sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider' }}>
+                    <Button onClick={() => setSettingsOpen(false)} sx={{ fontWeight: 700, color: 'text.secondary' }}>Cancel</Button>
+                    <Button
+                        variant="contained"
+                        startIcon={<Save />}
+                        onClick={handleSettingsSave}
+                        disabled={settingsSaving}
+                        sx={{ px: 3.5, borderRadius: 2.5, fontWeight: 700 }}
+                    >
+                        {settingsSaving ? 'Saving…' : 'Save Settings'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* ── Award Custom Points Dialog ── */}
+            <Dialog
+                open={awardDialog}
+                onClose={() => setAwardDialog(false)}
+                maxWidth="xs"
+                fullWidth
+                fullScreen={isMobile}
+                PaperProps={{ sx: { borderRadius: isMobile ? 0 : 4, p: 0.5 } }}
+            >
+                <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <Box sx={{ p: 1, borderRadius: 2, bgcolor: '#059669', color: '#fff' }}><CardGiftcard sx={{ fontSize: 18 }} /></Box>
+                        <Box>
+                            <Typography sx={{ fontWeight: 800, fontSize: '1rem', lineHeight: 1.2 }}>Award Custom Points</Typography>
+                            {awardCustomer && <Typography variant="caption" color="text.secondary">{awardCustomer.name}</Typography>}
+                        </Box>
+                    </Box>
+                    <IconButton onClick={() => setAwardDialog(false)} size="small"><Close fontSize="small" /></IconButton>
+                </DialogTitle>
+                <DialogContent dividers>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
+                        {awardError && <Alert severity="error" sx={{ borderRadius: 2 }}>{awardError}</Alert>}
+                        <TextField
+                            fullWidth
+                            autoFocus
+                            label="Points to Award *"
+                            type="number"
+                            value={awardPoints}
+                            onChange={(e) => { setAwardPoints(e.target.value); setAwardError(''); }}
+                            InputProps={{ endAdornment: <InputAdornment position="end">pts</InputAdornment>, inputProps: { min: 1 } }}
+                        />
+                        <TextField
+                            fullWidth
+                            label="Reason / Description *"
+                            placeholder="e.g. Special event bonus, referral credit…"
+                            value={awardReason}
+                            onChange={(e) => { setAwardReason(e.target.value); setAwardError(''); }}
+                            multiline
+                            rows={2}
+                        />
+                        <Grid container spacing={2}>
+                            <Grid item xs={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Points Valid From"
+                                    type="date"
+                                    size="small"
+                                    value={awardStart}
+                                    onChange={(e) => setAwardStart(e.target.value)}
+                                    InputLabelProps={{ shrink: true }}
+                                    helperText="Optional"
+                                />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Points Expire On"
+                                    type="date"
+                                    size="small"
+                                    value={awardExpiry}
+                                    onChange={(e) => setAwardExpiry(e.target.value)}
+                                    InputLabelProps={{ shrink: true }}
+                                    helperText="Optional"
+                                />
+                            </Grid>
+                        </Grid>
+                        {awardPoints && parseInt(awardPoints) > 0 && (
+                            <Box sx={{ p: 1.5, bgcolor: 'rgba(5, 150, 105, 0.06)', borderRadius: 2.5, border: '1px solid rgba(5, 150, 105, 0.2)' }}>
+                                <Typography variant="body2" sx={{ fontWeight: 750, color: '#059669' }}>
+                                    +{parseInt(awardPoints).toLocaleString()} pts → ₹{parseInt(awardPoints).toLocaleString()} credit value
+                                </Typography>
+                            </Box>
+                        )}
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider' }}>
+                    <Button onClick={() => setAwardDialog(false)} sx={{ fontWeight: 700, color: 'text.secondary' }}>Cancel</Button>
+                    <Button
+                        variant="contained"
+                        startIcon={<CardGiftcard />}
+                        onClick={handleAwardPoints}
+                        disabled={awardSaving || !awardPoints || !awardReason.trim()}
+                        sx={{ px: 3.5, borderRadius: 2.5, fontWeight: 700, bgcolor: '#059669', '&:hover': { bgcolor: '#047857' } }}
+                    >
+                        {awardSaving ? 'Awarding…' : 'Award Points'}
                     </Button>
                 </DialogActions>
             </Dialog>

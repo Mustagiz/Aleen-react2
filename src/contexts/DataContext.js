@@ -35,6 +35,19 @@ export const DataProvider = ({ children }) => {
   const [expenses, setExpenses] = useState([]);
   const [expenseCategories, setExpenseCategories] = useState(['General', 'Rent', 'Electricity', 'Water', 'Repairs', 'Staff Welfare', 'Marketing', 'Courier', 'Stationery', 'Others']);
   const [invoiceTemplateSettings, setInvoiceTemplateSettings] = useState(() => getStoredInvoiceSettings());
+  const [loyaltySettings, setLoyaltySettings] = useState({
+    spendPerPoint: 100, // ₹100 spent = 1 point earned
+    pointsPerRupee: 0.01,
+    programStartDate: '',
+    programExpiryDate: '',
+    pointsExpiryDays: 365,
+    tierMultipliers: {
+      Bronze: 1,
+      Silver: 1.25,
+      Gold: 1.5,
+      Platinum: 2
+    }
+  });
   const [loading, setLoading] = useState(true);
 
   // Real-time synchronization
@@ -117,6 +130,13 @@ export const DataProvider = ({ children }) => {
       }
     }, onError('invoiceTemplate'));
 
+    const unsubLoyalty = onSnapshot(doc(db, 'settings', 'loyalty'), (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        setLoyaltySettings(prev => ({ ...prev, ...data }));
+      }
+    }, onError('loyalty'));
+
     return () => {
       if (unsubInventory) unsubInventory();
       if (unsubInvoices) unsubInvoices();
@@ -130,6 +150,7 @@ export const DataProvider = ({ children }) => {
       if (unsubExpenseCategories) unsubExpenseCategories();
       if (unsubMarketingTemplates) unsubMarketingTemplates();
       if (unsubInvoiceTemplate) unsubInvoiceTemplate();
+      if (unsubLoyalty) unsubLoyalty();
       clearTimeout(safetyTimer);
     };
   }, []);
@@ -513,13 +534,25 @@ export const DataProvider = ({ children }) => {
       const customerRef = doc(db, 'customers', invoice.customerId);
       const customer = customers.find(c => c.id === invoice.customerId);
       if (customer) {
-        const pointsEarned = Math.floor(invoice.total / 100);
+        const spendPerPt = loyaltySettings?.spendPerPoint || 100;
+        const tierMultiplier = loyaltySettings?.tierMultipliers?.[customer.loyaltyTier || 'Bronze'] || 1;
+        const calculatedBase = Math.floor((invoice.total / spendPerPt) * tierMultiplier);
+        const bonusPts = Number(invoice.customBonusPoints || 0);
+        const pointsEarned = invoice.pointsEarned !== undefined ? Number(invoice.pointsEarned) : (calculatedBase + bonusPts);
+
         const newTotalSpent = (customer.totalSpent || 0) + invoice.total;
         const newTotalDue = (customer.totalDue || 0) + balanceDue;
         const newTier = calculateLoyaltyTier(newTotalSpent);
         const pointsHistory = customer.pointsHistory || [];
 
-        batch.update(customerRef, {
+        let expiryDate = '';
+        if (loyaltySettings?.pointsExpiryDays) {
+          const exp = new Date();
+          exp.setDate(exp.getDate() + Number(loyaltySettings.pointsExpiryDays));
+          expiryDate = exp.toISOString().split('T')[0];
+        }
+
+        const updatePayload = {
           totalSpent: newTotalSpent,
           totalDue: newTotalDue,
           visitCount: (customer.visitCount || 0) + 1,
@@ -530,13 +563,23 @@ export const DataProvider = ({ children }) => {
             {
               date: new Date().toISOString(),
               points: pointsEarned,
+              basePoints: calculatedBase,
+              bonusPoints: bonusPts,
               type: 'earned',
-              reason: `Purchase - Invoice #${id}`,
+              reason: `Purchase - Invoice #${id}${bonusPts > 0 ? ` (Includes +${bonusPts} VIP Bonus)` : ''}`,
               invoiceId: id,
-              invoiceTotal: invoice.total
+              invoiceTotal: invoice.total,
+              startDate: new Date().toISOString().split('T')[0],
+              expiryDate: expiryDate || ''
             }
           ]
-        });
+        };
+
+        if (expiryDate) {
+          updatePayload.pointsExpiryDate = expiryDate;
+        }
+
+        batch.update(customerRef, updatePayload);
       }
     }
 
@@ -724,6 +767,58 @@ export const DataProvider = ({ children }) => {
     });
   };
 
+  const updateLoyaltySettings = async (updates) => {
+    await setDoc(doc(db, 'settings', 'loyalty'), updates, { merge: true });
+    setLoyaltySettings(prev => ({ ...prev, ...updates }));
+  };
+
+  const addCustomLoyaltyPoints = async (customerId, points, reason = 'VIP Courtesy Points', startDate = '', expiryDate = '') => {
+    const customer = customers.find(c => c.id === customerId);
+    if (!customer) throw new Error('Customer not found');
+
+    const numPoints = parseInt(points, 10);
+    if (isNaN(numPoints) || numPoints === 0) throw new Error('Please enter a valid points amount');
+
+    const customerRef = doc(db, 'customers', customerId);
+    const pointsHistory = customer.pointsHistory || [];
+    const todayStr = new Date().toISOString().split('T')[0];
+    const sDate = startDate || todayStr;
+
+    let eDate = expiryDate;
+    if (!eDate && loyaltySettings?.pointsExpiryDays) {
+      const exp = new Date();
+      exp.setDate(exp.getDate() + Number(loyaltySettings.pointsExpiryDays));
+      eDate = exp.toISOString().split('T')[0];
+    }
+
+    const newPointsBalance = Math.max(0, (customer.loyaltyPoints || 0) + numPoints);
+
+    const updatePayload = {
+      loyaltyPoints: newPointsBalance,
+      pointsHistory: [
+        ...pointsHistory,
+        {
+          date: new Date().toISOString(),
+          points: numPoints,
+          type: numPoints >= 0 ? 'custom_award' : 'adjustment',
+          reason: reason || (numPoints >= 0 ? 'Custom VIP Points Award' : 'VIP Points Adjustment'),
+          startDate: sDate,
+          expiryDate: eDate || ''
+        }
+      ]
+    };
+
+    if (eDate) {
+      updatePayload.pointsExpiryDate = eDate;
+    }
+    if (sDate) {
+      updatePayload.pointsStartDate = sDate;
+    }
+
+    await updateDoc(customerRef, updatePayload);
+    return newPointsBalance;
+  };
+
   const addMarketingTemplate = async (template) => {
     const id = Date.now().toString();
     await setDoc(doc(db, 'marketing_templates', id), { ...template, id });
@@ -853,7 +948,10 @@ export const DataProvider = ({ children }) => {
       // Loyalty Program Functions
       calculateLoyaltyTier,
       redeemLoyaltyPoints,
-      addBirthdayBonus
+      addBirthdayBonus,
+      loyaltySettings,
+      updateLoyaltySettings,
+      addCustomLoyaltyPoints
     }}>
       {children}
     </DataContext.Provider>
