@@ -16,7 +16,7 @@ export default function AtelierFooter() {
         pt: 3,
         pb: 2.5,
         borderTop: '1px solid',
-        borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 118, 110, 0.12)',
+        borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.12)',
         color: 'text.secondary',
         fontSize: '0.8rem',
         '@media print': { display: 'none' }
@@ -78,7 +78,7 @@ export default function AtelierFooter() {
               fontWeight: 700,
               bgcolor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(15,118,110,0.06)',
               border: '1px solid',
-              borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(15,118,110,0.15)'
+              borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.15)'
             }}
           />
 
@@ -91,7 +91,7 @@ export default function AtelierFooter() {
               fontWeight: 700,
               bgcolor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(15,118,110,0.06)',
               border: '1px solid',
-              borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(15,118,110,0.15)'
+              borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.15)'
             }}
           />
 

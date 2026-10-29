@@ -615,7 +615,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                     </Typography>
 
                     <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', lineHeight: 1.3 }}>
-                      <b style={{ color: '#0F766E' }}>✂️ Tailoring:</b> 30-Day complimentary alterations
+                      <b style={{ color: (t) => t.palette.primary.main }}>✂️ Tailoring:</b> 30-Day complimentary alterations
                     </Typography>
 
                     <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', lineHeight: 1.3 }}>

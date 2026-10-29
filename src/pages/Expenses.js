@@ -260,7 +260,7 @@ const Expenses = () => {
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
                                     border: (t) => `1.5px solid ${t.palette.primary.dark}`,
-                                    bgcolor: 'rgba(15, 118, 110, 0.05)',
+                                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
                             }}
@@ -289,7 +289,7 @@ const Expenses = () => {
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
                                     border: (t) => `1.5px solid ${t.palette.primary.main}`,
-                                    bgcolor: 'rgba(15, 118, 110, 0.05)',
+                                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
                             }}
@@ -318,7 +318,7 @@ const Expenses = () => {
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
                                     border: (t) => `1.5px solid ${t.palette.primary.main}`,
-                                    bgcolor: 'rgba(15, 118, 110, 0.05)',
+                                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
                             }}
@@ -487,14 +487,14 @@ const Expenses = () => {
                 p: 0, 
                 overflow: 'hidden', 
                 borderRadius: '20px', 
-                border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.14)',
+                border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.14)',
                 boxShadow: (t) => t.palette.mode === 'dark' 
                     ? '0 10px 30px rgba(0, 0, 0, 0.4)' 
-                    : '0 10px 30px -10px rgba(15, 118, 110, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
+                    : '0 10px 30px -10px rgba(var(--primary-rgb, 15, 118, 110), 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
             }}>
                 <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
                     <Table size="small" sx={{ minWidth: 680 }}>
-                        <TableHead sx={{ bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(15, 118, 110, 0.04)' }}>
+                        <TableHead sx={{ bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }}>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
                                     <TableSortLabel active={orderBy === 'date'} direction={orderBy === 'date' ? order : 'asc'} onClick={() => handleRequestSort('date')}>
@@ -533,7 +533,7 @@ const Expenses = () => {
                                     <TableRow 
                                         key={exp.id} 
                                         hover
-                                        sx={{ '&:hover': { bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(15, 118, 110, 0.02)' } }}
+                                        sx={{ '&:hover': { bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.02)' } }}
                                     >
                                         <TableCell sx={{ py: 1.75 }}>
                                             <Typography variant="body2" sx={{ fontWeight: 600 }}>
@@ -577,8 +577,8 @@ const Expenses = () => {
                                                     gap: 0.75,
                                                     p: '3px 6px',
                                                     borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                                                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)',
-                                                    border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.12)'
+                                                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
+                                                    border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.12)'
                                                 }}
                                             >
                                                 <Tooltip title="Edit Expense">

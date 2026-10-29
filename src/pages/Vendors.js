@@ -325,10 +325,10 @@ const Vendors = () => {
                 p: 0, 
                 overflow: 'hidden', 
                 borderRadius: '20px', 
-                border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.14)',
+                border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.14)',
                 boxShadow: (t) => t.palette.mode === 'dark' 
                     ? '0 10px 30px rgba(0, 0, 0, 0.4)' 
-                    : '0 10px 30px -10px rgba(15, 118, 110, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
+                    : '0 10px 30px -10px rgba(var(--primary-rgb, 15, 118, 110), 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
             }}>
                 <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
                     <Table sx={{ minWidth: 680 }} stickyHeader>
@@ -339,7 +339,7 @@ const Vendors = () => {
                             '& th': {
                                 backdropFilter: 'blur(10px)',
                                 bgcolor: theme.palette.mode === 'dark' ? 'rgba(16, 32, 32, 0.92)' : 'rgba(255, 255, 255, 0.92)',
-                                borderBottom: theme.palette.mode === 'dark' ? '1.5px solid rgba(255, 255, 255, 0.1)' : '1.5px solid rgba(15, 118, 110, 0.15)'
+                                borderBottom: theme.palette.mode === 'dark' ? '1.5px solid rgba(255, 255, 255, 0.1)' : '1.5px solid rgba(var(--primary-rgb, 15, 118, 110), 0.15)'
                             }
                         }}>
                             <TableRow>
@@ -377,7 +377,7 @@ const Vendors = () => {
                                         <TableRow 
                                             key={vendor.id} 
                                             hover
-                                            sx={{ '&:hover': { bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(15, 118, 110, 0.02)' } }}
+                                            sx={{ '&:hover': { bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.02)' } }}
                                         >
                                             {/* Vendor Name & Firm */}
                                             <TableCell sx={{ py: 2 }}>
@@ -391,7 +391,7 @@ const Vendors = () => {
                                                             width: 42,
                                                             height: 42,
                                                             fontSize: '0.95rem',
-                                                            boxShadow: '0 4px 14px rgba(15, 118, 110, 0.25)',
+                                                            boxShadow: '0 4px 14px rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
                                                             border: '2px solid rgba(255, 255, 255, 0.9)'
                                                         }}
                                                     >
@@ -553,8 +553,8 @@ const Vendors = () => {
                                                         gap: 0.75,
                                                         p: '3px 6px',
                                                         borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                                                        bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)',
-                                                        border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.12)'
+                                                        bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
+                                                        border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.12)'
                                                     }}
                                                 >
                                                     <Tooltip title="Edit Vendor Details">

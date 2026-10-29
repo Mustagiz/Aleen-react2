@@ -152,11 +152,11 @@ export default function PosHoldCartToolbar({
                   fontSize: '0.72rem',
                   fontWeight: 700,
                   borderRadius: 2,
-                  borderColor: 'rgba(15, 118, 110, 0.25)',
+                  borderColor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
                   color: 'primary.main',
                   '&:hover': {
                     borderColor: 'primary.main',
-                    bgcolor: 'rgba(15, 118, 110, 0.05)'
+                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)'
                   }
                 }}
               >

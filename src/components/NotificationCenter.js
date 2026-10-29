@@ -186,11 +186,11 @@ const NotificationCenter = () => {
                         width: 36,
                         height: 36,
                         borderRadius: '9px',
-                        border: '1px solid rgba(15, 118, 110, 0.15)',
+                        border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.15)',
                         color: unreadCount > 0 ? '#0F766E' : 'text.primary',
                         bgcolor: unreadCount > 0 ? 'rgba(15, 118, 110, 0.06)' : 'transparent',
                         '&:hover': {
-                            bgcolor: 'rgba(15, 118, 110, 0.1)'
+                            bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)'
                         }
                     }}
                 >
@@ -227,8 +227,8 @@ const NotificationCenter = () => {
                         maxHeight: 480,
                         borderRadius: 3,
                         mt: 1.5,
-                        boxShadow: '0 16px 40px rgba(15, 118, 110, 0.15), 0 4px 16px rgba(0,0,0,0.08)',
-                        border: '1px solid rgba(15, 118, 110, 0.12)',
+                        boxShadow: '0 16px 40px rgba(var(--primary-rgb, 15, 118, 110), 0.15), 0 4px 16px rgba(0,0,0,0.08)',
+                        border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.12)',
                         overflow: 'hidden',
                         display: 'flex',
                         flexDirection: 'column'
@@ -282,11 +282,11 @@ const NotificationCenter = () => {
                                 fontSize: '0.72rem',
                                 fontWeight: 700,
                                 textTransform: 'none',
-                                color: '#0F766E',
+                                color: (t) => t.palette.primary.main,
                                 px: 1,
                                 py: 0.35,
                                 borderRadius: '6px',
-                                '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.08)' },
+                                '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)' },
                                 '&.Mui-disabled': { color: 'text.disabled' }
                             }}
                         >
@@ -359,7 +359,7 @@ const NotificationCenter = () => {
                                         py: 1.25,
                                         borderBottom: '1px solid',
                                         borderColor: 'divider',
-                                        bgcolor: notif.isRead ? 'transparent' : 'rgba(15, 118, 110, 0.04)',
+                                        bgcolor: notif.isRead ? 'transparent' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
                                         transition: 'background-color 0.15s ease',
                                         '&:hover': {
                                             bgcolor: notif.isRead ? 'action.hover' : 'rgba(15, 118, 110, 0.09)'
@@ -391,7 +391,7 @@ const NotificationCenter = () => {
                                                             width: 6,
                                                             height: 6,
                                                             borderRadius: '50%',
-                                                            bgcolor: '#0F766E'
+                                                            bgcolor: (t) => t.palette.primary.main
                                                         }}
                                                     />
                                                 )}
@@ -422,7 +422,7 @@ const NotificationCenter = () => {
                                             sx={{
                                                 ml: 1,
                                                 color: notif.isRead ? 'text.disabled' : '#0F766E',
-                                                '&:hover': { color: '#0F766E', bgcolor: 'rgba(15, 118, 110, 0.08)' }
+                                                '&:hover': { color: (t) => t.palette.primary.main, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)' }
                                             }}
                                         >
                                             {notif.isRead ? (
@@ -465,7 +465,7 @@ const NotificationCenter = () => {
                                 sx={{
                                     fontSize: '0.75rem',
                                     fontWeight: 700,
-                                    color: '#0F766E',
+                                    color: (t) => t.palette.primary.main,
                                     textTransform: 'none'
                                 }}
                             >

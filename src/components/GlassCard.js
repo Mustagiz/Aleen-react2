@@ -90,7 +90,7 @@ export default function GlassCard({ children, sx = {}, hover = false, glowColor 
                     background: isDark
                         ? 'radial-gradient(ellipse at 50% 0%, rgba(20, 184, 166, 0.08) 0%, rgba(12, 26, 25, 0.96) 85%)'
                         : 'rgba(255, 255, 255, 0.97)',
-                    border: isDark ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.14)',
+                    border: isDark ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.14)',
                     boxShadow: isDark
                         ? 'inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 32px rgba(0, 0, 0, 0.5)'
                         : 'inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 8px 24px -4px rgba(15, 118, 110, 0.07)',

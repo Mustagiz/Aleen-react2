@@ -442,7 +442,7 @@ const Dashboard = () => {
         ticks: { font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 }, color: '#94A3B8' }
       },
       y: {
-        grid: { borderDash: [4, 4], color: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(15, 118, 110, 0.08)', drawBorder: false },
+        grid: { borderDash: [4, 4], color: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)', drawBorder: false },
         ticks: { font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 }, color: '#94A3B8' }
       }
     }
@@ -487,7 +487,7 @@ const Dashboard = () => {
                   borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 6}px`
                 }}
               />
-              <Typography variant="caption" sx={{ color: isDark ? 'rgba(255, 255, 255, 0.75)' : 'text.secondary', fontWeight: 600 }}>
+              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.85)', fontWeight: 600 }}>
                 {profile.businessName || 'Aleen Clothing'} • CRM Studio
               </Typography>
             </Box>
@@ -505,7 +505,7 @@ const Dashboard = () => {
               {sysBanner.title}
             </Typography>
 
-            <Typography variant="body2" sx={{ color: isDark ? 'rgba(255, 255, 255, 0.82)' : 'text.secondary', mt: 0.8, maxWidth: 650, fontSize: '0.86rem' }}>
+            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.92)', mt: 0.8, maxWidth: 650, fontSize: '0.86rem' }}>
               Welcome back, <strong>{user?.name || user?.email?.split('@')[0] || 'Store Stylist'}</strong>. Live pulse of retail billing, custom bridal tailoring, and garment inventory.
             </Typography>
           </Box>

@@ -166,7 +166,7 @@ const InventoryReports = () => {
                 fontWeight: 700,
                 textTransform: 'none',
                 px: 2.5,
-                '&:hover': { bordercolor: (t) => t.palette.primary.main, bgcolor: 'rgba(15, 118, 110, 0.04)' }
+                '&:hover': { bordercolor: (t) => t.palette.primary.main, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }
               }}
             >
               CSV Export
@@ -182,7 +182,7 @@ const InventoryReports = () => {
                 fontWeight: 700,
                 textTransform: 'none',
                 px: 3,
-                boxShadow: '0 4px 14px rgba(15, 118, 110, 0.25)',
+                boxShadow: '0 4px 14px rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
                 '&:hover': {
                   background: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)'
                 }
@@ -245,10 +245,10 @@ const InventoryReports = () => {
           border: '1px solid',
           borderColor: 'divider',
           overflow: 'hidden',
-          boxShadow: '0 4px 20px -4px rgba(15, 118, 110, 0.08)'
+          boxShadow: '0 4px 20px -4px rgba(var(--primary-rgb, 15, 118, 110), 0.08)'
         }}
       >
-        <Box sx={{ borderBottom: '1px solid', borderColor: 'divider', px: 2, pt: 1, bgcolor: 'rgba(15, 118, 110, 0.02)' }}>
+        <Box sx={{ borderBottom: '1px solid', borderColor: 'divider', px: 2, pt: 1, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.02)' }}>
           <Tabs
             value={activeTab}
             onChange={(e, val) => { setActiveTab(val); setPage(0); }}
@@ -354,14 +354,14 @@ const InventoryReports = () => {
               {/* Table */}
               <TableContainer sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                 <Table>
-                  <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
+                  <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }}>
                     <TableRow>
-                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Creations / Item Details</TableCell>
-                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Category</TableCell>
-                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Specs</TableCell>
-                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Unit Price</TableCell>
-                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="center">Stock Level</TableCell>
-                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Asset Valuation</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: 'text.primary' }}>Creations / Item Details</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: 'text.primary' }}>Category</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: 'text.primary' }}>Specs</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: 'text.primary' }} align="right">Unit Price</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: 'text.primary' }} align="center">Stock Level</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: 'text.primary' }} align="right">Asset Valuation</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -375,7 +375,7 @@ const InventoryReports = () => {
                       filteredInventory
                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                         .map((item) => (
-                          <TableRow key={item.id} hover sx={{ '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.02)' } }}>
+                          <TableRow key={item.id} hover sx={{ '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.02)' } }}>
                             <TableCell>
                               <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>
                                 {item.name}
@@ -388,7 +388,7 @@ const InventoryReports = () => {
                               <Chip
                                 label={item.category || 'General'}
                                 size="small"
-                                sx={{ bgcolor: 'rgba(15, 118, 110, 0.08)', color: (t) => t.palette.primary.main, fontWeight: 700, fontSize: '0.72rem' }}
+                                sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)', color: (t) => t.palette.primary.main, fontWeight: 700, fontSize: '0.72rem' }}
                               />
                             </TableCell>
                             <TableCell sx={{ color: 'text.secondary', fontSize: '0.8rem' }}>
@@ -404,7 +404,7 @@ const InventoryReports = () => {
                                 sx={{
                                   fontWeight: 800,
                                   fontSize: '0.72rem',
-                                  bgcolor: item.quantity < 2 ? 'rgba(220, 38, 38, 0.1)' : item.quantity < 20 ? 'rgba(217, 119, 6, 0.1)' : 'rgba(15, 118, 110, 0.1)',
+                                  bgcolor: item.quantity < 2 ? 'rgba(220, 38, 38, 0.1)' : item.quantity < 20 ? 'rgba(217, 119, 6, 0.1)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
                                   color: item.quantity < 2 ? '#DC2626' : item.quantity < 20 ? '#D97706' : '#0F766E'
                                 }}
                               />
@@ -436,13 +436,13 @@ const InventoryReports = () => {
             <>
               <TableContainer sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                 <Table>
-                  <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
+                  <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }}>
                     <TableRow>
-                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Timestamp</TableCell>
-                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Garment Product</TableCell>
-                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="center">Adjustment</TableCell>
-                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="center">Updated Stock</TableCell>
-                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Reason / Operational Note</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: 'text.primary' }}>Timestamp</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: 'text.primary' }}>Garment Product</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: 'text.primary' }} align="center">Adjustment</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: 'text.primary' }} align="center">Updated Stock</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: 'text.primary' }}>Reason / Operational Note</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -456,7 +456,7 @@ const InventoryReports = () => {
                       sortedLogs
                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                         .map((log) => (
-                          <TableRow key={log.id} hover sx={{ '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.02)' } }}>
+                          <TableRow key={log.id} hover sx={{ '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.02)' } }}>
                             <TableCell sx={{ fontSize: '0.825rem' }}>
                               <Typography variant="body2" sx={{ fontWeight: 700 }}>
                                 {new Date(log.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
@@ -473,7 +473,7 @@ const InventoryReports = () => {
                                 label={`${log.change > 0 ? '+' : ''}${log.change}`}
                                 size="small"
                                 sx={{
-                                  bgcolor: log.change > 0 ? 'rgba(15, 118, 110, 0.1)' : 'rgba(220, 38, 38, 0.1)',
+                                  bgcolor: log.change > 0 ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)' : 'rgba(220, 38, 38, 0.1)',
                                   color: log.change > 0 ? '#0F766E' : '#DC2626',
                                   fontWeight: 800,
                                   fontSize: '0.75rem'
@@ -517,13 +517,13 @@ const InventoryReports = () => {
 
               <TableContainer sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                 <Table>
-                  <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
+                  <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }}>
                     <TableRow>
-                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Creations / Item Details</TableCell>
-                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Category</TableCell>
-                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="center">Current Stock</TableCell>
-                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Unit Price</TableCell>
-                      <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Tied-Up Capital</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: 'text.primary' }}>Creations / Item Details</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: 'text.primary' }}>Category</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: 'text.primary' }} align="center">Current Stock</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: 'text.primary' }} align="right">Unit Price</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: 'text.primary' }} align="right">Tied-Up Capital</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -535,7 +535,7 @@ const InventoryReports = () => {
                       </TableRow>
                     ) : (
                       slowMovingItems.map((item) => (
-                        <TableRow key={item.id} hover sx={{ '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.02)' } }}>
+                        <TableRow key={item.id} hover sx={{ '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.02)' } }}>
                           <TableCell>
                             <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.name}</Typography>
                             <Typography variant="caption" sx={{ color: 'text.secondary', fontFamily: 'monospace', textTransform: 'uppercase' }}>

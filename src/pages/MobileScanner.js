@@ -245,7 +245,7 @@ export default function MobileScanner() {
         <Box
             sx={{
                 minHeight: '100vh',
-                bgcolor: '#042F2E',
+                bgcolor: 'text.primary',
                 color: '#FFFFFF',
                 display: 'flex',
                 flexDirection: 'column',
@@ -430,7 +430,7 @@ export default function MobileScanner() {
                                 color: '#FFFFFF',
                                 borderRadius: 2.5,
                                 px: 3,
-                                '&:hover': { bgcolor: '#042F2E' }
+                                '&:hover': { bgcolor: 'text.primary' }
                             }}
                         >
                             Grant Camera Permission

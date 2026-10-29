@@ -324,7 +324,7 @@ const PaymentSummary = () => {
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
                                     border: (t) => `1.5px solid ${t.palette.primary.dark}`,
-                                    bgcolor: 'rgba(15, 118, 110, 0.05)',
+                                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
                             }}
@@ -353,7 +353,7 @@ const PaymentSummary = () => {
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
                                     border: (t) => `1.5px solid ${t.palette.primary.dark}`,
-                                    bgcolor: 'rgba(15, 118, 110, 0.05)',
+                                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
                             }}
@@ -382,7 +382,7 @@ const PaymentSummary = () => {
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
                                     border: (t) => `1.5px solid ${t.palette.primary.dark}`,
-                                    bgcolor: 'rgba(15, 118, 110, 0.05)',
+                                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
                             }}
@@ -444,7 +444,7 @@ const PaymentSummary = () => {
                     height: 40,
                     boxSizing: 'border-box',
                     borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                    border: '1.5px solid rgba(15, 118, 110, 0.25)',
+                    border: '1.5px solid rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
                     boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
                 }}>
                     {[
@@ -470,11 +470,11 @@ const PaymentSummary = () => {
                                     fontWeight: 700,
                                     fontSize: '0.82rem',
                                     color: isSelected ? '#FFFFFF' : 'text.secondary',
-                                    bgcolor: isSelected ? '#0F766E' : 'transparent',
+                                    bgcolor: isSelected ? 'primary.main' : 'transparent',
                                     boxShadow: isSelected ? '0 2px 8px rgba(15, 118, 110, 0.28)' : 'none',
                                     transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                                     '&:hover': {
-                                        bgcolor: isSelected ? '#042F2E' : 'rgba(15, 118, 110, 0.08)'
+                                        bgcolor: isSelected ? '#042F2E' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)'
                                     }
                                 }}
                             >
@@ -605,7 +605,7 @@ const PaymentSummary = () => {
                                     borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                     bgcolor: 'background.paper',
                                     fontSize: '0.84rem',
-                                    '& fieldset': { borderColor: 'rgba(15, 118, 110, 0.25)' },
+                                    '& fieldset': { borderColor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.25)' },
                                     '&:hover fieldset': { bordercolor: (t) => t.palette.primary.main },
                                     '&.Mui-focused fieldset': { bordercolor: (t) => t.palette.primary.main, borderWidth: 1.5 }
                                 }
@@ -629,7 +629,7 @@ const PaymentSummary = () => {
                                     borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                     bgcolor: 'background.paper',
                                     fontSize: '0.84rem',
-                                    '& fieldset': { borderColor: 'rgba(15, 118, 110, 0.25)' },
+                                    '& fieldset': { borderColor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.25)' },
                                     '&:hover fieldset': { bordercolor: (t) => t.palette.primary.main },
                                     '&.Mui-focused fieldset': { bordercolor: (t) => t.palette.primary.main, borderWidth: 1.5 }
                                 }
@@ -665,7 +665,7 @@ const PaymentSummary = () => {
                                     transition: 'all 0.15s ease',
                                     '&:hover': {
                                         border: (t) => `1.5px solid ${t.palette.primary.main}`,
-                                        bgcolor: 'rgba(15, 118, 110, 0.05)',
+                                        bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
                                         transform: 'translateY(-1px)'
                                     }
                                 }}
@@ -682,10 +682,10 @@ const PaymentSummary = () => {
                 p: 0, 
                 overflow: 'hidden', 
                 borderRadius: '20px', 
-                border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.14)',
+                border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.14)',
                 boxShadow: (t) => t.palette.mode === 'dark' 
                     ? '0 10px 30px rgba(0, 0, 0, 0.4)' 
-                    : '0 10px 30px -10px rgba(15, 118, 110, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
+                    : '0 10px 30px -10px rgba(var(--primary-rgb, 15, 118, 110), 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
             }}>
                 <TableContainer sx={{ maxHeight: 680 }}>
                     <Table size="small" stickyHeader>
@@ -696,7 +696,7 @@ const PaymentSummary = () => {
                             '& th': {
                                 backdropFilter: 'blur(10px)',
                                 bgcolor: theme.palette.mode === 'dark' ? 'rgba(16, 32, 32, 0.92)' : 'rgba(255, 255, 255, 0.92)',
-                                borderBottom: theme.palette.mode === 'dark' ? '1.5px solid rgba(255, 255, 255, 0.1)' : '1.5px solid rgba(15, 118, 110, 0.15)'
+                                borderBottom: theme.palette.mode === 'dark' ? '1.5px solid rgba(255, 255, 255, 0.1)' : '1.5px solid rgba(var(--primary-rgb, 15, 118, 110), 0.15)'
                             }
                         }}>
                             <TableRow>
@@ -729,7 +729,7 @@ const PaymentSummary = () => {
                                         <TableRow 
                                             key={`${txn.id}-${index}`} 
                                             hover
-                                            sx={{ '&:hover': { bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(15, 118, 110, 0.02)' } }}
+                                            sx={{ '&:hover': { bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.02)' } }}
                                         >
                                             <TableCell sx={{ py: 1.75 }}>
                                                 <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary', fontFamily: 'monospace' }}>
@@ -746,7 +746,7 @@ const PaymentSummary = () => {
                                             </TableCell>
                                             <TableCell sx={{ py: 1.75 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                    <Avatar sx={{ width: 26, height: 26, fontSize: '0.7rem', bgcolor: 'rgba(15, 118, 110, 0.1)', color: (t) => t.palette.primary.main, fontWeight: 800 }}>
+                                                    <Avatar sx={{ width: 26, height: 26, fontSize: '0.7rem', bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main, fontWeight: 800 }}>
                                                         {(txn.customer || 'G').charAt(0).toUpperCase()}
                                                     </Avatar>
                                                     <Typography variant="body2" sx={{ fontWeight: 600 }}>

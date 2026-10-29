@@ -233,7 +233,7 @@ const ProfitLoss = () => {
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
                                     border: (t) => `1.5px solid ${t.palette.primary.dark}`,
-                                    bgcolor: 'rgba(15, 118, 110, 0.05)',
+                                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
                             }}
@@ -445,12 +445,12 @@ const ProfitLoss = () => {
                     <Chip 
                         label={`${profitData.length} Line Items`} 
                         size="small" 
-                        sx={{ fontWeight: 700, bgcolor: 'rgba(15, 118, 110, 0.1)', color: (t) => t.palette.primary.main }}
+                        sx={{ fontWeight: 700, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main }}
                     />
                 </Box>
                 <TableContainer>
                     <Table size="small">
-                        <TableHead sx={{ bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(15, 118, 110, 0.04)' }}>
+                        <TableHead sx={{ bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }}>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
                                     Invoice Ref
@@ -489,7 +489,7 @@ const ProfitLoss = () => {
                                             <TableRow 
                                                 key={idx} 
                                                 hover
-                                                sx={{ '&:hover': { bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(15, 118, 110, 0.02)' } }}
+                                                sx={{ '&:hover': { bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.02)' } }}
                                             >
                                                 <TableCell sx={{ py: 1.75 }}>
                                                     <Typography variant="body2" sx={{ fontWeight: 800, fontFamily: 'monospace' }}>

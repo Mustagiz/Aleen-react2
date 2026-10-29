@@ -18,7 +18,7 @@ const SILHOUETTES = {
   lehenga: { label: 'Lehenga', icon: Face3, color: '#D97706' },
   shawl: { label: 'Shawl', icon: Checkroom, color: '#059669' },
   abaya: { label: 'Haute Abaya', icon: Checkroom, color: '#7C3AED' },
-  blazer: { label: 'Couture Blazer', icon: DryCleaning, color: '#0F766E' },
+  blazer: { label: 'Couture Blazer', icon: DryCleaning, color: (t) => t.palette.primary.main },
   shirt: { label: 'Tailored Shirt', icon: Checkroom, color: '#2563EB' }
 };
 
@@ -54,11 +54,11 @@ export default function GarmentSilhouetteBadge({
           flexShrink: 0,
           background: isDark
             ? 'rgba(255, 255, 255, 0.05)'
-            : 'rgba(15, 118, 110, 0.04)',
+            : 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
           border: '1px solid',
           borderColor: isDark
             ? 'rgba(255, 255, 255, 0.1)'
-            : 'rgba(15, 118, 110, 0.15)',
+            : 'rgba(var(--primary-rgb, 15, 118, 110), 0.15)',
           ...sx
         }}
       >

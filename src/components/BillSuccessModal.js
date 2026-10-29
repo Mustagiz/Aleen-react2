@@ -356,8 +356,8 @@ const BillSuccessModal = ({
                   width: 40,
                   height: 40,
                   borderRadius: 2,
-                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(15,118,110,0.2)' : 'rgba(15,118,110,0.1)',
-                  color: '#0F766E',
+                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.2)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
+                  color: (t) => t.palette.primary.main,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -387,7 +387,7 @@ const BillSuccessModal = ({
                 variant="h6"
                 sx={{
                   fontWeight: 900,
-                  color: '#0F766E',
+                  color: (t) => t.palette.primary.main,
                   fontFamily: 'Inter, -apple-system, sans-serif',
                   letterSpacing: '-0.02em'
                 }}
@@ -405,7 +405,7 @@ const BillSuccessModal = ({
               borderRadius: 3,
               border: '1.5px solid',
               borderColor: '#0F766E',
-              bgcolor: theme.palette.mode === 'dark' ? 'rgba(15, 118, 110, 0.08)' : '#F0FDFA',
+              bgcolor: theme.palette.mode === 'dark' ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)' : '#F0FDFA',
               display: 'flex',
               flexDirection: 'column',
               gap: 1.75
@@ -418,7 +418,7 @@ const BillSuccessModal = ({
                     width: 32,
                     height: 32,
                     borderRadius: '50%',
-                    bgcolor: '#0F766E',
+                    bgcolor: (t) => t.palette.primary.main,
                     color: '#FFFFFF',
                     display: 'flex',
                     alignItems: 'center',
@@ -450,7 +450,7 @@ const BillSuccessModal = ({
                       fontSize: '0.72rem',
                       fontWeight: 700,
                       textTransform: 'none',
-                      color: '#0F766E',
+                      color: (t) => t.palette.primary.main,
                       p: 0.5
                     }}
                   >
@@ -476,13 +476,13 @@ const BillSuccessModal = ({
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Phone sx={{ color: '#0F766E', fontSize: 20 }} />
+                    <Phone sx={{ color: (t) => t.palette.primary.main, fontSize: 20 }} />
                   </InputAdornment>
                 ),
                 endAdornment: (
                   <InputAdornment position="end">
                     <Tooltip title="Copy direct customer PDF bill link">
-                      <IconButton size="small" onClick={handleCopyBillLink} sx={{ color: '#0F766E' }}>
+                      <IconButton size="small" onClick={handleCopyBillLink} sx={{ color: 'primary.main' }}>
                         <LinkIcon fontSize="small" sx={{ fontSize: 18 }} />
                       </IconButton>
                     </Tooltip>
@@ -611,11 +611,11 @@ const BillSuccessModal = ({
                     textTransform: 'none',
                     fontWeight: 700,
                     fontSize: '0.74rem',
-                    color: '#0F766E',
+                    color: (t) => t.palette.primary.main,
                     bgcolor: 'rgba(15, 118, 110, 0.06)',
                     borderRadius: 1.5,
                     py: 0.6,
-                    '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.12)' }
+                    '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.12)' }
                   }}
                 >
                   Copy Bill Link
@@ -675,7 +675,7 @@ const BillSuccessModal = ({
               <Button
                 variant="outlined"
                 size="small"
-                startIcon={<Print sx={{ color: '#0F766E', fontSize: 16 }} />}
+                startIcon={<Print sx={{ color: (t) => t.palette.primary.main, fontSize: 16 }} />}
                 onClick={() => {
                   const el = document.getElementById('bill-success-thermal-80mm');
                   if (el) {
@@ -701,7 +701,7 @@ const BillSuccessModal = ({
                   gap: 0.3,
                   '&:hover': {
                     borderColor: '#0F766E',
-                    bgcolor: 'rgba(15, 118, 110, 0.05)'
+                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)'
                   }
                 }}
               >
@@ -842,7 +842,7 @@ const BillSuccessModal = ({
                 }}
                 sx={{
                   fontWeight: 700,
-                  color: '#0F766E',
+                  color: (t) => t.palette.primary.main,
                   textTransform: 'none',
                   fontSize: '0.84rem'
                 }}

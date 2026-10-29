@@ -1298,7 +1298,7 @@ export default function BarcodeGenerator() {
                                     <Chip
                                         size="small"
                                         label={`Sale: ${settings.currencySymbol || '₹'}${(sampleProduct.customPrice !== undefined ? sampleProduct.customPrice : sampleProduct.price || 0).toLocaleString('en-IN')}`}
-                                        sx={{ height: 20, fontSize: '0.68rem', fontWeight: 800, bgcolor: 'rgba(15, 118, 110, 0.1)', color: (t) => t.palette.primary.main }}
+                                        sx={{ height: 20, fontSize: '0.68rem', fontWeight: 800, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main }}
                                     />
                                     {settings.showMrp && (
                                         <Chip
@@ -1519,9 +1519,9 @@ export default function BarcodeGenerator() {
                                     height: 24,
                                     fontSize: '0.75rem',
                                     fontWeight: 700,
-                                    bgcolor: 'rgba(15, 118, 110, 0.1)',
+                                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
                                     color: (t) => t.palette.primary.main,
-                                    border: '1px solid rgba(15, 118, 110, 0.25)'
+                                    border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.25)'
                                 }}
                             />
                         ))
@@ -1620,12 +1620,12 @@ export default function BarcodeGenerator() {
                                 width: 34,
                                 height: 34,
                                 borderRadius: 2,
-                                bgcolor: 'rgba(15, 118, 110, 0.1)',
+                                bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
                                 color: (t) => t.palette.primary.main,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                border: '1px solid rgba(15, 118, 110, 0.2)'
+                                border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.2)'
                             }}>
                                 <Inventory2 sx={{ fontSize: 19 }} />
                             </Box>
@@ -1643,7 +1643,7 @@ export default function BarcodeGenerator() {
                                 label="10 items per page"
                                 size="small"
                                 sx={{
-                                    bgcolor: 'rgba(15, 118, 110, 0.08)',
+                                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)',
                                     color: (t) => t.palette.primary.main,
                                     fontWeight: 700,
                                     fontSize: '0.68rem',
@@ -1665,7 +1665,7 @@ export default function BarcodeGenerator() {
                         <Table size="small">
                             <TableHead sx={{
                                 background: 'linear-gradient(180deg, #F0FDF4 0%, #E6F4F1 100%)',
-                                borderBottom: '2px solid rgba(15, 118, 110, 0.15)'
+                                borderBottom: '2px solid rgba(var(--primary-rgb, 15, 118, 110), 0.15)'
                             }}>
                                 <TableRow>
                                     <TableCell padding="checkbox" sx={{ py: 1.2 }}>
@@ -1733,13 +1733,13 @@ export default function BarcodeGenerator() {
                                                 key={item.id}
                                                 hover
                                                 sx={{
-                                                    bgcolor: isSelected ? 'rgba(15, 118, 110, 0.05)' : index % 2 === 1 ? 'rgba(248, 250, 252, 0.7)' : '#FFFFFF',
+                                                    bgcolor: isSelected ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)' : index % 2 === 1 ? 'rgba(248, 250, 252, 0.7)' : '#FFFFFF',
                                                     borderLeft: isSelected ? '4px solid #0F766E' : '4px solid transparent',
                                                     transition: 'all 0.18s ease',
                                                     cursor: 'pointer',
                                                     '&:hover': {
                                                         bgcolor: 'rgba(15, 118, 110, 0.06) !important',
-                                                        boxShadow: 'inset 0 0 0 1px rgba(15, 118, 110, 0.1)'
+                                                        boxShadow: 'inset 0 0 0 1px rgba(var(--primary-rgb, 15, 118, 110), 0.1)'
                                                     }
                                                 }}
                                                 onClick={() => handleToggleProduct(item)}
@@ -1758,7 +1758,7 @@ export default function BarcodeGenerator() {
                                                             width: 30,
                                                             height: 30,
                                                             borderRadius: 1.5,
-                                                            bgcolor: isSelected ? '#0F766E' : 'rgba(15, 118, 110, 0.08)',
+                                                            bgcolor: isSelected ? '#0F766E' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)',
                                                             color: isSelected ? '#FFFFFF' : '#0F766E',
                                                             display: 'flex',
                                                             alignItems: 'center',
@@ -1766,7 +1766,7 @@ export default function BarcodeGenerator() {
                                                             fontSize: '0.74rem',
                                                             fontWeight: 800,
                                                             flexShrink: 0,
-                                                            border: '1px solid rgba(15, 118, 110, 0.15)'
+                                                            border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.15)'
                                                         }}>
                                                             {item.name ? item.name.charAt(0).toUpperCase() : 'G'}
                                                         </Box>
@@ -1791,8 +1791,8 @@ export default function BarcodeGenerator() {
                                                         px: 1,
                                                         py: 0.35,
                                                         borderRadius: 1.5,
-                                                        bgcolor: 'rgba(15, 118, 110, 0.08)',
-                                                        border: '1px solid rgba(15, 118, 110, 0.2)',
+                                                        bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)',
+                                                        border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.2)',
                                                         fontFamily: '"JetBrains Mono", monospace',
                                                         fontWeight: 800,
                                                         fontSize: '0.76rem',
@@ -1961,8 +1961,8 @@ export default function BarcodeGenerator() {
                                     textTransform: 'none',
                                     color: (t) => t.palette.primary.main,
                                     bordercolor: (t) => t.palette.primary.main,
-                                    bgcolor: 'rgba(15, 118, 110, 0.04)',
-                                    '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.1)', borderColor: '#042F2E' }
+                                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
+                                    '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', borderColor: (t) => t.palette.primary.dark }
                                 }}
                             >
                                 Preview Stickers
@@ -2041,10 +2041,10 @@ export default function BarcodeGenerator() {
                                             borderColor: isCurrentPreview ? '#0F766E' : 'divider',
                                             borderWidth: isCurrentPreview ? 1.5 : 1,
                                             transition: 'all 0.15s ease-in-out',
-                                            bgcolor: isCurrentPreview ? 'rgba(15, 118, 110, 0.02)' : 'background.paper',
+                                            bgcolor: isCurrentPreview ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.02)' : 'background.paper',
                                             '&:hover': {
                                                 bordercolor: (t) => t.palette.primary.main,
-                                                boxShadow: '0 4px 14px rgba(15,118,110,0.1)'
+                                                boxShadow: '0 4px 14px rgba(var(--primary-rgb, 15, 118, 110), 0.1)'
                                             }
                                         }}
                                     >
@@ -2092,8 +2092,8 @@ export default function BarcodeGenerator() {
                                                             }}
                                                             sx={{
                                                                 color: (t) => t.palette.primary.main,
-                                                                bgcolor: 'rgba(15, 118, 110, 0.08)',
-                                                                '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.2)' }
+                                                                bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)',
+                                                                '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.2)' }
                                                             }}
                                                         >
                                                             <Visibility fontSize="small" />
@@ -2220,7 +2220,7 @@ export default function BarcodeGenerator() {
                                                             bgcolor: currentDiscount === d ? '#0F766E' : 'rgba(0,0,0,0.04)',
                                                             color: currentDiscount === d ? '#FFFFFF' : 'text.primary',
                                                             '&:hover': {
-                                                                bgcolor: currentDiscount === d ? '#115E59' : 'rgba(15,118,110,0.1)'
+                                                                bgcolor: currentDiscount === d ? '#115E59' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)'
                                                             }
                                                         }}
                                                     />
@@ -2496,7 +2496,7 @@ export default function BarcodeGenerator() {
                                 settings.template === 'thermal_single' ? 'Thermal Roll' : 'A4 Sheet Label'
                             }
                             size="small"
-                            sx={{ bgcolor: 'rgba(15, 118, 110, 0.1)', color: (t) => t.palette.primary.main, fontWeight: 700, fontSize: '0.72rem' }}
+                            sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main, fontWeight: 700, fontSize: '0.72rem' }}
                         />
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                             <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', mr: 0.5 }}>
@@ -2575,7 +2575,7 @@ export default function BarcodeGenerator() {
                                         <Chip
                                             label={`${sampleProduct.labelCount} stickers`}
                                             size="small"
-                                            sx={{ bgcolor: 'rgba(15,118,110,0.1)', color: (t) => t.palette.primary.main, fontWeight: 700 }}
+                                            sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main, fontWeight: 700 }}
                                         />
                                     )}
                                 </Box>
@@ -2701,7 +2701,7 @@ export default function BarcodeGenerator() {
                             fontWeight: 700,
                             textTransform: 'none',
                             bgcolor: (t) => t.palette.primary.main,
-                            '&:hover': { bgcolor: '#042F2E' }
+                            '&:hover': { bgcolor: 'text.primary' }
                         }}
                     >
                         Done

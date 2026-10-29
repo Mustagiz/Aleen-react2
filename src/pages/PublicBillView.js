@@ -302,7 +302,7 @@ const PublicBillView = () => {
     return (
       <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', bgcolor: '#F8FAFC', p: 3 }}>
         <CircularProgress sx={{ color: (t) => t.palette.primary.main, mb: 2 }} />
-        <Typography variant="h6" sx={{ fontWeight: 800, color: '#042F2E' }}>
+        <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary' }}>
           Loading Your Official E-Bill...
         </Typography>
         <Typography variant="body2" color="text.secondary">
@@ -664,7 +664,7 @@ const PublicBillView = () => {
                   borderRadius: 2.5,
                   textTransform: 'none',
                   boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
-                  '&:hover': { bgcolor: '#042F2E' }
+                  '&:hover': { bgcolor: 'text.primary' }
                 }}
               >
                 Pay via UPI App
@@ -698,8 +698,8 @@ const PublicBillView = () => {
               p: 1.5,
               px: 2,
               borderRadius: 2.5,
-              bgcolor: 'rgba(15, 118, 110, 0.08)',
-              border: '1px solid rgba(15, 118, 110, 0.2)',
+              bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)',
+              border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.2)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
@@ -807,7 +807,7 @@ const PublicBillView = () => {
                 borderRadius: 3,
                 bgcolor: '#FFFFFF',
                 border: '2px solid #0F766E',
-                boxShadow: '0 10px 30px rgba(15, 118, 110, 0.15)',
+                boxShadow: '0 10px 30px rgba(var(--primary-rgb, 15, 118, 110), 0.15)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -879,7 +879,7 @@ const PublicBillView = () => {
                   bgcolor: copiedVpa ? '#0F766E' : 'transparent',
                   bordercolor: (t) => t.palette.primary.main,
                   color: copiedVpa ? '#FFFFFF' : '#0F766E',
-                  '&:hover': { bgcolor: copiedVpa ? '#042F2E' : 'rgba(15, 118, 110, 0.08)' }
+                  '&:hover': { bgcolor: copiedVpa ? '#042F2E' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)' }
                 }}
               >
                 {copiedVpa ? 'Copied!' : 'Copy'}
@@ -901,7 +901,7 @@ const PublicBillView = () => {
                 textTransform: 'none',
                 mb: 1.5,
                 boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
-                '&:hover': { bgcolor: '#042F2E' }
+                '&:hover': { bgcolor: 'text.primary' }
               }}
             >
               Launch UPI App Now

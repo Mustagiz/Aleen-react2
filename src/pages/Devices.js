@@ -542,7 +542,7 @@ export default function Devices() {
                                 fontWeight: 700,
                                 textTransform: 'none',
                                 px: 2.5,
-                                '&:hover': { borderColor: '#042F2E', bgcolor: 'rgba(15, 118, 110, 0.06)' }
+                                '&:hover': { borderColor: (t) => t.palette.primary.dark, bgcolor: 'rgba(15, 118, 110, 0.06)' }
                             }}
                         >
                             Open Camera Scanner
@@ -576,7 +576,7 @@ export default function Devices() {
                                 fontWeight: 700,
                                 textTransform: 'none',
                                 px: 3,
-                                boxShadow: '0 4px 14px rgba(15, 118, 110, 0.25)',
+                                boxShadow: '0 4px 14px rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
                                 '&:hover': {
                                     background: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)'
                                 }
@@ -649,7 +649,7 @@ export default function Devices() {
                     >
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5 }}>
                             <Box>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                     Paired Devices & Scanners ({devices.length})
                                 </Typography>
                                 <Typography variant="caption" color="text.secondary">
@@ -732,7 +732,7 @@ export default function Devices() {
                                                         width: 46,
                                                         height: 46,
                                                         bgcolor: isConnected 
-                                                            ? (device.type === 'phone_camera' ? 'rgba(217, 119, 6, 0.12)' : 'rgba(15, 118, 110, 0.12)')
+                                                            ? (device.type === 'phone_camera' ? 'rgba(217, 119, 6, 0.12)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.12)')
                                                             : 'rgba(0,0,0,0.06)',
                                                         color: isConnected 
                                                             ? (device.type === 'phone_camera' ? '#D97706' : '#0F766E')
@@ -753,7 +753,7 @@ export default function Devices() {
                                                                 height: 20,
                                                                 fontSize: '0.68rem',
                                                                 fontWeight: 800,
-                                                                bgcolor: isConnected ? 'rgba(15, 118, 110, 0.1)' : 'rgba(0,0,0,0.08)',
+                                                                bgcolor: isConnected ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)' : 'rgba(0,0,0,0.08)',
                                                                 color: isConnected ? '#0F766E' : 'text.secondary'
                                                             }}
                                                         />
@@ -890,7 +890,7 @@ export default function Devices() {
                     >
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                             <Box>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                     Interactive Scan Test Bench
                                 </Typography>
                                 <Typography variant="caption" color="text.secondary">
@@ -961,7 +961,7 @@ export default function Devices() {
                                                     fontWeight: 700,
                                                     borderRadius: 2,
                                                     bgcolor: (t) => t.palette.primary.main,
-                                                    '&:hover': { bgcolor: '#042F2E' }
+                                                    '&:hover': { bgcolor: 'text.primary' }
                                                 }}
                                             >
                                                 Test
@@ -981,8 +981,8 @@ export default function Devices() {
                                     sx={{
                                         p: 2.5,
                                         borderRadius: 3,
-                                        bgcolor: 'rgba(15, 118, 110, 0.05)',
-                                        border: '1px solid rgba(15, 118, 110, 0.25)'
+                                        bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
+                                        border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.25)'
                                     }}
                                 >
                                     <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 1.5 }}>
@@ -993,7 +993,7 @@ export default function Devices() {
                                                 size="small"
                                                 sx={{ bgcolor: 'rgba(5, 150, 105, 0.1)', color: '#059669', fontWeight: 800, mb: 1 }}
                                             />
-                                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                                 {lastScannedResult.item.name}
                                             </Typography>
                                             <Typography variant="caption" color="text.secondary">
@@ -1017,7 +1017,7 @@ export default function Devices() {
                                                 fontWeight: 700,
                                                 textTransform: 'none',
                                                 bgcolor: (t) => t.palette.primary.main,
-                                                '&:hover': { bgcolor: '#042F2E' }
+                                                '&:hover': { bgcolor: 'text.primary' }
                                             }}
                                         >
                                             Ring Up in Billing
@@ -1111,7 +1111,7 @@ export default function Devices() {
 
                             <TableContainer sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, maxHeight: 220 }}>
                                 <Table size="small">
-                                    <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
+                                    <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }}>
                                         <TableRow>
                                             <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem' }}>Timestamp</TableCell>
                                             <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem' }}>Barcode / QR</TableCell>
@@ -1165,10 +1165,10 @@ export default function Devices() {
             >
                 <DialogTitle sx={{
                     fontWeight: 800,
-                    bgcolor: 'rgba(15, 118, 110, 0.04)',
+                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
                     borderBottom: '1px solid',
                     borderColor: 'divider',
-                    color: '#042F2E',
+                    color: 'text.primary',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between'
@@ -1234,7 +1234,7 @@ export default function Devices() {
                                     bgcolor: (t) => t.palette.primary.main,
                                     color: '#FFFFFF',
                                     py: 1.2,
-                                    '&:hover': { bgcolor: '#042F2E' }
+                                    '&:hover': { bgcolor: 'text.primary' }
                                 }}
                             >
                                 Open Phone Camera (Continuity Bluetooth)
@@ -1276,7 +1276,7 @@ export default function Devices() {
                     >
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                             <Bluetooth sx={{ color: (t) => t.palette.primary.main, fontSize: 24 }} />
-                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                 Pair Hardware Scanner Gun / Ring Scanner
                             </Typography>
                         </Box>
@@ -1291,7 +1291,7 @@ export default function Devices() {
                                         Scanning for nearby hardware scanners...
                                     </Typography>
                                 </Box>
-                                <LinearProgress sx={{ borderRadius: 2, height: 6, bgcolor: 'rgba(15, 118, 110, 0.1)', '& .MuiLinearProgress-bar': { bgcolor: (t) => t.palette.primary.main } }} />
+                                <LinearProgress sx={{ borderRadius: 2, height: 6, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', '& .MuiLinearProgress-bar': { bgcolor: (t) => t.palette.primary.main } }} />
                             </Box>
                         )}
 
@@ -1315,7 +1315,7 @@ export default function Devices() {
                                 color: '#FFFFFF',
                                 py: 1.2,
                                 mb: 2,
-                                '&:hover': { bgcolor: '#042F2E' }
+                                '&:hover': { bgcolor: 'text.primary' }
                             }}
                         >
                             {isScanningBluetooth ? 'Searching...' : 'Search for Hardware Scanner (Bluetooth)'}
@@ -1408,7 +1408,7 @@ export default function Devices() {
                     bgcolor: 'rgba(217, 119, 6, 0.05)',
                     borderBottom: '1px solid',
                     borderColor: 'divider',
-                    color: '#042F2E',
+                    color: 'text.primary',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between'
@@ -1432,7 +1432,7 @@ export default function Devices() {
                         borderRadius: 3,
                         border: '2px solid #0F766E',
                         bgcolor: '#FFFFFF',
-                        boxShadow: '0 8px 24px rgba(15, 118, 110, 0.15)',
+                        boxShadow: '0 8px 24px rgba(var(--primary-rgb, 15, 118, 110), 0.15)',
                         mb: 2.5
                     }}>
                         <img
@@ -1443,8 +1443,8 @@ export default function Devices() {
                     </Box>
 
                     {/* Step by Step Guide */}
-                    <Box sx={{ textAlign: 'left', p: 2, bgcolor: 'rgba(15, 118, 110, 0.04)', borderRadius: 2.5, mb: 2.5 }}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1, color: '#042F2E' }}>
+                    <Box sx={{ textAlign: 'left', p: 2, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)', borderRadius: 2.5, mb: 2.5 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1, color: 'text.primary' }}>
                             How to pair your phone:
                         </Typography>
                         <Typography variant="caption" sx={{ display: 'block', mb: 0.5 }}>
@@ -1464,7 +1464,7 @@ export default function Devices() {
                             <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary' }}>
                                 Computer Wi-Fi Address:
                             </Typography>
-                            <Chip label={networkHost} size="small" sx={{ fontWeight: 700, fontSize: '0.72rem', bgcolor: 'rgba(15, 118, 110, 0.1)', color: (t) => t.palette.primary.main }} />
+                            <Chip label={networkHost} size="small" sx={{ fontWeight: 700, fontSize: '0.72rem', bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main }} />
                         </Box>
                         <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
                             Ensure your smartphone is connected to the same Wi-Fi network as this register.
@@ -1552,10 +1552,10 @@ export default function Devices() {
             >
                 <DialogTitle sx={{
                     fontWeight: 800,
-                    bgcolor: 'rgba(15, 118, 110, 0.05)',
+                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
                     borderBottom: '1px solid',
                     borderColor: 'divider',
-                    color: '#042F2E',
+                    color: 'text.primary',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between'
@@ -1647,8 +1647,8 @@ export default function Devices() {
                         </Box>
                     )}
 
-                    <Alert severity="info" sx={{ mb: 2, borderRadius: 2, bgcolor: 'rgba(15, 118, 110, 0.06)', border: '1px solid rgba(15, 118, 110, 0.2)' }}>
-                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#042F2E', display: 'block', mb: 0.3 }}>
+                    <Alert severity="info" sx={{ mb: 2, borderRadius: 2, bgcolor: 'rgba(15, 118, 110, 0.06)', border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.2)' }}>
+                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary', display: 'block', mb: 0.3 }}>
                             ℹ️ Phone Camera Compatibility:
                         </Typography>
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1.4 }}>
@@ -1679,7 +1679,7 @@ export default function Devices() {
                         </Box>
                     )}
 
-                    <Box sx={{ mt: 2, p: 2, borderRadius: 2.5, bgcolor: 'rgba(15, 118, 110, 0.04)', border: '1px solid', borderColor: 'divider' }}>
+                    <Box sx={{ mt: 2, p: 2, borderRadius: 2.5, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)', border: '1px solid', borderColor: 'divider' }}>
                         <Typography variant="caption" sx={{ fontWeight: 700, color: (t) => t.palette.primary.main, display: 'flex', alignItems: 'center', gap: 0.8 }}>
                             <Sensors fontSize="small" /> Real-time Inventory Matcher Active
                         </Typography>

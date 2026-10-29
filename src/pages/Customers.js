@@ -345,7 +345,7 @@ const Customers = () => {
                                 fontWeight: 700,
                                 textTransform: 'none',
                                 px: 2.5,
-                                '&:hover': { bordercolor: (t) => t.palette.primary.main, bgcolor: 'rgba(15, 118, 110, 0.04)' }
+                                '&:hover': { bordercolor: (t) => t.palette.primary.main, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }
                             }}
                         >
                             Export Directory
@@ -361,7 +361,7 @@ const Customers = () => {
                                 fontWeight: 700,
                                 textTransform: 'none',
                                 px: 3,
-                                boxShadow: '0 4px 14px rgba(15, 118, 110, 0.25)',
+                                boxShadow: '0 4px 14px rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
                                 '&:hover': {
                                     background: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)'
                                 }
@@ -499,7 +499,7 @@ const Customers = () => {
                     background: (t) => t.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.95)' : '#FFFFFF',
                     boxShadow: (t) => t.palette.mode === 'dark'
                         ? '0 12px 36px rgba(0, 0, 0, 0.5), 0 0 24px rgba(20, 184, 166, 0.12)'
-                        : '0 12px 32px -4px rgba(15, 118, 110, 0.08), 0 2px 6px rgba(0, 0, 0, 0.02)',
+                        : '0 12px 32px -4px rgba(var(--primary-rgb, 15, 118, 110), 0.08), 0 2px 6px rgba(0, 0, 0, 0.02)',
                     position: 'relative'
                 }}
             >
@@ -552,11 +552,11 @@ const Customers = () => {
                                             ? '2px solid rgba(245, 158, 11, 0.6)'
                                             : isPremier
                                             ? '2px solid rgba(20, 184, 166, 0.45)'
-                                            : '2px solid rgba(15, 118, 110, 0.25)';
+                                            : '2px solid rgba(var(--primary-rgb, 15, 118, 110), 0.25)';
 
                                         const avatarShadow = isVip
                                             ? '0 4px 12px rgba(217, 119, 6, 0.35)'
-                                            : '0 2px 8px rgba(15, 118, 110, 0.2)';
+                                            : '0 2px 8px rgba(var(--primary-rgb, 15, 118, 110), 0.2)';
 
                                         return (
                                             <TableRow 
@@ -790,8 +790,8 @@ const Customers = () => {
                                                             gap: 0.65,
                                                             p: '3px 6px',
                                                             borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)',
-                                                            border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.12)'
+                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
+                                                            border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.12)'
                                                         }}
                                                     >
                                                         <Tooltip title="View 360° Profile & Sizing Specs">
@@ -977,10 +977,10 @@ const Customers = () => {
             >
                 <DialogTitle sx={{ 
                     fontWeight: 800, 
-                    bgcolor: 'rgba(15, 118, 110, 0.04)', 
+                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)', 
                     borderBottom: '1px solid', 
                     borderColor: 'divider',
-                    color: '#042F2E'
+                    color: 'text.primary'
                 }}>
                     {editCustomer ? 'Update Guest Profile' : 'Register New Atelier Guest'}
                 </DialogTitle>
@@ -1065,7 +1065,7 @@ const Customers = () => {
                     bgcolor: 'rgba(5, 150, 105, 0.05)',
                     borderBottom: '1px solid',
                     borderColor: 'divider',
-                    color: '#042F2E'
+                    color: 'text.primary'
                 }}>
                     <Payments sx={{ color: '#059669' }} /> Settle Balance Due
                 </DialogTitle>

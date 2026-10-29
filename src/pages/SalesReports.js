@@ -100,7 +100,7 @@ const SalesReports = () => {
     datasets: [{
       label: 'Sales Revenue (₹)',
       data: Object.values(salesByDate),
-      backgroundColor: 'rgba(15, 118, 110, 0.08)',
+      backgroundColor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)',
       bordercolor: (t) => t.palette.primary.main,
       borderWidth: 2.5,
       tension: 0.35,
@@ -260,7 +260,7 @@ const SalesReports = () => {
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <FilterList sx={{ color: (t) => t.palette.primary.main, fontSize: 20 }} />
-            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#042F2E', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
               Filter Sales Records
             </Typography>
           </Box>
@@ -347,7 +347,7 @@ const SalesReports = () => {
               boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
             }}
           >
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 2, color: '#042F2E' }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 2, color: 'text.primary' }}>
               Sales Revenue Timeline
             </Typography>
             <Box sx={{ height: 260 }}>
@@ -382,7 +382,7 @@ const SalesReports = () => {
               boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
             }}
           >
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 2, color: '#042F2E' }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 2, color: 'text.primary' }}>
               Payment Methods Breakdown
             </Typography>
             <Box sx={{ height: 260, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -411,7 +411,7 @@ const SalesReports = () => {
           boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
         }}
       >
-        <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 2, color: '#042F2E' }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 2, color: 'text.primary' }}>
           Revenue by Garment & Haute Couture Category
         </Typography>
         <Box sx={{ height: 220 }}>
@@ -439,14 +439,14 @@ const SalesReports = () => {
         elevation={0}
         sx={{
           borderRadius: '20px',
-          border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.14)',
+          border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.14)',
           overflow: 'hidden',
           boxShadow: (t) => t.palette.mode === 'dark' 
             ? '0 10px 30px rgba(0, 0, 0, 0.4)' 
-            : '0 10px 30px -10px rgba(15, 118, 110, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
+            : '0 10px 30px -10px rgba(var(--primary-rgb, 15, 118, 110), 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
         }}
       >
-        <Box sx={{ px: 3, py: 2, bgcolor: 'rgba(15, 118, 110, 0.02)', borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box sx={{ px: 3, py: 2, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.02)', borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
             Detailed Sales Ledger ({filteredInvoices.length} entries)
           </Typography>

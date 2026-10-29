@@ -176,7 +176,7 @@ export default function CustomerMeasurementModal({
           borderRadius: 3.5,
           overflow: 'hidden',
           backgroundColor: isDark ? '#0F1E1D' : '#FFFFFF',
-          border: isDark ? '1px solid rgba(20, 184, 166, 0.22)' : '1px solid rgba(15, 118, 110, 0.14)',
+          border: isDark ? '1px solid rgba(20, 184, 166, 0.22)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.14)',
           boxShadow: isDark
             ? '0 24px 60px rgba(0, 0, 0, 0.75), 0 0 35px rgba(20, 184, 166, 0.15)'
             : '0 24px 60px -8px rgba(10, 77, 70, 0.22), 0 4px 16px rgba(0, 0, 0, 0.06)'
@@ -264,7 +264,7 @@ export default function CustomerMeasurementModal({
             borderRadius: 2.5,
             bgcolor: isDark ? 'rgba(20, 184, 166, 0.05)' : 'rgba(15, 118, 110, 0.035)',
             border: '1px solid',
-            borderColor: isDark ? 'rgba(20, 184, 166, 0.14)' : 'rgba(15, 118, 110, 0.1)'
+            borderColor: isDark ? 'rgba(20, 184, 166, 0.14)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)'
           }}
         >
           {/* Fit Selector */}
@@ -378,7 +378,7 @@ export default function CustomerMeasurementModal({
           ))}
         </Grid>
 
-        <Divider sx={{ my: 0.5, borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 118, 110, 0.1)' }} />
+        <Divider sx={{ my: 0.5, borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)' }} />
 
         {/* Tailor & Styling Notes */}
         <TextField
@@ -404,7 +404,7 @@ export default function CustomerMeasurementModal({
           px: 3,
           py: 2,
           borderTop: '1px solid',
-          borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 118, 110, 0.1)',
+          borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
           display: 'flex',
           justifyContent: 'space-between'
         }}

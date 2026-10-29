@@ -157,7 +157,7 @@ export const PREDEFINED_LOGOS = [
         <rect width="120" height="120" rx="26" fill="url(#gBg5)" stroke="#D97706" stroke-width="2.5" />
         <!-- Shield -->
         <path d="M38 34 L82 34 C82 58 74 78 60 92 C46 78 38 58 38 34 Z" fill="none" stroke="url(#gGold5)" stroke-width="3" stroke-linejoin="round" />
-        <path d="M44 40 L76 40 C76 58 70 72 60 82 C50 72 44 58 44 40 Z" fill="rgba(15, 118, 110, 0.25)" stroke="url(#gGold5)" stroke-width="1.2" />
+        <path d="M44 40 L76 40 C76 58 70 72 60 82 C50 72 44 58 44 40 Z" fill="rgba(var(--primary-rgb, 15, 118, 110), 0.25)" stroke="url(#gGold5)" stroke-width="1.2" />
         <!-- Mini Crown on Shield -->
         <path d="M50 48 L54 55 L60 46 L66 55 L70 48 L70 58 L50 58 Z" fill="url(#gGold5)" />
         <circle cx="60" cy="70" r="3.5" fill="#FEF08A" />

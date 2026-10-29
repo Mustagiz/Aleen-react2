@@ -41,7 +41,7 @@ export default function AtelierBespokeLoader({
           borderRadius: '50%',
           background: isDark
             ? 'radial-gradient(circle, rgba(20, 184, 166, 0.18) 0%, rgba(217, 119, 6, 0.08) 50%, transparent 70%)'
-            : 'radial-gradient(circle, rgba(15, 118, 110, 0.12) 0%, rgba(245, 158, 11, 0.08) 50%, transparent 70%)',
+            : 'radial-gradient(circle, rgba(var(--primary-rgb, 15, 118, 110), 0.12) 0%, rgba(245, 158, 11, 0.08) 50%, transparent 70%)',
           filter: 'blur(30px)',
           pointerEvents: 'none',
           animation: 'atelierPulse 3s ease-in-out infinite'

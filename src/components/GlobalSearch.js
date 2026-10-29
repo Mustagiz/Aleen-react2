@@ -75,7 +75,7 @@ const GlobalSearch = ({ open, onClose }) => {
         navigate('/invoices?action=new');
         onClose();
       },
-      color: '#0F766E',
+      color: (t) => t.palette.primary.main,
       keywords: ['new', 'invoice', 'sale', 'bill', 'pos', 'counter', 'checkout']
     },
     {
@@ -145,7 +145,7 @@ const GlobalSearch = ({ open, onClose }) => {
         navigate('/inventory');
         onClose();
       },
-      color: '#0F766E',
+      color: (t) => t.palette.primary.main,
       keywords: ['inventory', 'product', 'item', 'stock', 'catalog', 'garment']
     },
     {
@@ -207,7 +207,7 @@ const GlobalSearch = ({ open, onClose }) => {
               navigate('/inventory');
               onClose();
             },
-            color: '#0F766E'
+            color: (t) => t.palette.primary.main
           });
         }
       });
@@ -349,7 +349,7 @@ const GlobalSearch = ({ open, onClose }) => {
           maxWidth: '100%',
           bgcolor: 'background.paper',
           backgroundImage: 'linear-gradient(180deg, rgba(15, 118, 110, 0.03) 0%, rgba(0, 0, 0, 0) 100%)',
-          boxShadow: '0 25px 50px -12px rgba(4, 47, 46, 0.35), 0 0 0 1px rgba(15, 118, 110, 0.2)',
+          boxShadow: '0 25px 50px -12px rgba(4, 47, 46, 0.35), 0 0 0 1px rgba(var(--primary-rgb, 15, 118, 110), 0.2)',
           overflow: 'hidden'
         }
       }}
@@ -363,9 +363,9 @@ const GlobalSearch = ({ open, onClose }) => {
           gap: 1.5,
           borderBottom: '1px solid',
           borderColor: 'divider',
-          bgcolor: 'rgba(15, 118, 110, 0.04)'
+          bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)'
         }}>
-          <Search sx={{ color: '#0F766E', fontSize: 26 }} />
+          <Search sx={{ color: (t) => t.palette.primary.main, fontSize: 26 }} />
           <TextField
             fullWidth
             inputRef={inputRef}
@@ -421,12 +421,12 @@ const GlobalSearch = ({ open, onClose }) => {
                   fontSize: '0.72rem',
                   fontWeight: 700,
                   cursor: 'pointer',
-                  bgcolor: isSelected ? '#0F766E' : 'transparent',
+                  bgcolor: isSelected ? 'primary.main' : 'transparent',
                   color: isSelected ? '#FFFFFF' : 'text.secondary',
                   border: '1px solid',
-                  borderColor: isSelected ? '#0F766E' : 'divider',
+                  borderColor: isSelected ? 'primary.main' : 'divider',
                   '&:hover': {
-                    bgcolor: isSelected ? '#042F2E' : 'rgba(15, 118, 110, 0.08)'
+                    bgcolor: isSelected ? '#042F2E' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)'
                   }
                 }}
               />
@@ -449,7 +449,7 @@ const GlobalSearch = ({ open, onClose }) => {
                     mb: 0.5,
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
-                    bgcolor: isSelected ? 'rgba(15, 118, 110, 0.08)' : 'transparent',
+                    bgcolor: isSelected ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)' : 'transparent',
                     border: '1px solid',
                     borderColor: isSelected ? 'rgba(15, 118, 110, 0.3)' : 'transparent',
                     '&:hover': {
@@ -555,7 +555,7 @@ const GlobalSearch = ({ open, onClose }) => {
               <Typography variant="caption" color="text.secondary">Dismiss</Typography>
             </Box>
           </Box>
-          <Typography variant="caption" sx={{ fontWeight: 700, color: '#0F766E' }}>
+          <Typography variant="caption" sx={{ fontWeight: 700, color: (t) => t.palette.primary.main }}>
             Aleen Clothing Boutique Command OS
           </Typography>
         </Box>

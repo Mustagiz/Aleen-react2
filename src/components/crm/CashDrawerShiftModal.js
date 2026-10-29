@@ -367,9 +367,9 @@ ${shiftNotes ? `\n📝 *Notes:* ${shiftNotes}` : ''}
               fontSize: '0.86rem',
               minHeight: 48,
               color: 'text.secondary',
-              '&.Mui-selected': { color: '#0F766E' }
+              '&.Mui-selected': { color: (t) => t.palette.primary.main }
             },
-            '& .MuiTabs-indicator': { bgcolor: '#0F766E', height: 3, borderRadius: '3px 3px 0 0' }
+            '& .MuiTabs-indicator': { bgcolor: (t) => t.palette.primary.main, height: 3, borderRadius: '3px 3px 0 0' }
           }}
         >
           <Tab icon={<PointOfSale sx={{ fontSize: 18 }} />} iconPosition="start" label="Drawer Reconciliation (Z-Report)" />
@@ -421,7 +421,7 @@ ${shiftNotes ? `\n📝 *Notes:* ${shiftNotes}` : ''}
                     <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', fontWeight: 700 }}>
                       Today's Bills Raised
                     </Typography>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#0F766E' }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 900, color: (t) => t.palette.primary.main }}>
                       {todayInvoices.length} Orders • ₹{tenderSummary.grossTotal.toLocaleString('en-IN')}
                     </Typography>
                   </Box>
@@ -447,7 +447,7 @@ ${shiftNotes ? `\n📝 *Notes:* ${shiftNotes}` : ''}
                   <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, textTransform: 'uppercase' }}>
                     Expected Cash in Drawer
                   </Typography>
-                  <Typography variant="h5" sx={{ fontWeight: 900, color: '#0F766E', mt: 0.5 }}>
+                  <Typography variant="h5" sx={{ fontWeight: 900, color: (t) => t.palette.primary.main, mt: 0.5 }}>
                     ₹{expectedCash.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </Typography>
                   <Box sx={{ mt: 1, fontSize: '0.74rem', color: 'text.secondary' }}>
@@ -535,7 +535,7 @@ ${shiftNotes ? `\n📝 *Notes:* ${shiftNotes}` : ''}
             {/* Currency Denomination Counter */}
             <Paper elevation={0} sx={{ p: 2.5, borderRadius: 3, border: '1px solid #E2E8F0', bgcolor: '#FFFFFF', mb: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0F766E', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                   💵 Physical Currency Denomination Counter
                 </Typography>
                 <Button
@@ -559,7 +559,7 @@ ${shiftNotes ? `\n📝 *Notes:* ${shiftNotes}` : ''}
                         sx={{
                           p: 1.5,
                           borderRadius: 2,
-                          bgcolor: count > 0 ? 'rgba(15, 118, 110, 0.04)' : '#F8FAFC',
+                          bgcolor: count > 0 ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' : '#F8FAFC',
                           border: '1px solid',
                           borderColor: count > 0 ? '#0F766E' : '#E2E8F0'
                         }}
@@ -568,7 +568,7 @@ ${shiftNotes ? `\n📝 *Notes:* ${shiftNotes}` : ''}
                           <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F172A' }}>
                             {den.label}
                           </Typography>
-                          <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                          <Typography variant="caption" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>
                             ₹{lineTotal.toLocaleString('en-IN')}
                           </Typography>
                         </Box>
@@ -597,7 +597,7 @@ ${shiftNotes ? `\n📝 *Notes:* ${shiftNotes}` : ''}
                     sx={{
                       p: 1.5,
                       borderRadius: 2,
-                      bgcolor: counts.coins > 0 ? 'rgba(15, 118, 110, 0.04)' : '#F8FAFC',
+                      bgcolor: counts.coins > 0 ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' : '#F8FAFC',
                       border: '1px solid',
                       borderColor: counts.coins > 0 ? '#0F766E' : '#E2E8F0'
                     }}
@@ -606,7 +606,7 @@ ${shiftNotes ? `\n📝 *Notes:* ${shiftNotes}` : ''}
                       <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F172A' }}>
                         🪙 Loose Coins / Cash
                       </Typography>
-                      <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                      <Typography variant="caption" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>
                         ₹{Number(counts.coins || 0).toLocaleString('en-IN')}
                       </Typography>
                     </Box>
@@ -663,14 +663,14 @@ ${shiftNotes ? `\n📝 *Notes:* ${shiftNotes}` : ''}
                 onClick={handleSaveShift}
                 disabled={savingShift}
                 sx={{
-                  bgcolor: '#0F766E',
+                  bgcolor: (t) => t.palette.primary.main,
                   color: '#FFFFFF',
                   fontWeight: 800,
                   px: 3,
                   borderRadius: 2.5,
                   textTransform: 'none',
                   boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
-                  '&:hover': { bgcolor: '#042F2E' }
+                  '&:hover': { bgcolor: 'text.primary' }
                 }}
               >
                 {savingShift ? 'Saving Z-Report...' : 'Save & Close Shift (Record Z-Report)'}
@@ -725,7 +725,7 @@ ${shiftNotes ? `\n📝 *Notes:* ${shiftNotes}` : ''}
 
               <Divider sx={{ my: 2 }} />
 
-              <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E', textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', mb: 1 }}>
+              <Typography variant="caption" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', mb: 1 }}>
                 Live Message Preview:
               </Typography>
 
@@ -757,17 +757,17 @@ ${shiftNotes ? `\n📝 *Notes:* ${shiftNotes}` : ''}
         {activeTab === 2 && (
           <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0F766E' }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>
                 Archived Shift Reconciliation Records
               </Typography>
-              <IconButton onClick={fetchShiftHistory} size="small" sx={{ color: '#0F766E' }}>
+              <IconButton onClick={fetchShiftHistory} size="small" sx={{ color: 'primary.main' }}>
                 <Refresh />
               </IconButton>
             </Box>
 
             {loadingHistory ? (
               <Box sx={{ p: 4, textAlign: 'center' }}>
-                <CircularProgress size={28} sx={{ color: '#0F766E' }} />
+                <CircularProgress size={28} sx={{ color: 'primary.main' }} />
               </Box>
             ) : pastShifts.length === 0 ? (
               <Paper elevation={0} sx={{ p: 4, textAlign: 'center', bgcolor: '#FFFFFF', borderRadius: 2.5 }}>
@@ -778,7 +778,7 @@ ${shiftNotes ? `\n📝 *Notes:* ${shiftNotes}` : ''}
             ) : (
               <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 2.5, border: '1px solid #E2E8F0' }}>
                 <Table size="small">
-                  <TableHead sx={{ bgcolor: '#0F766E' }}>
+                  <TableHead sx={{ bgcolor: (t) => t.palette.primary.main }}>
                     <TableRow>
                       <TableCell sx={{ color: '#FFFFFF', fontWeight: 800, fontSize: '0.76rem' }}>Date / Shift</TableCell>
                       <TableCell sx={{ color: '#FFFFFF', fontWeight: 800, fontSize: '0.76rem' }}>Cashier</TableCell>

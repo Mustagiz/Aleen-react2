@@ -513,7 +513,7 @@ export default function Settings() {
       <Box sx={{ p: 4, textAlign: 'center' }}>
         <Paper elevation={0} sx={{ p: 5, borderRadius: 4, maxWidth: 500, mx: 'auto', border: '1px solid #E2E8F0' }}>
           <Security sx={{ fontSize: 56, color: '#D97706', mb: 2 }} />
-          <Typography variant="h5" sx={{ fontWeight: 800, color: '#042F2E', mb: 1 }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, color: 'text.primary', mb: 1 }}>
             Access Restricted
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -653,7 +653,7 @@ export default function Settings() {
                       justifyContent: 'center',
                       color: '#F59E0B',
                       border: '2px solid rgba(217, 119, 6, 0.45)',
-                      boxShadow: '0 8px 24px rgba(15, 118, 110, 0.25)'
+                      boxShadow: '0 8px 24px rgba(var(--primary-rgb, 15, 118, 110), 0.25)'
                     }}
                   >
                     <Typography sx={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 900, fontSize: '2.5rem', color: '#F59E0B' }}>
@@ -735,7 +735,7 @@ export default function Settings() {
                 )}
               </Box>
 
-              <Typography variant="h5" sx={{ fontWeight: 900, color: '#042F2E', letterSpacing: '-0.02em', mb: 0.5 }}>
+              <Typography variant="h5" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-0.02em', mb: 0.5 }}>
                 {formProfile.businessName || 'Aleen Clothing'}
               </Typography>
               <Typography variant="caption" sx={{ display: 'block', color: '#D97706', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, mb: 2 }}>
@@ -759,7 +759,7 @@ export default function Settings() {
                 </Typography>
               </Box>
 
-              <Box sx={{ mt: 3, p: 1.5, borderRadius: 2, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)', border: '1px dashed #0F766E' }}>
+              <Box sx={{ mt: 3, p: 1.5, borderRadius: 2, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)', border: (t) => `1px dashed ${t.palette.primary.main}` }}>
                 <Typography variant="caption" sx={{ fontWeight: 700, color: (t) => t.palette.primary.main, display: 'block' }}>
                   ✓ Invoices Automatically Updated
                 </Typography>
@@ -781,7 +781,7 @@ export default function Settings() {
                 bgcolor: 'background.paper'
               }}
             >
-              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E', mb: 0.5 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5 }}>
                 Boutique Legal & Contact Profile
               </Typography>
               <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 3 }}>
@@ -938,7 +938,7 @@ export default function Settings() {
             >
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Box>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
                     Electronic Settlement & Bank Details
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
@@ -1191,7 +1191,7 @@ export default function Settings() {
                 bgcolor: 'background.paper'
               }}
             >
-              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E', mb: 0.5 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5 }}>
                 Default Invoice Template & Print Styling
               </Typography>
               <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 3 }}>
@@ -1214,7 +1214,7 @@ export default function Settings() {
                             p: 1.5,
                             borderRadius: 2,
                             border: '2px solid',
-                            borderColor: isSelected ? '#0F766E' : 'divider',
+                            borderColor: isSelected ? 'primary.main' : 'divider',
                             bgcolor: isSelected ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)' : 'background.paper',
                             cursor: 'pointer',
                             display: 'flex',
@@ -1224,7 +1224,7 @@ export default function Settings() {
                           }}
                         >
                           <Box>
-                            <Typography variant="body2" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                            <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary' }}>
                               {tmpl.name}
                             </Typography>
                             <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.68rem' }}>
@@ -1375,7 +1375,7 @@ export default function Settings() {
                 </Typography>
 
                 {formProfile.showSignatureStamp && (
-                  <Box sx={{ p: 2.5, borderRadius: (t) => `${t.shape?.borderRadius || 8}px`, bgcolor: 'rgba(15, 118, 110, 0.03)', border: '1px solid rgba(15, 118, 110, 0.15)' }}>
+                  <Box sx={{ p: 2.5, borderRadius: (t) => `${t.shape?.borderRadius || 8}px`, bgcolor: 'rgba(15, 118, 110, 0.03)', border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.15)' }}>
                     <Grid container spacing={2}>
                       <Grid item xs={12} sm={6}>
                         <TextField
@@ -1413,7 +1413,7 @@ export default function Settings() {
                               fontWeight: 700,
                               borderRadius: 2,
                               '&:hover': {
-                                borderColor: '#042F2E',
+                                borderColor: (t) => t.palette.primary.dark,
                                 bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)'
                               }
                             }}
@@ -1452,7 +1452,7 @@ export default function Settings() {
                               />
                             </Box>
                             <Box>
-                              <Typography variant="body2" sx={{ fontWeight: 800, color: '#042F2E', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary', display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                 <CheckCircle sx={{ fontSize: 16, color: (t) => t.palette.primary.main }} /> Custom Signature Active
                               </Typography>
                               <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
@@ -1532,7 +1532,7 @@ export default function Settings() {
                 bgcolor: 'background.paper'
               }}
             >
-              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#042F2E', mb: 1 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', mb: 1 }}>
                 Live Invoice Footer Preview
               </Typography>
               <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#F8FAFC', border: '1px solid #E2E8F0', mb: 2 }}>
@@ -1586,7 +1586,7 @@ export default function Settings() {
           >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5, flexWrap: 'wrap', gap: 1.5 }}>
               <Box>
-                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
                   Staff Roster & Access Permissions ({staffList.length})
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
@@ -1754,7 +1754,7 @@ export default function Settings() {
                 bgcolor: 'background.paper'
               }}
             >
-              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E', mb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Lock sx={{ color: (t) => t.palette.primary.main }} /> Master Admin Password
               </Typography>
               <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 3 }}>
@@ -1852,7 +1852,7 @@ export default function Settings() {
                 bgcolor: 'background.paper'
               }}
             >
-              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E', mb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
                 <VpnKey sx={{ color: '#D97706' }} /> Counter Terminal Quick Passcode
               </Typography>
               <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 3 }}>
@@ -1913,7 +1913,7 @@ export default function Settings() {
         fullScreen={isMobile}
         PaperProps={{ sx: { borderRadius: isMobile ? 0 : 4 } }}
       >
-        <DialogTitle sx={{ fontWeight: 800, color: '#042F2E', borderBottom: '1px solid', borderColor: 'divider' }}>
+        <DialogTitle sx={{ fontWeight: 800, color: 'text.primary', borderBottom: '1px solid', borderColor: 'divider' }}>
           {editingStaffId ? 'Edit Staff Member & Permissions' : 'Register New Staff Member'}
         </DialogTitle>
         <Box component="form" onSubmit={handleSaveStaff}>
@@ -2000,7 +2000,7 @@ export default function Settings() {
 
               <Grid item xs={12}>
                 <Divider sx={{ my: 1 }} />
-                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#042F2E', mb: 0.5 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5 }}>
                   Granular Module Permissions
                 </Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
@@ -2146,7 +2146,7 @@ export default function Settings() {
         fullScreen={isMobile}
         PaperProps={{ sx: { borderRadius: isMobile ? 0 : 3.5 } }}
       >
-        <DialogTitle sx={{ fontWeight: 800, color: '#042F2E', display: 'flex', alignItems: 'center', gap: 1 }}>
+        <DialogTitle sx={{ fontWeight: 800, color: 'text.primary', display: 'flex', alignItems: 'center', gap: 1 }}>
           <VpnKey sx={{ color: '#D97706' }} /> Reset Staff Password
         </DialogTitle>
         <DialogContent sx={{ pt: 2 }}>
@@ -2211,13 +2211,13 @@ export default function Settings() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 4px 12px rgba(15, 118, 110, 0.25)'
+                boxShadow: '0 4px 12px rgba(var(--primary-rgb, 15, 118, 110), 0.25)'
               }}
             >
               <AutoAwesome fontSize="small" />
             </Box>
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 800, color: '#042F2E', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+              <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
                 Predefined Luxury Atelier Logos
               </Typography>
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
@@ -2243,7 +2243,7 @@ export default function Settings() {
                       p: 2.5,
                       borderRadius: (t) => `${t.custom?.designSystem?.shape?.cardRadius || 10}px`,
                       border: '2px solid',
-                      borderColor: isSelected ? '#0F766E' : 'divider',
+                      borderColor: isSelected ? 'primary.main' : 'divider',
                       bgcolor: isSelected ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)' : 'background.paper',
                       textAlign: 'center',
                       cursor: 'pointer',
@@ -2252,7 +2252,7 @@ export default function Settings() {
                       overflow: 'hidden',
                       '&:hover': {
                         transform: 'translateY(-3px)',
-                        boxShadow: '0 10px 25px rgba(15, 118, 110, 0.15)',
+                        boxShadow: '0 10px 25px rgba(var(--primary-rgb, 15, 118, 110), 0.15)',
                         bordercolor: (t) => t.palette.primary.main
                       }
                     }}
@@ -2291,7 +2291,7 @@ export default function Settings() {
                       }}
                     />
 
-                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#042F2E', mb: 0.5 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5 }}>
                       {logo.name}
                     </Typography>
 
@@ -2322,11 +2322,11 @@ export default function Settings() {
                         fontWeight: 700,
                         fontSize: '0.75rem',
                         textTransform: 'none',
-                        bgcolor: isSelected ? '#0F766E' : 'transparent',
+                        bgcolor: isSelected ? 'primary.main' : 'transparent',
                         bordercolor: (t) => t.palette.primary.main,
                         color: isSelected ? '#FFFFFF' : '#0F766E',
                         '&:hover': {
-                          bgcolor: isSelected ? '#042F2E' : 'rgba(15, 118, 110, 0.08)'
+                          bgcolor: isSelected ? '#042F2E' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)'
                         }
                       }}
                     >

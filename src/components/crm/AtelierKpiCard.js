@@ -206,7 +206,7 @@ export default function AtelierKpiCard({
               justifyContent: 'center',
               filter: isDark
                 ? 'drop-shadow(0 4px 16px rgba(0, 0, 0, 0.6))'
-                : 'drop-shadow(0 4px 10px rgba(15, 118, 110, 0.12))',
+                : 'drop-shadow(0 4px 10px rgba(var(--primary-rgb, 15, 118, 110), 0.12))',
               '& .MuiSvgIcon-root, & svg': {
                 width: { xs: 90, sm: 108, md: 126 },
                 height: { xs: 90, sm: 108, md: 126 },
@@ -272,7 +272,7 @@ export default function AtelierKpiCard({
                   background: getIconBg(),
                   border: getIconBorder(),
                   color: getIconColor(),
-                  boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 6px rgba(15, 118, 110, 0.08)',
+                  boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 6px rgba(var(--primary-rgb, 15, 118, 110), 0.08)',
                   transition: 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
                   '& svg': {
                     fontSize: { xs: '1rem', sm: '1.15rem', md: '1.25rem' }

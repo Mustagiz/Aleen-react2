@@ -833,22 +833,22 @@ export default function Layout() {
               <Button
                 size="small"
                 variant="outlined"
-                startIcon={<PointOfSale sx={{ fontSize: '15px !important', color: topBarConfig.isColored ? '#FFFFFF' : '#10B981' }} />}
+                startIcon={<PointOfSale sx={{ fontSize: '15px !important', color: topBarConfig.isColored ? '#FFFFFF !important' : '#10B981 !important' }} />}
                 onClick={() => setCashDrawerOpen(true)}
                 sx={{
                   height: 32,
                   fontSize: '0.74rem',
                   fontWeight: 800,
-                  bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.15)' : (isDark ? 'rgba(16, 185, 129, 0.12)' : '#DCFCE7'),
-                  color: topBarConfig.isColored ? '#FFFFFF' : '#047857',
-                  borderColor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.3)' : 'rgba(16, 185, 129, 0.35)',
-                  borderRadius: '20px',
+                  bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.18)' : (isDark ? 'rgba(16, 185, 129, 0.12)' : '#DCFCE7'),
+                  color: topBarConfig.isColored ? '#FFFFFF !important' : '#047857',
+                  borderColor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.45) !important' : 'rgba(16, 185, 129, 0.35)',
+                  borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 6}px !important`,
                   px: 1.5,
                   display: { xs: 'none', lg: 'inline-flex' },
                   textTransform: 'none',
                   '&:hover': {
-                    bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.25)' : (isDark ? 'rgba(16, 185, 129, 0.2)' : '#BBF7D0'),
-                    borderColor: topBarConfig.isColored ? '#FFFFFF' : '#10B981'
+                    bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.28)' : (isDark ? 'rgba(16, 185, 129, 0.2)' : '#BBF7D0'),
+                    borderColor: topBarConfig.isColored ? '#FFFFFF !important' : '#10B981'
                   }
                 }}
               >
@@ -866,10 +866,10 @@ export default function Layout() {
                     width: 36,
                     height: 36,
                     display: { xs: 'inline-flex', sm: 'none' },
-                    borderRadius: '9px',
-                    background: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
-                    color: '#ffffff',
-                    boxShadow: `0 2px 8px ${theme.palette.secondary.main}59`,
+                    borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 6}px`,
+                    bgcolor: topBarConfig.isColored ? '#FFFFFF' : theme.palette.secondary.main,
+                    color: topBarConfig.isColored ? theme.palette.primary.main : '#FFFFFF',
+                    boxShadow: topBarConfig.isColored ? '0 2px 8px rgba(0,0,0,0.2)' : `0 2px 8px ${theme.palette.secondary.main}59`,
                     '&:hover': {
                       filter: 'brightness(0.92)'
                     }
@@ -882,21 +882,25 @@ export default function Layout() {
             {canQuickBill && (
               <Button
                 variant="contained"
-                color="secondary"
                 size="small"
-                startIcon={<Add fontSize="small" />}
+                startIcon={<Add fontSize="small" sx={{ color: topBarConfig.isColored ? `${theme.palette.primary.main} !important` : '#FFFFFF !important' }} />}
                 onClick={handleQuickBill}
                 title="Create Retail Invoice (Alt + N or F2)"
                 sx={{
-                  height: 36,
+                  height: 34,
                   px: 2,
-                  borderRadius: '9999px',
+                  borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 6}px !important`,
                   fontWeight: 800,
                   fontSize: '0.825rem',
-                  boxShadow: `0 4px 14px ${theme.palette.secondary.main}4D`,
+                  bgcolor: topBarConfig.isColored ? '#FFFFFF !important' : `${theme.palette.secondary.main} !important`,
+                  color: topBarConfig.isColored ? `${theme.palette.primary.main} !important` : '#FFFFFF !important',
+                  boxShadow: topBarConfig.isColored ? '0 2px 8px rgba(0, 0, 0, 0.2)' : `0 4px 14px ${theme.palette.secondary.main}4D`,
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',
-                  display: { xs: 'none', sm: 'inline-flex' }
+                  display: { xs: 'none', sm: 'inline-flex' },
+                  '&:hover': {
+                    bgcolor: topBarConfig.isColored ? '#F1F5F9 !important' : `${theme.palette.secondary.dark} !important`
+                  }
                 }}
               >
                 Quick Bill
@@ -914,9 +918,9 @@ export default function Layout() {
                 sx={{ 
                   width: 36, 
                   height: 36, 
-                  borderRadius: '9px',
-                  border: topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.25)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)'),
-                  color: density === 'compact' ? (topBarConfig.isColored ? '#FFFFFF' : (isDark ? '#2DD4BF' : theme.palette.primary.main)) : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.85)' : 'text.secondary'),
+                  borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 6}px`,
+                  border: topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.35)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)'),
+                  color: density === 'compact' ? (topBarConfig.isColored ? '#FFFFFF' : (isDark ? '#2DD4BF' : theme.palette.primary.main)) : (topBarConfig.isColored ? '#FFFFFF' : 'text.secondary'),
                   bgcolor: density === 'compact' ? (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.25)' : (isDark ? 'rgba(20, 184, 166, 0.14)' : `${theme.palette.primary.main}14`)) : 'transparent',
                   display: { xs: 'none', sm: 'inline-flex' },
                   '&:hover': {
@@ -936,8 +940,8 @@ export default function Layout() {
                 sx={{ 
                   width: 36, 
                   height: 36, 
-                  borderRadius: '9px',
-                  border: topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.25)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : `1px solid ${theme.palette.primary.main}26`),
+                  borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 6}px`,
+                  border: topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.35)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : `1px solid ${theme.palette.primary.main}26`),
                   color: topBarConfig.isColored ? '#FFFFFF' : 'primary.main',
                   display: { xs: 'none', sm: 'inline-flex' },
                   '&:hover': {
@@ -956,8 +960,8 @@ export default function Layout() {
               sx={{ 
                 width: 36, 
                 height: 36, 
-                borderRadius: '9px',
-                border: topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.25)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : `1px solid ${theme.palette.primary.main}26`),
+                borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 6}px`,
+                border: topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.35)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : `1px solid ${theme.palette.primary.main}26`),
                 color: topBarConfig.textColor,
                 '&:hover': {
                   bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.2)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)')
@@ -968,23 +972,22 @@ export default function Layout() {
               {mode === 'dark' ? <Brightness7 fontSize="small" sx={{ color: '#F59E0B' }} /> : <Brightness4 fontSize="small" sx={{ color: topBarConfig.isColored ? '#FFFFFF' : theme.palette.primary.main }} />}
             </IconButton>
 
-            {/* Top Right Logout Button - Hidden on phone screens to eliminate clutter; accessible via drawer */}
+            {/* Top Right Logout Button */}
             <Tooltip title="Log out of Aleen Clothing">
               <Button
                 onClick={handleLogout}
                 size="small"
-                variant="outlined"
-                color="error"
-                startIcon={<Logout fontSize="small" />}
+                variant={topBarConfig.isColored ? "contained" : "outlined"}
+                startIcon={<Logout fontSize="small" sx={{ color: topBarConfig.isColored ? '#FFFFFF !important' : 'inherit' }} />}
                 sx={{
-                  height: 36,
-                  borderRadius: '9999px',
+                  height: 34,
+                  borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 6}px !important`,
                   textTransform: 'none',
                   fontWeight: 700,
                   fontSize: '0.78rem',
-                  borderColor: isDark ? 'rgba(239, 68, 68, 0.35)' : 'rgba(239, 68, 68, 0.25)',
-                  color: isDark ? '#FCA5A5' : '#DC2626',
-                  bgcolor: isDark ? 'rgba(239, 68, 68, 0.08)' : 'rgba(254, 242, 242, 0.7)',
+                  borderColor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.45) !important' : (isDark ? 'rgba(239, 68, 68, 0.35)' : 'rgba(239, 68, 68, 0.25)'),
+                  color: topBarConfig.isColored ? '#FFFFFF !important' : (isDark ? '#FCA5A5' : '#DC2626'),
+                  bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.2) !important' : (isDark ? 'rgba(239, 68, 68, 0.08)' : 'rgba(254, 242, 242, 0.7)'),
                   px: { xs: 1, sm: 1.6 },
                   display: { xs: 'none', sm: 'inline-flex' },
                   '& .MuiButton-startIcon': {
@@ -992,8 +995,8 @@ export default function Layout() {
                     ml: { xs: 0, sm: -0.5 }
                   },
                   '&:hover': {
-                    borderColor: 'error.main',
-                    bgcolor: isDark ? 'rgba(239, 68, 68, 0.18)' : '#FEE2E2'
+                    borderColor: topBarConfig.isColored ? '#FFFFFF !important' : 'error.main',
+                    bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.3) !important' : (isDark ? 'rgba(239, 68, 68, 0.18)' : '#FEE2E2')
                   }
                 }}
               >

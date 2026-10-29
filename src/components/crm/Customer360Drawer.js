@@ -281,7 +281,7 @@ export default function Customer360Drawer({
               <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.68rem', fontWeight: 600, textTransform: 'uppercase' }}>
                 Total Spent
               </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 800, color: '#0F766E' }}>
+              <Typography variant="body2" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>
                 ₹{(customer.totalSpent || 0).toLocaleString('en-IN')}
               </Typography>
             </Grid>
@@ -462,7 +462,7 @@ export default function Customer360Drawer({
                       transition: 'all 0.15s ease-in-out',
                       '&:hover': {
                         borderColor: '#0F766E',
-                        boxShadow: '0 4px 12px rgba(15,118,110,0.08)'
+                        boxShadow: '0 4px 12px rgba(var(--primary-rgb, 15, 118, 110), 0.08)'
                       }
                     }}
                   >
@@ -484,7 +484,7 @@ export default function Customer360Drawer({
                     </Box>
 
                     <Box sx={{ textAlign: 'right' }}>
-                      <Typography variant="body2" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                      <Typography variant="body2" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>
                         ₹{(inv.total || 0).toLocaleString('en-IN')}
                       </Typography>
                       {inv.balanceDue > 0 && (

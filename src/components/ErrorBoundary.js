@@ -109,7 +109,7 @@ class ErrorBoundary extends React.Component {
                 variant="contained"
                 onClick={this.handleReset}
                 sx={{
-                  bgcolor: '#0F766E',
+                  bgcolor: (t) => t.palette.primary.main,
                   color: '#FFFFFF',
                   textTransform: 'none',
                   fontWeight: 700,

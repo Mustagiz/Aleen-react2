@@ -527,7 +527,7 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <Avatar sx={{ bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E' }}>
+            <Avatar sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main }}>
               <Person />
             </Avatar>
             <Box>
@@ -578,9 +578,9 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
                       borderRadius: 2.5,
                       cursor: 'pointer',
                       border: '1.5px solid',
-                      borderColor: isSelected ? '#0F766E' : 'divider',
-                      bgcolor: isSelected ? 'rgba(15, 118, 110, 0.08)' : 'background.paper',
-                      boxShadow: isSelected ? '0 4px 14px rgba(15, 118, 110, 0.15)' : 'none',
+                      borderColor: isSelected ? 'primary.main' : 'divider',
+                      bgcolor: isSelected ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)' : 'background.paper',
+                      boxShadow: isSelected ? '0 4px 14px rgba(var(--primary-rgb, 15, 118, 110), 0.15)' : 'none',
                       transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                       height: '100%',
                       display: 'flex',
@@ -639,7 +639,7 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
             >
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5, flexWrap: 'wrap', gap: 1 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Edit sx={{ fontSize: 18, color: '#0F766E' }} />
+                  <Edit sx={{ fontSize: 18, color: (t) => t.palette.primary.main }} />
                   <Typography variant="subtitle2" sx={{ fontWeight: 800, textTransform: 'uppercase', fontSize: '0.78rem', letterSpacing: '0.04em' }}>
                     Customise & Edit Message
                   </Typography>
@@ -665,9 +665,9 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
                       fontSize: '0.76rem',
                       fontWeight: 700,
                       borderRadius: '16px',
-                      color: '#0F766E',
+                      color: (t) => t.palette.primary.main,
                       borderColor: '#0F766E',
-                      '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.08)', borderColor: '#042F2E' }
+                      '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)', borderColor: (t) => t.palette.primary.dark }
                     }}
                   >
                     Save as My Custom
@@ -729,7 +729,7 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
                     const link = invRef ? `${origin}/bill/${invRef}` : '';
                     handleInsertVariable(`📥 *Download PDF Bill:* ${link}`);
                   }}
-                  sx={{ cursor: 'pointer', height: 22, fontSize: '0.7rem', fontWeight: 700, bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E' }}
+                  sx={{ cursor: 'pointer', height: 22, fontSize: '0.7rem', fontWeight: 700, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main }}
                 />
                 <Chip
                   label="+ Boutique Phone"
@@ -886,7 +886,7 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
             onClick={handleSendPDFWhatsApp}
             variant="outlined"
             size="large"
-            startIcon={<PictureAsPdf sx={{ fontSize: 20, color: '#0F766E' }} />}
+            startIcon={<PictureAsPdf sx={{ fontSize: 20, color: (t) => t.palette.primary.main }} />}
             sx={{
               px: 3,
               py: 1.1,
@@ -894,11 +894,11 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
               fontWeight: 800,
               fontSize: '0.9rem',
               borderColor: '#0F766E',
-              color: '#0F766E',
+              color: (t) => t.palette.primary.main,
               textTransform: 'none',
               '&:hover': {
                 borderColor: '#0D6861',
-                bgcolor: 'rgba(15, 118, 110, 0.08)'
+                bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)'
               }
             }}
           >

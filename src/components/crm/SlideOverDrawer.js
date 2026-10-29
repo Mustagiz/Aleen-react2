@@ -24,7 +24,7 @@ export default function SlideOverDrawer({
           width: { xs: '100%', sm: width },
           maxWidth: '100vw',
           background: isDark ? '#102020' : '#FFFFFF',
-          borderLeft: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(15, 118, 110, 0.15)',
+          borderLeft: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.15)',
           boxShadow: '-8px 0 32px rgba(0, 0, 0, 0.15)',
           display: 'flex',
           flexDirection: 'column'
@@ -46,8 +46,8 @@ export default function SlideOverDrawer({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.1)',
-          background: isDark ? 'rgba(15, 118, 110, 0.08)' : '#F8FAFC'
+          borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
+          background: isDark ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)' : '#F8FAFC'
         }}
       >
         <Box>
@@ -68,7 +68,7 @@ export default function SlideOverDrawer({
             size="small"
             sx={{ 
               color: 'text.secondary',
-              '&:hover': { color: 'text.primary', background: 'rgba(15, 118, 110, 0.1)' } 
+              '&:hover': { color: 'text.primary', background: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)' } 
             }}
           >
             <Close fontSize="small" />

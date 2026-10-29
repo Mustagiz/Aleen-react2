@@ -881,7 +881,7 @@ const Marketing = () => {
                                 color: (t) => t.palette.primary.main,
                                 '&:hover': {
                                     bordercolor: (t) => t.palette.primary.main,
-                                    bgcolor: 'rgba(15, 118, 110, 0.04)'
+                                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)'
                                 }
                             }}
                         >
@@ -899,7 +899,7 @@ const Marketing = () => {
                                 textTransform: 'none',
                                 background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                                 color: '#ffffff',
-                                boxShadow: '0 4px 14px rgba(15, 118, 110, 0.25)',
+                                boxShadow: '0 4px 14px rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
                                 '&:hover': {
                                     background: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)'
                                 }
@@ -1041,7 +1041,7 @@ const Marketing = () => {
                             }}
                         >
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#042F2E', letterSpacing: '0.02em', textTransform: 'uppercase', fontSize: '0.78rem' }}>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', letterSpacing: '0.02em', textTransform: 'uppercase', fontSize: '0.78rem' }}>
                                     Smart Audience Segmentation
                                 </Typography>
                                 <Typography variant="caption" color="text.secondary">
@@ -1190,7 +1190,7 @@ const Marketing = () => {
                                 }}
                             >
                                 <Group sx={{ fontSize: 48, color: 'text.secondary', mb: 1, opacity: 0.5 }} />
-                                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                     No Patrons Found in Current Segment
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 400, mx: 'auto', mt: 0.5 }}>
@@ -1215,14 +1215,14 @@ const Marketing = () => {
                                                         borderRadius: 3,
                                                         border: '2px solid',
                                                         borderColor: isPreviewActive ? '#0F766E' : isSelected ? 'rgba(15, 118, 110, 0.5)' : 'divider',
-                                                        bgcolor: isPreviewActive ? 'rgba(15, 118, 110, 0.05)' : 'background.paper',
-                                                        boxShadow: isPreviewActive ? '0 6px 20px rgba(15, 118, 110, 0.15)' : 'none',
+                                                        bgcolor: isPreviewActive ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)' : 'background.paper',
+                                                        boxShadow: isPreviewActive ? '0 6px 20px rgba(var(--primary-rgb, 15, 118, 110), 0.15)' : 'none',
                                                         transition: 'all 0.2s',
                                                         position: 'relative',
                                                         overflow: 'hidden',
                                                         '&:hover': {
                                                             bordercolor: (t) => t.palette.primary.main,
-                                                            boxShadow: '0 4px 16px rgba(15, 118, 110, 0.12)',
+                                                            boxShadow: '0 4px 16px rgba(var(--primary-rgb, 15, 118, 110), 0.12)',
                                                             transform: 'translateY(-2px)'
                                                         }
                                                     }}
@@ -1256,7 +1256,7 @@ const Marketing = () => {
                                                                     {customer.displayName[0]}
                                                                 </Avatar>
                                                                 <Box>
-                                                                    <Typography variant="body2" sx={{ fontWeight: 800, color: '#042F2E', lineHeight: 1.2 }}>
+                                                                    <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.2 }}>
                                                                         {customer.displayName}
                                                                     </Typography>
                                                                     <Typography variant="caption" color="text.secondary">
@@ -1272,7 +1272,7 @@ const Marketing = () => {
                                                                     height: 20,
                                                                     fontSize: '0.65rem',
                                                                     fontWeight: 800,
-                                                                    bgcolor: customer.tier === 'Platinum' ? 'rgba(4, 47, 46, 0.1)' : customer.tier === 'Gold' ? 'rgba(217, 119, 6, 0.12)' : 'rgba(15, 118, 110, 0.1)',
+                                                                    bgcolor: customer.tier === 'Platinum' ? 'rgba(4, 47, 46, 0.1)' : customer.tier === 'Gold' ? 'rgba(217, 119, 6, 0.12)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
                                                                     color: customer.tier === 'Platinum' ? '#042F2E' : customer.tier === 'Gold' ? '#B45309' : '#0F766E'
                                                                 }}
                                                             />
@@ -1296,7 +1296,7 @@ const Marketing = () => {
                                                                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.65rem' }}>
                                                                     Spend
                                                                 </Typography>
-                                                                <Typography variant="caption" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                                                                <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                                                     ₹{(customer.totalSpent || 0).toLocaleString()}
                                                                 </Typography>
                                                             </Box>
@@ -1372,7 +1372,7 @@ const Marketing = () => {
                                 sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider' }}
                             >
                                 <Table size="small">
-                                    <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
+                                    <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }}>
                                         <TableRow>
                                             <TableCell padding="checkbox">
                                                 <Checkbox
@@ -1429,7 +1429,7 @@ const Marketing = () => {
                                                             />
                                                         </TableCell>
                                                         <TableCell>
-                                                            <Typography variant="body2" sx={{ fontWeight: 750, color: '#042F2E' }}>
+                                                            <Typography variant="body2" sx={{ fontWeight: 750, color: 'text.primary' }}>
                                                                 {customer.displayName}
                                                             </Typography>
                                                             <Typography variant="caption" color="text.secondary">
@@ -1523,7 +1523,7 @@ const Marketing = () => {
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <Chat sx={{ color: (t) => t.palette.primary.main }} />
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                         Live WhatsApp Preview
                                     </Typography>
                                 </Box>
@@ -1531,7 +1531,7 @@ const Marketing = () => {
                                     size="small"
                                     icon={<Person sx={{ fontSize: '0.9rem !important' }} />}
                                     label={toSentenceCase(samplePreviewCustomer.name).split(' ')[0]}
-                                    sx={{ fontWeight: 750, bgcolor: 'rgba(15, 118, 110, 0.08)', color: (t) => t.palette.primary.main }}
+                                    sx={{ fontWeight: 750, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)', color: (t) => t.palette.primary.main }}
                                 />
                             </Box>
 
@@ -1557,11 +1557,11 @@ const Marketing = () => {
                                             sx={{
                                                 fontWeight: 800,
                                                 fontSize: '0.74rem',
-                                                bgcolor: isActive ? '#0F766E' : 'rgba(15, 118, 110, 0.08)',
+                                                bgcolor: isActive ? '#0F766E' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)',
                                                 color: isActive ? '#FFFFFF' : '#0F766E',
                                                 border: '1.5px solid',
                                                 borderColor: isActive ? '#0F766E' : 'transparent',
-                                                boxShadow: isActive ? '0 2px 8px rgba(15, 118, 110, 0.25)' : 'none',
+                                                boxShadow: isActive ? '0 2px 8px rgba(var(--primary-rgb, 15, 118, 110), 0.25)' : 'none',
                                                 transition: 'all 0.18s ease',
                                                 '&:hover': {
                                                     bgcolor: isActive ? '#115E59' : 'rgba(15, 118, 110, 0.16)'
@@ -1857,7 +1857,7 @@ const Marketing = () => {
                             p: 3,
                             borderRadius: 3.5,
                             border: '1.5px solid',
-                            borderColor: gatewayConfig.mode !== 'browser' ? '#0F766E' : 'rgba(15, 118, 110, 0.25)',
+                            borderColor: gatewayConfig.mode !== 'browser' ? '#0F766E' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
                             bgcolor: 'rgba(15, 118, 110, 0.03)',
                             mb: 3.5,
                             display: 'flex',
@@ -1873,7 +1873,7 @@ const Marketing = () => {
                             </Avatar>
                             <Box>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                                    <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                         WhatsApp Dispatch Gateway
                                     </Typography>
                                     <Chip
@@ -1941,7 +1941,7 @@ const Marketing = () => {
                     )}
 
                     {/* Automation Trigger Rules Grid */}
-                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E', mb: 2 }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', mb: 2 }}>
                         Automated Lifecycle & Event Triggers
                     </Typography>
 
@@ -1966,7 +1966,7 @@ const Marketing = () => {
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <Cake sx={{ color: '#D97706' }} />
-                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                                 Daily Birthday & Anniversary Greeter
                                             </Typography>
                                         </Box>
@@ -2025,7 +2025,7 @@ const Marketing = () => {
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <Warning sx={{ color: (t) => t.palette.primary.main }} />
-                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                                 Dormant Patron Winback (30d+ Inactivity)
                                             </Typography>
                                         </Box>
@@ -2044,7 +2044,7 @@ const Marketing = () => {
                                     <Chip
                                         size="small"
                                         label={`${segmentCounts.dormant30} In Dormancy Queue`}
-                                        sx={{ bgcolor: 'rgba(15, 118, 110, 0.1)', color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: '0.7rem' }}
+                                        sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: '0.7rem' }}
                                     />
                                     <Button
                                         size="small"
@@ -2081,7 +2081,7 @@ const Marketing = () => {
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <ReceiptLong sx={{ color: (t) => t.palette.primary.main }} />
-                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                                 E-Invoice & Digital Receipt Auto-Share
                                             </Typography>
                                         </Box>
@@ -2129,7 +2129,7 @@ const Marketing = () => {
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <CheckCircle sx={{ color: (t) => t.palette.primary.main }} />
-                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                                 Tailoring Ready & Fitting Notification
                                             </Typography>
                                         </Box>
@@ -2148,7 +2148,7 @@ const Marketing = () => {
                                     <Chip
                                         size="small"
                                         label="Connected to Tailoring Kanban"
-                                        sx={{ bgcolor: 'rgba(15, 118, 110, 0.1)', color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: '0.7rem' }}
+                                        sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: '0.7rem' }}
                                     />
                                     <Typography variant="caption" color="text.secondary">
                                         Includes delivery target date
@@ -2201,7 +2201,7 @@ const Marketing = () => {
                                 fontWeight: 750,
                                 textTransform: 'none',
                                 bgcolor: (t) => t.palette.primary.main,
-                                '&:hover': { bgcolor: '#042F2E' }
+                                '&:hover': { bgcolor: 'text.primary' }
                             }}
                         >
                             + Create Custom Template
@@ -2227,7 +2227,7 @@ const Marketing = () => {
                                         '&:hover': {
                                             bordercolor: (t) => t.palette.primary.main,
                                             transform: 'translateY(-3px)',
-                                            boxShadow: '0 8px 24px rgba(15, 118, 110, 0.08)'
+                                            boxShadow: '0 8px 24px rgba(var(--primary-rgb, 15, 118, 110), 0.08)'
                                         }
                                     }}
                                 >
@@ -2244,7 +2244,7 @@ const Marketing = () => {
                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: template.color || '#0F766E' }} />
-                                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                                 {template.title}
                                             </Typography>
                                         </Box>
@@ -2310,7 +2310,7 @@ const Marketing = () => {
                                             }}
                                             sx={{
                                                 bgcolor: (t) => t.palette.primary.main,
-                                                '&:hover': { bgcolor: '#042F2E' },
+                                                '&:hover': { bgcolor: 'text.primary' },
                                                 borderRadius: 2,
                                                 fontWeight: 750,
                                                 fontSize: '0.75rem',
@@ -2336,13 +2336,13 @@ const Marketing = () => {
                                 mb: 1,
                                 p: 2,
                                 borderRadius: 3,
-                                bgcolor: 'rgba(15, 118, 110, 0.04)',
-                                border: '1px solid rgba(15, 118, 110, 0.12)',
+                                bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
+                                border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.12)',
                                 flexWrap: 'wrap',
                                 gap: 2
                             }}
                         >
-                            <Typography variant="body2" sx={{ fontWeight: 750, color: '#042F2E' }}>
+                            <Typography variant="body2" sx={{ fontWeight: 750, color: 'text.primary' }}>
                                 Showing {Math.min((templatePage - 1) * TEMPLATES_PER_PAGE + 1, filteredTemplates.length)}–{Math.min(templatePage * TEMPLATES_PER_PAGE, filteredTemplates.length)} of {filteredTemplates.length} campaign templates (9 per page)
                             </Typography>
                             <Pagination
@@ -2485,7 +2485,7 @@ const Marketing = () => {
                         <Paper elevation={0} sx={{ p: 3, borderRadius: 3.5, border: '1px solid', borderColor: 'divider' }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                                 <CalendarMonth sx={{ color: (t) => t.palette.primary.main }} />
-                                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                     Upcoming in Next 7 Days ({upcomingWeekCelebrants.length})
                                 </Typography>
                             </Box>
@@ -2531,7 +2531,7 @@ const Marketing = () => {
                         <Paper elevation={0} sx={{ p: 3, borderRadius: 3.5, border: '1px solid', borderColor: 'divider' }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                                 <Cake sx={{ color: '#D97706' }} />
-                                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                     All Celebrants This Month ({monthCelebrants.length})
                                 </Typography>
                             </Box>
@@ -2578,7 +2578,7 @@ const Marketing = () => {
                 <Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
                         <Box>
-                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                 WhatsApp Inbound Keywords & QR Code Auto-Responder
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
@@ -2598,7 +2598,7 @@ const Marketing = () => {
                                 fontWeight: 750,
                                 textTransform: 'none',
                                 bgcolor: (t) => t.palette.primary.main,
-                                '&:hover': { bgcolor: '#042F2E' }
+                                '&:hover': { bgcolor: 'text.primary' }
                             }}
                         >
                             + Add Keyword Trigger
@@ -2630,7 +2630,7 @@ const Marketing = () => {
                                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                                                 <Chip
                                                     label={`Trigger: "${kw.keyword}"`}
-                                                    sx={{ bgcolor: 'rgba(15, 118, 110, 0.1)', color: (t) => t.palette.primary.main, fontWeight: 800 }}
+                                                    sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main, fontWeight: 800 }}
                                                 />
                                                 <Box sx={{ display: 'flex', gap: 0.5 }}>
                                                     <IconButton
@@ -2732,7 +2732,7 @@ const Marketing = () => {
                 <Paper elevation={0} sx={{ p: 3, borderRadius: 3.5, border: '1px solid', borderColor: 'divider' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5, flexWrap: 'wrap', gap: 1 }}>
                         <Box>
-                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                 Broadcast Dispatch Audit Trail
                             </Typography>
                             <Typography variant="caption" color="text.secondary">
@@ -2773,7 +2773,7 @@ const Marketing = () => {
                     ) : (
                         <TableContainer>
                             <Table size="small">
-                                <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
+                                <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }}>
                                     <TableRow>
                                         <TableCell sx={{ fontWeight: 800 }}>Dispatched Time</TableCell>
                                         <TableCell sx={{ fontWeight: 800 }}>Patron</TableCell>
@@ -2793,7 +2793,7 @@ const Marketing = () => {
                                                     minute: '2-digit'
                                                 })}
                                             </TableCell>
-                                            <TableCell sx={{ fontWeight: 750, color: '#042F2E' }}>
+                                            <TableCell sx={{ fontWeight: 750, color: 'text.primary' }}>
                                                 {toSentenceCase(entry.customerName)}
                                             </TableCell>
                                             <TableCell>{entry.phone}</TableCell>
@@ -2841,7 +2841,7 @@ const Marketing = () => {
                         px: 3,
                         py: 1.5,
                         borderRadius: 10,
-                        bgcolor: '#042F2E',
+                        bgcolor: 'text.primary',
                         color: '#FFFFFF',
                         display: 'flex',
                         alignItems: 'center',
@@ -2921,10 +2921,10 @@ const Marketing = () => {
                 <DialogTitle
                     sx={{
                         fontWeight: 800,
-                        bgcolor: 'rgba(15, 118, 110, 0.05)',
+                        bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
                         borderBottom: '1px solid',
                         borderColor: 'divider',
-                        color: '#042F2E',
+                        color: 'text.primary',
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center'
@@ -2960,7 +2960,7 @@ const Marketing = () => {
                             sx={{
                                 height: 8,
                                 borderRadius: 4,
-                                bgcolor: 'rgba(15, 118, 110, 0.1)',
+                                bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
                                 '& .MuiLinearProgress-bar': { bgcolor: (t) => t.palette.primary.main }
                             }}
                         />
@@ -3016,7 +3016,7 @@ const Marketing = () => {
                                             {customer.name[0]}
                                         </Avatar>
                                         <Box>
-                                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                                 {toSentenceCase(customer.name)}
                                             </Typography>
                                             <Typography variant="caption" color="text.secondary">
@@ -3081,7 +3081,7 @@ const Marketing = () => {
                                     setAutoPilotPaused(false);
                                     setAutoPilotRunning(true);
                                 }}
-                                sx={{ bgcolor: (t) => t.palette.primary.main, '&:hover': { bgcolor: '#042F2E' }, textTransform: 'none', fontWeight: 750 }}
+                                sx={{ bgcolor: (t) => t.palette.primary.main, '&:hover': { bgcolor: 'text.primary' }, textTransform: 'none', fontWeight: 750 }}
                             >
                                 Resume Auto-Pilot
                             </Button>
@@ -3130,10 +3130,10 @@ const Marketing = () => {
                 <DialogTitle
                     sx={{
                         fontWeight: 800,
-                        bgcolor: 'rgba(15, 118, 110, 0.05)',
+                        bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
                         borderBottom: '1px solid',
                         borderColor: 'divider',
-                        color: '#042F2E',
+                        color: 'text.primary',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between'
@@ -3152,7 +3152,7 @@ const Marketing = () => {
 
                 <DialogContent sx={{ pt: 2.5 }}>
                     <FormControl component="fieldset" sx={{ mb: 2.5, width: '100%' }}>
-                        <FormLabel component="legend" sx={{ fontWeight: 800, fontSize: '0.85rem', color: '#042F2E', mb: 1 }}>
+                        <FormLabel component="legend" sx={{ fontWeight: 800, fontSize: '0.85rem', color: 'text.primary', mb: 1 }}>
                             Select Dispatch Method:
                         </FormLabel>
                         <RadioGroup
@@ -3167,7 +3167,7 @@ const Marketing = () => {
                                     borderRadius: 2.5,
                                     border: '1.5px solid',
                                     borderColor: gatewayConfig.mode === 'browser' ? '#0F766E' : 'divider',
-                                    bgcolor: gatewayConfig.mode === 'browser' ? 'rgba(15, 118, 110, 0.04)' : 'transparent'
+                                    bgcolor: gatewayConfig.mode === 'browser' ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' : 'transparent'
                                 }}
                             >
                                 <FormControlLabel
@@ -3194,7 +3194,7 @@ const Marketing = () => {
                                     borderRadius: 2.5,
                                     border: '1.5px solid',
                                     borderColor: gatewayConfig.mode === 'meta_cloud' ? '#0F766E' : 'divider',
-                                    bgcolor: gatewayConfig.mode === 'meta_cloud' ? 'rgba(15, 118, 110, 0.04)' : 'transparent'
+                                    bgcolor: gatewayConfig.mode === 'meta_cloud' ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' : 'transparent'
                                 }}
                             >
                                 <FormControlLabel
@@ -3220,7 +3220,7 @@ const Marketing = () => {
                                     borderRadius: 2.5,
                                     border: '1.5px solid',
                                     borderColor: gatewayConfig.mode === 'webhook' ? '#0F766E' : 'divider',
-                                    bgcolor: gatewayConfig.mode === 'webhook' ? 'rgba(15, 118, 110, 0.04)' : 'transparent'
+                                    bgcolor: gatewayConfig.mode === 'webhook' ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' : 'transparent'
                                 }}
                             >
                                 <FormControlLabel
@@ -3244,7 +3244,7 @@ const Marketing = () => {
                     {/* Meta Cloud Credentials Form */}
                     {gatewayConfig.mode === 'meta_cloud' && (
                         <Stack spacing={2} sx={{ mt: 1, p: 2, borderRadius: 2.5, bgcolor: 'rgba(0,0,0,0.02)', border: '1px solid divider' }}>
-                            <Typography variant="caption" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                            <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                 Meta Graph API Parameters:
                             </Typography>
                             <TextField
@@ -3278,7 +3278,7 @@ const Marketing = () => {
                     {/* Webhook Gateway Credentials Form */}
                     {gatewayConfig.mode === 'webhook' && (
                         <Stack spacing={2} sx={{ mt: 1, p: 2, borderRadius: 2.5, bgcolor: 'rgba(0,0,0,0.02)', border: '1px solid divider' }}>
-                            <Typography variant="caption" sx={{ fontWeight: 800, color: '#042F2E' }}>
+                            <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                 Gateway Microservice Endpoint:
                             </Typography>
                             <TextField
@@ -3347,10 +3347,10 @@ const Marketing = () => {
                 <DialogTitle
                     sx={{
                         fontWeight: 800,
-                        bgcolor: 'rgba(15, 118, 110, 0.04)',
+                        bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
                         borderBottom: '1px solid',
                         borderColor: 'divider',
-                        color: '#042F2E'
+                        color: 'text.primary'
                     }}
                 >
                     {editingKeyword ? 'Edit Keyword Auto-Responder' : 'Add New Keyword Auto-Responder'}
@@ -3427,10 +3427,10 @@ const Marketing = () => {
                 <DialogTitle
                     sx={{
                         fontWeight: 800,
-                        bgcolor: 'rgba(15, 118, 110, 0.04)',
+                        bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
                         borderBottom: '1px solid',
                         borderColor: 'divider',
-                        color: '#042F2E'
+                        color: 'text.primary'
                     }}
                 >
                     {editingTemplate ? 'Edit Campaign Template' : 'Create Custom Broadcast Template'}
@@ -3587,16 +3587,16 @@ const Marketing = () => {
                     }
                 }}
             >
-                <DialogTitle sx={{ fontWeight: 800, color: '#042F2E', display: 'flex', alignItems: 'center', gap: 1.5, pb: 1 }}>
+                <DialogTitle sx={{ fontWeight: 800, color: 'text.primary', display: 'flex', alignItems: 'center', gap: 1.5, pb: 1 }}>
                     <Avatar sx={{
-                        bgcolor: confirmDialog.isDanger ? 'rgba(220, 38, 38, 0.1)' : 'rgba(15, 118, 110, 0.1)',
+                        bgcolor: confirmDialog.isDanger ? 'rgba(220, 38, 38, 0.1)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
                         color: confirmDialog.isDanger ? '#DC2626' : '#0F766E',
                         width: 40,
                         height: 40
                     }}>
                         <Warning fontSize="small" />
                     </Avatar>
-                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#042F2E', fontSize: '1.1rem' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '1.1rem' }}>
                         {confirmDialog.title}
                     </Typography>
                 </DialogTitle>

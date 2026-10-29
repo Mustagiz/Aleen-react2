@@ -19,7 +19,7 @@ export const TableSkeleton = ({ rows = 6, cols = 7, isDark = false }) => (
     }}
   >
     <Table size="small">
-      <TableHead sx={{ bgcolor: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(15, 118, 110, 0.04)' }}>
+      <TableHead sx={{ bgcolor: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }}>
         <TableRow>
           {Array.from({ length: cols }).map((_, cIdx) => (
             <TableCell key={cIdx} sx={{ py: 1.5 }}>

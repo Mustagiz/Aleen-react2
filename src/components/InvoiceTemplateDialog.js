@@ -215,12 +215,12 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
                 label={`${INVOICE_TEMPLATES.length} Luxury Templates`}
                 size="small"
                 sx={{
-                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.15)' : 'rgba(15, 118, 110, 0.1)',
+                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.15)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
                   color: (t) => t.palette.mode === 'dark' ? '#2DD4BF' : '#0F766E',
                   fontWeight: 800,
                   fontSize: '0.72rem',
                   borderRadius: '6px',
-                  border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.3)' : 'rgba(15, 118, 110, 0.2)'}`
+                  border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.3)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.2)'}`
                 }}
               />
             </Box>
@@ -319,7 +319,7 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
           <Box>
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0F766E', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
                   <CloudUpload fontSize="small" /> Upload Custom Graphic Letterhead
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2.5, fontSize: '0.84rem' }}>
@@ -343,15 +343,15 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
                     p: 4,
                     textAlign: 'center',
                     cursor: 'pointer',
-                    bgcolor: localSettings.customLetterheadImage ? 'rgba(15, 118, 110, 0.04)' : 'background.paper',
+                    bgcolor: localSettings.customLetterheadImage ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' : 'background.paper',
                     transition: 'all 0.2s',
                     '&:hover': {
                       borderColor: '#0F766E',
-                      bgcolor: 'rgba(15, 118, 110, 0.04)'
+                      bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)'
                     }
                   }}
                 >
-                  <CloudUpload sx={{ fontSize: 44, color: '#0F766E', mb: 1 }} />
+                  <CloudUpload sx={{ fontSize: 44, color: (t) => t.palette.primary.main, mb: 1 }} />
                   <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
                     Click or Drag to Upload Letterhead
                   </Typography>
@@ -361,7 +361,7 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
                   <Button
                     variant="outlined"
                     size="small"
-                    sx={{ mt: 2, borderRadius: 2, fontWeight: 700, borderColor: '#0F766E', color: '#0F766E' }}
+                    sx={{ mt: 2, borderRadius: 2, fontWeight: 700, borderColor: '#0F766E', color: (t) => t.palette.primary.main }}
                   >
                     Select File
                   </Button>
@@ -472,7 +472,7 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
           <Box>
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0F766E', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
                   <AccountBalance fontSize="small" /> Bank Account & UPI Settlement Details
                 </Typography>
 
@@ -549,7 +549,7 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
               </Grid>
 
               <Grid item xs={12} md={6}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0F766E', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
                   <DescriptionOutlined fontSize="small" /> Terms & Conditions & Signatory
                 </Typography>
 

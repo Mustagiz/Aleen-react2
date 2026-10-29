@@ -143,7 +143,7 @@ export const FeedbackProvider = ({ children }) => {
                         minWidth: { xs: '90%', sm: 440 },
                         maxWidth: 480,
                         border: '1px solid',
-                        borderColor: confirmState.isDanger ? 'rgba(239, 68, 68, 0.25)' : 'rgba(15, 118, 110, 0.25)',
+                        borderColor: confirmState.isDanger ? 'rgba(239, 68, 68, 0.25)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
                         boxShadow: '0 24px 60px rgba(0,0,0,0.3)',
                         bgcolor: 'background.paper'
                     }
@@ -155,14 +155,14 @@ export const FeedbackProvider = ({ children }) => {
                             sx={{
                                 width: 44,
                                 height: 44,
-                                bgcolor: confirmState.isDanger ? 'rgba(239, 68, 68, 0.12)' : 'rgba(15, 118, 110, 0.12)',
+                                bgcolor: confirmState.isDanger ? 'rgba(239, 68, 68, 0.12)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.12)',
                                 color: confirmState.isDanger ? '#DC2626' : '#0F766E'
                             }}
                         >
                             {confirmState.isDanger ? <Warning /> : <HelpOutline />}
                         </Avatar>
                         <Box>
-                            <Typography variant="h6" sx={{ fontWeight: 800, color: '#042F2E', lineHeight: 1.2 }}>
+                            <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.2 }}>
                                 {confirmState.title}
                             </Typography>
                             <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>

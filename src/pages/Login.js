@@ -62,7 +62,7 @@ export default function Login() {
         minHeight: '100vh',
         width: '100vw',
         display: 'flex',
-        bgcolor: '#042F2E',
+        bgcolor: 'text.primary',
         overflow: 'hidden'
       }}
     >
@@ -192,7 +192,7 @@ export default function Login() {
               sx={{
                 p: 2,
                 borderRadius: 2.5,
-                bgcolor: 'rgba(15, 118, 110, 0.25)',
+                bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
                 border: '1px solid rgba(15, 118, 110, 0.4)',
                 backdropFilter: 'blur(8px)'
               }}
@@ -210,7 +210,7 @@ export default function Login() {
               sx={{
                 p: 2,
                 borderRadius: 2.5,
-                bgcolor: 'rgba(15, 118, 110, 0.25)',
+                bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
                 border: '1px solid rgba(15, 118, 110, 0.4)',
                 backdropFilter: 'blur(8px)'
               }}
@@ -282,7 +282,7 @@ export default function Login() {
                   justifyContent: 'center',
                   mx: 'auto',
                   mb: 2,
-                  boxShadow: '0 6px 16px rgba(15, 118, 110, 0.25)',
+                  boxShadow: '0 6px 16px rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
                   border: '1px solid rgba(217, 119, 6, 0.3)'
                 }}
               >
@@ -294,7 +294,7 @@ export default function Login() {
                 sx={{
                   fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
                   fontWeight: 800,
-                  color: '#042F2E',
+                  color: 'text.primary',
                   letterSpacing: '-0.025em',
                   mb: 0.5
                 }}
@@ -435,7 +435,7 @@ export default function Login() {
                 textAlign: 'center'
               }}
             >
-              <Typography variant="caption" sx={{ color: '#042F2E', fontWeight: 700, display: 'block', mb: 0.5 }}>
+              <Typography variant="caption" sx={{ color: 'text.primary', fontWeight: 700, display: 'block', mb: 0.5 }}>
                 Boutique Demo Credentials:
               </Typography>
               <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', fontFamily: 'monospace', mb: 1.5 }}>
@@ -454,7 +454,7 @@ export default function Login() {
                   py: 0.5,
                   px: 2,
                   '&:hover': {
-                    bgcolor: 'rgba(15, 118, 110, 0.08)',
+                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)',
                     bordercolor: (t) => t.palette.primary.main
                   }
                 }}
