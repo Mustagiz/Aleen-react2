@@ -37,7 +37,8 @@ import {
   Favorite,
   WhatsApp,
   Spa,
-  PlayCircleOutline
+  CropFree,
+  Star
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '../firebase';
@@ -113,7 +114,7 @@ export default function CustomerDisplay() {
     return null;
   });
 
-  // Admin CFD Configuration (Idle screen animations, video, marquee text)
+  // Admin CFD Configuration (Idle screen animations, video, marquee text, customer name styling)
   const [cfdConfig, setCfdConfig] = useState(() => {
     try {
       const saved = localStorage.getItem('aleen_cfd_config');
@@ -122,15 +123,29 @@ export default function CustomerDisplay() {
     return {
       idleDisplayType: 'animation',
       animationType: 'couture-showcase',
-      videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-fashion-model-in-a-golden-dress-41551-large.mp4',
+      videoPreset: 'interactive-runway',
+      videoUrl: 'canvas-runway',
       videoFit: 'cover',
       customHeadline: 'Welcome to Aleen Clothing Atelier',
       customSubtext: 'Bespoke Bridal Lehengas • Pure Handloom Banarasi Silks • Master Couture Tailoring',
       textAnimationStyle: 'marquee-glide',
       animateCustomerName: true,
+      customerAnimationStyle: 'golden-shimmer',
       welcomeTone: 'luxury'
     };
   });
+
+  // Video element reference for reliable autoplay & framing control
+  const videoRef = useRef(null);
+
+  // Auto-play video with sound policy compliance whenever video URL/fit/mode changes
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.defaultMuted = true;
+      videoRef.current.muted = true;
+      videoRef.current.play().catch(() => {});
+    }
+  }, [cfdConfig.videoUrl, cfdConfig.videoFit, cfdConfig.idleDisplayType]);
 
   // Interactive Customer Touchpoint States
   const [patronRating, setPatronRating] = useState(5);
@@ -357,7 +372,6 @@ export default function CustomerDisplay() {
   // Luxury Light Theme Accent Palette
   const themeAccent = '#C5A059'; // Royal Champagne Gold
   const themeAccentDeep = '#937230'; // Deep Antique Gold
-  const themeAccentSoft = 'rgba(197, 160, 89, 0.15)'; // Champagne veil
 
   const handleCopyUpi = () => {
     if (upiUrl && navigator?.clipboard?.writeText) {
@@ -388,6 +402,55 @@ export default function CustomerDisplay() {
   const isEmptyCart = !items.length && !isSettled;
   const hasCustomer = Boolean(customerName);
 
+  // Dynamic Patron VIP Name Renderer with selectable animation styles
+  const renderPatronName = (name, customSx = {}) => {
+    if (!name) return null;
+    const isAnimated = cfdConfig.animateCustomerName !== false;
+    const style = cfdConfig.customerAnimationStyle || 'golden-shimmer';
+
+    const animSx = isAnimated ? {
+      ...(style === 'golden-shimmer' && {
+        background: 'linear-gradient(90deg, #937230 0%, #D97706 25%, #FDE047 50%, #D97706 75%, #937230 100%)',
+        backgroundSize: '200% auto',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        animation: 'cfdShimmer 2.2s linear infinite'
+      }),
+      ...(style === 'bounce-float' && {
+        color: '#0F172A',
+        animation: 'cfdBounceFloat 1.8s ease-in-out infinite'
+      }),
+      ...(style === 'pulse-glow' && {
+        color: '#937230',
+        animation: 'cfdPulseGlow 2s ease-in-out infinite'
+      }),
+      ...(style === 'sparkle-pop' && {
+        color: '#B45309',
+        animation: 'cfdSparklePop 2.4s ease-in-out infinite'
+      }),
+      ...(style === 'neon-atelier' && {
+        color: '#937230',
+        animation: 'cfdNeonGlow 2s ease-in-out infinite'
+      })
+    } : {
+      color: '#0F172A'
+    };
+
+    return (
+      <Box
+        component="span"
+        sx={{
+          display: 'inline-block',
+          fontWeight: 900,
+          ...animSx,
+          ...customSx
+        }}
+      >
+        {isAnimated ? `✨ ${name} 💎` : name}
+      </Box>
+    );
+  };
+
   return (
     <Box
       sx={{
@@ -403,6 +466,60 @@ export default function CustomerDisplay() {
         userSelect: 'none'
       }}
     >
+      {/* Explicit Global CSS Keyframes for Guaranteed 60FPS Cross-Browser Animations */}
+      <style>{`
+        @keyframes cfdShimmer {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        @keyframes cfdPulseGlow {
+          0%, 100% {
+            transform: scale(1);
+            filter: drop-shadow(0 0 6px rgba(197, 160, 89, 0.4));
+          }
+          50% {
+            transform: scale(1.06);
+            filter: drop-shadow(0 0 24px rgba(217, 119, 6, 0.85));
+          }
+        }
+        @keyframes cfdBounceFloat {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-8px); }
+        }
+        @keyframes cfdSparklePop {
+          0%, 100% { transform: scale(1) rotate(0deg); }
+          30% { transform: scale(1.1) rotate(1.5deg); }
+          70% { transform: scale(0.96) rotate(-1.5deg); }
+        }
+        @keyframes cfdNeonGlow {
+          0%, 100% {
+            text-shadow: 0 0 8px rgba(197, 160, 89, 0.4), 0 0 16px rgba(197, 160, 89, 0.2);
+          }
+          50% {
+            text-shadow: 0 0 20px rgba(217, 119, 6, 0.9), 0 0 35px rgba(245, 158, 11, 0.8);
+          }
+        }
+        @keyframes cfdMarqueeScroll {
+          0% { transform: translateX(0%); }
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes cfdRotateSlow {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        @keyframes cfdRotateReverseSlow {
+          0% { transform: rotate(360deg); }
+          100% { transform: rotate(0deg); }
+        }
+        @keyframes cfdWaveUndulate {
+          0%, 100% { transform: scaleY(1) translateY(0); }
+          50% { transform: scaleY(1.22) translateY(-8px); }
+        }
+        @keyframes cfdRunwayLight {
+          0%, 100% { opacity: 0.3; transform: scale(0.95); }
+          50% { opacity: 1; transform: scale(1.05); }
+        }
+      `}</style>
       {/* Test Ping Toast Notification */}
       <Snackbar
         open={pingAlert}
@@ -634,7 +751,12 @@ export default function CustomerDisplay() {
                   {patronInitials}
                 </Avatar>
               }
-              label={`${timeGreeting}, ${customerName}`}
+              label={
+                <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.6 }}>
+                  <span>{timeGreeting},</span>
+                  {renderPatronName(customerName, { fontSize: '0.84rem' })}
+                </Box>
+              }
               sx={{
                 bgcolor: 'rgba(197, 160, 89, 0.12)',
                 color: '#937230 !important',
@@ -642,7 +764,7 @@ export default function CustomerDisplay() {
                 fontWeight: 800,
                 fontSize: { xs: '0.72rem', sm: '0.84rem' },
                 height: { xs: 30, sm: 34 },
-                maxWidth: { xs: 150, sm: 260, md: 'none' },
+                maxWidth: { xs: 180, sm: 320, md: 'none' },
                 boxShadow: '0 2px 6px rgba(197, 160, 89, 0.15)',
                 '& .MuiChip-label': {
                   color: '#937230 !important',
@@ -758,19 +880,7 @@ export default function CustomerDisplay() {
 
                 {/* Animated Customer Name Highlight on Settlement */}
                 <Typography variant="h3" sx={{ fontWeight: 900, mt: 0.5, mb: 1, color: '#0F172A', fontSize: { xs: '1.8rem', md: '2.5rem' } }}>
-                  Thank You,{' '}
-                  <Box
-                    component="span"
-                    sx={{
-                      background: 'linear-gradient(90deg, #937230 0%, #D97706 50%, #937230 100%)',
-                      backgroundSize: '200% auto',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      display: 'inline-block'
-                    }}
-                  >
-                    {customerName || 'Honoured Patron'}!
-                  </Box>
+                  Thank You, {renderPatronName(customerName || 'Honoured Patron')}!
                 </Typography>
 
                 <Typography variant="body1" sx={{ color: '#64748B', mb: 3, maxWidth: 540, mx: 'auto', fontSize: '0.95rem', lineHeight: 1.5 }}>
@@ -1010,23 +1120,7 @@ export default function CustomerDisplay() {
                       mb: 1.2
                     }}
                   >
-                    Welcome,{' '}
-                    <Box
-                      component="span"
-                      sx={{
-                        background: 'linear-gradient(90deg, #937230 0%, #D97706 30%, #F59E0B 50%, #937230 100%)',
-                        backgroundSize: '200% auto',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        animation: 'shimmer 3s linear infinite',
-                        '@keyframes shimmer': {
-                          '0%': { backgroundPosition: '0% 50%' },
-                          '100%': { backgroundPosition: '200% 50%' }
-                        }
-                      }}
-                    >
-                      {customerName}
-                    </Box>
+                    Welcome, {renderPatronName(customerName)}
                   </Typography>
 
                   <Typography variant="body1" sx={{ color: '#64748B', maxWidth: 580, mx: 'auto', mb: 4, fontSize: '0.98rem' }}>
@@ -1153,90 +1247,217 @@ export default function CustomerDisplay() {
                     position: 'relative'
                   }}
                 >
-                  {/* MODE A: HAUTE COUTURE FASHION VIDEO */}
+                  {/* MODE A: HAUTE COUTURE FASHION VIDEO & VIDEO FRAMING */}
                   {cfdConfig.idleDisplayType === 'video' ? (
                     <Box sx={{ width: '100%', position: 'relative' }}>
-                      <Box
-                        sx={{
-                          width: '100%',
-                          height: { xs: 260, sm: 340, md: 420 },
-                          borderRadius: 3.5,
-                          overflow: 'hidden',
-                          border: '1.5px solid rgba(197, 160, 89, 0.35)',
-                          bgcolor: '#000000',
-                          position: 'relative',
-                          boxShadow: '0 12px 35px rgba(0,0,0,0.1)'
-                        }}
-                      >
-                        <video
-                          src={cfdConfig.videoUrl || 'https://assets.mixkit.co/videos/preview/mixkit-fashion-model-in-a-golden-dress-41551-large.mp4'}
-                          autoPlay
-                          loop
-                          muted
-                          playsInline
-                          style={{
+                      {cfdConfig.videoUrl === 'canvas-runway' ? (
+                        /* 60FPS Interactive Virtual Runway Catwalk Canvas */
+                        <Box
+                          sx={{
                             width: '100%',
-                            height: '100%',
-                            objectFit: cfdConfig.videoFit || 'cover',
-                            display: 'block'
-                          }}
-                        />
-
-                        {/* Video Luxury Frosted Overlay */}
-                        <Box
-                          sx={{
-                            position: 'absolute',
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            p: { xs: 2, sm: 3 },
-                            background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%)',
-                            color: '#FFFFFF',
-                            textAlign: 'left'
-                          }}
-                        >
-                          <Typography variant="overline" sx={{ color: '#FCD34D', letterSpacing: '0.2em', fontWeight: 900 }}>
-                            {storeName.toUpperCase()} • RUNWAY ATELIER
-                          </Typography>
-                          <Typography variant="h5" sx={{ fontWeight: 900, color: '#FFFFFF', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
-                            Haute Couture & Bespoke Matrimonial Craft
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.85)', display: 'block', mt: 0.5 }}>
-                            Crafted with pure mulberry silks, antique zardozi needlework and master tailoring.
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Box>
-                  ) : cfdConfig.idleDisplayType === 'text' ? (
-                    /* MODE B: ANIMATED CUSTOM HEADLINE / MARQUEE TEXT */
-                    <Box sx={{ py: { xs: 2, sm: 4 } }}>
-                      <motion.div
-                        animate={{ scale: [1, 1.05, 1] }}
-                        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                      >
-                        <Box
-                          sx={{
-                            width: 80,
-                            height: 80,
-                            mx: 'auto',
-                            mb: 2.5,
-                            borderRadius: '50%',
-                            background: 'linear-gradient(135deg, #C5A059 0%, #937230 100%)',
+                            ...(cfdConfig.videoFit === 'cinematic'
+                              ? { aspectRatio: '21 / 9', borderTop: '16px solid #000000', borderBottom: '16px solid #000000' }
+                              : cfdConfig.videoFit === 'contain'
+                              ? { height: { xs: 280, sm: 380, md: 460 }, border: '4px solid #C5A059', p: 1.5, bgcolor: '#000000', boxShadow: '0 15px 45px rgba(197, 160, 89, 0.25)' }
+                              : { height: { xs: 280, sm: 380, md: 460 }, border: '1.5px solid rgba(197, 160, 89, 0.4)' }),
+                            borderRadius: 3.5,
+                            overflow: 'hidden',
+                            background: 'radial-gradient(circle at 50% 30%, #2A2215 0%, #0A0805 100%)',
+                            position: 'relative',
                             display: 'flex',
+                            flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            boxShadow: '0 8px 25px rgba(197, 160, 89, 0.4)'
+                            color: '#FFFFFF'
                           }}
                         >
-                          <Diamond sx={{ fontSize: 42, color: '#FFFFFF' }} />
+                          {/* Animated Runway Lighting Pillars */}
+                          <Box sx={{ position: 'absolute', top: 0, left: '18%', width: 3, height: '100%', bgcolor: 'rgba(197, 160, 89, 0.65)', animation: 'cfdRunwayLight 2s infinite ease-in-out' }} />
+                          <Box sx={{ position: 'absolute', top: 0, right: '18%', width: 3, height: '100%', bgcolor: 'rgba(197, 160, 89, 0.65)', animation: 'cfdRunwayLight 2s infinite ease-in-out 1s' }} />
+
+                          {/* Perspective Gold Runway Lines */}
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              bottom: 0,
+                              left: '15%',
+                              right: '15%',
+                              height: 140,
+                              background: 'linear-gradient(to top, rgba(197, 160, 89, 0.35) 0%, rgba(197, 160, 89, 0) 100%)',
+                              borderLeft: '2px solid rgba(197, 160, 89, 0.4)',
+                              borderRight: '2px solid rgba(197, 160, 89, 0.4)',
+                              transform: 'perspective(200px) rotateX(45deg)',
+                              pointerEvents: 'none'
+                            }}
+                          />
+
+                          {/* Floating Runway Stardust */}
+                          <Stack direction="row" spacing={4} sx={{ position: 'absolute', top: '18%', pointerEvents: 'none' }}>
+                            {['✨', '⭐', '💎', '🌟', '✨'].map((star, sIdx) => (
+                              <motion.div
+                                key={sIdx}
+                                animate={{ y: [0, -12, 0], opacity: [0.4, 1, 0.4] }}
+                                transition={{ repeat: Infinity, duration: 2.2, delay: sIdx * 0.4, ease: 'easeInOut' }}
+                              >
+                                <Typography sx={{ fontSize: 22 }}>{star}</Typography>
+                              </motion.div>
+                            ))}
+                          </Stack>
+
+                          {/* Walking Haute Couture Model Silhouette */}
+                          <motion.div
+                            animate={{ y: [0, -14, 0], scale: [1, 1.08, 1] }}
+                            transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
+                          >
+                            <Typography sx={{ fontSize: { xs: 58, sm: 76 } }}>💃</Typography>
+                          </motion.div>
+
+                          {/* Frosted Lower Third */}
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              p: { xs: 2, sm: 3 },
+                              background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%)',
+                              textAlign: 'left',
+                              display: 'flex',
+                              alignItems: 'flex-end',
+                              justifyContent: 'space-between',
+                              flexWrap: 'wrap',
+                              gap: 1
+                            }}
+                          >
+                            <Box>
+                              <Typography variant="overline" sx={{ color: '#FCD34D', letterSpacing: '0.24em', fontWeight: 900, fontSize: '0.8rem' }}>
+                                {storeName.toUpperCase()} • RUNWAY ATELIER
+                              </Typography>
+                              <Typography variant="h5" sx={{ fontWeight: 900, color: '#FFFFFF', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
+                                Haute Couture Catwalk & Bespoke Craft
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.85)', display: 'block', mt: 0.3 }}>
+                                60FPS Virtual Runway • Pure mulberry silks, zardozi needlework and master tailoring.
+                              </Typography>
+                            </Box>
+                            <Chip
+                              icon={<CropFree sx={{ color: '#FCD34D !important', fontSize: '0.9rem !important' }} />}
+                              label={`FRAMING: ${(cfdConfig.videoFit || 'cover').toUpperCase()}`}
+                              size="small"
+                              sx={{
+                                bgcolor: 'rgba(0,0,0,0.65)',
+                                color: '#FCD34D',
+                                border: '1px solid rgba(252, 211, 77, 0.5)',
+                                fontWeight: 800,
+                                fontSize: '0.72rem'
+                              }}
+                            />
+                          </Box>
                         </Box>
-                      </motion.div>
+                      ) : (
+                        /* Real Video Player with Explicit Autoplay & Framing */
+                        <Box
+                          sx={{
+                            width: '100%',
+                            ...(cfdConfig.videoFit === 'cinematic'
+                              ? { aspectRatio: '21 / 9', borderTop: '16px solid #000000', borderBottom: '16px solid #000000' }
+                              : cfdConfig.videoFit === 'contain'
+                              ? { height: { xs: 280, sm: 380, md: 460 }, border: '4px solid #C5A059', p: 1.5, bgcolor: '#000000', boxShadow: '0 15px 45px rgba(197, 160, 89, 0.25)' }
+                              : { height: { xs: 280, sm: 380, md: 460 }, border: '1.5px solid rgba(197, 160, 89, 0.4)' }),
+                            borderRadius: 3.5,
+                            overflow: 'hidden',
+                            bgcolor: '#000000',
+                            position: 'relative',
+                            boxShadow: '0 12px 35px rgba(0,0,0,0.1)'
+                          }}
+                        >
+                          <video
+                            ref={videoRef}
+                            src={cfdConfig.videoUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: cfdConfig.videoFit === 'contain' ? 'contain' : 'cover',
+                              display: 'block'
+                            }}
+                          />
+
+                          {/* Video Luxury Frosted Overlay */}
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              p: { xs: 2, sm: 3 },
+                              background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%)',
+                              color: '#FFFFFF',
+                              textAlign: 'left',
+                              display: 'flex',
+                              alignItems: 'flex-end',
+                              justifyContent: 'space-between',
+                              flexWrap: 'wrap',
+                              gap: 1
+                            }}
+                          >
+                            <Box>
+                              <Typography variant="overline" sx={{ color: '#FCD34D', letterSpacing: '0.2em', fontWeight: 900 }}>
+                                {storeName.toUpperCase()} • RUNWAY ATELIER
+                              </Typography>
+                              <Typography variant="h5" sx={{ fontWeight: 900, color: '#FFFFFF', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
+                                Haute Couture & Bespoke Matrimonial Craft
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.85)', display: 'block', mt: 0.5 }}>
+                                Crafted with pure mulberry silks, antique zardozi needlework and master tailoring.
+                              </Typography>
+                            </Box>
+                            <Chip
+                              icon={<CropFree sx={{ color: '#FCD34D !important', fontSize: '0.9rem !important' }} />}
+                              label={`FRAMING: ${(cfdConfig.videoFit || 'cover').toUpperCase()}`}
+                              size="small"
+                              sx={{
+                                bgcolor: 'rgba(0,0,0,0.65)',
+                                color: '#FCD34D',
+                                border: '1px solid rgba(252, 211, 77, 0.5)',
+                                fontWeight: 800,
+                                fontSize: '0.72rem'
+                              }}
+                            />
+                          </Box>
+                        </Box>
+                      )}
+                    </Box>
+                  ) : cfdConfig.idleDisplayType === 'text' ? (
+                    /* MODE B: ANIMATED CUSTOM HEADLINE / SEAMLESS MARQUEE TEXT */
+                    <Box sx={{ py: { xs: 2, sm: 4 } }}>
+                      {/* Floating Rotating Diamond Medallion */}
+                      <Box
+                        sx={{
+                          width: 84,
+                          height: 84,
+                          mx: 'auto',
+                          mb: 2.5,
+                          borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #C5A059 0%, #937230 100%)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxShadow: '0 8px 25px rgba(197, 160, 89, 0.45)',
+                          animation: 'cfdPulseGlow 2.5s infinite ease-in-out'
+                        }}
+                      >
+                        <Diamond sx={{ fontSize: 44, color: '#FFFFFF' }} />
+                      </Box>
 
                       <Typography
                         variant="overline"
                         sx={{ color: '#937230', letterSpacing: '0.24em', fontWeight: 900, fontSize: '0.85rem' }}
                       >
-                        {storeName.toUpperCase()}
+                        {storeName.toUpperCase()} • ATELIER BESPOKE
                       </Typography>
 
                       {/* Custom Headline with Chosen Animation */}
@@ -1248,177 +1469,246 @@ export default function CustomerDisplay() {
                           mb: 2,
                           fontSize: { xs: '1.9rem', sm: '2.5rem', md: '3.1rem' },
                           lineHeight: 1.2,
-                          background: 'linear-gradient(90deg, #937230 0%, #D97706 40%, #B45309 70%, #937230 100%)',
-                          backgroundSize: '200% auto',
-                          WebkitBackgroundClip: 'text',
-                          WebkitTextFillColor: 'transparent',
-                          animation: cfdConfig.textAnimationStyle === 'pulse-glow' ? 'pulse 2.5s infinite ease-in-out' : 'shimmer 4s linear infinite',
-                          '@keyframes shimmer': {
-                            '0%': { backgroundPosition: '0% 50%' },
-                            '100%': { backgroundPosition: '200% 50%' }
-                          },
-                          '@keyframes pulse': {
-                            '0%, 100%': { opacity: 1, transform: 'scale(1)' },
-                            '50%': { opacity: 0.85, transform: 'scale(1.02)' }
-                          }
+                          ...(cfdConfig.textAnimationStyle === 'pulse-glow' && {
+                            color: '#937230',
+                            animation: 'cfdPulseGlow 2.2s infinite ease-in-out'
+                          }),
+                          ...(cfdConfig.textAnimationStyle === 'marquee-glide' && {
+                            background: 'linear-gradient(90deg, #937230 0%, #D97706 25%, #FDE047 50%, #D97706 75%, #937230 100%)',
+                            backgroundSize: '200% auto',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            animation: 'cfdShimmer 2.5s linear infinite'
+                          }),
+                          ...(cfdConfig.textAnimationStyle === 'waterfall-cascade' && {
+                            color: '#0F172A',
+                            animation: 'cfdBounceFloat 1.8s ease-in-out infinite'
+                          }),
+                          ...(cfdConfig.textAnimationStyle === 'typewriter-fade' && {
+                            color: '#B45309',
+                            animation: 'cfdSparklePop 2.4s ease-in-out infinite'
+                          })
                         }}
                       >
                         {cfdConfig.customHeadline || 'Welcome to Aleen Clothing Atelier'}
                       </Typography>
 
-                      {/* Marquee Ticker Tape or Subtext */}
+                      {/* Seamless Gapless Continuous Marquee Ticker */}
                       {cfdConfig.textAnimationStyle === 'marquee-glide' ? (
                         <Box
                           sx={{
                             overflow: 'hidden',
                             whiteSpace: 'nowrap',
-                            p: 2,
-                            borderRadius: 3,
-                            bgcolor: '#FAF8F5',
-                            border: '1px solid rgba(197, 160, 89, 0.3)',
+                            width: '100%',
+                            py: 2,
                             my: 2.5,
-                            boxShadow: '0 4px 12px rgba(197, 160, 89, 0.08)'
+                            borderRadius: 3.5,
+                            bgcolor: '#FAF8F5',
+                            border: '1.5px solid rgba(197, 160, 89, 0.35)',
+                            boxShadow: '0 8px 25px rgba(197, 160, 89, 0.1)'
                           }}
                         >
                           <Box
-                            component={motion.div}
-                            animate={{ x: ['100%', '-100%'] }}
-                            transition={{ repeat: Infinity, duration: 18, ease: 'linear' }}
-                            sx={{ display: 'inline-flex', gap: 3, alignItems: 'center' }}
+                            sx={{
+                              display: 'flex',
+                              width: 'max-content',
+                              animation: 'cfdMarqueeScroll 20s linear infinite'
+                            }}
                           >
-                            <Typography variant="body1" sx={{ fontWeight: 800, color: '#937230' }}>
-                              💎 {cfdConfig.customSubtext || 'Handcrafted Silks • Bespoke Bridal Lehengas • Master Atelier Precision'}
-                            </Typography>
-                            <Typography variant="body1" sx={{ fontWeight: 800, color: '#0F172A' }}>
-                              ✨ {storeTagline}
-                            </Typography>
+                            {/* Track 1 */}
+                            <Stack direction="row" spacing={3} sx={{ px: 2, flexShrink: 0, alignItems: 'center' }}>
+                              <Typography variant="h6" sx={{ fontWeight: 800, color: '#937230' }}>
+                                💎 {cfdConfig.customSubtext || 'Bespoke Bridal Lehengas • Pure Handloom Banarasi Silks • Master Couture Tailoring'}
+                              </Typography>
+                              <Typography variant="h6" sx={{ fontWeight: 800, color: '#0F172A' }}>
+                                ✨ {storeTagline}
+                              </Typography>
+                              <Typography variant="h6" sx={{ fontWeight: 800, color: '#D97706' }}>
+                                👑 Generational Weaver Guilds & Atelier Precision
+                              </Typography>
+                            </Stack>
+                            {/* Track 2 (Duplicate for Seamless Loop) */}
+                            <Stack direction="row" spacing={3} sx={{ px: 2, flexShrink: 0, alignItems: 'center' }}>
+                              <Typography variant="h6" sx={{ fontWeight: 800, color: '#937230' }}>
+                                💎 {cfdConfig.customSubtext || 'Bespoke Bridal Lehengas • Pure Handloom Banarasi Silks • Master Couture Tailoring'}
+                              </Typography>
+                              <Typography variant="h6" sx={{ fontWeight: 800, color: '#0F172A' }}>
+                                ✨ {storeTagline}
+                              </Typography>
+                              <Typography variant="h6" sx={{ fontWeight: 800, color: '#D97706' }}>
+                                👑 Generational Weaver Guilds & Atelier Precision
+                              </Typography>
+                            </Stack>
                           </Box>
                         </Box>
                       ) : (
-                        <Typography variant="h6" sx={{ color: '#64748B', maxWidth: 620, mx: 'auto', mb: 3, fontWeight: 600 }}>
+                        <Typography variant="h6" sx={{ color: '#64748B', maxWidth: 640, mx: 'auto', mb: 3, fontWeight: 600, lineHeight: 1.6 }}>
                           {cfdConfig.customSubtext || 'Handcrafted Silks • Bespoke Bridal Lehengas • Master Atelier Precision'}
                         </Typography>
                       )}
+
+                      {/* Highlight Badges */}
+                      <Stack direction="row" spacing={1.5} justifyContent="center" flexWrap="wrap" sx={{ mt: 1 }}>
+                        <Chip
+                          icon={<Star sx={{ color: '#937230 !important' }} />}
+                          label="Bespoke Bridal Lehengas"
+                          sx={{ bgcolor: '#FAF8F5', color: '#937230', border: '1px solid rgba(197, 160, 89, 0.3)', fontWeight: 800 }}
+                        />
+                        <Chip
+                          icon={<Diamond sx={{ color: '#937230 !important' }} />}
+                          label="Pure Handloom Silks"
+                          sx={{ bgcolor: '#FAF8F5', color: '#937230', border: '1px solid rgba(197, 160, 89, 0.3)', fontWeight: 800 }}
+                        />
+                        <Chip
+                          icon={<Spa sx={{ color: '#937230 !important' }} />}
+                          label="Master Fitting Guaranteed"
+                          sx={{ bgcolor: '#FAF8F5', color: '#937230', border: '1px solid rgba(197, 160, 89, 0.3)', fontWeight: 800 }}
+                        />
+                      </Stack>
                     </Box>
                   ) : (
-                    /* MODE C: 4 HAUTE COUTURE ANIMATION STYLES */
+                    /* MODE C: 4 HAUTE COUTURE HIGH-MOTION ANIMATION STYLES */
                     <Box>
                       {/* Sub-Type 1: Golden Mandala / Rotating Filigree Rings */}
                       {cfdConfig.animationType === 'golden-mandala' ? (
                         <Box sx={{ py: 3, position: 'relative' }}>
-                          <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ repeat: Infinity, duration: 24, ease: 'linear' }}
-                            style={{ display: 'inline-block' }}
-                          >
+                          <Box sx={{ position: 'relative', width: 200, height: 200, mx: 'auto', my: 2 }}>
+                            {/* Outer Clockwise Rotating Ring with 12 Filigree Ray Markers */}
                             <Box
                               sx={{
-                                width: { xs: 130, sm: 160 },
-                                height: { xs: 130, sm: 160 },
+                                position: 'absolute',
+                                inset: 0,
                                 borderRadius: '50%',
-                                border: '2px dashed #C5A059',
+                                border: '2.5px dashed #C5A059',
+                                animation: 'cfdRotateSlow 20s linear infinite'
+                              }}
+                            />
+
+                            {/* Inner Counter-Clockwise Filigree Ring */}
+                            <Box
+                              sx={{
+                                position: 'absolute',
+                                inset: 26,
+                                borderRadius: '50%',
+                                border: '2px dotted #937230',
+                                animation: 'cfdRotateReverseSlow 14s linear infinite'
+                              }}
+                            />
+
+                            {/* Center Diamond Medallion with Breathing Golden Glow */}
+                            <Box
+                              sx={{
+                                position: 'absolute',
+                                inset: 56,
+                                borderRadius: '50%',
+                                background: 'linear-gradient(135deg, #C5A059 0%, #937230 100%)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                position: 'relative'
+                                color: '#FFF',
+                                boxShadow: '0 8px 30px rgba(197, 160, 89, 0.55)',
+                                animation: 'cfdPulseGlow 2.5s infinite ease-in-out'
                               }}
                             >
-                              <Box
-                                sx={{
-                                  width: '80%',
-                                  height: '80%',
-                                  borderRadius: '50%',
-                                  border: '1.5px solid rgba(197, 160, 89, 0.4)'
-                                }}
-                              />
+                              <Diamond sx={{ fontSize: 38 }} />
                             </Box>
-                          </motion.div>
-
-                          <Box
-                            sx={{
-                              position: 'absolute',
-                              top: '50%',
-                              left: '50%',
-                              transform: 'translate(-50%, -50%)',
-                              width: 72,
-                              height: 72,
-                              borderRadius: '50%',
-                              background: 'linear-gradient(135deg, #C5A059 0%, #937230 100%)',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              color: '#FFF',
-                              boxShadow: '0 8px 24px rgba(197, 160, 89, 0.45)'
-                            }}
-                          >
-                            <Diamond sx={{ fontSize: 36 }} />
                           </Box>
 
-                          <Typography variant="overline" sx={{ color: '#937230', letterSpacing: '0.24em', fontWeight: 900, display: 'block', mt: 3 }}>
+                          <Typography variant="overline" sx={{ color: '#937230', letterSpacing: '0.24em', fontWeight: 900, display: 'block', mt: 2 }}>
                             ROYAL ZARDOZI HERITAGE
                           </Typography>
                           <Typography variant="h3" sx={{ fontWeight: 900, color: '#0F172A', mt: 0.5, mb: 1, fontSize: { xs: '1.8rem', md: '2.6rem' } }}>
                             Sacred Weaves & Timeless Bridal Grandeur
                           </Typography>
-                          <Typography variant="body1" sx={{ color: '#64748B', maxWidth: 560, mx: 'auto', mb: 2 }}>
-                            Every ensemble reflects generational craftsmanship from our master weaver guilds.
+                          <Typography variant="body1" sx={{ color: '#64748B', maxWidth: 580, mx: 'auto', mb: 2 }}>
+                            Dual concentric mandala rings rotating with generational precision. Every ensemble reflects the master weaver guilds of Aleen Atelier.
                           </Typography>
                         </Box>
                       ) : cfdConfig.animationType === 'fabric-flow' ? (
                         /* Sub-Type 2: Silken Fabric Flow & Floating Stardust */
                         <Box sx={{ py: 3, position: 'relative' }}>
-                          <motion.div
-                            animate={{
-                              borderRadius: ['40% 60% 70% 30% / 40% 50% 60% 50%', '60% 40% 30% 70% / 50% 60% 40% 60%', '40% 60% 70% 30% / 40% 50% 60% 50%']
-                            }}
-                            transition={{ repeat: Infinity, duration: 6, ease: 'easeInOut' }}
-                            style={{
-                              width: 130,
-                              height: 130,
-                              margin: '0 auto',
-                              background: 'linear-gradient(135deg, rgba(197, 160, 89, 0.4) 0%, rgba(217, 119, 6, 0.2) 100%)',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center'
-                            }}
-                          >
-                            <Spa sx={{ fontSize: 50, color: '#937230' }} />
-                          </motion.div>
+                          {/* 8-Bar Undulating Liquid Silk Wave */}
+                          <Stack direction="row" spacing={{ xs: 1, sm: 1.5 }} justifyContent="center" alignItems="center" sx={{ height: 110, mb: 2 }}>
+                            {[0, 1, 2, 3, 4, 5, 6, 7].map((barIdx) => (
+                              <Box
+                                key={barIdx}
+                                sx={{
+                                  width: { xs: 10, sm: 16 },
+                                  height: 42 + (barIdx % 4) * 18,
+                                  borderRadius: 3,
+                                  background: 'linear-gradient(180deg, #FDE047 0%, #D97706 50%, #937230 100%)',
+                                  boxShadow: '0 4px 15px rgba(217, 119, 6, 0.45)',
+                                  animation: `cfdWaveUndulate 2s ease-in-out infinite ${barIdx * 0.22}s`
+                                }}
+                              />
+                            ))}
+                          </Stack>
 
-                          <Typography variant="overline" sx={{ color: '#937230', letterSpacing: '0.24em', fontWeight: 900, display: 'block', mt: 2.5 }}>
-                            FLOWING PURE MULBERRY SILKS
+                          {/* Floating Golden Stardust Particles */}
+                          <Stack direction="row" spacing={3} justifyContent="center" sx={{ mb: 2 }}>
+                            {['✨', '⭐', '💎', '🌟', '✨'].map((star, sIdx) => (
+                              <motion.div
+                                key={sIdx}
+                                animate={{ y: [0, -14, 0], scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+                                transition={{ repeat: Infinity, duration: 2.2, delay: sIdx * 0.35, ease: 'easeInOut' }}
+                              >
+                                <Typography sx={{ fontSize: 26 }}>{star}</Typography>
+                              </motion.div>
+                            ))}
+                          </Stack>
+
+                          <Typography variant="overline" sx={{ color: '#937230', letterSpacing: '0.24em', fontWeight: 900, display: 'block' }}>
+                            FLOWING PURE MULBERRY SILKS & GOLDEN STARDUST
                           </Typography>
                           <Typography variant="h3" sx={{ fontWeight: 900, color: '#0F172A', mt: 0.5, mb: 1, fontSize: { xs: '1.8rem', md: '2.6rem' } }}>
                             Liquid Drape & Artisanal Luxury
                           </Typography>
-                          <Typography variant="body1" sx={{ color: '#64748B', maxWidth: 560, mx: 'auto', mb: 2 }}>
-                            Hand-loomed organic silks sculpted to your exact bespoke measurements.
+                          <Typography variant="body1" sx={{ color: '#64748B', maxWidth: 580, mx: 'auto', mb: 2 }}>
+                            Hand-loomed organic mulberry silks undulating with liquid fluidity, woven on generational pit looms.
                           </Typography>
                         </Box>
                       ) : cfdConfig.animationType === 'minimalist-aura' ? (
                         /* Sub-Type 3: Modern Atelier Breathing Aura */
-                        <Box sx={{ py: 3 }}>
-                          <motion.div
-                            animate={{ scale: [0.95, 1.05, 0.95], opacity: [0.7, 1, 0.7] }}
-                            transition={{ repeat: Infinity, duration: 3.5, ease: 'easeInOut' }}
-                          >
+                        <Box sx={{ py: 3, position: 'relative' }}>
+                          <Box sx={{ position: 'relative', width: 220, height: 220, mx: 'auto', my: 2 }}>
+                            {/* Outer Expanding Aura Ring */}
                             <Box
                               sx={{
-                                width: 88,
-                                height: 88,
-                                mx: 'auto',
-                                mb: 2.5,
-                                borderRadius: 4,
-                                bgcolor: 'rgba(197, 160, 89, 0.15)',
-                                border: '1.5px solid #C5A059',
+                                position: 'absolute',
+                                inset: 0,
+                                borderRadius: '50%',
+                                border: '1.5px dashed rgba(197, 160, 89, 0.4)',
+                                animation: 'cfdPulseGlow 3.5s infinite ease-in-out 1.5s'
+                              }}
+                            />
+                            {/* Middle Ring */}
+                            <Box
+                              sx={{
+                                position: 'absolute',
+                                inset: 32,
+                                borderRadius: '50%',
+                                border: '2px solid rgba(197, 160, 89, 0.6)',
+                                animation: 'cfdPulseGlow 3.5s infinite ease-in-out 0.75s'
+                              }}
+                            />
+                            {/* Inner Ring with Diamond */}
+                            <Box
+                              sx={{
+                                position: 'absolute',
+                                inset: 68,
+                                borderRadius: '50%',
+                                background: 'linear-gradient(135deg, rgba(197, 160, 89, 0.3) 0%, rgba(147, 114, 48, 0.4) 100%)',
+                                border: '2px solid #C5A059',
                                 display: 'flex',
                                 alignItems: 'center',
-                                justifyContent: 'center'
+                                justifyContent: 'center',
+                                boxShadow: '0 8px 30px rgba(197, 160, 89, 0.4)',
+                                animation: 'cfdPulseGlow 3.5s infinite ease-in-out'
                               }}
                             >
-                              <Diamond sx={{ fontSize: 44, color: '#937230' }} />
+                              <Diamond sx={{ fontSize: 40, color: '#937230' }} />
                             </Box>
-                          </motion.div>
+                          </Box>
 
                           <Typography variant="overline" sx={{ color: '#937230', letterSpacing: '0.28em', fontWeight: 900, fontSize: '0.85rem' }}>
                             ALEEN COUTURE MANIFESTO
@@ -1426,34 +1716,32 @@ export default function CustomerDisplay() {
                           <Typography variant="h3" sx={{ fontWeight: 900, color: '#0F172A', mt: 0.5, mb: 1, fontSize: { xs: '1.8rem', md: '2.6rem' } }}>
                             Perfection in Every Silhouette
                           </Typography>
-                          <Typography variant="body1" sx={{ color: '#64748B', maxWidth: 540, mx: 'auto', mb: 2 }}>
-                            Parisian atelier precision meets royal Indian weaving traditions.
+                          <Typography variant="body1" sx={{ color: '#64748B', maxWidth: 560, mx: 'auto', mb: 2 }}>
+                            Parisian atelier precision meets royal Indian weaving traditions. Expanding radiant golden halos sculpted to measure.
                           </Typography>
                         </Box>
                       ) : (
                         /* Sub-Type 4 (Default): Haute Couture Editorial Collection Carousel */
                         <Box>
-                          <motion.div
-                            animate={{ y: [0, -6, 0] }}
-                            transition={{ repeat: Infinity, duration: 4, ease: 'easeInOut' }}
+                          {/* Floating Haute Couture Emblem */}
+                          <Box
+                            sx={{
+                              width: 88,
+                              height: 88,
+                              mx: 'auto',
+                              mb: 2.5,
+                              borderRadius: 4,
+                              background: 'linear-gradient(135deg, rgba(197, 160, 89, 0.3) 0%, rgba(197, 160, 89, 0.1) 100%)',
+                              border: '2px solid rgba(197, 160, 89, 0.6)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              animation: 'cfdPulseGlow 3s infinite ease-in-out',
+                              boxShadow: '0 8px 25px rgba(197, 160, 89, 0.3)'
+                            }}
                           >
-                            <Box
-                              sx={{
-                                width: 88,
-                                height: 88,
-                                mx: 'auto',
-                                mb: 2.5,
-                                borderRadius: 3.5,
-                                background: 'linear-gradient(135deg, rgba(197, 160, 89, 0.25) 0%, rgba(197, 160, 89, 0.08) 100%)',
-                                border: '1.5px solid rgba(197, 160, 89, 0.5)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                              }}
-                            >
-                              <Diamond sx={{ fontSize: 46, color: '#937230' }} />
-                            </Box>
-                          </motion.div>
+                            <Diamond sx={{ fontSize: 46, color: '#937230' }} />
+                          </Box>
 
                           <Typography
                             variant="overline"
@@ -1475,7 +1763,7 @@ export default function CustomerDisplay() {
                             Bespoke Craftsmanship & Haute Couture
                           </Typography>
 
-                          {/* Active Carousel Card (Light Theme) */}
+                          {/* Active Carousel Card with Animated Progress Line */}
                           <Box
                             sx={{
                               p: 3,
@@ -1527,6 +1815,20 @@ export default function CustomerDisplay() {
                                 />
                               ))}
                             </Stack>
+
+                            {/* Continuous Animated Gold Progress Bar */}
+                            <Box
+                              sx={{
+                                position: 'absolute',
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                height: 3.5,
+                                background: 'linear-gradient(90deg, #937230, #FDE047, #937230)',
+                                backgroundSize: '200% auto',
+                                animation: 'cfdShimmer 2.5s linear infinite'
+                              }}
+                            />
 
                             {/* Carousel Dots */}
                             <Stack direction="row" spacing={1} justifyContent="center" sx={{ mt: 2.5 }}>
@@ -1613,7 +1915,7 @@ export default function CustomerDisplay() {
                     <Stack direction="row" spacing={1.5} alignItems="center">
                       <LocalMall sx={{ color: '#937230', fontSize: 24 }} />
                       <Typography variant="h6" sx={{ fontWeight: 900, color: '#0F172A', fontSize: { xs: '0.98rem', sm: '1.1rem' } }}>
-                        Curated Ensemble for {customerName || 'Honoured Patron'} ({items.length} {items.length === 1 ? 'Item' : 'Items'})
+                        Curated Ensemble for {renderPatronName(customerName || 'Honoured Patron', { fontSize: 'inherit' })} ({items.length} {items.length === 1 ? 'Item' : 'Items'})
                       </Typography>
                     </Stack>
 
