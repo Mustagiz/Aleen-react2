@@ -163,6 +163,28 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
 
   const leftBoxMode = activeSettings?.leftBoxMode || profile?.leftBoxMode || 'luxury-composite';
 
+  // Robust check for paid status across all invoice schemas, capitalizations, and template previews
+  const isPaidInvoice = Boolean(
+    String(invoice?.paymentStatus || '').toLowerCase() === 'paid' ||
+    String(invoice?.status || '').toLowerCase() === 'paid' ||
+    String(invoice?.status || '').toLowerCase() === 'settled' ||
+    String(invoice?.status || '').toLowerCase() === 'completed' ||
+    (invoice?.balanceDue !== undefined && Number(invoice?.balanceDue) <= 0 && Number(invoice?.total || 0) > 0) ||
+    (invoice?.balance !== undefined && Number(invoice?.balance) <= 0 && Number(invoice?.total || 0) > 0) ||
+    (invoice?.paidAmount !== undefined && Number(invoice?.paidAmount) >= Number(invoice?.total || 0) && Number(invoice?.total || 0) > 0) ||
+    (invoice?.amountPaid !== undefined && Number(invoice?.amountPaid) >= Number(invoice?.total || 0) && Number(invoice?.total || 0) > 0) ||
+    Boolean(invoice?.isSample) ||
+    String(invoice?.id || '').includes('SAMPLE')
+  );
+
+  const stampVariant =
+    activeTemplate === 'champagne-gold' ? 'gold' :
+    activeTemplate === 'heritage-crimson' ? 'crimson' :
+    activeTemplate === 'royal-sapphire' ? 'sapphire' :
+    activeTemplate === 'rose-plum' ? 'plum' :
+    activeTemplate === 'executive-slate' || activeTemplate === 'minimal-haute' ? 'slate' :
+    'emerald';
+
   if (!invoice) return null;
 
   return (
@@ -899,22 +921,22 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
 
         {!isSlip && (profile.showSignatureStamp ?? activeSettings.showSignatureStamp) && (
           <Box sx={{ textAlign: 'center', width: '40%', minWidth: 240, position: 'relative' }}>
-            {/* Retro Watermark Stamp centered directly behind the signature */}
-            {(invoice?.paymentStatus === 'paid' || invoice?.status === 'paid' || (invoice?.paidAmount && Number(invoice?.paidAmount) >= Number(invoice?.total))) && (
+            {/* Retro Watermark Stamp centered directly behind / over the signature */}
+            {isPaidInvoice && (
               <Box
                 sx={{
                   position: 'absolute',
-                  top: '40%',
+                  top: '42%',
                   left: '50%',
                   transform: 'translate(-50%, -50%)',
-                  zIndex: 1,
+                  zIndex: 3,
                   pointerEvents: 'none'
                 }}
               >
                 <WaxSealStamp
                   label="PAID"
                   subtitle="ATELIER ALEEN"
-                  variant={activeTemplate === 'champagne-gold' ? 'gold' : activeTemplate === 'heritage-crimson' ? 'crimson' : 'emerald'}
+                  variant={stampVariant}
                   isWatermark={true}
                   size={140}
                   animate={false}
@@ -923,33 +945,33 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
             )}
 
             {(profile.signatureImage || activeSettings.signatureImage) ? (
-              <Box sx={{ minHeight: 95, maxHeight: 130, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', mb: 0.5, position: 'relative', zIndex: 2 }}>
+              <Box sx={{ minHeight: 95, maxHeight: 130, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', mb: 0.5, position: 'relative', zIndex: 1 }}>
                 <img
                   src={profile.signatureImage || activeSettings.signatureImage}
                   alt="Authorized Signature"
-                  style={{ maxHeight: 120, maxWidth: 280, objectFit: 'contain' }}
+                  style={{ maxHeight: 120, maxWidth: 280, objectFit: 'contain', mixBlendMode: 'multiply' }}
                 />
               </Box>
             ) : (
-              <Box sx={{ height: 80, position: 'relative', zIndex: 2 }} />
+              <Box sx={{ height: 80, position: 'relative', zIndex: 1 }} />
             )}
-            <Box sx={{ borderBottom: '1.5px solid #94A3B8', mb: 0.5, position: 'relative', zIndex: 2 }} />
-            <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', fontSize: '0.75rem', position: 'relative', zIndex: 2 }}>
+            <Box sx={{ borderBottom: '1.5px solid #94A3B8', mb: 0.5, position: 'relative', zIndex: 1 }} />
+            <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', fontSize: '0.75rem', position: 'relative', zIndex: 1 }}>
               {profile.signatureLabel || activeSettings.signatureLabel || 'Authorized Signatory'}
             </Typography>
-            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', position: 'relative', zIndex: 2 }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', position: 'relative', zIndex: 1 }}>
               {profile.businessName || 'Aleen Clothing'}
             </Typography>
           </Box>
         )}
 
         {/* Fallback if signature block is disabled */}
-        {(!profile.showSignatureStamp && !activeSettings.showSignatureStamp) && (invoice?.paymentStatus === 'paid' || invoice?.status === 'paid' || (invoice?.paidAmount && Number(invoice?.paidAmount) >= Number(invoice?.total))) && (
-          <Box sx={{ position: 'absolute', right: 30, bottom: 20, zIndex: 1, pointerEvents: 'none' }}>
+        {(!profile.showSignatureStamp && !activeSettings.showSignatureStamp) && isPaidInvoice && (
+          <Box sx={{ position: 'absolute', right: 30, bottom: 20, zIndex: 2, pointerEvents: 'none' }}>
             <WaxSealStamp
               label="PAID"
               subtitle="ATELIER ALEEN"
-              variant={activeTemplate === 'champagne-gold' ? 'gold' : activeTemplate === 'heritage-crimson' ? 'crimson' : 'emerald'}
+              variant={stampVariant}
               isWatermark={true}
               size={96}
               animate={false}

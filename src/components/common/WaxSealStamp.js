@@ -31,6 +31,21 @@ export default function WaxSealStamp({
       ink: '#064E3B',
       border: '#0F766E',
       innerRing: '#14B8A6'
+    },
+    sapphire: {
+      ink: '#1E3A8A',
+      border: '#1D4ED8',
+      innerRing: '#3B82F6'
+    },
+    plum: {
+      ink: '#701A75',
+      border: '#86198F',
+      innerRing: '#A21CAF'
+    },
+    slate: {
+      ink: '#1E293B',
+      border: '#334155',
+      innerRing: '#475569'
     }
   };
 
@@ -41,7 +56,7 @@ export default function WaxSealStamp({
         component={animate ? motion.div : 'div'}
         {...(animate ? {
           initial: { scale: 1.25, opacity: 0, rotate: -18 },
-          animate: { scale: 1, opacity: 0.28, rotate: -13 },
+          animate: { scale: 1, opacity: 0.52, rotate: -13 },
           transition: { type: 'spring', stiffness: 220, damping: 18 }
         } : {})}
         sx={{
@@ -57,7 +72,7 @@ export default function WaxSealStamp({
           userSelect: 'none',
           position: 'relative',
           boxSizing: 'border-box',
-          opacity: 0.28,
+          opacity: 0.52,
           mixBlendMode: 'multiply',
           transform: 'rotate(-13deg)',
           pointerEvents: 'none',

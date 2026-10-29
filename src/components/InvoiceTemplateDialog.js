@@ -54,6 +54,11 @@ const SAMPLE_INVOICE = {
   gst: 18,
   tax: 6190.20,
   total: 40580.20,
+  paymentStatus: 'paid',
+  status: 'paid',
+  paidAmount: 40580.20,
+  balanceDue: 0,
+  isSample: true,
   paymentMethod: 'UPI / Split Payment',
   notes: 'Client fitting scheduled for 28th Oct. Roll pressing included.'
 };
