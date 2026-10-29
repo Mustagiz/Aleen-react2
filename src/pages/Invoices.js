@@ -4,7 +4,7 @@ import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, 
 import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, QrCode2, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, PauseCircleOutline, ShoppingCart, RestartAlt, CalendarMonth, Phone, Straighten, Clear, Stars, Redeem, AccountBalanceWallet, Keyboard, Tv, VolumeUp, VolumeOff } from '@mui/icons-material';
 import { Html5Qrcode } from 'html5-qrcode';
 import { db } from '../firebase';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
@@ -29,6 +29,7 @@ import AtelierStitchDivider from '../components/common/AtelierStitchDivider';
 import ThermalReceipt from '../components/ThermalReceipt';
 import CustomerMeasurementModal from '../components/crm/CustomerMeasurementModal';
 import UpiPaymentQrModal from '../components/pos/UpiPaymentQrModal';
+import PairCustomerDisplayModal from '../components/pos/PairCustomerDisplayModal';
 import { speakItemScan, speakItemNotFound, speakBillSettlement, getVoiceSettings, setVoiceSettings } from '../utils/posVoiceEngine';
 
 const Invoices = () => {
@@ -59,6 +60,7 @@ const Invoices = () => {
   const [offscreenInvoice, setOffscreenInvoice] = useState(null);
   const [clientValidationErrors, setClientValidationErrors] = useState({ customer: false, phone: false });
   const [shortcutHelpOpen, setShortcutHelpOpen] = useState(false);
+  const [pairModalOpen, setPairModalOpen] = useState(false);
   const offscreenInvoiceRef = useRef(null);
 
   useEffect(() => {
@@ -905,7 +907,7 @@ const Invoices = () => {
     });
   };
 
-  // Realtime BroadcastChannel Sync for Customer Facing Display (CFD)
+  // Realtime BroadcastChannel & Cloud Firestore Sync for Customer Facing Display (CFD)
   const syncCustomerDisplay = (overrideStatus = null, lastScanned = null) => {
     try {
       const validItems = (selectedItems || [])
@@ -928,7 +930,10 @@ const Invoices = () => {
         storeName,
         storeLogo: profile?.logoUrl || null,
         customerName: customer || '',
+        customerPhone: phone || '',
         customerTier: matchedCustomer?.loyaltyTier || 'Silver',
+        loyaltyPoints: matchedCustomer?.loyaltyPoints || 0,
+        loyaltyDiscount: totals.loyaltyDiscount || 0,
         items: validItems,
         subtotal: totals.subtotal || 0,
         discount: (totals.absDiscount || 0) + (totals.loyaltyDiscount || 0),
@@ -937,15 +942,29 @@ const Invoices = () => {
         paymentMethod: isSplitPayment ? `${paymentMethod} + ${paymentMethod2}` : paymentMethod,
         upiUrl: (paymentMethod === 'UPI' || (isSplitPayment && (paymentMethod === 'UPI' || paymentMethod2 === 'UPI'))) ? upiUrl : '',
         status,
-        lastScannedItem: lastScanned || null
+        lastScannedItem: lastScanned || null,
+        currency: 'INR',
+        updatedAt: Date.now()
       };
 
+      // 1. Same-device instant BroadcastChannel
       if (cfdChannelRef.current) {
         cfdChannelRef.current.postMessage({ type: 'SYNC', payload });
       }
+
+      // 2. LocalStorage fallback
       try {
         localStorage.setItem('aleen_cfd_state', JSON.stringify(payload));
       } catch (e) {}
+
+      // 3. Real-time Cloud Firestore Sync for 2nd Device (iPad, tablet, phone over Wi-Fi)
+      try {
+        setDoc(doc(db, 'cfd_live_sessions', 'primary'), payload, { merge: true }).catch((err) => {
+          console.warn('Firestore CFD live sync warning:', err);
+        });
+      } catch (err) {
+        console.warn('Firestore CFD write warning:', err);
+      }
     } catch (err) {
       console.warn('Failed to broadcast to Customer Display:', err);
     }
@@ -1836,6 +1855,35 @@ const Invoices = () => {
                   borderRadius: '6px'
                 }}
               />
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<QrCode2 sx={{ fontSize: 19, color: (t) => t.palette.primary.main }} />}
+              onClick={() => setPairModalOpen(true)}
+              sx={{
+                height: 42,
+                minHeight: 42,
+                px: 2.2,
+                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                border: (t) => `1.5px solid ${t.palette.primary.main}`,
+                color: (t) => t.palette.primary.main,
+                bgcolor: 'background.paper',
+                fontWeight: 700,
+                fontSize: '0.84rem',
+                textTransform: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxSizing: 'border-box',
+                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                '&:hover': {
+                  border: (t) => `1.5px solid ${t.palette.primary.dark}`,
+                  bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
+                  transform: 'translateY(-1px)'
+                }
+              }}
+            >
+              Pair 2nd Screen
             </Button>
             <Button
               variant="outlined"
@@ -3387,6 +3435,45 @@ const Invoices = () => {
               >
                 {voiceSettings.voiceEnabled ? <VolumeUp sx={{ fontSize: 18 }} /> : <VolumeOff sx={{ fontSize: 18 }} />}
               </IconButton>
+            </Tooltip>
+
+            {/* Pair 2nd Device (iPad / Tablet / Phone) QR Launcher */}
+            <Tooltip title="Scan QR Code to connect iPad, Tablet or Phone as Customer Screen">
+              <Button
+                size="small"
+                onClick={() => setPairModalOpen(true)}
+                startIcon={<QrCode2 sx={{ fontSize: { xs: 15, sm: 17 }, color: '#FFFFFF !important' }} />}
+                className="header-contrast-btn"
+                sx={{
+                  color: '#FFFFFF !important',
+                  background: 'rgba(255, 255, 255, 0.2) !important',
+                  border: '1px solid rgba(255, 255, 255, 0.45) !important',
+                  backdropFilter: 'blur(8px)',
+                  borderRadius: '8px !important',
+                  height: { xs: 32, sm: 36 },
+                  minHeight: { xs: 32, sm: 36 },
+                  px: { xs: 1, sm: 1.5 },
+                  py: 0,
+                  textTransform: 'none',
+                  fontWeight: 700,
+                  fontSize: { xs: '0.72rem', sm: '0.8rem' },
+                  letterSpacing: '0.02em',
+                  whiteSpace: 'nowrap',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)',
+                  transition: 'all 0.2s ease',
+                  '& .MuiSvgIcon-root': {
+                    color: '#FFFFFF !important'
+                  },
+                  '&:hover': {
+                    background: 'rgba(255, 255, 255, 0.32) !important',
+                    borderColor: '#FFFFFF !important',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
+                  }
+                }}
+              >
+                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Pair iPad / Phone</Box>
+                <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Pair</Box>
+              </Button>
             </Tooltip>
 
             {/* Customer Facing Display Launcher */}
@@ -5196,6 +5283,14 @@ const Invoices = () => {
             }
           }
         }}
+      />
+
+      {/* Customer Facing Display 2nd Device Pairing Modal (QR & Wi-Fi) */}
+      <PairCustomerDisplayModal
+        open={pairModalOpen}
+        onClose={() => setPairModalOpen(false)}
+        profile={profile}
+        onLaunchSameWindow={handleOpenCustomerDisplay}
       />
 
       {/* POS Keyboard Accelerators Guide Dialog */}
