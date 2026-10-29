@@ -164,3 +164,126 @@ export const formatSkuWithHyphen = (sku) => {
   str = str.replace(/-+/g, '-');
   return str;
 };
+
+/**
+ * Curated Luxury Color Palettes for CRM Contact Cards and Avatars
+ * Deterministically chosen by name/initials so each client has a distinct, beautiful, vibrant palette
+ */
+export const LUXURY_CONTACT_PALETTES = [
+  {
+    name: 'Sapphire Royal',
+    gradient: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 50%, #1E3A8A 100%)',
+    border: 'rgba(59, 130, 246, 0.45)',
+    glow: 'rgba(37, 99, 235, 0.32)',
+    accent: '#2563EB',
+    chipBg: 'rgba(37, 99, 235, 0.08)',
+    chipText: '#1D4ED8'
+  },
+  {
+    name: 'Amethyst Violet',
+    gradient: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 50%, #5B21B6 100%)',
+    border: 'rgba(139, 92, 246, 0.45)',
+    glow: 'rgba(124, 58, 237, 0.32)',
+    accent: '#7C3AED',
+    chipBg: 'rgba(124, 58, 237, 0.08)',
+    chipText: '#6D28D9'
+  },
+  {
+    name: 'Rose Velvet',
+    gradient: 'linear-gradient(135deg, #EC4899 0%, #DB2777 50%, #9D174D 100%)',
+    border: 'rgba(236, 72, 153, 0.45)',
+    glow: 'rgba(219, 39, 119, 0.32)',
+    accent: '#DB2777',
+    chipBg: 'rgba(219, 39, 119, 0.08)',
+    chipText: '#BE185D'
+  },
+  {
+    name: 'Emerald Jade',
+    gradient: 'linear-gradient(135deg, #10B981 0%, #059669 50%, #064E3B 100%)',
+    border: 'rgba(16, 185, 129, 0.45)',
+    glow: 'rgba(5, 150, 105, 0.32)',
+    accent: '#059669',
+    chipBg: 'rgba(5, 150, 105, 0.08)',
+    chipText: '#047857'
+  },
+  {
+    name: 'Ocean Cyan',
+    gradient: 'linear-gradient(135deg, #06B6D4 0%, #0891B2 50%, #164E63 100%)',
+    border: 'rgba(6, 182, 212, 0.45)',
+    glow: 'rgba(8, 145, 178, 0.32)',
+    accent: '#0891B2',
+    chipBg: 'rgba(8, 145, 178, 0.08)',
+    chipText: '#0E7490'
+  },
+  {
+    name: 'Crimson Ruby',
+    gradient: 'linear-gradient(135deg, #F43F5E 0%, #E11D48 50%, #881337 100%)',
+    border: 'rgba(244, 63, 94, 0.45)',
+    glow: 'rgba(225, 29, 72, 0.32)',
+    accent: '#E11D48',
+    chipBg: 'rgba(225, 29, 72, 0.08)',
+    chipText: '#BE123C'
+  },
+  {
+    name: 'Sunset Terracotta',
+    gradient: 'linear-gradient(135deg, #F97316 0%, #EA580C 50%, #9A3412 100%)',
+    border: 'rgba(249, 115, 22, 0.45)',
+    glow: 'rgba(234, 88, 12, 0.32)',
+    accent: '#EA580C',
+    chipBg: 'rgba(234, 88, 12, 0.08)',
+    chipText: '#C2410C'
+  },
+  {
+    name: 'Royal Indigo',
+    gradient: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 50%, #312E81 100%)',
+    border: 'rgba(99, 102, 241, 0.45)',
+    glow: 'rgba(79, 70, 229, 0.32)',
+    accent: '#4F46E5',
+    chipBg: 'rgba(79, 70, 229, 0.08)',
+    chipText: '#4338CA'
+  },
+  {
+    name: 'Teal Peacock',
+    gradient: 'linear-gradient(135deg, #14B8A6 0%, #0D9488 50%, #134E4A 100%)',
+    border: 'rgba(20, 184, 166, 0.45)',
+    glow: 'rgba(13, 148, 136, 0.32)',
+    accent: '#0D9488',
+    chipBg: 'rgba(13, 148, 136, 0.08)',
+    chipText: '#0F766E'
+  },
+  {
+    name: 'Plum Bordeaux',
+    gradient: 'linear-gradient(135deg, #A855F7 0%, #9333EA 50%, #581C87 100%)',
+    border: 'rgba(168, 85, 247, 0.45)',
+    glow: 'rgba(147, 51, 234, 0.32)',
+    accent: '#9333EA',
+    chipBg: 'rgba(147, 51, 234, 0.08)',
+    chipText: '#7E22CE'
+  }
+];
+
+export const VIP_GOLD_PALETTE = {
+  name: 'Imperial Gold VIP',
+  gradient: 'linear-gradient(135deg, #F59E0B 0%, #D97706 50%, #78350F 100%)',
+  border: 'rgba(245, 158, 11, 0.65)',
+  glow: 'rgba(217, 119, 6, 0.42)',
+  accent: '#D97706',
+  chipBg: 'rgba(217, 119, 6, 0.12)',
+  chipText: '#B45309'
+};
+
+/**
+ * Returns a luxury palette deterministically selected from contact name or phone,
+ * with VIP gold tier override.
+ */
+export const getContactAvatarPalette = (nameOrPhone = '', isVip = false) => {
+  if (isVip) return VIP_GOLD_PALETTE;
+  const str = String(nameOrPhone || 'Guest').trim();
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0; // Convert to 32bit int
+  }
+  const index = Math.abs(hash) % LUXURY_CONTACT_PALETTES.length;
+  return LUXURY_CONTACT_PALETTES[index];
+};

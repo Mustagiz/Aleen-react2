@@ -57,6 +57,7 @@ import Customer360Drawer from '../components/crm/Customer360Drawer';
 import ClienteleNavTabs from '../components/crm/ClienteleNavTabs';
 import { useFeedback } from '../contexts/FeedbackContext';
 import CustomerMeasurementModal from '../components/crm/CustomerMeasurementModal';
+import { getContactAvatarPalette } from '../utils/helpers';
 
 const Customers = () => {
     const theme = useTheme();
@@ -541,22 +542,10 @@ const Customers = () => {
                                         const hasDue = (cust.totalDue || 0) > 0;
                                         const isVip = customerStat.totalSpent >= 50000;
                                         const isPremier = customerStat.totalSpent >= 10000 && !isVip;
-
-                                        const avatarBg = isVip
-                                            ? 'linear-gradient(135deg, #F59E0B 0%, #D97706 60%, #92400E 100%)'
-                                            : isPremier
-                                            ? 'linear-gradient(135deg, #14B8A6 0%, #0F766E 60%, #042F2E 100%)'
-                                            : 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)';
-
-                                        const avatarBorder = isVip
-                                            ? '2px solid rgba(245, 158, 11, 0.6)'
-                                            : isPremier
-                                            ? '2px solid rgba(20, 184, 166, 0.45)'
-                                            : '2px solid rgba(var(--primary-rgb, 15, 118, 110), 0.25)';
-
-                                        const avatarShadow = isVip
-                                            ? '0 4px 12px rgba(217, 119, 6, 0.35)'
-                                            : '0 2px 8px rgba(var(--primary-rgb, 15, 118, 110), 0.2)';
+                                        const palette = getContactAvatarPalette(cust.name || cust.phone || cust.id, isVip);
+                                        const rawPhone = (cust.phone || '').replace(/\D/g, '');
+                                        const cleanPhone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
+                                        const hasPhone = Boolean(cust.phone && cust.phone.trim() && cust.phone !== '+91' && rawPhone.length >= 7);
 
                                         return (
                                             <TableRow 
@@ -565,44 +554,50 @@ const Customers = () => {
                                                 sx={{ 
                                                     transition: 'all 0.18s ease',
                                                     '&:hover': { 
-                                                        bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.04)' : 'rgba(15, 118, 110, 0.025)'
+                                                        bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.025)' : 'rgba(0, 0, 0, 0.015)'
                                                     }
                                                 }}
                                             >
                                                 {/* Customer Name, Avatar & Specs */}
-                                                <TableCell sx={{ py: 1.5 }}>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.6 }}>
+                                                <TableCell sx={{ py: 1.6 }}>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.8 }}>
                                                         <Avatar
                                                             onClick={() => handleOpen360(cust)}
                                                             sx={{
-                                                                background: avatarBg,
-                                                                border: avatarBorder,
+                                                                background: palette.gradient,
+                                                                border: `2px solid ${palette.border}`,
                                                                 color: '#FFFFFF',
-                                                                width: 42,
-                                                                height: 42,
-                                                                fontSize: '0.84rem',
+                                                                width: 44,
+                                                                height: 44,
+                                                                borderRadius: '13px',
+                                                                fontSize: '0.86rem',
                                                                 fontWeight: 900,
                                                                 letterSpacing: '0.04em',
                                                                 cursor: 'pointer',
-                                                                boxShadow: avatarShadow,
-                                                                transition: 'transform 0.2s ease',
-                                                                '&:hover': { transform: 'scale(1.08)' }
+                                                                boxShadow: `0 4px 14px ${palette.glow}, inset 0 1px 1px rgba(255,255,255,0.4)`,
+                                                                transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                                                                '&:hover': { 
+                                                                    transform: 'scale(1.08) translateY(-1px)',
+                                                                    boxShadow: `0 6px 18px ${palette.glow}`
+                                                                }
                                                             }}
                                                         >
                                                             {getInitials(cust.name)}
                                                         </Avatar>
-                                                        <Box>
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                                                        <Box sx={{ minWidth: 0, flex: 1 }}>
+                                                            {/* Guest Name & VIP / Premier Tier Badge */}
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.85, flexWrap: 'wrap' }}>
                                                                 <Typography
                                                                     onClick={() => handleOpen360(cust)}
                                                                     sx={{
                                                                         fontWeight: 800,
-                                                                        fontSize: '0.92rem',
+                                                                        fontSize: '0.94rem',
                                                                         color: 'text.primary',
                                                                         textTransform: 'capitalize',
                                                                         cursor: 'pointer',
+                                                                        letterSpacing: '-0.01em',
                                                                         transition: 'color 0.15s ease',
-                                                                        '&:hover': { color: (t) => t.palette.primary.main }
+                                                                        '&:hover': { color: palette.accent }
                                                                     }}
                                                                 >
                                                                     {cust.name}
@@ -613,44 +608,130 @@ const Customers = () => {
                                                                         size="small"
                                                                         icon={<Stars sx={{ fontSize: '11px !important', color: '#D97706' }} />}
                                                                         sx={{
-                                                                            height: 18,
+                                                                            height: 19,
                                                                             fontSize: '0.62rem',
                                                                             fontWeight: 900,
                                                                             bgcolor: 'rgba(217, 119, 6, 0.14)',
                                                                             color: '#B45309',
-                                                                            border: '1px solid rgba(217, 119, 6, 0.3)',
+                                                                            border: '1px solid rgba(217, 119, 6, 0.35)',
+                                                                            letterSpacing: '0.05em',
+                                                                            boxShadow: '0 1px 4px rgba(217, 119, 6, 0.15)'
+                                                                        }}
+                                                                    />
+                                                                )}
+                                                                {isPremier && (
+                                                                    <Chip
+                                                                        label="PREMIER"
+                                                                        size="small"
+                                                                        sx={{
+                                                                            height: 18,
+                                                                            fontSize: '0.58rem',
+                                                                            fontWeight: 800,
+                                                                            bgcolor: palette.chipBg,
+                                                                            color: palette.chipText,
+                                                                            border: `1px solid ${palette.border}`,
                                                                             letterSpacing: '0.04em'
                                                                         }}
                                                                     />
                                                                 )}
                                                             </Box>
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.9, mt: 0.35, flexWrap: 'wrap' }}>
-                                                                <Typography
-                                                                    variant="caption"
-                                                                    sx={{
-                                                                        color: 'text.secondary',
-                                                                        fontFamily: 'monospace',
-                                                                        fontWeight: 600,
-                                                                        fontSize: '0.74rem',
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        gap: 0.4
-                                                                    }}
-                                                                >
-                                                                    <Phone sx={{ fontSize: 11, color: (t) => t.palette.primary.main, opacity: 0.7 }} /> {cust.phone || 'No phone'}
-                                                                </Typography>
+
+                                                            {/* Contact details: Phone Pill, WhatsApp quick-tap & Measurements */}
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mt: 0.45, flexWrap: 'wrap' }}>
+                                                                {hasPhone ? (
+                                                                    <Box
+                                                                        component="a"
+                                                                        href={`tel:${cust.phone}`}
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                        sx={{
+                                                                            display: 'inline-flex',
+                                                                            alignItems: 'center',
+                                                                            gap: 0.5,
+                                                                            textDecoration: 'none',
+                                                                            px: 0.85,
+                                                                            py: 0.2,
+                                                                            borderRadius: '6px',
+                                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)',
+                                                                            border: '1px solid',
+                                                                            borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
+                                                                            transition: 'all 0.15s ease',
+                                                                            '&:hover': {
+                                                                                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                                                                borderColor: palette.accent
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        <Phone sx={{ fontSize: 11, color: palette.accent }} />
+                                                                        <Typography
+                                                                            variant="caption"
+                                                                            sx={{
+                                                                                fontFamily: 'Roboto Mono, monospace',
+                                                                                fontWeight: 600,
+                                                                                fontSize: '0.74rem',
+                                                                                color: 'text.secondary'
+                                                                            }}
+                                                                        >
+                                                                            {cust.phone}
+                                                                        </Typography>
+                                                                    </Box>
+                                                                ) : (
+                                                                    <Box
+                                                                        sx={{
+                                                                            display: 'inline-flex',
+                                                                            alignItems: 'center',
+                                                                            gap: 0.4,
+                                                                            px: 0.75,
+                                                                            py: 0.15,
+                                                                            borderRadius: '5px',
+                                                                            bgcolor: 'rgba(0,0,0,0.03)',
+                                                                            border: '1px dashed rgba(0,0,0,0.1)'
+                                                                        }}
+                                                                    >
+                                                                        <Phone sx={{ fontSize: 10, color: 'text.disabled' }} />
+                                                                        <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.disabled', fontStyle: 'italic' }}>
+                                                                            No phone
+                                                                        </Typography>
+                                                                    </Box>
+                                                                )}
+
+                                                                {/* Direct WhatsApp Quick-Chat Action */}
+                                                                {hasPhone && (
+                                                                    <Tooltip title={`Chat with ${cust.name} on WhatsApp`} arrow>
+                                                                        <IconButton
+                                                                            size="small"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                window.open(`https://wa.me/${cleanPhone}`, '_blank');
+                                                                            }}
+                                                                            sx={{
+                                                                                p: 0.35,
+                                                                                color: '#25D366',
+                                                                                bgcolor: 'rgba(37, 211, 102, 0.08)',
+                                                                                border: '1px solid rgba(37, 211, 102, 0.25)',
+                                                                                transition: 'all 0.15s ease',
+                                                                                '&:hover': {
+                                                                                    bgcolor: 'rgba(37, 211, 102, 0.2)',
+                                                                                    transform: 'scale(1.1)'
+                                                                                }
+                                                                            }}
+                                                                        >
+                                                                            <WhatsApp sx={{ fontSize: 12 }} />
+                                                                        </IconButton>
+                                                                    </Tooltip>
+                                                                )}
+
                                                                 {cust.measurements?.bust && (
                                                                     <Chip
-                                                                        icon={<Straighten sx={{ fontSize: '11px !important', color: '#B45309' }} />}
+                                                                        icon={<Straighten sx={{ fontSize: '11px !important', color: palette.accent }} />}
                                                                         label={`Bust: ${cust.measurements.bust}" • ${cust.measurements.preferredFit || 'Custom'}`}
                                                                         size="small"
                                                                         sx={{
                                                                             height: 19,
                                                                             fontSize: '0.67rem',
-                                                                            bgcolor: 'rgba(217, 119, 6, 0.09)',
-                                                                            color: '#B45309',
+                                                                            bgcolor: palette.chipBg,
+                                                                            color: palette.chipText,
                                                                             fontWeight: 700,
-                                                                            border: '1px solid rgba(217, 119, 6, 0.2)'
+                                                                            border: `1px solid ${palette.border}`
                                                                         }}
                                                                     />
                                                                 )}
