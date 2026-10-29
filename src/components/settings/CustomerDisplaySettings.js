@@ -48,9 +48,8 @@ import {
   VideoLibrary
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { db, storage } from '../../firebase';
-import { doc, setDoc, onSnapshot } from 'firebase/firestore';
-import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { db } from '../../firebase';
+import { doc, setDoc, onSnapshot, collection, getDocs, deleteDoc } from 'firebase/firestore';
 import { useFeedback } from '../../contexts/FeedbackContext';
 
 // Verified, Cross-Origin Safe, Fast-Loading Video Presets
@@ -58,7 +57,7 @@ export const VIDEO_PRESETS = [
   {
     id: 'golden-runway',
     label: '✨ Golden Couture Silk Catwalk',
-    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    url: 'https://media.w3.org/2010/05/sintel/trailer_hd.mp4',
     desc: 'Dramatic golden atelier illumination and fluid couture fashion'
   },
   {
@@ -204,9 +203,46 @@ export default function CustomerDisplaySettings() {
   const [uploadingVideo, setUploadingVideo] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedVideoFileName, setUploadedVideoFileName] = useState('');
+  const [localPreviewBlobUrl, setLocalPreviewBlobUrl] = useState(null);
+  const [chunkedVideoUrl, setChunkedVideoUrl] = useState(null);
 
-  // Local Video Upload Handler (Instant local preview + Firebase cloud storage sync)
-  const handleLocalVideoUpload = (e) => {
+  // Cross-device chunk reassembly for uploaded videos in settings simulator
+  useEffect(() => {
+    let active = true;
+    if (config.idleDisplayType === 'video' && config.videoUrl === 'firestore-chunked' && !localPreviewBlobUrl) {
+      const fetchChunkedVideo = async () => {
+        try {
+          const snap = await getDocs(collection(db, 'cfd_video_chunks'));
+          if (!active || snap.empty) return;
+          const chunks = [];
+          snap.forEach((d) => chunks.push(d.data()));
+          chunks.sort((a, b) => (a.index || 0) - (b.index || 0));
+
+          const byteArrays = chunks.map((chunk) => {
+            const binary = atob(chunk.data);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) {
+              bytes[i] = binary.charCodeAt(i);
+            }
+            return bytes;
+          });
+
+          const blob = new Blob(byteArrays, { type: config.videoMimeType || 'video/mp4' });
+          const url = URL.createObjectURL(blob);
+          if (active) setChunkedVideoUrl(url);
+        } catch (e) {
+          console.warn('Error fetching chunked video in settings preview:', e);
+        }
+      };
+      fetchChunkedVideo();
+    }
+    return () => {
+      active = false;
+    };
+  }, [config.videoUrl, config.videoUpdatedAt, config.idleDisplayType, config.videoMimeType, localPreviewBlobUrl]);
+
+  // Local Video Upload Handler (Instant local preview + Firestore chunked cross-device cloud sync)
+  const handleLocalVideoUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -215,55 +251,94 @@ export default function CustomerDisplaySettings() {
       return;
     }
 
-    if (file.size > 150 * 1024 * 1024) {
-      showToast('Video size exceeds 150MB. Please choose a smaller video.', 'warning');
+    if (file.size > 30 * 1024 * 1024) {
+      showToast('Video size exceeds 30MB. Please choose a video under 30MB for fast mobile streaming.', 'warning');
       return;
     }
 
-    // 1. Immediately create local object URL so video plays in preview and display with 0ms wait
+    // 1. Immediately create local object URL so video plays in the preview simulator with 0ms wait
     const localBlobUrl = URL.createObjectURL(file);
+    setLocalPreviewBlobUrl(localBlobUrl);
     setUploadedVideoFileName(file.name);
-    updateMultipleConfig({
-      videoPreset: 'uploaded',
-      videoUrl: localBlobUrl,
-      idleDisplayType: 'video'
-    });
-    showToast(`Loaded "${file.name}" locally. Syncing to cloud...`, 'info');
-
-    // 2. Upload to Firebase Storage in background for persistence
     setUploadingVideo(true);
-    setUploadProgress(0);
+    setUploadProgress(5);
 
-    const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-    const sRef = storageRef(storage, `customer_display_videos/${Date.now()}_${cleanName}`);
-    const uploadTask = uploadBytesResumable(sRef, file);
+    showToast(`Uploading "${file.name}" and syncing to mobile/tablet displays...`, 'info');
 
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-        setUploadProgress(progress);
-      },
-      (error) => {
-        console.warn('Video cloud storage upload warning:', error);
-        setUploadingVideo(false);
-        showToast('Cloud storage upload warning, but video is active locally on this machine!', 'info');
-      },
-      async () => {
-        try {
-          const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
-          updateMultipleConfig({
-            videoPreset: 'uploaded',
-            videoUrl: downloadUrl,
-            idleDisplayType: 'video'
-          });
-          setUploadingVideo(false);
-          showToast('✨ Fashion video uploaded and synced to Customer Display!', 'success');
-        } catch (err) {
-          setUploadingVideo(false);
+    try {
+      // 2. Read binary file as ArrayBuffer
+      const arrayBuffer = await file.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+
+      // Slice into 600KB chunks (base64 will be ~800KB, well within Firestore 1MB doc limit)
+      const CHUNK_SIZE = 600 * 1024;
+      const totalChunks = Math.ceil(uint8Array.length / CHUNK_SIZE);
+
+      // 3. Delete any old chunks beyond totalChunks
+      try {
+        const snap = await getDocs(collection(db, 'cfd_video_chunks'));
+        const deleteOps = [];
+        snap.forEach((docSnap) => {
+          const cIdx = parseInt(docSnap.id.replace('chunk_', ''), 10);
+          if (isNaN(cIdx) || cIdx >= totalChunks) {
+            deleteOps.push(deleteDoc(docSnap.ref));
+          }
+        });
+        if (deleteOps.length > 0) {
+          await Promise.all(deleteOps);
         }
+      } catch (cleanErr) {
+        console.warn('Chunk cleanup notice:', cleanErr);
       }
-    );
+
+      // 4. Upload each chunk with base64 encoding and progress tracking
+      const subChunkSize = 16384;
+      for (let i = 0; i < totalChunks; i++) {
+        const start = i * CHUNK_SIZE;
+        const end = Math.min(start + CHUNK_SIZE, uint8Array.length);
+        const slice = uint8Array.subarray(start, end);
+
+        let binary = '';
+        for (let j = 0; j < slice.length; j += subChunkSize) {
+          binary += String.fromCharCode.apply(null, slice.subarray(j, j + subChunkSize));
+        }
+        const base64Data = btoa(binary);
+
+        await setDoc(doc(db, 'cfd_video_chunks', `chunk_${i}`), {
+          index: i,
+          total: totalChunks,
+          data: base64Data,
+          updatedAt: Date.now()
+        });
+
+        const progressPercent = Math.min(95, Math.round(((i + 1) / totalChunks) * 90) + 5);
+        setUploadProgress(progressPercent);
+      }
+
+      // 5. Update Firestore cfd_config document
+      const updatedConfig = {
+        ...config,
+        idleDisplayType: 'video',
+        videoPreset: 'uploaded',
+        videoUrl: 'firestore-chunked',
+        videoFileName: file.name,
+        videoMimeType: file.type || 'video/mp4',
+        videoSize: file.size,
+        videoChunksCount: totalChunks,
+        videoUpdatedAt: Date.now(),
+        updatedAt: new Date().toISOString()
+      };
+
+      await setDoc(doc(db, 'settings', 'cfd_config'), updatedConfig, { merge: true });
+      updateMultipleConfig(updatedConfig);
+      setUploadProgress(100);
+      setUploadingVideo(false);
+      showToast('✨ Fashion video synced to cloud! Mobile and tablet customer displays will now stream this video.', 'success');
+    } catch (uploadErr) {
+      console.error('Video upload and chunking error:', uploadErr);
+      setUploadingVideo(false);
+      showToast('Failed to sync video: ' + uploadErr.message, 'error');
+    }
   };
 
   // Sync with Firestore once on mount (without clobbering active edits)
@@ -749,9 +824,10 @@ export default function CustomerDisplaySettings() {
                       {config.videoPreset === 'uploaded' && (
                         <Chip
                           icon={<CheckCircle sx={{ color: '#059669 !important' }} />}
-                          label={uploadedVideoFileName || 'Active Uploaded Local Video'}
+                          label={uploadedVideoFileName || config.videoFileName || 'Active Uploaded Local Video'}
                           onDelete={() => {
                             setUploadedVideoFileName('');
+                            setLocalPreviewBlobUrl(null);
                             updateMultipleConfig({
                               videoPreset: 'interactive-runway',
                               videoUrl: 'canvas-runway'
@@ -1323,7 +1399,7 @@ export default function CustomerDisplaySettings() {
                       >
                         <video
                           ref={videoRef}
-                          src={config.videoUrl}
+                          src={config.videoUrl === 'firestore-chunked' ? (localPreviewBlobUrl || chunkedVideoUrl) : config.videoUrl}
                           autoPlay
                           loop
                           muted

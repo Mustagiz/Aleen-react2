@@ -42,7 +42,7 @@ import {
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '../firebase';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, collection, getDocs } from 'firebase/firestore';
 import { QRCodeSVG } from 'qrcode.react';
 
 const COMPLIMENT_OPTIONS = [
@@ -137,15 +137,68 @@ export default function CustomerDisplay() {
 
   // Video element reference for reliable autoplay & framing control
   const videoRef = useRef(null);
+  const [chunkedVideoUrl, setChunkedVideoUrl] = useState(null);
+  const [videoLoadError, setVideoLoadError] = useState(false);
+
+  // Cross-device chunk reassembly for uploaded videos
+  useEffect(() => {
+    let active = true;
+    if (cfdConfig.idleDisplayType === 'video' && cfdConfig.videoUrl === 'firestore-chunked') {
+      const fetchChunkedVideo = async () => {
+        try {
+          setVideoLoadError(false);
+          const snap = await getDocs(collection(db, 'cfd_video_chunks'));
+          if (!active) return;
+          if (snap.empty) {
+            console.warn('No video chunks found in firestore collection');
+            setVideoLoadError(true);
+            return;
+          }
+          const chunks = [];
+          snap.forEach((d) => chunks.push(d.data()));
+          chunks.sort((a, b) => (a.index || 0) - (b.index || 0));
+
+          const byteArrays = chunks.map((chunk) => {
+            const binary = atob(chunk.data);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) {
+              bytes[i] = binary.charCodeAt(i);
+            }
+            return bytes;
+          });
+
+          const blob = new Blob(byteArrays, { type: cfdConfig.videoMimeType || 'video/mp4' });
+          const url = URL.createObjectURL(blob);
+          if (active) {
+            setChunkedVideoUrl(url);
+            setVideoLoadError(false);
+          }
+        } catch (err) {
+          console.warn('Error fetching chunked video on this device:', err);
+          if (active) setVideoLoadError(true);
+        }
+      };
+      fetchChunkedVideo();
+    } else {
+      setChunkedVideoUrl(null);
+      setVideoLoadError(false);
+    }
+    return () => {
+      active = false;
+    };
+  }, [cfdConfig.videoUrl, cfdConfig.videoUpdatedAt, cfdConfig.idleDisplayType, cfdConfig.videoMimeType]);
 
   // Auto-play video with sound policy compliance whenever video URL/fit/mode changes
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.defaultMuted = true;
       videoRef.current.muted = true;
-      videoRef.current.play().catch(() => {});
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {});
+      }
     }
-  }, [cfdConfig.videoUrl, cfdConfig.videoFit, cfdConfig.idleDisplayType]);
+  }, [cfdConfig.videoUrl, cfdConfig.videoFit, cfdConfig.idleDisplayType, chunkedVideoUrl]);
 
   // Interactive Customer Touchpoint States
   const [patronRating, setPatronRating] = useState(5);
@@ -658,68 +711,69 @@ export default function CustomerDisplay() {
       {/* TOP LUXURY HEADER (Light Theme with CRM Synced Logo) */}
       <Box
         sx={{
-          px: { xs: 1.5, sm: 2.5, md: 4 },
-          py: { xs: 1.2, sm: 1.6 },
-          minHeight: { xs: 60, sm: 70 },
+          px: { xs: 1.2, sm: 2.5, md: 4 },
+          py: { xs: 0.8, sm: 1.2 },
+          minHeight: { xs: 52, sm: 64 },
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: { xs: 1, sm: 2 },
+          gap: { xs: 0.8, sm: 2 },
           borderBottom: '1px solid rgba(197, 160, 89, 0.25)',
-          bgcolor: 'rgba(255, 255, 255, 0.94)',
+          bgcolor: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(20px)',
           boxShadow: '0 4px 20px rgba(180, 140, 75, 0.06)',
-          zIndex: 10
+          zIndex: 10,
+          overflow: 'hidden'
         }}
       >
         {/* Brand & Synced Store Logo */}
-        <Stack direction="row" alignItems="center" spacing={{ xs: 1.2, sm: 2 }} sx={{ minWidth: 0, flexShrink: 1 }}>
+        <Stack direction="row" alignItems="center" spacing={{ xs: 1, sm: 1.8 }} sx={{ minWidth: 0, flexShrink: 0 }}>
           {storeLogo ? (
             <Box
               component="img"
               src={storeLogo}
               alt={storeName}
               sx={{
-                width: { xs: 40, sm: 48 },
-                height: { xs: 40, sm: 48 },
-                borderRadius: '12px',
+                width: { xs: 34, sm: 42, md: 46 },
+                height: { xs: 34, sm: 42, md: 46 },
+                borderRadius: { xs: '8px', sm: '12px' },
                 objectFit: 'contain',
                 flexShrink: 0,
                 border: '1.5px solid rgba(197, 160, 89, 0.35)',
                 bgcolor: '#FFFFFF',
-                p: 0.4,
-                boxShadow: '0 4px 12px rgba(197, 160, 89, 0.15)'
+                p: 0.3,
+                boxShadow: '0 2px 8px rgba(197, 160, 89, 0.15)'
               }}
             />
           ) : (
             <Box
               sx={{
-                width: { xs: 40, sm: 48 },
-                height: { xs: 40, sm: 48 },
-                borderRadius: '12px',
+                width: { xs: 34, sm: 42, md: 46 },
+                height: { xs: 34, sm: 42, md: 46 },
+                borderRadius: { xs: '8px', sm: '12px' },
                 background: `linear-gradient(135deg, ${themeAccent} 0%, #937230 100%)`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 4px 16px rgba(197, 160, 89, 0.35)',
+                boxShadow: '0 3px 12px rgba(197, 160, 89, 0.35)',
                 flexShrink: 0
               }}
             >
-              <Diamond sx={{ color: '#FFFFFF', fontSize: { xs: 22, sm: 26 } }} />
+              <Diamond sx={{ color: '#FFFFFF', fontSize: { xs: 18, sm: 24 } }} />
             </Box>
           )}
 
-          <Box sx={{ minWidth: 0 }}>
+          <Box sx={{ minWidth: 0, flexShrink: 0 }}>
             <Typography
               variant="h6"
-              noWrap
               sx={{
                 fontWeight: 900,
-                letterSpacing: '0.04em',
+                letterSpacing: '0.03em',
                 color: '#0F172A',
                 textTransform: 'uppercase',
-                fontSize: { xs: '0.95rem', sm: '1.15rem', md: '1.3rem' },
-                lineHeight: 1.2
+                fontSize: { xs: '0.84rem', sm: '1.05rem', md: '1.25rem' },
+                lineHeight: 1.15,
+                whiteSpace: 'nowrap'
               }}
             >
               {storeName}
@@ -732,8 +786,8 @@ export default function CustomerDisplay() {
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 fontWeight: 800,
-                fontSize: { xs: '0.62rem', sm: '0.72rem' },
-                display: { xs: 'none', sm: 'block' }
+                fontSize: { xs: '0.6rem', sm: '0.7rem' },
+                display: { xs: 'none', md: 'block' }
               }}
             >
               {storeTagline}
@@ -742,53 +796,79 @@ export default function CustomerDisplay() {
         </Stack>
 
         {/* Right Status Controls */}
-        <Stack direction="row" alignItems="center" spacing={{ xs: 0.8, sm: 1.5 }} sx={{ flexShrink: 0 }}>
+        <Stack direction="row" alignItems="center" spacing={{ xs: 0.6, sm: 1.2 }} sx={{ minWidth: 0, flexShrink: 1, justifyContent: 'flex-end' }}>
           {/* Personalized Customer Welcome Chip in Header */}
           {hasCustomer && (
-            <Chip
-              avatar={
-                <Avatar sx={{ bgcolor: themeAccentDeep, color: '#FFFFFF', fontWeight: 900, fontSize: '0.72rem', width: 26, height: 26 }}>
-                  {patronInitials}
-                </Avatar>
-              }
-              label={
-                <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.6 }}>
-                  <span>{timeGreeting},</span>
-                  {renderPatronName(customerName, { fontSize: '0.84rem' })}
-                </Box>
-              }
-              sx={{
-                bgcolor: 'rgba(197, 160, 89, 0.12)',
-                color: '#937230 !important',
-                border: '1px solid rgba(197, 160, 89, 0.4)',
-                fontWeight: 800,
-                fontSize: { xs: '0.72rem', sm: '0.84rem' },
-                height: { xs: 30, sm: 34 },
-                maxWidth: { xs: 180, sm: 320, md: 'none' },
-                boxShadow: '0 2px 6px rgba(197, 160, 89, 0.15)',
-                '& .MuiChip-label': {
-                  color: '#937230 !important',
-                  fontWeight: 800,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
+            <Tooltip title={`${timeGreeting}, ${customerName}`}>
+              <Chip
+                avatar={
+                  <Avatar sx={{ bgcolor: themeAccentDeep, color: '#FFFFFF', fontWeight: 900, fontSize: { xs: '0.62rem', sm: '0.72rem' }, width: { xs: 22, sm: 26 }, height: { xs: 22, sm: 26 } }}>
+                    {patronInitials}
+                  </Avatar>
                 }
-              }}
-            />
+                label={
+                  <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+                    <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>{timeGreeting},</Box>
+                    {renderPatronName(customerName, { fontSize: { xs: '0.72rem', sm: '0.82rem' } })}
+                  </Box>
+                }
+                sx={{
+                  bgcolor: 'rgba(197, 160, 89, 0.12)',
+                  color: '#937230 !important',
+                  border: '1px solid rgba(197, 160, 89, 0.4)',
+                  fontWeight: 800,
+                  fontSize: { xs: '0.68rem', sm: '0.82rem' },
+                  height: { xs: 26, sm: 32 },
+                  maxWidth: { xs: 125, sm: 240, md: 'none' },
+                  boxShadow: '0 2px 6px rgba(197, 160, 89, 0.12)',
+                  '& .MuiChip-label': {
+                    px: { xs: 0.6, sm: 1 },
+                    color: '#937230 !important',
+                    fontWeight: 800,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }
+                }}
+              />
+            </Tooltip>
           )}
 
-          {/* Sync Status Badge — Instant 0ms Dual Screen or Cloud Live */}
+          {/* Sync Status Badge — Responsive: Pill on xs, Full on sm+ */}
           <Chip
-            icon={<Wifi sx={{ fontSize: '0.85rem !important', color: '#059669' }} />}
-            label={syncChannel === 'instant' ? 'Instant Live ✓' : 'Cloud Live'}
+            icon={
+              <Box
+                sx={{
+                  width: 7,
+                  height: 7,
+                  borderRadius: '50%',
+                  bgcolor: '#10B981',
+                  boxShadow: '0 0 6px #10B981',
+                  animation: 'cfdPulseGlow 2s infinite',
+                  ml: { xs: '6px !important', sm: '8px !important' },
+                  mr: { xs: '4px !important', sm: '6px !important' }
+                }}
+              />
+            }
+            label={
+              <Box component="span">
+                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                  {syncChannel === 'instant' ? 'Instant Live ✓' : 'Cloud Live'}
+                </Box>
+                <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>
+                  Live
+                </Box>
+              </Box>
+            }
             size="small"
             sx={{
               bgcolor: 'rgba(16, 185, 129, 0.12)',
               color: '#059669',
               border: '1px solid rgba(16, 185, 129, 0.35)',
               fontWeight: 800,
-              fontSize: '0.72rem',
-              height: 28,
-              '& .MuiChip-label': { color: '#059669', fontWeight: 800 }
+              fontSize: { xs: '0.65rem', sm: '0.72rem' },
+              height: { xs: 26, sm: 28 },
+              px: { xs: 0.2, sm: 0.5 },
+              '& .MuiChip-label': { color: '#059669', fontWeight: 800, px: 0.6 }
             }}
           />
 
@@ -813,13 +893,15 @@ export default function CustomerDisplay() {
               sx={{
                 color: '#475569',
                 bgcolor: 'rgba(0, 0, 0, 0.04)',
-                borderRadius: 2.5,
-                p: { xs: 0.7, sm: 0.9 },
+                borderRadius: 2,
+                width: { xs: 28, sm: 34 },
+                height: { xs: 28, sm: 34 },
+                p: { xs: 0.4, sm: 0.8 },
                 border: '1px solid rgba(0, 0, 0, 0.08)',
                 '&:hover': { bgcolor: 'rgba(197, 160, 89, 0.15)', color: '#937230' }
               }}
             >
-              {isFullscreen ? <FullscreenExit fontSize="small" /> : <Fullscreen fontSize="small" />}
+              {isFullscreen ? <FullscreenExit sx={{ fontSize: { xs: 16, sm: 20 } }} /> : <Fullscreen sx={{ fontSize: { xs: 16, sm: 20 } }} />}
             </IconButton>
           </Tooltip>
         </Stack>
@@ -1265,7 +1347,8 @@ export default function CustomerDisplay() {
                     flexDirection: 'column'
                   }}
                 >
-                  {cfdConfig.videoUrl === 'canvas-runway' ? (
+                  {/* If canvas-runway, or if video load failed, or foreign invalid blob: fallback gracefully to 60FPS Virtual Runway Catwalk Canvas */}
+                  {(cfdConfig.videoUrl === 'canvas-runway' || videoLoadError || (cfdConfig.videoUrl === 'firestore-chunked' && !chunkedVideoUrl) || (cfdConfig.videoUrl?.startsWith('blob:') && !chunkedVideoUrl)) ? (
                     /* 60FPS Interactive Virtual Runway Catwalk Canvas - Fullscreen Edge-to-Edge */
                     <Box
                       sx={{
@@ -1324,7 +1407,7 @@ export default function CustomerDisplay() {
                       </motion.div>
                     </Box>
                   ) : (
-                    /* Real Video Player with Explicit Autoplay & Framing - Fullscreen */
+                    /* Real Video Player with Explicit Autoplay & Mobile Compliance - Fullscreen */
                     <Box
                       sx={{
                         position: 'absolute',
@@ -1337,18 +1420,26 @@ export default function CustomerDisplay() {
                         alignItems: 'center',
                         justifyContent: 'center',
                         ...(cfdConfig.videoFit === 'cinematic' ? {
-                          borderTop: { xs: '20px solid #000000', md: '35px solid #000000' },
-                          borderBottom: { xs: '20px solid #000000', md: '35px solid #000000' }
+                          borderTop: { xs: '16px solid #000000', md: '35px solid #000000' },
+                          borderBottom: { xs: '16px solid #000000', md: '35px solid #000000' }
                         } : {})
                       }}
                     >
                       <video
                         ref={videoRef}
-                        src={cfdConfig.videoUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'}
+                        src={cfdConfig.videoUrl === 'firestore-chunked' ? chunkedVideoUrl : cfdConfig.videoUrl}
                         autoPlay
                         loop
                         muted
                         playsInline
+                        webkit-playsinline="true"
+                        x5-playsinline="true"
+                        preload="auto"
+                        controls={false}
+                        onError={() => {
+                          console.warn('Video playback error on this device, falling back to 60FPS Virtual Runway Catwalk Canvas');
+                          setVideoLoadError(true);
+                        }}
                         style={{
                           width: '100%',
                           height: '100%',
