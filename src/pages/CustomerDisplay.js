@@ -291,6 +291,16 @@ export default function CustomerDisplay() {
   const upiUrl = cfdState?.upiUrl || '';
   const isSettled = cfdState?.status === 'settled';
 
+  // Auto-return to homepage 2.5s after bill settlement
+  useEffect(() => {
+    if (isSettled) {
+      const timer = setTimeout(() => {
+        setCfdState((prev) => (prev ? { ...prev, status: 'idle', items: [], customerName: '', customerPhone: '' } : null));
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [isSettled]);
+
   // Interactive Customer Touchpoint States
   const [patronRating, setPatronRating] = useState(5);
   const [selectedCompliments, setSelectedCompliments] = useState(['✨ Exquisite Fabric', '✂️ Flawless Fit']);
@@ -506,51 +516,63 @@ export default function CustomerDisplay() {
       {/* Top Luxury Banner */}
       <Box
         sx={{
-          px: { xs: 2, md: 4 },
-          py: 1.6,
+          px: { xs: 1.5, sm: 2.5, md: 4 },
+          py: { xs: 1.2, sm: 1.5 },
+          minHeight: { xs: 58, sm: 66 },
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
+          gap: { xs: 1, sm: 2 },
           borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
           backdropFilter: 'blur(20px)',
-          bgcolor: 'rgba(15, 23, 42, 0.85)',
+          bgcolor: 'rgba(15, 23, 42, 0.92)',
           zIndex: 10
         }}
       >
         {/* Brand & Store Name */}
-        <Stack direction="row" alignItems="center" spacing={2}>
+        <Stack direction="row" alignItems="center" spacing={{ xs: 1.2, sm: 2 }} sx={{ minWidth: 0, flexShrink: 1 }}>
           {storeLogo ? (
             <Box
               component="img"
               src={storeLogo}
               alt={storeName}
-              sx={{ width: 44, height: 44, borderRadius: 2.5, objectFit: 'contain' }}
+              sx={{
+                width: { xs: 36, sm: 42 },
+                height: { xs: 36, sm: 42 },
+                borderRadius: '12px',
+                objectFit: 'contain',
+                flexShrink: 0,
+                border: `1px solid ${themeAccent}44`,
+                bgcolor: 'rgba(255,255,255,0.04)'
+              }}
             />
           ) : (
             <Box
               sx={{
-                width: 44,
-                height: 44,
-                borderRadius: '14px',
+                width: { xs: 36, sm: 42 },
+                height: { xs: 36, sm: 42 },
+                borderRadius: '12px',
                 background: `linear-gradient(135deg, ${themeAccent} 0%, #8F6E2B 100%)`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: `0 4px 16px ${themeAccent}55`
+                boxShadow: `0 4px 16px ${themeAccent}55`,
+                flexShrink: 0
               }}
             >
-              <Diamond sx={{ color: '#FFFFFF', fontSize: 24 }} />
+              <Diamond sx={{ color: '#FFFFFF', fontSize: { xs: 20, sm: 24 } }} />
             </Box>
           )}
-          <Box>
+          <Box sx={{ minWidth: 0 }}>
             <Typography
               variant="h6"
+              noWrap
               sx={{
                 fontWeight: 800,
                 letterSpacing: '0.04em',
                 color: '#FFFFFF',
                 textTransform: 'uppercase',
-                fontSize: { xs: '0.95rem', md: '1.15rem' },
+                fontSize: { xs: '0.9rem', sm: '1.05rem', md: '1.2rem' },
                 lineHeight: 1.2
               }}
             >
@@ -558,12 +580,14 @@ export default function CustomerDisplay() {
             </Typography>
             <Typography
               variant="caption"
+              noWrap
               sx={{
                 color: themeAccent,
-                letterSpacing: '0.14em',
+                letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 fontWeight: 700,
-                fontSize: '0.68rem'
+                fontSize: { xs: '0.62rem', sm: '0.68rem' },
+                display: { xs: 'none', sm: 'block' }
               }}
             >
               Haute Couture Interactive Customer Terminal
@@ -572,8 +596,8 @@ export default function CustomerDisplay() {
         </Stack>
 
         {/* Right Status Controls */}
-        <Stack direction="row" alignItems="center" spacing={{ xs: 1, sm: 1.5 }}>
-          {/* Personalized Customer Welcome Chip in Header */}
+        <Stack direction="row" alignItems="center" spacing={{ xs: 0.8, sm: 1.2 }} sx={{ flexShrink: 0 }}>
+          {/* Personalized Customer Welcome Chip in Header (Pure White Text) */}
           {hasCustomer && (
             <Chip
               avatar={
@@ -583,12 +607,20 @@ export default function CustomerDisplay() {
               }
               label={`${timeGreeting}, ${customerName}`}
               sx={{
-                bgcolor: 'rgba(255, 255, 255, 0.05)',
-                color: '#F8FAFC',
-                border: `1px solid ${themeAccent}55`,
-                fontWeight: 700,
+                bgcolor: 'rgba(255, 255, 255, 0.1)',
+                color: '#FFFFFF !important',
+                border: `1px solid ${themeAccent}66`,
+                fontWeight: 800,
                 fontSize: { xs: '0.72rem', sm: '0.82rem' },
-                height: 32
+                height: { xs: 28, sm: 32 },
+                maxWidth: { xs: 150, sm: 240, md: 'none' },
+                boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                '& .MuiChip-label': {
+                  color: '#FFFFFF !important',
+                  fontWeight: 800,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }
               }}
             />
           )}
@@ -596,7 +628,7 @@ export default function CustomerDisplay() {
           {/* Sync Status Badge */}
           <Chip
             icon={<Wifi sx={{ fontSize: '0.85rem !important', color: connected ? '#10B981' : '#F59E0B' }} />}
-            label={connected ? (syncSource === 'cloud' ? 'Cloud Connected' : 'Dual-Screen Live') : 'Reconnecting'}
+            label={connected ? (syncSource === 'cloud' ? 'Cloud' : 'Dual-Screen') : 'Connecting'}
             size="small"
             sx={{
               bgcolor: connected ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.12)',
@@ -604,7 +636,11 @@ export default function CustomerDisplay() {
               border: `1px solid ${connected ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`,
               fontWeight: 700,
               fontSize: '0.72rem',
-              height: 28
+              height: 28,
+              '& .MuiChip-label': {
+                color: connected ? '#34D399' : '#FBBF24',
+                fontWeight: 700
+              }
             }}
           />
 
@@ -613,10 +649,10 @@ export default function CustomerDisplay() {
             direction="row"
             alignItems="center"
             spacing={0.6}
-            sx={{ color: 'rgba(255, 255, 255, 0.7)', display: { xs: 'none', sm: 'flex' } }}
+            sx={{ color: '#FFFFFF', display: { xs: 'none', md: 'flex' } }}
           >
-            <AccessTime sx={{ fontSize: 16 }} />
-            <Typography variant="body2" sx={{ fontWeight: 600, letterSpacing: '0.04em', fontSize: '0.85rem' }}>
+            <AccessTime sx={{ fontSize: 16, color: 'rgba(255, 255, 255, 0.7)' }} />
+            <Typography variant="body2" sx={{ fontWeight: 600, letterSpacing: '0.04em', fontSize: '0.85rem', color: '#FFFFFF' }}>
               {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
             </Typography>
           </Stack>
@@ -627,9 +663,11 @@ export default function CustomerDisplay() {
               onClick={toggleFullscreen}
               size="small"
               sx={{
-                color: 'rgba(255, 255, 255, 0.8)',
+                color: '#FFFFFF',
                 bgcolor: 'rgba(255, 255, 255, 0.08)',
                 borderRadius: 2,
+                p: { xs: 0.7, sm: 0.8 },
+                border: '1px solid rgba(255, 255, 255, 0.1)',
                 '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.18)', color: '#FFFFFF' }
               }}
             >
@@ -640,7 +678,7 @@ export default function CustomerDisplay() {
       </Box>
 
       {/* Main Content Area */}
-      <Box sx={{ flex: 1, display: 'flex', p: { xs: 2, md: 3 }, gap: { xs: 2, md: 3 }, zIndex: 1, minHeight: 0 }}>
+      <Box sx={{ flex: 1, display: 'flex', p: { xs: 1.5, sm: 2.5, md: 3 }, gap: { xs: 2, md: 3 }, zIndex: 1, minHeight: 0, overflowY: { xs: 'auto', lg: 'hidden' } }}>
         <AnimatePresence mode="wait">
           {/* STATE 1: BILL SETTLED CELEBRATION */}
           {isSettled ? (
@@ -1190,19 +1228,19 @@ export default function CustomerDisplay() {
               exit={{ opacity: 0 }}
               style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}
             >
-              <Box sx={{ flex: 1, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3, minHeight: 0 }}>
+              <Box sx={{ flex: 1, display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, gap: { xs: 2, sm: 2.5, md: 3 }, minHeight: 0, width: '100%' }}>
                 {/* Left Panel: Itemized Live Bill Stream (60%) */}
                 <Box
                   sx={{
-                    flex: { xs: 1, md: 1.5 },
+                    flex: { xs: 'none', lg: 1.5 },
+                    minHeight: { xs: 320, lg: 0 },
                     display: 'flex',
                     flexDirection: 'column',
                     borderRadius: 4,
                     bgcolor: 'rgba(15, 23, 42, 0.75)',
                     border: '1px solid rgba(255, 255, 255, 0.08)',
                     backdropFilter: 'blur(24px)',
-                    overflow: 'hidden',
-                    minHeight: 0
+                    overflow: 'hidden'
                   }}
                 >
                   {/* Cart Header with Customer Details */}
@@ -1355,7 +1393,7 @@ export default function CustomerDisplay() {
                 {/* Right Panel: Totals & Dynamic UPI QR Code (40%) */}
                 <Box
                   sx={{
-                    flex: { xs: 1, md: 1 },
+                    flex: { xs: 'none', lg: 1 },
                     display: 'flex',
                     flexDirection: 'column',
                     gap: 2.5
@@ -1680,24 +1718,28 @@ export default function CustomerDisplay() {
         </Stack>
       </Dialog>
 
-      {/* Subtle Footer Bar */}
+      {/* Subtle Responsive Luxury Footer Bar */}
       <Box
         sx={{
-          py: 1.4,
-          px: 3,
+          py: { xs: 1.2, sm: 1.5 },
+          px: { xs: 2, sm: 3, md: 4 },
           display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
           justifyContent: 'space-between',
           alignItems: 'center',
-          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-          bgcolor: 'rgba(10, 13, 20, 0.85)',
-          zIndex: 10
+          gap: { xs: 0.6, sm: 2 },
+          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          bgcolor: 'rgba(10, 13, 20, 0.95)',
+          backdropFilter: 'blur(24px)',
+          zIndex: 10,
+          textAlign: { xs: 'center', sm: 'left' }
         }}
       >
-        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.45)', fontSize: '0.72rem' }}>
-          Powered by Aleen Atelier Cloud Engine • Real-Time Firestore & Dual-Monitor Mirroring
+        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: { xs: '0.68rem', sm: '0.74rem' }, fontWeight: 500 }}>
+          ✨ Powered by {storeName} Atelier Engine • Real-Time Dual-Screen Synchronization
         </Typography>
-        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.45)', fontSize: '0.72rem' }}>
-          Strictly Confidential & Encrypted Locally
+        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.45)', fontSize: { xs: '0.64rem', sm: '0.72rem' } }}>
+          🔒 Strictly Confidential & Encrypted Locally
         </Typography>
       </Box>
     </Box>

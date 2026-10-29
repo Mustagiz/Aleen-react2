@@ -77,16 +77,10 @@ export default function Layout() {
   const isDark = mode === 'dark';
 
   const getSystemSubtitle = () => {
-    switch (designSystem) {
-      case 'apple': return 'macOS Liquid Glass CRM';
-      case 'microsoft': return 'Microsoft 365 Retail Suite';
-      case 'zoho': return 'Zoho CRM Enterprise';
-      case 'linear': return 'Linear Sprint Workspace';
-      case 'material': return 'Material You POS 3.0';
-      case 'stripe': return 'Stripe FinTech Engine';
-      case 'salesforce': return 'Salesforce Lightning App';
-      default: return profile?.tagline || 'Haute Couture Atelier';
+    if (profile?.tagline && profile.tagline.trim()) {
+      return profile.tagline.trim();
     }
+    return 'Haute Couture Atelier';
   };
 
   const getLinearShortcut = (path) => {
@@ -288,11 +282,6 @@ export default function Layout() {
             <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#FF5F56', boxShadow: '0 0 2px rgba(0,0,0,0.2)' }} />
             <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#FFBD2E', boxShadow: '0 0 2px rgba(0,0,0,0.2)' }} />
             <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#27C93F', boxShadow: '0 0 2px rgba(0,0,0,0.2)' }} />
-            {!showCollapsed && (
-              <Typography sx={{ ml: 1, fontSize: '0.68rem', fontWeight: 700, color: 'text.secondary', letterSpacing: '0.04em' }}>
-                ALEEN.app
-              </Typography>
-            )}
           </Box>
         )}
 

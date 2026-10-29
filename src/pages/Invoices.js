@@ -933,19 +933,25 @@ const Invoices = () => {
 
       const totals = calculateTotal();
 
-      // If bill was settled within the last 15 seconds and cart is currently reset, retain 'settled'
-      const timeSinceSettled = Date.now() - cfdLastSettledTimeRef.current;
       let status;
       if (overrideStatus === 'settled') {
         cfdLastSettledTimeRef.current = Date.now();
         status = 'settled';
+      } else if (overrideStatus === 'idle') {
+        cfdLastSettledTimeRef.current = 0;
+        status = 'idle';
       } else if (overrideStatus) {
         status = overrideStatus;
-      } else if (timeSinceSettled < 15000 && validItems.length === 0) {
-        status = 'settled';
+      } else if (!open) {
+        status = 'idle';
       } else {
-        status = (open && validItems.length > 0) ? 'active' : 'idle';
+        status = validItems.length > 0 ? 'active' : 'idle';
       }
+
+      const isIdle = status === 'idle';
+      const cfdItems = isIdle ? [] : validItems;
+      const cfdCustomer = isIdle ? '' : (customer || '');
+      const cfdPhone = isIdle ? '' : (phone || '');
 
       const storeVpa = profile?.bankDetails?.upiId || profile?.upiId || 'aleenclothing@hdfcbank';
       const storeName = profile?.businessName || 'Aleen Clothing';
@@ -959,20 +965,20 @@ const Invoices = () => {
       const payload = {
         storeName,
         storeLogo: profile?.logoUrl || null,
-        customerName: customer || '',
-        customerPhone: phone || '',
+        customerName: cfdCustomer,
+        customerPhone: cfdPhone,
         customerTier: matchedCustomer?.loyaltyTier || 'Silver',
         loyaltyPoints: matchedCustomer?.loyaltyPoints || 0,
-        loyaltyDiscount: totals.loyaltyDiscount || 0,
-        items: validItems,
-        subtotal: totals.subtotal || 0,
-        discount: (totals.absDiscount || 0) + (totals.loyaltyDiscount || 0),
-        tax: totals.taxAmount || 0,
-        total: totals.total || 0,
+        loyaltyDiscount: isIdle ? 0 : (totals.loyaltyDiscount || 0),
+        items: cfdItems,
+        subtotal: isIdle ? 0 : (totals.subtotal || 0),
+        discount: isIdle ? 0 : ((totals.absDiscount || 0) + (totals.loyaltyDiscount || 0)),
+        tax: isIdle ? 0 : (totals.taxAmount || 0),
+        total: isIdle ? 0 : (totals.total || 0),
         paymentMethod: isSplitPayment ? `${paymentMethod} + ${paymentMethod2}` : paymentMethod,
-        upiUrl: (paymentMethod === 'UPI' || (isSplitPayment && (paymentMethod === 'UPI' || paymentMethod2 === 'UPI'))) ? upiUrl : '',
+        upiUrl: (!isIdle && (paymentMethod === 'UPI' || (isSplitPayment && (paymentMethod === 'UPI' || paymentMethod2 === 'UPI')))) ? upiUrl : '',
         status,
-        lastScannedItem: lastScanned || null,
+        lastScannedItem: isIdle ? null : (lastScanned || null),
         currency: 'INR',
         themeColor: theme?.palette?.primary?.main || '#C5A059',
         updatedAt: Date.now(),
@@ -1285,6 +1291,12 @@ const Invoices = () => {
     speakBillSettlement(total);
     const savedInvoice = await addInvoice(invoice);
     setOpen(false);
+    // After 2.5s celebration, return customer screen back to homepage ('idle')
+    setTimeout(() => {
+      if (syncCustomerDisplayRef.current) {
+        syncCustomerDisplayRef.current('idle', null, true);
+      }
+    }, 2500);
     setSuccessInvoice(savedInvoice || invoice); // Show success dialog with persisted invoice
     setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0 }]);
     setDiscountPercent('');
