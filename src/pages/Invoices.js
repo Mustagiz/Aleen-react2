@@ -29,7 +29,7 @@ import AtelierStitchDivider from '../components/common/AtelierStitchDivider';
 import ThermalReceipt from '../components/ThermalReceipt';
 import CustomerMeasurementModal from '../components/crm/CustomerMeasurementModal';
 import UpiPaymentQrModal from '../components/pos/UpiPaymentQrModal';
-import { playLuxuryChime, speakItemScan, speakItemNotFound, speakBillSettlement, getVoiceSettings, setVoiceSettings } from '../utils/posVoiceEngine';
+import { speakItemScan, speakItemNotFound, speakBillSettlement, getVoiceSettings, setVoiceSettings } from '../utils/posVoiceEngine';
 
 const Invoices = () => {
   const location = useLocation();
