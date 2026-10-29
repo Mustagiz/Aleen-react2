@@ -102,8 +102,11 @@ const Invoices = () => {
     setVoiceSettings(updated);
   };
 
-  // Customer Facing Display (CFD) - BroadcastChannel & Window Launcher
+  // Customer Facing Display (CFD) - High-Speed Sync & Window Launcher
   const cfdChannelRef = useRef(null);
+  const cfdCloudDebounceTimerRef = useRef(null);
+  const cfdLastSettledTimeRef = useRef(0);
+  const syncCustomerDisplayRef = useRef(null);
 
   const handleOpenCustomerDisplay = () => {
     if (typeof window !== 'undefined') {
@@ -908,14 +911,27 @@ const Invoices = () => {
   };
 
   // Realtime BroadcastChannel & Cloud Firestore Sync for Customer Facing Display (CFD)
-  const syncCustomerDisplay = (overrideStatus = null, lastScanned = null) => {
+  const syncCustomerDisplay = (overrideStatus = null, lastScanned = null, isImmediate = false) => {
     try {
       const validItems = (selectedItems || [])
         .filter(item => item.id || (item.isCustom && item.customName && item.customPrice > 0))
         .map(item => calculateLineItem(item, inventory));
 
       const totals = calculateTotal();
-      const status = overrideStatus || (open && validItems.length > 0 ? 'active' : 'idle');
+
+      // If bill was settled within the last 15 seconds and cart is currently reset, retain 'settled'
+      const timeSinceSettled = Date.now() - cfdLastSettledTimeRef.current;
+      let status;
+      if (overrideStatus === 'settled') {
+        cfdLastSettledTimeRef.current = Date.now();
+        status = 'settled';
+      } else if (overrideStatus) {
+        status = overrideStatus;
+      } else if (timeSinceSettled < 15000 && validItems.length === 0) {
+        status = 'settled';
+      } else {
+        status = (open && validItems.length > 0) ? 'active' : 'idle';
+      }
 
       const storeVpa = profile?.bankDetails?.upiId || profile?.upiId || 'aleenclothing@hdfcbank';
       const storeName = profile?.businessName || 'Aleen Clothing';
@@ -947,30 +963,54 @@ const Invoices = () => {
         updatedAt: Date.now()
       };
 
-      // 1. Same-device instant BroadcastChannel
+      // 1. Same-device instant BroadcastChannel (0ms, un-throttled)
       if (cfdChannelRef.current) {
-        cfdChannelRef.current.postMessage({ type: 'SYNC', payload });
+        try {
+          cfdChannelRef.current.postMessage({ type: 'SYNC', payload });
+        } catch (e) {}
       }
 
-      // 2. LocalStorage fallback
+      // 2. LocalStorage fallback (0ms)
       try {
         localStorage.setItem('aleen_cfd_state', JSON.stringify(payload));
       } catch (e) {}
 
       // 3. Real-time Cloud Firestore Sync for 2nd Device (iPad, tablet, phone over Wi-Fi)
-      try {
-        setDoc(doc(db, 'cfd_live_sessions', 'primary'), payload, { merge: true }).catch((err) => {
-          console.warn('Firestore CFD live sync warning:', err);
-        });
-      } catch (err) {
-        console.warn('Firestore CFD write warning:', err);
+      const dispatchCloudWrite = () => {
+        try {
+          // Direct document replacement without { merge: true } for maximum Firestore throughput
+          setDoc(doc(db, 'cfd_live_sessions', 'primary'), payload).catch((err) => {
+            console.warn('Firestore CFD live sync warning:', err);
+          });
+        } catch (err) {
+          console.warn('Firestore CFD write warning:', err);
+        }
+      };
+
+      if (isImmediate || overrideStatus === 'settled' || validItems.length > 0) {
+        if (cfdCloudDebounceTimerRef.current) {
+          clearTimeout(cfdCloudDebounceTimerRef.current);
+          cfdCloudDebounceTimerRef.current = null;
+        }
+        dispatchCloudWrite();
+      } else {
+        // Debounce typing (customer name, phone) by 100ms so Firestore isn't flooded with intermediate requests
+        if (cfdCloudDebounceTimerRef.current) {
+          clearTimeout(cfdCloudDebounceTimerRef.current);
+        }
+        cfdCloudDebounceTimerRef.current = setTimeout(() => {
+          dispatchCloudWrite();
+          cfdCloudDebounceTimerRef.current = null;
+        }, 100);
       }
     } catch (err) {
       console.warn('Failed to broadcast to Customer Display:', err);
     }
   };
 
-  // BroadcastChannel listener for incoming CFD sync requests
+  syncCustomerDisplayRef.current = syncCustomerDisplay;
+
+  // Stable BroadcastChannel listener initialized ONCE on mount (prevents tearing down channels on state changes)
   useEffect(() => {
     let bc = null;
     try {
@@ -980,7 +1020,9 @@ const Invoices = () => {
 
         bc.onmessage = (event) => {
           if (event.data?.type === 'REQUEST_SYNC') {
-            syncCustomerDisplay();
+            if (syncCustomerDisplayRef.current) {
+              syncCustomerDisplayRef.current(null, null, true);
+            }
           }
         };
       }
@@ -988,14 +1030,20 @@ const Invoices = () => {
       console.warn('CFD BroadcastChannel init error:', e);
     }
     return () => {
-      if (bc) bc.close();
+      if (bc) {
+        bc.close();
+        cfdChannelRef.current = null;
+      }
+      if (cfdCloudDebounceTimerRef.current) {
+        clearTimeout(cfdCloudDebounceTimerRef.current);
+      }
     };
-  }, [selectedItems, customer, phone, discountPercent, discountAmount, tax, loyaltyPointsToRedeem, paymentMethod, isSplitPayment, paymentMethod2, open, inventory, profile]);
+  }, []);
 
   // Sync to CFD whenever cart, payment tender or discount modifies
   useEffect(() => {
     syncCustomerDisplay();
-  }, [selectedItems, customer, discountPercent, discountAmount, tax, loyaltyPointsToRedeem, paymentMethod, isSplitPayment, paymentMethod2, open]);
+  }, [selectedItems, customer, phone, discountPercent, discountAmount, tax, loyaltyPointsToRedeem, paymentMethod, isSplitPayment, paymentMethod2, open]);
 
   const handleSaveInvoice = async () => {
     // Validate mandatory customer name and 10-digit phone number
@@ -1194,9 +1242,10 @@ const Invoices = () => {
         }
       ]
     };
-    const savedInvoice = await addInvoice(invoice);
+    // Broadcast instant settlement to customer screen before database writes (0ms delay)
+    syncCustomerDisplay('settled', null, true);
     speakBillSettlement(total);
-    syncCustomerDisplay('settled');
+    const savedInvoice = await addInvoice(invoice);
     setOpen(false);
     setSuccessInvoice(savedInvoice || invoice); // Show success dialog with persisted invoice
     setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0 }]);

@@ -92,21 +92,34 @@ export default function CustomerDisplay() {
     return () => clearInterval(slideTimer);
   }, []);
 
+  const applyCfdUpdate = (data, source) => {
+    if (!data) return;
+    setCfdState((prev) => {
+      // Discard out-of-order packets if a newer update is already rendered
+      if (prev?.updatedAt && data.updatedAt && data.updatedAt < prev.updatedAt) {
+        return prev;
+      }
+      return { ...prev, ...data };
+    });
+    setConnected(true);
+    setSyncSource(source);
+    try {
+      localStorage.setItem(CFD_STORAGE_KEY, JSON.stringify(data));
+    } catch (e) {}
+  };
+
   // 1. Cloud Firestore Real-time Listener (Enables 2nd Device / iPad over Wi-Fi/4G/5G)
   useEffect(() => {
     try {
+      // includeMetadataChanges: true delivers updates instantly without waiting for server network acks
       const unsub = onSnapshot(
         doc(db, 'cfd_live_sessions', 'primary'),
+        { includeMetadataChanges: true },
         (snapshot) => {
           if (snapshot.exists()) {
             const data = snapshot.data();
             if (data) {
-              setCfdState((prev) => ({ ...prev, ...data }));
-              setConnected(true);
-              setSyncSource('cloud');
-              try {
-                localStorage.setItem(CFD_STORAGE_KEY, JSON.stringify(data));
-              } catch (e) {}
+              applyCfdUpdate(data, 'cloud');
 
               // Check for test ping
               if (data.testPing && Date.now() - data.testPing < 8000) {
@@ -137,13 +150,8 @@ export default function CustomerDisplay() {
           if (!event.data) return;
           const { type, payload } = event.data;
 
-          if (type === 'SYNC') {
-            setCfdState(payload);
-            setConnected(true);
-            setSyncSource('local');
-            try {
-              localStorage.setItem(CFD_STORAGE_KEY, JSON.stringify(payload));
-            } catch (e) {}
+          if (type === 'SYNC' && payload) {
+            applyCfdUpdate(payload, 'local');
           } else if (type === 'CLEAR') {
             setCfdState(null);
             try {
@@ -157,7 +165,7 @@ export default function CustomerDisplay() {
           }
         };
 
-        // Request initial sync from active POS tab
+        // Request initial sync from active POS tab immediately on mount
         bc.postMessage({ type: 'REQUEST_SYNC' });
       }
     } catch (err) {
@@ -166,10 +174,12 @@ export default function CustomerDisplay() {
 
     // LocalStorage fallback listener
     const handleStorage = (e) => {
-      if (e.key === CFD_STORAGE_KEY) {
+      if (e.key === CFD_STORAGE_KEY && e.newValue) {
         try {
-          const updated = e.newValue ? JSON.parse(e.newValue) : null;
-          setCfdState(updated);
+          const updated = JSON.parse(e.newValue);
+          if (updated) {
+            applyCfdUpdate(updated, 'local');
+          }
         } catch {}
       }
     };
@@ -181,10 +191,19 @@ export default function CustomerDisplay() {
     };
     document.addEventListener('fullscreenchange', handleFullscreenChange);
 
+    // Instant wake-up sync when tablet screen turns on or browser tab gains focus
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && channelRef.current) {
+        channelRef.current.postMessage({ type: 'REQUEST_SYNC' });
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
       if (bc) bc.close();
       window.removeEventListener('storage', handleStorage);
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
 
