@@ -132,7 +132,7 @@ const Invoices = () => {
     cfdLastSettledTimeRef.current = 0;
     setOpen(false);
     if (syncCustomerDisplayRef.current) {
-      syncCustomerDisplayRef.current('idle', null, true);
+      syncCustomerDisplayRef.current('idle', null, true, []);
     }
   };
 
@@ -520,6 +520,7 @@ const Invoices = () => {
       );
       playVibration();
 
+      let updatedCartItems = [];
       setSelectedItems(prevItems => {
         // 1. If item already exists in the cart with the same variantSku, increment quantity
         const existingIndex = prevItems.findIndex(item =>
@@ -533,6 +534,7 @@ const Invoices = () => {
             ...updated[existingIndex],
             quantity: currentQty + 1
           };
+          updatedCartItems = updated;
           return updated;
         }
 
@@ -549,11 +551,12 @@ const Invoices = () => {
             customPrice: 0,
             customCost: 0
           };
+          updatedCartItems = updated;
           return updated;
         }
 
         // 3. Otherwise append new line item
-        return [
+        const updated = [
           ...prevItems,
           {
             id: product.id,
@@ -565,7 +568,14 @@ const Invoices = () => {
             customCost: 0
           }
         ];
+        updatedCartItems = updated;
+        return updated;
       });
+
+      // INSTANT 0ms Customer Facing Display Broadcast upon scanning
+      if (syncCustomerDisplayRef.current && updatedCartItems.length > 0) {
+        syncCustomerDisplayRef.current('active', product.name, true, updatedCartItems);
+      }
 
       setItemSearchTerm('');
       setUnrecognizedScan(null);
@@ -933,13 +943,26 @@ const Invoices = () => {
   };
 
   // Realtime BroadcastChannel & Cloud Firestore Sync for Customer Facing Display (CFD)
-  const syncCustomerDisplay = (overrideStatus = null, lastScanned = null, isImmediate = false) => {
+  const syncCustomerDisplay = (overrideStatus = null, lastScanned = null, isImmediate = false, overrideItems = null) => {
     try {
-      const validItems = (selectedItems || [])
-        .filter(item => item.id || (item.isCustom && item.customName && item.customPrice > 0))
+      const sourceItems = overrideItems !== null ? overrideItems : selectedItems;
+      const validItems = (sourceItems || [])
+        .filter(item => item && (item.id || (item.isCustom && item.customName && item.customPrice > 0)))
         .map(item => calculateLineItem(item, inventory));
 
-      const totals = calculateTotal();
+      let totals;
+      if (overrideItems !== null) {
+        totals = calculateInvoiceTotals({
+          items: validItems,
+          discountPercent,
+          discountAmount,
+          tax,
+          loyaltyPointsToRedeem,
+          matchedCustomer
+        });
+      } else {
+        totals = calculateTotal();
+      }
 
       let status;
       if (overrideStatus === 'settled') {
@@ -966,7 +989,7 @@ const Invoices = () => {
       const upiUrl = generateUpiPaymentUrl({
         vpa: storeVpa,
         payeeName: storeName,
-        amount: totals.total,
+        amount: isIdle ? 0 : totals.total,
         invoiceNumber: generateInvoiceNumber(invoices?.length || 0)
       });
 
@@ -995,10 +1018,15 @@ const Invoices = () => {
         seq: ++cfdSeqRef.current
       };
 
+      // Sanitize payload so Firestore never rejects due to undefined values
+      const cleanPayload = JSON.parse(
+        JSON.stringify(payload, (key, value) => (value === undefined ? null : value))
+      );
+
       // 1. Direct In-Memory Child Window Message (sub-millisecond instant 0ms sync for popups)
       if (cfdWindowRef.current && !cfdWindowRef.current.closed) {
         try {
-          cfdWindowRef.current.postMessage({ type: 'SYNC', payload }, '*');
+          cfdWindowRef.current.postMessage({ type: 'SYNC', payload: cleanPayload }, '*');
         } catch (e) {}
       }
 
@@ -1010,19 +1038,19 @@ const Invoices = () => {
       }
       if (cfdChannelRef.current) {
         try {
-          cfdChannelRef.current.postMessage({ type: 'SYNC', payload });
+          cfdChannelRef.current.postMessage({ type: 'SYNC', payload: cleanPayload });
         } catch (e) {}
       }
 
       // 3. LocalStorage fallback with storage event (0ms cross-tab fallback)
       try {
-        localStorage.setItem('aleen_cfd_state', JSON.stringify(payload));
+        localStorage.setItem('aleen_cfd_state', JSON.stringify(cleanPayload));
       } catch (e) {}
 
       // 4. Real-time Cloud Firestore Sync for 2nd Device (iPad, tablet, phone over Wi-Fi)
       const dispatchCloudWrite = () => {
         try {
-          setDoc(doc(db, 'cfd_live_sessions', 'primary'), payload).catch((err) => {
+          setDoc(doc(db, 'cfd_live_sessions', 'primary'), cleanPayload).catch((err) => {
             console.warn('Firestore CFD live sync warning:', err);
           });
         } catch (err) {
@@ -1030,7 +1058,7 @@ const Invoices = () => {
         }
       };
 
-      if (isImmediate || overrideStatus === 'settled' || validItems.length > 0) {
+      if (isImmediate || overrideStatus === 'settled' || overrideStatus === 'idle' || validItems.length > 0) {
         if (cfdCloudDebounceTimerRef.current) {
           clearTimeout(cfdCloudDebounceTimerRef.current);
           cfdCloudDebounceTimerRef.current = null;
@@ -1043,7 +1071,7 @@ const Invoices = () => {
         cfdCloudDebounceTimerRef.current = setTimeout(() => {
           dispatchCloudWrite();
           cfdCloudDebounceTimerRef.current = null;
-        }, 50);
+        }, 30);
       }
     } catch (err) {
       console.warn('Failed to broadcast to Customer Display:', err);

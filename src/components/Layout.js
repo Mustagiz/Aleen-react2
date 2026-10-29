@@ -276,14 +276,7 @@ export default function Layout() {
 
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-        {/* macOS Window Controls */}
-        {designSystem === 'apple' && !isMobile && (
-          <Box sx={{ px: 2.5, pt: 2, pb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#FF5F56', boxShadow: '0 0 2px rgba(0,0,0,0.2)' }} />
-            <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#FFBD2E', boxShadow: '0 0 2px rgba(0,0,0,0.2)' }} />
-            <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#27C93F', boxShadow: '0 0 2px rgba(0,0,0,0.2)' }} />
-          </Box>
-        )}
+
 
         {/* Brand Header with Luxury Monogram & Mobile Close Button */}
         <Box sx={{

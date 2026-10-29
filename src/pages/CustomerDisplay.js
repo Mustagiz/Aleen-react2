@@ -248,7 +248,12 @@ export default function CustomerDisplay() {
 
   const applyCfdUpdate = (data, source = 'cloud') => {
     if (!data) return;
-    setCfdState(data);
+    setCfdState((prev) => {
+      // Guard against stale or out-of-order network frames
+      if (prev?.seq && data?.seq && data.seq < prev.seq) return prev;
+      if (prev?.updatedAt && data?.updatedAt && data.updatedAt < prev.updatedAt) return prev;
+      return data;
+    });
     if (source === 'local') {
       setSyncChannel('instant');
     }
@@ -423,16 +428,23 @@ export default function CustomerDisplay() {
   const paymentMethod = cfdState?.paymentMethod || 'Cash';
   const upiUrl = cfdState?.upiUrl || '';
   const isSettled = cfdState?.status === 'settled';
+  const isIdle = cfdState?.status === 'idle';
 
-  // Retain last known customer name so thank-you receipt never loses the patron name
+  // Retain last known customer name during active invoice so thank-you receipt never loses the patron name
   const [lastKnownCustomerName, setLastKnownCustomerName] = useState('');
   useEffect(() => {
+    if (cfdState?.status === 'idle') {
+      setLastKnownCustomerName('');
+      return;
+    }
     if (customerName && customerName.toLowerCase() !== 'honoured patron' && customerName.toLowerCase() !== 'walk-in') {
       setLastKnownCustomerName(customerName);
     }
-  }, [customerName]);
+  }, [customerName, cfdState?.status]);
 
-  const activeCustomerName = (customerName && customerName.toLowerCase() !== 'honoured patron') ? customerName : lastKnownCustomerName;
+  const activeCustomerName = !isIdle
+    ? (customerName && customerName.toLowerCase() !== 'honoured patron' ? customerName : (isSettled ? lastKnownCustomerName : ''))
+    : '';
 
   // Celebration state triggered on settlement
   const [showCelebration, setShowCelebration] = useState(false);
@@ -441,6 +453,8 @@ export default function CustomerDisplay() {
       setShowCelebration(true);
       const timer = setTimeout(() => setShowCelebration(false), 6000);
       return () => clearTimeout(timer);
+    } else {
+      setShowCelebration(false);
     }
   }, [isSettled, cfdState?.updatedAt]);
 
@@ -493,8 +507,8 @@ export default function CustomerDisplay() {
     setReceiptToast(true);
   };
 
-  const isEmptyCart = !items.length && !isSettled;
-  const hasCustomer = Boolean(activeCustomerName);
+  const isEmptyCart = (!items.length || isIdle) && !isSettled;
+  const hasCustomer = Boolean(activeCustomerName) && cfdState?.status === 'active';
 
   // Dynamic Patron VIP Name Renderer with selectable animation styles
   const renderPatronName = (name, customSx = {}) => {
