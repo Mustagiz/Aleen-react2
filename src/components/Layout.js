@@ -796,23 +796,23 @@ export default function Layout() {
               onClick={() => setSearchOpen(true)}
               variant="outlined"
               size="small"
-              startIcon={<Search fontSize="small" sx={{ color: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.85)' : 'text.secondary' }} />}
+              startIcon={<Search fontSize="small" sx={{ color: topBarConfig.isColored ? '#FFFFFF !important' : 'text.secondary' }} />}
               sx={{
-                borderRadius: '9999px',
-                borderColor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.3)' : (isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)'),
-                color: topBarConfig.isColored ? '#FFFFFF' : 'text.secondary',
+                borderRadius: topBarConfig.isColored ? `${activeSystemConfig?.shape?.buttonRadius || 6}px !important` : '9999px',
+                borderColor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.45) !important' : (isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)'),
+                color: topBarConfig.isColored ? '#FFFFFF !important' : 'text.secondary',
                 px: 1.75,
                 py: 0.5,
                 height: 36,
-                bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.14)' : (isDark ? 'rgba(0, 0, 0, 0.2)' : '#F8FAFC'),
+                bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.18) !important' : (isDark ? 'rgba(0, 0, 0, 0.2)' : '#F8FAFC'),
                 display: { xs: 'none', md: 'inline-flex' },
                 '&:hover': {
-                  borderColor: topBarConfig.isColored ? '#FFFFFF' : 'primary.main',
-                  bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.22)' : (isDark ? 'rgba(20, 184, 166, 0.08)' : '#F0FDFA')
+                  borderColor: topBarConfig.isColored ? '#FFFFFF !important' : 'primary.main',
+                  bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.28) !important' : (isDark ? 'rgba(20, 184, 166, 0.08)' : '#F0FDFA')
                 }
               }}
             >
-              <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, mr: 1, color: topBarConfig.isColored ? '#FFFFFF' : 'inherit' }}>
+              <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, mr: 1, color: topBarConfig.isColored ? '#FFFFFF !important' : 'inherit' }}>
                 Search CRM...
               </Typography>
               <Chip 
@@ -822,8 +822,9 @@ export default function Layout() {
                   height: 18, 
                   fontSize: '0.65rem', 
                   fontWeight: 800,
-                  bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.2)' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'),
-                  color: topBarConfig.isColored ? '#FFFFFF' : 'text.secondary'
+                  borderRadius: topBarConfig.isColored ? '4px !important' : '9999px',
+                  bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.28) !important' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'),
+                  color: topBarConfig.isColored ? '#FFFFFF !important' : 'text.secondary'
                 }} 
               />
             </Button>

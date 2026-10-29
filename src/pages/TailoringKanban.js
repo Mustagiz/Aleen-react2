@@ -1492,13 +1492,13 @@ export default function TailoringKanban() {
                       gap: 0.5,
                       textTransform: 'none',
                       borderRadius: 2,
-                      bgcolor: isSelected ? '#0F766E' : 'background.paper',
-                      color: isSelected ? '#FFFFFF' : '#334155',
-                      borderColor: isSelected ? '#0F766E' : 'rgba(0,0,0,0.12)',
+                      bgcolor: isSelected ? 'primary.main' : 'background.paper',
+                      color: isSelected ? '#FFFFFF' : 'text.primary',
+                      borderColor: isSelected ? 'primary.main' : 'divider',
                       boxShadow: isSelected ? '0 2px 8px rgba(var(--primary-rgb, 15, 118, 110), 0.25)' : 'none',
                       '&:hover': {
-                        bgcolor: isSelected ? '#042F2E' : 'rgba(15, 118, 110, 0.06)',
-                        bordercolor: (t) => t.palette.primary.main
+                        bgcolor: isSelected ? (t) => `${t.palette.primary.dark} !important` : (t) => `${t.palette.primary.main}14`,
+                        borderColor: (t) => t.palette.primary.main
                       }
                     }}
                   >
@@ -1628,10 +1628,10 @@ export default function TailoringKanban() {
                       fontWeight: 800,
                       textTransform: 'none',
                       borderRadius: 1,
-                      bgcolor: !formData.urgent ? '#0F766E' : 'transparent',
-                      color: !formData.urgent ? '#FFFFFF' : '#0F766E',
-                      bordercolor: (t) => t.palette.primary.main,
-                      '&:hover': { bgcolor: !formData.urgent ? '#042F2E' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)' }
+                      bgcolor: !formData.urgent ? 'primary.main' : 'transparent',
+                      color: !formData.urgent ? '#FFFFFF' : (t) => t.palette.primary.main,
+                      borderColor: (t) => t.palette.primary.main,
+                      '&:hover': { bgcolor: !formData.urgent ? (t) => `${t.palette.primary.dark} !important` : (t) => `${t.palette.primary.main}14` }
                     }}
                   >
                     🧵 Standard (4d)

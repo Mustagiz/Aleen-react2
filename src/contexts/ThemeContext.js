@@ -117,11 +117,23 @@ export const ThemeProvider = ({ children }) => {
     useEffect(() => {
         const root = document.documentElement;
         if (activeSystemConfig && activePalette) {
+            const hexToRgb = (hex) => {
+                if (!hex) return '15, 118, 110';
+                let c = hex.replace('#', '');
+                if (c.length === 3) {
+                    c = c.split('').map(char => char + char).join('');
+                }
+                const num = parseInt(c, 16);
+                return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
+            };
+
             root.setAttribute('data-design-system', activeSystemConfig.id);
             document.body.style.fontFamily = activeSystemConfig.typography.fontFamily;
             root.style.setProperty('--emerald-primary', activePalette.primary.main);
             root.style.setProperty('--emerald-light', activePalette.primary.light);
             root.style.setProperty('--emerald-dark', activePalette.primary.dark);
+            root.style.setProperty('--primary-rgb', hexToRgb(activePalette.primary.main));
+            root.style.setProperty('--secondary-rgb', hexToRgb(activePalette.secondary.main));
             root.style.setProperty('--gold-accent', activePalette.secondary.main);
             root.style.setProperty('--gold-champagne', activePalette.secondary.light);
             root.style.setProperty('--accent-glow', activePalette.accentGlow);
@@ -209,7 +221,7 @@ export const ThemeProvider = ({ children }) => {
                     },
                     styleOverrides: {
                         root: {
-                            borderRadius: activeSystemConfig.id === 'material' ? 9999 : (activeSystemConfig.id === 'microsoft' ? 4 : (activeSystemConfig.id === 'linear' || activeSystemConfig.id === 'zoho' ? 6 : (activeSystemConfig.id === 'apple' ? 10 : activeSystemConfig.shape.buttonRadius))),
+                            borderRadius: activeSystemConfig.shape.buttonRadius,
                             minHeight: activeSystemConfig.id === 'zoho' || activeSystemConfig.id === 'microsoft' ? 36 : 40,
                             padding: activeSystemConfig.id === 'material' ? '10px 24px' : (activeSystemConfig.id === 'microsoft' || activeSystemConfig.id === 'zoho' ? '6px 16px' : '8px 20px'),
                             boxShadow: 'none',
@@ -253,7 +265,7 @@ export const ThemeProvider = ({ children }) => {
                     styleOverrides: {
                         root: {
                             backgroundImage: 'none',
-                            borderRadius: activeSystemConfig.id === 'material' ? 24 : (activeSystemConfig.id === 'microsoft' ? 4 : (activeSystemConfig.id === 'linear' || activeSystemConfig.id === 'zoho' ? 6 : (activeSystemConfig.id === 'apple' ? 14 : activeSystemConfig.shape.cardRadius)))
+                            borderRadius: activeSystemConfig.shape.cardRadius
                         }
                     }
                 },
@@ -263,7 +275,7 @@ export const ThemeProvider = ({ children }) => {
                     },
                     styleOverrides: {
                         root: {
-                            borderRadius: activeSystemConfig.id === 'material' ? 24 : (activeSystemConfig.id === 'microsoft' ? 4 : (activeSystemConfig.id === 'linear' || activeSystemConfig.id === 'zoho' ? 6 : (activeSystemConfig.id === 'apple' ? 14 : activeSystemConfig.shape.cardRadius))),
+                            borderRadius: activeSystemConfig.shape.cardRadius,
                             border: mode === 'light' ? activeSystemConfig.cardStyle.borderLight : activeSystemConfig.cardStyle.borderDark,
                             boxShadow: mode === 'light' ? activeSystemConfig.cardStyle.boxShadowLight : activeSystemConfig.cardStyle.boxShadowDark,
                             backdropFilter: activeSystemConfig.cardStyle.backdropFilter || 'none',
@@ -274,7 +286,7 @@ export const ThemeProvider = ({ children }) => {
                 MuiTableContainer: {
                     styleOverrides: {
                         root: {
-                            borderRadius: activeSystemConfig.id === 'material' ? 24 : (activeSystemConfig.id === 'microsoft' ? 4 : (activeSystemConfig.id === 'linear' || activeSystemConfig.id === 'zoho' ? 6 : (activeSystemConfig.id === 'apple' ? 14 : activeSystemConfig.shape.cardRadius))),
+                            borderRadius: activeSystemConfig.shape.cardRadius,
                             border: mode === 'light' ? activeSystemConfig.cardStyle.borderLight : activeSystemConfig.cardStyle.borderDark,
                             boxShadow: mode === 'light' ? activeSystemConfig.cardStyle.boxShadowLight : activeSystemConfig.cardStyle.boxShadowDark,
                             overflow: 'hidden'
@@ -290,10 +302,12 @@ export const ThemeProvider = ({ children }) => {
                                     ? (mode === 'light' ? '#F8FAFC' : '#182033')
                                     : (activeSystemConfig.id === 'linear'
                                         ? '#0F1012'
-                                        : (mode === 'light' ? `${activePalette.primary.main}0A` : 'rgba(255, 255, 255, 0.03)'))),
-                            borderTop: activeSystemConfig.id === 'zoho' ? `3px solid ${activePalette.primary.main}` : 'none',
+                                        : (activeSystemConfig.id === 'salesforce'
+                                            ? (mode === 'light' ? '#FAFAF9' : '#1A212D')
+                                            : (mode === 'light' ? `${activePalette.primary.main}0A` : 'rgba(255, 255, 255, 0.03)')))),
+                            borderTop: activeSystemConfig.id === 'zoho' ? `3px solid ${activePalette.primary.main}` : (activeSystemConfig.id === 'salesforce' ? `2px solid ${activePalette.primary.main}` : 'none'),
                             '& .MuiTableCell-head': {
-                                color: mode === 'light' ? activePalette.primary.dark : '#F8FAFC',
+                                color: mode === 'light' ? (activeSystemConfig.id === 'salesforce' ? '#0176D3' : activePalette.primary.dark) : '#F8FAFC',
                                 fontWeight: activeSystemConfig.id === 'microsoft' ? 600 : 800,
                                 fontSize: activeSystemConfig.id === 'zoho' || activeSystemConfig.id === 'microsoft' ? '0.74rem' : '0.78rem',
                                 textTransform: activeSystemConfig.id === 'microsoft' ? 'none' : 'uppercase',
@@ -341,7 +355,7 @@ export const ThemeProvider = ({ children }) => {
                 MuiChip: {
                     styleOverrides: {
                         root: {
-                            borderRadius: activeSystemConfig.id === 'material' ? 9999 : (activeSystemConfig.id === 'microsoft' ? 4 : (activeSystemConfig.id === 'linear' || activeSystemConfig.id === 'zoho' ? 4 : (activeSystemConfig.id === 'apple' ? 8 : activeSystemConfig.shape.buttonRadius))),
+                            borderRadius: activeSystemConfig.shape.buttonRadius,
                             fontWeight: 700,
                             fontSize: '0.74rem',
                             fontFamily: activeSystemConfig.id === 'linear' ? 'monospace' : activeSystemConfig.typography.fontFamily
@@ -351,7 +365,7 @@ export const ThemeProvider = ({ children }) => {
                 MuiOutlinedInput: {
                     styleOverrides: {
                         root: {
-                            borderRadius: activeSystemConfig.id === 'material' ? 28 : (activeSystemConfig.id === 'microsoft' ? 4 : (activeSystemConfig.id === 'linear' || activeSystemConfig.id === 'zoho' ? 4 : (activeSystemConfig.id === 'apple' ? 10 : activeSystemConfig.shape.inputRadius))),
+                            borderRadius: activeSystemConfig.shape.inputRadius,
                             minHeight: activeSystemConfig.id === 'zoho' || activeSystemConfig.id === 'microsoft' ? 36 : 40,
                             fontFamily: activeSystemConfig.typography.fontFamily,
                             '&:hover .MuiOutlinedInput-notchedOutline': {

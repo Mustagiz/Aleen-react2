@@ -2318,15 +2318,15 @@ export default function Settings() {
                       variant={isSelected ? 'contained' : 'outlined'}
                       sx={{
                         mt: 1.5,
-                        borderRadius: '20px',
+                        borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                         fontWeight: 700,
                         fontSize: '0.75rem',
                         textTransform: 'none',
                         bgcolor: isSelected ? 'primary.main' : 'transparent',
-                        bordercolor: (t) => t.palette.primary.main,
-                        color: isSelected ? '#FFFFFF' : '#0F766E',
+                        borderColor: (t) => t.palette.primary.main,
+                        color: isSelected ? '#FFFFFF' : (t) => t.palette.primary.main,
                         '&:hover': {
-                          bgcolor: isSelected ? '#042F2E' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)'
+                          bgcolor: isSelected ? (t) => t.palette.primary.dark : (t) => `${t.palette.primary.main}14`
                         }
                       }}
                     >

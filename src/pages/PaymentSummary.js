@@ -444,7 +444,7 @@ const PaymentSummary = () => {
                     height: 40,
                     boxSizing: 'border-box',
                     borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                    border: '1.5px solid rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
+                    border: (t) => `1.5px solid ${t.palette.primary.main}33`,
                     boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
                 }}>
                     {[
@@ -465,16 +465,16 @@ const PaymentSummary = () => {
                                     height: 32,
                                     minHeight: 32,
                                     px: 2,
-                                    borderRadius: '8px',
+                                    borderRadius: (t) => `${Math.max(4, (t.shape?.borderRadius || 8) - 2)}px`,
                                     textTransform: 'none',
                                     fontWeight: 700,
                                     fontSize: '0.82rem',
-                                    color: isSelected ? '#FFFFFF' : 'text.secondary',
-                                    bgcolor: isSelected ? 'primary.main' : 'transparent',
-                                    boxShadow: isSelected ? '0 2px 8px rgba(15, 118, 110, 0.28)' : 'none',
+                                    color: isSelected ? '#FFFFFF !important' : 'text.secondary',
+                                    bgcolor: isSelected ? 'primary.main !important' : 'transparent',
+                                    boxShadow: isSelected ? (t) => `0 2px 8px ${t.palette.primary.main}4D` : 'none',
                                     transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                                     '&:hover': {
-                                        bgcolor: isSelected ? '#042F2E' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)'
+                                        bgcolor: isSelected ? (t) => `${t.palette.primary.dark} !important` : (t) => `${t.palette.primary.main}14`
                                     }
                                 }}
                             >

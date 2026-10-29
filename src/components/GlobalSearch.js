@@ -426,7 +426,7 @@ const GlobalSearch = ({ open, onClose }) => {
                   border: '1px solid',
                   borderColor: isSelected ? 'primary.main' : 'divider',
                   '&:hover': {
-                    bgcolor: isSelected ? '#042F2E' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)'
+                    bgcolor: isSelected ? (t) => `${t.palette.primary.dark} !important` : (t) => `${t.palette.primary.main}14`
                   }
                 }}
               />

@@ -1051,7 +1051,7 @@ const Inventory = () => {
                             : isLowStock
                               ? '0 12px 28px rgba(217, 119, 6, 0.18)'
                               : '0 12px 28px rgba(var(--primary-rgb, 15, 118, 110), 0.14)',
-                          borderColor: (t) => isOutOfStock ? '#EF4444' : isLowStock ? '#D97706' : (t.palette.mode === 'dark' ? '#2DD4BF' : '#0F766E')
+                          borderColor: (t) => isOutOfStock ? '#EF4444' : isLowStock ? '#D97706' : t.palette.primary.main
                         }
                       }}
                     >
@@ -1063,11 +1063,11 @@ const Inventory = () => {
                           left: 0,
                           right: 0,
                           height: '3.5px',
-                          background: isOutOfStock
+                          background: (t) => isOutOfStock
                             ? 'linear-gradient(90deg, #DC2626 0%, #EF4444 100%)'
                             : isLowStock
                               ? 'linear-gradient(90deg, #B45309 0%, #D97706 50%, #F59E0B 100%)'
-                              : 'linear-gradient(90deg, #042F2E 0%, #0F766E 50%, #14B8A6 100%)'
+                              : `linear-gradient(90deg, ${t.palette.primary.dark} 0%, ${t.palette.primary.main} 50%, ${t.palette.primary.light} 100%)`
                         }}
                       />
 
@@ -1121,7 +1121,7 @@ const Inventory = () => {
                               fontSize: '0.68rem',
                               borderRadius: '8px',
                               borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.3)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.22)',
-                              color: (t) => t.palette.mode === 'dark' ? '#2DD4BF' : '#0F766E',
+                              color: (t) => t.palette.primary.main,
                               bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.06)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
                               flexShrink: 0
                             }}
@@ -1975,12 +1975,12 @@ const Inventory = () => {
                         sx={{
                           fontWeight: form.size === sz ? 800 : 600,
                           fontSize: '0.72rem',
-                          bgcolor: form.size === sz ? '#0F766E' : 'action.hover',
+                          bgcolor: form.size === sz ? 'primary.main' : 'action.hover',
                           color: form.size === sz ? '#FFFFFF' : 'text.primary',
                           borderRadius: 1.5,
-                          border: form.size === sz ? '1px solid #0F766E' : '1px solid transparent',
+                          border: form.size === sz ? (t) => `1px solid ${t.palette.primary.main}` : '1px solid transparent',
                           '&:hover': {
-                            bgcolor: form.size === sz ? '#0D6860' : 'action.selected'
+                            bgcolor: form.size === sz ? (t) => t.palette.primary.dark : 'action.selected'
                           }
                         }}
                       />
@@ -2016,9 +2016,9 @@ const Inventory = () => {
                         sx={{
                           fontWeight: form.color === c.name ? 800 : 600,
                           fontSize: '0.72rem',
-                          bgcolor: form.color === c.name ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.12)' : 'action.hover',
-                          color: form.color === c.name ? '#0F766E' : 'text.primary',
-                          border: form.color === c.name ? '1px solid #0F766E' : '1px solid transparent',
+                          bgcolor: form.color === c.name ? (t) => `${t.palette.primary.main}1A` : 'action.hover',
+                          color: form.color === c.name ? (t) => t.palette.primary.main : 'text.primary',
+                          border: form.color === c.name ? (t) => `1px solid ${t.palette.primary.main}` : '1px solid transparent',
                           borderRadius: 1.5
                         }}
                       />

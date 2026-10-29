@@ -319,10 +319,10 @@ export default function CustomerMeasurementModal({
                   fontSize: '0.75rem',
                   textTransform: 'none',
                   '&.Mui-selected': {
-                    bgcolor: isDark ? '#0F766E' : '#0A4D46',
+                    bgcolor: 'primary.main',
                     color: '#FFFFFF',
                     '&:hover': {
-                      bgcolor: isDark ? '#115E59' : '#042F2E'
+                      bgcolor: 'primary.dark'
                     }
                   }
                 }

@@ -4038,12 +4038,11 @@ const Invoices = () => {
                             borderRadius: '16px',
                             textTransform: 'none',
                             bgcolor: isSelected ? 'primary.main' : 'transparent',
-                            color: isSelected ? '#FFFFFF' : '#334155',
-                            borderColor: isSelected ? '#0F766E' : 'rgba(0,0,0,0.12)',
+                            borderColor: isSelected ? 'primary.main' : 'divider',
                             boxShadow: isSelected ? '0 2px 8px rgba(var(--primary-rgb, 15, 118, 110), 0.25)' : 'none',
                             '&:hover': {
-                              bgcolor: isSelected ? '#042F2E' : 'rgba(15, 118, 110, 0.06)',
-                              bordercolor: (t) => t.palette.primary.main
+                              bgcolor: isSelected ? (t) => `${t.palette.primary.dark} !important` : (t) => `${t.palette.primary.main}14`,
+                              borderColor: (t) => t.palette.primary.main
                             }
                           }}
                         >

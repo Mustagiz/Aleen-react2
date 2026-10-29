@@ -364,15 +364,15 @@ const AdvancedReports = () => {
                                     sx={{
                                         height: 34,
                                         px: 2,
-                                        borderRadius: '20px',
+                                        borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                         textTransform: 'none',
                                         fontWeight: 700,
                                         fontSize: '0.82rem',
-                                        color: dateRange === tab.id ? '#FFFFFF' : 'text.secondary',
-                                        bgcolor: dateRange === tab.id ? '#0F766E' : 'transparent',
+                                        color: dateRange === tab.id ? '#FFFFFF !important' : 'text.secondary',
+                                        bgcolor: dateRange === tab.id ? 'primary.main !important' : 'transparent',
                                         transition: 'all 0.15s ease',
                                         '&:hover': {
-                                            bgcolor: dateRange === tab.id ? '#042F2E' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)'
+                                            bgcolor: dateRange === tab.id ? (t) => `${t.palette.primary.dark} !important` : (t) => `${t.palette.primary.main}14`
                                         }
                                     }}
                                 >

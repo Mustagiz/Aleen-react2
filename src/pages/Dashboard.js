@@ -514,57 +514,63 @@ const Dashboard = () => {
           <Stack direction={{ xs: 'row' }} spacing={1} flexWrap="wrap" useFlexGap sx={{ alignSelf: { xs: 'stretch', md: 'center' } }}>
             <Button
               variant="contained"
-              startIcon={<Add />}
+              startIcon={<Add sx={{ color: '#FFFFFF !important' }} />}
               onClick={() => navigate('/invoices?action=new', { state: { openNewBill: true } })}
               sx={{
-                bgcolor: sysBanner.ctaBg,
-                color: '#FFFFFF',
+                bgcolor: `${sysBanner.ctaBg} !important`,
+                color: '#FFFFFF !important',
                 fontWeight: 800,
                 fontSize: '0.82rem',
-                borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 8}px`,
+                borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 8}px !important`,
                 height: 40,
                 px: 2.2,
                 textTransform: 'none',
                 boxShadow: `0 4px 14px ${sysBanner.ctaBg}66`,
-                '&:hover': { bgcolor: sysBanner.ctaHover }
+                '&:hover': { bgcolor: `${sysBanner.ctaHover} !important` }
               }}
             >
               New Bill
             </Button>
             <Button
               variant="outlined"
-              startIcon={<PointOfSale />}
+              startIcon={<PointOfSale sx={{ color: '#FFFFFF !important' }} />}
               onClick={() => setDrawerModalOpen(true)}
               sx={{
-                borderColor: isDark ? 'rgba(255, 255, 255, 0.35)' : 'divider',
-                color: sysBanner.color || '#FFFFFF',
+                borderColor: 'rgba(255, 255, 255, 0.45) !important',
+                color: '#FFFFFF !important',
                 fontWeight: 700,
                 fontSize: '0.82rem',
-                borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 8}px`,
+                borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 8}px !important`,
                 height: 40,
                 px: 2,
                 textTransform: 'none',
-                bgcolor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
-                '&:hover': { borderColor: theme.palette.primary.main, bgcolor: `${theme.palette.primary.main}15` }
+                bgcolor: 'rgba(255, 255, 255, 0.12) !important',
+                '&:hover': {
+                  borderColor: '#FFFFFF !important',
+                  bgcolor: 'rgba(255, 255, 255, 0.22) !important'
+                }
               }}
             >
               Shift & Z-Report
             </Button>
             <Button
               variant="outlined"
-              startIcon={<Straighten />}
+              startIcon={<Straighten sx={{ color: '#FFFFFF !important' }} />}
               onClick={() => navigate('/tailoring')}
               sx={{
-                borderColor: isDark ? 'rgba(255, 255, 255, 0.35)' : 'divider',
-                color: sysBanner.color || '#FFFFFF',
+                borderColor: 'rgba(255, 255, 255, 0.45) !important',
+                color: '#FFFFFF !important',
                 fontWeight: 700,
                 fontSize: '0.82rem',
-                borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 8}px`,
+                borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 8}px !important`,
                 height: 40,
                 px: 2,
                 textTransform: 'none',
-                bgcolor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
-                '&:hover': { borderColor: theme.palette.primary.main, bgcolor: `${theme.palette.primary.main}15` }
+                bgcolor: 'rgba(255, 255, 255, 0.12) !important',
+                '&:hover': {
+                  borderColor: '#FFFFFF !important',
+                  bgcolor: 'rgba(255, 255, 255, 0.22) !important'
+                }
               }}
             >
               Tailoring Board
