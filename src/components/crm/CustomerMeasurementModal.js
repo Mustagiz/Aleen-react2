@@ -185,9 +185,7 @@ export default function CustomerMeasurementModal({
     >
       <DialogTitle
         sx={{
-          background: isDark
-            ? 'linear-gradient(135deg, #042F2E 0%, #0B3835 50%, #0F1E1D 100%)'
-            : 'linear-gradient(135deg, #0A4D46 0%, #0F766E 70%, #115E59 100%)',
+          background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.dark || '#042F2E'} 0%, ${t.palette.primary.main} 100%)`,
           color: '#FFFFFF',
           px: 3,
           py: 2.25,

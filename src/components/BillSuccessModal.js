@@ -268,7 +268,7 @@ const BillSuccessModal = ({
         {/* Atelier Header Banner */}
         <Box
           sx={{
-            background: 'linear-gradient(135deg, #042F2E 0%, #0F766E 60%, #115E59 100%)',
+            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.dark || '#042F2E'} 0%, ${t.palette.primary.main} 100%)`,
             color: '#FFFFFF',
             px: { xs: 2.5, sm: 3.5 },
             py: { xs: 2.5, sm: 3 },

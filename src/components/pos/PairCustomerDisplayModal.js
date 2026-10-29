@@ -130,11 +130,11 @@ export default function PairCustomerDisplayModal({
               width: 42,
               height: 42,
               borderRadius: 2.5,
-              background: 'linear-gradient(135deg, #C5A059 0%, #8F6E2B 100%)',
+              background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.main} 0%, ${t.palette.primary.dark} 100%)`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 14px rgba(197, 160, 89, 0.35)'
+              boxShadow: (t) => `0 4px 14px ${t.palette.primary.main}55`
             }}
           >
             <PhoneIphone sx={{ color: '#FFFFFF', fontSize: 24 }} />
@@ -143,7 +143,7 @@ export default function PairCustomerDisplayModal({
             <Typography variant="h6" sx={{ fontWeight: 800, color: '#FFFFFF', fontSize: { xs: '1rem', sm: '1.2rem' } }}>
               Connect 2nd Screen / Customer Facing Display
             </Typography>
-            <Typography variant="caption" sx={{ color: '#C5A059', letterSpacing: '0.08em', fontWeight: 600 }}>
+            <Typography variant="caption" sx={{ color: (t) => t.palette.primary.light || '#C5A059', letterSpacing: '0.08em', fontWeight: 600 }}>
               Live Real-Time Cloud & Dual-Monitor Pairing (iPad, Tablet, Phone or 2nd Monitor)
             </Typography>
           </Box>
@@ -243,16 +243,16 @@ export default function PairCustomerDisplayModal({
                   else window.open(customerDisplayUrl, 'AleenCustomerDisplay', 'width=1120,height=760,menubar=no,toolbar=no');
                 }}
                 sx={{
-                  background: 'linear-gradient(135deg, #C5A059 0%, #8F6E2B 100%)',
+                  background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.main} 0%, ${t.palette.primary.dark} 100%)`,
                   color: '#FFFFFF',
                   textTransform: 'none',
                   fontWeight: 700,
                   fontSize: '0.8rem',
                   py: 1,
                   borderRadius: 2,
-                  boxShadow: '0 4px 14px rgba(197, 160, 89, 0.35)',
+                  boxShadow: (t) => `0 4px 14px ${t.palette.primary.main}55`,
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #D4AF37 0%, #9A7B38 100%)'
+                    filter: 'brightness(1.08)'
                   }
                 }}
               >
@@ -443,7 +443,7 @@ export default function PairCustomerDisplayModal({
           onClick={onClose}
           variant="contained"
           sx={{
-            background: 'linear-gradient(135deg, #C5A059 0%, #8F6E2B 100%)',
+            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.main} 0%, ${t.palette.primary.dark} 100%)`,
             color: '#FFFFFF',
             fontWeight: 700,
             textTransform: 'none',

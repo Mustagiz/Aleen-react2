@@ -1025,41 +1025,6 @@ export default function Layout() {
         >
           <Box sx={{ flex: 1, position: 'relative' }}>
             <Outlet />
-            {/* Google Material 3 Floating Action Button (FAB) */}
-            {designSystem === 'material' && canQuickBill && (
-              <Fab
-                variant="extended"
-                color="primary"
-                onClick={handleQuickBill}
-                sx={{
-                  position: 'fixed',
-                  bottom: { xs: 76, sm: 32 },
-                  right: { xs: 20, sm: 32 },
-                  zIndex: 1100,
-                  borderRadius: '16px',
-                  px: 3,
-                  py: 1.5,
-                  height: 54,
-                  textTransform: 'none',
-                  fontWeight: 700,
-                  fontSize: '0.88rem',
-                  letterSpacing: '0.02em',
-                  boxShadow: '0 8px 24px rgba(103, 80, 164, 0.4)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1.2,
-                  bgcolor: theme.palette.primary.main,
-                  color: '#FFFFFF',
-                  '&:hover': {
-                    bgcolor: theme.palette.primary.dark,
-                    boxShadow: '0 12px 28px rgba(103, 80, 164, 0.5)'
-                  }
-                }}
-              >
-                <Add sx={{ fontSize: 22 }} />
-                <span>Quick POS Bill</span>
-              </Fab>
-            )}
           </Box>
           <AtelierFooter />
         </Box>

@@ -960,6 +960,7 @@ const Invoices = () => {
         status,
         lastScannedItem: lastScanned || null,
         currency: 'INR',
+        themeColor: theme?.palette?.primary?.main || '#C5A059',
         updatedAt: Date.now()
       };
 
@@ -2316,7 +2317,7 @@ const Invoices = () => {
                     left: 0,
                     right: 0,
                     height: '3px',
-                    background: 'linear-gradient(90deg, #042F2E 0%, #0F766E 50%, #14B8A6 100%)'
+                    background: (t) => `linear-gradient(90deg, ${t.palette.primary.dark} 0%, ${t.palette.primary.main} 50%, ${t.palette.primary.light} 100%)`
                   }}
                 />
 
@@ -4625,10 +4626,10 @@ const Invoices = () => {
                           sx={{
                             py: 0.8,
                             fontWeight: 800,
-                            background: 'linear-gradient(135deg, #0A4D46 0%, #0F766E 100%)',
+                            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.main} 0%, ${t.palette.primary.dark} 100%)`,
                             color: '#FFFFFF',
-                            boxShadow: '0 4px 12px rgba(10, 77, 70, 0.3)',
-                            '&:hover': { background: 'linear-gradient(135deg, #042F2E 0%, #0A4D46 100%)' }
+                            boxShadow: (t) => `0 4px 12px ${t.palette.primary.main}55`,
+                            '&:hover': { filter: 'brightness(0.92)' }
                           }}
                         >
                           ⚡ Receive Tender 2 via UPI QR (₹{Math.max(0, total - (Number(splitAmount) || 0)).toFixed(2)})
@@ -5352,17 +5353,15 @@ const Invoices = () => {
           sx: {
             borderRadius: 3.5,
             overflow: 'hidden',
-            bgcolor: mode === 'dark' ? '#0F1E1D' : '#FFFFFF',
-            border: mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.22)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.15)',
-            boxShadow: mode === 'dark' ? '0 24px 60px rgba(0, 0, 0, 0.75)' : '0 24px 60px rgba(10, 77, 70, 0.2)'
+            bgcolor: mode === 'dark' ? 'background.paper' : '#FFFFFF',
+            border: (t) => `1px solid ${t.palette.primary.main}33`,
+            boxShadow: (t) => `0 24px 60px ${t.palette.primary.main}40`
           }
         }}
       >
         <DialogTitle
           sx={{
-            background: mode === 'dark'
-              ? 'linear-gradient(135deg, #042F2E 0%, #0F1E1D 100%)'
-              : 'linear-gradient(135deg, #0A4D46 0%, #0F766E 100%)',
+            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.dark || '#042F2E'} 0%, ${t.palette.primary.main} 100%)`,
             color: '#FFFFFF',
             px: 2.5,
             py: 2,
@@ -5372,7 +5371,7 @@ const Invoices = () => {
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
-            <Keyboard sx={{ color: '#2DD4BF', fontSize: 22 }} />
+            <Keyboard sx={{ color: (t) => t.palette.mode === 'dark' ? t.palette.primary.light : '#FEF08A', fontSize: 22 }} />
             <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#FFFFFF' }}>
               POS Cashier Hotkeys
             </Typography>
@@ -5415,10 +5414,10 @@ const Invoices = () => {
                     fontFamily: 'monospace',
                     fontWeight: 800,
                     fontSize: '0.74rem',
-                    bgcolor: mode === 'dark' ? 'rgba(20, 184, 166, 0.18)' : '#CCFBF1',
-                    color: mode === 'dark' ? '#2DD4BF' : '#0F766E',
+                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
+                    color: (t) => t.palette.mode === 'dark' ? t.palette.primary.light : t.palette.primary.main,
                     border: '1px solid',
-                    borderColor: mode === 'dark' ? 'rgba(20, 184, 166, 0.35)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.25)'
+                    borderColor: (t) => `${t.palette.primary.main}44`
                   }}
                 />
                 {item.alt && (

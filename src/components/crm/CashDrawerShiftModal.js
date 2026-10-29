@@ -312,7 +312,7 @@ ${shiftNotes ? `\n📝 *Notes:* ${shiftNotes}` : ''}
           borderRadius: 3.5,
           overflow: 'hidden',
           bgcolor: '#FFFFFF',
-          boxShadow: '0 24px 60px rgba(4, 47, 46, 0.25)'
+          boxShadow: (t) => `0 24px 60px ${t.palette.primary.main}40`
         }
       }}
     >
@@ -320,7 +320,7 @@ ${shiftNotes ? `\n📝 *Notes:* ${shiftNotes}` : ''}
       <Box
         sx={{
           p: 2.5,
-          background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+          background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.dark || '#042F2E'} 0%, ${t.palette.primary.main} 100%)`,
           color: '#FFFFFF',
           display: 'flex',
           alignItems: 'center',
@@ -561,7 +561,7 @@ ${shiftNotes ? `\n📝 *Notes:* ${shiftNotes}` : ''}
                           borderRadius: 2,
                           bgcolor: count > 0 ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' : '#F8FAFC',
                           border: '1px solid',
-                          borderColor: count > 0 ? '#0F766E' : '#E2E8F0'
+                          borderColor: (t) => count > 0 ? t.palette.primary.main : '#E2E8F0'
                         }}
                       >
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.8 }}>
@@ -599,7 +599,7 @@ ${shiftNotes ? `\n📝 *Notes:* ${shiftNotes}` : ''}
                       borderRadius: 2,
                       bgcolor: counts.coins > 0 ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' : '#F8FAFC',
                       border: '1px solid',
-                      borderColor: counts.coins > 0 ? '#0F766E' : '#E2E8F0'
+                      borderColor: (t) => counts.coins > 0 ? t.palette.primary.main : '#E2E8F0'
                     }}
                   >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.8 }}>
@@ -669,7 +669,7 @@ ${shiftNotes ? `\n📝 *Notes:* ${shiftNotes}` : ''}
                   px: 3,
                   borderRadius: 2.5,
                   textTransform: 'none',
-                  boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
+                  boxShadow: (t) => `0 4px 14px ${t.palette.primary.main}55`,
                   '&:hover': { bgcolor: 'text.primary' }
                 }}
               >

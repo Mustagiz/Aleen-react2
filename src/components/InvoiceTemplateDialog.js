@@ -150,7 +150,7 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
       {/* Luxury Header Banner */}
       <Box
         sx={{
-          background: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)',
+          background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.dark || '#042F2E'} 0%, ${t.palette.primary.main} 100%)`,
           color: '#ffffff',
           p: 2.5,
           display: 'flex',
@@ -220,12 +220,12 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
                 label={`${INVOICE_TEMPLATES.length} Luxury Templates`}
                 size="small"
                 sx={{
-                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.15)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
-                  color: (t) => t.palette.mode === 'dark' ? '#2DD4BF' : '#0F766E',
+                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
+                  color: (t) => t.palette.primary.main,
                   fontWeight: 800,
                   fontSize: '0.72rem',
                   borderRadius: '6px',
-                  border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.3)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.2)'}`
+                  border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.2)'}`
                 }}
               />
             </Box>
@@ -343,7 +343,7 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
                   onClick={() => fileInputRef.current?.click()}
                   sx={{
                     border: '2px dashed',
-                    borderColor: localSettings.customLetterheadImage ? '#0F766E' : 'divider',
+                    borderColor: (t) => localSettings.customLetterheadImage ? t.palette.primary.main : t.palette.divider,
                     borderRadius: 3,
                     p: 4,
                     textAlign: 'center',
@@ -351,7 +351,7 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
                     bgcolor: localSettings.customLetterheadImage ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' : 'background.paper',
                     transition: 'all 0.2s',
                     '&:hover': {
-                      borderColor: '#0F766E',
+                      borderColor: (t) => t.palette.primary.main,
                       bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)'
                     }
                   }}
@@ -366,7 +366,7 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
                   <Button
                     variant="outlined"
                     size="small"
-                    sx={{ mt: 2, borderRadius: 2, fontWeight: 700, borderColor: '#0F766E', color: (t) => t.palette.primary.main }}
+                    sx={{ mt: 2, borderRadius: 2, fontWeight: 700, borderColor: (t) => t.palette.primary.main, color: (t) => t.palette.primary.main }}
                   >
                     Select File
                   </Button>
@@ -674,9 +674,9 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
             py: 1,
             borderRadius: '8px',
             fontWeight: 800,
-            background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.main} 0%, ${t.palette.primary.dark} 100%)`,
             color: '#ffffff',
-            boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)'
+            boxShadow: (t) => `0 4px 14px ${t.palette.primary.main}55`
           }}
         >
           Save Template & Branding

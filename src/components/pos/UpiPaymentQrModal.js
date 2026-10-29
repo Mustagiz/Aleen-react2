@@ -121,7 +121,7 @@ export default function UpiPaymentQrModal({
         sx={{
           py: 2,
           px: 3,
-          background: 'linear-gradient(135deg, #0A4D46 0%, #042F2E 100%)',
+          background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.dark || '#042F2E'} 0%, ${t.palette.primary.main} 100%)`,
           color: '#FFFFFF',
           display: 'flex',
           alignItems: 'center',
@@ -326,8 +326,8 @@ export default function UpiPaymentQrModal({
           sx={{
             px: 3,
             fontWeight: 800,
-            background: 'linear-gradient(135deg, #0A4D46 0%, #0F766E 100%)',
-            boxShadow: '0 4px 16px rgba(10, 77, 70, 0.35)'
+            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.main} 0%, ${t.palette.primary.dark} 100%)`,
+            boxShadow: (t) => `0 4px 16px ${t.palette.primary.main}55`
           }}
         >
           Payment Received
