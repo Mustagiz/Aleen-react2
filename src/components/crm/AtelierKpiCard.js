@@ -18,6 +18,11 @@ export default function AtelierKpiCard({
 }) {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const primaryColor = theme.palette.primary.main;
+  const secondaryColor = theme.palette.secondary?.main || '#D97706';
+  const primaryLight = theme.palette.primary.light;
+  const primaryDark = theme.palette.primary.dark;
+  const cardRadius = theme.custom?.designSystem?.shape?.cardRadius ?? (theme.shape?.borderRadius || 12);
 
   // Safely extract trend label and positive state
   const trendLabel = (typeof trend === 'object' && trend !== null)
@@ -30,16 +35,16 @@ export default function AtelierKpiCard({
 
   const getBorderColor = () => {
     if (redAccent) return isDark ? '1px solid rgba(239, 68, 68, 0.35)' : '1px solid rgba(239, 68, 68, 0.22)';
-    if (goldAccent) return isDark ? '1px solid rgba(217, 119, 6, 0.35)' : '1px solid rgba(217, 119, 6, 0.22)';
+    if (goldAccent) return isDark ? `1px solid ${secondaryColor}59` : `1px solid ${secondaryColor}38`;
     if (sapphireAccent) return isDark ? '1px solid rgba(56, 189, 248, 0.35)' : '1px solid rgba(2, 132, 199, 0.22)';
-    return isDark ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.12)';
+    return isDark ? '1px solid rgba(255, 255, 255, 0.08)' : `1px solid ${primaryColor}24`;
   };
 
   const getTopGradient = () => {
     if (redAccent) return 'linear-gradient(90deg, #991B1B 0%, #DC2626 35%, #F87171 70%, #EF4444 100%)';
-    if (goldAccent) return 'linear-gradient(90deg, #78350F 0%, #B45309 35%, #FBBF24 70%, #D97706 100%)';
+    if (goldAccent) return `linear-gradient(90deg, ${secondaryColor}99 0%, ${secondaryColor} 50%, #FBBF24 100%)`;
     if (sapphireAccent) return 'linear-gradient(90deg, #0F172A 0%, #0284C7 35%, #38BDF8 70%, #2563EB 100%)';
-    return 'linear-gradient(90deg, #042F2E 0%, #0F766E 35%, #2DD4BF 70%, #14B8A6 100%)';
+    return `linear-gradient(90deg, ${primaryDark} 0%, ${primaryColor} 50%, ${primaryLight} 100%)`;
   };
 
   const getAmbientGlow = () => {
@@ -50,8 +55,8 @@ export default function AtelierKpiCard({
     }
     if (goldAccent) {
       return isDark
-        ? 'radial-gradient(circle at 92% 82%, rgba(245, 158, 11, 0.16) 0%, rgba(217, 119, 6, 0.05) 38%, transparent 70%)'
-        : 'radial-gradient(circle at 92% 82%, rgba(245, 158, 11, 0.10) 0%, rgba(254, 243, 199, 0.45) 42%, transparent 70%)';
+        ? `radial-gradient(circle at 92% 82%, ${secondaryColor}26 0%, ${secondaryColor}0D 38%, transparent 70%)`
+        : `radial-gradient(circle at 92% 82%, ${secondaryColor}1A 0%, rgba(254, 243, 199, 0.45) 42%, transparent 70%)`;
     }
     if (sapphireAccent) {
       return isDark
@@ -59,15 +64,15 @@ export default function AtelierKpiCard({
         : 'radial-gradient(circle at 92% 82%, rgba(56, 189, 248, 0.10) 0%, rgba(224, 242, 254, 0.45) 42%, transparent 70%)';
     }
     return isDark
-      ? 'radial-gradient(circle at 92% 82%, rgba(20, 184, 166, 0.16) 0%, rgba(15, 118, 110, 0.05) 38%, transparent 70%)'
-      : 'radial-gradient(circle at 92% 82%, rgba(20, 184, 166, 0.10) 0%, rgba(240, 253, 250, 0.5) 42%, transparent 70%)';
+      ? `radial-gradient(circle at 92% 82%, ${primaryColor}26 0%, ${primaryColor}0D 38%, transparent 70%)`
+      : `radial-gradient(circle at 92% 82%, ${primaryColor}1A 0%, rgba(255, 255, 255, 0.7) 42%, transparent 70%)`;
   };
 
   const getHoverBorderColor = () => {
     if (redAccent) return isDark ? '#F87171' : '#DC2626';
-    if (goldAccent) return isDark ? '#F59E0B' : '#D97706';
+    if (goldAccent) return secondaryColor;
     if (sapphireAccent) return isDark ? '#38BDF8' : '#0284C7';
-    return isDark ? '#2DD4BF' : '#0F766E';
+    return primaryColor;
   };
 
   const getHoverShadow = () => {
@@ -78,8 +83,8 @@ export default function AtelierKpiCard({
     }
     if (goldAccent) {
       return isDark
-        ? '0 20px 44px -4px rgba(0, 0, 0, 0.7), 0 0 32px rgba(217, 119, 6, 0.35)'
-        : '0 18px 40px -4px rgba(217, 119, 6, 0.25), 0 0 24px rgba(245, 158, 11, 0.2)';
+        ? `0 20px 44px -4px rgba(0, 0, 0, 0.7), 0 0 32px ${secondaryColor}59`
+        : `0 18px 40px -4px ${secondaryColor}40, 0 0 24px ${secondaryColor}33`;
     }
     if (sapphireAccent) {
       return isDark
@@ -87,29 +92,29 @@ export default function AtelierKpiCard({
         : '0 18px 40px -4px rgba(2, 132, 199, 0.25), 0 0 24px rgba(56, 189, 248, 0.2)';
     }
     return isDark
-      ? '0 20px 44px -4px rgba(0, 0, 0, 0.7), 0 0 32px rgba(20, 184, 166, 0.35)'
-      : '0 18px 40px -4px rgba(15, 118, 110, 0.25), 0 0 24px rgba(15, 118, 110, 0.18)';
+      ? `0 20px 44px -4px rgba(0, 0, 0, 0.7), 0 0 32px ${primaryColor}59`
+      : `0 18px 40px -4px ${primaryColor}38, 0 0 24px ${primaryColor}29`;
   };
 
   const getIconBg = () => {
     if (redAccent) return isDark ? 'rgba(239, 68, 68, 0.16)' : 'rgba(254, 226, 226, 0.85)';
-    if (goldAccent) return isDark ? 'rgba(217, 119, 6, 0.16)' : 'rgba(254, 243, 199, 0.85)';
+    if (goldAccent) return isDark ? `${secondaryColor}26` : `${secondaryColor}1A`;
     if (sapphireAccent) return isDark ? 'rgba(2, 132, 199, 0.16)' : 'rgba(224, 242, 254, 0.85)';
-    return isDark ? 'rgba(15, 118, 110, 0.2)' : 'rgba(240, 253, 250, 0.9)';
+    return isDark ? `${primaryColor}26` : `${primaryColor}14`;
   };
 
   const getIconBorder = () => {
     if (redAccent) return isDark ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(239, 68, 68, 0.15)';
-    if (goldAccent) return isDark ? '1px solid rgba(217, 119, 6, 0.3)' : '1px solid rgba(217, 119, 6, 0.15)';
+    if (goldAccent) return isDark ? `1px solid ${secondaryColor}4D` : `1px solid ${secondaryColor}29`;
     if (sapphireAccent) return isDark ? '1px solid rgba(56, 189, 248, 0.3)' : '1px solid rgba(2, 132, 199, 0.15)';
-    return isDark ? '1px solid rgba(20, 184, 166, 0.3)' : '1px solid rgba(15, 118, 110, 0.15)';
+    return isDark ? `1px solid ${primaryColor}4D` : `1px solid ${primaryColor}26`;
   };
 
   const getIconColor = () => {
     if (redAccent) return isDark ? '#F87171' : '#DC2626';
-    if (goldAccent) return isDark ? '#FBBF24' : '#D97706';
+    if (goldAccent) return secondaryColor;
     if (sapphireAccent) return isDark ? '#38BDF8' : '#0284C7';
-    return isDark ? '#2DD4BF' : '#0F766E';
+    return primaryColor;
   };
 
   return (
@@ -128,7 +133,7 @@ export default function AtelierKpiCard({
           height: '100%',
           position: 'relative',
           overflow: 'hidden',
-          borderRadius: '16px',
+          borderRadius: `${cardRadius}px`,
           cursor: onClick ? 'pointer' : 'default',
           transition: 'box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.28s ease',
           background: `${getAmbientGlow()}, ${isDark
@@ -137,7 +142,7 @@ export default function AtelierKpiCard({
           border: getBorderColor(),
           boxShadow: isDark
             ? 'inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 26px rgba(0, 0, 0, 0.45)'
-            : 'inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 4px 20px -2px rgba(15, 118, 110, 0.06), 0 1px 3px rgba(0, 0, 0, 0.02)',
+            : `inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 4px 20px -2px ${primaryColor}14, 0 1px 3px rgba(0, 0, 0, 0.02)`,
           '&::before': {
             content: '""',
             position: 'absolute',
@@ -176,7 +181,7 @@ export default function AtelierKpiCard({
             right: 0,
             height: '3.5px',
             background: getTopGradient(),
-            borderRadius: '16px 16px 0 0',
+            borderRadius: `${cardRadius}px ${cardRadius}px 0 0`,
             zIndex: 2
           }}
         />

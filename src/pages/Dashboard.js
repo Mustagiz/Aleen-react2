@@ -45,6 +45,7 @@ import { useNavigate } from 'react-router-dom';
 import GlassCard from '../components/GlassCard';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import CashDrawerShiftModal from '../components/crm/CashDrawerShiftModal';
+import { useThemeContext } from '../contexts/ThemeContext';
 
 ChartJS.register(
   CategoryScale,
@@ -64,7 +65,128 @@ const Dashboard = () => {
   const { inventory = [], invoices = [], purchases = [], vendors = [], expenses = [], getLowStockItems, profile = {} } = useData();
   const navigate = useNavigate();
   const theme = useTheme();
+  const { designSystem, activeSystemConfig } = useThemeContext();
   const isDark = theme.palette.mode === 'dark';
+
+  const getSystemBannerConfig = () => {
+    switch (designSystem) {
+      case 'zoho':
+        return {
+          badge: 'ZOHO CRM ENTERPRISE',
+          title: 'Enterprise Command & Operations',
+          bg: isDark ? 'linear-gradient(135deg, #182033 0%, #0F1522 100%)' : 'linear-gradient(135deg, #182033 0%, #253352 100%)',
+          color: '#FFFFFF',
+          borderColor: 'rgba(241, 90, 36, 0.45)',
+          shadow: '0 12px 32px rgba(24, 32, 51, 0.35)',
+          ctaBg: '#F15A24',
+          ctaHover: '#D4380D',
+          badgeBg: 'rgba(241, 90, 36, 0.25)',
+          badgeColor: '#FFD8BF',
+          radius: '8px'
+        };
+      case 'microsoft':
+        return {
+          badge: 'MICROSOFT FLUENT 365',
+          title: 'Dynamics 365 Operations Console',
+          bg: isDark ? 'linear-gradient(135deg, #004E8C 0%, #002B4D 100%)' : 'linear-gradient(135deg, #0078D4 0%, #004E8C 100%)',
+          color: '#FFFFFF',
+          borderColor: 'rgba(255, 255, 255, 0.25)',
+          shadow: '0 8px 24px rgba(0, 120, 212, 0.3)',
+          ctaBg: '#107C41',
+          ctaHover: '#0B5A2E',
+          badgeBg: 'rgba(255, 255, 255, 0.2)',
+          badgeColor: '#FFFFFF',
+          radius: '6px'
+        };
+      case 'apple':
+        return {
+          badge: 'MACOS LIQUID STUDIO',
+          title: 'Executive Studio Overview',
+          bg: isDark ? 'rgba(28, 28, 30, 0.85)' : 'rgba(255, 255, 255, 0.75)',
+          color: isDark ? '#FFFFFF' : '#1D1D1F',
+          borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.08)',
+          shadow: '0 16px 40px rgba(0, 0, 0, 0.08)',
+          ctaBg: '#0071E3',
+          ctaHover: '#0051A8',
+          badgeBg: 'rgba(0, 113, 227, 0.15)',
+          badgeColor: '#0071E3',
+          backdropFilter: 'blur(30px) saturate(180%)',
+          radius: '18px'
+        };
+      case 'linear':
+        return {
+          badge: 'LINEAR PRECISION CORE',
+          title: 'Workspace Metrics & Revenue Pulse',
+          bg: '#0D0E11',
+          color: '#FFFFFF',
+          borderColor: '#23252A',
+          shadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
+          ctaBg: '#5E6AD2',
+          ctaHover: '#434EAE',
+          badgeBg: 'rgba(94, 106, 210, 0.2)',
+          badgeColor: '#828DF8',
+          radius: '6px'
+        };
+      case 'material':
+        return {
+          badge: 'MATERIAL YOU M3',
+          title: 'Expressive Boutique Summary',
+          bg: isDark ? 'linear-gradient(135deg, #1E2129 0%, #111318 100%)' : 'linear-gradient(135deg, #E8F0FE 0%, #D2E3FC 100%)',
+          color: isDark ? '#FFFFFF' : '#041E49',
+          borderColor: 'rgba(26, 115, 232, 0.3)',
+          shadow: '0 8px 28px rgba(26, 115, 232, 0.15)',
+          ctaBg: '#1A73E8',
+          ctaHover: '#0D47A1',
+          badgeBg: 'rgba(26, 115, 232, 0.2)',
+          badgeColor: isDark ? '#D2E3FC' : '#1A73E8',
+          radius: '24px'
+        };
+      case 'stripe':
+        return {
+          badge: 'STRIPE FINTECH PLATFORM',
+          title: 'Financial Revenue & Orders Intel',
+          bg: 'linear-gradient(135deg, #0A2540 0%, #071A2E 100%)',
+          color: '#FFFFFF',
+          borderColor: 'rgba(99, 91, 255, 0.4)',
+          shadow: '0 12px 32px rgba(10, 37, 64, 0.4)',
+          ctaBg: '#635BFF',
+          ctaHover: '#5248E5',
+          badgeBg: 'rgba(0, 212, 178, 0.2)',
+          badgeColor: '#00D4B2',
+          radius: '12px'
+        };
+      case 'salesforce':
+        return {
+          badge: 'SALESFORCE LIGHTNING',
+          title: 'Lightning Cloud Operations',
+          bg: isDark ? 'linear-gradient(135deg, #014486 0%, #012852 100%)' : 'linear-gradient(135deg, #0176D3 0%, #014486 100%)',
+          color: '#FFFFFF',
+          borderColor: 'rgba(255, 255, 255, 0.25)',
+          shadow: '0 8px 24px rgba(1, 118, 211, 0.3)',
+          ctaBg: '#0176D3',
+          ctaHover: '#014486',
+          badgeBg: 'rgba(255, 255, 255, 0.2)',
+          badgeColor: '#FFFFFF',
+          radius: '6px'
+        };
+      default: // Atelier
+        return {
+          badge: 'HAUTE COUTURE ATELIER',
+          title: 'Executive Command & Overview',
+          bg: isDark ? 'linear-gradient(135deg, #071E1C 0%, #041211 100%)' : 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+          color: '#FFFFFF',
+          borderColor: 'rgba(217, 119, 6, 0.35)',
+          shadow: '0 12px 32px rgba(4, 47, 46, 0.25)',
+          ctaBg: '#D97706',
+          ctaHover: '#B45309',
+          badgeBg: 'rgba(217, 119, 6, 0.25)',
+          badgeColor: '#FEF08A',
+          radius: '16px'
+        };
+    }
+  };
+
+  const sysBanner = getSystemBannerConfig();
 
   const [dateRange, setDateRange] = useState('7days');
   const [drawerModalOpen, setDrawerModalOpen] = useState(false);
@@ -214,8 +336,8 @@ const Dashboard = () => {
     datasets: [{
       label: 'Pieces Sold',
       data: top5ProductsData.map(p => p.quantity),
-      backgroundColor: '#0F766E',
-      borderRadius: 6,
+      backgroundColor: theme.palette.primary.main,
+      borderRadius: activeSystemConfig?.shape?.borderRadius || 6,
       barThickness: 24,
     }]
   };
@@ -265,22 +387,22 @@ const Dashboard = () => {
       {
         label: 'Gross Sales (Revenue)',
         data: trend.sales,
-        borderColor: '#0F766E',
-        backgroundColor: 'rgba(15, 118, 110, 0.12)',
+        borderColor: theme.palette.primary.main,
+        backgroundColor: `${theme.palette.primary.main}1F`,
         fill: true,
         tension: 0.4,
-        pointBackgroundColor: '#0F766E',
+        pointBackgroundColor: theme.palette.primary.main,
         pointRadius: 4,
         borderWidth: 2.5
       },
       {
         label: 'Store Operating Expenses',
         data: trend.expenses,
-        borderColor: '#D97706',
-        backgroundColor: 'rgba(217, 119, 6, 0.08)',
+        borderColor: theme.palette.secondary?.main || '#D97706',
+        backgroundColor: `${theme.palette.secondary?.main || '#D97706'}14`,
         fill: true,
         tension: 0.4,
-        pointBackgroundColor: '#D97706',
+        pointBackgroundColor: theme.palette.secondary?.main || '#D97706',
         pointRadius: 4,
         borderWidth: 2
       }
@@ -329,59 +451,61 @@ const Dashboard = () => {
   return (
     <Box sx={{ maxWidth: 1600, mx: 'auto' }}>
       {/* ============================================================== */}
-      {/* 1. HAUTE COUTURE EXECUTIVE WELCOME CREST                      */}
+      {/* 1. ECOSYSTEM EXECUTIVE COMMAND BANNER                          */}
       {/* ============================================================== */}
       <Paper
         elevation={0}
         sx={{
           p: { xs: 2.5, sm: 3.5 },
           mb: 3.5,
-          borderRadius: 3.5,
-          background: isDark
-            ? 'linear-gradient(135deg, #071E1C 0%, #041211 100%)'
-            : 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
-          color: '#FFFFFF',
-          border: '1.5px solid rgba(217, 119, 6, 0.35)',
-          boxShadow: '0 12px 32px rgba(4, 47, 46, 0.25)',
+          borderRadius: sysBanner.radius,
+          background: sysBanner.bg,
+          color: sysBanner.color || '#FFFFFF',
+          border: `1.5px solid ${sysBanner.borderColor}`,
+          boxShadow: sysBanner.shadow,
+          backdropFilter: sysBanner.backdropFilter || 'none',
+          WebkitBackdropFilter: sysBanner.backdropFilter || 'none',
           position: 'relative',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
         }}
       >
         <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: { xs: 'flex-start', md: 'center' }, justifyContent: 'space-between', gap: 2.5 }}>
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.8, flexWrap: 'wrap' }}>
               <Chip
-                label="HAUTE COUTURE ATELIER"
+                label={sysBanner.badge}
                 size="small"
                 sx={{
-                  bgcolor: 'rgba(217, 119, 6, 0.25)',
-                  color: '#FEF08A',
+                  bgcolor: sysBanner.badgeBg,
+                  color: sysBanner.badgeColor,
                   fontWeight: 900,
                   fontSize: '0.66rem',
                   letterSpacing: '0.1em',
-                  border: '1px solid rgba(217, 119, 6, 0.4)',
-                  height: 22
+                  border: `1px solid ${sysBanner.borderColor}`,
+                  height: 22,
+                  borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 6}px`
                 }}
               />
-              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.75)', fontWeight: 600 }}>
-                {profile.businessName || 'Aleen Clothing'} • Pune
+              <Typography variant="caption" sx={{ color: isDark ? 'rgba(255, 255, 255, 0.75)' : 'text.secondary', fontWeight: 600 }}>
+                {profile.businessName || 'Aleen Clothing'} • CRM Studio
               </Typography>
             </Box>
 
             <Typography
               variant="h3"
               sx={{
-                fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
+                fontFamily: 'inherit',
                 fontWeight: 800,
                 letterSpacing: '-0.025em',
                 lineHeight: 1.15,
-                color: '#FFFFFF'
+                color: sysBanner.color || '#FFFFFF'
               }}
             >
-              Executive Command & Overview
+              {sysBanner.title}
             </Typography>
 
-            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.82)', mt: 0.8, maxWidth: 650, fontSize: '0.86rem' }}>
+            <Typography variant="body2" sx={{ color: isDark ? 'rgba(255, 255, 255, 0.82)' : 'text.secondary', mt: 0.8, maxWidth: 650, fontSize: '0.86rem' }}>
               Welcome back, <strong>{user?.name || user?.email?.split('@')[0] || 'Store Stylist'}</strong>. Live pulse of retail billing, custom bridal tailoring, and garment inventory.
             </Typography>
           </Box>
@@ -393,16 +517,16 @@ const Dashboard = () => {
               startIcon={<Add />}
               onClick={() => navigate('/invoices?action=new', { state: { openNewBill: true } })}
               sx={{
-                bgcolor: '#D97706',
+                bgcolor: sysBanner.ctaBg,
                 color: '#FFFFFF',
                 fontWeight: 800,
                 fontSize: '0.82rem',
-                borderRadius: '24px',
+                borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 8}px`,
                 height: 40,
                 px: 2.2,
                 textTransform: 'none',
-                boxShadow: '0 4px 14px rgba(217, 119, 6, 0.4)',
-                '&:hover': { bgcolor: '#B45309' }
+                boxShadow: `0 4px 14px ${sysBanner.ctaBg}66`,
+                '&:hover': { bgcolor: sysBanner.ctaHover }
               }}
             >
               New Bill
@@ -412,16 +536,16 @@ const Dashboard = () => {
               startIcon={<PointOfSale />}
               onClick={() => setDrawerModalOpen(true)}
               sx={{
-                borderColor: 'rgba(255, 255, 255, 0.35)',
-                color: '#FFFFFF',
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.35)' : 'divider',
+                color: sysBanner.color || '#FFFFFF',
                 fontWeight: 700,
                 fontSize: '0.82rem',
-                borderRadius: '24px',
+                borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 8}px`,
                 height: 40,
                 px: 2,
                 textTransform: 'none',
-                bgcolor: 'rgba(255, 255, 255, 0.08)',
-                '&:hover': { borderColor: '#FFFFFF', bgcolor: 'rgba(255, 255, 255, 0.16)' }
+                bgcolor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                '&:hover': { borderColor: theme.palette.primary.main, bgcolor: `${theme.palette.primary.main}15` }
               }}
             >
               Shift & Z-Report
@@ -431,16 +555,16 @@ const Dashboard = () => {
               startIcon={<Straighten />}
               onClick={() => navigate('/tailoring')}
               sx={{
-                borderColor: 'rgba(255, 255, 255, 0.35)',
-                color: '#FFFFFF',
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.35)' : 'divider',
+                color: sysBanner.color || '#FFFFFF',
                 fontWeight: 700,
                 fontSize: '0.82rem',
-                borderRadius: '24px',
+                borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 8}px`,
                 height: 40,
                 px: 2,
                 textTransform: 'none',
-                bgcolor: 'rgba(255, 255, 255, 0.08)',
-                '&:hover': { borderColor: '#FFFFFF', bgcolor: 'rgba(255, 255, 255, 0.16)' }
+                bgcolor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                '&:hover': { borderColor: theme.palette.primary.main, bgcolor: `${theme.palette.primary.main}15` }
               }}
             >
               Tailoring Board
@@ -457,7 +581,7 @@ const Dashboard = () => {
           Atelier Financial Metrics ({dateRange === '7days' ? 'Last 7 Days' : dateRange === '30days' ? 'Last 30 Days' : dateRange === 'thisMonth' ? 'This Month' : 'All-Time'})
         </Typography>
 
-        <GlassCard sx={{ p: 0.4, borderRadius: '9999px', display: 'flex', gap: 0.5 }}>
+        <GlassCard sx={{ p: 0.4, borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 8}px`, display: 'flex', gap: 0.5 }}>
           {[
             { id: '7days', label: '7 Days' },
             { id: '30days', label: '30 Days' },
@@ -472,13 +596,13 @@ const Dashboard = () => {
               sx={{
                 px: 2,
                 py: 0.4,
-                borderRadius: '9999px',
+                borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 8}px`,
                 fontSize: '0.76rem',
                 fontWeight: 800,
-                bgcolor: dateRange === item.id ? '#0F766E' : 'transparent',
-                color: dateRange === item.id ? '#FFFFFF' : 'text.secondary',
+                bgcolor: dateRange === item.id ? theme.palette.primary.main : 'transparent',
+                color: dateRange === item.id ? (theme.palette.primary.contrastText || '#FFFFFF') : 'text.secondary',
                 '&:hover': {
-                  bgcolor: dateRange === item.id ? '#042F2E' : 'action.hover'
+                  bgcolor: dateRange === item.id ? theme.palette.primary.dark : 'action.hover'
                 }
               }}
             >

@@ -117,6 +117,8 @@ export const ThemeProvider = ({ children }) => {
     useEffect(() => {
         const root = document.documentElement;
         if (activeSystemConfig && activePalette) {
+            root.setAttribute('data-design-system', activeSystemConfig.id);
+            document.body.style.fontFamily = activeSystemConfig.typography.fontFamily;
             root.style.setProperty('--emerald-primary', activePalette.primary.main);
             root.style.setProperty('--emerald-light', activePalette.primary.light);
             root.style.setProperty('--emerald-dark', activePalette.primary.dark);
@@ -130,10 +132,14 @@ export const ThemeProvider = ({ children }) => {
             root.style.setProperty('--radius-card', `${activeSystemConfig.shape.cardRadius}px`);
             root.style.setProperty('--radius-control', `${activeSystemConfig.shape.buttonRadius}px`);
             root.style.setProperty('--radius-inner', `${activeSystemConfig.shape.inputRadius}px`);
+            root.style.setProperty('--card-radius', `${activeSystemConfig.shape.cardRadius}px`);
+            root.style.setProperty('--button-radius', `${activeSystemConfig.shape.buttonRadius}px`);
+            root.style.setProperty('--card-border', mode === 'light' ? activeSystemConfig.cardStyle.borderLight : activeSystemConfig.cardStyle.borderDark);
+            root.style.setProperty('--card-shadow', mode === 'light' ? activeSystemConfig.cardStyle.boxShadowLight : activeSystemConfig.cardStyle.boxShadowDark);
             root.style.setProperty('--font-sans', activeSystemConfig.typography.fontFamily);
             root.style.setProperty('--font-serif', activeSystemConfig.typography.h1Font);
         }
-    }, [activeSystemConfig, activePalette, computedSidebar, computedTopBar]);
+    }, [activeSystemConfig, activePalette, computedSidebar, computedTopBar, mode]);
 
     const toggleTheme = () => {
         setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));

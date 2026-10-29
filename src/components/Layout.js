@@ -17,7 +17,8 @@ import {
   ListSubheader, 
   Tooltip,
   Paper,
-  Button
+  Button,
+  Fab
 } from '@mui/material';
 import { 
   Menu, 
@@ -50,7 +51,8 @@ import {
   QrCodeScanner,
   Close,
   ViewHeadline,
-  Palette
+  Palette,
+  Apps
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
@@ -67,12 +69,46 @@ const SIDEBAR_COLLAPSED_WIDTH = 74;
 export default function Layout() {
   const { logout, user } = useAuth();
   const { profile } = useData();
-  const { mode, toggleTheme, density, toggleDensity } = useThemeContext();
+  const { mode, toggleTheme, density, toggleDensity, designSystem, activeSystemConfig } = useThemeContext();
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isDark = mode === 'dark';
+
+  const getSystemSubtitle = () => {
+    switch (designSystem) {
+      case 'apple': return 'macOS Liquid Glass CRM';
+      case 'microsoft': return 'Microsoft 365 Retail Suite';
+      case 'zoho': return 'Zoho CRM Enterprise';
+      case 'linear': return 'Linear Sprint Workspace';
+      case 'material': return 'Material You POS 3.0';
+      case 'stripe': return 'Stripe FinTech Engine';
+      case 'salesforce': return 'Salesforce Lightning App';
+      default: return profile?.tagline || 'Haute Couture Atelier';
+    }
+  };
+
+  const getLinearShortcut = (path) => {
+    switch (path) {
+      case '/': return 'G D';
+      case '/invoices': return 'G B';
+      case '/orders': return 'G O';
+      case '/customers': return 'G C';
+      case '/tailoring': return 'G T';
+      case '/inventory': return 'G I';
+      case '/settings': return 'G S';
+      default: return null;
+    }
+  };
+
+  const getItemBorderRadius = () => {
+    if (designSystem === 'material') return '9999px';
+    if (designSystem === 'microsoft') return '4px';
+    if (designSystem === 'apple') return '10px';
+    if (designSystem === 'linear') return '6px';
+    return `${activeSystemConfig?.shape?.buttonRadius || 8}px`;
+  };
 
   const sidebarConfig = theme.custom?.sidebar || {
     bg: isDark ? '#0F1E1D' : '#FFFFFF',
@@ -246,6 +282,20 @@ export default function Layout() {
 
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+        {/* macOS Window Controls */}
+        {designSystem === 'apple' && !isMobile && (
+          <Box sx={{ px: 2.5, pt: 2, pb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#FF5F56', boxShadow: '0 0 2px rgba(0,0,0,0.2)' }} />
+            <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#FFBD2E', boxShadow: '0 0 2px rgba(0,0,0,0.2)' }} />
+            <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#27C93F', boxShadow: '0 0 2px rgba(0,0,0,0.2)' }} />
+            {!showCollapsed && (
+              <Typography sx={{ ml: 1, fontSize: '0.68rem', fontWeight: 700, color: 'text.secondary', letterSpacing: '0.04em' }}>
+                ALEEN.app
+              </Typography>
+            )}
+          </Box>
+        )}
+
         {/* Brand Header with Luxury Monogram & Mobile Close Button */}
         <Box sx={{
           p: showCollapsed ? 2 : 2.5,
@@ -265,7 +315,7 @@ export default function Layout() {
                 sx={{
                   width: 40,
                   height: 40,
-                  borderRadius: '12px',
+                  borderRadius: designSystem === 'material' ? '50%' : (designSystem === 'microsoft' ? '4px' : '12px'),
                   objectFit: 'contain',
                   border: '1.5px solid rgba(217, 119, 6, 0.4)',
                   boxShadow: `0 4px 12px ${theme.palette.primary.main}40`,
@@ -281,7 +331,7 @@ export default function Layout() {
               <Box sx={{
                 width: 40,
                 height: 40,
-                borderRadius: '12px',
+                borderRadius: designSystem === 'material' ? '50%' : (designSystem === 'microsoft' ? '4px' : '12px'),
                 background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.dark} 100%)`,
                 border: '1.5px solid rgba(217, 119, 6, 0.4)',
                 boxShadow: `0 4px 12px ${theme.palette.primary.main}40`,
@@ -331,7 +381,7 @@ export default function Layout() {
                   overflow: 'hidden',
                   textOverflow: 'ellipsis'
                 }}>
-                  {profile?.tagline || 'Haute Couture CRM'}
+                  {getSystemSubtitle()}
                 </Typography>
               </Box>
             )}
@@ -354,6 +404,18 @@ export default function Layout() {
             </IconButton>
           )}
         </Box>
+
+        {/* Linear Ecosystem Workspace Pill */}
+        {designSystem === 'linear' && !showCollapsed && (
+          <Box sx={{ px: 2, py: 0.8, mx: 1.5, mt: 1.5, mb: 0.5, bgcolor: 'rgba(255,255,255,0.04)', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.06em', color: '#A78BFA' }}>
+              WORKSPACE / ALEEN
+            </Typography>
+            <Typography sx={{ fontSize: '0.62rem', fontFamily: 'monospace', color: '#64748B' }}>
+              v2.4
+            </Typography>
+          </Box>
+        )}
 
         {/* Navigation List */}
         <Box sx={{ 
@@ -384,6 +446,7 @@ export default function Layout() {
               <List disablePadding>
                 {section.items.map((item) => {
                   const isActive = location.pathname === item.path;
+                  const shortcut = getLinearShortcut(item.path);
                   const linkButton = (
                     <ListItem
                       button
@@ -393,7 +456,7 @@ export default function Layout() {
                         if (isMobile) setMobileOpen(false);
                       }}
                       sx={{
-                        borderRadius: 'var(--radius-control, 10px)',
+                        borderRadius: getItemBorderRadius(),
                         mb: 0.5,
                         py: { xs: 1.1, sm: 1 },
                         minHeight: { xs: 44, sm: 40 },
@@ -441,6 +504,20 @@ export default function Layout() {
                             color: isActive ? sidebarConfig.activePillText : (sidebarConfig.isDark ? '#F8FAFC' : 'text.primary')
                           }}
                         />
+                      )}
+                      {!showCollapsed && designSystem === 'linear' && shortcut && (
+                        <Typography sx={{
+                          fontSize: '0.62rem',
+                          fontFamily: 'monospace',
+                          px: 0.8,
+                          py: 0.2,
+                          borderRadius: '4px',
+                          bgcolor: isActive ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.06)',
+                          color: isActive ? '#FFFFFF' : '#94A3B8',
+                          letterSpacing: '0.05em'
+                        }}>
+                          {shortcut}
+                        </Typography>
                       )}
                     </ListItem>
                   );
@@ -589,6 +666,25 @@ export default function Layout() {
         >
           {/* Left: Collapse Toggle + Breadcrumbs */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 }, minWidth: 0 }}>
+            {/* Microsoft 365 Waffle Icon */}
+            {designSystem === 'microsoft' && (
+              <Tooltip title="Microsoft 365 Apps">
+                <IconButton
+                  size="small"
+                  sx={{
+                    width: 34,
+                    height: 34,
+                    color: '#0078D4',
+                    p: 0.5,
+                    borderRadius: '4px',
+                    '&:hover': { bgcolor: 'rgba(0, 120, 212, 0.1)' }
+                  }}
+                >
+                  <Apps fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
+
             <IconButton
               onClick={isMobile ? () => setMobileOpen(true) : toggleSidebarCollapse}
               size="small"
@@ -596,7 +692,7 @@ export default function Layout() {
                 width: 36,
                 height: 36,
                 flexShrink: 0,
-                borderRadius: '9px',
+                borderRadius: designSystem === 'microsoft' ? '4px' : (designSystem === 'material' ? '50%' : '9px'),
                 border: topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.25)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)'),
                 color: topBarConfig.textColor,
                 '&:hover': { bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.15)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)') }
@@ -624,12 +720,55 @@ export default function Layout() {
             {/* Tablet / iPad / Desktop Breadcrumbs */}
             <Box sx={{ display: { xs: 'none', sm: 'block' }, minWidth: 0 }}>
               <Typography sx={{ fontSize: '0.72rem', color: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.75)' : 'text.secondary', fontWeight: 600, lineHeight: 1.2 }} noWrap>
-                {profile?.businessName || 'Aleen Clothing'}{profile?.tagline ? ` • ${profile.tagline}` : ' • Atelier CRM'}
+                {profile?.businessName || 'Aleen Clothing'} • {getSystemSubtitle()}
               </Typography>
               <Typography sx={{ fontSize: '0.95rem', color: topBarConfig.textColor, fontWeight: 800, letterSpacing: '-0.015em', lineHeight: 1.2 }} noWrap>
                 {getBreadcrumbTitle()}
               </Typography>
             </Box>
+
+            {/* Zoho CRM Module Navigation Bar */}
+            {designSystem === 'zoho' && (
+              <Box sx={{ display: { xs: 'none', xl: 'flex' }, alignItems: 'center', gap: 0.5, ml: 2, pl: 2, borderLeft: '1px solid rgba(0,0,0,0.1)' }}>
+                {[
+                  { label: 'Sales & Invoices', path: '/invoices' },
+                  { label: 'Customers', path: '/customers' },
+                  { label: 'Workshop', path: '/tailoring' },
+                  { label: 'Inventory', path: '/inventory' },
+                  { label: 'Analytics', path: '/advanced-reports' }
+                ].map(tab => (
+                  <Button
+                    key={tab.label}
+                    onClick={() => navigate(tab.path)}
+                    size="small"
+                    sx={{
+                      textTransform: 'none',
+                      fontSize: '0.78rem',
+                      fontWeight: location.pathname === tab.path ? 700 : 500,
+                      color: location.pathname === tab.path ? '#EA580C' : (isDark ? '#CBD5E1' : '#475569'),
+                      borderBottom: location.pathname === tab.path ? '2px solid #EA580C' : '2px solid transparent',
+                      borderRadius: 0,
+                      px: 1,
+                      py: 0.5,
+                      minWidth: 0,
+                      '&:hover': { bgcolor: 'rgba(234, 88, 12, 0.08)' }
+                    }}
+                  >
+                    {tab.label}
+                  </Button>
+                ))}
+              </Box>
+            )}
+
+            {/* Stripe FinTech Live Badge */}
+            {designSystem === 'stripe' && (
+              <Box sx={{ display: { xs: 'none', lg: 'inline-flex' }, alignItems: 'center', gap: 0.75, ml: 1.5, px: 1.2, py: 0.35, borderRadius: '6px', bgcolor: 'rgba(99, 91, 255, 0.1)', border: '1px solid rgba(99, 91, 255, 0.25)' }}>
+                <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#00D924', boxShadow: '0 0 6px #00D924' }} />
+                <Typography sx={{ fontSize: '0.68rem', fontFamily: 'monospace', fontWeight: 700, color: '#635BFF' }}>
+                  FINTECH API • v2.4 LIVE
+                </Typography>
+              </Box>
+            )}
           </Box>
 
           {/* Right: Actions, Search Capsule, Register Status, Quick Bill, Theme Toggle */}
@@ -879,8 +1018,43 @@ export default function Layout() {
             flexDirection: 'column'
           }}
         >
-          <Box sx={{ flex: 1 }}>
+          <Box sx={{ flex: 1, position: 'relative' }}>
             <Outlet />
+            {/* Google Material 3 Floating Action Button (FAB) */}
+            {designSystem === 'material' && canQuickBill && (
+              <Fab
+                variant="extended"
+                color="primary"
+                onClick={handleQuickBill}
+                sx={{
+                  position: 'fixed',
+                  bottom: { xs: 76, sm: 32 },
+                  right: { xs: 20, sm: 32 },
+                  zIndex: 1100,
+                  borderRadius: '16px',
+                  px: 3,
+                  py: 1.5,
+                  height: 54,
+                  textTransform: 'none',
+                  fontWeight: 700,
+                  fontSize: '0.88rem',
+                  letterSpacing: '0.02em',
+                  boxShadow: '0 8px 24px rgba(103, 80, 164, 0.4)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.2,
+                  bgcolor: theme.palette.primary.main,
+                  color: '#FFFFFF',
+                  '&:hover': {
+                    bgcolor: theme.palette.primary.dark,
+                    boxShadow: '0 12px 28px rgba(103, 80, 164, 0.5)'
+                  }
+                }}
+              >
+                <Add sx={{ fontSize: 22 }} />
+                <span>Quick POS Bill</span>
+              </Fab>
+            )}
           </Box>
           <AtelierFooter />
         </Box>
