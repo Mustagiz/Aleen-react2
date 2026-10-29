@@ -40,6 +40,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '../firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
+import { QRCodeSVG } from 'qrcode.react';
 
 const CFD_CHANNEL_NAME = 'aleen_customer_display';
 const CFD_STORAGE_KEY = 'aleen_cfd_state';
@@ -123,13 +124,7 @@ export default function CustomerDisplay() {
 
   const applyCfdUpdate = (data, source) => {
     if (!data) return;
-    setCfdState((prev) => {
-      // Discard out-of-order packets if a newer update is already rendered
-      if (prev?.updatedAt && data.updatedAt && data.updatedAt < prev.updatedAt) {
-        return prev;
-      }
-      return { ...prev, ...data };
-    });
+    setCfdState(data);
     setConnected(true);
     setSyncSource(source);
     try {
@@ -167,7 +162,7 @@ export default function CustomerDisplay() {
     }
   }, []);
 
-  // 2. BroadcastChannel & LocalStorage Event Listeners (For zero-latency same-computer dual monitor)
+  // 2. BroadcastChannel, Window postMessage & LocalStorage Event Listeners (Zero-latency dual-monitor / multi-window)
   useEffect(() => {
     let bc = null;
     try {
@@ -201,6 +196,33 @@ export default function CustomerDisplay() {
       console.warn('BroadcastChannel error in CFD:', err);
     }
 
+    // Direct window.postMessage listener (for child windows / popups opened via POS)
+    const handleDirectMessage = (event) => {
+      if (!event.data) return;
+      const { type, payload } = event.data;
+      if (type === 'SYNC' && payload) {
+        applyCfdUpdate(payload, 'local');
+      } else if (type === 'CLEAR') {
+        setCfdState(null);
+        try {
+          localStorage.removeItem(CFD_STORAGE_KEY);
+        } catch (e) {}
+      } else if (type === 'PING') {
+        setPingAlert(true);
+        setConnected(true);
+      }
+    };
+    window.addEventListener('message', handleDirectMessage);
+
+    // If opened via window.open from POS, request immediate sync from opener
+    if (window.opener) {
+      try {
+        window.opener.postMessage({ type: 'REQUEST_SYNC' }, '*');
+      } catch (err) {
+        console.warn('Failed to handshake with opener window:', err);
+      }
+    }
+
     // LocalStorage fallback listener
     const handleStorage = (e) => {
       if (e.key === CFD_STORAGE_KEY && e.newValue) {
@@ -222,14 +244,22 @@ export default function CustomerDisplay() {
 
     // Instant wake-up sync when tablet screen turns on or browser tab gains focus
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && channelRef.current) {
-        channelRef.current.postMessage({ type: 'REQUEST_SYNC' });
+      if (document.visibilityState === 'visible') {
+        if (channelRef.current) {
+          channelRef.current.postMessage({ type: 'REQUEST_SYNC' });
+        }
+        if (window.opener) {
+          try {
+            window.opener.postMessage({ type: 'REQUEST_SYNC' }, '*');
+          } catch (e) {}
+        }
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       if (bc) bc.close();
+      window.removeEventListener('message', handleDirectMessage);
       window.removeEventListener('storage', handleStorage);
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -290,11 +320,6 @@ export default function CustomerDisplay() {
   // Dynamic Theme Accent
   const themeAccent = cfdState?.themeColor || '#C5A059';
 
-  // Dynamic UPI QR code URL (High-definition)
-  const qrCodeImageUrl = useMemo(() => {
-    if (!upiUrl) return '';
-    return `https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=8&data=${encodeURIComponent(upiUrl)}`;
-  }, [upiUrl]);
 
   const handleCopyUpi = () => {
     if (upiUrl && navigator?.clipboard?.writeText) {
@@ -1423,7 +1448,7 @@ export default function CustomerDisplay() {
                       overflow: 'hidden'
                     }}
                   >
-                    {paymentMethod === 'UPI' && qrCodeImageUrl ? (
+                    {paymentMethod === 'UPI' && upiUrl ? (
                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
                         {/* Interactive Clickable QR Box with Zoom Badge */}
                         <Tooltip title="Tap to expand QR code for easier camera scanning">
@@ -1445,11 +1470,11 @@ export default function CustomerDisplay() {
                               }
                             }}
                           >
-                            <Box
-                              component="img"
-                              src={qrCodeImageUrl}
-                              alt="Dynamic UPI QR Code"
-                              sx={{ width: 175, height: 175, display: 'block' }}
+                            <QRCodeSVG
+                              value={upiUrl}
+                              size={175}
+                              level="M"
+                              style={{ display: 'block' }}
                             />
                             {/* Tap To Zoom Overlay Indicator */}
                             <Box
@@ -1593,12 +1618,12 @@ export default function CustomerDisplay() {
             mb: 2.5
           }}
         >
-          {qrCodeImageUrl && (
-            <Box
-              component="img"
-              src={qrCodeImageUrl}
-              alt="Enlarged UPI QR Code"
-              sx={{ width: { xs: 240, sm: 280 }, height: { xs: 240, sm: 280 }, display: 'block' }}
+          {upiUrl && (
+            <QRCodeSVG
+              value={upiUrl}
+              size={260}
+              level="Q"
+              style={{ display: 'block', maxWidth: '100%', height: 'auto' }}
             />
           )}
         </Box>

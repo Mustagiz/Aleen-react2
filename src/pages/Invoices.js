@@ -106,11 +106,25 @@ const Invoices = () => {
   const cfdChannelRef = useRef(null);
   const cfdCloudDebounceTimerRef = useRef(null);
   const cfdLastSettledTimeRef = useRef(0);
+  const cfdWindowRef = useRef(null);
+  const cfdSeqRef = useRef(0);
   const syncCustomerDisplayRef = useRef(null);
 
   const handleOpenCustomerDisplay = () => {
     if (typeof window !== 'undefined') {
-      window.open('/customer-display', 'AleenCustomerDisplay', 'width=1120,height=760,menubar=no,toolbar=no,location=no');
+      const cfdWin = window.open('/customer-display', 'AleenCustomerDisplay', 'width=1120,height=760,menubar=no,toolbar=no,location=no');
+      cfdWindowRef.current = cfdWin;
+      // Proactively sync current cart state as soon as child window mounts
+      setTimeout(() => {
+        if (syncCustomerDisplayRef.current) {
+          syncCustomerDisplayRef.current(null, null, true);
+        }
+      }, 150);
+      setTimeout(() => {
+        if (syncCustomerDisplayRef.current) {
+          syncCustomerDisplayRef.current(null, null, true);
+        }
+      }, 600);
     }
   };
 
@@ -961,25 +975,37 @@ const Invoices = () => {
         lastScannedItem: lastScanned || null,
         currency: 'INR',
         themeColor: theme?.palette?.primary?.main || '#C5A059',
-        updatedAt: Date.now()
+        updatedAt: Date.now(),
+        seq: ++cfdSeqRef.current
       };
 
-      // 1. Same-device instant BroadcastChannel (0ms, un-throttled)
+      // 1. Direct In-Memory Child Window Message (sub-millisecond instant 0ms sync for popups)
+      if (cfdWindowRef.current && !cfdWindowRef.current.closed) {
+        try {
+          cfdWindowRef.current.postMessage({ type: 'SYNC', payload }, '*');
+        } catch (e) {}
+      }
+
+      // 2. Same-device instant BroadcastChannel (0ms, un-throttled cross-tab)
+      if (!cfdChannelRef.current && typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        try {
+          cfdChannelRef.current = new BroadcastChannel('aleen_customer_display');
+        } catch (e) {}
+      }
       if (cfdChannelRef.current) {
         try {
           cfdChannelRef.current.postMessage({ type: 'SYNC', payload });
         } catch (e) {}
       }
 
-      // 2. LocalStorage fallback (0ms)
+      // 3. LocalStorage fallback with storage event (0ms cross-tab fallback)
       try {
         localStorage.setItem('aleen_cfd_state', JSON.stringify(payload));
       } catch (e) {}
 
-      // 3. Real-time Cloud Firestore Sync for 2nd Device (iPad, tablet, phone over Wi-Fi)
+      // 4. Real-time Cloud Firestore Sync for 2nd Device (iPad, tablet, phone over Wi-Fi)
       const dispatchCloudWrite = () => {
         try {
-          // Direct document replacement without { merge: true } for maximum Firestore throughput
           setDoc(doc(db, 'cfd_live_sessions', 'primary'), payload).catch((err) => {
             console.warn('Firestore CFD live sync warning:', err);
           });
@@ -995,14 +1021,13 @@ const Invoices = () => {
         }
         dispatchCloudWrite();
       } else {
-        // Debounce typing (customer name, phone) by 100ms so Firestore isn't flooded with intermediate requests
         if (cfdCloudDebounceTimerRef.current) {
           clearTimeout(cfdCloudDebounceTimerRef.current);
         }
         cfdCloudDebounceTimerRef.current = setTimeout(() => {
           dispatchCloudWrite();
           cfdCloudDebounceTimerRef.current = null;
-        }, 100);
+        }, 50);
       }
     } catch (err) {
       console.warn('Failed to broadcast to Customer Display:', err);
@@ -1011,7 +1036,7 @@ const Invoices = () => {
 
   syncCustomerDisplayRef.current = syncCustomerDisplay;
 
-  // Stable BroadcastChannel listener initialized ONCE on mount (prevents tearing down channels on state changes)
+  // Stable BroadcastChannel & Direct Window listener initialized ONCE on mount
   useEffect(() => {
     let bc = null;
     try {
@@ -1030,11 +1055,23 @@ const Invoices = () => {
     } catch (e) {
       console.warn('CFD BroadcastChannel init error:', e);
     }
+
+    // Direct Window PostMessage listener (allows child popups to request sync on mount)
+    const handleDirectMessage = (event) => {
+      if (event.data?.type === 'REQUEST_SYNC') {
+        if (syncCustomerDisplayRef.current) {
+          syncCustomerDisplayRef.current(null, null, true);
+        }
+      }
+    };
+    window.addEventListener('message', handleDirectMessage);
+
     return () => {
       if (bc) {
         bc.close();
         cfdChannelRef.current = null;
       }
+      window.removeEventListener('message', handleDirectMessage);
       if (cfdCloudDebounceTimerRef.current) {
         clearTimeout(cfdCloudDebounceTimerRef.current);
       }
