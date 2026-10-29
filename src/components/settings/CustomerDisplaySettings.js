@@ -18,7 +18,8 @@ import {
   FormControl,
   InputLabel,
   Tabs,
-  Tab
+  Tab,
+  LinearProgress
 } from '@mui/material';
 import {
   Tv,
@@ -41,11 +42,15 @@ import {
   Refresh,
   Spa,
   Stars,
-  Brush
+  Brush,
+  CloudUpload,
+  DeleteOutline,
+  VideoLibrary
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { db } from '../../firebase';
+import { db, storage } from '../../firebase';
 import { doc, setDoc, onSnapshot } from 'firebase/firestore';
+import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { useFeedback } from '../../contexts/FeedbackContext';
 
 // Verified, Cross-Origin Safe, Fast-Loading Video Presets
@@ -195,6 +200,71 @@ export default function CustomerDisplaySettings() {
   const [saving, setSaving] = useState(false);
   const [pingSending, setPingSending] = useState(false);
   const videoRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadedVideoFileName, setUploadedVideoFileName] = useState('');
+
+  // Local Video Upload Handler (Instant local preview + Firebase cloud storage sync)
+  const handleLocalVideoUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('video/') && !file.name.match(/\.(mp4|webm|mov|m4v|ogg)$/i)) {
+      showToast('Please select a valid video file (.mp4, .webm, .mov)', 'warning');
+      return;
+    }
+
+    if (file.size > 150 * 1024 * 1024) {
+      showToast('Video size exceeds 150MB. Please choose a smaller video.', 'warning');
+      return;
+    }
+
+    // 1. Immediately create local object URL so video plays in preview and display with 0ms wait
+    const localBlobUrl = URL.createObjectURL(file);
+    setUploadedVideoFileName(file.name);
+    updateMultipleConfig({
+      videoPreset: 'uploaded',
+      videoUrl: localBlobUrl,
+      idleDisplayType: 'video'
+    });
+    showToast(`Loaded "${file.name}" locally. Syncing to cloud...`, 'info');
+
+    // 2. Upload to Firebase Storage in background for persistence
+    setUploadingVideo(true);
+    setUploadProgress(0);
+
+    const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const sRef = storageRef(storage, `customer_display_videos/${Date.now()}_${cleanName}`);
+    const uploadTask = uploadBytesResumable(sRef, file);
+
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+        setUploadProgress(progress);
+      },
+      (error) => {
+        console.warn('Video cloud storage upload warning:', error);
+        setUploadingVideo(false);
+        showToast('Cloud storage upload warning, but video is active locally on this machine!', 'info');
+      },
+      async () => {
+        try {
+          const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+          updateMultipleConfig({
+            videoPreset: 'uploaded',
+            videoUrl: downloadUrl,
+            idleDisplayType: 'video'
+          });
+          setUploadingVideo(false);
+          showToast('✨ Fashion video uploaded and synced to Customer Display!', 'success');
+        } catch (err) {
+          setUploadingVideo(false);
+        }
+      }
+    );
+  };
 
   // Sync with Firestore once on mount (without clobbering active edits)
   useEffect(() => {
@@ -629,6 +699,118 @@ export default function CustomerDisplaySettings() {
                     />
                   </Stack>
 
+                  {/* LOCAL VIDEO UPLOAD CARD */}
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2.5,
+                      borderRadius: 3,
+                      bgcolor: '#FFFFFF',
+                      border: '1.5px dashed rgba(197, 160, 89, 0.55)',
+                      mb: 2.5,
+                      textAlign: 'center',
+                      transition: 'all 0.2s ease',
+                      '&:hover': { borderColor: '#C5A059', bgcolor: '#FAF8F5' }
+                    }}
+                  >
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="video/mp4,video/webm,video/ogg,video/quicktime,video/x-m4v"
+                      style={{ display: 'none' }}
+                      onChange={handleLocalVideoUpload}
+                    />
+
+                    <Stack spacing={1.5} alignItems="center">
+                      <Box
+                        sx={{
+                          width: 52,
+                          height: 52,
+                          borderRadius: '50%',
+                          bgcolor: 'rgba(197, 160, 89, 0.15)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#937230'
+                        }}
+                      >
+                        <CloudUpload sx={{ fontSize: 30 }} />
+                      </Box>
+
+                      <Box>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0F172A' }}>
+                          Upload Fashion Video from Local Device
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#64748B', display: 'block' }}>
+                          Select an MP4, WebM or MOV video file directly from your computer or tablet
+                        </Typography>
+                      </Box>
+
+                      {config.videoPreset === 'uploaded' && (
+                        <Chip
+                          icon={<CheckCircle sx={{ color: '#059669 !important' }} />}
+                          label={uploadedVideoFileName || 'Active Uploaded Local Video'}
+                          onDelete={() => {
+                            setUploadedVideoFileName('');
+                            updateMultipleConfig({
+                              videoPreset: 'interactive-runway',
+                              videoUrl: 'canvas-runway'
+                            });
+                          }}
+                          deleteIcon={<DeleteOutline />}
+                          sx={{
+                            bgcolor: 'rgba(16, 185, 129, 0.12)',
+                            color: '#065F46',
+                            border: '1px solid rgba(16, 185, 129, 0.4)',
+                            fontWeight: 800,
+                            maxWidth: '90%'
+                          }}
+                        />
+                      )}
+
+                      {uploadingVideo && (
+                        <Box sx={{ width: '100%', maxWidth: 300, mt: 1 }}>
+                          <LinearProgress
+                            variant="determinate"
+                            value={uploadProgress}
+                            sx={{
+                              height: 8,
+                              borderRadius: 4,
+                              bgcolor: 'rgba(197, 160, 89, 0.2)',
+                              '& .MuiLinearProgress-bar': { bgcolor: '#C5A059' }
+                            }}
+                          />
+                          <Typography variant="caption" sx={{ color: '#937230', fontWeight: 800, display: 'block', mt: 0.5 }}>
+                            Cloud syncing video: {uploadProgress}%
+                          </Typography>
+                        </Box>
+                      )}
+
+                      <Button
+                        variant="outlined"
+                        startIcon={<CloudUpload />}
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadingVideo}
+                        sx={{
+                          color: '#937230',
+                          borderColor: '#C5A059',
+                          fontWeight: 800,
+                          borderRadius: 2.5,
+                          px: 3,
+                          '&:hover': { bgcolor: 'rgba(197, 160, 89, 0.1)', borderColor: '#937230' }
+                        }}
+                      >
+                        {config.videoPreset === 'uploaded' ? 'Choose Another Video' : 'Choose Local Video File'}
+                      </Button>
+                    </Stack>
+                  </Paper>
+
+                  <Divider sx={{ my: 2 }}>
+                    <Typography variant="caption" sx={{ color: '#94A3B8', fontWeight: 700, letterSpacing: '0.05em' }}>
+                      OR SELECT ATELIER PRESET / DIRECT URL
+                    </Typography>
+                  </Divider>
+
                   {/* Video Preset Selector */}
                   <FormControl fullWidth size="small" sx={{ mb: 2.5 }}>
                     <InputLabel>Video Source Preset</InputLabel>
@@ -645,6 +827,9 @@ export default function CustomerDisplaySettings() {
                         });
                       }}
                     >
+                      {config.videoPreset === 'uploaded' && (
+                        <MenuItem value="uploaded">📹 Current Uploaded Device Video</MenuItem>
+                      )}
                       {VIDEO_PRESETS.map((p) => (
                         <MenuItem key={p.id} value={p.id}>
                           {p.label}
@@ -1080,10 +1265,6 @@ export default function CustomerDisplaySettings() {
                     >
                       ✨ {config.testCustomerName || 'Mrs. Ayesha Khan'} 💎
                     </Box>
-
-                    <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mt: 0.5, fontSize: '0.68rem', fontWeight: 600 }}>
-                      Style: <strong>{CUSTOMER_ANIMATION_STYLES.find(c => c.id === config.customerAnimationStyle)?.title || 'Golden Silk Shimmer'}</strong>
-                    </Typography>
                   </Box>
                 )}
 
