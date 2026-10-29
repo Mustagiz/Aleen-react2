@@ -248,12 +248,7 @@ export default function CustomerDisplay() {
 
   const applyCfdUpdate = (data, source = 'cloud') => {
     if (!data) return;
-    setCfdState((prev) => {
-      // Guard against stale or out-of-order network frames
-      if (prev?.seq && data?.seq && data.seq < prev.seq) return prev;
-      if (prev?.updatedAt && data?.updatedAt && data.updatedAt < prev.updatedAt) return prev;
-      return data;
-    });
+    setCfdState(data);
     if (source === 'local') {
       setSyncChannel('instant');
     }
@@ -446,20 +441,42 @@ export default function CustomerDisplay() {
     ? (customerName && customerName.toLowerCase() !== 'honoured patron' ? customerName : (isSettled ? lastKnownCustomerName : ''))
     : '';
 
-  // Celebration state triggered on settlement
+  // Celebration state triggered on settlement + Auto return to homepage
   const [showCelebration, setShowCelebration] = useState(false);
   useEffect(() => {
     if (isSettled) {
       setShowCelebration(true);
-      const timer = setTimeout(() => setShowCelebration(false), 6000);
-      return () => clearTimeout(timer);
+      const celebrationTimer = setTimeout(() => setShowCelebration(false), 3000);
+
+      // Auto-return to Atelier Home Showcase after 4 seconds
+      const autoReturnTimer = setTimeout(() => {
+        setCfdState((prev) => ({
+          ...prev,
+          status: 'idle',
+          items: [],
+          total: 0,
+          customerName: '',
+          updatedAt: Date.now()
+        }));
+        try {
+          localStorage.setItem('aleen_cfd_state', JSON.stringify({
+            status: 'idle',
+            items: [],
+            total: 0,
+            customerName: '',
+            updatedAt: Date.now()
+          }));
+        } catch (e) {}
+      }, 4000);
+
+      return () => {
+        clearTimeout(celebrationTimer);
+        clearTimeout(autoReturnTimer);
+      };
     } else {
       setShowCelebration(false);
     }
-  }, [isSettled, cfdState?.updatedAt]);
-
-  // NOTE: Per user requirement, NO arbitrary timeout is set on settlement.
-  // The screen only refreshes once the cashier cancels or bills/starts a new invoice!
+  }, [isSettled]);
 
   // Time-aware greeting
   const timeGreeting = useMemo(() => {
@@ -1111,25 +1128,25 @@ export default function CustomerDisplay() {
                   Your bespoke ensemble is registered. Our master tailors and craftspersons cherish your patronage at {storeName}.
                 </Typography>
 
-                {/* Amount Paid & Reward Points Cards in Vibrant Green */}
+                {/* Amount Paid & Reward Points Cards matching Box 2 Clean Luxury Style */}
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.8} sx={{ mb: 2.8 }}>
                   <Box
                     sx={{
                       flex: 1,
-                      p: 2.2,
-                      borderRadius: 3.5,
-                      bgcolor: '#FAF8F5',
+                      p: 2.5,
+                      borderRadius: 4,
+                      bgcolor: '#FFFFFF',
                       border: '1.5px solid rgba(197, 160, 89, 0.3)',
-                      boxShadow: '0 4px 14px rgba(197, 160, 89, 0.08)'
+                      boxShadow: '0 8px 25px rgba(180, 140, 75, 0.08)'
                     }}
                   >
-                    <Typography variant="caption" sx={{ color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 800 }}>
+                    <Typography variant="overline" sx={{ color: '#64748B', letterSpacing: '0.12em', fontWeight: 800, display: 'block' }}>
                       Settled Tender ({paymentMethod})
                     </Typography>
                     <Typography variant="h4" sx={{ fontWeight: 900, color: '#937230', mt: 0.5, fontSize: { xs: '1.6rem', sm: '1.9rem' } }}>
                       ₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: '#10B981', fontWeight: 800, display: 'block', mt: 0.3 }}>
+                    <Typography variant="caption" sx={{ color: '#059669', fontWeight: 800, display: 'block', mt: 0.3 }}>
                       ✓ Payment Verified
                     </Typography>
                   </Box>
@@ -1138,14 +1155,14 @@ export default function CustomerDisplay() {
                   <Box
                     sx={{
                       flex: 1,
-                      p: 2.2,
-                      borderRadius: 3.5,
-                      bgcolor: 'rgba(16, 185, 129, 0.12)',
-                      border: '1.5px solid rgba(16, 185, 129, 0.45)',
-                      boxShadow: '0 4px 16px rgba(16, 185, 129, 0.15)'
+                      p: 2.5,
+                      borderRadius: 4,
+                      bgcolor: 'rgba(16, 185, 129, 0.08)',
+                      border: '1.5px solid rgba(16, 185, 129, 0.35)',
+                      boxShadow: '0 8px 25px rgba(16, 185, 129, 0.08)'
                     }}
                   >
-                    <Typography variant="caption" sx={{ color: '#047857', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+                    <Typography variant="overline" sx={{ color: '#047857', letterSpacing: '0.12em', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
                       ✨ Privilege Rewards Credited
                     </Typography>
                     <Typography variant="h4" sx={{ fontWeight: 900, color: '#059669', mt: 0.5, fontSize: { xs: '1.6rem', sm: '1.9rem' } }}>
@@ -1160,10 +1177,11 @@ export default function CustomerDisplay() {
                 {/* Interactive Customer Feedback & Compliment Section */}
                 <Box
                   sx={{
-                    p: 2.5,
-                    borderRadius: 3.5,
-                    bgcolor: '#FAF8F5',
-                    border: '1px solid rgba(197, 160, 89, 0.3)',
+                    p: 2.8,
+                    borderRadius: 4,
+                    bgcolor: '#FFFFFF',
+                    border: '1.5px solid rgba(197, 160, 89, 0.3)',
+                    boxShadow: '0 8px 25px rgba(180, 140, 75, 0.06)',
                     mb: 3,
                     textAlign: 'center'
                   }}
@@ -2061,141 +2079,111 @@ export default function CustomerDisplay() {
               style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}
             >
               <Box sx={{ flex: 1, display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, gap: { xs: 2, sm: 2.5, md: 3 }, minHeight: 0, width: '100%' }}>
-                {/* Left Panel: Itemized Live Bill Stream (60%) */}
-                <Box
+                {/* Left Panel: Itemized Live Bill Stream (60%) Matching Box 2 Clean Luxury Style */}
+                <Paper
+                  elevation={0}
                   sx={{
                     flex: { xs: 'none', lg: 1.5 },
                     minHeight: { xs: 320, lg: 0 },
                     display: 'flex',
                     flexDirection: 'column',
+                    p: 3,
                     borderRadius: 4,
                     bgcolor: '#FFFFFF',
                     border: '1.5px solid rgba(197, 160, 89, 0.3)',
-                    boxShadow: '0 12px 35px rgba(180, 140, 75, 0.08), 0 2px 10px rgba(0, 0, 0, 0.03)',
-                    overflow: 'hidden'
+                    boxShadow: '0 12px 35px rgba(180, 140, 75, 0.08), 0 2px 10px rgba(0, 0, 0, 0.03)'
                   }}
                 >
-                  {/* Cart Header with Customer Details */}
-                  <Box
-                    sx={{
-                      px: { xs: 2, sm: 3 },
-                      py: 2,
-                      borderBottom: '1px solid rgba(197, 160, 89, 0.25)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      bgcolor: '#FAF8F5'
-                    }}
-                  >
-                    <Stack direction="row" spacing={1.5} alignItems="center">
-                      <LocalMall sx={{ color: '#937230', fontSize: 24 }} />
-                      <Typography variant="h6" sx={{ fontWeight: 900, color: '#0F172A', fontSize: { xs: '0.98rem', sm: '1.1rem' } }}>
-                        {activeCustomerName ? (
-                          <>Curated Ensemble for {renderPatronName(activeCustomerName, { fontSize: 'inherit' })} ({items.length} {items.length === 1 ? 'Item' : 'Items'})</>
-                        ) : (
-                          <>Curated Ensemble ({items.length} {items.length === 1 ? 'Item' : 'Items'})</>
-                        )}
-                      </Typography>
-                    </Stack>
-
-                    {cfdState?.lastScannedItem && (
-                      <Chip
-                        size="small"
-                        icon={<AutoAwesome sx={{ fontSize: '0.85rem !important', color: '#937230 !important' }} />}
-                        label={`Just Added: ${cfdState.lastScannedItem}`}
-                        sx={{
-                          bgcolor: 'rgba(197, 160, 89, 0.15)',
-                          color: '#937230',
-                          border: '1px solid rgba(197, 160, 89, 0.4)',
-                          fontWeight: 800,
-                          fontSize: '0.74rem'
-                        }}
-                      />
-                    )}
+                  {/* Clean Header Matching Box 2 */}
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                    <Typography variant="overline" sx={{ color: '#937230', letterSpacing: '0.15em', fontWeight: 900 }}>
+                      {activeCustomerName ? (
+                        <>CURATED ENSEMBLE • {renderPatronName(activeCustomerName, { fontSize: 'inherit' })}</>
+                      ) : (
+                        'CURATED ENSEMBLE'
+                      )}
+                    </Typography>
+                    <Chip
+                      label={`${items.length} ${items.length === 1 ? 'ITEM' : 'ITEMS'}`}
+                      size="small"
+                      sx={{
+                        bgcolor: 'rgba(197, 160, 89, 0.15)',
+                        color: '#937230',
+                        fontWeight: 900,
+                        fontSize: '0.68rem',
+                        height: 22,
+                        px: 0.5,
+                        border: '1px solid rgba(197, 160, 89, 0.3)'
+                      }}
+                    />
                   </Box>
 
-                  {/* Scanned Items Scrollable Table (Light Theme Cards) */}
-                  <Box sx={{ flex: 1, overflowY: 'auto', p: { xs: 1.5, sm: 2.5 } }}>
-                    <Stack spacing={1.5}>
+                  {/* Scanned Items Stream (Open, Clean, Light Aesthetic Matching Box 2) */}
+                  <Box sx={{ flex: 1, overflowY: 'auto', pr: 0.5 }}>
+                    <Stack spacing={1.2} divider={<Divider sx={{ borderColor: 'rgba(197, 160, 89, 0.15)' }} />}>
                       <AnimatePresence initial={false}>
                         {items.map((item, idx) => {
                           const garmentMeta = getGarmentMeta(item.name);
+                          const itemPrice = parseFloat(item.price) || 0;
+                          const itemQty = parseInt(item.quantity) || 1;
+                          const lineTotal = itemPrice * itemQty;
                           return (
                             <motion.div
                               key={item.id || idx}
-                              initial={{ opacity: 0, x: -20, scale: 0.98 }}
-                              animate={{ opacity: 1, x: 0, scale: 1 }}
-                              exit={{ opacity: 0, scale: 0.95 }}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0 }}
                               transition={{ duration: 0.2 }}
                             >
-                              <Paper
-                                elevation={0}
+                              <Box
                                 sx={{
-                                  p: 2,
-                                  borderRadius: 3,
-                                  bgcolor: '#FAF8F5',
-                                  border: '1px solid rgba(197, 160, 89, 0.22)',
+                                  py: 1,
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'space-between',
-                                  transition: 'all 0.2s ease',
-                                  boxShadow: '0 2px 8px rgba(180, 140, 75, 0.04)',
-                                  '&:hover': {
-                                    bgcolor: '#FFFFFF',
-                                    borderColor: '#C5A059',
-                                    boxShadow: '0 6px 18px rgba(197, 160, 89, 0.15)'
-                                  }
+                                  borderRadius: 2,
+                                  px: 0.5
                                 }}
                               >
                                 <Box sx={{ flex: 1, pr: 2 }}>
-                                  <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.4 }}>
+                                  <Stack direction="row" spacing={0.8} alignItems="center" sx={{ mb: 0.4 }}>
                                     <Chip
                                       label={`${garmentMeta.icon} ${garmentMeta.tag}`}
                                       size="small"
                                       sx={{
                                         height: 20,
-                                        fontSize: '0.68rem',
-                                        bgcolor: 'rgba(197, 160, 89, 0.15)',
+                                        fontSize: '0.65rem',
+                                        bgcolor: 'rgba(197, 160, 89, 0.12)',
                                         color: '#937230',
-                                        border: '1px solid rgba(197, 160, 89, 0.35)',
-                                        fontWeight: 800,
-                                        letterSpacing: '0.04em'
+                                        border: '1px solid rgba(197, 160, 89, 0.25)',
+                                        fontWeight: 800
                                       }}
                                     />
+                                    {item.variantDetails && (
+                                      <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.72rem' }}>
+                                        {item.variantDetails}
+                                      </Typography>
+                                    )}
                                   </Stack>
-                                  <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0F172A', lineHeight: 1.25 }}>
+
+                                  <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0F172A', fontSize: { xs: '0.92rem', sm: '1.02rem' }, lineHeight: 1.25 }}>
                                     {item.name}
                                   </Typography>
-                                  <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.8 }}>
-                                    {item.variantDetails && (
-                                      <Chip
-                                        label={item.variantDetails}
-                                        size="small"
-                                        sx={{
-                                          height: 22,
-                                          fontSize: '0.7rem',
-                                          bgcolor: '#FFFFFF',
-                                          color: '#475569',
-                                          border: '1px solid rgba(0,0,0,0.08)',
-                                          fontWeight: 700
-                                        }}
-                                      />
-                                    )}
-                                    <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600 }}>
-                                      ₹{item.price.toLocaleString('en-IN')} × {item.quantity}
-                                    </Typography>
-                                  </Stack>
+
+                                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, mt: 0.2, display: 'inline-block' }}>
+                                    ₹{itemPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })} × {itemQty}
+                                  </Typography>
                                 </Box>
 
-                                <Box sx={{ textAlign: 'right' }}>
-                                  <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#937230', fontSize: '1.2rem' }}>
-                                    ₹{(item.price * item.quantity).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                                <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
+                                  <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#937230', fontSize: { xs: '1rem', sm: '1.1rem' } }}>
+                                    ₹{lineTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                                   </Typography>
-                                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700 }}>
-                                    Qty: {item.quantity}
+                                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700, fontSize: '0.72rem', display: 'block' }}>
+                                    Qty: {itemQty}
                                   </Typography>
                                 </Box>
-                              </Paper>
+                              </Box>
                             </motion.div>
                           );
                         })}
@@ -2203,31 +2191,32 @@ export default function CustomerDisplay() {
                     </Stack>
                   </Box>
 
-                  {/* Valued Patron Privilege Savings Banner */}
+                  {/* Valued Patron Privilege Savings Banner Matching Box 2 Green Badge */}
                   {discount > 0 && (
                     <Box
                       sx={{
-                        px: 3,
-                        py: 1.6,
-                        bgcolor: 'rgba(16, 185, 129, 0.08)',
-                        borderTop: '1px solid rgba(16, 185, 129, 0.25)',
+                        mt: 2,
+                        p: 1.2,
+                        borderRadius: 2.5,
+                        bgcolor: 'rgba(16, 185, 129, 0.1)',
+                        border: '1px solid rgba(16, 185, 129, 0.35)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between'
                       }}
                     >
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        <AutoAwesome sx={{ color: '#059669', fontSize: 18 }} />
-                        <Typography variant="caption" sx={{ color: '#059669', fontWeight: 800 }}>
+                      <Stack direction="row" spacing={0.8} alignItems="center">
+                        <AutoAwesome sx={{ color: '#059669', fontSize: 16 }} />
+                        <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, color: '#065F46', lineHeight: 1.2 }}>
                           Valued Patron Privilege Applied
                         </Typography>
                       </Stack>
-                      <Typography variant="caption" sx={{ color: '#059669', fontWeight: 900, fontSize: '0.88rem' }}>
-                        You are saving ₹{discount.toLocaleString('en-IN', { minimumFractionDigits: 2 })} today!
+                      <Typography sx={{ fontSize: '0.82rem', fontWeight: 900, color: '#059669' }}>
+                        Saving ₹{discount.toLocaleString('en-IN', { minimumFractionDigits: 2 })} today!
                       </Typography>
                     </Box>
                   )}
-                </Box>
+                </Paper>
 
                 {/* Right Panel: Totals & Dynamic UPI QR Code (40%) */}
                 <Box

@@ -108,6 +108,7 @@ const Invoices = () => {
   const cfdLastSettledTimeRef = useRef(0);
   const cfdWindowRef = useRef(null);
   const cfdSeqRef = useRef(0);
+  const cfdAutoIdleTimerRef = useRef(null);
   const syncCustomerDisplayRef = useRef(null);
 
   const handleOpenCustomerDisplay = () => {
@@ -129,6 +130,10 @@ const Invoices = () => {
   };
 
   const handleCloseInvoiceModal = () => {
+    if (cfdAutoIdleTimerRef.current) {
+      clearTimeout(cfdAutoIdleTimerRef.current);
+      cfdAutoIdleTimerRef.current = null;
+    }
     cfdLastSettledTimeRef.current = 0;
     setOpen(false);
     if (syncCustomerDisplayRef.current) {
@@ -924,6 +929,17 @@ const Invoices = () => {
     const updated = [...selectedItems];
     updated[index][field] = value;
     setSelectedItems(updated);
+    if (syncCustomerDisplayRef.current) {
+      syncCustomerDisplayRef.current(null, null, true, updated);
+    }
+  };
+
+  const handleRemoveItem = (index) => {
+    const updated = selectedItems.filter((_, i) => i !== index);
+    setSelectedItems(updated);
+    if (syncCustomerDisplayRef.current) {
+      syncCustomerDisplayRef.current(null, null, true, updated);
+    }
   };
 
   const matchedCustomer = selectedCustomerId
@@ -1058,21 +1074,11 @@ const Invoices = () => {
         }
       };
 
-      if (isImmediate || overrideStatus === 'settled' || overrideStatus === 'idle' || validItems.length > 0) {
-        if (cfdCloudDebounceTimerRef.current) {
-          clearTimeout(cfdCloudDebounceTimerRef.current);
-          cfdCloudDebounceTimerRef.current = null;
-        }
-        dispatchCloudWrite();
-      } else {
-        if (cfdCloudDebounceTimerRef.current) {
-          clearTimeout(cfdCloudDebounceTimerRef.current);
-        }
-        cfdCloudDebounceTimerRef.current = setTimeout(() => {
-          dispatchCloudWrite();
-          cfdCloudDebounceTimerRef.current = null;
-        }, 30);
+      if (cfdCloudDebounceTimerRef.current) {
+        clearTimeout(cfdCloudDebounceTimerRef.current);
+        cfdCloudDebounceTimerRef.current = null;
       }
+      dispatchCloudWrite();
     } catch (err) {
       console.warn('Failed to broadcast to Customer Display:', err);
     }
@@ -1124,7 +1130,7 @@ const Invoices = () => {
 
   // Sync to CFD whenever cart, payment tender or discount modifies
   useEffect(() => {
-    syncCustomerDisplay();
+    syncCustomerDisplay(null, null, true);
   }, [selectedItems, customer, phone, discountPercent, discountAmount, tax, loyaltyPointsToRedeem, paymentMethod, isSplitPayment, paymentMethod2, open]);
 
   const handleSaveInvoice = async () => {
@@ -1325,11 +1331,24 @@ const Invoices = () => {
       ]
     };
     // Broadcast instant settlement to customer screen before database writes (0ms delay)
+    cfdLastSettledTimeRef.current = Date.now();
     syncCustomerDisplay('settled', null, true);
     speakBillSettlement(total);
+
+    // Auto-return customer display to homepage (idle) after 4 seconds
+    if (cfdAutoIdleTimerRef.current) {
+      clearTimeout(cfdAutoIdleTimerRef.current);
+    }
+    cfdAutoIdleTimerRef.current = setTimeout(() => {
+      cfdLastSettledTimeRef.current = 0;
+      if (syncCustomerDisplayRef.current) {
+        syncCustomerDisplayRef.current('idle', null, true, []);
+      }
+      cfdAutoIdleTimerRef.current = null;
+    }, 4000);
+
     const savedInvoice = await addInvoice(invoice);
     setOpen(false);
-    // Settlement display remains on customer display until next invoice or cancellation (no auto-timeout)
     setSuccessInvoice(savedInvoice || invoice); // Show success dialog with persisted invoice
     setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0 }]);
     setDiscountPercent('');
@@ -4309,7 +4328,7 @@ const Invoices = () => {
                             {selectedItems.length > 1 && (
                               <IconButton
                                 size="small"
-                                onClick={() => setSelectedItems(selectedItems.filter((_, i) => i !== index))}
+                                onClick={() => handleRemoveItem(index)}
                                 sx={{ color: 'error.main', p: 0.5 }}
                               >
                                 <Delete fontSize="small" sx={{ fontSize: 18 }} />
@@ -5219,7 +5238,17 @@ const Invoices = () => {
       {/* Post-Billing Instant Dispatch & WhatsApp Pop-up Modal */}
       <BillSuccessModal
         open={!!successInvoice}
-        onClose={() => setSuccessInvoice(null)}
+        onClose={() => {
+          if (cfdAutoIdleTimerRef.current) {
+            clearTimeout(cfdAutoIdleTimerRef.current);
+            cfdAutoIdleTimerRef.current = null;
+          }
+          cfdLastSettledTimeRef.current = 0;
+          setSuccessInvoice(null);
+          if (syncCustomerDisplayRef.current) {
+            syncCustomerDisplayRef.current('idle', null, true, []);
+          }
+        }}
         invoice={successInvoice}
         profile={profile}
         onPrint={handlePrint}
@@ -5228,8 +5257,16 @@ const Invoices = () => {
         isDownloadingPDF={isExportingPDF}
         onOpenAdvancedWhatsApp={(inv) => sendWhatsApp(inv)}
         onNewBill={() => {
+          if (cfdAutoIdleTimerRef.current) {
+            clearTimeout(cfdAutoIdleTimerRef.current);
+            cfdAutoIdleTimerRef.current = null;
+          }
+          cfdLastSettledTimeRef.current = 0;
           setSuccessInvoice(null);
           setOpen(true);
+          if (syncCustomerDisplayRef.current) {
+            syncCustomerDisplayRef.current('idle', null, true, []);
+          }
         }}
         onUpdateInvoicePhone={handleUpdateInvoicePhone}
       />
