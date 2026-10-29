@@ -112,12 +112,16 @@ export default function PageHeader({
       {/* Title & Action Buttons Row */}
       <Box sx={{ 
         display: 'flex', 
-        alignItems: { xs: 'flex-start', md: 'center' }, 
+        alignItems: { xs: 'flex-start', lg: 'center' }, 
         justifyContent: 'space-between', 
-        flexDirection: { xs: 'column', md: 'row' },
-        gap: { xs: 2, md: 2.5 }
+        flexDirection: { xs: 'column', lg: 'row' },
+        gap: { xs: 2, lg: 3 }
       }}>
-        <Box sx={{ minWidth: 0, flex: 1, ...headerStyle }}>
+        <Box sx={{ 
+          minWidth: { xs: '100%', lg: '320px' }, 
+          flex: { xs: 'none', lg: 1 }, 
+          ...headerStyle 
+        }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
             {designSystem === 'linear' && (
               <Chip
@@ -131,7 +135,9 @@ export default function PageHeader({
                   borderRadius: '4px',
                   bgcolor: 'rgba(139, 92, 246, 0.15)',
                   color: '#A78BFA',
-                  border: '1px solid rgba(139, 92, 246, 0.3)'
+                  border: '1px solid rgba(139, 92, 246, 0.3)',
+                  flexShrink: 0,
+                  whiteSpace: 'nowrap'
                 }}
               />
             )}
@@ -147,7 +153,9 @@ export default function PageHeader({
                   borderRadius: '4px',
                   bgcolor: 'rgba(99, 91, 255, 0.12)',
                   color: '#635BFF',
-                  border: '1px solid rgba(99, 91, 255, 0.25)'
+                  border: '1px solid rgba(99, 91, 255, 0.25)',
+                  flexShrink: 0,
+                  whiteSpace: 'nowrap'
                 }}
               />
             )}
@@ -159,7 +167,8 @@ export default function PageHeader({
                 color: 'text.primary',
                 letterSpacing: designSystem === 'linear' ? '-0.03em' : (designSystem === 'material' ? '0' : '-0.025em'),
                 fontSize: { xs: '1.4rem', sm: '1.75rem' },
-                fontFamily: 'inherit'
+                fontFamily: 'inherit',
+                whiteSpace: { xs: 'normal', md: 'nowrap' }
               }}
             >
               {title}
@@ -173,7 +182,9 @@ export default function PageHeader({
                 color: 'text.secondary', 
                 mt: 0.5,
                 fontWeight: 500,
-                fontSize: designSystem === 'microsoft' ? '0.8rem' : '0.84rem'
+                fontSize: designSystem === 'microsoft' ? '0.8rem' : '0.84rem',
+                maxWidth: { xs: '100%', lg: '560px' },
+                lineHeight: 1.5
               }}
             >
               {subtitle}
@@ -188,8 +199,8 @@ export default function PageHeader({
               alignItems: 'center', 
               flexWrap: 'wrap',
               gap: 1.25,
-              width: { xs: '100%', md: 'auto' },
-              justifyContent: { xs: 'flex-start', md: 'flex-end' }
+              width: { xs: '100%', lg: 'auto' },
+              justifyContent: { xs: 'flex-start', lg: 'flex-end' }
             }}
           >
             {actions}

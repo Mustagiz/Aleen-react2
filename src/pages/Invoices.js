@@ -1697,21 +1697,21 @@ const Invoices = () => {
           { label: 'Invoices' }
         ]}
         actions={
-          <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap', width: '100%', justifyContent: { xs: 'flex-start', lg: 'flex-end' } }}>
             <Button
               variant="outlined"
-              startIcon={<Palette sx={{ fontSize: 19, color: (t) => t.palette.primary.main }} />}
+              startIcon={<Palette sx={{ fontSize: 18, color: (t) => t.palette.primary.main }} />}
               onClick={() => setTemplateModalOpen(true)}
               sx={{
-                height: 42,
-                minHeight: 42,
-                px: 2.75,
+                height: { xs: 36, sm: 40 },
+                minHeight: { xs: 36, sm: 40 },
+                px: { xs: 1.5, sm: 2 },
                 borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                 border: (t) => `1.5px solid ${t.palette.primary.main}`,
                 color: (t) => t.palette.primary.main,
                 bgcolor: 'background.paper',
                 fontWeight: 700,
-                fontSize: '0.84rem',
+                fontSize: { xs: '0.76rem', sm: '0.82rem' },
                 textTransform: 'none',
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -1725,22 +1725,22 @@ const Invoices = () => {
                 }
               }}
             >
-              Templates & Letterhead
+              Templates
             </Button>
             <Button
               variant="outlined"
-              startIcon={<PointOfSale sx={{ fontSize: 19, color: (t) => t.palette.primary.main }} />}
+              startIcon={<PointOfSale sx={{ fontSize: 18, color: (t) => t.palette.primary.main }} />}
               onClick={() => setCashDrawerModalOpen(true)}
               sx={{
-                height: 42,
-                minHeight: 42,
-                px: 2.75,
+                height: { xs: 36, sm: 40 },
+                minHeight: { xs: 36, sm: 40 },
+                px: { xs: 1.5, sm: 2 },
                 borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                 border: (t) => `1.5px solid ${t.palette.primary.main}`,
                 color: (t) => t.palette.primary.main,
                 bgcolor: 'background.paper',
                 fontWeight: 700,
-                fontSize: '0.84rem',
+                fontSize: { xs: '0.76rem', sm: '0.82rem' },
                 textTransform: 'none',
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -1754,22 +1754,22 @@ const Invoices = () => {
                 }
               }}
             >
-              Shift Close & Z-Report
+              Shift Close
             </Button>
             <Button
               variant="outlined"
-              startIcon={<Download sx={{ fontSize: 19, color: (t) => t.palette.primary.main }} />}
+              startIcon={<Download sx={{ fontSize: 18, color: (t) => t.palette.primary.main }} />}
               onClick={downloadInvoices}
               sx={{
-                height: 42,
-                minHeight: 42,
-                px: 2.75,
+                height: { xs: 36, sm: 40 },
+                minHeight: { xs: 36, sm: 40 },
+                px: { xs: 1.5, sm: 2 },
                 borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                 border: (t) => `1.5px solid ${t.palette.primary.main}`,
                 color: (t) => t.palette.primary.main,
                 bgcolor: 'background.paper',
                 fontWeight: 700,
-                fontSize: '0.84rem',
+                fontSize: { xs: '0.76rem', sm: '0.82rem' },
                 textTransform: 'none',
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -1783,20 +1783,20 @@ const Invoices = () => {
                 }
               }}
             >
-              Export CSV
+              Export
             </Button>
             {parkedCarts.length > 0 && (
               <Button
                 variant="outlined"
-                startIcon={<PauseCircle sx={{ fontSize: 19, color: '#D97706' }} />}
+                startIcon={<PauseCircle sx={{ fontSize: 18, color: '#D97706' }} />}
                 onClick={() => setHeldCartsDialogOpen(true)}
                 sx={{
-                  height: 42,
-                  minHeight: 42,
-                  px: 2.5,
+                  height: { xs: 36, sm: 40 },
+                  minHeight: { xs: 36, sm: 40 },
+                  px: { xs: 1.5, sm: 2 },
                   borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                   fontWeight: 700,
-                  fontSize: '0.84rem',
+                  fontSize: { xs: '0.76rem', sm: '0.82rem' },
                   textTransform: 'none',
                   border: '1.5px solid #D97706',
                   color: '#D97706',
@@ -1809,21 +1809,21 @@ const Invoices = () => {
                   }
                 }}
               >
-                Held Carts ({parkedCarts.length})
+                Held ({parkedCarts.length})
               </Button>
             )}
             {/* POS Keyboard Accelerators Help */}
             <Button
               variant="outlined"
-              startIcon={<Keyboard sx={{ fontSize: 18, color: 'text.secondary' }} />}
+              startIcon={<Keyboard sx={{ fontSize: 17, color: 'text.secondary' }} />}
               onClick={() => setShortcutHelpOpen(true)}
               sx={{
-                height: 42,
-                minHeight: 42,
-                px: 2,
+                height: { xs: 36, sm: 40 },
+                minHeight: { xs: 36, sm: 40 },
+                px: { xs: 1.25, sm: 1.75 },
                 borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                 fontWeight: 700,
-                fontSize: '0.84rem',
+                fontSize: { xs: '0.76rem', sm: '0.82rem' },
                 textTransform: 'none',
                 display: { xs: 'none', md: 'inline-flex' },
                 alignItems: 'center',
@@ -1847,29 +1847,29 @@ const Invoices = () => {
                 label="F1"
                 size="small"
                 sx={{
-                  height: 20,
-                  fontSize: '0.68rem',
+                  height: 18,
+                  fontSize: '0.64rem',
                   fontWeight: 800,
                   bgcolor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.06)',
                   color: 'text.secondary',
-                  borderRadius: '6px'
+                  borderRadius: '5px'
                 }}
               />
             </Button>
             <Button
               variant="outlined"
-              startIcon={<QrCode2 sx={{ fontSize: 19, color: (t) => t.palette.primary.main }} />}
+              startIcon={<QrCode2 sx={{ fontSize: 18, color: (t) => t.palette.primary.main }} />}
               onClick={() => setPairModalOpen(true)}
               sx={{
-                height: 42,
-                minHeight: 42,
-                px: 2.2,
+                height: { xs: 36, sm: 40 },
+                minHeight: { xs: 36, sm: 40 },
+                px: { xs: 1.5, sm: 2 },
                 borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                 border: (t) => `1.5px solid ${t.palette.primary.main}`,
                 color: (t) => t.palette.primary.main,
                 bgcolor: 'background.paper',
                 fontWeight: 700,
-                fontSize: '0.84rem',
+                fontSize: { xs: '0.76rem', sm: '0.82rem' },
                 textTransform: 'none',
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -1887,18 +1887,18 @@ const Invoices = () => {
             </Button>
             <Button
               variant="outlined"
-              startIcon={<Tv sx={{ fontSize: 19, color: (t) => t.palette.primary.main }} />}
+              startIcon={<Tv sx={{ fontSize: 18, color: (t) => t.palette.primary.main }} />}
               onClick={handleOpenCustomerDisplay}
               sx={{
-                height: 42,
-                minHeight: 42,
-                px: 2.2,
+                height: { xs: 36, sm: 40 },
+                minHeight: { xs: 36, sm: 40 },
+                px: { xs: 1.5, sm: 2 },
                 borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                 border: (t) => `1.5px solid ${t.palette.primary.main}`,
                 color: (t) => t.palette.primary.main,
                 bgcolor: 'background.paper',
                 fontWeight: 700,
-                fontSize: '0.84rem',
+                fontSize: { xs: '0.76rem', sm: '0.82rem' },
                 textTransform: 'none',
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -1922,12 +1922,12 @@ const Invoices = () => {
                 setOpen(true);
               }}
               sx={{
-                height: 42,
-                minHeight: 42,
-                px: 3,
+                height: { xs: 36, sm: 40 },
+                minHeight: { xs: 36, sm: 40 },
+                px: { xs: 2, sm: 2.75 },
                 borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                 fontWeight: 700,
-                fontSize: '0.84rem',
+                fontSize: { xs: '0.78rem', sm: '0.84rem' },
                 textTransform: 'none',
                 display: 'inline-flex',
                 alignItems: 'center',
