@@ -1,0 +1,236 @@
+/**
+ * Aleen Atelier POS Audio & Voice Synthesis Engine
+ * 100% Zero-API: Uses Native Web Audio API + Web Speech API (window.speechSynthesis)
+ * Provides crisp audio chimes and natural voice confirmations for double-scan protection,
+ * stock warnings, and payment confirmations.
+ */
+
+// Global AudioContext singleton to avoid browser limits
+let sharedAudioCtx = null;
+const getAudioContext = () => {
+  if (typeof window === 'undefined') return null;
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtx) return null;
+  if (!sharedAudioCtx || sharedAudioCtx.state === 'closed') {
+    sharedAudioCtx = new AudioCtx();
+  }
+  if (sharedAudioCtx.state === 'suspended') {
+    sharedAudioCtx.resume().catch(() => {});
+  }
+  return sharedAudioCtx;
+};
+
+// Check if voice synthesis is supported
+export const isVoiceSupported = () => {
+  return typeof window !== 'undefined' && 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+};
+
+// Preferences management
+export const getVoiceSettings = () => {
+  try {
+    const soundEnabled = localStorage.getItem('aleen_pos_sound_enabled');
+    const voiceEnabled = localStorage.getItem('aleen_pos_voice_enabled');
+    const volume = localStorage.getItem('aleen_pos_voice_volume');
+    return {
+      soundEnabled: soundEnabled !== null ? soundEnabled === 'true' : true,
+      voiceEnabled: voiceEnabled !== null ? voiceEnabled === 'true' : true,
+      volume: volume ? parseFloat(volume) : 0.9,
+    };
+  } catch {
+    return { soundEnabled: true, voiceEnabled: true, volume: 0.9 };
+  }
+};
+
+export const setVoiceSettings = (settings) => {
+  try {
+    if (typeof settings.soundEnabled === 'boolean') {
+      localStorage.setItem('aleen_pos_sound_enabled', String(settings.soundEnabled));
+    }
+    if (typeof settings.voiceEnabled === 'boolean') {
+      localStorage.setItem('aleen_pos_voice_enabled', String(settings.voiceEnabled));
+    }
+    if (typeof settings.volume === 'number') {
+      localStorage.setItem('aleen_pos_voice_volume', String(settings.volume));
+    }
+  } catch (err) {
+    console.warn('Failed to save POS voice settings:', err);
+  }
+};
+
+/**
+ * Crisp synthesized audio chimes using pure Web Audio API oscillators
+ * Types:
+ * - 'scan': Crisp dual-chime (A6 -> E7) for new item scan
+ * - 'duplicate': Soft musical double-pip (C6 -> G6) when quantity increments
+ * - 'warning': Resonant minor chord chime for low stock
+ * - 'error': Low frequency double-buzz for item not found
+ * - 'success': Cash register triumphant harmonic chord on bill settlement
+ */
+export const playLuxuryChime = (type = 'scan') => {
+  const settings = getVoiceSettings();
+  if (!settings.soundEnabled) return;
+
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    const gainNode = ctx.createGain();
+    gainNode.connect(ctx.destination);
+    const now = ctx.currentTime;
+
+    if (type === 'scan') {
+      // Crisp Atelier dual chime: A6 (1760Hz) -> E7 (2637Hz)
+      const osc1 = ctx.createOscillator();
+      const osc2 = ctx.createOscillator();
+      osc1.connect(gainNode);
+      osc2.connect(gainNode);
+
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(1760, now);
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(2637, now + 0.035);
+
+      gainNode.gain.setValueAtTime(0.2, now);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+
+      osc1.start(now);
+      osc1.stop(now + 0.045);
+      osc2.start(now + 0.035);
+      osc2.stop(now + 0.14);
+    } else if (type === 'duplicate') {
+      // Double tap chime indicating quantity +1 on double scan
+      const osc = ctx.createOscillator();
+      osc.connect(gainNode);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1318, now); // E6
+      osc.frequency.setValueAtTime(1567, now + 0.06); // G6
+
+      gainNode.gain.setValueAtTime(0.18, now);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+      osc.start(now);
+      osc.stop(now + 0.15);
+    } else if (type === 'warning') {
+      // Amber tone for low stock
+      const osc = ctx.createOscillator();
+      osc.connect(gainNode);
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(440, now); // A4
+      osc.frequency.setValueAtTime(392, now + 0.09); // G4
+
+      gainNode.gain.setValueAtTime(0.24, now);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+
+      osc.start(now);
+      osc.stop(now + 0.28);
+    } else if (type === 'error') {
+      // Low buzz
+      const osc = ctx.createOscillator();
+      osc.connect(gainNode);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, now);
+      gainNode.gain.setValueAtTime(0.25, now);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+      osc.start(now);
+      osc.stop(now + 0.2);
+    } else if (type === 'success') {
+      // Triumphant luxury triad chord: C6 (1046Hz), E6 (1318Hz), G6 (1567Hz)
+      const freqs = [1046.5, 1318.5, 1567.98, 2093];
+      freqs.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const oscGain = ctx.createGain();
+        osc.connect(oscGain);
+        oscGain.connect(ctx.destination);
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+
+        oscGain.gain.setValueAtTime(0.15, now + idx * 0.05);
+        oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+
+        osc.start(now + idx * 0.05);
+        osc.stop(now + 0.45);
+      });
+    }
+  } catch (err) {
+    console.warn('Audio chime playback error:', err);
+  }
+};
+
+/**
+ * Text-to-Speech Engine using window.speechSynthesis
+ */
+let lastSpeakTimestamp = 0;
+
+export const speakVoice = (text, options = {}) => {
+  const settings = getVoiceSettings();
+  if (!settings.voiceEnabled || !isVoiceSupported()) return;
+
+  try {
+    const synth = window.speechSynthesis;
+    // Cancel ongoing speech if rapid scanning to avoid huge queue delay
+    const now = Date.now();
+    if (now - lastSpeakTimestamp < 1500) {
+      synth.cancel();
+    }
+    lastSpeakTimestamp = now;
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.volume = settings.volume;
+    utterance.rate = options.rate || 1.08; // Brisk and clear
+    utterance.pitch = options.pitch || 1.0;
+
+    // Pick a natural English voice if available (e.g. Samantha, Karen, Google UK, etc.)
+    const voices = synth.getVoices();
+    if (voices && voices.length > 0) {
+      const preferred = voices.find(
+        (v) =>
+          (v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Siri') || v.name.includes('Samantha') || v.name.includes('Google')))
+      ) || voices.find((v) => v.lang.startsWith('en'));
+      if (preferred) {
+        utterance.voice = preferred;
+      }
+    }
+
+    synth.speak(utterance);
+  } catch (err) {
+    console.warn('Web Speech synthesis error:', err);
+  }
+};
+
+/**
+ * High-level POS Voice actions
+ */
+export const speakItemScan = (item, options = {}) => {
+  const { isIncrement = false, newQty = 1, remainingStock = null } = options;
+  const name = item.name || 'Item';
+  const variant = [item.size ? `Size ${item.size}` : '', item.color || ''].filter(Boolean).join(' ');
+  const itemDesc = variant ? `${name}, ${variant}` : name;
+
+  if (isIncrement) {
+    playLuxuryChime('duplicate');
+    speakVoice(`Quantity ${newQty} for ${itemDesc}`);
+  } else {
+    playLuxuryChime('scan');
+    speakVoice(`${itemDesc} added`);
+  }
+
+  // Stock warning if low stock (<= 2)
+  if (typeof remainingStock === 'number' && remainingStock <= 2 && remainingStock >= 0) {
+    setTimeout(() => {
+      playLuxuryChime('warning');
+      speakVoice(remainingStock === 0 ? `Stock exhausted for ${name}` : `Low stock alert, ${remainingStock} left`);
+    }, 900);
+  }
+};
+
+export const speakItemNotFound = (barcode) => {
+  playLuxuryChime('error');
+  speakVoice(`Barcode not found`);
+};
+
+export const speakBillSettlement = (amount) => {
+  playLuxuryChime('success');
+  const formatted = Math.round(amount || 0).toLocaleString('en-IN');
+  speakVoice(`Bill settled. Total rupees ${formatted}`);
+};

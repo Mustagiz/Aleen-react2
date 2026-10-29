@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel, CircularProgress, Alert, Snackbar, InputAdornment, List } from '@mui/material';
-import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, QrCode2, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, PauseCircleOutline, ShoppingCart, RestartAlt, CalendarMonth, Phone, Straighten, Clear, Stars, Redeem, AccountBalanceWallet, Keyboard } from '@mui/icons-material';
+import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, QrCode2, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, PauseCircleOutline, ShoppingCart, RestartAlt, CalendarMonth, Phone, Straighten, Clear, Stars, Redeem, AccountBalanceWallet, Keyboard, Tv, VolumeUp, VolumeOff } from '@mui/icons-material';
 import { Html5Qrcode } from 'html5-qrcode';
 import { db } from '../firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -24,11 +24,12 @@ import InvoiceWhatsAppDialog from '../components/InvoiceWhatsAppDialog';
 import BillSuccessModal from '../components/BillSuccessModal';
 import { printInvoiceElement } from '../utils/printInvoice';
 import CashDrawerShiftModal from '../components/crm/CashDrawerShiftModal';
-import { calculateInvoiceTotals, calculateTenderSettlement, calculateCashChange, generateQuickCashPresets } from '../engine/billingEngine';
+import { calculateInvoiceTotals, calculateLineItem, calculateTenderSettlement, calculateCashChange, generateQuickCashPresets, generateUpiPaymentUrl } from '../engine/billingEngine';
 import AtelierStitchDivider from '../components/common/AtelierStitchDivider';
 import ThermalReceipt from '../components/ThermalReceipt';
 import CustomerMeasurementModal from '../components/crm/CustomerMeasurementModal';
 import UpiPaymentQrModal from '../components/pos/UpiPaymentQrModal';
+import { playLuxuryChime, speakItemScan, speakItemNotFound, speakBillSettlement, getVoiceSettings, setVoiceSettings } from '../utils/posVoiceEngine';
 
 const Invoices = () => {
   const location = useLocation();
@@ -79,51 +80,32 @@ const Invoices = () => {
     );
   };
 
-  // Smart Dual-Tone POS Barcode Audio Feedback
-  const playBeep = (type = 'success') => {
-    try {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const gainNode = audioCtx.createGain();
-      gainNode.connect(audioCtx.destination);
 
-      if (type === 'success') {
-        // High-pitched cheerful POS dual-chime (A6 -> E7)
-        const osc1 = audioCtx.createOscillator();
-        const osc2 = audioCtx.createOscillator();
-        osc1.connect(gainNode);
-        osc2.connect(gainNode);
-
-        osc1.type = 'sine';
-        osc1.frequency.setValueAtTime(1760, audioCtx.currentTime);
-        osc2.type = 'sine';
-        osc2.frequency.setValueAtTime(2637, audioCtx.currentTime + 0.04);
-
-        gainNode.gain.setValueAtTime(0.22, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.14);
-
-        osc1.start(audioCtx.currentTime);
-        osc1.stop(audioCtx.currentTime + 0.05);
-        osc2.start(audioCtx.currentTime + 0.04);
-        osc2.stop(audioCtx.currentTime + 0.14);
-      } else {
-        // Low-frequency warning buzz (320Hz)
-        const osc = audioCtx.createOscillator();
-        osc.connect(gainNode);
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(320, audioCtx.currentTime);
-        gainNode.gain.setValueAtTime(0.25, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.22);
-        osc.start(audioCtx.currentTime);
-        osc.stop(audioCtx.currentTime + 0.22);
-      }
-    } catch (e) {
-      console.warn("Audio feedback synthesis failed", e);
-    }
-  };
 
   const playVibration = () => {
     if ("vibrate" in navigator) {
       navigator.vibrate(50); // Short 50ms tactile vibration
+    }
+  };
+
+  // Interactive Voice & Sound Confirmation Settings
+  const [voiceSettings, setPosVoiceSettings] = useState(() => getVoiceSettings());
+
+  const handleToggleVoice = () => {
+    const updated = {
+      ...voiceSettings,
+      voiceEnabled: !voiceSettings.voiceEnabled
+    };
+    setPosVoiceSettings(updated);
+    setVoiceSettings(updated);
+  };
+
+  // Customer Facing Display (CFD) - BroadcastChannel & Window Launcher
+  const cfdChannelRef = useRef(null);
+
+  const handleOpenCustomerDisplay = () => {
+    if (typeof window !== 'undefined') {
+      window.open('/customer-display', 'AleenCustomerDisplay', 'width=1120,height=760,menubar=no,toolbar=no,location=no');
     }
   };
 
@@ -483,7 +465,32 @@ const Invoices = () => {
 
     if (matchResult && matchResult.product) {
       const { product, variantSku } = matchResult;
-      playBeep();
+
+      // Extract variant & remaining stock for voice confirmation
+      const variantObj = (product.hasVariants && variantSku && product.variants?.length)
+        ? product.variants.find(v => v.sku === variantSku)
+        : null;
+      const remainingStock = typeof variantObj?.stock === 'number' ? variantObj.stock : (typeof product.stock === 'number' ? product.stock : null);
+
+      const existingItem = selectedItems.find(item =>
+        item.id === product.id && (!variantSku || item.variantSku === variantSku) && !item.isCustom
+      );
+      const isIncrement = Boolean(existingItem);
+      const newQty = isIncrement ? (parseInt(existingItem.quantity) || 1) + 1 : 1;
+
+      // Native Speech & Audio Feedback
+      speakItemScan(
+        {
+          name: product.name,
+          size: variantObj?.size,
+          color: variantObj?.color
+        },
+        {
+          isIncrement,
+          newQty,
+          remainingStock
+        }
+      );
       playVibration();
 
       setSelectedItems(prevItems => {
@@ -540,8 +547,8 @@ const Invoices = () => {
         message: `✓ Added: "${product.name}" (${variantSku || product.productId || cleanCode}) via ${source}`
       });
     } else {
-      playBeep('error');
       const codeToShow = matchResult?.resolvedCode || cleanCode;
+      speakItemNotFound(codeToShow);
       setUnrecognizedScan(codeToShow);
       setScanFeedback({
         type: 'warning',
@@ -898,6 +905,79 @@ const Invoices = () => {
     });
   };
 
+  // Realtime BroadcastChannel Sync for Customer Facing Display (CFD)
+  const syncCustomerDisplay = (overrideStatus = null, lastScanned = null) => {
+    try {
+      const validItems = (selectedItems || [])
+        .filter(item => item.id || (item.isCustom && item.customName && item.customPrice > 0))
+        .map(item => calculateLineItem(item, inventory));
+
+      const totals = calculateTotal();
+      const status = overrideStatus || (open && validItems.length > 0 ? 'active' : 'idle');
+
+      const storeVpa = profile?.bankDetails?.upiId || profile?.upiId || 'aleenclothing@hdfcbank';
+      const storeName = profile?.businessName || 'Aleen Clothing';
+      const upiUrl = generateUpiPaymentUrl({
+        vpa: storeVpa,
+        payeeName: storeName,
+        amount: totals.total,
+        invoiceNumber: generateInvoiceNumber(invoices?.length || 0)
+      });
+
+      const payload = {
+        storeName,
+        storeLogo: profile?.logoUrl || null,
+        customerName: customer || '',
+        customerTier: matchedCustomer?.loyaltyTier || 'Silver',
+        items: validItems,
+        subtotal: totals.subtotal || 0,
+        discount: (totals.absDiscount || 0) + (totals.loyaltyDiscount || 0),
+        tax: totals.taxAmount || 0,
+        total: totals.total || 0,
+        paymentMethod: isSplitPayment ? `${paymentMethod} + ${paymentMethod2}` : paymentMethod,
+        upiUrl: (paymentMethod === 'UPI' || (isSplitPayment && (paymentMethod === 'UPI' || paymentMethod2 === 'UPI'))) ? upiUrl : '',
+        status,
+        lastScannedItem: lastScanned || null
+      };
+
+      if (cfdChannelRef.current) {
+        cfdChannelRef.current.postMessage({ type: 'SYNC', payload });
+      }
+      try {
+        localStorage.setItem('aleen_cfd_state', JSON.stringify(payload));
+      } catch (e) {}
+    } catch (err) {
+      console.warn('Failed to broadcast to Customer Display:', err);
+    }
+  };
+
+  // BroadcastChannel listener for incoming CFD sync requests
+  useEffect(() => {
+    let bc = null;
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        bc = new BroadcastChannel('aleen_customer_display');
+        cfdChannelRef.current = bc;
+
+        bc.onmessage = (event) => {
+          if (event.data?.type === 'REQUEST_SYNC') {
+            syncCustomerDisplay();
+          }
+        };
+      }
+    } catch (e) {
+      console.warn('CFD BroadcastChannel init error:', e);
+    }
+    return () => {
+      if (bc) bc.close();
+    };
+  }, [selectedItems, customer, phone, discountPercent, discountAmount, tax, loyaltyPointsToRedeem, paymentMethod, isSplitPayment, paymentMethod2, open, inventory, profile]);
+
+  // Sync to CFD whenever cart, payment tender or discount modifies
+  useEffect(() => {
+    syncCustomerDisplay();
+  }, [selectedItems, customer, discountPercent, discountAmount, tax, loyaltyPointsToRedeem, paymentMethod, isSplitPayment, paymentMethod2, open]);
+
   const handleSaveInvoice = async () => {
     // Validate mandatory customer name and 10-digit phone number
     const isCustomerValid = Boolean(customer && customer.trim());
@@ -1096,6 +1176,8 @@ const Invoices = () => {
       ]
     };
     const savedInvoice = await addInvoice(invoice);
+    speakBillSettlement(total);
+    syncCustomerDisplay('settled');
     setOpen(false);
     setSuccessInvoice(savedInvoice || invoice); // Show success dialog with persisted invoice
     setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0 }]);
@@ -1754,6 +1836,35 @@ const Invoices = () => {
                   borderRadius: '6px'
                 }}
               />
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<Tv sx={{ fontSize: 19, color: (t) => t.palette.primary.main }} />}
+              onClick={handleOpenCustomerDisplay}
+              sx={{
+                height: 42,
+                minHeight: 42,
+                px: 2.2,
+                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                border: (t) => `1.5px solid ${t.palette.primary.main}`,
+                color: (t) => t.palette.primary.main,
+                bgcolor: 'background.paper',
+                fontWeight: 700,
+                fontSize: '0.84rem',
+                textTransform: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxSizing: 'border-box',
+                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                '&:hover': {
+                  border: (t) => `1.5px solid ${t.palette.primary.dark}`,
+                  bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
+                  transform: 'translateY(-1px)'
+                }
+              }}
+            >
+              Customer Screen
             </Button>
             <Button
               variant="contained"
@@ -3248,8 +3359,59 @@ const Invoices = () => {
             </Box>
           </Box>
 
-          {/* Right: Park Cart Action & Close Icon */}
+          {/* Right: Sound Voice Toggle + Customer Screen + Park Cart + Close Icon */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.75, sm: 1 }, flexShrink: 0 }}>
+            {/* Interactive Voice & Sound Confirmations Toggle */}
+            <Tooltip title={voiceSettings.voiceEnabled ? "Voice Confirmations: Active (Click to mute)" : "Voice Confirmations: Muted (Click to enable)"}>
+              <IconButton
+                size="small"
+                onClick={handleToggleVoice}
+                sx={{
+                  color: voiceSettings.voiceEnabled ? '#FBBF24' : 'rgba(255, 255, 255, 0.5)',
+                  bgcolor: voiceSettings.voiceEnabled ? 'rgba(251, 191, 36, 0.15)' : 'rgba(255, 255, 255, 0.08)',
+                  border: `1px solid ${voiceSettings.voiceEnabled ? 'rgba(251, 191, 36, 0.4)' : 'rgba(255, 255, 255, 0.15)'}`,
+                  width: { xs: 32, sm: 36 },
+                  height: { xs: 32, sm: 36 },
+                  borderRadius: '8px'
+                }}
+              >
+                {voiceSettings.voiceEnabled ? <VolumeUp sx={{ fontSize: 18 }} /> : <VolumeOff sx={{ fontSize: 18 }} />}
+              </IconButton>
+            </Tooltip>
+
+            {/* Customer Facing Display Launcher */}
+            <Tooltip title="Launch 2nd Monitor Customer Facing Display (Dual-Screen Mirror)">
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={handleOpenCustomerDisplay}
+                startIcon={<Tv sx={{ fontSize: { xs: 15, sm: 17 } }} />}
+                sx={{
+                  color: '#FEF3C7',
+                  borderColor: 'rgba(254, 243, 199, 0.35)',
+                  bgcolor: 'rgba(255, 255, 255, 0.08)',
+                  backdropFilter: 'blur(4px)',
+                  borderRadius: '8px',
+                  height: { xs: 32, sm: 36 },
+                  minHeight: { xs: 32, sm: 36 },
+                  px: { xs: 1.2, sm: 1.8 },
+                  py: 0,
+                  textTransform: 'none',
+                  fontWeight: 700,
+                  fontSize: { xs: '0.74rem', sm: '0.8rem' },
+                  letterSpacing: '0.02em',
+                  whiteSpace: 'nowrap',
+                  '&:hover': {
+                    bgcolor: 'rgba(255, 255, 255, 0.16)',
+                    borderColor: '#FEF3C7'
+                  }
+                }}
+              >
+                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Customer Screen ↗</Box>
+                <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Screen ↗</Box>
+              </Button>
+            </Tooltip>
+
             <Button
               size="small"
               variant="outlined"

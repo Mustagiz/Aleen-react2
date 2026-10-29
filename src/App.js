@@ -34,6 +34,7 @@ const TailoringKanban = lazy(() => import('./pages/TailoringKanban'));
 const Devices = lazy(() => import('./pages/Devices'));
 const MobileScanner = lazy(() => import('./pages/MobileScanner'));
 const PublicBillView = lazy(() => import('./pages/PublicBillView'));
+const CustomerDisplay = lazy(() => import('./pages/CustomerDisplay'));
 
 // Luxury Atelier Page Suspense Fallback
 const AtelierPageLoader = () => (
@@ -73,6 +74,7 @@ const AnimatedRoutes = () => {
       <Routes location={location} key={location.pathname}>
         <Route path="/login" element={<Login />} />
         <Route path="/mobile-scanner" element={<Suspense fallback={<AtelierPageLoader />}><MobileScanner /></Suspense>} />
+        <Route path="/customer-display" element={<Suspense fallback={<AtelierPageLoader />}><CustomerDisplay /></Suspense>} />
         <Route path="/bill/:id" element={<Suspense fallback={<AtelierPageLoader />}><PublicBillView /></Suspense>} />
         <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
           <Route index element={<PageWrapper><Dashboard /></PageWrapper>} />
