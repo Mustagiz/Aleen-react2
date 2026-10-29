@@ -46,6 +46,7 @@ import GlassCard from '../components/GlassCard';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import CashDrawerShiftModal from '../components/crm/CashDrawerShiftModal';
 import { useThemeContext } from '../contexts/ThemeContext';
+import { getThemeChartPalette } from '../utils/chartTheme';
 
 ChartJS.register(
   CategoryScale,
@@ -352,7 +353,7 @@ const Dashboard = () => {
     datasets: [{
       label: 'Pieces Sold',
       data: top5ProductsData.map(p => p.quantity),
-      backgroundColor: theme.palette.primary.main,
+      backgroundColor: getThemeChartPalette(theme, top5ProductsData.length),
       borderRadius: activeSystemConfig?.shape?.borderRadius || 6,
       barThickness: 24,
     }]
@@ -408,6 +409,7 @@ const Dashboard = () => {
         fill: true,
         tension: 0.4,
         pointBackgroundColor: theme.palette.primary.main,
+        pointBorderColor: isDark ? '#0F172A' : '#FFFFFF',
         pointRadius: 4,
         borderWidth: 2.5
       },
@@ -419,6 +421,7 @@ const Dashboard = () => {
         fill: true,
         tension: 0.4,
         pointBackgroundColor: theme.palette.secondary?.main || '#D97706',
+        pointBorderColor: isDark ? '#0F172A' : '#FFFFFF',
         pointRadius: 4,
         borderWidth: 2
       }
@@ -433,8 +436,13 @@ const Dashboard = () => {
         inventory.filter(i => (Number(i.quantity) || 0) > 1 && (Number(i.quantity) || 0) < 50).length,
         inventory.filter(i => (Number(i.quantity) || 0) >= 50).length
       ],
-      backgroundColor: ['#EF4444', '#0F766E', '#10B981'],
-      borderWidth: 0,
+      backgroundColor: [
+        theme.palette.error.main,
+        theme.palette.primary.main,
+        theme.palette.success.main
+      ],
+      borderWidth: 2,
+      borderColor: isDark ? '#1E293B' : '#FFFFFF'
     }]
   };
 
@@ -444,10 +452,12 @@ const Dashboard = () => {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: 'rgba(4, 47, 46, 0.92)',
+        backgroundColor: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(15, 23, 42, 0.92)',
+        borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)',
+        borderWidth: 1,
         padding: 12,
-        titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 13, weight: '700' },
-        bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12 },
+        titleFont: { family: theme.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 13, weight: '700' },
+        bodyFont: { family: theme.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 12 },
         cornerRadius: 8,
         displayColors: false,
       }
@@ -455,11 +465,11 @@ const Dashboard = () => {
     scales: {
       x: {
         grid: { display: false },
-        ticks: { font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 }, color: '#94A3B8' }
+        ticks: { font: { family: theme.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 11 }, color: theme.palette.text.secondary || '#94A3B8' }
       },
       y: {
-        grid: { borderDash: [4, 4], color: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)', drawBorder: false },
-        ticks: { font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 }, color: '#94A3B8' }
+        grid: { borderDash: [4, 4], color: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0, 0, 0, 0.06)', drawBorder: false },
+        ticks: { font: { family: theme.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 11 }, color: theme.palette.text.secondary || '#94A3B8' }
       }
     }
   };

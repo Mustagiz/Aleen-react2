@@ -22,6 +22,7 @@ import autoTable from 'jspdf-autotable';
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import FinanceNavTabs from '../components/crm/FinanceNavTabs';
+import { getThemeChartOptions } from '../utils/chartTheme';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, ChartTooltip, Legend);
 
@@ -109,13 +110,15 @@ const ProfitLoss = () => {
         }, {});
     }, [profitData]);
 
+    const isDark = theme.palette.mode === 'dark';
+
     const chartData = {
         labels: Object.keys(categoryProfit).slice(0, 8),
         datasets: [{
             label: 'Net Category Profit (₹)',
             data: Object.values(categoryProfit).slice(0, 8),
             backgroundColor: Object.values(categoryProfit).slice(0, 8).map(val =>
-                val >= 0 ? '#0F766E' : '#DC2626'
+                val >= 0 ? theme.palette.primary.main : theme.palette.error.main
             ),
             borderRadius: 6
         }]
@@ -129,9 +132,13 @@ const ProfitLoss = () => {
                 Math.max(0, expenseTotal), 
                 Math.max(0, totalProfit)
             ],
-            backgroundColor: ['#0891B2', '#D97706', '#059669'],
+            backgroundColor: [
+                theme.palette.info.main,
+                theme.palette.secondary?.main || theme.palette.warning.main,
+                theme.palette.primary.main
+            ],
             borderWidth: 2,
-            borderColor: theme.palette.mode === 'dark' ? '#1E293B' : '#FFFFFF'
+            borderColor: isDark ? '#1E293B' : '#FFFFFF'
         }]
     };
 
@@ -403,11 +410,7 @@ const ProfitLoss = () => {
                         <Box sx={{ height: 260 }}>
                             <Bar 
                                 data={chartData} 
-                                options={{ 
-                                    responsive: true, 
-                                    maintainAspectRatio: false,
-                                    plugins: { legend: { display: false } } 
-                                }} 
+                                options={getThemeChartOptions(theme, { currency: '₹' })} 
                             />
                         </Box>
                     </GlassCard>
@@ -423,7 +426,28 @@ const ProfitLoss = () => {
                                 options={{ 
                                     responsive: true, 
                                     maintainAspectRatio: false,
-                                    plugins: { legend: { position: 'bottom' } } 
+                                    plugins: { 
+                                        legend: { 
+                                            position: 'bottom',
+                                            labels: {
+                                                color: theme.palette.text.primary,
+                                                font: { family: theme.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 12 },
+                                                boxWidth: 12,
+                                                boxHeight: 12,
+                                                usePointStyle: true,
+                                                padding: 16
+                                            }
+                                        },
+                                        tooltip: {
+                                            backgroundColor: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(15, 23, 42, 0.92)',
+                                            borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)',
+                                            borderWidth: 1,
+                                            padding: 12,
+                                            cornerRadius: 8,
+                                            titleFont: { family: theme.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 13, weight: '700' },
+                                            bodyFont: { family: theme.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 12 }
+                                        }
+                                    } 
                                 }} 
                             />
                         </Box>

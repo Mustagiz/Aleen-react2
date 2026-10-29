@@ -14,8 +14,10 @@ import {
   Chip,
   TablePagination,
   MenuItem,
-  Paper
+  Paper,
+  useTheme
 } from '@mui/material';
+import { getThemeChartPalette, getThemeChartOptions } from '../utils/chartTheme';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -47,6 +49,8 @@ import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler);
 
 const SalesReports = () => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const { invoices, profile, inventory } = useData();
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -100,15 +104,16 @@ const SalesReports = () => {
     datasets: [{
       label: 'Sales Revenue (₹)',
       data: Object.values(salesByDate),
-      backgroundColor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)',
-      bordercolor: (t) => t.palette.primary.main,
+      backgroundColor: `${theme.palette.primary.main}1A`,
+      borderColor: theme.palette.primary.main,
       borderWidth: 2.5,
       tension: 0.35,
       fill: true,
-      pointBackgroundcolor: (t) => t.palette.primary.main,
-      pointBorderColor: '#FFFFFF',
+      pointBackgroundColor: theme.palette.primary.main,
+      pointBorderColor: isDark ? '#0F172A' : '#FFFFFF',
       pointBorderWidth: 2,
       pointRadius: 4,
+      pointHoverRadius: 6
     }]
   };
 
@@ -126,14 +131,7 @@ const SalesReports = () => {
     datasets: [{
       label: 'Sales by Category (₹)',
       data: Object.values(categorySales),
-      backgroundColor: [
-        '#0F766E',
-        '#D97706',
-        '#042F2E',
-        '#059669',
-        '#B45309',
-        '#64748B'
-      ],
+      backgroundColor: getThemeChartPalette(theme, Object.keys(categorySales).length),
       borderRadius: 6,
       borderWidth: 0
     }]
@@ -150,14 +148,9 @@ const SalesReports = () => {
     labels: Object.keys(paymentMethodsChartData),
     datasets: [{
       data: Object.values(paymentMethodsChartData),
-      backgroundColor: [
-        '#0F766E',
-        '#D97706',
-        '#10B981',
-        '#6366F1'
-      ],
+      backgroundColor: getThemeChartPalette(theme, Object.keys(paymentMethodsChartData).length),
       borderWidth: 2,
-      borderColor: '#FFFFFF',
+      borderColor: isDark ? '#1E293B' : '#FFFFFF',
       hoverOffset: 8
     }]
   };
@@ -353,19 +346,7 @@ const SalesReports = () => {
             <Box sx={{ height: 260 }}>
               <Line
                 data={chartData}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: { legend: { display: false } },
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                      ticks: { callback: (val) => `₹${val.toLocaleString('en-IN')}` },
-                      grid: { color: 'rgba(0,0,0,0.04)' }
-                    },
-                    x: { grid: { display: false } }
-                  }
-                }}
+                options={getThemeChartOptions(theme, { currency: '₹' })}
               />
             </Box>
           </Paper>
@@ -391,7 +372,28 @@ const SalesReports = () => {
                 options={{
                   responsive: true,
                   maintainAspectRatio: false,
-                  plugins: { legend: { position: 'bottom' } }
+                  plugins: {
+                    legend: {
+                      position: 'bottom',
+                      labels: {
+                        color: theme.palette.text.primary,
+                        font: { family: theme.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 12 },
+                        boxWidth: 12,
+                        boxHeight: 12,
+                        usePointStyle: true,
+                        padding: 16
+                      }
+                    },
+                    tooltip: {
+                      backgroundColor: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(15, 23, 42, 0.92)',
+                      borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)',
+                      borderWidth: 1,
+                      padding: 12,
+                      cornerRadius: 8,
+                      titleFont: { family: theme.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 13, weight: '700' },
+                      bodyFont: { family: theme.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 12 }
+                    }
+                  }
                 }}
               />
             </Box>
@@ -417,19 +419,7 @@ const SalesReports = () => {
         <Box sx={{ height: 220 }}>
           <Bar
             data={categoryChartData}
-            options={{
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: { legend: { display: false } },
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  ticks: { callback: (val) => `₹${val.toLocaleString('en-IN')}` },
-                  grid: { color: 'rgba(0,0,0,0.04)' }
-                },
-                x: { grid: { display: false } }
-              }
-            }}
+            options={getThemeChartOptions(theme, { currency: '₹' })}
           />
         </Box>
       </Paper>

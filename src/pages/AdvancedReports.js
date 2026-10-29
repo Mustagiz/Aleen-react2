@@ -13,7 +13,8 @@ import {
     Button,
     Tabs,
     Tab,
-    Chip
+    Chip,
+    useTheme
 } from '@mui/material';
 import {
     Download,
@@ -31,8 +32,11 @@ import * as XLSX from 'xlsx';
 import PageHeader from '../components/crm/PageHeader';
 import FinanceNavTabs from '../components/crm/FinanceNavTabs';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
+import { getThemeChartOptions } from '../utils/chartTheme';
 
 const AdvancedReports = () => {
+    const theme = useTheme();
+    const isDark = theme.palette.mode === 'dark';
     const { invoices, inventory } = useData();
     const [activeTab, setActiveTab] = useState(0);
     const [dateRange, setDateRange] = useState('month');
@@ -788,34 +792,17 @@ const AdvancedReports = () => {
                                         datasets: [{
                                             label: 'Average Order Value (₹)',
                                             data: aovTrends.map(d => d.aov),
-                                            bordercolor: (t) => t.palette.primary.main,
-                                            backgroundColor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)',
+                                            borderColor: theme.palette.primary.main,
+                                            backgroundColor: `${theme.palette.primary.main}1A`,
                                             fill: true,
                                             tension: 0.35,
-                                            pointBackgroundcolor: (t) => t.palette.primary.main,
+                                            pointBackgroundColor: theme.palette.primary.main,
+                                            pointBorderColor: isDark ? '#0F172A' : '#FFFFFF',
                                             pointRadius: 4,
                                             pointHoverRadius: 6
                                         }]
                                     }}
-                                    options={{
-                                        responsive: true,
-                                        maintainAspectRatio: false,
-                                        plugins: {
-                                            legend: { display: false }
-                                        },
-                                        scales: {
-                                            y: {
-                                                beginAtZero: true,
-                                                ticks: {
-                                                    callback: (value) => `₹${value.toLocaleString('en-IN')}`
-                                                },
-                                                grid: { color: 'rgba(0,0,0,0.04)' }
-                                            },
-                                            x: {
-                                                grid: { display: false }
-                                            }
-                                        }
-                                    }}
+                                    options={getThemeChartOptions(theme, { currency: '₹' })}
                                 />
                             </Box>
                             <TableContainer sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
