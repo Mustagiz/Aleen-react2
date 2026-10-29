@@ -132,6 +132,21 @@ code, pre, kbd, samp, [style*="font-family: monospace"], [style*="font-family:mo
   color: var(--emerald-primary) !important;
 }
 
+/* Header & Modal Title Glassmorphic Contrast Exemption: Always crisp white on colored gradients */
+.MuiDialogTitle-root .MuiButton-root,
+.MuiDialogTitle-root .MuiIconButton-root,
+.MuiAppBar-root .header-contrast-btn,
+.header-contrast-btn {
+  color: #FFFFFF !important;
+}
+
+.MuiDialogTitle-root .MuiButton-root .MuiSvgIcon-root,
+.MuiDialogTitle-root .MuiIconButton-root .MuiSvgIcon-root,
+.MuiAppBar-root .header-contrast-btn .MuiSvgIcon-root,
+.header-contrast-btn .MuiSvgIcon-root {
+  color: #FFFFFF !important;
+}
+
 .MuiButton-outlined:hover,
 .MuiButton-outlinedPrimary:hover {
   border-color: var(--emerald-dark) !important;
@@ -141,9 +156,7 @@ code, pre, kbd, samp, [style*="font-family: monospace"], [style*="font-family:mo
 .MuiButton-root[style*="border: 1.5px solid #0F766E"] .MuiSvgIcon-root,
 .MuiButton-root[style*="border: 1.5px solid #0f766e"] .MuiSvgIcon-root,
 .MuiButton-root[style*="color: #0F766E"] .MuiSvgIcon-root,
-.MuiButton-root[style*="color: #0f766e"] .MuiSvgIcon-root,
-.MuiButton-outlined .MuiSvgIcon-root,
-.MuiButton-outlinedPrimary .MuiSvgIcon-root {
+.MuiButton-root[style*="color: #0f766e"] .MuiSvgIcon-root {
   color: var(--emerald-primary) !important;
 }
 

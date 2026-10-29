@@ -3294,35 +3294,35 @@ const Invoices = () => {
       >
         <DialogTitle sx={{
           background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
-          color: 'white',
-          px: { xs: 1.75, sm: 2.5 },
+          color: '#FFFFFF',
+          px: { xs: 1.5, sm: 2.5 },
           py: { xs: 1.25, sm: 1.75 },
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          gap: 1.5,
-          borderBottom: '1px solid rgba(217, 119, 6, 0.2)'
+          gap: { xs: 1, sm: 1.5 },
+          borderBottom: '1px solid rgba(255, 255, 255, 0.18)'
         }}>
           {/* Left: Avatar + Title + Badges */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.25, sm: 1.5 }, minWidth: 0, flex: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 }, minWidth: 0, flex: 1 }}>
             <Avatar sx={{
-              bgcolor: 'rgba(255, 255, 255, 0.15)',
-              color: '#FBBF24',
-              width: { xs: 34, sm: 42 },
-              height: { xs: 34, sm: 42 },
+              bgcolor: 'rgba(255, 255, 255, 0.2)',
+              color: '#FFFFFF',
+              width: { xs: 34, sm: 40 },
+              height: { xs: 34, sm: 40 },
               flexShrink: 0,
-              border: '1px solid rgba(251, 191, 36, 0.45)',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
+              border: '1px solid rgba(255, 255, 255, 0.45)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
             }}>
-              <PointOfSale sx={{ fontSize: { xs: 18, sm: 22 } }} />
+              <PointOfSale sx={{ fontSize: { xs: 18, sm: 22 }, color: '#FFFFFF !important' }} />
             </Avatar>
             <Box sx={{ minWidth: 0, flex: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap' }}>
                 <Typography sx={{ 
                   fontWeight: 800, 
-                  fontSize: { xs: '0.94rem', sm: '1.2rem' }, 
+                  fontSize: { xs: '0.92rem', sm: '1.15rem' }, 
                   letterSpacing: '-0.01em', 
-                  color: '#FFFFFF',
+                  color: '#FFFFFF !important',
                   lineHeight: 1.2,
                   whiteSpace: 'nowrap'
                 }}>
@@ -3335,9 +3335,9 @@ const Invoices = () => {
                     height: { xs: 18, sm: 20 },
                     fontSize: { xs: '0.62rem', sm: '0.68rem' },
                     fontWeight: 800,
-                    bgcolor: 'rgba(217, 119, 6, 0.25)',
-                    color: '#FBBF24',
-                    border: '1px solid rgba(251, 191, 36, 0.4)',
+                    bgcolor: 'rgba(255, 255, 255, 0.22)',
+                    color: '#FFFFFF !important',
+                    border: '1px solid rgba(255, 255, 255, 0.45)',
                     px: { xs: 0.25, sm: 0.5 }
                   }}
                 />
@@ -3346,7 +3346,7 @@ const Invoices = () => {
                 variant="caption" 
                 noWrap
                 sx={{ 
-                  color: 'rgba(255, 255, 255, 0.7)', 
+                  color: 'rgba(255, 255, 255, 0.85)', 
                   display: 'block', 
                   fontSize: { xs: '0.68rem', sm: '0.75rem' },
                   mt: 0.25,
@@ -3360,19 +3360,29 @@ const Invoices = () => {
           </Box>
 
           {/* Right: Sound Voice Toggle + Customer Screen + Park Cart + Close Icon */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.75, sm: 1 }, flexShrink: 0 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.6, sm: 1 }, flexShrink: 0 }}>
             {/* Interactive Voice & Sound Confirmations Toggle */}
             <Tooltip title={voiceSettings.voiceEnabled ? "Voice Confirmations: Active (Click to mute)" : "Voice Confirmations: Muted (Click to enable)"}>
               <IconButton
                 size="small"
                 onClick={handleToggleVoice}
+                className="header-contrast-btn"
                 sx={{
-                  color: voiceSettings.voiceEnabled ? '#FBBF24' : 'rgba(255, 255, 255, 0.5)',
-                  bgcolor: voiceSettings.voiceEnabled ? 'rgba(251, 191, 36, 0.15)' : 'rgba(255, 255, 255, 0.08)',
-                  border: `1px solid ${voiceSettings.voiceEnabled ? 'rgba(251, 191, 36, 0.4)' : 'rgba(255, 255, 255, 0.15)'}`,
+                  color: '#FFFFFF !important',
+                  bgcolor: voiceSettings.voiceEnabled ? 'rgba(255, 255, 255, 0.28) !important' : 'rgba(255, 255, 255, 0.12) !important',
+                  border: '1px solid rgba(255, 255, 255, 0.45) !important',
                   width: { xs: 32, sm: 36 },
                   height: { xs: 32, sm: 36 },
-                  borderRadius: '8px'
+                  borderRadius: '8px !important',
+                  boxShadow: voiceSettings.voiceEnabled ? '0 0 10px rgba(255, 255, 255, 0.25)' : 'none',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    bgcolor: 'rgba(255, 255, 255, 0.36) !important',
+                    borderColor: '#FFFFFF !important'
+                  },
+                  '& .MuiSvgIcon-root': {
+                    color: '#FFFFFF !important'
+                  }
                 }}
               >
                 {voiceSettings.voiceEnabled ? <VolumeUp sx={{ fontSize: 18 }} /> : <VolumeOff sx={{ fontSize: 18 }} />}
@@ -3383,74 +3393,101 @@ const Invoices = () => {
             <Tooltip title="Launch 2nd Monitor Customer Facing Display (Dual-Screen Mirror)">
               <Button
                 size="small"
-                variant="outlined"
                 onClick={handleOpenCustomerDisplay}
-                startIcon={<Tv sx={{ fontSize: { xs: 15, sm: 17 } }} />}
+                startIcon={<Tv sx={{ fontSize: { xs: 15, sm: 17 }, color: '#FFFFFF !important' }} />}
+                className="header-contrast-btn"
                 sx={{
-                  color: '#FEF3C7',
-                  borderColor: 'rgba(254, 243, 199, 0.35)',
-                  bgcolor: 'rgba(255, 255, 255, 0.08)',
-                  backdropFilter: 'blur(4px)',
-                  borderRadius: '8px',
+                  color: '#FFFFFF !important',
+                  background: 'rgba(255, 255, 255, 0.2) !important',
+                  border: '1px solid rgba(255, 255, 255, 0.45) !important',
+                  backdropFilter: 'blur(8px)',
+                  borderRadius: '8px !important',
                   height: { xs: 32, sm: 36 },
                   minHeight: { xs: 32, sm: 36 },
-                  px: { xs: 1.2, sm: 1.8 },
+                  px: { xs: 1, sm: 1.5 },
                   py: 0,
                   textTransform: 'none',
                   fontWeight: 700,
-                  fontSize: { xs: '0.74rem', sm: '0.8rem' },
+                  fontSize: { xs: '0.72rem', sm: '0.8rem' },
                   letterSpacing: '0.02em',
                   whiteSpace: 'nowrap',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)',
+                  transition: 'all 0.2s ease',
+                  '& .MuiSvgIcon-root': {
+                    color: '#FFFFFF !important'
+                  },
                   '&:hover': {
-                    bgcolor: 'rgba(255, 255, 255, 0.16)',
-                    borderColor: '#FEF3C7'
+                    background: 'rgba(255, 255, 255, 0.32) !important',
+                    borderColor: '#FFFFFF !important',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
                   }
                 }}
               >
-                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Customer Screen ↗</Box>
-                <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Screen ↗</Box>
+                <Box component="span" sx={{ display: { xs: 'none', md: 'inline' } }}>Customer Screen ↗</Box>
+                <Box component="span" sx={{ display: { xs: 'inline', md: 'none' } }}>Screen ↗</Box>
               </Button>
             </Tooltip>
 
-            <Button
-              size="small"
-              variant="outlined"
-              onClick={handleParkCart}
-              startIcon={<PauseCircleOutline sx={{ fontSize: { xs: 15, sm: 17 } }} />}
-              sx={{
-                color: '#FEF3C7',
-                borderColor: 'rgba(254, 243, 199, 0.35)',
-                bgcolor: 'rgba(255, 255, 255, 0.08)',
-                backdropFilter: 'blur(4px)',
-                borderRadius: '8px',
-                height: { xs: 32, sm: 36 },
-                minHeight: { xs: 32, sm: 36 },
-                px: { xs: 1.2, sm: 1.8 },
-                py: 0,
-                textTransform: 'none',
-                fontWeight: 700,
-                fontSize: { xs: '0.74rem', sm: '0.8rem' },
-                letterSpacing: '0.02em',
-                whiteSpace: 'nowrap',
-                transition: 'all 0.2s ease',
-                '&:hover': {
-                  bgcolor: 'rgba(255, 255, 255, 0.16)',
-                  borderColor: '#FEF3C7',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
-                }
-              }}
-            >
-              <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Park Cart</Box>
-              <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Park</Box>
-            </Button>
+            {/* Park Cart Button */}
+            <Tooltip title="Park current cart to resume later">
+              <Button
+                size="small"
+                onClick={handleParkCart}
+                startIcon={<PauseCircleOutline sx={{ fontSize: { xs: 15, sm: 17 }, color: '#FFFFFF !important' }} />}
+                className="header-contrast-btn"
+                sx={{
+                  color: '#FFFFFF !important',
+                  background: 'rgba(255, 255, 255, 0.2) !important',
+                  border: '1px solid rgba(255, 255, 255, 0.45) !important',
+                  backdropFilter: 'blur(8px)',
+                  borderRadius: '8px !important',
+                  height: { xs: 32, sm: 36 },
+                  minHeight: { xs: 32, sm: 36 },
+                  px: { xs: 1, sm: 1.5 },
+                  py: 0,
+                  textTransform: 'none',
+                  fontWeight: 700,
+                  fontSize: { xs: '0.72rem', sm: '0.8rem' },
+                  letterSpacing: '0.02em',
+                  whiteSpace: 'nowrap',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)',
+                  transition: 'all 0.2s ease',
+                  '& .MuiSvgIcon-root': {
+                    color: '#FFFFFF !important'
+                  },
+                  '&:hover': {
+                    background: 'rgba(255, 255, 255, 0.32) !important',
+                    borderColor: '#FFFFFF !important',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
+                  }
+                }}
+              >
+                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Park Cart</Box>
+                <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Park</Box>
+              </Button>
+            </Tooltip>
+
+            {/* Close Button */}
             <IconButton 
               onClick={() => setOpen(false)} 
               size="small"
+              className="header-contrast-btn"
               sx={{ 
-                color: 'rgba(255, 255, 255, 0.8)', 
+                color: '#FFFFFF !important',
+                background: 'rgba(255, 255, 255, 0.15) !important',
+                border: '1px solid rgba(255, 255, 255, 0.35) !important',
+                borderRadius: '8px !important',
                 width: { xs: 32, sm: 36 },
                 height: { xs: 32, sm: 36 },
-                '&:hover': { color: '#ffffff', bgcolor: 'rgba(255, 255, 255, 0.1)' } 
+                transition: 'all 0.2s ease',
+                '&:hover': { 
+                  color: '#FFFFFF !important', 
+                  background: 'rgba(255, 255, 255, 0.32) !important', 
+                  borderColor: '#FFFFFF !important' 
+                },
+                '& .MuiSvgIcon-root': {
+                  color: '#FFFFFF !important'
+                }
               }}
             >
               <Close sx={{ fontSize: { xs: 18, sm: 20 } }} />
@@ -3458,10 +3495,10 @@ const Invoices = () => {
           </Box>
         </DialogTitle>
 
-        <DialogContent sx={{ p: { xs: 2, sm: 3 }, bgcolor: mode === 'light' ? '#F8FAFC' : 'background.default' }}>
-          <Grid container spacing={2.5}>
+        <DialogContent sx={{ p: { xs: 1.5, sm: 2.5, md: 3 }, bgcolor: mode === 'light' ? '#F8FAFC' : 'background.default' }}>
+          <Grid container spacing={{ xs: 2, md: 2.5 }}>
             {/* Left Column: Customer & Item Cart */}
-            <Grid item xs={12} lg={7}>
+            <Grid item xs={12} md={7}>
               {/* Customer Information Card */}
               <Paper sx={{
                 p: 2.5,
@@ -4125,7 +4162,7 @@ const Invoices = () => {
                     bordercolor: (t) => t.palette.primary.main,
                     '&:hover': {
                       borderStyle: 'dashed',
-                      bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)'
+                      bgcolor: (t) => `${t.palette.primary.main}10`
                     }
                   }}
                 >
@@ -4135,19 +4172,19 @@ const Invoices = () => {
             </Grid>
 
             {/* Right Column: Settlement, Taxes & Luxury Ledger Summary */}
-            <Grid item xs={12} lg={5}>
+            <Grid item xs={12} md={5}>
               <Paper sx={{
-                p: 2.5,
+                p: { xs: 2, sm: 2.5 },
                 bgcolor: 'background.paper',
                 borderRadius: 2.5,
                 border: '1px solid',
                 borderColor: 'divider',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
-                position: { lg: 'sticky' },
+                position: { md: 'sticky' },
                 top: 16
               }}>
                 <Box sx={{ mb: 2 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5, flexWrap: 'wrap', gap: 1 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <PaymentsOutlined sx={{ color: (t) => t.palette.primary.main, fontSize: 20 }} />
                       <Typography variant="subtitle2" sx={{ fontWeight: 800, letterSpacing: '0.02em', textTransform: 'uppercase', fontSize: '0.78rem', color: (t) => t.palette.primary.main }}>
@@ -4160,16 +4197,16 @@ const Invoices = () => {
                       sx={{ 
                         fontWeight: 800, 
                         fontSize: '0.68rem',
-                        bgcolor: isSplitPayment ? 'rgba(217, 119, 6, 0.12)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.12)',
-                        color: isSplitPayment ? '#D97706' : '#0F766E',
+                        bgcolor: isSplitPayment ? 'rgba(245, 158, 11, 0.12)' : (t) => `${t.palette.primary.main}18`,
+                        color: isSplitPayment ? '#d97706' : (t) => t.palette.primary.main,
                         border: '1px solid',
-                        borderColor: isSplitPayment ? 'rgba(217, 119, 6, 0.3)' : 'rgba(15, 118, 110, 0.3)'
+                        borderColor: isSplitPayment ? 'rgba(245, 158, 11, 0.3)' : (t) => `${t.palette.primary.main}40`
                       }} 
                     />
                   </Box>
 
                   {/* Fast Tender Shortcut Buttons */}
-                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, mb: 2 }}>
+                  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' }, gap: 1, mb: 2 }}>
                     {[
                       { label: '💵 Cash', method: 'Cash', split: false },
                       { label: '⚡ UPI', method: 'UPI', split: false },
@@ -4751,14 +4788,13 @@ const Invoices = () => {
                 textTransform: 'none',
                 whiteSpace: 'nowrap',
                 flex: { xs: 1, sm: 'initial' },
-                color: mode === 'dark' ? '#FBBF24' : '#92400E',
-                borderColor: mode === 'dark' ? 'rgba(251, 191, 36, 0.35)' : 'rgba(217, 119, 6, 0.35)',
-                bgcolor: mode === 'dark' ? 'rgba(251, 191, 36, 0.06)' : 'rgba(217, 119, 6, 0.04)',
+                color: (t) => t.palette.mode === 'dark' ? t.palette.primary.light : t.palette.primary.main,
+                borderColor: (t) => t.palette.mode === 'dark' ? `${t.palette.primary.light}55` : `${t.palette.primary.main}55`,
+                bgcolor: (t) => `${t.palette.primary.main}08`,
                 transition: 'all 0.2s ease',
                 '&:hover': {
-                  borderColor: '#D97706',
-                  bgcolor: mode === 'dark' ? 'rgba(251, 191, 36, 0.12)' : 'rgba(217, 119, 6, 0.08)',
-                  boxShadow: '0 2px 8px rgba(217, 119, 6, 0.12)'
+                  borderColor: (t) => t.palette.primary.main,
+                  bgcolor: (t) => `${t.palette.primary.main}18`
                 }
               }}
             >
@@ -4768,7 +4804,7 @@ const Invoices = () => {
               onClick={handleSaveInvoice}
               variant="contained"
               size="small"
-              startIcon={<ReceiptLong sx={{ fontSize: 17 }} />}
+              startIcon={<ReceiptLong sx={{ fontSize: 17, color: '#FFFFFF !important' }} />}
               sx={{
                 px: { xs: 2, sm: 2.2 },
                 py: 0.85,
@@ -4778,14 +4814,16 @@ const Invoices = () => {
                 whiteSpace: 'nowrap',
                 flex: { xs: 1.4, sm: 'initial' },
                 background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
-                color: '#ffffff',
-                boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
+                color: '#ffffff !important',
+                boxShadow: (t) => `0 4px 14px ${t.palette.mode === 'dark' ? 'rgba(0,0,0,0.4)' : `${t.palette.primary.main}45`}`,
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: 0.8,
+                transition: 'all 0.2s ease',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #115E59 0%, #022c22 100%)'
+                  filter: 'brightness(1.08)',
+                  transform: 'translateY(-1px)'
                 }
               }}
             >
