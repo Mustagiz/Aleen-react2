@@ -52,6 +52,7 @@ import {
   People,
   CheckCircle,
   Block,
+  Close,
   Security,
   ColorLens,
   CloudUpload,
@@ -2189,48 +2190,89 @@ export default function Settings() {
       <Dialog
         open={logoModalOpen}
         onClose={() => setLogoModalOpen(false)}
-        maxWidth="md"
+        maxWidth="lg"
         fullWidth
         fullScreen={isTablet}
         PaperProps={{
           sx: {
             borderRadius: isTablet ? 0 : 3.5,
-            p: 1
+            p: { xs: 1, sm: 1.5 },
+            backgroundImage: (t) =>
+              t.palette.mode === 'dark'
+                ? 'linear-gradient(180deg, #111827 0%, #0B0F17 100%)'
+                : 'linear-gradient(180deg, #FFFFFF 0%, #FAF8F5 100%)',
+            border: '1px solid',
+            borderColor: (t) =>
+              t.palette.mode === 'dark' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(217, 119, 6, 0.15)',
+            boxShadow: '0 32px 64px -12px rgba(0, 0, 0, 0.35)',
+            overflow: 'hidden'
           }
         }}
       >
-        <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            pb: 1.5,
+            pt: 2,
+            px: { xs: 2, sm: 3 },
+            borderBottom: '1px solid',
+            borderColor: (t) => (t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(217, 119, 6, 0.12)')
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <Box
               sx={{
-                width: 38,
-                height: 38,
-                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
-                color: '#F59E0B',
+                width: 44,
+                height: 44,
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                color: '#FFFFFF',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 4px 12px rgba(var(--primary-rgb, 15, 118, 110), 0.25)'
+                boxShadow: '0 6px 18px rgba(217, 119, 6, 0.35)'
               }}
             >
               <AutoAwesome fontSize="small" />
             </Box>
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 800,
+                  color: 'text.primary',
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1.2,
+                  fontFamily: '"Cinzel", "Playfair Display", Georgia, serif, system-ui'
+                }}
+              >
                 Predefined Luxury Atelier Logos
               </Typography>
-              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                Select an exclusive vector crest crafted for haute couture & bridal studios
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500, display: 'block', mt: 0.25 }}>
+                Handcrafted vector crests tailored for haute couture, bridal & bespoke houses
               </Typography>
             </Box>
           </Box>
-          <IconButton size="small" onClick={() => setLogoModalOpen(false)}>
-            <Block fontSize="small" />
+          <IconButton
+            size="small"
+            onClick={() => setLogoModalOpen(false)}
+            sx={{
+              color: 'text.secondary',
+              bgcolor: (t) => (t.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'),
+              '&:hover': {
+                bgcolor: (t) => (t.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'),
+                transform: 'rotate(90deg)'
+              },
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <Close fontSize="small" />
           </IconButton>
         </DialogTitle>
 
-        <DialogContent sx={{ pt: 3, pb: 3 }}>
+        <DialogContent sx={{ pt: { xs: 2.5, sm: 3 }, pb: 3, px: { xs: 2, sm: 3 } }}>
           <Grid container spacing={2.5}>
             {PREDEFINED_LOGOS.map((logo) => {
               const isSelected = formProfile.logoUrl === logo.dataUri;
@@ -2240,58 +2282,96 @@ export default function Settings() {
                     elevation={0}
                     onClick={() => handleSelectPredefinedLogo(logo.dataUri, logo.name)}
                     sx={{
-                      p: 2.5,
-                      borderRadius: (t) => `${t.custom?.designSystem?.shape?.cardRadius || 10}px`,
-                      border: '2px solid',
-                      borderColor: isSelected ? 'primary.main' : 'divider',
-                      bgcolor: isSelected ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)' : 'background.paper',
+                      p: { xs: 2, sm: 2.5 },
+                      borderRadius: '16px',
+                      border: '1.5px solid',
+                      borderColor: isSelected
+                        ? '#D97706'
+                        : (t) => (t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)'),
+                      bgcolor: isSelected
+                        ? (t) => (t.palette.mode === 'dark' ? 'rgba(217, 119, 6, 0.12)' : 'rgba(254, 243, 199, 0.45)')
+                        : (t) => (t.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : '#FFFFFF'),
                       textAlign: 'center',
                       cursor: 'pointer',
-                      transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                      transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
                       position: 'relative',
                       overflow: 'hidden',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      height: '100%',
+                      boxShadow: isSelected
+                        ? '0 12px 30px rgba(217, 119, 6, 0.22)'
+                        : '0 2px 8px rgba(0,0,0,0.04)',
                       '&:hover': {
-                        transform: 'translateY(-3px)',
-                        boxShadow: '0 10px 25px rgba(var(--primary-rgb, 15, 118, 110), 0.15)',
-                        bordercolor: (t) => t.palette.primary.main
+                        transform: 'translateY(-5px)',
+                        boxShadow: `0 16px 36px -8px ${logo.accentGlow || 'rgba(217, 119, 6, 0.25)'}`,
+                        borderColor: logo.badgeColor || '#D97706'
                       }
                     }}
                   >
                     {isSelected && (
                       <Chip
-                        icon={<CheckCircle sx={{ fontSize: '14px !important', color: '#FFFFFF !important' }} />}
-                        label="Active Logo"
+                        icon={<CheckCircle sx={{ fontSize: '13px !important', color: '#FFFFFF !important' }} />}
+                        label="Active Crest"
                         size="small"
                         sx={{
                           position: 'absolute',
-                          top: 10,
-                          right: 10,
-                          bgcolor: (t) => t.palette.primary.main,
+                          top: 12,
+                          right: 12,
+                          background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
                           color: '#FFFFFF',
                           fontWeight: 800,
                           fontSize: '0.68rem',
-                          height: 22
+                          height: 22,
+                          boxShadow: '0 2px 8px rgba(217, 119, 6, 0.4)',
+                          zIndex: 1
                         }}
                       />
                     )}
 
-                    {/* Logo SVG Preview */}
+                    {/* Logo SVG Pedestal Preview */}
                     <Box
-                      component="img"
-                      src={logo.dataUri}
-                      alt={logo.name}
                       sx={{
-                        width: 90,
-                        height: 90,
-                        borderRadius: (t) => `${t.custom?.designSystem?.shape?.cardRadius || 10}px`,
+                        width: 120,
+                        height: 120,
                         mx: 'auto',
-                        mb: 1.5,
-                        display: 'block',
-                        boxShadow: '0 6px 18px rgba(0,0,0,0.12)'
+                        mb: 1.75,
+                        p: 0.75,
+                        borderRadius: '24px',
+                        background: 'radial-gradient(circle, rgba(253, 230, 138, 0.2) 0%, rgba(217, 119, 6, 0.04) 60%, transparent 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
                       }}
-                    />
+                    >
+                      <Box
+                        component="img"
+                        src={logo.dataUri}
+                        alt={logo.name}
+                        sx={{
+                          width: 108,
+                          height: 108,
+                          borderRadius: '20px',
+                          display: 'block',
+                          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.22)',
+                          transition: 'transform 0.3s ease',
+                          '&:hover': {
+                            transform: 'scale(1.04)'
+                          }
+                        }}
+                      />
+                    </Box>
 
-                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5 }}>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{
+                        fontWeight: 800,
+                        color: 'text.primary',
+                        mb: 0.75,
+                        letterSpacing: '-0.01em',
+                        lineHeight: 1.25
+                      }}
+                    >
                       {logo.name}
                     </Typography>
 
@@ -2299,16 +2379,30 @@ export default function Settings() {
                       label={logo.category}
                       size="small"
                       sx={{
-                        height: 20,
-                        fontSize: '0.65rem',
-                        fontWeight: 700,
-                        bgcolor: 'rgba(217, 119, 6, 0.12)',
-                        color: '#B45309',
-                        mb: 1
+                        height: 22,
+                        fontSize: '0.68rem',
+                        fontWeight: 800,
+                        letterSpacing: '0.04em',
+                        textTransform: 'uppercase',
+                        bgcolor: `${logo.badgeColor || '#D97706'}18`,
+                        color: logo.badgeColor || '#D97706',
+                        border: `1px solid ${logo.badgeColor || '#D97706'}40`,
+                        mb: 1.25,
+                        alignSelf: 'center'
                       }}
                     />
 
-                    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', fontSize: '0.72rem', minHeight: 32 }}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: 'text.secondary',
+                        display: 'block',
+                        fontSize: '0.74rem',
+                        lineHeight: 1.5,
+                        flexGrow: 1,
+                        minHeight: 38
+                      }}
+                    >
                       {logo.description}
                     </Typography>
 
@@ -2316,21 +2410,38 @@ export default function Settings() {
                       fullWidth
                       size="small"
                       variant={isSelected ? 'contained' : 'outlined'}
+                      startIcon={isSelected ? <CheckCircle sx={{ fontSize: '15px !important' }} /> : null}
                       sx={{
-                        mt: 1.5,
-                        borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                        fontWeight: 700,
+                        mt: 2,
+                        borderRadius: 2,
+                        fontWeight: 800,
                         fontSize: '0.75rem',
                         textTransform: 'none',
-                        bgcolor: isSelected ? 'primary.main' : 'transparent',
-                        borderColor: (t) => t.palette.primary.main,
-                        color: isSelected ? '#FFFFFF' : (t) => t.palette.primary.main,
-                        '&:hover': {
-                          bgcolor: isSelected ? (t) => t.palette.primary.dark : (t) => `${t.palette.primary.main}14`
-                        }
+                        py: 0.8,
+                        transition: 'all 0.2s ease',
+                        ...(isSelected
+                          ? {
+                              background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                              color: '#FFFFFF',
+                              boxShadow: '0 4px 12px rgba(217, 119, 6, 0.35)',
+                              border: 'none',
+                              '&:hover': {
+                                background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)'
+                              }
+                            }
+                          : {
+                              borderColor: (t) =>
+                                t.palette.mode === 'dark' ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.15)',
+                              color: 'text.primary',
+                              '&:hover': {
+                                borderColor: logo.badgeColor || '#D97706',
+                                bgcolor: `${logo.badgeColor || '#D97706'}14`,
+                                color: logo.badgeColor || '#D97706'
+                              }
+                            })
                       }}
                     >
-                      {isSelected ? 'Active Selection' : 'Use This Logo'}
+                      {isSelected ? 'Active Crest' : 'Use This Logo'}
                     </Button>
                   </Paper>
                 </Grid>
@@ -2339,14 +2450,27 @@ export default function Settings() {
           </Grid>
         </DialogContent>
 
-        <DialogActions sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider', justifyContent: 'space-between' }}>
+        <DialogActions
+          sx={{
+            p: { xs: 2, sm: 2.5 },
+            borderTop: '1px solid',
+            borderColor: (t) => (t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'),
+            justifyContent: 'space-between',
+            bgcolor: (t) => (t.palette.mode === 'dark' ? 'rgba(0,0,0,0.2)' : 'rgba(250, 248, 245, 0.6)')
+          }}
+        >
           <Button
             startIcon={<CloudUpload />}
             onClick={() => {
               setLogoModalOpen(false);
               logoInputRef.current?.click();
             }}
-            sx={{ fontWeight: 700, textTransform: 'none', color: (t) => t.palette.primary.main }}
+            sx={{
+              fontWeight: 700,
+              textTransform: 'none',
+              color: 'text.secondary',
+              '&:hover': { color: 'primary.main', bgcolor: 'transparent' }
+            }}
           >
             Or Upload Custom File from Device
           </Button>
@@ -2354,13 +2478,17 @@ export default function Settings() {
             onClick={() => setLogoModalOpen(false)}
             variant="contained"
             sx={{
-              bgcolor: (t) => t.palette.primary.dark,
+              background: (t) =>
+                t.custom?.designSystem?.buttonStyle?.background ||
+                'linear-gradient(135deg, #0F766E 0%, #042F2C 100%)',
               color: '#FFFFFF',
               fontWeight: 800,
               borderRadius: 2,
               textTransform: 'none',
-              px: 3,
-              '&:hover': { bgcolor: (t) => t.palette.primary.main }
+              px: 3.5,
+              py: 0.85,
+              boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
+              '&:hover': { opacity: 0.92 }
             }}
           >
             Done
