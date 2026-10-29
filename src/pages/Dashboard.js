@@ -163,8 +163,8 @@ const Dashboard = () => {
           color: '#FFFFFF',
           borderColor: 'rgba(255, 255, 255, 0.25)',
           shadow: '0 8px 24px rgba(1, 118, 211, 0.3)',
-          ctaBg: '#0176D3',
-          ctaHover: '#014486',
+          ctaBg: '#04844B', // Salesforce Success Emerald for New Bill
+          ctaHover: '#036838',
           badgeBg: 'rgba(255, 255, 255, 0.2)',
           badgeColor: '#FFFFFF',
           radius: '6px'

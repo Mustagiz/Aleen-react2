@@ -834,21 +834,21 @@ export default function Layout() {
               <Button
                 size="small"
                 variant="outlined"
-                startIcon={<PointOfSale sx={{ fontSize: '15px !important', color: topBarConfig.isColored ? '#FFFFFF !important' : '#10B981 !important' }} />}
+                startIcon={<PointOfSale sx={{ fontSize: '15px !important', color: topBarConfig.isColored ? '#FFFFFF !important' : (isDark ? '#34D399 !important' : '#059669 !important') }} />}
                 onClick={() => setCashDrawerOpen(true)}
                 sx={{
                   height: 32,
                   fontSize: '0.74rem',
                   fontWeight: 800,
-                  bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.18)' : (isDark ? 'rgba(16, 185, 129, 0.12)' : '#DCFCE7'),
-                  color: topBarConfig.isColored ? '#FFFFFF !important' : '#047857',
-                  borderColor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.45) !important' : 'rgba(16, 185, 129, 0.35)',
+                  bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.18) !important' : (isDark ? 'rgba(16, 185, 129, 0.12)' : '#DCFCE7'),
+                  color: topBarConfig.isColored ? '#FFFFFF !important' : (isDark ? '#34D399' : '#047857'),
+                  borderColor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.5) !important' : 'rgba(16, 185, 129, 0.35)',
                   borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 6}px !important`,
                   px: 1.5,
                   display: { xs: 'none', lg: 'inline-flex' },
                   textTransform: 'none',
                   '&:hover': {
-                    bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.28)' : (isDark ? 'rgba(16, 185, 129, 0.2)' : '#BBF7D0'),
+                    bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.28) !important' : (isDark ? 'rgba(16, 185, 129, 0.2)' : '#BBF7D0'),
                     borderColor: topBarConfig.isColored ? '#FFFFFF !important' : '#10B981'
                   }
                 }}
@@ -895,12 +895,13 @@ export default function Layout() {
                   fontSize: '0.825rem',
                   bgcolor: topBarConfig.isColored ? '#FFFFFF !important' : `${theme.palette.secondary.main} !important`,
                   color: topBarConfig.isColored ? `${theme.palette.primary.main} !important` : '#FFFFFF !important',
-                  boxShadow: topBarConfig.isColored ? '0 2px 8px rgba(0, 0, 0, 0.2)' : `0 4px 14px ${theme.palette.secondary.main}4D`,
+                  boxShadow: topBarConfig.isColored ? '0 2px 10px rgba(0, 0, 0, 0.25)' : `0 4px 14px ${theme.palette.secondary.main}4D`,
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',
                   display: { xs: 'none', sm: 'inline-flex' },
                   '&:hover': {
-                    bgcolor: topBarConfig.isColored ? '#F1F5F9 !important' : `${theme.palette.secondary.dark} !important`
+                    bgcolor: topBarConfig.isColored ? '#F8FAFC !important' : `${theme.palette.secondary.dark} !important`,
+                    boxShadow: topBarConfig.isColored ? '0 4px 14px rgba(0, 0, 0, 0.3)' : `0 6px 18px ${theme.palette.secondary.main}66`
                   }
                 }}
               >

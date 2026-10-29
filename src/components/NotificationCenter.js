@@ -13,8 +13,10 @@ import {
     Button,
     Chip,
     Tooltip,
-    Stack
+    Stack,
+    useTheme
 } from '@mui/material';
+import { useThemeContext } from '../contexts/ThemeContext';
 import {
     Notifications,
     NotificationsNone,
@@ -34,6 +36,13 @@ const READ_STORAGE_KEY = 'aleen_read_notifications';
 const CLEARED_STORAGE_KEY = 'aleen_cleared_notifications';
 
 const NotificationCenter = () => {
+    const theme = useTheme();
+    const { activeSystemConfig } = useThemeContext() || {};
+    const topBarConfig = theme.custom?.topBar || {
+        isColored: false,
+        textColor: theme.palette.mode === 'dark' ? '#F8FAFC' : '#0F172A'
+    };
+    const isDark = theme.palette.mode === 'dark';
     const { inventory = [] } = useData();
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
@@ -185,12 +194,16 @@ const NotificationCenter = () => {
                     sx={{
                         width: 36,
                         height: 36,
-                        borderRadius: '9px',
-                        border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.15)',
-                        color: unreadCount > 0 ? '#0F766E' : 'text.primary',
-                        bgcolor: unreadCount > 0 ? 'rgba(15, 118, 110, 0.06)' : 'transparent',
+                        borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 6}px`,
+                        border: topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.35)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)'),
+                        color: topBarConfig.isColored 
+                            ? '#FFFFFF' 
+                            : (unreadCount > 0 ? theme.palette.primary.main : 'text.primary'),
+                        bgcolor: topBarConfig.isColored 
+                            ? (unreadCount > 0 ? 'rgba(255, 255, 255, 0.22)' : 'transparent') 
+                            : (unreadCount > 0 ? `${theme.palette.primary.main}12` : 'transparent'),
                         '&:hover': {
-                            bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)'
+                            bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.2)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)')
                         }
                     }}
                 >
@@ -209,7 +222,7 @@ const NotificationCenter = () => {
                             }
                         }}
                     >
-                        {unreadCount > 0 ? <Notifications fontSize="small" /> : <NotificationsNone fontSize="small" />}
+                        {unreadCount > 0 ? <Notifications fontSize="small" sx={{ color: topBarConfig.isColored ? '#FFFFFF' : 'inherit' }} /> : <NotificationsNone fontSize="small" sx={{ color: topBarConfig.isColored ? '#FFFFFF' : 'inherit' }} />}
                     </Badge>
                 </IconButton>
             </Tooltip>
