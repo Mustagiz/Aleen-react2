@@ -304,15 +304,15 @@ const PaymentSummary = () => {
                     <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
                         <Button
                             variant="outlined"
-                            startIcon={<PointOfSale sx={{ fontSize: 19, color: '#0F766E' }} />}
+                            startIcon={<PointOfSale sx={{ fontSize: 19, color: (t) => t.palette.primary.main }} />}
                             onClick={() => setCashDrawerModalOpen(true)}
                             sx={{
                                 height: 40,
                                 minHeight: 40,
                                 px: 2.25,
-                                borderRadius: '10px',
-                                border: '1.5px solid #0F766E',
-                                color: '#0F766E',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                                border: (t) => `1.5px solid ${t.palette.primary.main}`,
+                                color: (t) => t.palette.primary.main,
                                 bgcolor: 'background.paper',
                                 fontWeight: 700,
                                 fontSize: '0.84rem',
@@ -323,7 +323,7 @@ const PaymentSummary = () => {
                                 boxSizing: 'border-box',
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
-                                    border: '1.5px solid #042F2E',
+                                    border: (t) => `1.5px solid ${t.palette.primary.dark}`,
                                     bgcolor: 'rgba(15, 118, 110, 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
@@ -333,15 +333,15 @@ const PaymentSummary = () => {
                         </Button>
                         <Button
                             variant="outlined"
-                            startIcon={<Download sx={{ fontSize: 19, color: '#0F766E' }} />}
+                            startIcon={<Download sx={{ fontSize: 19, color: (t) => t.palette.primary.main }} />}
                             onClick={exportToExcel}
                             sx={{
                                 height: 40,
                                 minHeight: 40,
                                 px: 2.25,
-                                borderRadius: '10px',
-                                border: '1.5px solid #0F766E',
-                                color: '#0F766E',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                                border: (t) => `1.5px solid ${t.palette.primary.main}`,
+                                color: (t) => t.palette.primary.main,
                                 bgcolor: 'background.paper',
                                 fontWeight: 700,
                                 fontSize: '0.84rem',
@@ -352,7 +352,7 @@ const PaymentSummary = () => {
                                 boxSizing: 'border-box',
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
-                                    border: '1.5px solid #042F2E',
+                                    border: (t) => `1.5px solid ${t.palette.primary.dark}`,
                                     bgcolor: 'rgba(15, 118, 110, 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
@@ -362,15 +362,15 @@ const PaymentSummary = () => {
                         </Button>
                         <Button
                             variant="outlined"
-                            startIcon={<Print sx={{ fontSize: 19, color: '#0F766E' }} />}
+                            startIcon={<Print sx={{ fontSize: 19, color: (t) => t.palette.primary.main }} />}
                             onClick={handlePrint}
                             sx={{
                                 height: 40,
                                 minHeight: 40,
                                 px: 2.25,
-                                borderRadius: '10px',
-                                border: '1.5px solid #0F766E',
-                                color: '#0F766E',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                                border: (t) => `1.5px solid ${t.palette.primary.main}`,
+                                color: (t) => t.palette.primary.main,
                                 bgcolor: 'background.paper',
                                 fontWeight: 700,
                                 fontSize: '0.84rem',
@@ -381,7 +381,7 @@ const PaymentSummary = () => {
                                 boxSizing: 'border-box',
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
-                                    border: '1.5px solid #042F2E',
+                                    border: (t) => `1.5px solid ${t.palette.primary.dark}`,
                                     bgcolor: 'rgba(15, 118, 110, 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
@@ -397,7 +397,7 @@ const PaymentSummary = () => {
                                 height: 40,
                                 minHeight: 40,
                                 px: 2.5,
-                                borderRadius: '10px',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                 textTransform: 'none',
                                 fontWeight: 700,
                                 fontSize: '0.84rem',
@@ -405,7 +405,7 @@ const PaymentSummary = () => {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 boxSizing: 'border-box',
-                                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%) !important',
+                                background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                                 color: '#FFFFFF !important',
                                 boxShadow: '0 4px 14px rgba(15, 118, 110, 0.3)',
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -413,7 +413,7 @@ const PaymentSummary = () => {
                                     color: '#FFFFFF !important'
                                 },
                                 '&:hover': {
-                                    background: 'linear-gradient(135deg, #115E59 0%, #021C1B 100%) !important',
+                                    background: (t) => t.palette.primary.dark,
                                     boxShadow: '0 6px 18px rgba(15, 118, 110, 0.45)',
                                     transform: 'translateY(-1px)'
                                 }
@@ -431,7 +431,7 @@ const PaymentSummary = () => {
             {/* Date Range Selector Bar */}
             <GlassCard sx={{ p: 1.5, mb: 3.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <CalendarToday sx={{ fontSize: '1.1rem', color: '#0F766E' }} />
+                    <CalendarToday sx={{ fontSize: '1.1rem', color: (t) => t.palette.primary.main }} />
                     <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
                         Reconciliation Period:
                     </Typography>
@@ -443,7 +443,7 @@ const PaymentSummary = () => {
                     p: '3px',
                     height: 40,
                     boxSizing: 'border-box',
-                    borderRadius: '10px',
+                    borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                     border: '1.5px solid rgba(15, 118, 110, 0.25)',
                     boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
                 }}>
@@ -543,7 +543,7 @@ const PaymentSummary = () => {
                                         <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.25 }}>
                                             {method}
                                         </Typography>
-                                        <Typography variant="h6" sx={{ fontWeight: 900, color: '#0F766E', fontSize: '1.15rem' }}>
+                                        <Typography variant="h6" sx={{ fontWeight: 900, color: (t) => t.palette.primary.main, fontSize: '1.15rem' }}>
                                             ₹{data.total.toLocaleString('en-IN')}
                                         </Typography>
                                     </Box>
@@ -588,7 +588,7 @@ const PaymentSummary = () => {
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <Search fontSize="small" sx={{ color: '#0F766E' }} />
+                                        <Search fontSize="small" sx={{ color: (t) => t.palette.primary.main }} />
                                     </InputAdornment>
                                 ),
                                 endAdornment: searchQuery && (
@@ -602,12 +602,12 @@ const PaymentSummary = () => {
                             sx={{
                                 '& .MuiOutlinedInput-root': {
                                     height: 40,
-                                    borderRadius: '10px',
+                                    borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                     bgcolor: 'background.paper',
                                     fontSize: '0.84rem',
                                     '& fieldset': { borderColor: 'rgba(15, 118, 110, 0.25)' },
-                                    '&:hover fieldset': { borderColor: '#0F766E' },
-                                    '&.Mui-focused fieldset': { borderColor: '#0F766E', borderWidth: 1.5 }
+                                    '&:hover fieldset': { bordercolor: (t) => t.palette.primary.main },
+                                    '&.Mui-focused fieldset': { bordercolor: (t) => t.palette.primary.main, borderWidth: 1.5 }
                                 }
                             }}
                         />
@@ -626,12 +626,12 @@ const PaymentSummary = () => {
                             sx={{
                                 '& .MuiOutlinedInput-root': {
                                     height: 40,
-                                    borderRadius: '10px',
+                                    borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                     bgcolor: 'background.paper',
                                     fontSize: '0.84rem',
                                     '& fieldset': { borderColor: 'rgba(15, 118, 110, 0.25)' },
-                                    '&:hover fieldset': { borderColor: '#0F766E' },
-                                    '&.Mui-focused fieldset': { borderColor: '#0F766E', borderWidth: 1.5 }
+                                    '&:hover fieldset': { bordercolor: (t) => t.palette.primary.main },
+                                    '&.Mui-focused fieldset': { bordercolor: (t) => t.palette.primary.main, borderWidth: 1.5 }
                                 }
                             }}
                         >
@@ -655,16 +655,16 @@ const PaymentSummary = () => {
                                 sx={{
                                     height: 40,
                                     minHeight: 40,
-                                    borderRadius: '10px',
+                                    borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                     px: 2,
                                     border: '1.5px solid rgba(15, 118, 110, 0.3)',
-                                    color: '#0F766E',
+                                    color: (t) => t.palette.primary.main,
                                     textTransform: 'none',
                                     fontSize: '0.82rem',
                                     fontWeight: 700,
                                     transition: 'all 0.15s ease',
                                     '&:hover': {
-                                        border: '1.5px solid #0F766E',
+                                        border: (t) => `1.5px solid ${t.palette.primary.main}`,
                                         bgcolor: 'rgba(15, 118, 110, 0.05)',
                                         transform: 'translateY(-1px)'
                                     }
@@ -746,7 +746,7 @@ const PaymentSummary = () => {
                                             </TableCell>
                                             <TableCell sx={{ py: 1.75 }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                    <Avatar sx={{ width: 26, height: 26, fontSize: '0.7rem', bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E', fontWeight: 800 }}>
+                                                    <Avatar sx={{ width: 26, height: 26, fontSize: '0.7rem', bgcolor: 'rgba(15, 118, 110, 0.1)', color: (t) => t.palette.primary.main, fontWeight: 800 }}>
                                                         {(txn.customer || 'G').charAt(0).toUpperCase()}
                                                     </Avatar>
                                                     <Typography variant="body2" sx={{ fontWeight: 600 }}>
@@ -773,7 +773,7 @@ const PaymentSummary = () => {
                                                 </Typography>
                                             </TableCell>
                                             <TableCell align="right" sx={{ py: 1.75, pr: 2 }}>
-                                                <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#0F766E', fontSize: '0.95rem' }}>
+                                                <Typography variant="subtitle2" sx={{ fontWeight: 900, color: (t) => t.palette.primary.main, fontSize: '0.95rem' }}>
                                                     ₹{txn.amount.toLocaleString('en-IN')}
                                                 </Typography>
                                             </TableCell>

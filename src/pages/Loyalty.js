@@ -232,7 +232,7 @@ const Loyalty = () => {
                                             {tier} Tier
                                         </Typography>
                                     </Box>
-                                    <Typography variant="body2" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>
                                         {tierStats[tier]} {tierStats[tier] === 1 ? 'member' : 'members'}
                                     </Typography>
                                 </Box>
@@ -275,7 +275,7 @@ const Loyalty = () => {
                         </Typography>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', p: 1.5, borderRadius: 2.5, bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
-                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E' }}>
+                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(15, 118, 110, 0.1)', color: (t) => t.palette.primary.main }}>
                                     <LocalOffer sx={{ fontSize: 20 }} />
                                 </Box>
                                 <Box>
@@ -357,13 +357,13 @@ const Loyalty = () => {
                     <Table sx={{ minWidth: 680 }}>
                         <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(15, 118, 110, 0.04)' }}>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', width: 70 }} align="center">Rank</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Client Details</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="center">Membership Tier</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="right">Available Points</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="right">Lifetime Spend</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Next Tier Target</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="right">Privilege Actions</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', width: 70 }} align="center">Rank</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Client Details</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="center">Membership Tier</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="right">Available Points</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="right">Lifetime Spend</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Next Tier Target</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="right">Privilege Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -450,7 +450,7 @@ const Loyalty = () => {
 
                                                 {/* Available Points (Right Aligned) */}
                                                 <TableCell align="right">
-                                                    <Typography variant="body2" sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.95rem' }}>
+                                                    <Typography variant="body2" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, fontSize: '0.95rem' }}>
                                                         {(customer.loyaltyPoints || 0).toLocaleString()} pts
                                                     </Typography>
                                                     <Typography variant="caption" color="text.secondary">
@@ -495,7 +495,7 @@ const Loyalty = () => {
                                                             alignItems: 'center',
                                                             gap: 0.75,
                                                             p: '3px 6px',
-                                                            borderRadius: '24px',
+                                                            borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                                             bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)',
                                                             border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.12)'
                                                         }}
@@ -509,13 +509,13 @@ const Loyalty = () => {
                                                                     sx={{
                                                                         width: 30,
                                                                         height: 30,
-                                                                        color: '#0F766E',
+                                                                        color: (t) => t.palette.primary.main,
                                                                         bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
                                                                         border: '1px solid rgba(15, 118, 110, 0.2)',
                                                                         boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
                                                                         transition: 'all 0.18s ease',
                                                                         '&:hover:not(:disabled)': {
-                                                                            bgcolor: '#0F766E',
+                                                                            bgcolor: (t) => t.palette.primary.main,
                                                                             color: '#FFFFFF',
                                                                             transform: 'translateY(-1px)',
                                                                             boxShadow: '0 4px 10px rgba(15, 118, 110, 0.3)'
@@ -591,7 +591,7 @@ const Loyalty = () => {
                     color: '#042F2E'
                 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Redeem sx={{ color: '#0F766E' }} /> Redeem Privilege Points
+                        <Redeem sx={{ color: (t) => t.palette.primary.main }} /> Redeem Privilege Points
                     </Box>
                     <IconButton onClick={() => setRedeemDialog(false)} size="small">
                         <Close fontSize="small" />
@@ -620,7 +620,7 @@ const Loyalty = () => {
                             />
                             {pointsToRedeem && parseInt(pointsToRedeem) > 0 && (
                                 <Box sx={{ mt: 2, p: 2, bgcolor: 'rgba(15, 118, 110, 0.06)', borderRadius: 2.5, border: '1px solid rgba(15, 118, 110, 0.15)' }}>
-                                    <Typography variant="body2" sx={{ fontWeight: 750, color: '#0F766E' }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 750, color: (t) => t.palette.primary.main }}>
                                         Instant Invoice Discount: ₹{parseInt(pointsToRedeem || 0).toLocaleString()}
                                     </Typography>
                                     <Typography variant="caption" color="text.secondary">
@@ -643,7 +643,7 @@ const Loyalty = () => {
                             px: 3.5, 
                             borderRadius: 2.5, 
                             fontWeight: 700,
-                            background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)'
+                            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`
                         }}
                     >
                         Redeem Discount

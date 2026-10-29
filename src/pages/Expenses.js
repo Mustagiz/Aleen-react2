@@ -240,15 +240,15 @@ const Expenses = () => {
                     <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
                         <Button
                             variant="outlined"
-                            startIcon={<Download sx={{ fontSize: 19, color: '#0F766E' }} />}
+                            startIcon={<Download sx={{ fontSize: 19, color: (t) => t.palette.primary.main }} />}
                             onClick={downloadExpenses}
                             sx={{
                                 height: 42,
                                 minHeight: 42,
                                 px: 2.25,
-                                borderRadius: '24px',
-                                border: '1.5px solid #0F766E',
-                                color: '#0F766E',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                                border: (t) => `1.5px solid ${t.palette.primary.main}`,
+                                color: (t) => t.palette.primary.main,
                                 bgcolor: 'background.paper',
                                 fontWeight: 700,
                                 fontSize: '0.84rem',
@@ -259,7 +259,7 @@ const Expenses = () => {
                                 boxSizing: 'border-box',
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
-                                    border: '1.5px solid #042F2E',
+                                    border: (t) => `1.5px solid ${t.palette.primary.dark}`,
                                     bgcolor: 'rgba(15, 118, 110, 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
@@ -269,15 +269,15 @@ const Expenses = () => {
                         </Button>
                         <Button
                             variant="outlined"
-                            startIcon={<Download sx={{ fontSize: 19, color: '#0F766E' }} />}
+                            startIcon={<Download sx={{ fontSize: 19, color: (t) => t.palette.primary.main }} />}
                             onClick={downloadTemplate}
                             sx={{
                                 height: 42,
                                 minHeight: 42,
                                 px: 2.25,
-                                borderRadius: '24px',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                 border: '1.5px solid rgba(15, 118, 110, 0.3)',
-                                color: '#0F766E',
+                                color: (t) => t.palette.primary.main,
                                 bgcolor: 'background.paper',
                                 fontWeight: 700,
                                 fontSize: '0.84rem',
@@ -288,7 +288,7 @@ const Expenses = () => {
                                 boxSizing: 'border-box',
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
-                                    border: '1.5px solid #0F766E',
+                                    border: (t) => `1.5px solid ${t.palette.primary.main}`,
                                     bgcolor: 'rgba(15, 118, 110, 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
@@ -299,14 +299,14 @@ const Expenses = () => {
                         <Button
                             variant="outlined"
                             component="label"
-                            startIcon={<Upload sx={{ fontSize: 19, color: '#0F766E' }} />}
+                            startIcon={<Upload sx={{ fontSize: 19, color: (t) => t.palette.primary.main }} />}
                             sx={{
                                 height: 42,
                                 minHeight: 42,
                                 px: 2.25,
-                                borderRadius: '24px',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                 border: '1.5px solid rgba(15, 118, 110, 0.3)',
-                                color: '#0F766E',
+                                color: (t) => t.palette.primary.main,
                                 bgcolor: 'background.paper',
                                 fontWeight: 700,
                                 fontSize: '0.84rem',
@@ -317,7 +317,7 @@ const Expenses = () => {
                                 boxSizing: 'border-box',
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
-                                    border: '1.5px solid #0F766E',
+                                    border: (t) => `1.5px solid ${t.palette.primary.main}`,
                                     bgcolor: 'rgba(15, 118, 110, 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
@@ -334,7 +334,7 @@ const Expenses = () => {
                                 height: 42,
                                 minHeight: 42,
                                 px: 3,
-                                borderRadius: '24px',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                 textTransform: 'none',
                                 fontWeight: 700,
                                 fontSize: '0.84rem',
@@ -342,7 +342,7 @@ const Expenses = () => {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 boxSizing: 'border-box',
-                                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%) !important',
+                                background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                                 color: '#FFFFFF !important',
                                 boxShadow: '0 4px 14px rgba(15, 118, 110, 0.3)',
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -350,7 +350,7 @@ const Expenses = () => {
                                     color: '#FFFFFF !important'
                                 },
                                 '&:hover': {
-                                    background: 'linear-gradient(135deg, #115E59 0%, #021C1B 100%) !important',
+                                    background: (t) => t.palette.primary.dark,
                                     boxShadow: '0 6px 18px rgba(15, 118, 110, 0.45)',
                                     transform: 'translateY(-1px)'
                                 }
@@ -560,7 +560,7 @@ const Expenses = () => {
                                             />
                                         </TableCell>
                                         <TableCell align="right" sx={{ py: 1.75 }}>
-                                            <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#0F766E', fontSize: '0.95rem' }}>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 900, color: (t) => t.palette.primary.main, fontSize: '0.95rem' }}>
                                                 ₹{(Number(exp.amount) || 0).toLocaleString('en-IN')}
                                             </Typography>
                                         </TableCell>
@@ -576,7 +576,7 @@ const Expenses = () => {
                                                     alignItems: 'center',
                                                     gap: 0.75,
                                                     p: '3px 6px',
-                                                    borderRadius: '24px',
+                                                    borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                                     bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)',
                                                     border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.12)'
                                                 }}
@@ -670,7 +670,7 @@ const Expenses = () => {
             >
                 <DialogTitle 
                     sx={{ 
-                        background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)', 
+                        background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`, 
                         color: 'white', 
                         px: 3, 
                         py: 2.25,
@@ -789,7 +789,7 @@ const Expenses = () => {
                             py: 1,
                             fontWeight: 700,
                             textTransform: 'none',
-                            background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                             color: '#ffffff',
                             boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
                             '&:hover': {

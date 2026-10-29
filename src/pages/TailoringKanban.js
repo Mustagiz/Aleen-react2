@@ -142,7 +142,7 @@ const SILHOUETTE_CONFIG = {
 const KANBAN_COLUMNS = [
   { id: 'intake', label: 'Intake & Specs', icon: <Straighten fontSize="small" />, color: '#64748B' },
   { id: 'cutting', label: 'Cutting & Pattern', icon: <ContentCut fontSize="small" />, color: '#D97706' },
-  { id: 'stitching', label: 'Stitching Craft', icon: <Schedule fontSize="small" />, color: '#0F766E' },
+  { id: 'stitching', label: 'Stitching Craft', icon: <Schedule fontSize="small" />, color: (t) => t.palette.primary.main },
   { id: 'trial', label: 'Trial Fitting', icon: <Person fontSize="small" />, color: '#7C3AED' },
   { id: 'ready', label: 'Ready for Pick-Up', icon: <CheckCircle fontSize="small" />, color: '#059669' }
 ];
@@ -465,23 +465,23 @@ export default function TailoringKanban() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               InputProps={{
-                startAdornment: <Search sx={{ mr: 1, color: '#0F766E', fontSize: 18 }} />
+                startAdornment: <Search sx={{ mr: 1, color: (t) => t.palette.primary.main, fontSize: 18 }} />
               }}
               sx={{
                 width: 240,
                 '& .MuiOutlinedInput-root': {
                   height: 42,
-                  borderRadius: '24px',
+                  borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                   bgcolor: 'background.paper',
                   fontSize: '0.84rem',
                   '& fieldset': {
                     borderColor: 'rgba(15, 118, 110, 0.3)'
                   },
                   '&:hover fieldset': {
-                    borderColor: '#0F766E'
+                    bordercolor: (t) => t.palette.primary.main
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: '#0F766E',
+                    bordercolor: (t) => t.palette.primary.main,
                     borderWidth: 1.5
                   }
                 }
@@ -489,15 +489,15 @@ export default function TailoringKanban() {
             />
             <Button
               variant="outlined"
-              startIcon={<Group sx={{ fontSize: 19, color: '#0F766E' }} />}
+              startIcon={<Group sx={{ fontSize: 19, color: (t) => t.palette.primary.main }} />}
               onClick={() => setTailorDialogOpen(true)}
               sx={{
                 height: 42,
                 minHeight: 42,
                 px: 2.5,
-                borderRadius: '24px',
-                border: '1.5px solid #0F766E',
-                color: '#0F766E',
+                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                border: (t) => `1.5px solid ${t.palette.primary.main}`,
+                color: (t) => t.palette.primary.main,
                 bgcolor: 'background.paper',
                 fontWeight: 700,
                 fontSize: '0.84rem',
@@ -509,7 +509,7 @@ export default function TailoringKanban() {
                 boxSizing: 'border-box',
                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                 '&:hover': {
-                  border: '1.5px solid #042F2E',
+                  border: (t) => `1.5px solid ${t.palette.primary.dark}`,
                   bgcolor: 'rgba(15, 118, 110, 0.05)',
                   transform: 'translateY(-1px)'
                 }
@@ -525,7 +525,7 @@ export default function TailoringKanban() {
                 height: 42,
                 minHeight: 42,
                 px: 3,
-                borderRadius: '24px',
+                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                 fontWeight: 700,
                 fontSize: '0.84rem',
                 textTransform: 'none',
@@ -534,7 +534,7 @@ export default function TailoringKanban() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 boxSizing: 'border-box',
-                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%) !important',
+                background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                 color: '#FFFFFF !important',
                 boxShadow: '0 4px 14px rgba(15, 118, 110, 0.3)',
                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -542,7 +542,7 @@ export default function TailoringKanban() {
                   color: '#FFFFFF !important'
                 },
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #115E59 0%, #021C1B 100%) !important',
+                  background: (t) => t.palette.primary.dark,
                   boxShadow: '0 6px 18px rgba(15, 118, 110, 0.45)',
                   transform: 'translateY(-1px)'
                 }
@@ -631,7 +631,7 @@ export default function TailoringKanban() {
                 sx={{
                   px: 1.25,
                   border: 'none',
-                  '&.Mui-selected': { bgcolor: 'rgba(15, 118, 110, 0.15)', color: '#0F766E' }
+                  '&.Mui-selected': { bgcolor: 'rgba(15, 118, 110, 0.15)', color: (t) => t.palette.primary.main }
                 }}
               >
                 <GridView sx={{ fontSize: 17, mr: { xs: 0, sm: 0.5 } }} />
@@ -643,7 +643,7 @@ export default function TailoringKanban() {
                 sx={{
                   px: 1.25,
                   border: 'none',
-                  '&.Mui-selected': { bgcolor: 'rgba(15, 118, 110, 0.15)', color: '#0F766E' }
+                  '&.Mui-selected': { bgcolor: 'rgba(15, 118, 110, 0.15)', color: (t) => t.palette.primary.main }
                 }}
               >
                 <ViewList sx={{ fontSize: 17, mr: { xs: 0, sm: 0.5 } }} />
@@ -659,14 +659,14 @@ export default function TailoringKanban() {
               <Table size="small">
                 <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)', borderBottom: '2px solid rgba(15, 118, 110, 0.16)' }}>
                   <TableRow>
-                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Job ID</TableCell>
-                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Client</TableCell>
-                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Garment & Specs</TableCell>
-                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Active Phase</TableCell>
-                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Master Tailor</TableCell>
-                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Target Due Date</TableCell>
-                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'right' }}>Fee & Balance</TableCell>
-                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'center' }}>Progress</TableCell>
+                    <TableCell sx={{ color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Job ID</TableCell>
+                    <TableCell sx={{ color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Client</TableCell>
+                    <TableCell sx={{ color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Garment & Specs</TableCell>
+                    <TableCell sx={{ color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Active Phase</TableCell>
+                    <TableCell sx={{ color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Master Tailor</TableCell>
+                    <TableCell sx={{ color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Target Due Date</TableCell>
+                    <TableCell sx={{ color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'right' }}>Fee & Balance</TableCell>
+                    <TableCell sx={{ color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'center' }}>Progress</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -693,7 +693,7 @@ export default function TailoringKanban() {
                                   sx={{
                                     fontFamily: '"JetBrains Mono", monospace',
                                     fontWeight: 800,
-                                    color: '#0F766E',
+                                    color: (t) => t.palette.primary.main,
                                     fontSize: '0.74rem',
                                     bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(15, 118, 110, 0.08)',
                                     px: 0.8,
@@ -740,11 +740,11 @@ export default function TailoringKanban() {
                             </TableCell>
                             <TableCell>
                               <Typography variant="caption" sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
-                                <AccessTime sx={{ fontSize: 13, color: '#0F766E' }} /> {order.targetDate}
+                                <AccessTime sx={{ fontSize: 13, color: (t) => t.palette.primary.main }} /> {order.targetDate}
                               </Typography>
                             </TableCell>
                             <TableCell sx={{ textAlign: 'right' }}>
-                              <Typography variant="body2" sx={{ fontWeight: 800, color: '#0F766E', fontVariantNumeric: 'tabular-nums' }}>₹{Number(order.price || 0).toLocaleString('en-IN')}</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, fontVariantNumeric: 'tabular-nums' }}>₹{Number(order.price || 0).toLocaleString('en-IN')}</Typography>
                               <Typography variant="caption" sx={{ fontWeight: 700, color: bal <= 0 ? 'success.main' : 'warning.main', fontSize: '0.68rem', display: 'block' }}>
                                 {bal <= 0 ? 'Paid' : `Bal: ₹${bal}`}
                               </Typography>
@@ -772,7 +772,7 @@ export default function TailoringKanban() {
                                   <IconButton
                                     size="small"
                                     onClick={() => moveOrder(order.id, 'next')}
-                                    sx={{ p: 0.5, color: '#0F766E' }}
+                                    sx={{ p: 0.5, color: (t) => t.palette.primary.main }}
                                   >
                                     <ArrowForward fontSize="small" sx={{ fontSize: 16 }} />
                                   </IconButton>
@@ -922,7 +922,7 @@ export default function TailoringKanban() {
                               sx={{
                                 fontFamily: '"JetBrains Mono", monospace',
                                 fontWeight: 700,
-                                color: '#0F766E',
+                                color: (t) => t.palette.primary.main,
                                 fontSize: '0.72rem',
                                 px: 0.75,
                                 py: 0.2,
@@ -983,7 +983,7 @@ export default function TailoringKanban() {
                               height: 22,
                               borderRadius: '50%',
                               bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.18)' : 'rgba(15, 118, 110, 0.12)',
-                              color: '#0F766E',
+                              color: (t) => t.palette.primary.main,
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
@@ -1036,7 +1036,7 @@ export default function TailoringKanban() {
                             <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.secondary' }}>
                               Labor: ₹{order.artisanWage}
                             </Typography>
-                            <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 700, color: '#0F766E' }}>
+                            <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 700, color: (t) => t.palette.primary.main }}>
                               Margin: ₹{Math.max(0, (order.price || 0) - (order.artisanWage || 0))}
                             </Typography>
                           </Box>
@@ -1047,7 +1047,7 @@ export default function TailoringKanban() {
 
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
                           <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 700, color: 'text.secondary', fontSize: '0.7rem' }}>
-                            <AccessTime sx={{ fontSize: 13, color: '#0F766E' }} /> Due: {order.targetDate}
+                            <AccessTime sx={{ fontSize: 13, color: (t) => t.palette.primary.main }} /> Due: {order.targetDate}
                           </Typography>
                           <Typography variant="caption" sx={{ fontSize: '0.7rem', color: order.advance >= order.price ? 'success.main' : 'warning.main', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
                             {order.advance >= order.price ? 'Fully Paid' : `Bal: ₹${(order.price || 0) - (order.advance || 0)}`}
@@ -1068,9 +1068,9 @@ export default function TailoringKanban() {
                               borderRadius: 1.5,
                               fontSize: '0.72rem',
                               fontWeight: 800,
-                              color: '#0F766E',
+                              color: (t) => t.palette.primary.main,
                               borderColor: 'rgba(15, 118, 110, 0.4)',
-                              '&:hover': { borderColor: '#0F766E', bgcolor: 'rgba(15, 118, 110, 0.06)' }
+                              '&:hover': { bordercolor: (t) => t.palette.primary.main, bgcolor: 'rgba(15, 118, 110, 0.06)' }
                             }}
                           >
                             Notify Trial Fitting
@@ -1144,7 +1144,7 @@ export default function TailoringKanban() {
                             <IconButton
                               size="small"
                               onClick={() => moveOrder(order.id, 'next')}
-                              sx={{ p: 0.5, color: '#0F766E' }}
+                              sx={{ p: 0.5, color: (t) => t.palette.primary.main }}
                             >
                               <ArrowForward fontSize="small" sx={{ fontSize: 16 }} />
                             </IconButton>
@@ -1222,14 +1222,14 @@ export default function TailoringKanban() {
           <Table size="small">
             <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(15, 118, 110, 0.04)' }}>
               <TableRow>
-                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Job ID</TableCell>
-                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Client</TableCell>
-                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Garment & Specs</TableCell>
-                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Master Tailor</TableCell>
-                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Handover Date</TableCell>
-                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E', textAlign: 'right' }}>Total Fee</TableCell>
-                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Payment Status</TableCell>
-                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E', textAlign: 'center' }}>Actions</TableCell>
+                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: (t) => t.palette.primary.main }}>Job ID</TableCell>
+                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: (t) => t.palette.primary.main }}>Client</TableCell>
+                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: (t) => t.palette.primary.main }}>Garment & Specs</TableCell>
+                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: (t) => t.palette.primary.main }}>Master Tailor</TableCell>
+                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: (t) => t.palette.primary.main }}>Handover Date</TableCell>
+                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: (t) => t.palette.primary.main, textAlign: 'right' }}>Total Fee</TableCell>
+                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: (t) => t.palette.primary.main }}>Payment Status</TableCell>
+                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: (t) => t.palette.primary.main, textAlign: 'center' }}>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -1256,7 +1256,7 @@ export default function TailoringKanban() {
                       hover
                       sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                     >
-                      <TableCell sx={{ fontFamily: 'monospace', fontWeight: 800, color: '#0F766E' }}>
+                      <TableCell sx={{ fontFamily: 'monospace', fontWeight: 800, color: (t) => t.palette.primary.main }}>
                         #{order.id}
                       </TableCell>
                       <TableCell>
@@ -1305,7 +1305,7 @@ export default function TailoringKanban() {
                             alignItems: 'center',
                             gap: 0.75,
                             p: '3px 6px',
-                            borderRadius: '24px',
+                            borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                             bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)',
                             border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.12)'
                           }}
@@ -1457,13 +1457,13 @@ export default function TailoringKanban() {
           {/* Visual Silhouette Selector Pills */}
           <Box sx={{ p: 2, bgcolor: 'rgba(15, 118, 110, 0.04)', borderRadius: 2.5, border: '1px solid rgba(15, 118, 110, 0.15)' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-              <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#0F766E' }}>
+              <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: (t) => t.palette.primary.main }}>
                 Select Anatomical Silhouette Template
               </Typography>
               <Chip 
                 size="small" 
                 label={`${SILHOUETTE_CONFIG[selectedSilhouette]?.label} Active`} 
-                sx={{ fontWeight: 800, bgcolor: 'rgba(15, 118, 110, 0.12)', color: '#0F766E', fontSize: '0.68rem' }}
+                sx={{ fontWeight: 800, bgcolor: 'rgba(15, 118, 110, 0.12)', color: (t) => t.palette.primary.main, fontSize: '0.68rem' }}
               />
             </Box>
 
@@ -1498,7 +1498,7 @@ export default function TailoringKanban() {
                       boxShadow: isSelected ? '0 2px 8px rgba(15, 118, 110, 0.25)' : 'none',
                       '&:hover': {
                         bgcolor: isSelected ? '#042F2E' : 'rgba(15, 118, 110, 0.06)',
-                        borderColor: '#0F766E'
+                        bordercolor: (t) => t.palette.primary.main
                       }
                     }}
                   >
@@ -1555,13 +1555,13 @@ export default function TailoringKanban() {
             <Grid item xs={12} sm={5}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.75, minHeight: 22 }}>
                 <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Person sx={{ fontSize: 15, color: '#0F766E' }} /> Assigned Master Tailor
+                  <Person sx={{ fontSize: 15, color: (t) => t.palette.primary.main }} /> Assigned Master Tailor
                 </Typography>
                 <Button
                   size="small"
                   variant="text"
                   onClick={() => setTailorDialogOpen(true)}
-                  sx={{ fontSize: '0.72rem', p: 0, minWidth: 'auto', textTransform: 'none', color: '#0F766E', fontWeight: 800 }}
+                  sx={{ fontSize: '0.72rem', p: 0, minWidth: 'auto', textTransform: 'none', color: (t) => t.palette.primary.main, fontWeight: 800 }}
                 >
                   + Tailors
                 </Button>
@@ -1587,7 +1587,7 @@ export default function TailoringKanban() {
             <Grid item xs={12} sm={7}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.75, minHeight: 22, flexWrap: 'wrap', gap: 0.5 }}>
                 <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <CalendarMonth sx={{ fontSize: 15, color: '#0F766E' }} /> Atelier Turnaround Calendar
+                  <CalendarMonth sx={{ fontSize: 15, color: (t) => t.palette.primary.main }} /> Atelier Turnaround Calendar
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 0.5 }}>
                   <Button
@@ -1630,7 +1630,7 @@ export default function TailoringKanban() {
                       borderRadius: 1,
                       bgcolor: !formData.urgent ? '#0F766E' : 'transparent',
                       color: !formData.urgent ? '#FFFFFF' : '#0F766E',
-                      borderColor: '#0F766E',
+                      bordercolor: (t) => t.palette.primary.main,
                       '&:hover': { bgcolor: !formData.urgent ? '#042F2E' : 'rgba(15, 118, 110, 0.08)' }
                     }}
                   >
@@ -1670,7 +1670,7 @@ export default function TailoringKanban() {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <CalendarMonth sx={{ fontSize: 18, color: '#0F766E' }} />
+                      <CalendarMonth sx={{ fontSize: 18, color: (t) => t.palette.primary.main }} />
                     </InputAdornment>
                   )
                 }}
@@ -1740,7 +1740,7 @@ export default function TailoringKanban() {
                   <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.68rem', lineHeight: 1 }}>
                     Est. Atelier Gross Margin
                   </Typography>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#0F766E', lineHeight: 1.2 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 900, color: (t) => t.palette.primary.main, lineHeight: 1.2 }}>
                     ₹{Math.max(0, (parseFloat(formData.price) || 0) - (parseFloat(formData.artisanWage) || 0)).toFixed(2)}
                   </Typography>
                 </Box>
@@ -1757,12 +1757,12 @@ export default function TailoringKanban() {
             variant="contained"
             onClick={handleCreateOrder}
             sx={{
-              background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+              background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
               color: '#FFFFFF',
               fontWeight: 800,
               px: 3.5,
               py: 1,
-              borderRadius: '24px',
+              borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
               boxShadow: '0 4px 12px rgba(15, 118, 110, 0.3)',
               '&:hover': {
                 background: 'linear-gradient(135deg, #042F2E 0%, #021716 100%)'
@@ -1828,7 +1828,7 @@ export default function TailoringKanban() {
               background: 'rgba(15, 118, 110, 0.03)'
             }}
           >
-            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0F766E', mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
               <PersonAdd fontSize="small" /> Add New Master Tailor
             </Typography>
 
@@ -1906,7 +1906,7 @@ export default function TailoringKanban() {
                     borderRadius: '8px',
                     fontWeight: 800,
                     fontSize: '0.82rem',
-                    background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                    background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                     color: '#ffffff',
                     whiteSpace: 'nowrap',
                     boxShadow: '0 3px 10px rgba(15, 118, 110, 0.3)'
@@ -1947,11 +1947,11 @@ export default function TailoringKanban() {
                 <Table size="small">
                   <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(15, 118, 110, 0.04)' }}>
                     <TableRow>
-                      <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Master Tailor</TableCell>
-                      <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Craft Specialty</TableCell>
-                      <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Contact</TableCell>
-                      <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Active Jobs</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F766E' }}>Action</TableCell>
+                      <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: (t) => t.palette.primary.main }}>Master Tailor</TableCell>
+                      <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: (t) => t.palette.primary.main }}>Craft Specialty</TableCell>
+                      <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: (t) => t.palette.primary.main }}>Contact</TableCell>
+                      <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: (t) => t.palette.primary.main }}>Active Jobs</TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: (t) => t.palette.primary.main }}>Action</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -1970,7 +1970,7 @@ export default function TailoringKanban() {
                                   fontSize: '0.8rem',
                                   fontWeight: 800,
                                   bgcolor: 'rgba(15, 118, 110, 0.12)',
-                                  color: '#0F766E',
+                                  color: (t) => t.palette.primary.main,
                                   border: '1px solid rgba(15, 118, 110, 0.25)'
                                 }}
                               >
@@ -2013,7 +2013,7 @@ export default function TailoringKanban() {
                                   display: 'inline-flex',
                                   alignItems: 'center',
                                   gap: 0.5,
-                                  color: '#0F766E',
+                                  color: (t) => t.palette.primary.main,
                                   textDecoration: 'none',
                                   fontWeight: 600,
                                   '&:hover': { textDecoration: 'underline' }
@@ -2073,7 +2073,7 @@ export default function TailoringKanban() {
               fontWeight: 800,
               px: 3,
               borderRadius: '8px',
-              background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+              background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
               color: '#ffffff'
             }}
           >

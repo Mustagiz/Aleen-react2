@@ -107,7 +107,7 @@ const PRESET_BROADCASTS = [
         title: '🌙 Haute Eid Couture Exclusive',
         shortTitle: 'Haute',
         category: 'festive',
-        color: '#0F766E',
+        color: (t) => t.palette.primary.main,
         offerCode: 'HAUTE20',
         message: 'Eid Mubarak {customer_name}! 🌙 Celebrate in bespoke luxury with our hand-embroidered shararas, anarkalis, and raw silk sarees. Visit {store_name} this week to explore private festive preview privileges with code {offer_code}!'
     },
@@ -216,7 +216,7 @@ const Marketing = () => {
     const [templateFormData, setTemplateFormData] = useState({
         title: '',
         message: '',
-        color: '#0F766E',
+        color: (t) => t.palette.primary.main,
         category: 'festive',
         imageUrl: ''
     });
@@ -799,7 +799,7 @@ const Marketing = () => {
         setTemplateFormData({
             title: '',
             message: '',
-            color: '#0F766E',
+            color: (t) => t.palette.primary.main,
             category: 'festive',
             imageUrl: ''
         });
@@ -878,9 +878,9 @@ const Marketing = () => {
                                 fontWeight: 750,
                                 textTransform: 'none',
                                 borderColor: 'rgba(15, 118, 110, 0.3)',
-                                color: '#0F766E',
+                                color: (t) => t.palette.primary.main,
                                 '&:hover': {
-                                    borderColor: '#0F766E',
+                                    bordercolor: (t) => t.palette.primary.main,
                                     bgcolor: 'rgba(15, 118, 110, 0.04)'
                                 }
                             }}
@@ -897,7 +897,7 @@ const Marketing = () => {
                                 borderRadius: 2.5,
                                 fontWeight: 750,
                                 textTransform: 'none',
-                                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                                background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                                 color: '#ffffff',
                                 boxShadow: '0 4px 14px rgba(15, 118, 110, 0.25)',
                                 '&:hover': {
@@ -979,7 +979,7 @@ const Marketing = () => {
                         px: 2,
                         minHeight: 52,
                         '& .MuiTabs-indicator': {
-                            bgcolor: '#0F766E',
+                            bgcolor: (t) => t.palette.primary.main,
                             height: 3,
                             borderRadius: '3px 3px 0 0'
                         },
@@ -991,7 +991,7 @@ const Marketing = () => {
                             color: 'text.secondary',
                             gap: 1,
                             '&.Mui-selected': {
-                                color: '#0F766E',
+                                color: (t) => t.palette.primary.main,
                                 fontWeight: 800
                             }
                         }
@@ -1129,7 +1129,7 @@ const Marketing = () => {
                                         InputProps={{
                                             startAdornment: (
                                                 <InputAdornment position="start">
-                                                    <Search fontSize="small" sx={{ color: '#0F766E' }} />
+                                                    <Search fontSize="small" sx={{ color: (t) => t.palette.primary.main }} />
                                                 </InputAdornment>
                                             )
                                         }}
@@ -1151,7 +1151,7 @@ const Marketing = () => {
                                                             setSelectedCustomerIds([]);
                                                         }
                                                     }}
-                                                    sx={{ color: '#0F766E', '&.Mui-checked': { color: '#0F766E' } }}
+                                                    sx={{ color: (t) => t.palette.primary.main, '&.Mui-checked': { color: (t) => t.palette.primary.main } }}
                                                 />
                                             }
                                             label={<Typography variant="caption" sx={{ fontWeight: 750 }}>Select All ({filteredPatrons.length})</Typography>}
@@ -1221,7 +1221,7 @@ const Marketing = () => {
                                                         position: 'relative',
                                                         overflow: 'hidden',
                                                         '&:hover': {
-                                                            borderColor: '#0F766E',
+                                                            bordercolor: (t) => t.palette.primary.main,
                                                             boxShadow: '0 4px 16px rgba(15, 118, 110, 0.12)',
                                                             transform: 'translateY(-2px)'
                                                         }
@@ -1241,7 +1241,7 @@ const Marketing = () => {
                                                                             setSelectedCustomerIds(prev => prev.filter(id => id !== customer.id));
                                                                         }
                                                                     }}
-                                                                    sx={{ p: 0.25, color: '#0F766E', '&.Mui-checked': { color: '#0F766E' } }}
+                                                                    sx={{ p: 0.25, color: (t) => t.palette.primary.main, '&.Mui-checked': { color: (t) => t.palette.primary.main } }}
                                                                 />
                                                                 <Avatar
                                                                     sx={{
@@ -1385,7 +1385,7 @@ const Marketing = () => {
                                                             setSelectedCustomerIds([]);
                                                         }
                                                     }}
-                                                    sx={{ color: '#0F766E', '&.Mui-checked': { color: '#0F766E' } }}
+                                                    sx={{ color: (t) => t.palette.primary.main, '&.Mui-checked': { color: (t) => t.palette.primary.main } }}
                                                 />
                                             </TableCell>
                                             <TableCell sx={{ fontWeight: 800 }}>Patron Details</TableCell>
@@ -1425,7 +1425,7 @@ const Marketing = () => {
                                                                         setSelectedCustomerIds(prev => prev.filter(id => id !== customer.id));
                                                                     }
                                                                 }}
-                                                                sx={{ color: '#0F766E', '&.Mui-checked': { color: '#0F766E' } }}
+                                                                sx={{ color: (t) => t.palette.primary.main, '&.Mui-checked': { color: (t) => t.palette.primary.main } }}
                                                             />
                                                         </TableCell>
                                                         <TableCell>
@@ -1522,7 +1522,7 @@ const Marketing = () => {
                         >
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Chat sx={{ color: '#0F766E' }} />
+                                    <Chat sx={{ color: (t) => t.palette.primary.main }} />
                                     <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
                                         Live WhatsApp Preview
                                     </Typography>
@@ -1531,7 +1531,7 @@ const Marketing = () => {
                                     size="small"
                                     icon={<Person sx={{ fontSize: '0.9rem !important' }} />}
                                     label={toSentenceCase(samplePreviewCustomer.name).split(' ')[0]}
-                                    sx={{ fontWeight: 750, bgcolor: 'rgba(15, 118, 110, 0.08)', color: '#0F766E' }}
+                                    sx={{ fontWeight: 750, bgcolor: 'rgba(15, 118, 110, 0.08)', color: (t) => t.palette.primary.main }}
                                 />
                             </Box>
 
@@ -1786,7 +1786,7 @@ const Marketing = () => {
                                         fontSize: '0.68rem',
                                         fontWeight: 750,
                                         textTransform: 'none',
-                                        color: '#0F766E',
+                                        color: (t) => t.palette.primary.main,
                                         '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' }
                                     }}
                                 >
@@ -1868,7 +1868,7 @@ const Marketing = () => {
                         }}
                     >
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Avatar sx={{ bgcolor: '#0F766E', width: 48, height: 48 }}>
+                            <Avatar sx={{ bgcolor: (t) => t.palette.primary.main, width: 48, height: 48 }}>
                                 <ElectricBolt sx={{ color: '#ffffff', fontSize: 28 }} />
                             </Avatar>
                             <Box>
@@ -1906,7 +1906,7 @@ const Marketing = () => {
                                     borderRadius: 2.5,
                                     fontWeight: 750,
                                     textTransform: 'none',
-                                    color: '#0F766E',
+                                    color: (t) => t.palette.primary.main,
                                     borderColor: 'rgba(15, 118, 110, 0.4)'
                                 }}
                             >
@@ -2024,7 +2024,7 @@ const Marketing = () => {
                                 <Box>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <Warning sx={{ color: '#0F766E' }} />
+                                            <Warning sx={{ color: (t) => t.palette.primary.main }} />
                                             <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#042F2E' }}>
                                                 Dormant Patron Winback (30d+ Inactivity)
                                             </Typography>
@@ -2044,7 +2044,7 @@ const Marketing = () => {
                                     <Chip
                                         size="small"
                                         label={`${segmentCounts.dormant30} In Dormancy Queue`}
-                                        sx={{ bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E', fontWeight: 800, fontSize: '0.7rem' }}
+                                        sx={{ bgcolor: 'rgba(15, 118, 110, 0.1)', color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: '0.7rem' }}
                                     />
                                     <Button
                                         size="small"
@@ -2080,7 +2080,7 @@ const Marketing = () => {
                                 <Box>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <ReceiptLong sx={{ color: '#0F766E' }} />
+                                            <ReceiptLong sx={{ color: (t) => t.palette.primary.main }} />
                                             <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#042F2E' }}>
                                                 E-Invoice & Digital Receipt Auto-Share
                                             </Typography>
@@ -2128,7 +2128,7 @@ const Marketing = () => {
                                 <Box>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <CheckCircle sx={{ color: '#0F766E' }} />
+                                            <CheckCircle sx={{ color: (t) => t.palette.primary.main }} />
                                             <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#042F2E' }}>
                                                 Tailoring Ready & Fitting Notification
                                             </Typography>
@@ -2148,7 +2148,7 @@ const Marketing = () => {
                                     <Chip
                                         size="small"
                                         label="Connected to Tailoring Kanban"
-                                        sx={{ bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E', fontWeight: 800, fontSize: '0.7rem' }}
+                                        sx={{ bgcolor: 'rgba(15, 118, 110, 0.1)', color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: '0.7rem' }}
                                     />
                                     <Typography variant="caption" color="text.secondary">
                                         Includes delivery target date
@@ -2190,7 +2190,7 @@ const Marketing = () => {
                                 setTemplateFormData({
                                     title: '',
                                     message: '',
-                                    color: '#0F766E',
+                                    color: (t) => t.palette.primary.main,
                                     category: 'festive',
                                     imageUrl: ''
                                 });
@@ -2200,7 +2200,7 @@ const Marketing = () => {
                                 borderRadius: 2.5,
                                 fontWeight: 750,
                                 textTransform: 'none',
-                                bgcolor: '#0F766E',
+                                bgcolor: (t) => t.palette.primary.main,
                                 '&:hover': { bgcolor: '#042F2E' }
                             }}
                         >
@@ -2225,7 +2225,7 @@ const Marketing = () => {
                                         position: 'relative',
                                         transition: 'all 0.22s',
                                         '&:hover': {
-                                            borderColor: '#0F766E',
+                                            bordercolor: (t) => t.palette.primary.main,
                                             transform: 'translateY(-3px)',
                                             boxShadow: '0 8px 24px rgba(15, 118, 110, 0.08)'
                                         }
@@ -2309,7 +2309,7 @@ const Marketing = () => {
                                                 setActiveSubTab(0);
                                             }}
                                             sx={{
-                                                bgcolor: '#0F766E',
+                                                bgcolor: (t) => t.palette.primary.main,
                                                 '&:hover': { bgcolor: '#042F2E' },
                                                 borderRadius: 2,
                                                 fontWeight: 750,
@@ -2484,7 +2484,7 @@ const Marketing = () => {
                     <Grid item xs={12} md={6}>
                         <Paper elevation={0} sx={{ p: 3, borderRadius: 3.5, border: '1px solid', borderColor: 'divider' }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                                <CalendarMonth sx={{ color: '#0F766E' }} />
+                                <CalendarMonth sx={{ color: (t) => t.palette.primary.main }} />
                                 <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
                                     Upcoming in Next 7 Days ({upcomingWeekCelebrants.length})
                                 </Typography>
@@ -2508,7 +2508,7 @@ const Marketing = () => {
                                         }
                                     >
                                         <ListItemAvatar>
-                                            <Avatar sx={{ bgcolor: '#0F766E', fontSize: '0.8rem', fontWeight: 800 }}>
+                                            <Avatar sx={{ bgcolor: (t) => t.palette.primary.main, fontSize: '0.8rem', fontWeight: 800 }}>
                                                 {c.displayName[0]}
                                             </Avatar>
                                         </ListItemAvatar>
@@ -2597,7 +2597,7 @@ const Marketing = () => {
                                 borderRadius: 2.5,
                                 fontWeight: 750,
                                 textTransform: 'none',
-                                bgcolor: '#0F766E',
+                                bgcolor: (t) => t.palette.primary.main,
                                 '&:hover': { bgcolor: '#042F2E' }
                             }}
                         >
@@ -2630,7 +2630,7 @@ const Marketing = () => {
                                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                                                 <Chip
                                                     label={`Trigger: "${kw.keyword}"`}
-                                                    sx={{ bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E', fontWeight: 800 }}
+                                                    sx={{ bgcolor: 'rgba(15, 118, 110, 0.1)', color: (t) => t.palette.primary.main, fontWeight: 800 }}
                                                 />
                                                 <Box sx={{ display: 'flex', gap: 0.5 }}>
                                                     <IconButton
@@ -2695,7 +2695,7 @@ const Marketing = () => {
                                                     navigator.clipboard.writeText(qrClickUrl);
                                                     showToast(`Copied WhatsApp QR link for "${kw.keyword}" to clipboard!`, 'success');
                                                 }}
-                                                sx={{ textTransform: 'none', fontWeight: 750, fontSize: '0.75rem', color: '#0F766E' }}
+                                                sx={{ textTransform: 'none', fontWeight: 750, fontSize: '0.75rem', color: (t) => t.palette.primary.main }}
                                             >
                                                 Copy QR Link
                                             </Button>
@@ -2856,7 +2856,7 @@ const Marketing = () => {
                         <Chip
                             label={`${selectedCustomerIds.length} Selected`}
                             size="small"
-                            sx={{ bgcolor: '#0F766E', color: '#FFFFFF', fontWeight: 800 }}
+                            sx={{ bgcolor: (t) => t.palette.primary.main, color: '#FFFFFF', fontWeight: 800 }}
                         />
                         <Typography variant="body2" sx={{ fontWeight: 700, display: { xs: 'none', sm: 'block' } }}>
                             Audience Broadcast Queue
@@ -2931,7 +2931,7 @@ const Marketing = () => {
                     }}
                 >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <ElectricBolt sx={{ color: '#0F766E' }} />
+                        <ElectricBolt sx={{ color: (t) => t.palette.primary.main }} />
                         <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
                             ⚡ Hands-Free Auto-Pilot Broadcast
                         </Typography>
@@ -2961,7 +2961,7 @@ const Marketing = () => {
                                 height: 8,
                                 borderRadius: 4,
                                 bgcolor: 'rgba(15, 118, 110, 0.1)',
-                                '& .MuiLinearProgress-bar': { bgcolor: '#0F766E' }
+                                '& .MuiLinearProgress-bar': { bgcolor: (t) => t.palette.primary.main }
                             }}
                         />
                     </Box>
@@ -3012,7 +3012,7 @@ const Marketing = () => {
                             >
                                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                        <Avatar sx={{ bgcolor: '#0F766E', fontWeight: 800 }}>
+                                        <Avatar sx={{ bgcolor: (t) => t.palette.primary.main, fontWeight: 800 }}>
                                             {customer.name[0]}
                                         </Avatar>
                                         <Box>
@@ -3027,7 +3027,7 @@ const Marketing = () => {
                                     {isAlreadyDispatched ? (
                                         <Chip icon={<CheckCircle sx={{ fontSize: '1rem !important' }} />} label="Dispatched" size="small" color="success" />
                                     ) : (
-                                        <Chip label={`Sending in ${autoPilotCountdown}s`} size="small" sx={{ bgcolor: '#0F766E', color: '#fff', fontWeight: 700 }} />
+                                        <Chip label={`Sending in ${autoPilotCountdown}s`} size="small" sx={{ bgcolor: (t) => t.palette.primary.main, color: '#fff', fontWeight: 700 }} />
                                     )}
                                 </Box>
 
@@ -3081,7 +3081,7 @@ const Marketing = () => {
                                     setAutoPilotPaused(false);
                                     setAutoPilotRunning(true);
                                 }}
-                                sx={{ bgcolor: '#0F766E', '&:hover': { bgcolor: '#042F2E' }, textTransform: 'none', fontWeight: 750 }}
+                                sx={{ bgcolor: (t) => t.palette.primary.main, '&:hover': { bgcolor: '#042F2E' }, textTransform: 'none', fontWeight: 750 }}
                             >
                                 Resume Auto-Pilot
                             </Button>
@@ -3140,7 +3140,7 @@ const Marketing = () => {
                     }}
                 >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <VpnKey sx={{ color: '#0F766E' }} />
+                        <VpnKey sx={{ color: (t) => t.palette.primary.main }} />
                         <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
                             WhatsApp Gateway & API Credentials
                         </Typography>
@@ -3172,7 +3172,7 @@ const Marketing = () => {
                             >
                                 <FormControlLabel
                                     value="browser"
-                                    control={<Radio size="small" sx={{ color: '#0F766E', '&.Mui-checked': { color: '#0F766E' } }} />}
+                                    control={<Radio size="small" sx={{ color: (t) => t.palette.primary.main, '&.Mui-checked': { color: (t) => t.palette.primary.main } }} />}
                                     label={
                                         <Box>
                                             <Typography variant="body2" sx={{ fontWeight: 750 }}>
@@ -3199,7 +3199,7 @@ const Marketing = () => {
                             >
                                 <FormControlLabel
                                     value="meta_cloud"
-                                    control={<Radio size="small" sx={{ color: '#0F766E', '&.Mui-checked': { color: '#0F766E' } }} />}
+                                    control={<Radio size="small" sx={{ color: (t) => t.palette.primary.main, '&.Mui-checked': { color: (t) => t.palette.primary.main } }} />}
                                     label={
                                         <Box>
                                             <Typography variant="body2" sx={{ fontWeight: 750 }}>
@@ -3225,7 +3225,7 @@ const Marketing = () => {
                             >
                                 <FormControlLabel
                                     value="webhook"
-                                    control={<Radio size="small" sx={{ color: '#0F766E', '&.Mui-checked': { color: '#0F766E' } }} />}
+                                    control={<Radio size="small" sx={{ color: (t) => t.palette.primary.main, '&.Mui-checked': { color: (t) => t.palette.primary.main } }} />}
                                     label={
                                         <Box>
                                             <Typography variant="body2" sx={{ fontWeight: 750 }}>
@@ -3325,7 +3325,7 @@ const Marketing = () => {
                             fontWeight: 750,
                             px: 3,
                             borderRadius: 2.5,
-                            background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)'
+                            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`
                         }}
                     >
                         Save Credentials
@@ -3405,7 +3405,7 @@ const Marketing = () => {
                             fontWeight: 750,
                             px: 3,
                             borderRadius: 2.5,
-                            background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)'
+                            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`
                         }}
                     >
                         Save Keyword Rule
@@ -3562,7 +3562,7 @@ const Marketing = () => {
                             fontWeight: 750,
                             px: 3.5,
                             borderRadius: 2.5,
-                            background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)'
+                            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`
                         }}
                     >
                         Save Template
@@ -3652,7 +3652,7 @@ const Marketing = () => {
                         px: 2.5,
                         py: 1,
                         fontSize: '0.88rem',
-                        ...(toast.severity === 'success' ? { bgcolor: '#0F766E' } : {})
+                        ...(toast.severity === 'success' ? { bgcolor: (t) => t.palette.primary.main } : {})
                     }}
                 >
                     {toast.message}

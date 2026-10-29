@@ -536,8 +536,8 @@ export default function Devices() {
                             startIcon={<CameraAlt />}
                             onClick={() => setCameraScannerOpen(true)}
                             sx={{
-                                borderColor: '#0F766E',
-                                color: '#0F766E',
+                                bordercolor: (t) => t.palette.primary.main,
+                                color: (t) => t.palette.primary.main,
                                 borderRadius: 2.5,
                                 fontWeight: 700,
                                 textTransform: 'none',
@@ -570,7 +570,7 @@ export default function Devices() {
                                 setBluetoothModalOpen(true);
                             }}
                             sx={{
-                                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                                background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                                 color: '#FFFFFF',
                                 borderRadius: 2.5,
                                 fontWeight: 700,
@@ -698,7 +698,7 @@ export default function Devices() {
                                     size="small"
                                     startIcon={<Refresh />}
                                     onClick={() => setDevices([...devices])}
-                                    sx={{ textTransform: 'none', fontWeight: 700, color: '#0F766E' }}
+                                    sx={{ textTransform: 'none', fontWeight: 700, color: (t) => t.palette.primary.main }}
                                 >
                                     Refresh
                                 </Button>
@@ -906,9 +906,9 @@ export default function Devices() {
                                             onChange={(e) => setAutoClear(e.target.checked)}
                                             sx={{
                                                 '& .MuiSwitch-switchBase.Mui-checked': {
-                                                    color: '#0F766E',
+                                                    color: (t) => t.palette.primary.main,
                                                     '& + .MuiSwitch-track': {
-                                                        backgroundColor: '#0F766E',
+                                                        backgroundcolor: (t) => t.palette.primary.main,
                                                     },
                                                 },
                                             }}
@@ -947,7 +947,7 @@ export default function Devices() {
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <QrCodeScanner sx={{ color: '#0F766E' }} />
+                                            <QrCodeScanner sx={{ color: (t) => t.palette.primary.main }} />
                                         </InputAdornment>
                                     ),
                                     endAdornment: (
@@ -960,7 +960,7 @@ export default function Devices() {
                                                     textTransform: 'none',
                                                     fontWeight: 700,
                                                     borderRadius: 2,
-                                                    bgcolor: '#0F766E',
+                                                    bgcolor: (t) => t.palette.primary.main,
                                                     '&:hover': { bgcolor: '#042F2E' }
                                                 }}
                                             >
@@ -1000,7 +1000,7 @@ export default function Devices() {
                                                 Code: {lastScannedResult.rawCode} • Category: {lastScannedResult.item.category || 'Couture'}
                                             </Typography>
                                         </Box>
-                                        <Typography variant="h6" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                                        <Typography variant="h6" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>
                                             ₹{lastScannedResult.item.price?.toLocaleString('en-IN')}
                                         </Typography>
                                     </Box>
@@ -1016,7 +1016,7 @@ export default function Devices() {
                                                 borderRadius: 2,
                                                 fontWeight: 700,
                                                 textTransform: 'none',
-                                                bgcolor: '#0F766E',
+                                                bgcolor: (t) => t.palette.primary.main,
                                                 '&:hover': { bgcolor: '#042F2E' }
                                             }}
                                         >
@@ -1174,7 +1174,7 @@ export default function Devices() {
                     justifyContent: 'space-between'
                 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Bluetooth sx={{ color: '#0F766E' }} /> Pair Bluetooth Barcode & QR Scanner
+                        <Bluetooth sx={{ color: (t) => t.palette.primary.main }} /> Pair Bluetooth Barcode & QR Scanner
                     </Box>
                     <IconButton size="small" onClick={() => setBluetoothModalOpen(false)}>
                         <Close fontSize="small" />
@@ -1231,7 +1231,7 @@ export default function Devices() {
                                     fontWeight: 800,
                                     fontSize: '0.8rem',
                                     borderRadius: 2.5,
-                                    bgcolor: '#0F766E',
+                                    bgcolor: (t) => t.palette.primary.main,
                                     color: '#FFFFFF',
                                     py: 1.2,
                                     '&:hover': { bgcolor: '#042F2E' }
@@ -1275,7 +1275,7 @@ export default function Devices() {
                         }}
                     >
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                            <Bluetooth sx={{ color: '#0F766E', fontSize: 24 }} />
+                            <Bluetooth sx={{ color: (t) => t.palette.primary.main, fontSize: 24 }} />
                             <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
                                 Pair Hardware Scanner Gun / Ring Scanner
                             </Typography>
@@ -1287,11 +1287,11 @@ export default function Devices() {
                         {isScanningBluetooth && (
                             <Box sx={{ mb: 2 }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
-                                    <Typography variant="caption" sx={{ fontWeight: 700, color: '#0F766E' }}>
+                                    <Typography variant="caption" sx={{ fontWeight: 700, color: (t) => t.palette.primary.main }}>
                                         Scanning for nearby hardware scanners...
                                     </Typography>
                                 </Box>
-                                <LinearProgress sx={{ borderRadius: 2, height: 6, bgcolor: 'rgba(15, 118, 110, 0.1)', '& .MuiLinearProgress-bar': { bgcolor: '#0F766E' } }} />
+                                <LinearProgress sx={{ borderRadius: 2, height: 6, bgcolor: 'rgba(15, 118, 110, 0.1)', '& .MuiLinearProgress-bar': { bgcolor: (t) => t.palette.primary.main } }} />
                             </Box>
                         )}
 
@@ -1311,7 +1311,7 @@ export default function Devices() {
                                 borderRadius: 2.5,
                                 fontWeight: 800,
                                 textTransform: 'none',
-                                bgcolor: '#0F766E',
+                                bgcolor: (t) => t.palette.primary.main,
                                 color: '#FFFFFF',
                                 py: 1.2,
                                 mb: 2,
@@ -1337,7 +1337,7 @@ export default function Devices() {
                                         fontWeight: 700,
                                         borderRadius: 2,
                                         bgcolor: customDeviceType === 'bluetooth_scanner' ? '#0F766E' : 'transparent',
-                                        borderColor: '#0F766E',
+                                        bordercolor: (t) => t.palette.primary.main,
                                         color: customDeviceType === 'bluetooth_scanner' ? '#fff' : '#0F766E'
                                     }}
                                 >
@@ -1378,8 +1378,8 @@ export default function Devices() {
                                     borderRadius: 2,
                                     fontWeight: 700,
                                     textTransform: 'none',
-                                    borderColor: '#0F766E',
-                                    color: '#0F766E'
+                                    bordercolor: (t) => t.palette.primary.main,
+                                    color: (t) => t.palette.primary.main
                                 }}
                             >
                                 + Add Device to Workstation
@@ -1464,7 +1464,7 @@ export default function Devices() {
                             <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary' }}>
                                 Computer Wi-Fi Address:
                             </Typography>
-                            <Chip label={networkHost} size="small" sx={{ fontWeight: 700, fontSize: '0.72rem', bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E' }} />
+                            <Chip label={networkHost} size="small" sx={{ fontWeight: 700, fontSize: '0.72rem', bgcolor: 'rgba(15, 118, 110, 0.1)', color: (t) => t.palette.primary.main }} />
                         </Box>
                         <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
                             Ensure your smartphone is connected to the same Wi-Fi network as this register.
@@ -1507,8 +1507,8 @@ export default function Devices() {
                                 borderRadius: 2.5,
                                 fontWeight: 700,
                                 textTransform: 'none',
-                                borderColor: '#0F766E',
-                                color: '#0F766E',
+                                bordercolor: (t) => t.palette.primary.main,
+                                color: (t) => t.palette.primary.main,
                                 '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.06)' }
                             }}
                         >
@@ -1561,7 +1561,7 @@ export default function Devices() {
                     justifyContent: 'space-between'
                 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <CameraAlt sx={{ color: '#0F766E' }} /> Live Camera Barcode & QR Scanner
+                        <CameraAlt sx={{ color: (t) => t.palette.primary.main }} /> Live Camera Barcode & QR Scanner
                     </Box>
                     <IconButton size="small" onClick={() => setCameraScannerOpen(false)}>
                         <Close fontSize="small" />
@@ -1680,7 +1680,7 @@ export default function Devices() {
                     )}
 
                     <Box sx={{ mt: 2, p: 2, borderRadius: 2.5, bgcolor: 'rgba(15, 118, 110, 0.04)', border: '1px solid', borderColor: 'divider' }}>
-                        <Typography variant="caption" sx={{ fontWeight: 700, color: '#0F766E', display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                        <Typography variant="caption" sx={{ fontWeight: 700, color: (t) => t.palette.primary.main, display: 'flex', alignItems: 'center', gap: 0.8 }}>
                             <Sensors fontSize="small" /> Real-time Inventory Matcher Active
                         </Typography>
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.3 }}>

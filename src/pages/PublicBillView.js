@@ -301,7 +301,7 @@ const PublicBillView = () => {
   if (loading) {
     return (
       <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', bgcolor: '#F8FAFC', p: 3 }}>
-        <CircularProgress sx={{ color: '#0F766E', mb: 2 }} />
+        <CircularProgress sx={{ color: (t) => t.palette.primary.main, mb: 2 }} />
         <Typography variant="h6" sx={{ fontWeight: 800, color: '#042F2E' }}>
           Loading Your Official E-Bill...
         </Typography>
@@ -401,7 +401,7 @@ const PublicBillView = () => {
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700 }}>
                   Invoice Reference:
                 </Typography>
-                <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                <Typography variant="caption" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>
                   #{invoice.invoiceNumber || invoice.id}
                 </Typography>
               </Box>
@@ -493,7 +493,7 @@ const PublicBillView = () => {
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: 2,
-            background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
             color: '#FFFFFF',
             boxShadow: '0 8px 24px rgba(4, 47, 46, 0.2)',
             '@media print': {
@@ -655,7 +655,7 @@ const PublicBillView = () => {
                 startIcon={<FlashOn />}
                 onClick={handlePayClick}
                 sx={{
-                  bgcolor: '#0F766E',
+                  bgcolor: (t) => t.palette.primary.main,
                   color: '#FFFFFF',
                   fontWeight: 800,
                   fontSize: '0.86rem',
@@ -709,8 +709,8 @@ const PublicBillView = () => {
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <CheckCircle sx={{ color: '#0F766E', fontSize: 20 }} />
-              <Typography variant="body2" sx={{ fontWeight: 800, color: '#0F766E' }}>
+              <CheckCircle sx={{ color: (t) => t.palette.primary.main, fontSize: 20 }} />
+              <Typography variant="body2" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>
                 Payment Settled in Full
               </Typography>
               <Typography variant="caption" sx={{ color: 'text.secondary' }}>
@@ -763,7 +763,7 @@ const PublicBillView = () => {
           <Box
             sx={{
               p: 2.5,
-              background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+              background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
               color: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
@@ -792,7 +792,7 @@ const PublicBillView = () => {
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
                 Outstanding Amount
               </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 900, color: '#0F766E', mt: 0.5 }}>
+              <Typography variant="h4" sx={{ fontWeight: 900, color: (t) => t.palette.primary.main, mt: 0.5 }}>
                 ₹{balanceDue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </Typography>
             </Box>
@@ -877,7 +877,7 @@ const PublicBillView = () => {
                   fontSize: '0.74rem',
                   borderRadius: 2,
                   bgcolor: copiedVpa ? '#0F766E' : 'transparent',
-                  borderColor: '#0F766E',
+                  bordercolor: (t) => t.palette.primary.main,
                   color: copiedVpa ? '#FFFFFF' : '#0F766E',
                   '&:hover': { bgcolor: copiedVpa ? '#042F2E' : 'rgba(15, 118, 110, 0.08)' }
                 }}
@@ -893,7 +893,7 @@ const PublicBillView = () => {
               startIcon={<FlashOn />}
               onClick={() => { window.location.href = upiPayUrl; }}
               sx={{
-                bgcolor: '#0F766E',
+                bgcolor: (t) => t.palette.primary.main,
                 color: '#FFFFFF',
                 fontWeight: 800,
                 py: 1.2,

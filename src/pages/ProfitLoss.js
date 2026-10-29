@@ -213,15 +213,15 @@ const ProfitLoss = () => {
                     <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
                         <Button
                             variant="outlined"
-                            startIcon={<Download sx={{ fontSize: 19, color: '#0F766E' }} />}
+                            startIcon={<Download sx={{ fontSize: 19, color: (t) => t.palette.primary.main }} />}
                             onClick={exportReport}
                             sx={{
                                 height: 42,
                                 minHeight: 42,
                                 px: 2.75,
-                                borderRadius: '24px',
-                                border: '1.5px solid #0F766E',
-                                color: '#0F766E',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                                border: (t) => `1.5px solid ${t.palette.primary.main}`,
+                                color: (t) => t.palette.primary.main,
                                 bgcolor: 'background.paper',
                                 fontWeight: 700,
                                 fontSize: '0.84rem',
@@ -232,7 +232,7 @@ const ProfitLoss = () => {
                                 boxSizing: 'border-box',
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
-                                    border: '1.5px solid #042F2E',
+                                    border: (t) => `1.5px solid ${t.palette.primary.dark}`,
                                     bgcolor: 'rgba(15, 118, 110, 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
@@ -248,7 +248,7 @@ const ProfitLoss = () => {
                                 height: 42,
                                 minHeight: 42,
                                 px: 3,
-                                borderRadius: '24px',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                 textTransform: 'none',
                                 fontWeight: 700,
                                 fontSize: '0.84rem',
@@ -256,7 +256,7 @@ const ProfitLoss = () => {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 boxSizing: 'border-box',
-                                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%) !important',
+                                background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                                 color: '#FFFFFF !important',
                                 boxShadow: '0 4px 14px rgba(15, 118, 110, 0.3)',
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -264,7 +264,7 @@ const ProfitLoss = () => {
                                     color: '#FFFFFF !important'
                                 },
                                 '&:hover': {
-                                    background: 'linear-gradient(135deg, #115E59 0%, #021C1B 100%) !important',
+                                    background: (t) => t.palette.primary.dark,
                                     boxShadow: '0 6px 18px rgba(15, 118, 110, 0.45)',
                                     transform: 'translateY(-1px)'
                                 }
@@ -397,7 +397,7 @@ const ProfitLoss = () => {
                 <Grid item xs={12} md={7}>
                     <GlassCard sx={{ p: 2.5, height: '100%' }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <BarChartIcon sx={{ color: '#0F766E' }} />
+                            <BarChartIcon sx={{ color: (t) => t.palette.primary.main }} />
                             Category Profitability Breakdown
                         </Typography>
                         <Box sx={{ height: 260 }}>
@@ -445,7 +445,7 @@ const ProfitLoss = () => {
                     <Chip 
                         label={`${profitData.length} Line Items`} 
                         size="small" 
-                        sx={{ fontWeight: 700, bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E' }}
+                        sx={{ fontWeight: 700, bgcolor: 'rgba(15, 118, 110, 0.1)', color: (t) => t.palette.primary.main }}
                     />
                 </Box>
                 <TableContainer>

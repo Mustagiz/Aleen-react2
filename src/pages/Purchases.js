@@ -167,7 +167,7 @@ const Purchases = () => {
             return {
                 label: `Due in ${diffDays}d`,
                 status: 'upcoming',
-                color: '#0F766E',
+                color: (t) => t.palette.primary.main,
                 bgcolor: 'rgba(15, 118, 110, 0.12)',
                 borderColor: 'rgba(15, 118, 110, 0.3)',
                 icon: <LocalShipping sx={{ fontSize: '0.85rem !important' }} />,
@@ -834,15 +834,15 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                     <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
                         <Button
                             variant="outlined"
-                            startIcon={<Download sx={{ fontSize: 19, color: '#0F766E' }} />}
+                            startIcon={<Download sx={{ fontSize: 19, color: (t) => t.palette.primary.main }} />}
                             onClick={downloadPurchases}
                             sx={{
                                 height: 40,
                                 minHeight: 40,
                                 px: 2.25,
-                                borderRadius: '10px',
-                                border: '1.5px solid #0F766E',
-                                color: '#0F766E',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                                border: (t) => `1.5px solid ${t.palette.primary.main}`,
+                                color: (t) => t.palette.primary.main,
                                 bgcolor: 'background.paper',
                                 fontWeight: 700,
                                 fontSize: '0.84rem',
@@ -853,7 +853,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                 boxSizing: 'border-box',
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
-                                    border: '1.5px solid #042F2E',
+                                    border: (t) => `1.5px solid ${t.palette.primary.dark}`,
                                     bgcolor: 'rgba(15, 118, 110, 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
@@ -869,7 +869,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                 height: 40,
                                 minHeight: 40,
                                 px: 2.75,
-                                borderRadius: '10px',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                 textTransform: 'none',
                                 fontWeight: 700,
                                 fontSize: '0.84rem',
@@ -877,7 +877,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 boxSizing: 'border-box',
-                                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%) !important',
+                                background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                                 color: '#FFFFFF !important',
                                 boxShadow: '0 4px 14px rgba(15, 118, 110, 0.3)',
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -885,7 +885,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                     color: '#FFFFFF !important'
                                 },
                                 '&:hover': {
-                                    background: 'linear-gradient(135deg, #115E59 0%, #021C1B 100%) !important',
+                                    background: (t) => t.palette.primary.dark,
                                     boxShadow: '0 6px 18px rgba(15, 118, 110, 0.45)',
                                     transform: 'translateY(-1px)'
                                 }
@@ -916,7 +916,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                         color: '#0F766E !important'
                     },
                     '& .MuiTabs-indicator': {
-                        backgroundColor: '#0F766E',
+                        backgroundcolor: (t) => t.palette.primary.main,
                         height: 3,
                         borderRadius: '3px 3px 0 0'
                     }
@@ -1299,7 +1299,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
 
                                                     {/* Total Cost & Paid (Right-aligned) */}
                                                     <TableCell align="right" sx={{ py: 2 }} onClick={() => handleOpenViewModal(po)}>
-                                                        <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#0F766E', fontSize: '0.95rem' }}>
+                                                        <Typography variant="subtitle2" sx={{ fontWeight: 900, color: (t) => t.palette.primary.main, fontSize: '0.95rem' }}>
                                                             ₹{(po.total || 0).toLocaleString('en-IN')}
                                                         </Typography>
                                                         {balanceDue > 0 ? (
@@ -1361,7 +1361,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                                                     size="small"
                                                                     onClick={(e) => { e.stopPropagation(); handleOpenViewModal(po); }}
                                                                     sx={{ 
-                                                                        color: '#0F766E',
+                                                                        color: (t) => t.palette.primary.main,
                                                                         bgcolor: theme.palette.mode === 'dark' ? 'rgba(15, 118, 110, 0.12)' : 'rgba(15, 118, 110, 0.08)',
                                                                         '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.2)' }
                                                                     }}
@@ -1462,7 +1462,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                                                     size="small" 
                                                                     onClick={(e) => { e.stopPropagation(); handleOpen(po); }} 
                                                                     sx={{ 
-                                                                        color: '#0F766E',
+                                                                        color: (t) => t.palette.primary.main,
                                                                         bgcolor: theme.palette.mode === 'dark' ? 'rgba(15, 118, 110, 0.1)' : 'rgba(15, 118, 110, 0.08)',
                                                                         '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.2)' }
                                                                     }}
@@ -1548,7 +1548,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
             >
                 <DialogTitle 
                     sx={{
-                        background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                        background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                         color: '#ffffff',
                         px: 3,
                         py: 2.25,
@@ -1693,7 +1693,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                 sx={{ 
                                     textTransform: 'none', 
                                     fontWeight: 700, 
-                                    color: '#0F766E',
+                                    color: (t) => t.palette.primary.main,
                                     fontSize: '0.8rem'
                                 }}
                             >
@@ -1740,8 +1740,8 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                                         sx={{ 
                                                             minWidth: 40, 
                                                             px: 1,
-                                                            borderColor: '#0F766E',
-                                                            color: '#0F766E'
+                                                            bordercolor: (t) => t.palette.primary.main,
+                                                            color: (t) => t.palette.primary.main
                                                         }}
                                                     >
                                                         <Add fontSize="small" />
@@ -1776,7 +1776,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                             <Typography variant="caption" color="text.secondary" display="block">
                                                 Line Subtotal
                                             </Typography>
-                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>
                                                 ₹{lineTotal.toLocaleString('en-IN')}
                                             </Typography>
                                         </Grid>
@@ -1865,7 +1865,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                     <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
                                         Total Order Value
                                     </Typography>
-                                    <Typography variant="h5" sx={{ fontWeight: 900, color: '#0F766E' }}>
+                                    <Typography variant="h5" sx={{ fontWeight: 900, color: (t) => t.palette.primary.main }}>
                                         ₹{calculateTotal().toLocaleString('en-IN')}
                                     </Typography>
                                     {paymentStatus === 'Partial' && (
@@ -1896,7 +1896,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                             py: 1,
                             fontWeight: 700,
                             textTransform: 'none',
-                            background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                             color: '#ffffff',
                             boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
                             '&:hover': {
@@ -1922,7 +1922,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                 fullWidth 
                 PaperProps={{ sx: { borderRadius: 3.5, overflow: 'hidden' } }}
             >
-                <DialogTitle sx={{ background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)', color: 'white', px: 3, py: 2 }}>
+                <DialogTitle sx={{ background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`, color: 'white', px: 3, py: 2 }}>
                     <Typography variant="h6" sx={{ fontWeight: 800 }}>Quick Add Product to Inventory</Typography>
                     <Typography variant="caption" sx={{ opacity: 0.85 }}>Adds product directly to boutique catalog</Typography>
                 </DialogTitle>
@@ -2005,7 +2005,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                         variant="contained" 
                         disabled={!quickForm.name || !quickForm.price}
                         sx={{ 
-                            background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                             fontWeight: 700,
                             textTransform: 'none',
                             borderRadius: 2,
@@ -2061,7 +2061,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                         <>
                             <DialogTitle 
                                 sx={{
-                                    background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                                    background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                                     color: '#ffffff',
                                     px: 3,
                                     py: 2.25,
@@ -2189,7 +2189,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                                 </Typography>
                                             )}
                                             <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.5 }}>
-                                                <Phone sx={{ fontSize: '0.9rem', color: '#0F766E' }} />
+                                                <Phone sx={{ fontSize: '0.9rem', color: (t) => t.palette.primary.main }} />
                                                 {phoneToUse || 'No phone registered'}
                                             </Typography>
 
@@ -2251,7 +2251,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                             <Grid container spacing={1} sx={{ mb: 1.5 }}>
                                                 <Grid item xs={4}>
                                                     <Typography variant="caption" color="text.secondary">Total Value</Typography>
-                                                    <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#0F766E' }}>
+                                                    <Typography variant="subtitle1" sx={{ fontWeight: 900, color: (t) => t.palette.primary.main }}>
                                                         ₹{total.toLocaleString('en-IN')}
                                                     </Typography>
                                                 </Grid>
@@ -2272,7 +2272,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                             <Box sx={{ mb: 1.5 }}>
                                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                                                     <Typography variant="caption" color="text.secondary">Payment Settlement Progress</Typography>
-                                                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E' }}>{percentPaid}%</Typography>
+                                                    <Typography variant="caption" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>{percentPaid}%</Typography>
                                                 </Box>
                                                 <LinearProgress 
                                                     variant="determinate" 
@@ -2347,7 +2347,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                                         <TableCell align="right" sx={{ py: 1.25 }}>
                                                             ₹{(Number(item.cost) || 0).toLocaleString('en-IN')}
                                                         </TableCell>
-                                                        <TableCell align="right" sx={{ py: 1.25, fontWeight: 800, color: '#0F766E' }}>
+                                                        <TableCell align="right" sx={{ py: 1.25, fontWeight: 800, color: (t) => t.palette.primary.main }}>
                                                             ₹{lineTotal.toLocaleString('en-IN')}
                                                         </TableCell>
                                                     </TableRow>
@@ -2394,7 +2394,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
 
                                 {po.notes && (
                                     <Box sx={{ mt: 2, p: 2, borderRadius: 2, bgcolor: 'rgba(15, 118, 110, 0.05)', border: '1px dashed rgba(15, 118, 110, 0.2)' }}>
-                                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E', display: 'block', mb: 0.5 }}>
+                                        <Typography variant="caption" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, display: 'block', mb: 0.5 }}>
                                             Special Instructions & Order Notes:
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
@@ -2784,7 +2784,7 @@ const SmartRestockView = ({ getLowStockItems, vendors, handleOpen, setVendorId, 
                             py: 1,
                             fontWeight: 700,
                             textTransform: 'none',
-                            background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                             color: '#ffffff',
                             boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
                             '&:hover': {
@@ -2983,7 +2983,7 @@ const SmartRestockView = ({ getLowStockItems, vendors, handleOpen, setVendorId, 
                                                         fontSize: '0.72rem', 
                                                         fontWeight: 600,
                                                         bgcolor: theme.palette.mode === 'dark' ? 'rgba(15, 118, 110, 0.2)' : 'rgba(15, 118, 110, 0.08)',
-                                                        color: '#0F766E'
+                                                        color: (t) => t.palette.primary.main
                                                     }}
                                                 />
                                             </TableCell>
@@ -3011,7 +3011,7 @@ const SmartRestockView = ({ getLowStockItems, vendors, handleOpen, setVendorId, 
                                                 </Typography>
                                             </TableCell>
                                             <TableCell align="center" sx={{ py: 1.75 }}>
-                                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>
                                                     +{recQty} Units
                                                 </Typography>
                                             </TableCell>
@@ -3039,8 +3039,8 @@ const SmartRestockView = ({ getLowStockItems, vendors, handleOpen, setVendorId, 
                                                         px: 1.5,
                                                         borderRadius: 1.5,
                                                         textTransform: 'none',
-                                                        borderColor: '#0F766E',
-                                                        color: '#0F766E',
+                                                        bordercolor: (t) => t.palette.primary.main,
+                                                        color: (t) => t.palette.primary.main,
                                                         '&:hover': {
                                                             borderColor: '#0b5650',
                                                             bgcolor: 'rgba(15, 118, 110, 0.05)'

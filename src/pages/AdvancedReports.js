@@ -349,7 +349,7 @@ const AdvancedReports = () => {
                             p: '3px',
                             height: 42,
                             boxSizing: 'border-box',
-                            borderRadius: '24px',
+                            borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                             border: '1.5px solid rgba(15, 118, 110, 0.25)',
                             boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
                         }}>
@@ -384,14 +384,14 @@ const AdvancedReports = () => {
                         <Button
                             variant="outlined"
                             onClick={exportToPDF}
-                            startIcon={<Download sx={{ fontSize: 18, color: '#0F766E' }} />}
+                            startIcon={<Download sx={{ fontSize: 18, color: (t) => t.palette.primary.main }} />}
                             sx={{
                                 height: 42,
                                 minHeight: 42,
                                 px: 2.5,
-                                borderRadius: '24px',
-                                border: '1.5px solid #0F766E',
-                                color: '#0F766E',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                                border: (t) => `1.5px solid ${t.palette.primary.main}`,
+                                color: (t) => t.palette.primary.main,
                                 bgcolor: 'background.paper',
                                 fontWeight: 700,
                                 fontSize: '0.84rem',
@@ -402,7 +402,7 @@ const AdvancedReports = () => {
                                 boxSizing: 'border-box',
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
-                                    border: '1.5px solid #042F2E',
+                                    border: (t) => `1.5px solid ${t.palette.primary.dark}`,
                                     bgcolor: 'rgba(15, 118, 110, 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
@@ -413,14 +413,14 @@ const AdvancedReports = () => {
                         <Button
                             variant="outlined"
                             onClick={exportToExcel}
-                            startIcon={<Download sx={{ fontSize: 18, color: '#0F766E' }} />}
+                            startIcon={<Download sx={{ fontSize: 18, color: (t) => t.palette.primary.main }} />}
                             sx={{
                                 height: 42,
                                 minHeight: 42,
                                 px: 2.5,
-                                borderRadius: '24px',
-                                border: '1.5px solid #0F766E',
-                                color: '#0F766E',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                                border: (t) => `1.5px solid ${t.palette.primary.main}`,
+                                color: (t) => t.palette.primary.main,
                                 bgcolor: 'background.paper',
                                 fontWeight: 700,
                                 fontSize: '0.84rem',
@@ -431,7 +431,7 @@ const AdvancedReports = () => {
                                 boxSizing: 'border-box',
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
-                                    border: '1.5px solid #042F2E',
+                                    border: (t) => `1.5px solid ${t.palette.primary.dark}`,
                                     bgcolor: 'rgba(15, 118, 110, 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
@@ -442,14 +442,14 @@ const AdvancedReports = () => {
                         <Button
                             variant="outlined"
                             onClick={handlePrint}
-                            startIcon={<Print sx={{ fontSize: 18, color: '#0F766E' }} />}
+                            startIcon={<Print sx={{ fontSize: 18, color: (t) => t.palette.primary.main }} />}
                             sx={{
                                 height: 42,
                                 minHeight: 42,
                                 px: 2.5,
-                                borderRadius: '24px',
-                                border: '1.5px solid #0F766E',
-                                color: '#0F766E',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                                border: (t) => `1.5px solid ${t.palette.primary.main}`,
+                                color: (t) => t.palette.primary.main,
                                 bgcolor: 'background.paper',
                                 fontWeight: 700,
                                 fontSize: '0.84rem',
@@ -460,7 +460,7 @@ const AdvancedReports = () => {
                                 boxSizing: 'border-box',
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
-                                    border: '1.5px solid #042F2E',
+                                    border: (t) => `1.5px solid ${t.palette.primary.dark}`,
                                     bgcolor: 'rgba(15, 118, 110, 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
@@ -544,11 +544,11 @@ const AdvancedReports = () => {
                                 minHeight: 48,
                                 color: 'text.secondary',
                                 '&.Mui-selected': {
-                                    color: '#0F766E'
+                                    color: (t) => t.palette.primary.main
                                 }
                             },
                             '& .MuiTabs-indicator': {
-                                backgroundColor: '#0F766E',
+                                backgroundcolor: (t) => t.palette.primary.main,
                                 height: 3,
                                 borderRadius: '3px 3px 0 0'
                             }
@@ -669,7 +669,7 @@ const AdvancedReports = () => {
                                                         sx={{ borderColor: 'divider', fontWeight: 600, fontSize: '0.75rem' }}
                                                     />
                                                 </TableCell>
-                                                <TableCell align="right" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                                                <TableCell align="right" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>
                                                     {product.quantity}
                                                 </TableCell>
                                                 <TableCell align="right" sx={{ fontWeight: 700 }}>
@@ -725,7 +725,7 @@ const AdvancedReports = () => {
                                             <TableCell align="right" sx={{ fontWeight: 700 }}>
                                                 {customer.purchaseCount}
                                             </TableCell>
-                                            <TableCell align="right" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                                            <TableCell align="right" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>
                                                 ₹{customer.totalSpent.toLocaleString('en-IN')}
                                             </TableCell>
                                             <TableCell align="right" sx={{ color: 'text.secondary' }}>
@@ -764,7 +764,7 @@ const AdvancedReports = () => {
                                                         size="small"
                                                         sx={{
                                                             bgcolor: 'rgba(15, 118, 110, 0.1)',
-                                                            color: '#0F766E',
+                                                            color: (t) => t.palette.primary.main,
                                                             fontWeight: 700,
                                                             fontSize: '0.72rem'
                                                         }}
@@ -788,11 +788,11 @@ const AdvancedReports = () => {
                                         datasets: [{
                                             label: 'Average Order Value (₹)',
                                             data: aovTrends.map(d => d.aov),
-                                            borderColor: '#0F766E',
+                                            bordercolor: (t) => t.palette.primary.main,
                                             backgroundColor: 'rgba(15, 118, 110, 0.08)',
                                             fill: true,
                                             tension: 0.35,
-                                            pointBackgroundColor: '#0F766E',
+                                            pointBackgroundcolor: (t) => t.palette.primary.main,
                                             pointRadius: 4,
                                             pointHoverRadius: 6
                                         }]
@@ -834,7 +834,7 @@ const AdvancedReports = () => {
                                                 <TableCell sx={{ fontWeight: 600 }}>{day.date}</TableCell>
                                                 <TableCell align="right" sx={{ fontWeight: 700 }}>{day.orders}</TableCell>
                                                 <TableCell align="right">₹{day.revenue.toLocaleString('en-IN')}</TableCell>
-                                                <TableCell align="right" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                                                <TableCell align="right" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>
                                                     ₹{day.aov.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                                                 </TableCell>
                                             </TableRow>

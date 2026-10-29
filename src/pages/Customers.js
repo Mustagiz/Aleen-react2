@@ -345,7 +345,7 @@ const Customers = () => {
                                 fontWeight: 700,
                                 textTransform: 'none',
                                 px: 2.5,
-                                '&:hover': { borderColor: '#0F766E', bgcolor: 'rgba(15, 118, 110, 0.04)' }
+                                '&:hover': { bordercolor: (t) => t.palette.primary.main, bgcolor: 'rgba(15, 118, 110, 0.04)' }
                             }}
                         >
                             Export Directory
@@ -355,7 +355,7 @@ const Customers = () => {
                             startIcon={<Add />}
                             onClick={() => handleOpen()}
                             sx={{
-                                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                                background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                                 color: '#FFFFFF',
                                 borderRadius: 2.5,
                                 fontWeight: 700,
@@ -443,7 +443,7 @@ const Customers = () => {
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <Search sx={{ color: '#0F766E' }} />
+                                        <Search sx={{ color: (t) => t.palette.primary.main }} />
                                     </InputAdornment>
                                 ),
                                 endAdornment: searchTerm && (
@@ -602,7 +602,7 @@ const Customers = () => {
                                                                         textTransform: 'capitalize',
                                                                         cursor: 'pointer',
                                                                         transition: 'color 0.15s ease',
-                                                                        '&:hover': { color: '#0F766E' }
+                                                                        '&:hover': { color: (t) => t.palette.primary.main }
                                                                     }}
                                                                 >
                                                                     {cust.name}
@@ -637,7 +637,7 @@ const Customers = () => {
                                                                         gap: 0.4
                                                                     }}
                                                                 >
-                                                                    <Phone sx={{ fontSize: 11, color: '#0F766E', opacity: 0.7 }} /> {cust.phone || 'No phone'}
+                                                                    <Phone sx={{ fontSize: 11, color: (t) => t.palette.primary.main, opacity: 0.7 }} /> {cust.phone || 'No phone'}
                                                                 </Typography>
                                                                 {cust.measurements?.bust && (
                                                                     <Chip
@@ -666,7 +666,7 @@ const Customers = () => {
                                                         sx={{
                                                             fontWeight: 900,
                                                             fontSize: '0.95rem',
-                                                            color: '#0F766E',
+                                                            color: (t) => t.palette.primary.main,
                                                             fontVariantNumeric: 'tabular-nums'
                                                         }}
                                                     >
@@ -773,7 +773,7 @@ const Customers = () => {
                                                         />
                                                     ) : (
                                                         <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
-                                                            <CalendarMonth sx={{ fontSize: 13, color: '#0F766E', opacity: 0.7 }} />
+                                                            <CalendarMonth sx={{ fontSize: 13, color: (t) => t.palette.primary.main, opacity: 0.7 }} />
                                                             <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.82rem', color: 'text.primary' }}>
                                                                 {customerStat.lastVisit}
                                                             </Typography>
@@ -789,7 +789,7 @@ const Customers = () => {
                                                             alignItems: 'center',
                                                             gap: 0.65,
                                                             p: '3px 6px',
-                                                            borderRadius: '24px',
+                                                            borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                                             bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)',
                                                             border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.12)'
                                                         }}
@@ -801,13 +801,13 @@ const Customers = () => {
                                                                 sx={{
                                                                     width: 30,
                                                                     height: 30,
-                                                                    color: '#0F766E',
+                                                                    color: (t) => t.palette.primary.main,
                                                                     bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
                                                                     border: '1px solid rgba(15, 118, 110, 0.16)',
                                                                     boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
                                                                     transition: 'all 0.18s ease',
                                                                     '&:hover': {
-                                                                        bgcolor: '#0F766E',
+                                                                        bgcolor: (t) => t.palette.primary.main,
                                                                         color: '#FFFFFF',
                                                                         transform: 'translateY(-1px)',
                                                                         boxShadow: '0 4px 10px rgba(15, 118, 110, 0.3)'
@@ -1040,7 +1040,7 @@ const Customers = () => {
                             px: 3.5, 
                             borderRadius: 2.5, 
                             fontWeight: 700,
-                            background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)'
+                            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`
                         }}
                     >
                         Save Guest Details
@@ -1080,7 +1080,7 @@ const Customers = () => {
                         type="number"
                         value={paymentData.amount}
                         onChange={(e) => setPaymentData({ ...paymentData, amount: e.target.value })}
-                        InputProps={{ startAdornment: <CurrencyRupee sx={{ fontSize: 16, mr: 0.5, color: '#0F766E' }} /> }}
+                        InputProps={{ startAdornment: <CurrencyRupee sx={{ fontSize: 16, mr: 0.5, color: (t) => t.palette.primary.main }} /> }}
                     />
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Payment Tender</InputLabel>

@@ -479,11 +479,11 @@ const Inventory = () => {
             borderRadius: '16px',
             bgcolor: 'rgba(15, 118, 110, 0.08)',
             border: '1px solid rgba(15, 118, 110, 0.22)',
-            color: '#0F766E',
+            color: (t) => t.palette.primary.main,
             whiteSpace: 'nowrap',
             flexShrink: 0
           }}>
-            <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: '#0F766E', flexShrink: 0 }} />
+            <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: (t) => t.palette.primary.main, flexShrink: 0 }} />
             <Typography variant="caption" sx={{ fontWeight: 700, fontSize: '0.72rem', whiteSpace: 'nowrap' }}>
               {qty} Units • Moderate
             </Typography>
@@ -574,7 +574,7 @@ const Inventory = () => {
                 borderRadius: 2,
                 fontWeight: 800,
                 fontSize: { xs: '0.8rem', sm: '0.85rem' },
-                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                 color: '#ffffff',
                 boxShadow: '0 4px 14px rgba(15,118,110,0.3)',
                 whiteSpace: 'nowrap'
@@ -659,7 +659,7 @@ const Inventory = () => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Search sx={{ color: '#0F766E', fontSize: 20 }} />
+                    <Search sx={{ color: (t) => t.palette.primary.main, fontSize: 20 }} />
                   </InputAdornment>
                 ),
                 endAdornment: search ? (
@@ -700,7 +700,7 @@ const Inventory = () => {
                 sx={{
                   px: { xs: 1.1, sm: 1.5 },
                   border: 'none',
-                  '&.Mui-selected': { bgcolor: 'rgba(15, 118, 110, 0.15)', color: '#0F766E' }
+                  '&.Mui-selected': { bgcolor: 'rgba(15, 118, 110, 0.15)', color: (t) => t.palette.primary.main }
                 }}
               >
                 <GridView sx={{ fontSize: 18 }} />
@@ -711,7 +711,7 @@ const Inventory = () => {
                 sx={{
                   px: { xs: 1.1, sm: 1.5 },
                   border: 'none',
-                  '&.Mui-selected': { bgcolor: 'rgba(15, 118, 110, 0.15)', color: '#0F766E' }
+                  '&.Mui-selected': { bgcolor: 'rgba(15, 118, 110, 0.15)', color: (t) => t.palette.primary.main }
                 }}
               >
                 <ViewList sx={{ fontSize: 18 }} />
@@ -786,7 +786,7 @@ const Inventory = () => {
                     height: 38,
                     borderRadius: 2,
                     border: '1px solid rgba(15, 118, 110, 0.25)',
-                    color: '#0F766E',
+                    color: (t) => t.palette.primary.main,
                     bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(15, 118, 110, 0.1)' : 'rgba(15, 118, 110, 0.05)',
                     flexShrink: 0
                   }}
@@ -812,7 +812,7 @@ const Inventory = () => {
                   whiteSpace: 'nowrap',
                   flex: { xs: 1, sm: 'none' },
                   ...(isFiltered ? {
-                    background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                    background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                     color: '#ffffff'
                   } : {})
                 }}
@@ -837,7 +837,7 @@ const Inventory = () => {
           '&::-webkit-scrollbar': { display: 'none' }
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mr: 0.5, flexShrink: 0 }}>
-            <FilterList sx={{ fontSize: 18, color: '#0F766E' }} />
+            <FilterList sx={{ fontSize: 18, color: (t) => t.palette.primary.main }} />
             <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'text.secondary', fontSize: '0.7rem' }}>
               Stock Filter:
             </Typography>
@@ -970,9 +970,9 @@ const Inventory = () => {
           borderTop: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(15, 118, 110, 0.08)'}`
         }}>
           <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: { xs: '0.72rem', sm: '0.78rem' } }}>
-            Showing <strong style={{ color: '#0F766E' }}>{filteredInventory.length}</strong> of {totalItems} garments ({filteredTotalUnits.toLocaleString('en-IN')} units)
+            Showing <strong style={{ color: (t) => t.palette.primary.main }}>{filteredInventory.length}</strong> of {totalItems} garments ({filteredTotalUnits.toLocaleString('en-IN')} units)
           </Typography>
-          <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 800, fontSize: { xs: '0.72rem', sm: '0.78rem' }, fontVariantNumeric: 'tabular-nums' }}>
+          <Typography variant="caption" sx={{ color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: { xs: '0.72rem', sm: '0.78rem' }, fontVariantNumeric: 'tabular-nums' }}>
             Catalog Valuation: ₹{filteredTotalValue.toLocaleString('en-IN')}
           </Typography>
         </Box>
@@ -983,7 +983,7 @@ const Inventory = () => {
         <Box>
           {filteredInventory.length === 0 ? (
             <GlassCard sx={{ p: 5, textAlign: 'center' }}>
-              <Inventory2 sx={{ fontSize: 44, opacity: 0.3, mb: 1.5, display: 'block', mx: 'auto', color: '#0F766E' }} />
+              <Inventory2 sx={{ fontSize: 44, opacity: 0.3, mb: 1.5, display: 'block', mx: 'auto', color: (t) => t.palette.primary.main }} />
               <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>No garments match current criteria</Typography>
               <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 420, mx: 'auto', mb: 2 }}>
                 Try adjusting your search query, collection filter, or stock level pills.
@@ -994,7 +994,7 @@ const Inventory = () => {
                   size="small"
                   startIcon={<RestartAlt />}
                   onClick={() => { setSearch(''); setCategoryFilter(''); setStockFilter('all'); }}
-                  sx={{ borderRadius: 2, fontWeight: 700, borderColor: '#0F766E', color: '#0F766E' }}
+                  sx={{ borderRadius: 2, fontWeight: 700, bordercolor: (t) => t.palette.primary.main, color: (t) => t.palette.primary.main }}
                 >
                   Clear All Filters
                 </Button>
@@ -1080,7 +1080,7 @@ const Inventory = () => {
                                 variant="caption"
                                 sx={{
                                   fontFamily: '"JetBrains Mono", monospace',
-                                  color: '#0F766E',
+                                  color: (t) => t.palette.primary.main,
                                   fontWeight: 700,
                                   fontSize: '0.72rem',
                                   textTransform: 'uppercase',
@@ -1210,7 +1210,7 @@ const Inventory = () => {
                             onClick={() => navigate('/barcodes', { state: { product: item } })}
                             startIcon={<QrCode fontSize="small" />}
                             sx={{
-                              borderRadius: '10px',
+                              borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                               color: '#D97706',
                               borderColor: 'rgba(217, 119, 6, 0.4)',
                               fontWeight: 700,
@@ -1237,7 +1237,7 @@ const Inventory = () => {
                             onClick={() => handleOpen(item)}
                             disabled={user?.role !== 'admin'}
                             sx={{
-                              borderRadius: '10px',
+                              borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                               fontWeight: 700,
                               fontSize: '0.75rem',
                               height: 36,
@@ -1256,7 +1256,7 @@ const Inventory = () => {
                             onClick={() => openDeleteDialog(item.id)}
                             disabled={user?.role !== 'admin'}
                             sx={{
-                              borderRadius: '10px',
+                              borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                               fontWeight: 700,
                               fontSize: '0.75rem',
                               height: 36,
@@ -1402,7 +1402,7 @@ const Inventory = () => {
                 ) : filteredInventory.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={user?.role === 'admin' ? 8 : 7} sx={{ textAlign: 'center', py: 6, color: 'text.secondary' }}>
-                      <Inventory2 sx={{ fontSize: 44, opacity: 0.35, mb: 1.5, display: 'block', mx: 'auto', color: '#0F766E' }} />
+                      <Inventory2 sx={{ fontSize: 44, opacity: 0.35, mb: 1.5, display: 'block', mx: 'auto', color: (t) => t.palette.primary.main }} />
                       <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5 }}>
                         No garments match current criteria
                       </Typography>
@@ -1417,7 +1417,7 @@ const Inventory = () => {
                           size="small"
                           startIcon={<RestartAlt />}
                           onClick={() => { setSearch(''); setCategoryFilter(''); setStockFilter('all'); }}
-                          sx={{ borderRadius: 2, fontWeight: 700, borderColor: '#0F766E', color: '#0F766E' }}
+                          sx={{ borderRadius: 2, fontWeight: 700, bordercolor: (t) => t.palette.primary.main, color: (t) => t.palette.primary.main }}
                         >
                           Clear All Filters
                         </Button>
@@ -1459,7 +1459,7 @@ const Inventory = () => {
                             variant="body2"
                             sx={{
                               fontWeight: 800,
-                              color: '#0F766E',
+                              color: (t) => t.palette.primary.main,
                               fontFamily: 'monospace',
                               fontSize: '0.85rem',
                               letterSpacing: '0.02em',
@@ -1486,7 +1486,7 @@ const Inventory = () => {
                                     fontSize: '0.62rem',
                                     fontWeight: 700,
                                     bgcolor: 'rgba(15, 118, 110, 0.1)',
-                                    color: '#0F766E',
+                                    color: (t) => t.palette.primary.main,
                                     borderRadius: 1
                                   }}
                                 />
@@ -1509,7 +1509,7 @@ const Inventory = () => {
                               fontSize: '0.72rem',
                               borderRadius: '12px',
                               borderColor: 'rgba(15, 118, 110, 0.25)',
-                              color: '#0F766E',
+                              color: (t) => t.palette.primary.main,
                               bgcolor: 'rgba(15, 118, 110, 0.04)'
                             }}
                           />
@@ -1612,7 +1612,7 @@ const Inventory = () => {
                               alignItems: 'center',
                               gap: 0.75,
                               p: '3px 6px',
-                              borderRadius: '24px',
+                              borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                               bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)',
                               border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.12)'
                             }}
@@ -1775,7 +1775,7 @@ const Inventory = () => {
         {/* Modern Luxury Header */}
         <DialogTitle
           sx={{
-            background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
             color: 'white',
             p: 2.5,
             display: 'flex',
@@ -1827,7 +1827,7 @@ const Inventory = () => {
             {/* Block 1: Garment Identity & Classification */}
             <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 3, bgcolor: 'background.paper' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                <Checkroom sx={{ fontSize: 20, color: '#0F766E' }} />
+                <Checkroom sx={{ fontSize: 20, color: (t) => t.palette.primary.main }} />
                 <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', textTransform: 'uppercase', letterSpacing: '0.04em', fontSize: '0.78rem' }}>
                   Garment Identity & Classification
                 </Typography>
@@ -1862,7 +1862,7 @@ const Inventory = () => {
                           <Button
                             size="small"
                             onClick={handleAutoGenerateSku}
-                            sx={{ fontSize: '0.68rem', fontWeight: 800, p: 0.25, minWidth: 'auto', textTransform: 'none', color: '#0F766E' }}
+                            sx={{ fontSize: '0.68rem', fontWeight: 800, p: 0.25, minWidth: 'auto', textTransform: 'none', color: (t) => t.palette.primary.main }}
                           >
                             Auto SKU
                           </Button>
@@ -1882,7 +1882,7 @@ const Inventory = () => {
                     <Button
                       size="small"
                       onClick={() => setShowNewCategoryInput(!showNewCategoryInput)}
-                      sx={{ fontSize: '0.72rem', textTransform: 'none', p: 0, fontWeight: 700, color: '#0F766E' }}
+                      sx={{ fontSize: '0.72rem', textTransform: 'none', p: 0, fontWeight: 700, color: (t) => t.palette.primary.main }}
                     >
                       {showNewCategoryInput ? 'Choose Existing' : '+ New Category'}
                     </Button>
@@ -1904,7 +1904,7 @@ const Inventory = () => {
                         size="small"
                         onClick={handleAddCategory}
                         sx={{
-                          bgcolor: '#0F766E',
+                          bgcolor: (t) => t.palette.primary.main,
                           color: '#ffffff',
                           fontWeight: 700,
                           borderRadius: 2,
@@ -1953,7 +1953,7 @@ const Inventory = () => {
             {!form.hasVariants && (
               <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 3, bgcolor: 'background.paper' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                  <Straighten sx={{ fontSize: 20, color: '#0F766E' }} />
+                  <Straighten sx={{ fontSize: 20, color: (t) => t.palette.primary.main }} />
                   <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', textTransform: 'uppercase', letterSpacing: '0.04em', fontSize: '0.78rem' }}>
                     Size & Color Attributes
                   </Typography>
@@ -2041,7 +2041,7 @@ const Inventory = () => {
             {!form.hasVariants && (
               <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 3, bgcolor: 'background.paper' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                  <LocalOffer sx={{ fontSize: 20, color: '#0F766E' }} />
+                  <LocalOffer sx={{ fontSize: 20, color: (t) => t.palette.primary.main }} />
                   <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', textTransform: 'uppercase', letterSpacing: '0.04em', fontSize: '0.78rem' }}>
                     Pricing & Atelier Gross Margins
                   </Typography>
@@ -2083,7 +2083,7 @@ const Inventory = () => {
                         '& .MuiOutlinedInput-root': {
                           borderRadius: 2,
                           fontWeight: 800,
-                          color: '#0F766E'
+                          color: (t) => t.palette.primary.main
                         }
                       }}
                     />
@@ -2117,7 +2117,7 @@ const Inventory = () => {
             {!form.hasVariants && (
               <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 3, bgcolor: 'background.paper' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                  <Inventory2 sx={{ fontSize: 20, color: '#0F766E' }} />
+                  <Inventory2 sx={{ fontSize: 20, color: (t) => t.palette.primary.main }} />
                   <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', textTransform: 'uppercase', letterSpacing: '0.04em', fontSize: '0.78rem' }}>
                     Inventory Stock & Thresholds
                   </Typography>
@@ -2192,7 +2192,7 @@ const Inventory = () => {
                       size="small"
                       variant="outlined"
                       onClick={addVariant}
-                      sx={{ borderRadius: 1.5, fontWeight: 700, fontSize: '0.75rem', color: '#0F766E' }}
+                      sx={{ borderRadius: 1.5, fontWeight: 700, fontSize: '0.75rem', color: (t) => t.palette.primary.main }}
                     >
                       Add Variant
                     </Button>
@@ -2286,7 +2286,7 @@ const Inventory = () => {
                     <Chip
                       label={`Total Inventory: ${(form.variants || []).reduce((sum, v) => sum + (parseInt(v.quantity) || 0), 0)} units`}
                       size="small"
-                      sx={{ fontWeight: 800, bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E' }}
+                      sx={{ fontWeight: 800, bgcolor: 'rgba(15, 118, 110, 0.1)', color: (t) => t.palette.primary.main }}
                     />
                   </Box>
                 </Box>
@@ -2336,7 +2336,7 @@ const Inventory = () => {
                 fontWeight: 800,
                 px: 3.5,
                 textTransform: 'none',
-                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                 color: '#FFFFFF',
                 boxShadow: '0 4px 14px rgba(15, 118, 110, 0.3)'
               }}

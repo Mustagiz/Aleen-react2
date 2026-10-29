@@ -177,7 +177,7 @@ const Vendors = () => {
                             height: 40,
                             minHeight: 40,
                             px: 2.75,
-                            borderRadius: '10px',
+                            borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                             textTransform: 'none',
                             fontWeight: 700,
                             fontSize: '0.84rem',
@@ -185,7 +185,7 @@ const Vendors = () => {
                             alignItems: 'center',
                             justifyContent: 'center',
                             boxSizing: 'border-box',
-                            background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%) !important',
+                            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                             color: '#FFFFFF !important',
                             boxShadow: '0 4px 14px rgba(15, 118, 110, 0.3)',
                             transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -193,7 +193,7 @@ const Vendors = () => {
                                 color: '#FFFFFF !important'
                             },
                             '&:hover': {
-                                background: 'linear-gradient(135deg, #115E59 0%, #021C1B 100%) !important',
+                                background: (t) => t.palette.primary.dark,
                                 boxShadow: '0 6px 18px rgba(15, 118, 110, 0.45)',
                                 transform: 'translateY(-1px)'
                             }
@@ -384,8 +384,8 @@ const Vendors = () => {
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.75 }}>
                                                     <Avatar 
                                                         sx={{ 
-                                                            bgcolor: '#0F766E',
-                                                            background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                                                            bgcolor: (t) => t.palette.primary.main,
+                                                            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                                                             color: '#ffffff',
                                                             fontWeight: 800,
                                                             width: 42,
@@ -493,7 +493,7 @@ const Vendors = () => {
                                                 {vendor.performance ? (
                                                     <Box>
                                                         <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                            <AccessTime sx={{ fontSize: '0.85rem', color: '#0F766E' }} />
+                                                            <AccessTime sx={{ fontSize: '0.85rem', color: (t) => t.palette.primary.main }} />
                                                             {vendor.performance.avgLeadTime || 0} days avg
                                                         </Typography>
                                                         <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
@@ -552,7 +552,7 @@ const Vendors = () => {
                                                         alignItems: 'center',
                                                         gap: 0.75,
                                                         p: '3px 6px',
-                                                        borderRadius: '24px',
+                                                        borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                                         bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)',
                                                         border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.12)'
                                                     }}
@@ -654,7 +654,7 @@ const Vendors = () => {
             >
                 <DialogTitle 
                     sx={{ 
-                        background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)', 
+                        background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`, 
                         color: '#ffffff',
                         px: 3,
                         py: 2.25,
@@ -814,7 +814,7 @@ const Vendors = () => {
                             borderRadius: 2,
                             fontWeight: 700,
                             textTransform: 'none',
-                            background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                             color: '#ffffff',
                             boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
                             '&:hover': {

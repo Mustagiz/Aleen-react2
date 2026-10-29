@@ -166,7 +166,7 @@ const InventoryReports = () => {
                 fontWeight: 700,
                 textTransform: 'none',
                 px: 2.5,
-                '&:hover': { borderColor: '#0F766E', bgcolor: 'rgba(15, 118, 110, 0.04)' }
+                '&:hover': { bordercolor: (t) => t.palette.primary.main, bgcolor: 'rgba(15, 118, 110, 0.04)' }
               }}
             >
               CSV Export
@@ -176,7 +176,7 @@ const InventoryReports = () => {
               startIcon={<Download />}
               onClick={exportPDF}
               sx={{
-                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                 color: '#FFFFFF',
                 borderRadius: 2.5,
                 fontWeight: 700,
@@ -262,11 +262,11 @@ const InventoryReports = () => {
                 minHeight: 48,
                 color: 'text.secondary',
                 '&.Mui-selected': {
-                  color: '#0F766E'
+                  color: (t) => t.palette.primary.main
                 }
               },
               '& .MuiTabs-indicator': {
-                backgroundColor: '#0F766E',
+                backgroundcolor: (t) => t.palette.primary.main,
                 height: 3,
                 borderRadius: '3px 3px 0 0'
               }
@@ -388,7 +388,7 @@ const InventoryReports = () => {
                               <Chip
                                 label={item.category || 'General'}
                                 size="small"
-                                sx={{ bgcolor: 'rgba(15, 118, 110, 0.08)', color: '#0F766E', fontWeight: 700, fontSize: '0.72rem' }}
+                                sx={{ bgcolor: 'rgba(15, 118, 110, 0.08)', color: (t) => t.palette.primary.main, fontWeight: 700, fontSize: '0.72rem' }}
                               />
                             </TableCell>
                             <TableCell sx={{ color: 'text.secondary', fontSize: '0.8rem' }}>
@@ -409,7 +409,7 @@ const InventoryReports = () => {
                                 }}
                               />
                             </TableCell>
-                            <TableCell align="right" sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.95rem' }}>
+                            <TableCell align="right" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, fontSize: '0.95rem' }}>
                               ₹{(item.price * item.quantity).toLocaleString('en-IN')}
                             </TableCell>
                           </TableRow>
@@ -560,7 +560,7 @@ const InventoryReports = () => {
                           <TableCell align="right" sx={{ fontWeight: 700 }}>
                             ₹{item.price?.toLocaleString('en-IN')}
                           </TableCell>
-                          <TableCell align="right" sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.95rem' }}>
+                          <TableCell align="right" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, fontSize: '0.95rem' }}>
                             ₹{(item.price * item.quantity).toLocaleString('en-IN')}
                           </TableCell>
                         </TableRow>

@@ -537,15 +537,15 @@ export default function Settings() {
             onClick={handleSaveProfile}
             disabled={isSaving}
             sx={{
-              borderRadius: 2.5,
+              borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
               fontWeight: 800,
               textTransform: 'none',
-              bgcolor: '#0F766E',
+              bgcolor: (t) => t.palette.primary.main,
               color: '#FFFFFF',
               px: 3,
               py: 1,
-              boxShadow: '0 4px 14px rgba(15, 118, 110, 0.3)',
-              '&:hover': { bgcolor: '#042F2E' }
+              boxShadow: '0 4px 14px rgba(var(--primary-rgb, 15, 118, 110), 0.3)',
+              '&:hover': { bgcolor: (t) => t.palette.primary.dark }
             }}
           >
             {isSaving ? 'Saving...' : 'Save Configuration'}
@@ -558,7 +558,7 @@ export default function Settings() {
         elevation={0}
         sx={{
           mb: 3,
-          borderRadius: 3,
+          borderRadius: (t) => `${t.custom?.designSystem?.shape?.cardRadius || 10}px`,
           border: '1px solid',
           borderColor: 'divider',
           bgcolor: 'background.paper',
@@ -606,7 +606,7 @@ export default function Settings() {
               elevation={0}
               sx={{
                 p: 3,
-                borderRadius: 3.5,
+                borderRadius: (t) => `${t.custom?.designSystem?.shape?.cardRadius || 12}px`,
                 border: '1px solid',
                 borderColor: 'divider',
                 bgcolor: 'background.paper',
@@ -633,11 +633,11 @@ export default function Settings() {
                     sx={{
                       width: 90,
                       height: 90,
-                      borderRadius: 3.5,
+                      borderRadius: (t) => `${t.custom?.designSystem?.shape?.cardRadius || 12}px`,
                       objectFit: 'contain',
                       bgcolor: '#FFFFFF',
                       border: '2px solid rgba(217, 119, 6, 0.45)',
-                      boxShadow: '0 8px 24px rgba(15, 118, 110, 0.2)',
+                      boxShadow: '0 8px 24px rgba(var(--primary-rgb, 15, 118, 110), 0.2)',
                       p: 0.5
                     }}
                   />
@@ -646,8 +646,8 @@ export default function Settings() {
                     sx={{
                       width: 90,
                       height: 90,
-                      borderRadius: 3.5,
-                      background: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)',
+                      borderRadius: (t) => `${t.custom?.designSystem?.shape?.cardRadius || 12}px`,
+                      background: (t) => `linear-gradient(135deg, ${t.palette.primary.dark} 0%, ${t.palette.primary.main} 100%)`,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -671,10 +671,10 @@ export default function Settings() {
                       position: 'absolute',
                       bottom: -6,
                       right: -6,
-                      bgcolor: '#0F766E',
+                      bgcolor: (t) => t.palette.primary.main,
                       color: '#FFFFFF',
                       boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-                      '&:hover': { bgcolor: '#042F2E' }
+                      '&:hover': { bgcolor: (t) => t.palette.primary.dark }
                     }}
                   >
                     <Edit sx={{ fontSize: 15 }} />
@@ -696,8 +696,8 @@ export default function Settings() {
                     py: 0.4,
                     px: 1.25,
                     textTransform: 'none',
-                    borderColor: '#0F766E',
-                    color: '#0F766E'
+                    bordercolor: (t) => t.palette.primary.main,
+                    color: (t) => t.palette.primary.main
                   }}
                 >
                   Upload Logo
@@ -714,9 +714,9 @@ export default function Settings() {
                     py: 0.4,
                     px: 1.25,
                     textTransform: 'none',
-                    bgcolor: '#042F2E',
+                    bgcolor: (t) => t.palette.primary.dark,
                     color: '#FFFFFF',
-                    '&:hover': { bgcolor: '#0F766E' }
+                    '&:hover': { bgcolor: (t) => t.palette.primary.main }
                   }}
                 >
                   Choose Predefined
@@ -746,21 +746,21 @@ export default function Settings() {
 
               <Box sx={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 1 }}>
                 <Typography variant="caption" sx={{ color: 'text.secondary', display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Phone fontSize="small" sx={{ color: '#0F766E' }} /> {formProfile.phone}
+                  <Phone fontSize="small" sx={{ color: (t) => t.palette.primary.main }} /> {formProfile.phone}
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'text.secondary', display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Email fontSize="small" sx={{ color: '#0F766E' }} /> {formProfile.email}
+                  <Email fontSize="small" sx={{ color: (t) => t.palette.primary.main }} /> {formProfile.email}
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'text.secondary', display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                  <LocationOn fontSize="small" sx={{ color: '#0F766E', mt: 0.2 }} /> {formProfile.address}
+                  <LocationOn fontSize="small" sx={{ color: (t) => t.palette.primary.main, mt: 0.2 }} /> {formProfile.address}
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'text.secondary', display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Payment fontSize="small" sx={{ color: '#0F766E' }} /> GSTIN: <b>{formProfile.gstin}</b>
+                  <Payment fontSize="small" sx={{ color: (t) => t.palette.primary.main }} /> GSTIN: <b>{formProfile.gstin}</b>
                 </Typography>
               </Box>
 
-              <Box sx={{ mt: 3, p: 1.5, borderRadius: 2, bgcolor: 'rgba(15, 118, 110, 0.05)', border: '1px dashed #0F766E' }}>
-                <Typography variant="caption" sx={{ fontWeight: 700, color: '#0F766E', display: 'block' }}>
+              <Box sx={{ mt: 3, p: 1.5, borderRadius: 2, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)', border: '1px dashed #0F766E' }}>
+                <Typography variant="caption" sx={{ fontWeight: 700, color: (t) => t.palette.primary.main, display: 'block' }}>
                   ✓ Invoices Automatically Updated
                 </Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
@@ -775,7 +775,7 @@ export default function Settings() {
               elevation={0}
               sx={{
                 p: { xs: 2.5, sm: 3.5 },
-                borderRadius: 3.5,
+                borderRadius: (t) => `${t.custom?.designSystem?.shape?.cardRadius || 12}px`,
                 border: '1px solid',
                 borderColor: 'divider',
                 bgcolor: 'background.paper'
@@ -797,7 +797,7 @@ export default function Settings() {
                     value={formProfile.businessName}
                     onChange={(e) => setFormProfile({ ...formProfile, businessName: e.target.value })}
                     InputProps={{
-                      startAdornment: <Store sx={{ mr: 1, color: '#0F766E', fontSize: 20 }} />
+                      startAdornment: <Store sx={{ mr: 1, color: (t) => t.palette.primary.main, fontSize: 20 }} />
                     }}
                   />
                 </Grid>
@@ -828,7 +828,7 @@ export default function Settings() {
                     value={formProfile.phone}
                     onChange={(e) => setFormProfile({ ...formProfile, phone: e.target.value })}
                     InputProps={{
-                      startAdornment: <Phone sx={{ mr: 1, color: '#0F766E', fontSize: 20 }} />
+                      startAdornment: <Phone sx={{ mr: 1, color: (t) => t.palette.primary.main, fontSize: 20 }} />
                     }}
                   />
                 </Grid>
@@ -840,7 +840,7 @@ export default function Settings() {
                     value={formProfile.email}
                     onChange={(e) => setFormProfile({ ...formProfile, email: e.target.value })}
                     InputProps={{
-                      startAdornment: <Email sx={{ mr: 1, color: '#0F766E', fontSize: 20 }} />
+                      startAdornment: <Email sx={{ mr: 1, color: (t) => t.palette.primary.main, fontSize: 20 }} />
                     }}
                   />
                 </Grid>
@@ -852,7 +852,7 @@ export default function Settings() {
                     value={formProfile.gstin}
                     onChange={(e) => setFormProfile({ ...formProfile, gstin: e.target.value.toUpperCase() })}
                     InputProps={{
-                      startAdornment: <Payment sx={{ mr: 1, color: '#0F766E', fontSize: 20 }} />
+                      startAdornment: <Payment sx={{ mr: 1, color: (t) => t.palette.primary.main, fontSize: 20 }} />
                     }}
                   />
                 </Grid>
@@ -884,7 +884,7 @@ export default function Settings() {
                     value={formProfile.address}
                     onChange={(e) => setFormProfile({ ...formProfile, address: e.target.value })}
                     InputProps={{
-                      startAdornment: <LocationOn sx={{ mr: 1, color: '#0F766E', fontSize: 20, mt: 0.5 }} />
+                      startAdornment: <LocationOn sx={{ mr: 1, color: (t) => t.palette.primary.main, fontSize: 20, mt: 0.5 }} />
                     }}
                   />
                 </Grid>
@@ -910,7 +910,7 @@ export default function Settings() {
                     borderRadius: 2,
                     fontWeight: 800,
                     textTransform: 'none',
-                    bgcolor: '#0F766E',
+                    bgcolor: (t) => t.palette.primary.main,
                     color: '#FFFFFF'
                   }}
                 >
@@ -930,7 +930,7 @@ export default function Settings() {
               elevation={0}
               sx={{
                 p: { xs: 2.5, sm: 3.5 },
-                borderRadius: 3.5,
+                borderRadius: (t) => `${t.custom?.designSystem?.shape?.cardRadius || 12}px`,
                 border: '1px solid',
                 borderColor: 'divider',
                 bgcolor: 'background.paper'
@@ -1053,7 +1053,7 @@ export default function Settings() {
                     borderRadius: 2,
                     fontWeight: 800,
                     textTransform: 'none',
-                    bgcolor: '#0F766E',
+                    bgcolor: (t) => t.palette.primary.main,
                     color: '#FFFFFF'
                   }}
                 >
@@ -1069,13 +1069,13 @@ export default function Settings() {
               elevation={0}
               sx={{
                 p: 3,
-                borderRadius: 3.5,
+                borderRadius: (t) => `${t.custom?.designSystem?.shape?.cardRadius || 12}px`,
                 border: '1px solid',
                 borderColor: 'divider',
                 bgcolor: 'background.paper'
               }}
             >
-              <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E', textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', mb: 1.5 }}>
+              <Typography variant="caption" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', mb: 1.5 }}>
                 🏛️ Invoice Settlement Box Live Preview
               </Typography>
               <Box
@@ -1083,21 +1083,21 @@ export default function Settings() {
                   p: 2,
                   borderRadius: 2,
                   bgcolor: 'rgba(15, 118, 110, 0.03)',
-                  border: '1.5px solid rgba(15, 118, 110, 0.2)'
+                  border: '1.5px solid rgba(var(--primary-rgb, 15, 118, 110), 0.2)'
                 }}
               >
                 {(formProfile.leftBoxMode === 'luxury-composite' || !formProfile.leftBoxMode) && (
                   <Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 0.8, mb: 1, borderBottom: '1px dashed rgba(15, 118, 110, 0.2)' }}>
-                      <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E', textTransform: 'uppercase', fontSize: '0.7rem' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 0.8, mb: 1, borderBottom: '1px dashed rgba(var(--primary-rgb, 15, 118, 110), 0.2)' }}>
+                      <Typography variant="caption" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, textTransform: 'uppercase', fontSize: '0.7rem' }}>
                         ⚜️ Atelier Privileges & Quick Pay
                       </Typography>
                       <Chip label="✦ VIP Patron" size="small" sx={{ bgcolor: 'rgba(194, 141, 75, 0.12)', color: '#B45309', fontWeight: 800, fontSize: '0.62rem' }} />
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', py: 0.75, mb: 1, bgcolor: '#FFFFFF', borderRadius: 1.5, border: '1px solid #E2E8F0' }}>
                       <Box sx={{ textAlign: 'center' }}>
-                        <QrCode2 sx={{ fontSize: 48, color: '#0F766E' }} />
-                        <Typography variant="caption" sx={{ display: 'block', fontSize: '0.55rem', fontWeight: 800, color: '#0F766E' }}>Scan to Pay</Typography>
+                        <QrCode2 sx={{ fontSize: 48, color: (t) => t.palette.primary.main }} />
+                        <Typography variant="caption" sx={{ display: 'block', fontSize: '0.55rem', fontWeight: 800, color: (t) => t.palette.primary.main }}>Scan to Pay</Typography>
                       </Box>
                       <Box sx={{ textAlign: 'center' }}>
                         <Box component="img" src={instagramQrImg} alt="Instagram QR" sx={{ width: 48, height: 48, objectFit: 'contain', display: 'block', mx: 'auto' }} />
@@ -1108,7 +1108,7 @@ export default function Settings() {
                       <Typography variant="caption" sx={{ color: 'text.secondary' }}>🎁 <b>Loyalty Club:</b> Reward points</Typography>
                       <Typography variant="caption" sx={{ color: 'text.secondary' }}>✂️ <b>Tailoring:</b> 30-Day alterations</Typography>
                       <Typography variant="caption" sx={{ color: 'text.secondary' }}>✨ <b>Care:</b> Dry Clean Only</Typography>
-                      <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 800 }}>UPI: {formProfile.bankDetails.upiId || 'aleenclothing@hdfcbank'}</Typography>
+                      <Typography variant="caption" sx={{ color: (t) => t.palette.primary.main, fontWeight: 800 }}>UPI: {formProfile.bankDetails.upiId || 'aleenclothing@hdfcbank'}</Typography>
                     </Box>
                   </Box>
                 )}
@@ -1116,10 +1116,10 @@ export default function Settings() {
                 {formProfile.leftBoxMode === 'upi-qr' && (
                   <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
                     <Box sx={{ p: 0.5, bgcolor: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 1.5, textAlign: 'center' }}>
-                      <QrCode2 sx={{ fontSize: 52, color: '#0F766E' }} />
+                      <QrCode2 sx={{ fontSize: 52, color: (t) => t.palette.primary.main }} />
                     </Box>
                     <Box>
-                      <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E', display: 'block' }}>⚡ Scan & Pay via UPI</Typography>
+                      <Typography variant="caption" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, display: 'block' }}>⚡ Scan & Pay via UPI</Typography>
                       <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>UPI ID: <b>{formProfile.bankDetails.upiId || 'aleenclothing@hdfcbank'}</b></Typography>
                       <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>GPay, PhonePe, Paytm, Cred</Typography>
                     </Box>
@@ -1128,17 +1128,17 @@ export default function Settings() {
 
                 {formProfile.leftBoxMode === 'banking' && (
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, fontSize: '0.75rem' }}>
-                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E' }}>Bank Details:</Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>Bank Details:</Typography>
                     <Typography variant="caption">Bank: <b>{formProfile.bankDetails.bankName || 'HDFC Bank Ltd'}</b></Typography>
                     <Typography variant="caption">A/C: <b>{formProfile.bankDetails.accountNumber || '50200088992211'}</b></Typography>
                     <Typography variant="caption">IFSC: <b>{formProfile.bankDetails.ifsc || 'HDFC0001234'}</b></Typography>
-                    <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 800 }}>UPI: {formProfile.bankDetails.upiId || 'aleenclothing@hdfcbank'}</Typography>
+                    <Typography variant="caption" sx={{ color: (t) => t.palette.primary.main, fontWeight: 800 }}>UPI: {formProfile.bankDetails.upiId || 'aleenclothing@hdfcbank'}</Typography>
                   </Box>
                 )}
 
                 {formProfile.leftBoxMode === 'loyalty-privileges' && (
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E' }}>👑 Atelier Patron Privileges</Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>👑 Atelier Patron Privileges</Typography>
                     <Typography variant="caption" sx={{ color: 'text.secondary' }}>🎁 VIP reward accruals on every purchase</Typography>
                     <Typography variant="caption" sx={{ color: 'text.secondary' }}>✂️ 30-Day complimentary fitting guarantee</Typography>
                     <Typography variant="caption" sx={{ color: 'text.secondary' }}>✦ Priority access to bespoke seasonal previews</Typography>
@@ -1147,7 +1147,7 @@ export default function Settings() {
 
                 {formProfile.leftBoxMode === 'garment-care' && (
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E' }}>✂️ Bespoke Care & Alterations</Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>✂️ Bespoke Care & Alterations</Typography>
                     <Typography variant="caption" sx={{ color: 'text.secondary' }}>✨ Dry clean only with specialized fabric preservation</Typography>
                     <Typography variant="caption" sx={{ color: 'text.secondary' }}>✂️ Complimentary tailoring adjustments within 30 days</Typography>
                   </Box>
@@ -1155,7 +1155,7 @@ export default function Settings() {
 
                 {formProfile.leftBoxMode === 'concierge' && (
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E' }}>💬 VIP Social & Concierge</Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>💬 VIP Social & Concierge</Typography>
                     <Typography variant="caption" sx={{ color: 'text.secondary' }}>📱 WhatsApp VIP styling concierge</Typography>
                     <Typography variant="caption" sx={{ color: 'text.secondary' }}>📸 Instagram: @aleenclothing</Typography>
                   </Box>
@@ -1185,7 +1185,7 @@ export default function Settings() {
               elevation={0}
               sx={{
                 p: { xs: 2.5, sm: 3.5 },
-                borderRadius: 3.5,
+                borderRadius: (t) => `${t.custom?.designSystem?.shape?.cardRadius || 12}px`,
                 border: '1px solid',
                 borderColor: 'divider',
                 bgcolor: 'background.paper'
@@ -1215,7 +1215,7 @@ export default function Settings() {
                             borderRadius: 2,
                             border: '2px solid',
                             borderColor: isSelected ? '#0F766E' : 'divider',
-                            bgcolor: isSelected ? 'rgba(15, 118, 110, 0.05)' : 'background.paper',
+                            bgcolor: isSelected ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)' : 'background.paper',
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
@@ -1268,8 +1268,8 @@ export default function Settings() {
                         sx={{
                           textTransform: 'none',
                           fontWeight: 700,
-                          borderColor: '#0F766E',
-                          color: '#0F766E'
+                          bordercolor: (t) => t.palette.primary.main,
+                          color: (t) => t.palette.primary.main
                         }}
                       >
                         Upload Letterhead Banner
@@ -1375,7 +1375,7 @@ export default function Settings() {
                 </Typography>
 
                 {formProfile.showSignatureStamp && (
-                  <Box sx={{ p: 2.5, borderRadius: 2.5, bgcolor: 'rgba(15, 118, 110, 0.03)', border: '1px solid rgba(15, 118, 110, 0.15)' }}>
+                  <Box sx={{ p: 2.5, borderRadius: (t) => `${t.shape?.borderRadius || 8}px`, bgcolor: 'rgba(15, 118, 110, 0.03)', border: '1px solid rgba(15, 118, 110, 0.15)' }}>
                     <Grid container spacing={2}>
                       <Grid item xs={12} sm={6}>
                         <TextField
@@ -1407,14 +1407,14 @@ export default function Settings() {
                             component="label"
                             startIcon={<CloudUpload />}
                             sx={{
-                              borderColor: '#0F766E',
-                              color: '#0F766E',
+                              bordercolor: (t) => t.palette.primary.main,
+                              color: (t) => t.palette.primary.main,
                               textTransform: 'none',
                               fontWeight: 700,
                               borderRadius: 2,
                               '&:hover': {
                                 borderColor: '#042F2E',
-                                bgcolor: 'rgba(15, 118, 110, 0.05)'
+                                bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)'
                               }
                             }}
                           >
@@ -1453,7 +1453,7 @@ export default function Settings() {
                             </Box>
                             <Box>
                               <Typography variant="body2" sx={{ fontWeight: 800, color: '#042F2E', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                <CheckCircle sx={{ fontSize: 16, color: '#0F766E' }} /> Custom Signature Active
+                                <CheckCircle sx={{ fontSize: 16, color: (t) => t.palette.primary.main }} /> Custom Signature Active
                               </Typography>
                               <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
                                 This signature will render directly above "{formProfile.signatureLabel}" on printed invoices and PDF downloads.
@@ -1511,7 +1511,7 @@ export default function Settings() {
                     borderRadius: 2,
                     fontWeight: 800,
                     textTransform: 'none',
-                    bgcolor: '#0F766E',
+                    bgcolor: (t) => t.palette.primary.main,
                     color: '#FFFFFF'
                   }}
                 >
@@ -1526,7 +1526,7 @@ export default function Settings() {
               elevation={0}
               sx={{
                 p: 3,
-                borderRadius: 3.5,
+                borderRadius: (t) => `${t.custom?.designSystem?.shape?.cardRadius || 12}px`,
                 border: '1px solid',
                 borderColor: 'divider',
                 bgcolor: 'background.paper'
@@ -1542,7 +1542,7 @@ export default function Settings() {
                 <Typography variant="caption" sx={{ color: 'text.secondary', whiteSpace: 'pre-line', display: 'block', fontSize: '0.68rem', lineHeight: 1.4 }}>
                   {formProfile.termsText}
                 </Typography>
-                <Typography variant="body2" sx={{ mt: 1.5, fontWeight: 700, color: '#0F766E', fontSize: '0.75rem' }}>
+                <Typography variant="body2" sx={{ mt: 1.5, fontWeight: 700, color: (t) => t.palette.primary.main, fontSize: '0.75rem' }}>
                   {formProfile.customFooterNote}
                 </Typography>
                 {formProfile.showSignatureStamp && (
@@ -1577,7 +1577,7 @@ export default function Settings() {
             elevation={0}
             sx={{
               p: { xs: 2.5, sm: 3.5 },
-              borderRadius: 3.5,
+              borderRadius: (t) => `${t.custom?.designSystem?.shape?.cardRadius || 12}px`,
               border: '1px solid',
               borderColor: 'divider',
               bgcolor: 'background.paper',
@@ -1598,7 +1598,7 @@ export default function Settings() {
                 startIcon={<Add />}
                 onClick={handleOpenAddStaff}
                 sx={{
-                  borderRadius: 2.5,
+                  borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                   fontWeight: 800,
                   textTransform: 'none',
                   bgcolor: '#D97706',
@@ -1613,7 +1613,7 @@ export default function Settings() {
 
             <TableContainer sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
               <Table>
-                <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.05)' }}>
+                <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)' }}>
                   <TableRow>
                     <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem' }}>Staff Member</TableCell>
                     <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem' }}>Login ID</TableCell>
@@ -1648,7 +1648,7 @@ export default function Settings() {
                           <Chip
                             label={staff.loginId}
                             size="small"
-                            sx={{ fontWeight: 800, fontFamily: 'monospace', bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E' }}
+                            sx={{ fontWeight: 800, fontFamily: 'monospace', bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main }}
                           />
                         </TableCell>
                         <TableCell>
@@ -1697,7 +1697,7 @@ export default function Settings() {
                               <IconButton
                                 size="small"
                                 onClick={() => handleOpenEditStaff(staff)}
-                                sx={{ color: '#0F766E' }}
+                                sx={{ color: (t) => t.palette.primary.main }}
                               >
                                 <Edit fontSize="small" />
                               </IconButton>
@@ -1748,14 +1748,14 @@ export default function Settings() {
               elevation={0}
               sx={{
                 p: { xs: 2.5, sm: 3.5 },
-                borderRadius: 3.5,
+                borderRadius: (t) => `${t.custom?.designSystem?.shape?.cardRadius || 12}px`,
                 border: '1px solid',
                 borderColor: 'divider',
                 bgcolor: 'background.paper'
               }}
             >
               <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E', mb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Lock sx={{ color: '#0F766E' }} /> Master Admin Password
+                <Lock sx={{ color: (t) => t.palette.primary.main }} /> Master Admin Password
               </Typography>
               <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 3 }}>
                 Change the master password used to authenticate as Administrator (<code>admin@aleen.com</code>).
@@ -1828,9 +1828,9 @@ export default function Settings() {
                         borderRadius: 2,
                         textTransform: 'none',
                         fontWeight: 800,
-                        bgcolor: '#0F766E',
+                        bgcolor: (t) => t.palette.primary.main,
                         color: '#FFFFFF',
-                        '&:hover': { bgcolor: '#042F2E' }
+                        '&:hover': { bgcolor: (t) => t.palette.primary.dark }
                       }}
                     >
                       Update Master Password
@@ -1846,7 +1846,7 @@ export default function Settings() {
               elevation={0}
               sx={{
                 p: { xs: 2.5, sm: 3.5 },
-                borderRadius: 3.5,
+                borderRadius: (t) => `${t.custom?.designSystem?.shape?.cardRadius || 12}px`,
                 border: '1px solid',
                 borderColor: 'divider',
                 bgcolor: 'background.paper'
@@ -2127,7 +2127,7 @@ export default function Settings() {
                 borderRadius: 2,
                 fontWeight: 800,
                 textTransform: 'none',
-                bgcolor: '#0F766E',
+                bgcolor: (t) => t.palette.primary.main,
                 color: '#FFFFFF'
               }}
             >
@@ -2205,8 +2205,8 @@ export default function Settings() {
               sx={{
                 width: 38,
                 height: 38,
-                borderRadius: '10px',
-                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                 color: '#F59E0B',
                 display: 'flex',
                 alignItems: 'center',
@@ -2241,10 +2241,10 @@ export default function Settings() {
                     onClick={() => handleSelectPredefinedLogo(logo.dataUri, logo.name)}
                     sx={{
                       p: 2.5,
-                      borderRadius: 3,
+                      borderRadius: (t) => `${t.custom?.designSystem?.shape?.cardRadius || 10}px`,
                       border: '2px solid',
                       borderColor: isSelected ? '#0F766E' : 'divider',
-                      bgcolor: isSelected ? 'rgba(15, 118, 110, 0.05)' : 'background.paper',
+                      bgcolor: isSelected ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)' : 'background.paper',
                       textAlign: 'center',
                       cursor: 'pointer',
                       transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -2253,7 +2253,7 @@ export default function Settings() {
                       '&:hover': {
                         transform: 'translateY(-3px)',
                         boxShadow: '0 10px 25px rgba(15, 118, 110, 0.15)',
-                        borderColor: '#0F766E'
+                        bordercolor: (t) => t.palette.primary.main
                       }
                     }}
                   >
@@ -2266,7 +2266,7 @@ export default function Settings() {
                           position: 'absolute',
                           top: 10,
                           right: 10,
-                          bgcolor: '#0F766E',
+                          bgcolor: (t) => t.palette.primary.main,
                           color: '#FFFFFF',
                           fontWeight: 800,
                           fontSize: '0.68rem',
@@ -2283,7 +2283,7 @@ export default function Settings() {
                       sx={{
                         width: 90,
                         height: 90,
-                        borderRadius: 3,
+                        borderRadius: (t) => `${t.custom?.designSystem?.shape?.cardRadius || 10}px`,
                         mx: 'auto',
                         mb: 1.5,
                         display: 'block',
@@ -2323,7 +2323,7 @@ export default function Settings() {
                         fontSize: '0.75rem',
                         textTransform: 'none',
                         bgcolor: isSelected ? '#0F766E' : 'transparent',
-                        borderColor: '#0F766E',
+                        bordercolor: (t) => t.palette.primary.main,
                         color: isSelected ? '#FFFFFF' : '#0F766E',
                         '&:hover': {
                           bgcolor: isSelected ? '#042F2E' : 'rgba(15, 118, 110, 0.08)'
@@ -2346,7 +2346,7 @@ export default function Settings() {
               setLogoModalOpen(false);
               logoInputRef.current?.click();
             }}
-            sx={{ fontWeight: 700, textTransform: 'none', color: '#0F766E' }}
+            sx={{ fontWeight: 700, textTransform: 'none', color: (t) => t.palette.primary.main }}
           >
             Or Upload Custom File from Device
           </Button>
@@ -2354,13 +2354,13 @@ export default function Settings() {
             onClick={() => setLogoModalOpen(false)}
             variant="contained"
             sx={{
-              bgcolor: '#042F2E',
+              bgcolor: (t) => t.palette.primary.dark,
               color: '#FFFFFF',
               fontWeight: 800,
               borderRadius: 2,
               textTransform: 'none',
               px: 3,
-              '&:hover': { bgcolor: '#0F766E' }
+              '&:hover': { bgcolor: (t) => t.palette.primary.main }
             }}
           >
             Done

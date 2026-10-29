@@ -1599,15 +1599,15 @@ const Invoices = () => {
           <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
             <Button
               variant="outlined"
-              startIcon={<Palette sx={{ fontSize: 19, color: '#0F766E' }} />}
+              startIcon={<Palette sx={{ fontSize: 19, color: (t) => t.palette.primary.main }} />}
               onClick={() => setTemplateModalOpen(true)}
               sx={{
                 height: 42,
                 minHeight: 42,
                 px: 2.75,
-                borderRadius: '24px',
-                border: '1.5px solid #0F766E',
-                color: '#0F766E',
+                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                border: (t) => `1.5px solid ${t.palette.primary.main}`,
+                color: (t) => t.palette.primary.main,
                 bgcolor: 'background.paper',
                 fontWeight: 700,
                 fontSize: '0.84rem',
@@ -1618,7 +1618,7 @@ const Invoices = () => {
                 boxSizing: 'border-box',
                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                 '&:hover': {
-                  border: '1.5px solid #042F2E',
+                  border: (t) => `1.5px solid ${t.palette.primary.dark}`,
                   bgcolor: 'rgba(15, 118, 110, 0.05)',
                   transform: 'translateY(-1px)'
                 }
@@ -1628,15 +1628,15 @@ const Invoices = () => {
             </Button>
             <Button
               variant="outlined"
-              startIcon={<PointOfSale sx={{ fontSize: 19, color: '#0F766E' }} />}
+              startIcon={<PointOfSale sx={{ fontSize: 19, color: (t) => t.palette.primary.main }} />}
               onClick={() => setCashDrawerModalOpen(true)}
               sx={{
                 height: 42,
                 minHeight: 42,
                 px: 2.75,
-                borderRadius: '24px',
-                border: '1.5px solid #0F766E',
-                color: '#0F766E',
+                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                border: (t) => `1.5px solid ${t.palette.primary.main}`,
+                color: (t) => t.palette.primary.main,
                 bgcolor: 'background.paper',
                 fontWeight: 700,
                 fontSize: '0.84rem',
@@ -1647,7 +1647,7 @@ const Invoices = () => {
                 boxSizing: 'border-box',
                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                 '&:hover': {
-                  border: '1.5px solid #042F2E',
+                  border: (t) => `1.5px solid ${t.palette.primary.dark}`,
                   bgcolor: 'rgba(15, 118, 110, 0.05)',
                   transform: 'translateY(-1px)'
                 }
@@ -1657,15 +1657,15 @@ const Invoices = () => {
             </Button>
             <Button
               variant="outlined"
-              startIcon={<Download sx={{ fontSize: 19, color: '#0F766E' }} />}
+              startIcon={<Download sx={{ fontSize: 19, color: (t) => t.palette.primary.main }} />}
               onClick={downloadInvoices}
               sx={{
                 height: 42,
                 minHeight: 42,
                 px: 2.75,
-                borderRadius: '24px',
-                border: '1.5px solid #0F766E',
-                color: '#0F766E',
+                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                border: (t) => `1.5px solid ${t.palette.primary.main}`,
+                color: (t) => t.palette.primary.main,
                 bgcolor: 'background.paper',
                 fontWeight: 700,
                 fontSize: '0.84rem',
@@ -1676,7 +1676,7 @@ const Invoices = () => {
                 boxSizing: 'border-box',
                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                 '&:hover': {
-                  border: '1.5px solid #042F2E',
+                  border: (t) => `1.5px solid ${t.palette.primary.dark}`,
                   bgcolor: 'rgba(15, 118, 110, 0.05)',
                   transform: 'translateY(-1px)'
                 }
@@ -1693,7 +1693,7 @@ const Invoices = () => {
                   height: 42,
                   minHeight: 42,
                   px: 2.5,
-                  borderRadius: '24px',
+                  borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                   fontWeight: 700,
                   fontSize: '0.84rem',
                   textTransform: 'none',
@@ -1720,7 +1720,7 @@ const Invoices = () => {
                 height: 42,
                 minHeight: 42,
                 px: 2,
-                borderRadius: '24px',
+                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                 fontWeight: 700,
                 fontSize: '0.84rem',
                 textTransform: 'none',
@@ -1766,7 +1766,7 @@ const Invoices = () => {
                 height: 42,
                 minHeight: 42,
                 px: 3,
-                borderRadius: '24px',
+                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                 fontWeight: 700,
                 fontSize: '0.84rem',
                 textTransform: 'none',
@@ -1775,7 +1775,7 @@ const Invoices = () => {
                 justifyContent: 'center',
                 gap: 1,
                 boxSizing: 'border-box',
-                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%) !important',
+                background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                 color: '#FFFFFF !important',
                 boxShadow: '0 4px 14px rgba(15, 118, 110, 0.3)',
                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -1783,7 +1783,7 @@ const Invoices = () => {
                   color: '#FFFFFF !important'
                 },
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #115E59 0%, #021C1B 100%) !important',
+                  background: (t) => t.palette.primary.dark,
                   boxShadow: '0 6px 18px rgba(15, 118, 110, 0.45)',
                   transform: 'translateY(-1px)'
                 }
@@ -2056,7 +2056,7 @@ const Invoices = () => {
               {paymentFilter !== 'All' && <span> • Payment: <strong>{paymentFilter}</strong></span>}
               {searchTerm && <span> • Search: "<em>{searchTerm}</em>"</span>}
               {' • Total Value: '}
-              <strong style={{ color: '#0F766E' }}>₹{displayRevenue.toLocaleString('en-IN')}</strong>
+              <strong style={{ color: (t) => t.palette.primary.main }}>₹{displayRevenue.toLocaleString('en-IN')}</strong>
             </Typography>
 
             <Chip
@@ -2068,7 +2068,7 @@ const Invoices = () => {
                 height: 24,
                 fontSize: '0.7rem',
                 fontWeight: 700,
-                bgcolor: '#0F766E',
+                bgcolor: (t) => t.palette.primary.main,
                 color: '#FFFFFF',
                 '& .MuiChip-deleteIcon': {
                   color: '#FFFFFF',
@@ -2120,7 +2120,7 @@ const Invoices = () => {
                         sx={{
                           fontFamily: '"JetBrains Mono", monospace',
                           fontWeight: 700,
-                          color: '#0F766E',
+                          color: (t) => t.palette.primary.main,
                           fontSize: '0.78rem',
                           px: 0.8,
                           py: 0.2,
@@ -2159,7 +2159,7 @@ const Invoices = () => {
                           height: 22,
                           borderRadius: '50%',
                           bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
-                          color: '#0F766E',
+                          color: (t) => t.palette.primary.main,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -2213,7 +2213,7 @@ const Invoices = () => {
                           sx={{
                             width: 28,
                             height: 28,
-                            color: '#0F766E',
+                            color: (t) => t.palette.primary.main,
                             bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(15, 118, 110, 0.08)',
                             border: '1px solid rgba(15, 118, 110, 0.2)'
                           }}
@@ -2291,7 +2291,7 @@ const Invoices = () => {
                         px: 1.5,
                         py: 1.1,
                         mb: 0.75,
-                        borderRadius: '10px',
+                        borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                         bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.1)' : 'rgba(15, 118, 110, 0.05)',
                         border: '1px solid rgba(15, 118, 110, 0.1)'
                       }}
@@ -2303,7 +2303,7 @@ const Invoices = () => {
                             fontFamily: 'monospace',
                             fontWeight: 800,
                             fontSize: '0.74rem',
-                            color: '#0F766E'
+                            color: (t) => t.palette.primary.main
                           }}
                         >
                           #{inv.invoiceNumber || inv.id?.slice(0, 8)}
@@ -2313,7 +2313,7 @@ const Invoices = () => {
                           sx={{
                             fontWeight: 900,
                             fontSize: '0.82rem',
-                            color: '#0F766E',
+                            color: (t) => t.palette.primary.main,
                             fontVariantNumeric: 'tabular-nums'
                           }}
                         >
@@ -2343,7 +2343,7 @@ const Invoices = () => {
                       sx={{
                         py: 0.9,
                         px: 1.2,
-                        borderRadius: '10px',
+                        borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                         my: 0.25,
                         transition: 'all 0.15s ease',
                         '&:hover': {
@@ -2361,7 +2361,7 @@ const Invoices = () => {
                           alignItems: 'center',
                           justifyContent: 'center',
                           bgcolor: 'rgba(15, 118, 110, 0.1)',
-                          color: '#0F766E',
+                          color: (t) => t.palette.primary.main,
                           mr: 1.4,
                           flexShrink: 0
                         }}
@@ -2383,7 +2383,7 @@ const Invoices = () => {
                       sx={{
                         py: 0.9,
                         px: 1.2,
-                        borderRadius: '10px',
+                        borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                         my: 0.25,
                         transition: 'all 0.15s ease',
                         '&:hover': {
@@ -2423,7 +2423,7 @@ const Invoices = () => {
                       sx={{
                         py: 0.9,
                         px: 1.2,
-                        borderRadius: '10px',
+                        borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                         my: 0.25,
                         transition: 'all 0.15s ease',
                         '&:hover': {
@@ -2463,7 +2463,7 @@ const Invoices = () => {
                       sx={{
                         py: 0.9,
                         px: 1.2,
-                        borderRadius: '10px',
+                        borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                         my: 0.25,
                         transition: 'all 0.15s ease',
                         '&:hover': {
@@ -2506,7 +2506,7 @@ const Invoices = () => {
                           sx={{
                             py: 0.9,
                             px: 1.2,
-                            borderRadius: '10px',
+                            borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                             my: 0.25,
                             transition: 'all 0.15s ease',
                             '&:hover': {
@@ -2614,7 +2614,7 @@ const Invoices = () => {
                                 sx={{
                                   fontFamily: '"JetBrains Mono", monospace',
                                   fontWeight: 800,
-                                  color: '#0F766E',
+                                  color: (t) => t.palette.primary.main,
                                   fontSize: '0.76rem',
                                   bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(15, 118, 110, 0.08)',
                                   px: 0.85,
@@ -2636,7 +2636,7 @@ const Invoices = () => {
                         </TableCell>
                         <TableCell>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                            <CalendarMonth sx={{ fontSize: 16, color: '#0F766E', opacity: 0.7 }} />
+                            <CalendarMonth sx={{ fontSize: 16, color: (t) => t.palette.primary.main, opacity: 0.7 }} />
                             <Box>
                               <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.84rem' }}>
                                 {new Date(inv.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
@@ -2656,7 +2656,7 @@ const Invoices = () => {
                                 fontSize: '0.75rem',
                                 fontWeight: 800,
                                 bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.18)' : 'rgba(15, 118, 110, 0.12)',
-                                color: '#0F766E',
+                                color: (t) => t.palette.primary.main,
                                 border: '1.5px solid rgba(15, 118, 110, 0.22)'
                               }}
                             >
@@ -2718,7 +2718,7 @@ const Invoices = () => {
                             sx={{
                               fontWeight: 900,
                               fontSize: '0.96rem',
-                              color: '#0F766E',
+                              color: (t) => t.palette.primary.main,
                               fontFamily: '"Plus Jakarta Sans", sans-serif',
                               fontVariantNumeric: 'tabular-nums'
                             }}
@@ -2733,7 +2733,7 @@ const Invoices = () => {
                               alignItems: 'center',
                               gap: 0.75,
                               p: '3px 6px',
-                              borderRadius: '24px',
+                              borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                               bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)',
                               border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.12)'
                             }}
@@ -2745,13 +2745,13 @@ const Invoices = () => {
                                 sx={{
                                   width: 30,
                                   height: 30,
-                                  color: '#0F766E',
+                                  color: (t) => t.palette.primary.main,
                                   bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
                                   border: '1px solid rgba(15, 118, 110, 0.16)',
                                   boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
                                   transition: 'all 0.18s ease',
                                   '&:hover': {
-                                    bgcolor: '#0F766E',
+                                    bgcolor: (t) => t.palette.primary.main,
                                     color: '#FFFFFF',
                                     transform: 'translateY(-1px)',
                                     boxShadow: '0 4px 10px rgba(15, 118, 110, 0.3)'
@@ -2822,7 +2822,7 @@ const Invoices = () => {
                                   transition: 'all 0.18s ease',
                                   '&:hover': {
                                     bgcolor: 'rgba(15, 118, 110, 0.1)',
-                                    color: '#0F766E',
+                                    color: (t) => t.palette.primary.main,
                                     borderColor: 'rgba(15, 118, 110, 0.25)'
                                   }
                                 }}
@@ -2855,7 +2855,7 @@ const Invoices = () => {
                                 px: 1.5,
                                 py: 1.1,
                                 mb: 0.75,
-                                borderRadius: '10px',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                 bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.1)' : 'rgba(15, 118, 110, 0.05)',
                                 border: '1px solid rgba(15, 118, 110, 0.1)'
                               }}
@@ -2867,7 +2867,7 @@ const Invoices = () => {
                                     fontFamily: 'monospace',
                                     fontWeight: 800,
                                     fontSize: '0.74rem',
-                                    color: '#0F766E'
+                                    color: (t) => t.palette.primary.main
                                   }}
                                 >
                                   #{inv.invoiceNumber || inv.id?.slice(0, 8)}
@@ -2877,7 +2877,7 @@ const Invoices = () => {
                                   sx={{
                                     fontWeight: 900,
                                     fontSize: '0.82rem',
-                                    color: '#0F766E',
+                                    color: (t) => t.palette.primary.main,
                                     fontVariantNumeric: 'tabular-nums'
                                   }}
                                 >
@@ -2907,7 +2907,7 @@ const Invoices = () => {
                               sx={{
                                 py: 0.9,
                                 px: 1.2,
-                                borderRadius: '10px',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                 my: 0.25,
                                 transition: 'all 0.15s ease',
                                 '&:hover': {
@@ -2925,7 +2925,7 @@ const Invoices = () => {
                                   alignItems: 'center',
                                   justifyContent: 'center',
                                   bgcolor: 'rgba(15, 118, 110, 0.1)',
-                                  color: '#0F766E',
+                                  color: (t) => t.palette.primary.main,
                                   mr: 1.4,
                                   flexShrink: 0
                                 }}
@@ -2947,7 +2947,7 @@ const Invoices = () => {
                               sx={{
                                 py: 0.9,
                                 px: 1.2,
-                                borderRadius: '10px',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                 my: 0.25,
                                 transition: 'all 0.15s ease',
                                 '&:hover': {
@@ -2987,7 +2987,7 @@ const Invoices = () => {
                               sx={{
                                 py: 0.9,
                                 px: 1.2,
-                                borderRadius: '10px',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                 my: 0.25,
                                 transition: 'all 0.15s ease',
                                 '&:hover': {
@@ -3027,7 +3027,7 @@ const Invoices = () => {
                               sx={{
                                 py: 0.9,
                                 px: 1.2,
-                                borderRadius: '10px',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                 my: 0.25,
                                 transition: 'all 0.15s ease',
                                 '&:hover': {
@@ -3070,7 +3070,7 @@ const Invoices = () => {
                                   sx={{
                                     py: 0.9,
                                     px: 1.2,
-                                    borderRadius: '10px',
+                                    borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                     my: 0.25,
                                     transition: 'all 0.15s ease',
                                     '&:hover': {
@@ -3130,8 +3130,8 @@ const Invoices = () => {
                             sx={{
                               mt: 2,
                               borderRadius: 2,
-                              borderColor: '#0F766E',
-                              color: '#0F766E',
+                              bordercolor: (t) => t.palette.primary.main,
+                              color: (t) => t.palette.primary.main,
                               fontWeight: 700,
                               textTransform: 'none'
                             }}
@@ -3182,7 +3182,7 @@ const Invoices = () => {
         }}
       >
         <DialogTitle sx={{
-          background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+          background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
           color: 'white',
           px: { xs: 1.75, sm: 2.5 },
           py: { xs: 1.25, sm: 1.75 },
@@ -3312,7 +3312,7 @@ const Invoices = () => {
               }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1, mb: 2 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <PersonOutline sx={{ color: '#0F766E', fontSize: 20 }} />
+                    <PersonOutline sx={{ color: (t) => t.palette.primary.main, fontSize: 20 }} />
                     <Typography variant="subtitle2" sx={{ fontWeight: 800, letterSpacing: '0.02em', textTransform: 'uppercase', fontSize: '0.78rem' }}>
                       Client Details
                     </Typography>
@@ -3348,9 +3348,9 @@ const Invoices = () => {
                             fontSize: '0.72rem',
                             py: 0.2,
                             px: 1,
-                            borderColor: '#0F766E',
-                            color: '#0F766E',
-                            '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.08)', borderColor: '#0F766E' }
+                            bordercolor: (t) => t.palette.primary.main,
+                            color: (t) => t.palette.primary.main,
+                            '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.08)', bordercolor: (t) => t.palette.primary.main }
                           }}
                         >
                           {matchedCustomer.measurements ? 'Fitted' : 'Measure'}
@@ -3525,7 +3525,7 @@ const Invoices = () => {
               }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <ShoppingBagOutlined sx={{ color: '#0F766E', fontSize: 20 }} />
+                    <ShoppingBagOutlined sx={{ color: (t) => t.palette.primary.main, fontSize: 20 }} />
                     <Typography variant="subtitle2" sx={{ fontWeight: 800, letterSpacing: '0.02em', textTransform: 'uppercase', fontSize: '0.78rem' }}>
                       Selected Garments & Merchandise ({selectedItems.filter(i => i.id).length})
                     </Typography>
@@ -3590,7 +3590,7 @@ const Invoices = () => {
                 {/* Quick Add / Scan Barcode Bar */}
                 <Box sx={{ mb: 2 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.75 }}>
-                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <QrCodeScanner sx={{ fontSize: 15 }} /> Scan Barcode or SKU
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
@@ -3658,7 +3658,7 @@ const Invoices = () => {
                                 fontWeight: 800,
                                 textTransform: 'none',
                                 borderRadius: 1.5,
-                                bgcolor: '#0F766E',
+                                bgcolor: (t) => t.palette.primary.main,
                                 color: '#fff'
                               }}
                             >
@@ -3666,7 +3666,7 @@ const Invoices = () => {
                             </Button>
                           )}
                           <Tooltip title="Scan using Camera / Phone Viewfinder">
-                            <IconButton size="small" onClick={() => setScannerOpen(true)} sx={{ color: '#0F766E' }}>
+                            <IconButton size="small" onClick={() => setScannerOpen(true)} sx={{ color: (t) => t.palette.primary.main }}>
                               <CameraAlt fontSize="small" />
                             </IconButton>
                           </Tooltip>
@@ -3778,7 +3778,7 @@ const Invoices = () => {
                         borderColor: 'divider',
                         transition: 'all 0.15s ease-in-out',
                         '&:hover': {
-                          borderColor: '#0F766E',
+                          bordercolor: (t) => t.palette.primary.main,
                           boxShadow: '0 4px 12px rgba(15,118,110,0.06)'
                         }
                       }}>
@@ -3936,7 +3936,7 @@ const Invoices = () => {
 
                           <Box sx={{ textAlign: 'right' }}>
                             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.68rem' }}>Line Total</Typography>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>
                               ₹{item.isCustom
                                 ? ((item.customPrice || 0) * item.quantity).toLocaleString('en-IN')
                                 : (selectedProduct ? (selectedProduct.price * item.quantity).toLocaleString('en-IN') : '0')
@@ -3959,8 +3959,8 @@ const Invoices = () => {
                     borderRadius: 2,
                     fontWeight: 700,
                     borderStyle: 'dashed',
-                    color: '#0F766E',
-                    borderColor: '#0F766E',
+                    color: (t) => t.palette.primary.main,
+                    bordercolor: (t) => t.palette.primary.main,
                     '&:hover': {
                       borderStyle: 'dashed',
                       bgcolor: 'rgba(15, 118, 110, 0.04)'
@@ -3987,8 +3987,8 @@ const Invoices = () => {
                 <Box sx={{ mb: 2 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <PaymentsOutlined sx={{ color: '#0F766E', fontSize: 20 }} />
-                      <Typography variant="subtitle2" sx={{ fontWeight: 800, letterSpacing: '0.02em', textTransform: 'uppercase', fontSize: '0.78rem', color: '#0F766E' }}>
+                      <PaymentsOutlined sx={{ color: (t) => t.palette.primary.main, fontSize: 20 }} />
+                      <Typography variant="subtitle2" sx={{ fontWeight: 800, letterSpacing: '0.02em', textTransform: 'uppercase', fontSize: '0.78rem', color: (t) => t.palette.primary.main }}>
                         Multi-Tender Settlement Console
                       </Typography>
                     </Box>
@@ -4043,7 +4043,7 @@ const Invoices = () => {
                             boxShadow: isSelected ? '0 2px 8px rgba(15, 118, 110, 0.25)' : 'none',
                             '&:hover': {
                               bgcolor: isSelected ? '#042F2E' : 'rgba(15, 118, 110, 0.06)',
-                              borderColor: '#0F766E'
+                              bordercolor: (t) => t.palette.primary.main
                             }
                           }}
                         >
@@ -4080,7 +4080,7 @@ const Invoices = () => {
                             fontWeight: 700,
                             borderRadius: '8px',
                             textTransform: 'none',
-                            color: '#0F766E',
+                            color: (t) => t.palette.primary.main,
                             borderColor: 'rgba(15, 118, 110, 0.25)',
                             bgcolor: 'rgba(15, 118, 110, 0.04)',
                             transition: 'all 0.15s ease',
@@ -4088,7 +4088,7 @@ const Invoices = () => {
                               transform: 'scale(0.95)'
                             },
                             '&:hover': {
-                              borderColor: '#0F766E',
+                              bordercolor: (t) => t.palette.primary.main,
                               bgcolor: 'rgba(15, 118, 110, 0.1)'
                             }
                           }}
@@ -4194,20 +4194,20 @@ const Invoices = () => {
                       border: '1px dashed rgba(15, 118, 110, 0.25)' 
                     }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                        <Typography variant="caption" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>
                           Split Breakdown (Total: ₹{total.toFixed(2)})
                         </Typography>
                         <Button 
                           size="small" 
                           variant="text" 
                           onClick={() => setSplitAmount(Math.round(total / 2))}
-                          sx={{ textTransform: 'none', fontSize: '0.7rem', py: 0, px: 0.8, color: '#0F766E', fontWeight: 700 }}
+                          sx={{ textTransform: 'none', fontSize: '0.7rem', py: 0, px: 0.8, color: (t) => t.palette.primary.main, fontWeight: 700 }}
                         >
                           50:50 Split
                         </Button>
                       </Box>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: '#475569', fontWeight: 600 }}>
-                        <span>Tender 1: <strong style={{ color: '#0F766E' }}>₹{Number(splitAmount || 0).toFixed(2)}</strong></span>
+                        <span>Tender 1: <strong style={{ color: (t) => t.palette.primary.main }}>₹{Number(splitAmount || 0).toFixed(2)}</strong></span>
                         <span>Tender 2: <strong style={{ color: '#D97706' }}>₹{Math.max(0, total - (Number(splitAmount) || 0)).toFixed(2)}</strong></span>
                       </Box>
                     </Box>
@@ -4322,8 +4322,8 @@ const Invoices = () => {
                     }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.2 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                          <AccountBalanceWallet sx={{ color: '#0F766E', fontSize: 18 }} />
-                          <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E', textTransform: 'uppercase' }}>
+                          <AccountBalanceWallet sx={{ color: (t) => t.palette.primary.main, fontSize: 18 }} />
+                          <Typography variant="caption" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, textTransform: 'uppercase' }}>
                             Cash Tender & Change Due
                           </Typography>
                         </Box>
@@ -4439,7 +4439,7 @@ const Invoices = () => {
                           </Button>
                         </Box>
                         {loyaltyPointsToRedeem > 0 && (
-                          <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 700 }}>
+                          <Typography variant="caption" sx={{ color: (t) => t.palette.primary.main, fontWeight: 700 }}>
                             ✓ ₹{loyaltyPointsToRedeem} discount applied from loyalty points.
                           </Typography>
                         )}
@@ -4509,10 +4509,10 @@ const Invoices = () => {
 
                   {cashTendered > 0 && (
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, p: 0.8, borderRadius: 1.5, bgcolor: 'rgba(15, 118, 110, 0.08)' }}>
-                      <Typography variant="caption" sx={{ fontWeight: 700, color: '#0F766E' }}>
+                      <Typography variant="caption" sx={{ fontWeight: 700, color: (t) => t.palette.primary.main }}>
                         Cash Tendered: ₹{cashTendered.toFixed(2)}
                       </Typography>
-                      <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F766E' }}>
+                      <Typography variant="caption" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>
                         Change Due: ₹{Math.max(0, cashTendered - total).toFixed(2)}
                       </Typography>
                     </Box>
@@ -4525,11 +4525,11 @@ const Invoices = () => {
                       <Typography variant="caption" sx={{ textTransform: 'uppercase', fontWeight: 800, color: '#D97706', letterSpacing: '0.04em' }}>
                         Net Payable
                       </Typography>
-                      <Typography variant="h4" sx={{ fontWeight: 900, color: '#0F766E', letterSpacing: '-0.02em' }}>
+                      <Typography variant="h4" sx={{ fontWeight: 900, color: (t) => t.palette.primary.main, letterSpacing: '-0.02em' }}>
                         ₹{total.toFixed(2).toLocaleString('en-IN')}
                       </Typography>
                       {loyaltyPointsEarned > 0 && (
-                        <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 700, display: 'block', mt: 0.3 }}>
+                        <Typography variant="caption" sx={{ color: (t) => t.palette.primary.main, fontWeight: 700, display: 'block', mt: 0.3 }}>
                           ✨ +{loyaltyPointsEarned} loyalty pts will be earned
                         </Typography>
                       )}
@@ -4616,7 +4616,7 @@ const Invoices = () => {
                 fontSize: '0.82rem',
                 whiteSpace: 'nowrap',
                 flex: { xs: 1.4, sm: 'initial' },
-                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                 color: '#ffffff',
                 boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
                 display: 'inline-flex',
@@ -4735,7 +4735,7 @@ const Invoices = () => {
             sx={{
               fontWeight: 800,
               fontSize: '0.74rem',
-              color: '#0F766E',
+              color: (t) => t.palette.primary.main,
               textTransform: 'none'
             }}
           >
@@ -4831,7 +4831,7 @@ const Invoices = () => {
         }}
       >
         <DialogTitle sx={{
-          background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+          background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
           color: 'white',
           p: 2.5,
           display: 'flex',
@@ -4897,7 +4897,7 @@ const Invoices = () => {
                     <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 0.8 }}>
                       Parked {new Date(cart.parkedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {cart.selectedItems?.length || 0} line items
                     </Typography>
-                    <Typography sx={{ fontWeight: 800, color: '#0F766E', fontSize: '1.05rem' }}>
+                    <Typography sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, fontSize: '1.05rem' }}>
                       ₹{Number(cart.totalAmount || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                     </Typography>
                   </Box>
@@ -4908,7 +4908,7 @@ const Invoices = () => {
                       size="small"
                       onClick={() => handleResumeCart(cart)}
                       sx={{
-                        background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                        background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                         color: '#fff',
                         fontWeight: 700,
                         borderRadius: '20px',

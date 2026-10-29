@@ -906,7 +906,7 @@ export default function BarcodeGenerator() {
             <GlassCard sx={{ p: 3, mb: 3.5 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Tune sx={{ color: '#0F766E', fontSize: 20 }} />
+                        <Tune sx={{ color: (t) => t.palette.primary.main, fontSize: 20 }} />
                         <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
                             Tag Layout & Print Settings
                         </Typography>
@@ -1072,7 +1072,7 @@ export default function BarcodeGenerator() {
                             {/* Row 3: Barcode Pricing Configuration (Custom MRP & Selling Price) */}
                             <Box sx={{ mb: 1 }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                                    <PriceChange sx={{ color: '#0F766E', fontSize: 18 }} />
+                                    <PriceChange sx={{ color: (t) => t.palette.primary.main, fontSize: 18 }} />
                                     <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', color: 'text.secondary' }}>
                                         Barcode Pricing & MRP Markup Settings:
                                     </Typography>
@@ -1211,7 +1211,7 @@ export default function BarcodeGenerator() {
                                     </Typography>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                         {selectedProducts.length > 1 && (
-                                            <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 700, mr: 0.5 }}>
+                                            <Typography variant="caption" sx={{ color: (t) => t.palette.primary.main, fontWeight: 700, mr: 0.5 }}>
                                                 {previewIndex + 1}/{selectedProducts.length}
                                             </Typography>
                                         )}
@@ -1298,7 +1298,7 @@ export default function BarcodeGenerator() {
                                     <Chip
                                         size="small"
                                         label={`Sale: ${settings.currencySymbol || '₹'}${(sampleProduct.customPrice !== undefined ? sampleProduct.customPrice : sampleProduct.price || 0).toLocaleString('en-IN')}`}
-                                        sx={{ height: 20, fontSize: '0.68rem', fontWeight: 800, bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E' }}
+                                        sx={{ height: 20, fontSize: '0.68rem', fontWeight: 800, bgcolor: 'rgba(15, 118, 110, 0.1)', color: (t) => t.palette.primary.main }}
                                     />
                                     {settings.showMrp && (
                                         <Chip
@@ -1474,7 +1474,7 @@ export default function BarcodeGenerator() {
                                 borderRadius: 1.5,
                                 fontSize: '0.75rem',
                                 fontWeight: 700,
-                                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                                background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                                 color: '#ffffff'
                             }}
                         >
@@ -1520,7 +1520,7 @@ export default function BarcodeGenerator() {
                                     fontSize: '0.75rem',
                                     fontWeight: 700,
                                     bgcolor: 'rgba(15, 118, 110, 0.1)',
-                                    color: '#0F766E',
+                                    color: (t) => t.palette.primary.main,
                                     border: '1px solid rgba(15, 118, 110, 0.25)'
                                 }}
                             />
@@ -1549,7 +1549,7 @@ export default function BarcodeGenerator() {
                                     checked={isSelected}
                                     sx={{
                                         color: 'text.secondary',
-                                        '&.Mui-checked': { color: '#0F766E' },
+                                        '&.Mui-checked': { color: (t) => t.palette.primary.main },
                                         p: 0.5
                                     }}
                                 />
@@ -1567,7 +1567,7 @@ export default function BarcodeGenerator() {
                                         )}
                                     </Box>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 0.25 }}>
-                                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 700, textTransform: 'uppercase' }}>
+                                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: (t) => t.palette.primary.main, fontWeight: 700, textTransform: 'uppercase' }}>
                                             #{formatSkuWithHyphen(option.productId || 'NO-SKU')}
                                         </Typography>
                                         {option.category && (
@@ -1621,7 +1621,7 @@ export default function BarcodeGenerator() {
                                 height: 34,
                                 borderRadius: 2,
                                 bgcolor: 'rgba(15, 118, 110, 0.1)',
-                                color: '#0F766E',
+                                color: (t) => t.palette.primary.main,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -1644,13 +1644,13 @@ export default function BarcodeGenerator() {
                                 size="small"
                                 sx={{
                                     bgcolor: 'rgba(15, 118, 110, 0.08)',
-                                    color: '#0F766E',
+                                    color: (t) => t.palette.primary.main,
                                     fontWeight: 700,
                                     fontSize: '0.68rem',
                                     borderRadius: 1.5
                                 }}
                             />
-                            <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.76rem' }}>
+                            <Typography variant="caption" sx={{ color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: '0.76rem' }}>
                                 Page {inventoryPage + 1} of {Math.max(1, Math.ceil(filteredAndSortedInventory.length / inventoryRowsPerPage))} • {filteredAndSortedInventory.length} items
                             </Typography>
                         </Box>
@@ -1700,15 +1700,15 @@ export default function BarcodeGenerator() {
                                                     setSelectedProducts(prev => [...prev, ...newToAdd]);
                                                 }
                                             }}
-                                            sx={{ color: '#0F766E', '&.Mui-checked': { color: '#0F766E' } }}
+                                            sx={{ color: (t) => t.palette.primary.main, '&.Mui-checked': { color: (t) => t.palette.primary.main } }}
                                         />
                                     </TableCell>
-                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', color: '#0F766E', textTransform: 'uppercase', letterSpacing: '0.06em', py: 1.2 }}>Garment Style</TableCell>
-                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', color: '#0F766E', textTransform: 'uppercase', letterSpacing: '0.06em', py: 1.2 }}>SKU / Product ID</TableCell>
-                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', color: '#0F766E', textTransform: 'uppercase', letterSpacing: '0.06em', py: 1.2 }}>Category</TableCell>
-                                    <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.74rem', color: '#0F766E', textTransform: 'uppercase', letterSpacing: '0.06em', py: 1.2 }}>Price</TableCell>
-                                    <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.74rem', color: '#0F766E', textTransform: 'uppercase', letterSpacing: '0.06em', py: 1.2 }}>Stock</TableCell>
-                                    <TableCell align="center" sx={{ fontWeight: 800, fontSize: '0.74rem', color: '#0F766E', textTransform: 'uppercase', letterSpacing: '0.06em', py: 1.2 }}>Queue Status</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', color: (t) => t.palette.primary.main, textTransform: 'uppercase', letterSpacing: '0.06em', py: 1.2 }}>Garment Style</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', color: (t) => t.palette.primary.main, textTransform: 'uppercase', letterSpacing: '0.06em', py: 1.2 }}>SKU / Product ID</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', color: (t) => t.palette.primary.main, textTransform: 'uppercase', letterSpacing: '0.06em', py: 1.2 }}>Category</TableCell>
+                                    <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.74rem', color: (t) => t.palette.primary.main, textTransform: 'uppercase', letterSpacing: '0.06em', py: 1.2 }}>Price</TableCell>
+                                    <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.74rem', color: (t) => t.palette.primary.main, textTransform: 'uppercase', letterSpacing: '0.06em', py: 1.2 }}>Stock</TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: 800, fontSize: '0.74rem', color: (t) => t.palette.primary.main, textTransform: 'uppercase', letterSpacing: '0.06em', py: 1.2 }}>Queue Status</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -1749,7 +1749,7 @@ export default function BarcodeGenerator() {
                                                         size="small"
                                                         checked={isSelected}
                                                         onChange={() => handleToggleProduct(item)}
-                                                        sx={{ color: '#0F766E', '&.Mui-checked': { color: '#0F766E' } }}
+                                                        sx={{ color: (t) => t.palette.primary.main, '&.Mui-checked': { color: (t) => t.palette.primary.main } }}
                                                     />
                                                 </TableCell>
                                                 <TableCell sx={{ py: 1.4 }}>
@@ -1796,7 +1796,7 @@ export default function BarcodeGenerator() {
                                                         fontFamily: '"JetBrains Mono", monospace',
                                                         fontWeight: 800,
                                                         fontSize: '0.76rem',
-                                                        color: '#0F766E',
+                                                        color: (t) => t.palette.primary.main,
                                                         letterSpacing: '0.04em'
                                                     }}>
                                                         {formattedSku}
@@ -1864,7 +1864,7 @@ export default function BarcodeGenerator() {
                                                                 height: 24,
                                                                 fontSize: '0.7rem',
                                                                 fontWeight: 700,
-                                                                bgcolor: '#0F766E',
+                                                                bgcolor: (t) => t.palette.primary.main,
                                                                 '& .MuiChip-deleteIcon': { color: 'rgba(255,255,255,0.8)', '&:hover': { color: '#FFFFFF' } }
                                                             }}
                                                         />
@@ -1881,12 +1881,12 @@ export default function BarcodeGenerator() {
                                                                 borderRadius: 2,
                                                                 fontWeight: 700,
                                                                 borderColor: 'rgba(15, 118, 110, 0.4)',
-                                                                color: '#0F766E',
+                                                                color: (t) => t.palette.primary.main,
                                                                 textTransform: 'none',
                                                                 transition: 'all 0.15s ease',
                                                                 '&:hover': {
-                                                                    borderColor: '#0F766E',
-                                                                    bgcolor: '#0F766E',
+                                                                    bordercolor: (t) => t.palette.primary.main,
+                                                                    bgcolor: (t) => t.palette.primary.main,
                                                                     color: '#FFFFFF'
                                                                 }
                                                             }}
@@ -1941,7 +1941,7 @@ export default function BarcodeGenerator() {
                             />
                         )}
                         {selectedProducts.length > 10 && (
-                            <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 700 }}>
+                            <Typography variant="caption" sx={{ color: (t) => t.palette.primary.main, fontWeight: 700 }}>
                                 • Page {queuePage + 1} of {Math.max(1, Math.ceil(selectedProducts.length / queueRowsPerPage))}
                             </Typography>
                         )}
@@ -1959,8 +1959,8 @@ export default function BarcodeGenerator() {
                                     fontSize: '0.75rem',
                                     fontWeight: 700,
                                     textTransform: 'none',
-                                    color: '#0F766E',
-                                    borderColor: '#0F766E',
+                                    color: (t) => t.palette.primary.main,
+                                    bordercolor: (t) => t.palette.primary.main,
                                     bgcolor: 'rgba(15, 118, 110, 0.04)',
                                     '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.1)', borderColor: '#042F2E' }
                                 }}
@@ -2043,7 +2043,7 @@ export default function BarcodeGenerator() {
                                             transition: 'all 0.15s ease-in-out',
                                             bgcolor: isCurrentPreview ? 'rgba(15, 118, 110, 0.02)' : 'background.paper',
                                             '&:hover': {
-                                                borderColor: '#0F766E',
+                                                bordercolor: (t) => t.palette.primary.main,
                                                 boxShadow: '0 4px 14px rgba(15,118,110,0.1)'
                                             }
                                         }}
@@ -2064,7 +2064,7 @@ export default function BarcodeGenerator() {
                                                         {product.name}
                                                     </Typography>
                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.25, flexWrap: 'wrap' }}>
-                                                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 700, textTransform: 'uppercase' }}>
+                                                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: (t) => t.palette.primary.main, fontWeight: 700, textTransform: 'uppercase' }}>
                                                             #{formatSkuWithHyphen(product.productId)}
                                                         </Typography>
                                                         {product.variantName && (
@@ -2091,7 +2091,7 @@ export default function BarcodeGenerator() {
                                                                 setPreviewModalOpen(true);
                                                             }}
                                                             sx={{
-                                                                color: '#0F766E',
+                                                                color: (t) => t.palette.primary.main,
                                                                 bgcolor: 'rgba(15, 118, 110, 0.08)',
                                                                 '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.2)' }
                                                             }}
@@ -2432,7 +2432,7 @@ export default function BarcodeGenerator() {
                         onClick={handleBulkSelectAdd}
                         disabled={tempSelectedIds.length === 0}
                         sx={{
-                            background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                             color: '#FFFFFF',
                             fontWeight: 800,
                             px: 3
@@ -2462,7 +2462,7 @@ export default function BarcodeGenerator() {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                        background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                         color: '#FFFFFF',
                         py: 1.75,
                         px: 2.5
@@ -2496,7 +2496,7 @@ export default function BarcodeGenerator() {
                                 settings.template === 'thermal_single' ? 'Thermal Roll' : 'A4 Sheet Label'
                             }
                             size="small"
-                            sx={{ bgcolor: 'rgba(15, 118, 110, 0.1)', color: '#0F766E', fontWeight: 700, fontSize: '0.72rem' }}
+                            sx={{ bgcolor: 'rgba(15, 118, 110, 0.1)', color: (t) => t.palette.primary.main, fontWeight: 700, fontSize: '0.72rem' }}
                         />
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                             <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', mr: 0.5 }}>
@@ -2567,7 +2567,7 @@ export default function BarcodeGenerator() {
                                         <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
                                             {sampleProduct.name}
                                         </Typography>
-                                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#0F766E', fontWeight: 700 }}>
+                                        <Typography variant="caption" sx={{ fontFamily: 'monospace', color: (t) => t.palette.primary.main, fontWeight: 700 }}>
                                             #{formatSkuWithHyphen(sampleProduct.productId)} {sampleProduct.category ? `• ${sampleProduct.category}` : ''}
                                         </Typography>
                                     </Box>
@@ -2575,7 +2575,7 @@ export default function BarcodeGenerator() {
                                         <Chip
                                             label={`${sampleProduct.labelCount} stickers`}
                                             size="small"
-                                            sx={{ bgcolor: 'rgba(15,118,110,0.1)', color: '#0F766E', fontWeight: 700 }}
+                                            sx={{ bgcolor: 'rgba(15,118,110,0.1)', color: (t) => t.palette.primary.main, fontWeight: 700 }}
                                         />
                                     )}
                                 </Box>
@@ -2689,7 +2689,7 @@ export default function BarcodeGenerator() {
                         variant="outlined"
                         startIcon={<Print />}
                         onClick={() => handlePrintSingle(sampleProduct)}
-                        sx={{ borderRadius: 2, fontWeight: 700, textTransform: 'none', color: '#0F766E', borderColor: '#0F766E' }}
+                        sx={{ borderRadius: 2, fontWeight: 700, textTransform: 'none', color: (t) => t.palette.primary.main, bordercolor: (t) => t.palette.primary.main }}
                     >
                         Print This Sticker
                     </Button>
@@ -2700,7 +2700,7 @@ export default function BarcodeGenerator() {
                             borderRadius: 2,
                             fontWeight: 700,
                             textTransform: 'none',
-                            bgcolor: '#0F766E',
+                            bgcolor: (t) => t.palette.primary.main,
                             '&:hover': { bgcolor: '#042F2E' }
                         }}
                     >

@@ -101,11 +101,11 @@ const SalesReports = () => {
       label: 'Sales Revenue (₹)',
       data: Object.values(salesByDate),
       backgroundColor: 'rgba(15, 118, 110, 0.08)',
-      borderColor: '#0F766E',
+      bordercolor: (t) => t.palette.primary.main,
       borderWidth: 2.5,
       tension: 0.35,
       fill: true,
-      pointBackgroundColor: '#0F766E',
+      pointBackgroundcolor: (t) => t.palette.primary.main,
       pointBorderColor: '#FFFFFF',
       pointBorderWidth: 2,
       pointRadius: 4,
@@ -259,7 +259,7 @@ const SalesReports = () => {
       >
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <FilterList sx={{ color: '#0F766E', fontSize: 20 }} />
+            <FilterList sx={{ color: (t) => t.palette.primary.main, fontSize: 20 }} />
             <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#042F2E', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
               Filter Sales Records
             </Typography>

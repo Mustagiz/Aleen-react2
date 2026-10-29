@@ -272,7 +272,7 @@ export default function MobileScanner() {
                             width: 32,
                             height: 32,
                             borderRadius: '50%',
-                            bgcolor: '#0F766E',
+                            bgcolor: (t) => t.palette.primary.main,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -426,7 +426,7 @@ export default function MobileScanner() {
                             sx={{
                                 textTransform: 'none',
                                 fontWeight: 700,
-                                bgcolor: '#0F766E',
+                                bgcolor: (t) => t.palette.primary.main,
                                 color: '#FFFFFF',
                                 borderRadius: 2.5,
                                 px: 3,

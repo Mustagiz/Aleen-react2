@@ -276,7 +276,7 @@ export default function Login() {
                   width: 52,
                   height: 52,
                   borderRadius: '16px',
-                  background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                  background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -338,7 +338,7 @@ export default function Login() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <EmailOutlined sx={{ color: '#0F766E', fontSize: 18 }} />
+                        <EmailOutlined sx={{ color: (t) => t.palette.primary.main, fontSize: 18 }} />
                       </InputAdornment>
                     )
                   }}
@@ -346,8 +346,8 @@ export default function Login() {
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2,
                       bgcolor: '#F8FAFC',
-                      '&:hover fieldset': { borderColor: '#0F766E' },
-                      '&.Mui-focused fieldset': { borderColor: '#0F766E', borderWidth: '1.5px' }
+                      '&:hover fieldset': { bordercolor: (t) => t.palette.primary.main },
+                      '&.Mui-focused fieldset': { bordercolor: (t) => t.palette.primary.main, borderWidth: '1.5px' }
                     }
                   }}
                 />
@@ -368,7 +368,7 @@ export default function Login() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <LockOutlined sx={{ color: '#0F766E', fontSize: 18 }} />
+                        <LockOutlined sx={{ color: (t) => t.palette.primary.main, fontSize: 18 }} />
                       </InputAdornment>
                     ),
                     endAdornment: (
@@ -388,8 +388,8 @@ export default function Login() {
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2,
                       bgcolor: '#F8FAFC',
-                      '&:hover fieldset': { borderColor: '#0F766E' },
-                      '&.Mui-focused fieldset': { borderColor: '#0F766E', borderWidth: '1.5px' }
+                      '&:hover fieldset': { bordercolor: (t) => t.palette.primary.main },
+                      '&.Mui-focused fieldset': { bordercolor: (t) => t.palette.primary.main, borderWidth: '1.5px' }
                     }
                   }}
                 />
@@ -408,7 +408,7 @@ export default function Login() {
                   fontWeight: 800,
                   fontSize: '0.9rem',
                   letterSpacing: '0.02em',
-                  background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                  background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                   color: '#FFFFFF',
                   boxShadow: '0 8px 20px rgba(15, 118, 110, 0.35)',
                   border: '1px solid rgba(217, 119, 6, 0.3)',
@@ -446,8 +446,8 @@ export default function Login() {
                 variant="outlined"
                 onClick={handleQuickDemoFill}
                 sx={{
-                  borderColor: '#0F766E',
-                  color: '#0F766E',
+                  bordercolor: (t) => t.palette.primary.main,
+                  color: (t) => t.palette.primary.main,
                   borderRadius: 1.5,
                   fontWeight: 700,
                   fontSize: '0.72rem',
@@ -455,7 +455,7 @@ export default function Login() {
                   px: 2,
                   '&:hover': {
                     bgcolor: 'rgba(15, 118, 110, 0.08)',
-                    borderColor: '#0F766E'
+                    bordercolor: (t) => t.palette.primary.main
                   }
                 }}
               >
