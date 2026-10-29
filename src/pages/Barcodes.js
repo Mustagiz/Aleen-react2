@@ -806,15 +806,15 @@ export default function BarcodeGenerator() {
                     <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
                         <Button
                             variant="outlined"
-                            startIcon={<Add sx={{ fontSize: 19, color: '#0F766E' }} />}
+                            startIcon={<Add sx={{ fontSize: 19, color: 'primary.main' }} />}
                             onClick={() => setIsBulkSelectOpen(true)}
                             sx={{
                                 height: 42,
                                 minHeight: 42,
                                 px: 2.75,
-                                borderRadius: '24px',
-                                border: '1.5px solid #0F766E',
-                                color: '#0F766E',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                                borderColor: 'primary.main',
+                                color: 'primary.main',
                                 bgcolor: 'background.paper',
                                 fontWeight: 700,
                                 fontSize: '0.85rem',
@@ -825,8 +825,8 @@ export default function BarcodeGenerator() {
                                 boxSizing: 'border-box',
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
-                                    border: '1.5px solid #042F2E',
-                                    bgcolor: 'rgba(15, 118, 110, 0.05)',
+                                    borderColor: 'primary.dark',
+                                    bgcolor: (t) => `${t.palette.primary.main}0A`,
                                     transform: 'translateY(-1px)'
                                 }
                             }}
@@ -835,13 +835,14 @@ export default function BarcodeGenerator() {
                         </Button>
                         <Button
                             variant="contained"
+                            color="primary"
                             startIcon={<Print sx={{ fontSize: 19, color: '#FFFFFF !important' }} />}
                             onClick={handlePrint}
                             sx={{
                                 height: 42,
                                 minHeight: 42,
                                 px: 3.25,
-                                borderRadius: '24px',
+                                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                 fontWeight: 700,
                                 fontSize: '0.85rem',
                                 textTransform: 'none',
@@ -849,17 +850,13 @@ export default function BarcodeGenerator() {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 boxSizing: 'border-box',
-                                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%) !important',
                                 color: '#FFFFFF !important',
-                                boxShadow: '0 4px 14px rgba(15, 118, 110, 0.3)',
                                 opacity: selectedProducts.length > 0 ? 1 : 0.9,
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '& .MuiSvgIcon-root': {
                                     color: '#FFFFFF !important'
                                 },
                                 '&:hover': {
-                                    background: 'linear-gradient(135deg, #115E59 0%, #021C1B 100%) !important',
-                                    boxShadow: '0 6px 18px rgba(15, 118, 110, 0.45)',
                                     transform: 'translateY(-1px)'
                                 }
                             }}

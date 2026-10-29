@@ -98,6 +98,59 @@ code, pre, kbd, samp, [style*="font-family: monospace"], [style*="font-family:mo
   border-color: var(--emerald-primary) !important;
 }
 
+/* Universal Button Overrides: bind all buttons to dynamic ecosystem radius and colors */
+.MuiButton-root {
+  border-radius: var(--button-radius, 8px) !important;
+  font-family: var(--font-sans) !important;
+}
+
+/* Contained action buttons & legacy hardcoded emerald gradient buttons */
+.MuiButton-containedPrimary,
+.MuiButton-contained,
+.MuiButton-root[style*="linear-gradient(135deg, #0F766E"],
+.MuiButton-root[style*="linear-gradient(135deg, #0f766e"],
+.MuiButton-root[style*="linear-gradient(135deg,#0F766E"],
+.MuiButton-root[style*="linear-gradient(135deg,#0f766e"],
+.MuiButton-root[style*="#0F766E"][style*="gradient"],
+.MuiButton-root[style*="#0f766e"][style*="gradient"],
+.MuiButton-root[style*="background: #0F766E"],
+.MuiButton-root[style*="background:#0F766E"],
+.MuiButton-root[style*="bgcolor: #0F766E"] {
+  background: var(--button-bg, var(--emerald-primary)) !important;
+  color: #FFFFFF !important;
+  border-radius: var(--button-radius, 8px) !important;
+}
+
+.MuiButton-root[style*="linear-gradient(135deg, #0F766E"] .MuiSvgIcon-root,
+.MuiButton-root[style*="linear-gradient(135deg, #0f766e"] .MuiSvgIcon-root,
+.MuiButton-containedPrimary .MuiSvgIcon-root,
+.MuiButton-contained .MuiSvgIcon-root {
+  color: #FFFFFF !important;
+}
+
+/* Outlined action buttons & legacy hardcoded emerald borders/text */
+.MuiButton-outlinedPrimary,
+.MuiButton-outlined,
+.MuiButton-root[style*="border: 1.5px solid #0F766E"],
+.MuiButton-root[style*="border: 1.5px solid #0f766e"],
+.MuiButton-root[style*="border:1.5px solid #0F766E"],
+.MuiButton-root[style*="border:1.5px solid #0f766e"],
+.MuiButton-root[style*="#0F766E"]:not([style*="gradient"]):not(.MuiButton-contained),
+.MuiButton-root[style*="#0f766e"]:not([style*="gradient"]):not(.MuiButton-contained) {
+  border-color: var(--emerald-primary) !important;
+  color: var(--emerald-primary) !important;
+  border-radius: var(--button-radius, 8px) !important;
+}
+
+.MuiButton-root[style*="border: 1.5px solid #0F766E"] .MuiSvgIcon-root,
+.MuiButton-root[style*="border: 1.5px solid #0f766e"] .MuiSvgIcon-root,
+.MuiButton-root[style*="color: #0F766E"] .MuiSvgIcon-root,
+.MuiButton-root[style*="color: #0f766e"] .MuiSvgIcon-root,
+.MuiButton-outlined .MuiSvgIcon-root,
+.MuiButton-outlinedPrimary .MuiSvgIcon-root {
+  color: var(--emerald-primary) !important;
+}
+
 /* 1. MICROSOFT FLUENT 365: Sharp 4px geometry, enterprise dense tables, Segoe UI */
 [data-design-system="microsoft"] {
   --radius-card: 4px !important;

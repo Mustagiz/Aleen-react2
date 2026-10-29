@@ -134,6 +134,7 @@ export const ThemeProvider = ({ children }) => {
             root.style.setProperty('--radius-inner', `${activeSystemConfig.shape.inputRadius}px`);
             root.style.setProperty('--card-radius', `${activeSystemConfig.shape.cardRadius}px`);
             root.style.setProperty('--button-radius', `${activeSystemConfig.shape.buttonRadius}px`);
+            root.style.setProperty('--button-bg', activeSystemConfig.buttonStyle?.background || activePalette.primary.main);
             root.style.setProperty('--card-border', mode === 'light' ? activeSystemConfig.cardStyle.borderLight : activeSystemConfig.cardStyle.borderDark);
             root.style.setProperty('--card-shadow', mode === 'light' ? activeSystemConfig.cardStyle.boxShadowLight : activeSystemConfig.cardStyle.boxShadowDark);
             root.style.setProperty('--font-sans', activeSystemConfig.typography.fontFamily);
