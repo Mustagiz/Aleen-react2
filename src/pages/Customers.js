@@ -472,14 +472,14 @@ const Customers = () => {
                                     sx={{
                                         px: 2,
                                         py: 0.6,
-                                        borderRadius: 2.5,
+                                        borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                                         textTransform: 'none',
                                         fontWeight: 700,
                                         fontSize: '0.8rem',
                                         color: segmentFilter === pill.id ? '#FFFFFF' : 'text.secondary',
-                                        bgcolor: segmentFilter === pill.id ? '#0F766E' : 'rgba(0,0,0,0.04)',
+                                        bgcolor: segmentFilter === pill.id ? 'primary.main' : 'action.hover',
                                         '&:hover': {
-                                            bgcolor: segmentFilter === pill.id ? '#042F2E' : 'rgba(15, 118, 110, 0.08)'
+                                            bgcolor: segmentFilter === pill.id ? 'primary.dark' : 'action.selected'
                                         }
                                     }}
                                 >
@@ -495,8 +495,6 @@ const Customers = () => {
             <Paper
                 elevation={0}
                 sx={{
-                    borderRadius: '20px',
-                    border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.14)',
                     overflow: 'hidden',
                     background: (t) => t.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.95)' : '#FFFFFF',
                     boxShadow: (t) => t.palette.mode === 'dark'
@@ -508,21 +506,21 @@ const Customers = () => {
                 {/* Decorative Atelier Emerald Hairline */}
                 <Box
                     sx={{
-                        height: '3.5px',
-                        background: 'linear-gradient(90deg, #042F2E 0%, #0F766E 35%, #2DD4BF 70%, #14B8A6 100%)'
+                        height: '3px',
+                        background: (t) => `linear-gradient(90deg, ${t.palette.primary.dark} 0%, ${t.palette.primary.main} 50%, ${t.palette.secondary.main} 100%)`
                     }}
                 />
 
                 <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
                     <Table sx={{ minWidth: 700 }}>
-                        <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)', borderBottom: '2px solid rgba(15, 118, 110, 0.14)' }}>
+                        <TableHead>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#0F766E', py: 1.8 }}>Guest & Contact Details</TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#0F766E', py: 1.8 }} align="right">Lifetime Spend</TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#0F766E', py: 1.8 }} align="center">Loyalty Points</TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#0F766E', py: 1.8 }} align="right">Balance Due</TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#0F766E', py: 1.8 }} align="center">Last Visit</TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#0F766E', py: 1.8, pr: 2.5 }} align="right">Atelier Actions</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'primary.main', py: 1.8 }}>Guest & Contact Details</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'primary.main', py: 1.8 }} align="right">Lifetime Spend</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'primary.main', py: 1.8 }} align="center">Loyalty Points</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'primary.main', py: 1.8 }} align="right">Balance Due</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'primary.main', py: 1.8 }} align="center">Last Visit</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'primary.main', py: 1.8, pr: 2.5 }} align="right">Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>

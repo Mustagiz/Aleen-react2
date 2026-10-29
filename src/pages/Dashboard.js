@@ -731,7 +731,7 @@ const Dashboard = () => {
       >
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, flexWrap: 'wrap', gap: 1 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
-            <Straighten sx={{ color: '#0F766E' }} />
+            <Straighten sx={{ color: 'primary.main' }} />
             <Box>
               <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.2 }}>
                 Bespoke Atelier Workshop Pulse
@@ -750,9 +750,9 @@ const Dashboard = () => {
               textTransform: 'none',
               fontWeight: 800,
               fontSize: '0.78rem',
-              borderRadius: 2,
-              borderColor: '#0F766E',
-              color: '#0F766E'
+              borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+              borderColor: 'primary.main',
+              color: 'primary.main'
             }}
           >
             Open Tailoring Board ({activeTailoringJobs.length} Active)
@@ -765,7 +765,7 @@ const Dashboard = () => {
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, textTransform: 'uppercase' }}>
                 Active Garments on Board
               </Typography>
-              <Typography variant="h5" sx={{ fontWeight: 900, color: '#0F766E', mt: 0.5 }}>
+              <Typography variant="h5" sx={{ fontWeight: 900, color: 'primary.main', mt: 0.5 }}>
                 {activeTailoringJobs.length} Orders
               </Typography>
               <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}>
@@ -826,11 +826,11 @@ const Dashboard = () => {
               </Box>
               <Box sx={{ display: 'flex', gap: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                  <Circle sx={{ fontSize: 10, color: '#0F766E' }} />
+                  <Circle sx={{ fontSize: 10, color: 'primary.main' }} />
                   <Typography variant="caption" sx={{ fontWeight: 700 }}>Gross Sales</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                  <Circle sx={{ fontSize: 10, color: '#D97706' }} />
+                  <Circle sx={{ fontSize: 10, color: 'secondary.main' }} />
                   <Typography variant="caption" sx={{ fontWeight: 700 }}>Expenses</Typography>
                 </Box>
               </Box>
@@ -858,7 +858,7 @@ const Dashboard = () => {
                 }}
               />
               <Box sx={{ position: 'absolute', textAlign: 'center' }}>
-                <Typography variant="h4" sx={{ fontWeight: 900, color: '#0F766E' }}>{totalItems}</Typography>
+                <Typography variant="h4" sx={{ fontWeight: 900, color: 'primary.main' }}>{totalItems}</Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>Total Pieces</Typography>
               </Box>
             </Box>
@@ -893,7 +893,7 @@ const Dashboard = () => {
                 size="small"
                 endIcon={<ArrowForward />}
                 onClick={() => navigate('/sales-reports')}
-                sx={{ textTransform: 'none', fontWeight: 800, fontSize: '0.76rem', color: '#0F766E' }}
+                sx={{ textTransform: 'none', fontWeight: 800, fontSize: '0.76rem', color: 'primary.main' }}
               >
                 Full Analytics
               </Button>
@@ -912,7 +912,7 @@ const Dashboard = () => {
               <Button
                 size="small"
                 onClick={() => navigate('/invoices')}
-                sx={{ textTransform: 'none', fontWeight: 800, fontSize: '0.76rem', color: '#0F766E' }}
+                sx={{ textTransform: 'none', fontWeight: 800, fontSize: '0.76rem', color: 'primary.main' }}
               >
                 All Invoices
               </Button>
@@ -939,7 +939,7 @@ const Dashboard = () => {
                     }}
                     onClick={() => navigate('/invoices')}
                   >
-                    <Avatar sx={{ bgcolor: 'rgba(15, 118, 110, 0.12)', color: '#0F766E', borderRadius: 2, width: 38, height: 38 }}>
+                    <Avatar sx={{ bgcolor: (t) => `${t.palette.primary.main}18`, color: 'primary.main', borderRadius: (t) => `${t.shape?.borderRadius || 8}px`, width: 38, height: 38 }}>
                       <Receipt sx={{ fontSize: 20 }} />
                     </Avatar>
                     <Box sx={{ flexGrow: 1, minWidth: 0 }}>
@@ -947,10 +947,10 @@ const Dashboard = () => {
                         {inv.customer || 'Walk-in Patron'} • #{inv.invoiceNumber || inv.id}
                       </Typography>
                       <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.72rem' }}>
-                        {inv.date ? new Date(inv.date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : 'Recent'} • {inv.items?.length || 1} pieces • <span style={{ color: '#0F766E', fontWeight: 700 }}>{inv.paymentMethod || 'Cash'}</span>
+                        {inv.date ? new Date(inv.date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : 'Recent'} • {inv.items?.length || 1} pieces • <span style={{ color: 'var(--emerald-primary)', fontWeight: 700 }}>{inv.paymentMethod || 'Cash'}</span>
                       </Typography>
                     </Box>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#0F766E', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'primary.main', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
                       ₹{Number(inv.total || 0).toLocaleString('en-IN')}
                     </Typography>
                   </Box>

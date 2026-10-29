@@ -852,13 +852,13 @@ const Inventory = () => {
             sx={{
               fontWeight: 700,
               fontSize: '0.75rem',
-              borderRadius: 2,
+              borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
               cursor: 'pointer',
               flexShrink: 0,
-              bgcolor: stockFilter === 'all' ? '#0F766E' : 'transparent',
+              bgcolor: stockFilter === 'all' ? 'primary.main' : 'transparent',
               color: stockFilter === 'all' ? '#FFFFFF' : 'text.primary',
-              borderColor: 'rgba(15, 118, 110, 0.25)',
-              '&:hover': { bgcolor: stockFilter === 'all' ? '#0F766E' : 'rgba(15, 118, 110, 0.08)' }
+              borderColor: 'primary.main',
+              '&:hover': { bgcolor: stockFilter === 'all' ? 'primary.dark' : (t) => `${t.palette.primary.main}12` }
             }}
           />
 
@@ -1328,18 +1328,10 @@ const Inventory = () => {
           )}
         </Box>
       ) : (
-        <GlassCard sx={{ 
-          p: 0, 
-          overflow: 'hidden', 
-          borderRadius: '20px', 
-          border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(15, 118, 110, 0.14)',
-          boxShadow: (t) => t.palette.mode === 'dark' 
-            ? '0 10px 30px rgba(0, 0, 0, 0.4)' 
-            : '0 10px 30px -10px rgba(15, 118, 110, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
-        }}>
+        <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
           <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
             <Table sx={{ minWidth: user?.role === 'admin' ? 1160 : 1030 }}>
-              <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(15, 118, 110, 0.1)' : 'rgba(15, 118, 110, 0.05)' }}>
+              <TableHead>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 800, width: 120, whiteSpace: 'nowrap' }}>
                     <TableSortLabel

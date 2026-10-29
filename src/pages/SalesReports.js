@@ -202,18 +202,8 @@ const SalesReports = () => {
             startIcon={<Download />}
             onClick={exportPDF}
             sx={{
-              background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
-              color: '#FFFFFF',
-              boxShadow: '0 4px 14px rgba(15, 118, 110, 0.25)',
-              textTransform: 'none',
-              fontWeight: 700,
-              borderRadius: 2.5,
               px: 3,
-              py: 1,
-              '&:hover': {
-                background: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)',
-                boxShadow: '0 6px 18px rgba(15, 118, 110, 0.35)'
-              }
+              py: 1
             }}
           >
             Export PDF Audit
@@ -457,21 +447,21 @@ const SalesReports = () => {
         }}
       >
         <Box sx={{ px: 3, py: 2, bgcolor: 'rgba(15, 118, 110, 0.02)', borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#042F2E' }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
             Detailed Sales Ledger ({filteredInvoices.length} entries)
           </Typography>
         </Box>
 
         <TableContainer>
           <Table>
-            <TableHead sx={{ bgcolor: 'rgba(15, 118, 110, 0.04)' }}>
+            <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 800, color: '#042F2E', width: 140 }}>Invoice No</TableCell>
-                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Date</TableCell>
-                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Client</TableCell>
-                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }}>Payment Method</TableCell>
-                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="center">Items</TableCell>
-                <TableCell sx={{ fontWeight: 800, color: '#042F2E' }} align="right">Invoice Total</TableCell>
+                <TableCell sx={{ fontWeight: 800, color: 'primary.main', width: 140 }}>Invoice No</TableCell>
+                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Date</TableCell>
+                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Client</TableCell>
+                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>Payment Method</TableCell>
+                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }} align="center">Items</TableCell>
+                <TableCell sx={{ fontWeight: 800, color: 'primary.main' }} align="right">Invoice Total</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -485,8 +475,8 @@ const SalesReports = () => {
                 filteredInvoices
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((inv) => (
-                    <TableRow key={inv.id} hover sx={{ '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.02)' } }}>
-                      <TableCell sx={{ fontFamily: 'monospace', fontWeight: 800, color: '#0F766E' }}>
+                    <TableRow key={inv.id} hover sx={{ '&:hover': { bgcolor: (t) => `${t.palette.primary.main}08` } }}>
+                      <TableCell sx={{ fontFamily: 'monospace', fontWeight: 800, color: 'primary.main' }}>
                         #{inv.id}
                       </TableCell>
                       <TableCell sx={{ fontSize: '0.875rem' }}>
@@ -515,7 +505,7 @@ const SalesReports = () => {
                           sx={{ borderColor: 'divider', fontWeight: 600, fontSize: '0.72rem' }}
                         />
                       </TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 800, color: '#0F766E', fontSize: '0.95rem' }}>
+                      <TableCell align="right" sx={{ fontWeight: 800, color: 'primary.main', fontSize: '0.95rem' }}>
                         ₹{inv.total.toLocaleString('en-IN')}
                       </TableCell>
                     </TableRow>

@@ -44,20 +44,20 @@ export default function FinanceNavTabs() {
                         minHeight: 44,
                         mr: 1.5,
                         px: 2.25,
-                        borderRadius: '10px 10px 0 0',
+                        borderRadius: (t) => `${t.shape?.borderRadius || 8}px ${t.shape?.borderRadius || 8}px 0 0`,
                         color: 'text.secondary',
                         transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                         '&:hover': {
-                            color: '#0F766E',
-                            bgcolor: 'rgba(15, 118, 110, 0.05)'
+                            color: 'primary.main',
+                            bgcolor: (t) => `${t.palette.primary.main}0D`
                         }
                     },
                     '& .Mui-selected': {
-                        color: '#0F766E !important',
-                        bgcolor: 'rgba(15, 118, 110, 0.08)'
+                        color: 'primary.main !important',
+                        bgcolor: (t) => `${t.palette.primary.main}14`
                     },
                     '& .MuiTabs-indicator': {
-                        backgroundColor: '#0F766E',
+                        backgroundColor: 'primary.main',
                         height: 3,
                         borderRadius: '3px 3px 0 0'
                     }

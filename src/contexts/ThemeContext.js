@@ -205,16 +205,16 @@ export const ThemeProvider = ({ children }) => {
                     },
                     styleOverrides: {
                         root: {
-                            borderRadius: activeSystemConfig.shape.buttonRadius,
-                            minHeight: 40,
-                            padding: '8px 20px',
+                            borderRadius: activeSystemConfig.id === 'material' ? 9999 : (activeSystemConfig.id === 'microsoft' ? 4 : (activeSystemConfig.id === 'linear' || activeSystemConfig.id === 'zoho' ? 6 : (activeSystemConfig.id === 'apple' ? 10 : activeSystemConfig.shape.buttonRadius))),
+                            minHeight: activeSystemConfig.id === 'zoho' || activeSystemConfig.id === 'microsoft' ? 36 : 40,
+                            padding: activeSystemConfig.id === 'material' ? '10px 24px' : (activeSystemConfig.id === 'microsoft' || activeSystemConfig.id === 'zoho' ? '6px 16px' : '8px 20px'),
                             boxShadow: 'none',
-                            fontWeight: 700,
-                            fontSize: '0.84rem',
-                            letterSpacing: '0.015em',
+                            fontWeight: activeSystemConfig.id === 'microsoft' ? 600 : 700,
+                            fontSize: activeSystemConfig.id === 'zoho' || activeSystemConfig.id === 'microsoft' ? '0.81rem' : '0.84rem',
+                            letterSpacing: activeSystemConfig.typography.letterSpacing || '0.015em',
                             transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                             '&:hover': {
-                                transform: 'translateY(-1px)',
+                                transform: activeSystemConfig.id === 'microsoft' ? 'none' : 'translateY(-1px)',
                                 boxShadow: mode === 'light' ? `0 4px 14px ${activePalette.accentGlow}` : '0 4px 14px rgba(0, 0, 0, 0.4)'
                             },
                             '&:active': {
@@ -224,7 +224,7 @@ export const ThemeProvider = ({ children }) => {
                         containedPrimary: {
                             background: activeSystemConfig.buttonStyle?.background || `linear-gradient(135deg, ${activePalette.primary.light} 0%, ${activePalette.primary.main} 100%)`,
                             '&:hover': {
-                                background: `linear-gradient(135deg, ${activePalette.primary.main} 0%, ${activePalette.primary.dark} 100%)`
+                                background: activeSystemConfig.id === 'microsoft' ? activePalette.primary.dark : `linear-gradient(135deg, ${activePalette.primary.main} 0%, ${activePalette.primary.dark} 100%)`
                             }
                         },
                         containedSecondary: {
@@ -249,7 +249,7 @@ export const ThemeProvider = ({ children }) => {
                     styleOverrides: {
                         root: {
                             backgroundImage: 'none',
-                            borderRadius: activeSystemConfig.shape.cardRadius
+                            borderRadius: activeSystemConfig.id === 'material' ? 24 : (activeSystemConfig.id === 'microsoft' ? 4 : (activeSystemConfig.id === 'linear' || activeSystemConfig.id === 'zoho' ? 6 : (activeSystemConfig.id === 'apple' ? 14 : activeSystemConfig.shape.cardRadius)))
                         }
                     }
                 },
@@ -259,7 +259,7 @@ export const ThemeProvider = ({ children }) => {
                     },
                     styleOverrides: {
                         root: {
-                            borderRadius: activeSystemConfig.shape.cardRadius,
+                            borderRadius: activeSystemConfig.id === 'material' ? 24 : (activeSystemConfig.id === 'microsoft' ? 4 : (activeSystemConfig.id === 'linear' || activeSystemConfig.id === 'zoho' ? 6 : (activeSystemConfig.id === 'apple' ? 14 : activeSystemConfig.shape.cardRadius))),
                             border: mode === 'light' ? activeSystemConfig.cardStyle.borderLight : activeSystemConfig.cardStyle.borderDark,
                             boxShadow: mode === 'light' ? activeSystemConfig.cardStyle.boxShadowLight : activeSystemConfig.cardStyle.boxShadowDark,
                             backdropFilter: activeSystemConfig.cardStyle.backdropFilter || 'none',
@@ -267,16 +267,34 @@ export const ThemeProvider = ({ children }) => {
                         }
                     }
                 },
+                MuiTableContainer: {
+                    styleOverrides: {
+                        root: {
+                            borderRadius: activeSystemConfig.id === 'material' ? 24 : (activeSystemConfig.id === 'microsoft' ? 4 : (activeSystemConfig.id === 'linear' || activeSystemConfig.id === 'zoho' ? 6 : (activeSystemConfig.id === 'apple' ? 14 : activeSystemConfig.shape.cardRadius))),
+                            border: mode === 'light' ? activeSystemConfig.cardStyle.borderLight : activeSystemConfig.cardStyle.borderDark,
+                            boxShadow: mode === 'light' ? activeSystemConfig.cardStyle.boxShadowLight : activeSystemConfig.cardStyle.boxShadowDark,
+                            overflow: 'hidden'
+                        }
+                    }
+                },
                 MuiTableHead: {
                     styleOverrides: {
                         root: {
-                            backgroundColor: mode === 'light' ? `${activePalette.primary.main}08` : 'rgba(255, 255, 255, 0.03)',
+                            backgroundColor: activeSystemConfig.id === 'microsoft' 
+                                ? (mode === 'light' ? '#F3F2F1' : '#292929')
+                                : (activeSystemConfig.id === 'zoho'
+                                    ? (mode === 'light' ? '#F8FAFC' : '#182033')
+                                    : (activeSystemConfig.id === 'linear'
+                                        ? '#0F1012'
+                                        : (mode === 'light' ? `${activePalette.primary.main}0A` : 'rgba(255, 255, 255, 0.03)'))),
+                            borderTop: activeSystemConfig.id === 'zoho' ? `3px solid ${activePalette.primary.main}` : 'none',
                             '& .MuiTableCell-head': {
                                 color: mode === 'light' ? activePalette.primary.dark : '#F8FAFC',
-                                fontWeight: 800,
-                                fontSize: '0.78rem',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.06em',
+                                fontWeight: activeSystemConfig.id === 'microsoft' ? 600 : 800,
+                                fontSize: activeSystemConfig.id === 'zoho' || activeSystemConfig.id === 'microsoft' ? '0.74rem' : '0.78rem',
+                                textTransform: activeSystemConfig.id === 'microsoft' ? 'none' : 'uppercase',
+                                letterSpacing: activeSystemConfig.id === 'linear' ? '0.08em' : '0.04em',
+                                fontFamily: activeSystemConfig.typography.fontFamily,
                                 borderBottom: mode === 'light' ? `1px solid ${activePalette.primary.main}1A` : '1px solid rgba(255, 255, 255, 0.08)'
                             }
                         }
@@ -286,8 +304,15 @@ export const ThemeProvider = ({ children }) => {
                     styleOverrides: {
                         root: {
                             transition: 'background-color 0.15s ease',
+                            '&:nth-of-type(even)': {
+                                backgroundColor: (activeSystemConfig.id === 'zoho' || activeSystemConfig.id === 'microsoft')
+                                    ? (mode === 'light' ? 'rgba(0, 0, 0, 0.018)' : 'rgba(255, 255, 255, 0.018)')
+                                    : 'transparent'
+                            },
                             '&:hover': {
-                                backgroundColor: mode === 'light' ? `${activePalette.primary.main}08` : 'rgba(255, 255, 255, 0.03)'
+                                backgroundColor: activeSystemConfig.id === 'linear'
+                                    ? 'rgba(139, 92, 246, 0.08)'
+                                    : (mode === 'light' ? `${activePalette.primary.main}0C` : 'rgba(255, 255, 255, 0.04)')
                             },
                             '&:last-child td': {
                                 borderBottom: 0
@@ -298,7 +323,12 @@ export const ThemeProvider = ({ children }) => {
                 MuiTableCell: {
                     styleOverrides: {
                         root: {
-                            padding: density === 'compact' ? '8px 12px' : '14px 18px',
+                            padding: activeSystemConfig.id === 'material'
+                                ? (density === 'compact' ? '10px 14px' : '16px 20px')
+                                : (activeSystemConfig.id === 'microsoft' || activeSystemConfig.id === 'zoho'
+                                    ? (density === 'compact' ? '6px 10px' : '10px 14px')
+                                    : (density === 'compact' ? '8px 12px' : '14px 18px')),
+                            fontFamily: activeSystemConfig.typography.fontFamily,
                             fontFeatureSettings: '"tnum"',
                             borderColor: mode === 'light' ? `${activePalette.primary.main}12` : 'rgba(255, 255, 255, 0.06)'
                         }
@@ -307,17 +337,19 @@ export const ThemeProvider = ({ children }) => {
                 MuiChip: {
                     styleOverrides: {
                         root: {
-                            borderRadius: activeSystemConfig.shape.buttonRadius,
+                            borderRadius: activeSystemConfig.id === 'material' ? 9999 : (activeSystemConfig.id === 'microsoft' ? 4 : (activeSystemConfig.id === 'linear' || activeSystemConfig.id === 'zoho' ? 4 : (activeSystemConfig.id === 'apple' ? 8 : activeSystemConfig.shape.buttonRadius))),
                             fontWeight: 700,
-                            fontSize: '0.75rem'
+                            fontSize: '0.74rem',
+                            fontFamily: activeSystemConfig.id === 'linear' ? 'monospace' : activeSystemConfig.typography.fontFamily
                         }
                     }
                 },
                 MuiOutlinedInput: {
                     styleOverrides: {
                         root: {
-                            borderRadius: activeSystemConfig.shape.inputRadius,
-                            minHeight: 40,
+                            borderRadius: activeSystemConfig.id === 'material' ? 28 : (activeSystemConfig.id === 'microsoft' ? 4 : (activeSystemConfig.id === 'linear' || activeSystemConfig.id === 'zoho' ? 4 : (activeSystemConfig.id === 'apple' ? 10 : activeSystemConfig.shape.inputRadius))),
+                            minHeight: activeSystemConfig.id === 'zoho' || activeSystemConfig.id === 'microsoft' ? 36 : 40,
+                            fontFamily: activeSystemConfig.typography.fontFamily,
                             '&:hover .MuiOutlinedInput-notchedOutline': {
                                 borderColor: activePalette.primary.main
                             },

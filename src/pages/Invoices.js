@@ -1901,13 +1901,13 @@ const Invoices = () => {
                       fontWeight: 700,
                       fontSize: '0.72rem',
                       height: 28,
-                      borderRadius: 1.5,
-                      bgcolor: active ? '#0F766E' : 'action.hover',
+                      borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                      bgcolor: active ? 'primary.main' : 'action.hover',
                       color: active ? '#FFFFFF' : 'text.primary',
                       border: '1px solid',
-                      borderColor: active ? '#0F766E' : 'divider',
+                      borderColor: active ? 'primary.main' : 'divider',
                       '&:hover': {
-                        bgcolor: active ? '#042F2E' : 'action.selected'
+                        bgcolor: active ? 'primary.dark' : 'action.selected'
                       }
                     }}
                   />
@@ -2010,17 +2010,17 @@ const Invoices = () => {
               onClick={handleClearFilters}
               sx={{
                 height: 38,
-                borderRadius: 2,
+                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
                 px: 2,
-                borderColor: '#0F766E',
-                color: '#0F766E',
+                borderColor: 'primary.main',
+                color: 'primary.main',
                 textTransform: 'none',
                 fontWeight: 700,
                 fontSize: '0.8rem',
                 ml: { sm: 'auto' },
                 '&:hover': {
-                  borderColor: '#042F2E',
-                  bgcolor: 'rgba(15, 118, 110, 0.05)'
+                  borderColor: 'primary.dark',
+                  bgcolor: (t) => `${t.palette.primary.main}12`
                 }
               }}
             >
@@ -2558,37 +2558,37 @@ const Invoices = () => {
             />
           </Box>
         ) : (
-          <GlassCard sx={{ p: 0, overflow: 'hidden', borderRadius: 3, border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(15, 118, 110, 0.14)' }}>
+          <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
             <TableContainer>
               <Table>
-                <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(15, 118, 110, 0.04)', borderBottom: '2px solid rgba(15, 118, 110, 0.16)' }}>
+                <TableHead>
                   <TableRow>
-                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       <TableSortLabel active={orderBy === 'id'} direction={orderBy === 'id' ? order : 'asc'} onClick={() => handleRequestSort('id')}>
                         Invoice Details
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       <TableSortLabel active={orderBy === 'date'} direction={orderBy === 'date' ? order : 'asc'} onClick={() => handleRequestSort('date')}>
                         Date
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em', display: { xs: 'none', sm: 'table-cell' } }}>
+                    <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em', display: { xs: 'none', sm: 'table-cell' } }}>
                       <TableSortLabel active={orderBy === 'customer'} direction={orderBy === 'customer' ? order : 'asc'} onClick={() => handleRequestSort('customer')}>
                         Customer
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em', display: { xs: 'none', md: 'table-cell' } }}>
+                    <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em', display: { xs: 'none', md: 'table-cell' } }}>
                       <TableSortLabel active={orderBy === 'paymentMethod'} direction={orderBy === 'paymentMethod' ? order : 'asc'} onClick={() => handleRequestSort('paymentMethod')}>
                         Payment
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       <TableSortLabel active={orderBy === 'total'} direction={orderBy === 'total' ? order : 'asc'} onClick={() => handleRequestSort('total')}>
                         Amount
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell align="right" sx={{ color: '#0F766E', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em', pr: 2.5 }}>Actions</TableCell>
+                    <TableCell align="right" sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em', pr: 2.5 }}>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>

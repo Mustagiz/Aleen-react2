@@ -31,7 +31,7 @@ export default function ClienteleNavTabs() {
                 scrollButtons="auto"
                 sx={{
                     '& .MuiTabs-indicator': {
-                        backgroundColor: '#0F766E', // Deep Emerald atelier primary
+                        backgroundColor: 'primary.main',
                         height: 3,
                         borderRadius: '3px 3px 0 0'
                     },
@@ -45,12 +45,12 @@ export default function ClienteleNavTabs() {
                         py: 1.25,
                         transition: 'all 0.2s ease',
                         '&.Mui-selected': {
-                            color: '#0F766E',
+                            color: 'primary.main',
                             fontWeight: 800
                         },
                         '&:hover': {
-                            color: '#042F2E',
-                            bgcolor: 'rgba(15, 118, 110, 0.04)'
+                            color: 'primary.dark',
+                            bgcolor: (t) => `${t.palette.primary.main}0A`
                         }
                     }
                 }}
