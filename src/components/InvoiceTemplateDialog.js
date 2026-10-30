@@ -150,25 +150,41 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
       {/* Luxury Header Banner */}
       <Box
         sx={{
-          background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.dark || '#042F2E'} 0%, ${t.palette.primary.main} 100%)`,
+          background: (t) => t.palette.mode === 'dark'
+            ? `linear-gradient(135deg, ${t.palette.background.paper} 0%, ${t.palette.primary.dark} 100%)`
+            : `linear-gradient(135deg, ${t.palette.primary.dark} 0%, ${t.palette.primary.main} 100%)`,
           color: '#ffffff',
           p: 2.5,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between'
+          justifyContent: 'space-between',
+          position: 'relative',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.15)'
         }}
       >
+        {/* Top Metallic Primary/Secondary Accent */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '3px',
+            background: (t) => `linear-gradient(90deg, ${t.palette.primary.light} 0%, ${t.palette.secondary?.main || t.palette.primary.main} 50%, ${t.palette.primary.light} 100%)`
+          }}
+        />
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <Box
             sx={{
               p: 1,
-              borderRadius: 2,
-              bgcolor: 'rgba(217, 119, 6, 0.2)',
-              border: '1px solid rgba(217, 119, 6, 0.4)',
-              display: 'flex'
+              borderRadius: '10px',
+              bgcolor: 'rgba(255, 255, 255, 0.18)',
+              border: '1.5px solid rgba(255, 255, 255, 0.35)',
+              display: 'flex',
+              boxShadow: '0 4px 14px rgba(0, 0, 0, 0.15)'
             }}
           >
-            <Palette sx={{ color: '#FDE68A', fontSize: 24 }} />
+            <Palette sx={{ color: '#FFFFFF', fontSize: 24 }} />
           </Box>
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 800, color: '#ffffff', letterSpacing: -0.2 }}>

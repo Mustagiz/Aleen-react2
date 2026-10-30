@@ -108,15 +108,15 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
         fontSize
     } = settings;
 
-    // Dimensions based on template
+    // Dimensions based on template (Standard A4 Sticker Sheets e.g. 3 cols x 8 rows = 24 up)
     const getDimensions = () => {
         switch (template) {
-            case 'small': return { w: '38mm', h: '22mm', barH: 22, barW: 1.0 };
-            case 'compact': return { w: '30mm', h: '20mm', barH: 18, barW: 0.9 };
-            case 'large': return { w: '60mm', h: '40mm', barH: 38, barW: 1.4 };
-            case 'thermal_single': return { w: '50mm', h: '32mm', barH: 30, barW: 1.2 };
-            case 'a4_sheet': return { w: '63.5mm', h: '38.1mm', barH: 34, barW: 1.3 };
-            default: return { w: '50mm', h: '26mm', barH: barcodeHeight || 28, barW: 1.15 };
+            case 'small': return { w: '44mm', maxWidth: '44mm', h: '24mm', barH: 22, barW: 1.0 };
+            case 'compact': return { w: '36mm', maxWidth: '36mm', h: '20mm', barH: 18, barW: 0.9 };
+            case 'large': return { w: '90mm', maxWidth: '90mm', h: '42mm', barH: 38, barW: 1.4 };
+            case 'thermal_single': return { w: '52mm', maxWidth: '52mm', h: '32mm', barH: 30, barW: 1.2 };
+            case 'a4_sheet': return { w: '64mm', maxWidth: '64mm', h: '36mm', barH: 32, barW: 1.25 };
+            default: return { w: '64mm', maxWidth: '64mm', h: '34mm', barH: barcodeHeight || 28, barW: 1.15 };
         }
     };
 
@@ -164,8 +164,10 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                 textAlign: 'center',
                 borderRadius: 0.5,
                 overflow: 'hidden',
+                minHeight: dims.h,
                 height: dims.h,
                 width: dims.w,
+                maxWidth: dims.maxWidth || dims.w,
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
@@ -177,9 +179,13 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                 boxSizing: 'border-box',
                 fontFamily: 'system-ui, -apple-system, sans-serif',
                 '@media print': {
-                    border: '0.25px solid #e5e7eb',
+                    border: '1px solid #94A3B8',
                     pageBreakInside: 'avoid',
-                    boxShadow: 'none'
+                    breakInside: 'avoid',
+                    boxShadow: 'none',
+                    width: '100% !important',
+                    maxWidth: `${dims.maxWidth || dims.w} !important`,
+                    height: `${dims.h} !important`
                 }
             }}
         >
@@ -2720,9 +2726,14 @@ export default function BarcodeGenerator() {
                             settings.template === 'small' ? 'repeat(4, 1fr)' :
                             settings.template === 'large' ? 'repeat(2, 1fr)' :
                             'repeat(3, 1fr)',
-                        gap: settings.template === 'thermal_single' ? '4mm' : '2mm',
+                        gap: settings.template === 'thermal_single' ? '4mm' : '3mm',
                         p: 0,
-                        width: '100%'
+                        width: '100%',
+                        maxWidth: '100%',
+                        margin: '0 auto',
+                        boxSizing: 'border-box',
+                        justifyItems: 'center',
+                        alignItems: 'start'
                     }}
                 >
                     {(printSingleTarget ? [printSingleTarget] : selectedProducts).flatMap(product =>
@@ -2744,13 +2755,32 @@ export default function BarcodeGenerator() {
                 {`
           @media print {
             @page { 
-                margin: ${settings.template === 'thermal_single' ? '0 !important' : '5mm !important'}; 
-                size: auto;
+                margin: ${settings.template === 'thermal_single' ? '0 !important' : '6mm !important'}; 
+                size: ${settings.template === 'thermal_single' ? '58mm 40mm' : 'A4 portrait'};
             }
-            body { 
+            html, body { 
                 margin: 0 !important; 
                 padding: 0 !important;
-                background: white !important;
+                background: #ffffff !important;
+                width: 100% !important;
+                height: auto !important;
+            }
+            aside, header, nav, footer, .no-print, .app-sidebar, .app-topbar, .MuiDrawer-root, .MuiBackdrop-root {
+                display: none !important;
+                width: 0 !important;
+                height: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            #root, #root > div, main, main > div {
+                display: block !important;
+                position: static !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                overflow: visible !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #ffffff !important;
             }
             body * { 
                 visibility: hidden !important; 
@@ -2759,11 +2789,12 @@ export default function BarcodeGenerator() {
                 visibility: visible !important; 
             }
             .print-only {
-              position: absolute !important;
-              left: 0 !important;
-              top: 0 !important;
+              position: static !important;
+              display: block !important;
               width: 100% !important;
-              padding: ${settings.template === 'thermal_single' ? '1mm' : '4mm'} !important;
+              max-width: 100% !important;
+              margin: 0 auto !important;
+              padding: ${settings.template === 'thermal_single' ? '1mm' : '2mm 0'} !important;
               box-sizing: border-box !important;
             }
           }

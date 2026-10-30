@@ -3,7 +3,7 @@
   /* 1. Global Page Setup */
   @page {
     size: A4 portrait;
-    margin: 14mm 16mm 14mm 16mm;
+    margin: 6mm 6mm 6mm 6mm;
   }
 
   * {
@@ -19,27 +19,53 @@
     padding: 0 !important;
     background: #ffffff !important;
     color: #0F172A !important;
+    width: 100% !important;
     height: auto !important;
-    min-height: 100% !important;
+    min-height: auto !important;
     overflow: visible !important;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
   }
 
-  /* 2. Hide Non-Print Elements */
+  /* 2. Hide Non-Print Elements & Layout Chrome */
   body * {
     visibility: hidden;
   }
 
+  aside,
+  header,
+  nav,
+  footer,
   .no-print,
-  button,
+  .app-sidebar,
+  .app-topbar,
+  .MuiDrawer-root,
   .MuiBackdrop-root,
   .MuiDialogActions-root,
   .MuiAppBar-root,
   .MuiToolbar-root,
-  nav,
-  header,
-  footer {
+  button {
     display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Reset layout wrappers so they don't offset or constrain width */
+  #root,
+  #root > div,
+  main,
+  main > div {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
   }
 
   /* 3. Reset MUI Dialog Wrappers so print doesn't inherit modal offsets/flexbox */
@@ -61,11 +87,13 @@
     transform: none !important;
   }
 
-  /* 4. Display and Center Printable Invoice Canvas */
+  /* 4. Display and Center Printable Canvas (Invoices & Barcode Sheets) */
   .printable-area,
   .printable-area *,
   #printable-invoice,
-  #printable-invoice * {
+  #printable-invoice *,
+  .print-only,
+  .print-only * {
     visibility: visible !important;
   }
 
@@ -85,6 +113,16 @@
     box-sizing: border-box !important;
   }
 
+  .print-only {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 2mm 0 !important;
+    box-sizing: border-box !important;
+  }
+
   /* 5. Precise Tabular Alignment & Page Break Guards */
   table {
     width: 100% !important;
@@ -100,8 +138,10 @@
 
   tr,
   .no-break,
-  .printable-area > div {
+  .printable-area > div,
+  .print-only > div {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
 }
+

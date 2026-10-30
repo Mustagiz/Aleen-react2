@@ -3593,14 +3593,14 @@ const Invoices = () => {
             borderRadius: isTablet ? 0 : '14px',
             overflow: 'hidden',
             maxHeight: isTablet ? '100%' : '92vh',
-            boxShadow: '0 24px 60px rgba(var(--primary-rgb, 15, 118, 110), 0.22)'
+            boxShadow: (t) => `0 24px 60px ${t.palette.primary.main}33`
           }
         }}
       >
         <DialogTitle sx={{
           background: (t) => t.palette.mode === 'dark'
-            ? 'linear-gradient(135deg, #02201E 0%, #042F2E 40%, #0F766E 100%)'
-            : 'linear-gradient(135deg, #042F2E 0%, #0F766E 55%, #115E59 100%)',
+            ? `linear-gradient(135deg, ${t.palette.background.paper} 0%, ${t.palette.primary.dark} 100%)`
+            : `linear-gradient(135deg, ${t.palette.primary.dark} 0%, ${t.palette.primary.main} 100%)`,
           color: '#FFFFFF',
           px: { xs: 2, sm: 3 },
           py: { xs: 1.5, sm: 2 },
@@ -3608,10 +3608,10 @@ const Invoices = () => {
           justifyContent: 'space-between',
           alignItems: 'center',
           gap: { xs: 1, sm: 2 },
-          borderBottom: '2px solid rgba(217, 119, 6, 0.45)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
           position: 'relative'
         }}>
-          {/* Top Metallic Gold Accent */}
+          {/* Top Metallic Primary Accent */}
           <Box
             sx={{
               position: 'absolute',
@@ -3619,23 +3619,23 @@ const Invoices = () => {
               left: 0,
               right: 0,
               height: '3px',
-              background: 'linear-gradient(90deg, #D97706 0%, #F59E0B 50%, #D97706 100%)'
+              background: (t) => `linear-gradient(90deg, ${t.palette.primary.light} 0%, ${t.palette.secondary?.main || t.palette.primary.main} 50%, ${t.palette.primary.light} 100%)`
             }}
           />
 
           {/* Left: Avatar + Title + Badges */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.25, sm: 2 }, minWidth: 0, flex: 1 }}>
             <Avatar sx={{
-              bgcolor: 'rgba(217, 119, 6, 0.25)',
-              color: '#FDE68A',
+              bgcolor: 'rgba(255, 255, 255, 0.18)',
+              color: '#FFFFFF',
               width: { xs: 38, sm: 44 },
               height: { xs: 38, sm: 44 },
               flexShrink: 0,
-              border: '1.5px solid rgba(217, 119, 6, 0.55)',
+              border: '1.5px solid rgba(255, 255, 255, 0.35)',
               borderRadius: '10px',
-              boxShadow: '0 4px 14px rgba(0, 0, 0, 0.25)'
+              boxShadow: '0 4px 14px rgba(0, 0, 0, 0.2)'
             }}>
-              <PointOfSale sx={{ fontSize: { xs: 20, sm: 24 }, color: '#FDE68A !important' }} />
+              <PointOfSale sx={{ fontSize: { xs: 20, sm: 24 }, color: '#FFFFFF !important' }} />
             </Avatar>
             <Box sx={{ minWidth: 0, flex: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
@@ -3658,9 +3658,9 @@ const Invoices = () => {
                     height: 20,
                     fontSize: '0.65rem',
                     fontWeight: 800,
-                    bgcolor: 'rgba(217, 119, 6, 0.25)',
-                    color: '#FDE68A !important',
-                    border: '1px solid rgba(217, 119, 6, 0.45)',
+                    bgcolor: 'rgba(255, 255, 255, 0.2)',
+                    color: '#FFFFFF !important',
+                    border: '1px solid rgba(255, 255, 255, 0.35)',
                     borderRadius: '6px',
                     letterSpacing: '0.06em',
                     px: 0.5
@@ -5226,11 +5226,11 @@ const Invoices = () => {
                 <Box sx={{
                   p: 2.5,
                   borderRadius: '12px',
-                  background: mode === 'dark'
-                    ? 'linear-gradient(135deg, rgba(15,118,110,0.18) 0%, rgba(217,119,6,0.12) 100%)'
-                    : 'linear-gradient(135deg, rgba(15,118,110,0.06) 0%, rgba(217,119,6,0.06) 100%)',
+                  background: (t) => t.palette.mode === 'dark'
+                    ? `linear-gradient(135deg, ${t.palette.primary.main}1A 0%, ${t.palette.background.paper} 100%)`
+                    : `linear-gradient(135deg, ${t.palette.primary.main}0D 0%, ${t.palette.background.paper} 100%)`,
                   border: '1px solid',
-                  borderColor: mode === 'dark' ? 'rgba(217,119,6,0.3)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.2)',
+                  borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.12)' : `${t.palette.primary.main}25`,
                   boxShadow: '0 4px 20px rgba(0,0,0,0.04)'
                 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
@@ -5250,17 +5250,17 @@ const Invoices = () => {
 
                   {loyaltyDiscount > 0 && (
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                      <Typography variant="body2" sx={{ color: '#D97706', fontWeight: 600 }}>
+                      <Typography variant="body2" sx={{ color: (t) => t.palette.secondary?.main || '#D97706', fontWeight: 600 }}>
                         Loyalty Redemption ({loyaltyPointsToRedeem} pts @ ₹{pointsRedeemRate}/pt):
                       </Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 800, color: '#D97706' }}>
+                      <Typography variant="body2" sx={{ fontWeight: 800, color: (t) => t.palette.secondary?.main || '#D97706' }}>
                         - ₹{loyaltyDiscount.toFixed(2).toLocaleString('en-IN')}
                       </Typography>
                     </Box>
                   )}
 
                   {cashTendered > 0 && (
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, p: 0.8, borderRadius: '8px', bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, p: 0.8, borderRadius: '8px', bgcolor: (t) => `${t.palette.primary.main}12` }}>
                       <Typography variant="caption" sx={{ fontWeight: 700, color: (t) => t.palette.primary.main }}>
                         Cash Tendered: ₹{cashTendered.toFixed(2)}
                       </Typography>
@@ -5270,11 +5270,11 @@ const Invoices = () => {
                     </Box>
                   )}
 
-                  <Divider sx={{ my: 1.5, borderColor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.2)' }} />
+                  <Divider sx={{ my: 1.5, borderColor: (t) => `${t.palette.primary.main}25` }} />
 
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Box>
-                      <Typography variant="caption" sx={{ textTransform: 'uppercase', fontWeight: 800, color: '#D97706', letterSpacing: '0.04em' }}>
+                      <Typography variant="caption" sx={{ textTransform: 'uppercase', fontWeight: 800, color: (t) => t.palette.primary.main, letterSpacing: '0.04em' }}>
                         Net Payable
                       </Typography>
                       <Typography variant="h4" sx={{ fontWeight: 900, color: (t) => t.palette.primary.main, letterSpacing: '-0.02em' }}>
