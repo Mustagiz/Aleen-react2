@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel, CircularProgress, Alert, Snackbar, InputAdornment, List } from '@mui/material';
 import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, QrCode2, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, PauseCircleOutline, ShoppingCart, RestartAlt, CalendarMonth, Phone, Straighten, Clear, Stars, Redeem, AccountBalanceWallet, Keyboard, Tv, VolumeUp, VolumeOff } from '@mui/icons-material';
@@ -30,7 +30,7 @@ import ThermalReceipt from '../components/ThermalReceipt';
 import CustomerMeasurementModal from '../components/crm/CustomerMeasurementModal';
 import UpiPaymentQrModal from '../components/pos/UpiPaymentQrModal';
 import PairCustomerDisplayModal from '../components/pos/PairCustomerDisplayModal';
-import { speakItemScan, speakItemNotFound, speakBillSettlement, getVoiceSettings, setVoiceSettings } from '../utils/posVoiceEngine';
+import { speakItemScan, speakItemNotFound, speakBillSettlement, getVoiceSettings, setVoiceSettings, playLuxuryChime, speakVoice } from '../utils/posVoiceEngine';
 
 const Invoices = () => {
   const location = useLocation();
@@ -94,12 +94,18 @@ const Invoices = () => {
   const [voiceSettings, setPosVoiceSettings] = useState(() => getVoiceSettings());
 
   const handleToggleVoice = () => {
+    const nextState = !voiceSettings.voiceEnabled;
     const updated = {
       ...voiceSettings,
-      voiceEnabled: !voiceSettings.voiceEnabled
+      voiceEnabled: nextState,
+      soundEnabled: nextState
     };
     setPosVoiceSettings(updated);
     setVoiceSettings(updated);
+    if (nextState) {
+      playLuxuryChime('scan');
+      speakVoice('Voice and sound enabled');
+    }
   };
 
   // Customer Facing Display (CFD) - High-Speed Sync & Window Launcher
@@ -129,25 +135,16 @@ const Invoices = () => {
     }
   };
 
+  const handleCloseInvoiceModalRef = useRef(null);
+  const handleOpenNewInvoiceRef = useRef(null);
   const handleCloseInvoiceModal = () => {
-    if (cfdAutoIdleTimerRef.current) {
-      clearTimeout(cfdAutoIdleTimerRef.current);
-      cfdAutoIdleTimerRef.current = null;
+    if (handleCloseInvoiceModalRef.current) {
+      handleCloseInvoiceModalRef.current();
     }
-    cfdLastSettledTimeRef.current = 0;
-    setOpen(false);
-    // Immediately clear cart items and search so closed modal never reverts to active
-    setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0, variantSku: '' }]);
-    setCustomer('');
-    setPhone('+91');
-    setSelectedCustomerId(null);
-    setDiscountPercent('');
-    setDiscountAmount('');
-    setTax('');
-    setLoyaltyPointsToRedeem(0);
-    setItemSearchTerm('');
-    if (syncCustomerDisplayRef.current) {
-      syncCustomerDisplayRef.current('idle', null, true, []);
+  };
+  const handleOpenNewInvoice = () => {
+    if (handleOpenNewInvoiceRef.current) {
+      handleOpenNewInvoiceRef.current();
     }
   };
 
@@ -188,8 +185,7 @@ const Invoices = () => {
       // F2 or Alt + N: New Invoice
       if (e.key === 'F2' || (e.altKey && e.key.toLowerCase() === 'n')) {
         e.preventDefault();
-        setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0 }]);
-        setOpen(true);
+        handleOpenNewInvoice();
         return;
       }
 
@@ -335,16 +331,79 @@ const Invoices = () => {
   const lastRemoteScanTimestampRef = useRef(Date.now());
   const quickAddInputRef = useRef(null);
 
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
+  const [invoiceDate, setInvoiceDate] = useState(getCurrentDateTime());
+
+  const resetInvoiceForm = useCallback(() => {
+    setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0, variantSku: '' }]);
+    setCustomer('');
+    setPhone('+91');
+    setSelectedCustomerId(null);
+    setDiscountPercent('');
+    setDiscountAmount('');
+    setTax('');
+    setLoyaltyPointsToRedeem(0);
+    setCashTendered('');
+    setPaymentMethod('Cash');
+    setIsSplitPayment(false);
+    setSplitAmount(0);
+    setPaymentMethod2('Card');
+    setUpiTransactionId('');
+    setUpiTransactionId2('');
+    setPaymentStatus('paid');
+    setUpiProvider('PhonePe');
+    setUpiProvider2('GPay');
+    setIsEMI(false);
+    setEmiTenure(3);
+    setReceivedAmount('');
+    setInvoiceDate(getCurrentDateTime());
+    setItemSearchTerm('');
+    setUnrecognizedScan(null);
+    setScanFeedback(null);
+  }, []);
+
+  const executeCloseInvoiceModal = useCallback(() => {
+    if (cfdAutoIdleTimerRef.current) {
+      clearTimeout(cfdAutoIdleTimerRef.current);
+      cfdAutoIdleTimerRef.current = null;
+    }
+    cfdLastSettledTimeRef.current = 0;
+    setOpen(false);
+    resetInvoiceForm();
+    if (syncCustomerDisplayRef.current) {
+      syncCustomerDisplayRef.current('idle', null, true, []);
+    }
+  }, [resetInvoiceForm]);
+
+  const executeOpenNewInvoice = useCallback(() => {
+    if (cfdAutoIdleTimerRef.current) {
+      clearTimeout(cfdAutoIdleTimerRef.current);
+      cfdAutoIdleTimerRef.current = null;
+    }
+    cfdLastSettledTimeRef.current = 0;
+    resetInvoiceForm();
+    setOpen(true);
+    if (syncCustomerDisplayRef.current) {
+      syncCustomerDisplayRef.current('idle', null, true, []);
+    }
+  }, [resetInvoiceForm]);
+
+  handleCloseInvoiceModalRef.current = executeCloseInvoiceModal;
+  handleOpenNewInvoiceRef.current = executeOpenNewInvoice;
+
   // Handle Quick Bill CTA from header navigation or Alt+N shortcut
   useEffect(() => {
     const triggerNewBill = () => {
-      setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0 }]);
-      setCustomer('');
-      setPhone('+91');
-      setDiscountPercent('');
-      setDiscountAmount('');
-      setTax('');
-      setOpen(true);
+      executeOpenNewInvoice();
     };
 
     const searchParams = new URLSearchParams(location.search);
@@ -360,7 +419,7 @@ const Invoices = () => {
 
     window.addEventListener('open-quick-bill', handleCustomEvent);
     return () => window.removeEventListener('open-quick-bill', handleCustomEvent);
-  }, [location.search, location.state, navigate]);
+  }, [location.search, location.state, navigate, executeOpenNewInvoice]);
 
   const [networkHost] = useState(() => {
     if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
@@ -816,18 +875,6 @@ const Invoices = () => {
     }
   }, [scannerOpen, inventory]);
 
-  const getCurrentDateTime = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
-  };
-
-  const [invoiceDate, setInvoiceDate] = useState(getCurrentDateTime());
-
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.down('md'));
@@ -948,6 +995,10 @@ const Invoices = () => {
         id: value,
         variantSku: defaultVariantSku
       };
+      if (prod && value !== 'custom') {
+        playLuxuryChime('scan');
+        speakVoice(`${prod.name} added`);
+      }
     } else {
       updated[index] = {
         ...updated[index],
@@ -963,6 +1014,7 @@ const Invoices = () => {
   const handleRemoveItem = (index) => {
     const updated = selectedItems.filter((_, i) => i !== index);
     setSelectedItems(updated);
+    playLuxuryChime('warning');
     if (syncCustomerDisplayRef.current) {
       const remainingValid = updated.filter(item => item && (item.id || (item.isCustom && item.customName && item.customPrice > 0)));
       syncCustomerDisplayRef.current(remainingValid.length > 0 ? 'active' : 'idle', null, true, updated);
@@ -971,7 +1023,13 @@ const Invoices = () => {
 
   const matchedCustomer = selectedCustomerId
     ? customers.find(c => c.id === selectedCustomerId)
-    : customers.find(c => c.phone && (c.phone === phone || c.phone.replace(/\D/g, '') === (phone || '').replace(/\D/g, '')));
+    : customers.find(c => {
+        if (!c.phone || !phone) return false;
+        const cleanP = phone.replace(/\D/g, '');
+        if (cleanP.length < 10) return false;
+        const cleanC = c.phone.replace(/\D/g, '');
+        return c.phone === phone || cleanC === cleanP || (cleanP.length >= 10 && cleanC.endsWith(cleanP));
+      });
 
   const calculateTotal = () => {
     return calculateInvoiceTotals({
@@ -1396,28 +1454,7 @@ const Invoices = () => {
     const savedInvoice = await addInvoice(invoice);
     setOpen(false);
     setSuccessInvoice(savedInvoice || invoice); // Show success dialog with persisted invoice
-    setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0 }]);
-    setDiscountPercent('');
-    setDiscountAmount('');
-    setTax('');
-    setCustomer('');
-    setPhone('+91');
-    setInvoiceDate(getCurrentDateTime());
-    setSelectedCustomerId(null);
-    setLoyaltyPointsToRedeem(0);
-    setCashTendered('');
-    setPaymentMethod('Cash');
-    setIsSplitPayment(false);
-    setSplitAmount(0);
-    setPaymentMethod2('Card');
-    setUpiTransactionId('');
-    setUpiTransactionId2('');
-    setPaymentStatus('paid');
-    setUpiProvider('PhonePe');
-    setUpiProvider2('GPay');
-    setIsEMI(false);
-    setEmiTenure(3);
-    setReceivedAmount('');
+    resetInvoiceForm();
   };
 
   handleSaveInvoiceRef.current = handleSaveInvoice;
@@ -1449,14 +1486,10 @@ const Invoices = () => {
 
     setParkedCarts(prev => [newHeldCart, ...prev]);
     setOpen(false);
-    // Reset state for new guest checkout
-    setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0, variantSku: '' }]);
-    setCustomer('');
-    setPhone('+91');
-    setSelectedCustomerId(null);
-    setDiscountPercent('');
-    setDiscountAmount('');
-    setTax('');
+    resetInvoiceForm();
+    if (syncCustomerDisplayRef.current) {
+      syncCustomerDisplayRef.current('idle', null, true, []);
+    }
   };
 
   const handleResumeCart = (cart) => {
@@ -2114,10 +2147,7 @@ const Invoices = () => {
             <Button
               variant="contained"
               startIcon={<Add sx={{ fontSize: 19, color: '#FFFFFF !important' }} />}
-              onClick={() => {
-                setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0 }]);
-                setOpen(true);
-              }}
+              onClick={handleOpenNewInvoice}
               sx={{
                 height: { xs: 36, sm: 40 },
                 minHeight: { xs: 36, sm: 40 },
@@ -5309,10 +5339,7 @@ const Invoices = () => {
           }
           cfdLastSettledTimeRef.current = 0;
           setSuccessInvoice(null);
-          setOpen(true);
-          if (syncCustomerDisplayRef.current) {
-            syncCustomerDisplayRef.current('idle', null, true, []);
-          }
+          handleOpenNewInvoice();
         }}
         onUpdateInvoicePhone={handleUpdateInvoicePhone}
       />

@@ -20,6 +20,24 @@ const getAudioContext = () => {
   return sharedAudioCtx;
 };
 
+// Auto-unlock audio and speech on first user interaction (click, keypress, touch)
+if (typeof window !== 'undefined') {
+  const unlockAudio = () => {
+    try {
+      const ctx = getAudioContext();
+      if (ctx && ctx.state === 'suspended') {
+        ctx.resume().catch(() => {});
+      }
+      if ('speechSynthesis' in window && window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
+    } catch (e) {}
+  };
+  window.addEventListener('click', unlockAudio, { passive: true });
+  window.addEventListener('keydown', unlockAudio, { passive: true });
+  window.addEventListener('touchstart', unlockAudio, { passive: true });
+}
+
 // Check if voice synthesis is supported
 export const isVoiceSupported = () => {
   return typeof window !== 'undefined' && 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
@@ -34,10 +52,10 @@ export const getVoiceSettings = () => {
     return {
       soundEnabled: soundEnabled !== null ? soundEnabled === 'true' : true,
       voiceEnabled: voiceEnabled !== null ? voiceEnabled === 'true' : true,
-      volume: volume ? parseFloat(volume) : 0.9,
+      volume: volume ? parseFloat(volume) : 0.95,
     };
   } catch {
-    return { soundEnabled: true, voiceEnabled: true, volume: 0.9 };
+    return { soundEnabled: true, voiceEnabled: true, volume: 0.95 };
   }
 };
 
@@ -74,83 +92,95 @@ export const playLuxuryChime = (type = 'scan') => {
     const ctx = getAudioContext();
     if (!ctx) return;
 
-    const gainNode = ctx.createGain();
-    gainNode.connect(ctx.destination);
-    const now = ctx.currentTime;
+    const executeSound = () => {
+      try {
+        const gainNode = ctx.createGain();
+        gainNode.connect(ctx.destination);
+        const now = ctx.currentTime;
 
-    if (type === 'scan') {
-      // Crisp Atelier dual chime: A6 (1760Hz) -> E7 (2637Hz)
-      const osc1 = ctx.createOscillator();
-      const osc2 = ctx.createOscillator();
-      osc1.connect(gainNode);
-      osc2.connect(gainNode);
+        if (type === 'scan') {
+          // Crisp Atelier dual chime: A6 (1760Hz) -> E7 (2637Hz)
+          const osc1 = ctx.createOscillator();
+          const osc2 = ctx.createOscillator();
+          osc1.connect(gainNode);
+          osc2.connect(gainNode);
 
-      osc1.type = 'sine';
-      osc1.frequency.setValueAtTime(1760, now);
-      osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(2637, now + 0.035);
+          osc1.type = 'sine';
+          osc1.frequency.setValueAtTime(1760, now);
+          osc2.type = 'sine';
+          osc2.frequency.setValueAtTime(2637, now + 0.035);
 
-      gainNode.gain.setValueAtTime(0.2, now);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+          gainNode.gain.setValueAtTime(0.25, now);
+          gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
 
-      osc1.start(now);
-      osc1.stop(now + 0.045);
-      osc2.start(now + 0.035);
-      osc2.stop(now + 0.14);
-    } else if (type === 'duplicate') {
-      // Double tap chime indicating quantity +1 on double scan
-      const osc = ctx.createOscillator();
-      osc.connect(gainNode);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(1318, now); // E6
-      osc.frequency.setValueAtTime(1567, now + 0.06); // G6
+          osc1.start(now);
+          osc1.stop(now + 0.045);
+          osc2.start(now + 0.035);
+          osc2.stop(now + 0.15);
+        } else if (type === 'duplicate') {
+          // Double tap chime indicating quantity +1 on double scan
+          const osc = ctx.createOscillator();
+          osc.connect(gainNode);
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(1318, now); // E6
+          osc.frequency.setValueAtTime(1567, now + 0.06); // G6
 
-      gainNode.gain.setValueAtTime(0.18, now);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+          gainNode.gain.setValueAtTime(0.2, now);
+          gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
 
-      osc.start(now);
-      osc.stop(now + 0.15);
-    } else if (type === 'warning') {
-      // Amber tone for low stock
-      const osc = ctx.createOscillator();
-      osc.connect(gainNode);
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(440, now); // A4
-      osc.frequency.setValueAtTime(392, now + 0.09); // G4
+          osc.start(now);
+          osc.stop(now + 0.15);
+        } else if (type === 'warning') {
+          // Amber tone for low stock
+          const osc = ctx.createOscillator();
+          osc.connect(gainNode);
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now); // A4
+          osc.frequency.setValueAtTime(392, now + 0.09); // G4
 
-      gainNode.gain.setValueAtTime(0.24, now);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+          gainNode.gain.setValueAtTime(0.25, now);
+          gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
 
-      osc.start(now);
-      osc.stop(now + 0.28);
-    } else if (type === 'error') {
-      // Low buzz
-      const osc = ctx.createOscillator();
-      osc.connect(gainNode);
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(220, now);
-      gainNode.gain.setValueAtTime(0.25, now);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
-      osc.start(now);
-      osc.stop(now + 0.2);
-    } else if (type === 'success') {
-      // Triumphant luxury triad chord: C6 (1046Hz), E6 (1318Hz), G6 (1567Hz)
-      const freqs = [1046.5, 1318.5, 1567.98, 2093];
-      freqs.forEach((freq, idx) => {
-        const osc = ctx.createOscillator();
-        const oscGain = ctx.createGain();
-        osc.connect(oscGain);
-        oscGain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.28);
+        } else if (type === 'error') {
+          // Low buzz
+          const osc = ctx.createOscillator();
+          osc.connect(gainNode);
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, now);
+          gainNode.gain.setValueAtTime(0.25, now);
+          gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        } else if (type === 'success') {
+          // Triumphant luxury triad chord: C6 (1046Hz), E6 (1318Hz), G6 (1567Hz), C7 (2093Hz)
+          const freqs = [1046.5, 1318.5, 1567.98, 2093];
+          freqs.forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const oscGain = ctx.createGain();
+            osc.connect(oscGain);
+            oscGain.connect(ctx.destination);
 
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.05);
 
-        oscGain.gain.setValueAtTime(0.15, now + idx * 0.05);
-        oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+            oscGain.gain.setValueAtTime(0.2, now + idx * 0.05);
+            oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
 
-        osc.start(now + idx * 0.05);
-        osc.stop(now + 0.45);
-      });
+            osc.start(now + idx * 0.05);
+            osc.stop(now + 0.5);
+          });
+        }
+      } catch (err) {
+        console.warn('Audio node execution error:', err);
+      }
+    };
+
+    if (ctx.state === 'suspended') {
+      ctx.resume().then(executeSound).catch(executeSound);
+    } else {
+      executeSound();
     }
   } catch (err) {
     console.warn('Audio chime playback error:', err);
@@ -161,6 +191,7 @@ export const playLuxuryChime = (type = 'scan') => {
  * Text-to-Speech Engine using window.speechSynthesis
  */
 let lastSpeakTimestamp = 0;
+let activeUtterances = [];
 
 export const speakVoice = (text, options = {}) => {
   const settings = getVoiceSettings();
@@ -168,6 +199,9 @@ export const speakVoice = (text, options = {}) => {
 
   try {
     const synth = window.speechSynthesis;
+    if (synth.paused) {
+      synth.resume();
+    }
     // Cancel ongoing speech if rapid scanning to avoid huge queue delay
     const now = Date.now();
     if (now - lastSpeakTimestamp < 1500) {
@@ -176,9 +210,18 @@ export const speakVoice = (text, options = {}) => {
     lastSpeakTimestamp = now;
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.volume = settings.volume;
-    utterance.rate = options.rate || 1.08; // Brisk and clear
+    utterance.volume = typeof settings.volume === 'number' ? settings.volume : 0.95;
+    utterance.rate = options.rate || 1.05; // Brisk and clear
     utterance.pitch = options.pitch || 1.0;
+
+    // Retain in memory to prevent Chrome/Safari garbage-collection speech silence bug
+    activeUtterances.push(utterance);
+    utterance.onend = () => {
+      activeUtterances = activeUtterances.filter(u => u !== utterance);
+    };
+    utterance.onerror = () => {
+      activeUtterances = activeUtterances.filter(u => u !== utterance);
+    };
 
     // Pick a natural English voice if available (e.g. Samantha, Karen, Google UK, etc.)
     const voices = synth.getVoices();

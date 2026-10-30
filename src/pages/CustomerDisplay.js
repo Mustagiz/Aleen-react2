@@ -38,11 +38,14 @@ import {
   WhatsApp,
   Spa,
   CropFree,
-  Star
+  Star,
+  VolumeUp,
+  VolumeOff
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '../firebase';
 import { doc, onSnapshot, collection, getDocs } from 'firebase/firestore';
+import { playLuxuryChime } from '../utils/posVoiceEngine';
 import { QRCodeSVG } from 'qrcode.react';
 
 const COMPLIMENT_OPTIONS = [
@@ -214,17 +217,68 @@ export default function CustomerDisplay() {
     };
   }, [cfdConfig.videoUrl, cfdConfig.videoUpdatedAt, cfdConfig.idleDisplayType, cfdConfig.videoMimeType]);
 
-  // Auto-play video with sound policy compliance whenever video URL/fit/mode changes
+  // Video Sound preference (default false = sound is enabled)
+  const [isVideoMuted, setIsVideoMuted] = useState(() => {
+    try {
+      const saved = localStorage.getItem('aleen_cfd_video_muted');
+      return saved !== null ? saved === 'true' : false;
+    } catch {
+      return false;
+    }
+  });
+
+  const handleToggleVideoSound = (e) => {
+    if (e) e.stopPropagation();
+    setIsVideoMuted((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('aleen_cfd_video_muted', String(next));
+      } catch (err) {}
+      if (videoRef.current) {
+        videoRef.current.muted = next;
+        if (!next) {
+          videoRef.current.volume = 1.0;
+          videoRef.current.play().catch(() => {});
+        }
+      }
+      return next;
+    });
+  };
+
+  // Auto-play video with audio or seamless fallback on mode/url change
   useEffect(() => {
     if (videoRef.current) {
-      videoRef.current.defaultMuted = true;
-      videoRef.current.muted = true;
+      videoRef.current.muted = isVideoMuted;
+      videoRef.current.volume = 1.0;
       const playPromise = videoRef.current.play();
       if (playPromise !== undefined) {
-        playPromise.catch(() => {});
+        playPromise.catch((err) => {
+          // If browser autoplay policy blocked unmuted sound, mute and play
+          if (videoRef.current) {
+            videoRef.current.muted = true;
+            videoRef.current.play().catch(() => {});
+          }
+        });
       }
     }
-  }, [cfdConfig.videoUrl, cfdConfig.videoFit, cfdConfig.idleDisplayType, chunkedVideoUrl]);
+  }, [cfdConfig.videoUrl, cfdConfig.videoFit, cfdConfig.idleDisplayType, chunkedVideoUrl, isVideoMuted]);
+
+  // Unlock video audio on first user touch / click
+  useEffect(() => {
+    const unlockAudio = () => {
+      if (videoRef.current && !isVideoMuted && videoRef.current.muted) {
+        videoRef.current.muted = false;
+        videoRef.current.volume = 1.0;
+        videoRef.current.play().catch(() => {});
+      }
+    };
+    window.addEventListener('click', unlockAudio, { passive: true });
+    window.addEventListener('touchstart', unlockAudio, { passive: true });
+    return () => {
+      window.removeEventListener('click', unlockAudio);
+      window.removeEventListener('touchstart', unlockAudio);
+    };
+  }, [isVideoMuted]);
 
   // Interactive Customer Touchpoint States
   const [patronRating, setPatronRating] = useState(5);
@@ -259,8 +313,28 @@ export default function CustomerDisplay() {
     const packetSeq = typeof data.seq === 'number' ? data.seq : 0;
     const packetTime = typeof data.updatedAt === 'number' ? data.updatedAt : 0;
 
-    // Detect new cashier billing session (e.g. cashier refreshed or new invoice started)
-    if (packetTime > lastAppliedUpdateRef.current.updatedAt + 1200) {
+    // 1. Explicit IDLE command: ALWAYS apply immediately to return to homepage/video
+    if (data.status === 'idle' || (!data.items?.length && data.status !== 'settled')) {
+      lastAppliedUpdateRef.current = {
+        seq: Math.max(lastAppliedUpdateRef.current.seq, packetSeq),
+        updatedAt: Math.max(lastAppliedUpdateRef.current.updatedAt, packetTime || Date.now())
+      };
+      setCfdState(data);
+      if (source === 'local') setSyncChannel('instant');
+      return;
+    }
+
+    // 2. Play chime when active bill arrives or updates
+    if (data.status === 'active' && data.items?.length > 0) {
+      if (cfdState?.status !== 'active' || (data.items?.length !== cfdState?.items?.length)) {
+        playLuxuryChime('scan');
+      }
+    } else if (data.status === 'settled') {
+      playLuxuryChime('success');
+    }
+
+    // 3. Detect new cashier billing session (e.g. cashier refreshed or new invoice started)
+    if (packetTime > lastAppliedUpdateRef.current.updatedAt + 1000) {
       lastAppliedUpdateRef.current = { seq: packetSeq, updatedAt: packetTime };
       setCfdState(data);
       if (source === 'local') {
@@ -269,7 +343,7 @@ export default function CustomerDisplay() {
       return;
     }
 
-    // Monotonic guard: reject out-of-order stale packets
+    // 4. Monotonic guard: reject out-of-order stale packets
     if (packetSeq && lastAppliedUpdateRef.current.seq && packetSeq < lastAppliedUpdateRef.current.seq) {
       return;
     }
@@ -560,6 +634,23 @@ export default function CustomerDisplay() {
 
   const isEmptyCart = (!items.length || isIdle) && !isSettled;
   const hasCustomer = Boolean(activeCustomerName) && cfdState?.status === 'active';
+
+  // Resume video playback immediately when invoice is cancelled or closed
+  useEffect(() => {
+    if (isEmptyCart && !hasCustomer && videoRef.current) {
+      videoRef.current.muted = isVideoMuted;
+      videoRef.current.volume = 1.0;
+      const p = videoRef.current.play();
+      if (p !== undefined) {
+        p.catch(() => {
+          if (videoRef.current) {
+            videoRef.current.muted = true;
+            videoRef.current.play().catch(() => {});
+          }
+        });
+      }
+    }
+  }, [isEmptyCart, hasCustomer, isVideoMuted, chunkedVideoUrl]);
 
   // Dynamic Patron VIP Name Renderer with selectable animation styles
   const renderPatronName = (name, customSx = {}) => {
@@ -1621,12 +1712,13 @@ export default function CustomerDisplay() {
                         src={cfdConfig.videoUrl === 'firestore-chunked' ? chunkedVideoUrl : cfdConfig.videoUrl}
                         autoPlay
                         loop
-                        muted
+                        muted={isVideoMuted}
                         playsInline
                         webkit-playsinline="true"
                         x5-playsinline="true"
                         preload="auto"
                         controls={false}
+                        onClick={handleToggleVideoSound}
                         onError={() => {
                           console.warn('Video playback error on this device, falling back to 60FPS Virtual Runway Catwalk Canvas');
                           setVideoLoadError(true);
@@ -1635,9 +1727,41 @@ export default function CustomerDisplay() {
                           width: '100%',
                           height: '100%',
                           objectFit: cfdConfig.videoFit === 'contain' ? 'contain' : 'cover',
-                          display: 'block'
+                          display: 'block',
+                          cursor: 'pointer'
                         }}
                       />
+
+                      {/* Luxury Floating Sound Toggle Button */}
+                      <Button
+                        onClick={handleToggleVideoSound}
+                        size="small"
+                        startIcon={isVideoMuted ? <VolumeOff sx={{ fontSize: 18, color: '#FFFFFF !important' }} /> : <VolumeUp sx={{ fontSize: 18, color: '#FFFFFF !important' }} />}
+                        sx={{
+                          position: 'absolute',
+                          bottom: { xs: 16, sm: 24 },
+                          right: { xs: 16, sm: 24 },
+                          zIndex: 30,
+                          bgcolor: isVideoMuted ? 'rgba(15, 23, 42, 0.85)' : 'rgba(197, 160, 89, 0.95)',
+                          color: '#FFFFFF !important',
+                          border: '1.5px solid rgba(255, 255, 255, 0.45)',
+                          backdropFilter: 'blur(10px)',
+                          boxShadow: '0 8px 25px rgba(0,0,0,0.5)',
+                          borderRadius: 3,
+                          px: 2,
+                          py: 0.8,
+                          fontWeight: 800,
+                          fontSize: '0.78rem',
+                          letterSpacing: '0.04em',
+                          textTransform: 'uppercase',
+                          cursor: 'pointer',
+                          '&:hover': {
+                            bgcolor: isVideoMuted ? 'rgba(15, 23, 42, 0.95)' : '#B38E44'
+                          }
+                        }}
+                      >
+                        {isVideoMuted ? '🔇 Unmute Video' : '🔊 Sound Active'}
+                      </Button>
                     </Box>
                   )}
                 </Box>
