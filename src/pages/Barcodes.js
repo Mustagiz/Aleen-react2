@@ -551,9 +551,20 @@ export default function BarcodeGenerator() {
     };
 
     const handleUpdateCount = (productId, count) => {
-        setSelectedProducts(selectedProducts.map(p =>
-            p.id === productId ? { ...p, labelCount: Math.max(1, parseInt(count) || 1) } : p
-        ));
+        setSelectedProducts(prev => prev.map(p => {
+            if (p.id !== productId) return p;
+            if (count === '') return { ...p, labelCount: '' };
+            const parsed = parseInt(count, 10);
+            return { ...p, labelCount: isNaN(parsed) ? '' : Math.max(0, parsed) };
+        }));
+    };
+
+    const handleCountBlur = (productId) => {
+        setSelectedProducts(prev => prev.map(p => {
+            if (p.id !== productId) return p;
+            const parsed = parseInt(p.labelCount, 10);
+            return { ...p, labelCount: (!parsed || parsed < 1) ? 1 : parsed };
+        }));
     };
 
     const handleRemove = (productId) => {
@@ -677,7 +688,7 @@ export default function BarcodeGenerator() {
     }, [allSearchableProducts, productSearch, categoryFilter, stockFilter, sortOption]);
 
     // Total label count across all items
-    const totalLabelsCount = selectedProducts.reduce((sum, p) => sum + (p.labelCount || 1), 0);
+    const totalLabelsCount = selectedProducts.reduce((sum, p) => sum + (parseInt(p.labelCount) || 1), 0);
 
     const handlePrint = () => {
         if (selectedProducts.length === 0) {
@@ -2186,24 +2197,50 @@ export default function BarcodeGenerator() {
 
                                                 {/* Label Copies */}
                                                 <Grid item xs={6}>
-                                                    <TextField
-                                                        size="small"
-                                                        type="number"
-                                                        label="Copies"
-                                                        value={product.labelCount || 1}
-                                                        onChange={(e) => handleUpdateCount(product.id, e.target.value)}
-                                                        inputProps={{ min: 1 }}
-                                                        InputProps={{
-                                                            endAdornment: <InputAdornment position="end" sx={{ '& p': { fontSize: '0.7rem' } }}>pcs</InputAdornment>
-                                                        }}
-                                                        sx={{
-                                                            '& .MuiOutlinedInput-root': {
-                                                                borderRadius: 1.5,
-                                                                fontWeight: 700,
-                                                                fontSize: '0.82rem'
-                                                            }
-                                                        }}
-                                                    />
+                                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                                                        <TextField
+                                                            size="small"
+                                                            type="number"
+                                                            label="Copies"
+                                                            value={product.labelCount !== undefined ? product.labelCount : 1}
+                                                            onChange={(e) => handleUpdateCount(product.id, e.target.value)}
+                                                            onBlur={() => handleCountBlur(product.id)}
+                                                            inputProps={{ min: 1, max: 9999 }}
+                                                            InputProps={{
+                                                                endAdornment: <InputAdornment position="end" sx={{ '& p': { fontSize: '0.7rem' } }}>pcs</InputAdornment>
+                                                            }}
+                                                            sx={{
+                                                                '& .MuiOutlinedInput-root': {
+                                                                    borderRadius: 1.5,
+                                                                    fontWeight: 700,
+                                                                    fontSize: '0.82rem'
+                                                                }
+                                                            }}
+                                                        />
+                                                        <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                                                            <Chip
+                                                                label="-1"
+                                                                size="small"
+                                                                clickable
+                                                                onClick={() => handleUpdateCount(product.id, Math.max(1, (parseInt(product.labelCount, 10) || 1) - 1))}
+                                                                sx={{ height: 16, fontSize: '0.58rem', px: 0.2 }}
+                                                            />
+                                                            <Chip
+                                                                label="+1"
+                                                                size="small"
+                                                                clickable
+                                                                onClick={() => handleUpdateCount(product.id, (parseInt(product.labelCount, 10) || 1) + 1)}
+                                                                sx={{ height: 16, fontSize: '0.58rem', px: 0.2 }}
+                                                            />
+                                                            <Chip
+                                                                label="24 (Sheet)"
+                                                                size="small"
+                                                                clickable
+                                                                onClick={() => handleUpdateCount(product.id, 24)}
+                                                                sx={{ height: 16, fontSize: '0.58rem', px: 0.2, fontWeight: 700, bgcolor: 'rgba(15, 118, 110, 0.08)', color: '#0F766E' }}
+                                                            />
+                                                        </Box>
+                                                    </Box>
                                                 </Grid>
                                             </Grid>
 
@@ -2737,7 +2774,7 @@ export default function BarcodeGenerator() {
                     }}
                 >
                     {(printSingleTarget ? [printSingleTarget] : selectedProducts).flatMap(product =>
-                        Array.from({ length: product.labelCount || 1 }).map((_, i) => (
+                        Array.from({ length: parseInt(product.labelCount, 10) || 1 }).map((_, i) => (
                             <BarcodeItem
                                 key={`${product.id}-${i}`}
                                 value={formatSkuWithHyphen(product.variantSku || product.productId || product.id)}

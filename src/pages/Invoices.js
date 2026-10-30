@@ -389,6 +389,7 @@ const Invoices = () => {
   const barcodeBufferRef = useRef('');
   const lastKeyTimeRef = useRef(0);
   const lastRemoteScanTimestampRef = useRef(Date.now());
+  const lastScanEventRef = useRef({ code: '', time: 0 });
   const quickAddInputRef = useRef(null);
 
   const getCurrentDateTime = () => {
@@ -623,6 +624,19 @@ const Invoices = () => {
     if (!rawCode) return;
     const cleanCode = String(rawCode).trim();
     if (!cleanCode) return;
+
+    // Debounce guard: throttle identical scans within 1200ms to eliminate multi-trigger bounce
+    const now = Date.now();
+    if (
+      lastScanEventRef.current.code &&
+      lastScanEventRef.current.code.toLowerCase() === cleanCode.toLowerCase() &&
+      (now - lastScanEventRef.current.time) < 1200
+    ) {
+      console.log(`[Barcode] Ignored rapid duplicate scan for "${cleanCode}" (${source})`);
+      return;
+    }
+    lastScanEventRef.current = { code: cleanCode, time: now };
+
     const matchResult = findProductByCode(cleanCode);
 
     if (matchResult && matchResult.product) {
@@ -638,41 +652,29 @@ const Invoices = () => {
       }
       cfdLastSettledTimeRef.current = 0;
 
-      const baseItems = Array.isArray(selectedItems) ? [...selectedItems] : [];
-      let updatedCartItems = [];
       const resolvedVariantSku = variantSku || (product.hasVariants && product.variants?.length ? product.variants[0].sku : '');
 
-      // 1. If item already exists in the cart with the same variantSku, increment quantity
-      const existingIndex = baseItems.findIndex(item =>
-        item.id === product.id && (!variantSku || item.variantSku === variantSku) && !item.isCustom
-      );
+      setSelectedItems(prev => {
+        const baseItems = Array.isArray(prev) ? [...prev] : [];
+        let updatedCartItems = [];
 
-      if (existingIndex !== -1) {
-        const currentQty = parseInt(baseItems[existingIndex].quantity) || 1;
-        baseItems[existingIndex] = {
-          ...baseItems[existingIndex],
-          quantity: currentQty + 1
-        };
-        updatedCartItems = baseItems;
-      } else {
-        // 2. Populate first unselected empty row if present
-        const emptyIndex = baseItems.findIndex(item => !item.id && !item.isCustom);
-        if (emptyIndex !== -1) {
-          baseItems[emptyIndex] = {
-            id: product.id,
-            quantity: 1,
-            variantSku: resolvedVariantSku,
-            isCustom: false,
-            customName: '',
-            customPrice: 0,
-            customCost: 0
+        // 1. If item already exists in the cart with the same variantSku, increment quantity
+        const existingIndex = baseItems.findIndex(item =>
+          item.id === product.id && (!variantSku || item.variantSku === variantSku) && !item.isCustom
+        );
+
+        if (existingIndex !== -1) {
+          const currentQty = parseInt(baseItems[existingIndex].quantity) || 1;
+          baseItems[existingIndex] = {
+            ...baseItems[existingIndex],
+            quantity: currentQty + 1
           };
           updatedCartItems = baseItems;
         } else {
-          // 3. Otherwise append new line item
-          updatedCartItems = [
-            ...baseItems,
-            {
+          // 2. Populate first unselected empty row if present
+          const emptyIndex = baseItems.findIndex(item => !item.id && !item.isCustom);
+          if (emptyIndex !== -1) {
+            baseItems[emptyIndex] = {
               id: product.id,
               quantity: 1,
               variantSku: resolvedVariantSku,
@@ -680,19 +682,34 @@ const Invoices = () => {
               customName: '',
               customPrice: 0,
               customCost: 0
-            }
-          ];
+            };
+            updatedCartItems = baseItems;
+          } else {
+            // 3. Otherwise append new line item
+            updatedCartItems = [
+              ...baseItems,
+              {
+                id: product.id,
+                quantity: 1,
+                variantSku: resolvedVariantSku,
+                isCustom: false,
+                customName: '',
+                customPrice: 0,
+                customCost: 0
+              }
+            ];
+          }
         }
-      }
 
-      setSelectedItems(updatedCartItems);
+        // INSTANT 0ms Customer Facing Display Broadcast upon scanning
+        if (syncCustomerDisplayRef.current && updatedCartItems.length > 0) {
+          syncCustomerDisplayRef.current('active', product.name, true, updatedCartItems);
+        }
+
+        return updatedCartItems;
+      });
+
       setOpen(true);
-
-      // INSTANT 0ms Customer Facing Display Broadcast upon scanning
-      if (syncCustomerDisplayRef.current && updatedCartItems.length > 0) {
-        syncCustomerDisplayRef.current('active', product.name, true, updatedCartItems);
-      }
-
       setItemSearchTerm('');
       setUnrecognizedScan(null);
       setScanFeedback({
@@ -742,6 +759,14 @@ const Invoices = () => {
 
       const activeEl = document.activeElement;
       const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+
+      // If typing inside the quick add barcode field, let that field's onKeyDown handle it
+      if (activeEl && activeEl === quickAddInputRef.current) {
+        if (e.key === 'Enter') {
+          barcodeBufferRef.current = '';
+        }
+        return;
+      }
 
       const now = Date.now();
       const timeDiff = now - lastKeyTimeRef.current;
@@ -1017,40 +1042,79 @@ const Invoices = () => {
   }, [filteredInvoices, orderBy, order]);
 
   const handleAddItem = () => {
-    setSelectedItems([...selectedItems, { id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0, variantSku: '' }]);
+    setSelectedItems(prev => [...(Array.isArray(prev) ? prev : []), { id: '', quantity: 1, isCustom: false, customName: '', customPrice: '', customCost: '', variantSku: '' }]);
+  };
+
+  const handleToggleCustom = (index, isChecked) => {
+    setSelectedItems(prev => {
+      const updated = Array.isArray(prev) ? [...prev] : [];
+      if (!updated[index]) return prev;
+      if (isChecked) {
+        updated[index] = {
+          ...updated[index],
+          isCustom: true,
+          id: updated[index].id && String(updated[index].id).startsWith('custom') ? updated[index].id : `custom_${Date.now()}_${index}`,
+          customName: updated[index].customName || '',
+          customPrice: updated[index].customPrice !== undefined && updated[index].customPrice !== null ? updated[index].customPrice : '',
+          customCost: updated[index].customCost !== undefined && updated[index].customCost !== null ? updated[index].customCost : '',
+          variantSku: ''
+        };
+      } else {
+        updated[index] = {
+          ...updated[index],
+          isCustom: false,
+          id: '',
+          customName: '',
+          customPrice: '',
+          customCost: '',
+          variantSku: ''
+        };
+      }
+      if (syncCustomerDisplayRef.current) {
+        syncCustomerDisplayRef.current('active', null, true, updated);
+      }
+      return updated;
+    });
   };
 
   const handleItemChange = (index, field, value) => {
-    const updated = [...selectedItems];
-    if (field === 'id') {
-      const prod = inventory.find(i => i.id === value);
-      const defaultVariantSku = (prod && prod.hasVariants && prod.variants?.length)
-        ? (prod.variants.find(v => (parseInt(v.quantity) || 0) > 0)?.sku || prod.variants[0].sku)
-        : '';
-      updated[index] = {
-        ...updated[index],
-        id: value,
-        variantSku: defaultVariantSku
-      };
-    } else {
-      updated[index] = {
-        ...updated[index],
-        [field]: value
-      };
-    }
-    setSelectedItems(updated);
-    if (syncCustomerDisplayRef.current) {
-      syncCustomerDisplayRef.current('active', null, true, updated);
-    }
+    setSelectedItems(prev => {
+      const updated = Array.isArray(prev) ? [...prev] : [];
+      if (!updated[index]) return prev;
+      if (field === 'id') {
+        const prod = inventory.find(i => i.id === value);
+        const defaultVariantSku = (prod && prod.hasVariants && prod.variants?.length)
+          ? (prod.variants.find(v => (parseInt(v.quantity) || 0) > 0)?.sku || prod.variants[0].sku)
+          : '';
+        updated[index] = {
+          ...updated[index],
+          id: value,
+          isCustom: false,
+          variantSku: defaultVariantSku
+        };
+      } else {
+        updated[index] = {
+          ...updated[index],
+          [field]: value
+        };
+      }
+      if (syncCustomerDisplayRef.current) {
+        syncCustomerDisplayRef.current('active', null, true, updated);
+      }
+      return updated;
+    });
   };
 
   const handleRemoveItem = (index) => {
-    const updated = selectedItems.filter((_, i) => i !== index);
-    setSelectedItems(updated);
-    if (syncCustomerDisplayRef.current) {
-      const remainingValid = updated.filter(item => item && (item.id || (item.isCustom && item.customName && item.customPrice > 0)));
-      syncCustomerDisplayRef.current(remainingValid.length > 0 ? 'active' : 'idle', null, true, updated);
-    }
+    setSelectedItems(prev => {
+      const updated = Array.isArray(prev) ? prev.filter((_, i) => i !== index) : [];
+      const finalItems = updated.length > 0 ? updated : [{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: '', customCost: '', variantSku: '' }];
+      if (syncCustomerDisplayRef.current) {
+        const remainingValid = finalItems.filter(item => item && (item.id || (item.isCustom && item.customName && parseFloat(item.customPrice) > 0)));
+        syncCustomerDisplayRef.current(remainingValid.length > 0 ? 'active' : 'idle', null, true, finalItems);
+      }
+      return finalItems;
+    });
   };
 
   const matchedCustomer = selectedCustomerId
@@ -4184,21 +4248,15 @@ const Invoices = () => {
                     placeholder="Aim scanner gun or type barcode / product ID and hit Enter..."
                     value={itemSearchTerm}
                     onChange={(e) => {
-                      const val = e.target.value;
-                      setItemSearchTerm(val);
-                      // If exact match found while typing or scanner pasted
-                      if (val.trim().length >= 3) {
-                        const directMatch = findProductByCode(val.trim());
-                        if (directMatch && directMatch.product) {
-                          handleProcessBarcode(val.trim(), 'Barcode Scanner');
-                        }
-                      }
+                      setItemSearchTerm(e.target.value);
                     }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
-                        if (itemSearchTerm.trim()) {
-                          handleProcessBarcode(itemSearchTerm.trim(), 'Barcode Quick Add');
+                        const term = itemSearchTerm.trim();
+                        if (term) {
+                          handleProcessBarcode(term, 'Barcode Quick Add');
+                          setItemSearchTerm('');
                         }
                       }
                     }}
@@ -4214,7 +4272,13 @@ const Invoices = () => {
                             <Button
                               size="small"
                               variant="contained"
-                              onClick={() => handleProcessBarcode(itemSearchTerm.trim(), 'Barcode Quick Add')}
+                              onClick={() => {
+                                const term = itemSearchTerm.trim();
+                                if (term) {
+                                  handleProcessBarcode(term, 'Barcode Quick Add');
+                                  setItemSearchTerm('');
+                                }
+                              }}
                               sx={{
                                 py: 0.2,
                                 px: 1,
@@ -4407,7 +4471,7 @@ const Invoices = () => {
                                   label="Custom Garment Name / Alteration"
                                   size="small"
                                   fullWidth
-                                  value={item.customName}
+                                  value={item.customName || ''}
                                   onChange={(e) => handleItemChange(index, 'customName', e.target.value)}
                                   error={!item.customName && selectedItems.length > 0}
                                 />
@@ -4417,16 +4481,16 @@ const Invoices = () => {
                                     size="small"
                                     type="number"
                                     fullWidth
-                                    value={item.customPrice}
-                                    onChange={(e) => handleItemChange(index, 'customPrice', parseFloat(e.target.value) || 0)}
+                                    value={item.customPrice !== undefined && item.customPrice !== null ? item.customPrice : ''}
+                                    onChange={(e) => handleItemChange(index, 'customPrice', e.target.value)}
                                   />
                                   <TextField
                                     label="Cost Basis (₹)"
                                     size="small"
                                     type="number"
                                     fullWidth
-                                    value={item.customCost}
-                                    onChange={(e) => handleItemChange(index, 'customCost', parseFloat(e.target.value) || 0)}
+                                    value={item.customCost !== undefined && item.customCost !== null ? item.customCost : ''}
+                                    onChange={(e) => handleItemChange(index, 'customCost', e.target.value)}
                                   />
                                 </Box>
                               </Box>
@@ -4439,12 +4503,8 @@ const Invoices = () => {
                                 control={
                                   <Switch
                                     size="small"
-                                    checked={item.isCustom}
-                                    onChange={(e) => {
-                                      handleItemChange(index, 'isCustom', e.target.checked);
-                                      if (e.target.checked) handleItemChange(index, 'id', 'custom');
-                                      else handleItemChange(index, 'id', '');
-                                    }}
+                                    checked={Boolean(item.isCustom)}
+                                    onChange={(e) => handleToggleCustom(index, e.target.checked)}
                                   />
                                 }
                                 label={<Typography variant="caption" sx={{ fontWeight: 700, fontSize: '0.65rem', color: 'text.secondary' }}>Custom</Typography>}
@@ -4492,8 +4552,13 @@ const Invoices = () => {
                             <TextField
                               type="number"
                               size="small"
-                              value={item.quantity}
-                              onChange={(e) => handleItemChange(index, 'quantity', Math.max(1, parseInt(e.target.value) || 1))}
+                              value={item.quantity !== undefined ? item.quantity : 1}
+                              onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
+                              onBlur={() => {
+                                if (!item.quantity || parseInt(item.quantity, 10) < 1) {
+                                  handleItemChange(index, 'quantity', 1);
+                                }
+                              }}
                               sx={{ width: 80, '& .MuiOutlinedInput-root': { borderRadius: '8px' }, '& input': { py: 0.5, textAlign: 'center', fontWeight: 800 } }}
                             />
                           </Box>
@@ -4502,8 +4567,8 @@ const Invoices = () => {
                             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.68rem' }}>Line Total</Typography>
                             <Typography variant="subtitle2" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>
                               ₹{item.isCustom
-                                ? ((item.customPrice || 0) * item.quantity).toLocaleString('en-IN')
-                                : (selectedProduct ? (selectedProduct.price * item.quantity).toLocaleString('en-IN') : '0')
+                                ? (((parseFloat(item.customPrice) || 0) * (parseInt(item.quantity, 10) || 1))).toLocaleString('en-IN')
+                                : (selectedProduct ? (selectedProduct.price * (parseInt(item.quantity, 10) || 1)).toLocaleString('en-IN') : '0')
                               }
                             </Typography>
                           </Box>
