@@ -3749,30 +3749,31 @@ const Invoices = () => {
           />
 
           {/* Left: Avatar + Title + Badges */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.25, sm: 2 }, minWidth: 0, flex: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.75 }, minWidth: 0, flexShrink: 0 }}>
             <Avatar sx={{
               bgcolor: 'rgba(255, 255, 255, 0.18)',
               color: '#FFFFFF',
-              width: { xs: 38, sm: 44 },
-              height: { xs: 38, sm: 44 },
+              width: { xs: 32, sm: 42 },
+              height: { xs: 32, sm: 42 },
               flexShrink: 0,
               border: '1.5px solid rgba(255, 255, 255, 0.35)',
-              borderRadius: '10px',
+              borderRadius: { xs: '7px', sm: '10px' },
               boxShadow: '0 4px 14px rgba(0, 0, 0, 0.2)'
             }}>
-              <PointOfSale sx={{ fontSize: { xs: 20, sm: 24 }, color: '#FFFFFF !important' }} />
+              <PointOfSale sx={{ fontSize: { xs: 18, sm: 22 }, color: '#FFFFFF !important' }} />
             </Avatar>
-            <Box sx={{ minWidth: 0, flex: 1 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+            <Box sx={{ minWidth: 0 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexWrap: 'nowrap' }}>
                 <Typography sx={{ 
                   fontWeight: 900, 
-                  fontSize: { xs: '1.15rem', sm: '1.4rem' }, 
-                  letterSpacing: '0.08em', 
+                  fontSize: { xs: '1.05rem', sm: '1.35rem' }, 
+                  letterSpacing: '0.06em', 
                   color: '#FFFFFF !important',
-                  lineHeight: 1.15,
+                  lineHeight: 1.2,
                   textTransform: 'uppercase',
                   textShadow: '0 2px 4px rgba(0,0,0,0.25)',
-                  fontFamily: 'inherit'
+                  fontFamily: 'inherit',
+                  whiteSpace: 'nowrap'
                 }}>
                   INVOICE
                 </Typography>
@@ -3780,14 +3781,14 @@ const Invoices = () => {
                   label={isMobile ? "POS" : "LIVE ATELIER POS"}
                   size="small"
                   sx={{
-                    height: 20,
-                    fontSize: '0.65rem',
+                    height: 18,
+                    fontSize: '0.62rem',
                     fontWeight: 800,
                     bgcolor: 'rgba(255, 255, 255, 0.2)',
                     color: '#FFFFFF !important',
                     border: '1px solid rgba(255, 255, 255, 0.35)',
-                    borderRadius: '6px',
-                    letterSpacing: '0.06em',
+                    borderRadius: '5px',
+                    letterSpacing: '0.05em',
                     px: 0.5
                   }}
                 />
@@ -3797,11 +3798,9 @@ const Invoices = () => {
                 noWrap
                 sx={{ 
                   color: 'rgba(255, 255, 255, 0.88)', 
-                  display: 'block', 
-                  fontSize: { xs: '0.7rem', sm: '0.78rem' },
-                  mt: 0.25,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
+                  display: { xs: 'none', md: 'block' }, 
+                  fontSize: '0.76rem',
+                  mt: 0.2,
                   letterSpacing: '0.01em'
                 }}
               >
@@ -3810,8 +3809,8 @@ const Invoices = () => {
             </Box>
           </Box>
 
-          {/* Right: Sound Voice Toggle + Customer Screen + Park Cart + Close Icon */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.6, sm: 1 }, flexShrink: 0 }}>
+          {/* Right: Sound Voice Toggle + Pair + Customer Screen + Park Cart + Close Icon */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 }, flexShrink: 0, ml: 'auto' }}>
             {/* Interactive Voice & Sound Confirmations Toggle */}
             <Tooltip title={voiceSettings.voiceEnabled ? "Voice Confirmations: Active (Click to mute)" : "Voice Confirmations: Muted (Click to enable)"}>
               <IconButton
@@ -3824,6 +3823,7 @@ const Invoices = () => {
                   border: '1px solid rgba(255, 255, 255, 0.45) !important',
                   width: { xs: 32, sm: 36 },
                   height: { xs: 32, sm: 36 },
+                  minWidth: { xs: 32, sm: 36 },
                   borderRadius: '8px !important',
                   boxShadow: voiceSettings.voiceEnabled ? '0 0 10px rgba(255, 255, 255, 0.25)' : 'none',
                   transition: 'all 0.2s ease',
@@ -3836,7 +3836,7 @@ const Invoices = () => {
                   }
                 }}
               >
-                {voiceSettings.voiceEnabled ? <VolumeUp sx={{ fontSize: 18 }} /> : <VolumeOff sx={{ fontSize: 18 }} />}
+                {voiceSettings.voiceEnabled ? <VolumeUp sx={{ fontSize: { xs: 17, sm: 18 } }} /> : <VolumeOff sx={{ fontSize: { xs: 17, sm: 18 } }} />}
               </IconButton>
             </Tooltip>
 
@@ -3845,7 +3845,7 @@ const Invoices = () => {
               <Button
                 size="small"
                 onClick={() => setPairModalOpen(true)}
-                startIcon={<QrCode2 sx={{ fontSize: { xs: 15, sm: 17 }, color: '#FFFFFF !important' }} />}
+                startIcon={<QrCode2 sx={{ fontSize: { xs: 16, sm: 17 }, color: '#FFFFFF !important', mr: { xs: -0.5, sm: 0 } }} />}
                 className="header-contrast-btn"
                 sx={{
                   color: '#FFFFFF !important',
@@ -3855,7 +3855,9 @@ const Invoices = () => {
                   borderRadius: '8px !important',
                   height: { xs: 32, sm: 36 },
                   minHeight: { xs: 32, sm: 36 },
-                  px: { xs: 1, sm: 1.5 },
+                  width: { xs: 32, sm: 'auto' },
+                  minWidth: { xs: 32, sm: 'auto' },
+                  px: { xs: 0, sm: 1.5 },
                   py: 0,
                   textTransform: 'none',
                   fontWeight: 700,
@@ -3875,7 +3877,6 @@ const Invoices = () => {
                 }}
               >
                 <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Pair iPad / Phone</Box>
-                <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Pair</Box>
               </Button>
             </Tooltip>
 
@@ -3884,7 +3885,7 @@ const Invoices = () => {
               <Button
                 size="small"
                 onClick={handleOpenCustomerDisplay}
-                startIcon={<Tv sx={{ fontSize: { xs: 15, sm: 17 }, color: '#FFFFFF !important' }} />}
+                startIcon={<Tv sx={{ fontSize: { xs: 16, sm: 17 }, color: '#FFFFFF !important', mr: { xs: -0.5, md: 0 } }} />}
                 className="header-contrast-btn"
                 sx={{
                   color: '#FFFFFF !important',
@@ -3894,7 +3895,9 @@ const Invoices = () => {
                   borderRadius: '8px !important',
                   height: { xs: 32, sm: 36 },
                   minHeight: { xs: 32, sm: 36 },
-                  px: { xs: 1, sm: 1.5 },
+                  width: { xs: 32, md: 'auto' },
+                  minWidth: { xs: 32, md: 'auto' },
+                  px: { xs: 0, md: 1.5 },
                   py: 0,
                   textTransform: 'none',
                   fontWeight: 700,
@@ -3914,7 +3917,6 @@ const Invoices = () => {
                 }}
               >
                 <Box component="span" sx={{ display: { xs: 'none', md: 'inline' } }}>Customer Screen ↗</Box>
-                <Box component="span" sx={{ display: { xs: 'inline', md: 'none' } }}>Screen ↗</Box>
               </Button>
             </Tooltip>
 
@@ -3923,7 +3925,7 @@ const Invoices = () => {
               <Button
                 size="small"
                 onClick={handleParkCart}
-                startIcon={<PauseCircleOutline sx={{ fontSize: { xs: 15, sm: 17 }, color: '#FFFFFF !important' }} />}
+                startIcon={<PauseCircleOutline sx={{ fontSize: { xs: 16, sm: 17 }, color: '#FFFFFF !important', mr: { xs: -0.5, sm: 0 } }} />}
                 className="header-contrast-btn"
                 sx={{
                   color: '#FFFFFF !important',
@@ -3933,7 +3935,9 @@ const Invoices = () => {
                   borderRadius: '8px !important',
                   height: { xs: 32, sm: 36 },
                   minHeight: { xs: 32, sm: 36 },
-                  px: { xs: 1, sm: 1.5 },
+                  width: { xs: 32, sm: 'auto' },
+                  minWidth: { xs: 32, sm: 'auto' },
+                  px: { xs: 0, sm: 1.5 },
                   py: 0,
                   textTransform: 'none',
                   fontWeight: 700,
@@ -3953,7 +3957,6 @@ const Invoices = () => {
                 }}
               >
                 <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Park Cart</Box>
-                <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Park</Box>
               </Button>
             </Tooltip>
 
@@ -3969,6 +3972,7 @@ const Invoices = () => {
                 borderRadius: '8px !important',
                 width: { xs: 32, sm: 36 },
                 height: { xs: 32, sm: 36 },
+                minWidth: { xs: 32, sm: 36 },
                 transition: 'all 0.2s ease',
                 '&:hover': { 
                   color: '#FFFFFF !important', 

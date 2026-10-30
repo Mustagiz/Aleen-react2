@@ -498,7 +498,7 @@ const PublicBillView = () => {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#F1F5F9', py: { xs: 2, sm: 4 }, px: { xs: 1.5, sm: 3 } }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#F1F5F9', py: { xs: 1.5, sm: 4 }, px: { xs: 1, sm: 3 } }}>
       <Box sx={{ maxWidth: activeTemplate === 'boutique-slip' ? 480 : 840, mx: 'auto', width: '100%' }}>
         {/* Top Floating Download Bar */}
         <Paper
@@ -552,9 +552,9 @@ const PublicBillView = () => {
           </Box>
 
           <Stack
-            direction="row"
+            direction={{ xs: 'column', sm: 'row' }}
             spacing={1.5}
-            alignItems="center"
+            alignItems="stretch"
             sx={{
               width: { xs: '100%', sm: 'auto' },
               justifyContent: { xs: 'stretch', sm: 'flex-end' },
@@ -570,15 +570,15 @@ const PublicBillView = () => {
                 bgcolor: '#D97706',
                 color: '#FFFFFF',
                 fontWeight: 800,
-                fontSize: '0.84rem',
+                fontSize: '0.86rem',
                 whiteSpace: 'nowrap',
-                height: 42,
+                height: 44,
                 px: 2.5,
                 borderRadius: 2.5,
                 textTransform: 'none',
                 boxShadow: '0 4px 12px rgba(217, 119, 6, 0.4)',
                 '&:hover': { bgcolor: '#B45309' },
-                flex: { xs: 1, sm: 'none' }
+                width: { xs: '100%', sm: 'auto' }
               }}
             >
               {downloading ? 'Generating PDF...' : 'Download PDF Bill'}
@@ -593,13 +593,12 @@ const PublicBillView = () => {
                 fontWeight: 700,
                 fontSize: '0.84rem',
                 whiteSpace: 'nowrap',
-                height: 42,
+                height: 44,
                 borderRadius: 2.5,
                 textTransform: 'none',
-                minWidth: 'auto',
                 px: 2.5,
                 '&:hover': { borderColor: '#FFFFFF', bgcolor: 'rgba(255,255,255,0.1)' },
-                flexShrink: 0
+                width: { xs: '100%', sm: 'auto' }
               }}
             >
               Print

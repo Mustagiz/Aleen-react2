@@ -193,16 +193,16 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
       id="printable-invoice"
       className="printable-area invoice-print-container"
       sx={{
-        p: isSlip ? 2.5 : 4,
+        p: { xs: 1.5, sm: isSlip ? 2.5 : 4 },
         bgcolor: '#FFFFFF',
         color: '#0F172A',
         maxWidth: isSlip ? 480 : 800,
-        minWidth: isSlip ? 360 : 760,
-        width: isSlip ? '100%' : '800px',
+        minWidth: { xs: '100%', sm: isSlip ? 360 : 760 },
+        width: '100%',
         mx: 'auto',
         position: 'relative',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
-        borderRadius: 2,
+        boxShadow: { xs: 'none', sm: '0 4px 20px rgba(0,0,0,0.06)' },
+        borderRadius: { xs: 2, sm: 2 },
         fontFamily: isSlip ? 'monospace, sans-serif' : '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         WebkitPrintColorAdjust: 'exact',
         printColorAdjust: 'exact',
@@ -304,16 +304,16 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
           sx={{
             background: theme.headerBg,
             color: '#FFFFFF',
-            p: 3,
+            p: { xs: 2, sm: 3 },
             borderRadius: 2,
-            mb: 3,
+            mb: { xs: 2, sm: 3 },
             position: 'relative',
             zIndex: 1,
             boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
             display: 'flex',
-            flexDirection: 'row',
+            flexDirection: { xs: 'column', sm: 'row' },
             justifyContent: 'space-between',
-            alignItems: 'center',
+            alignItems: { xs: 'flex-start', sm: 'center' },
             gap: 2,
             pageBreakInside: 'avoid',
             breakInside: 'avoid',
@@ -321,15 +321,15 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
             printColorAdjust: 'exact'
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, flex: 1, pr: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: { xs: 'flex-start', sm: 'center' }, gap: { xs: 1.5, sm: 2.5 }, flex: 1, pr: { xs: 0, sm: 2 }, width: { xs: '100%', sm: 'auto' } }}>
             {profile.logoUrl && (
               <Box
                 component="img"
                 src={profile.logoUrl}
                 alt={profile.businessName || 'Store Logo'}
                 sx={{
-                  width: 64,
-                  height: 64,
+                  width: { xs: 50, sm: 64 },
+                  height: { xs: 50, sm: 64 },
                   borderRadius: 2,
                   objectFit: 'contain',
                   bgcolor: '#FFFFFF',
@@ -339,43 +339,58 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                 }}
               />
             )}
-            <Box>
+            <Box sx={{ minWidth: 0, flex: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography variant="caption" sx={{ letterSpacing: 2, color: '#FDE68A', fontWeight: 800, textTransform: 'uppercase' }}>
+                <Typography variant="caption" sx={{ letterSpacing: { xs: 1, sm: 2 }, color: '#FDE68A', fontWeight: 800, textTransform: 'uppercase', fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>
                   ✂️ {profile.tagline || activeSettings.tagline || 'Haute Couture & Bespoke Craft'}
                 </Typography>
               </Box>
-              <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: -0.5, mt: 0.5, color: '#FFFFFF', fontSize: '1.75rem' }}>
+              <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: -0.5, mt: 0.5, color: '#FFFFFF', fontSize: { xs: '1.35rem', sm: '1.75rem' }, lineHeight: 1.15 }}>
                 {profile.businessName || 'Aleen Clothing'}
               </Typography>
-              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)', mt: 0.5, fontSize: '0.82rem' }}>
+              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)', mt: 0.5, fontSize: { xs: '0.74rem', sm: '0.82rem' }, wordBreak: 'break-word' }}>
                 {profile.address}
               </Typography>
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.75)', display: 'block', mt: 0.3 }}>
+              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.75)', display: 'block', mt: 0.3, fontSize: { xs: '0.68rem', sm: '0.75rem' }, wordBreak: 'break-word' }}>
                 Phone: {profile.phone} | GSTIN: {profile.gstin}
               </Typography>
             </Box>
           </Box>
 
-          <Box sx={{ textAlign: 'right', minWidth: 220 }}>
-            <Typography
-              variant="h3"
-              sx={{
-                fontWeight: 900,
-                letterSpacing: 2,
-                color: '#FFFFFF',
-                opacity: 0.95,
-                fontSize: '2rem'
-              }}
-            >
-              TAX INVOICE
-            </Typography>
-            <Box sx={{ display: 'inline-block', bgcolor: 'rgba(255,255,255,0.18)', px: 1.5, py: 0.4, borderRadius: 1, mt: 0.5 }}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#FDE68A', letterSpacing: 0.5 }}>
-                #{invoice.invoiceNumber || invoice.id}
+          <Box sx={{
+            textAlign: { xs: 'left', sm: 'right' },
+            minWidth: { xs: 'auto', sm: 220 },
+            width: { xs: '100%', sm: 'auto' },
+            pt: { xs: 1.5, sm: 0 },
+            borderTop: { xs: '1px solid rgba(255,255,255,0.2)', sm: 'none' },
+            display: 'flex',
+            flexDirection: { xs: 'row', sm: 'column' },
+            justifyContent: { xs: 'space-between', sm: 'flex-start' },
+            alignItems: { xs: 'center', sm: 'flex-end' },
+            flexWrap: 'wrap',
+            gap: 1
+          }}>
+            <Box>
+              <Typography
+                variant="h3"
+                sx={{
+                  fontWeight: 900,
+                  letterSpacing: { xs: 1, sm: 2 },
+                  color: '#FFFFFF',
+                  opacity: 0.95,
+                  fontSize: { xs: '1.3rem', sm: '2rem' },
+                  lineHeight: 1.1
+                }}
+              >
+                TAX INVOICE
               </Typography>
+              <Box sx={{ display: 'inline-block', bgcolor: 'rgba(255,255,255,0.18)', px: 1.2, py: 0.25, borderRadius: 1, mt: 0.5 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#FDE68A', letterSpacing: 0.5, fontSize: { xs: '0.78rem', sm: '0.875rem' } }}>
+                  #{invoice.invoiceNumber || invoice.id}
+                </Typography>
+              </Box>
             </Box>
-            <Typography variant="caption" sx={{ display: 'block', color: 'rgba(255,255,255,0.8)', mt: 0.8 }}>
+            <Typography variant="caption" sx={{ display: 'block', color: 'rgba(255,255,255,0.85)', mt: { xs: 0, sm: 0.8 }, fontSize: { xs: '0.72rem', sm: '0.75rem' } }}>
               Date: {new Date(invoice.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
             </Typography>
           </Box>
@@ -386,7 +401,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
       <Box
         sx={{
           mb: 3,
-          p: 2,
+          p: { xs: 1.5, sm: 2 },
           borderRadius: 2,
           border: '1px solid',
           borderColor: 'divider',
@@ -394,29 +409,29 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
           position: 'relative',
           zIndex: 1,
           display: 'flex',
-          flexDirection: 'row',
+          flexDirection: { xs: 'column', sm: 'row' },
           justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          gap: 2,
+          alignItems: { xs: 'flex-start', sm: 'flex-start' },
+          gap: { xs: 1.5, sm: 2 },
           pageBreakInside: 'avoid',
           breakInside: 'avoid'
         }}
       >
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="caption" sx={{ fontWeight: 800, color: theme.primaryColor, textTransform: 'uppercase', letterSpacing: 1 }}>
+        <Box sx={{ flex: 1, width: { xs: '100%', sm: 'auto' } }}>
+          <Typography variant="caption" sx={{ fontWeight: 800, color: theme.primaryColor, textTransform: 'uppercase', letterSpacing: 1, fontSize: '0.7rem' }}>
             Billed To (Client Profile):
           </Typography>
-          <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.2 }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', mt: 0.2, fontSize: { xs: '0.95rem', sm: '1rem' } }}>
             {invoice.customer || 'Walk-in Patron'}
           </Typography>
           {invoice.phone && (
-            <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.82rem' }}>
+            <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.8rem' }}>
               Contact: {invoice.phone}
             </Typography>
           )}
         </Box>
 
-        <Box sx={{ textAlign: 'right' }}>
+        <Box sx={{ textAlign: { xs: 'left', sm: 'right' }, width: { xs: '100%', sm: 'auto' }, pt: { xs: 1, sm: 0 }, borderTop: { xs: '1px dashed #E2E8F0', sm: 'none' } }}>
           <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
             Payment Method: <b>{invoice.paymentMethod || 'Cash'}</b>
           </Typography>
@@ -462,18 +477,19 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                 className="invoice-table-header-cell"
                 style={{ backgroundColor: theme.tableHeadBg, color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF' }}
                 sx={{
-                  width: isSlip ? '48%' : '42%',
+                  width: { xs: '44%', sm: isSlip ? '48%' : '42%' },
                   color: '#FFFFFF !important',
                   bgcolor: `${theme.tableHeadBg} !important`,
                   WebkitTextFillColor: '#FFFFFF !important',
                   '&.MuiTableCell-head': { color: '#FFFFFF !important', WebkitTextFillColor: '#FFFFFF !important' },
                   fontWeight: 800,
-                  fontSize: '0.78rem',
+                  fontSize: { xs: '0.72rem', sm: '0.78rem' },
                   textTransform: 'uppercase',
-                  py: 1.2
+                  py: 1.2,
+                  px: { xs: 1, sm: 2 }
                 }}
               >
-                Garment / Merchandise
+                Garment / Item
               </TableCell>
               {!isSlip && (
                 <TableCell
@@ -481,6 +497,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                   style={{ backgroundColor: theme.tableHeadBg, color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF' }}
                   sx={{
                     width: '18%',
+                    display: { xs: 'none', sm: 'table-cell' },
                     color: '#FFFFFF !important',
                     bgcolor: `${theme.tableHeadBg} !important`,
                     WebkitTextFillColor: '#FFFFFF !important',
@@ -499,15 +516,16 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                 className="invoice-table-header-cell"
                 style={{ backgroundColor: theme.tableHeadBg, color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF' }}
                 sx={{
-                  width: isSlip ? '14%' : '10%',
+                  width: { xs: '14%', sm: isSlip ? '14%' : '10%' },
                   color: '#FFFFFF !important',
                   bgcolor: `${theme.tableHeadBg} !important`,
                   WebkitTextFillColor: '#FFFFFF !important',
                   '&.MuiTableCell-head': { color: '#FFFFFF !important', WebkitTextFillColor: '#FFFFFF !important' },
                   fontWeight: 800,
-                  fontSize: '0.78rem',
+                  fontSize: { xs: '0.72rem', sm: '0.78rem' },
                   textTransform: 'uppercase',
-                  py: 1.2
+                  py: 1.2,
+                  px: { xs: 0.5, sm: 1.5 }
                 }}
               >
                 Qty
@@ -517,15 +535,16 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                 className="invoice-table-header-cell"
                 style={{ backgroundColor: theme.tableHeadBg, color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF' }}
                 sx={{
-                  width: isSlip ? '18%' : '15%',
+                  width: { xs: '20%', sm: isSlip ? '18%' : '15%' },
                   color: '#FFFFFF !important',
                   bgcolor: `${theme.tableHeadBg} !important`,
                   WebkitTextFillColor: '#FFFFFF !important',
                   '&.MuiTableCell-head': { color: '#FFFFFF !important', WebkitTextFillColor: '#FFFFFF !important' },
                   fontWeight: 800,
-                  fontSize: '0.78rem',
+                  fontSize: { xs: '0.72rem', sm: '0.78rem' },
                   textTransform: 'uppercase',
-                  py: 1.2
+                  py: 1.2,
+                  px: { xs: 0.5, sm: 1.5 }
                 }}
               >
                 Rate
@@ -535,15 +554,16 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                 className="invoice-table-header-cell"
                 style={{ backgroundColor: theme.tableHeadBg, color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF' }}
                 sx={{
-                  width: isSlip ? '20%' : '15%',
+                  width: { xs: '22%', sm: isSlip ? '20%' : '15%' },
                   color: '#FFFFFF !important',
                   bgcolor: `${theme.tableHeadBg} !important`,
                   WebkitTextFillColor: '#FFFFFF !important',
                   '&.MuiTableCell-head': { color: '#FFFFFF !important', WebkitTextFillColor: '#FFFFFF !important' },
                   fontWeight: 800,
-                  fontSize: '0.78rem',
+                  fontSize: { xs: '0.72rem', sm: '0.78rem' },
                   textTransform: 'uppercase',
-                  py: 1.2
+                  py: 1.2,
+                  px: { xs: 1, sm: 2 }
                 }}
               >
                 Amount
@@ -562,23 +582,23 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                   breakInside: 'avoid'
                 }}
               >
-                <TableCell sx={{ py: 1.2, wordBreak: 'break-word' }}>
-                  <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '0.86rem' }}>
+                <TableCell sx={{ py: 1.2, px: { xs: 1, sm: 2 }, wordBreak: 'break-word' }}>
+                  <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '0.8rem', sm: '0.86rem' } }}>
                     {item.name}
                   </Typography>
                   {(item.variantSku || item.productId || item.sku) && (
-                    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', fontSize: '0.67rem', fontFamily: 'monospace', textTransform: 'uppercase' }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', fontSize: '0.66rem', fontFamily: 'monospace', textTransform: 'uppercase' }}>
                       SKU: {formatSkuWithHyphen(item.variantSku || item.productId || item.sku)}
                     </Typography>
                   )}
-                  {isSlip && item.category && (
-                    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
+                  {item.category && (
+                    <Typography variant="caption" sx={{ display: { xs: 'block', sm: isSlip ? 'block' : 'none' }, color: 'text.secondary', fontSize: '0.66rem' }}>
                       {item.category}
                     </Typography>
                   )}
                 </TableCell>
                 {!isSlip && (
-                  <TableCell sx={{ py: 1.2 }}>
+                  <TableCell sx={{ py: 1.2, display: { xs: 'none', sm: 'table-cell' } }}>
                     <Chip
                       size="small"
                       label={item.category || 'Atelier Wear'}
@@ -586,13 +606,13 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                     />
                   </TableCell>
                 )}
-                <TableCell align="center" sx={{ py: 1.2, fontWeight: 700, fontVariantNumeric: 'tabular-nums', fontSize: '0.86rem' }}>
+                <TableCell align="center" sx={{ py: 1.2, px: { xs: 0.5, sm: 1.5 }, fontWeight: 700, fontVariantNumeric: 'tabular-nums', fontSize: { xs: '0.8rem', sm: '0.86rem' } }}>
                   {item.quantity}
                 </TableCell>
-                <TableCell align="right" sx={{ py: 1.2, fontVariantNumeric: 'tabular-nums', fontSize: '0.86rem' }}>
+                <TableCell align="right" sx={{ py: 1.2, px: { xs: 0.5, sm: 1.5 }, fontVariantNumeric: 'tabular-nums', fontSize: { xs: '0.78rem', sm: '0.86rem' } }}>
                   ₹{Number(item.price || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </TableCell>
-                <TableCell align="right" sx={{ py: 1.2, fontWeight: 800, color: 'text.primary', fontVariantNumeric: 'tabular-nums', fontSize: '0.86rem' }}>
+                <TableCell align="right" sx={{ py: 1.2, px: { xs: 1, sm: 2 }, fontWeight: 800, color: 'text.primary', fontVariantNumeric: 'tabular-nums', fontSize: { xs: '0.8rem', sm: '0.86rem' } }}>
                   ₹{(Number(item.price || 0) * (item.quantity || 1)).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </TableCell>
               </TableRow>
@@ -607,7 +627,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
         position: 'relative',
         zIndex: 1,
         display: 'flex',
-        flexDirection: isSlip ? 'column' : 'row',
+        flexDirection: { xs: 'column-reverse', sm: isSlip ? 'column' : 'row' },
         justifyContent: 'space-between',
         alignItems: 'stretch',
         gap: 2,
@@ -615,7 +635,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
         breakInside: 'avoid'
       }}>
         {/* Left: Atelier Privileges / Dynamic UPI QR / Settlement Box */}
-        <Box sx={{ flex: 1, width: isSlip ? '100%' : '52%' }}>
+        <Box sx={{ flex: 1, width: { xs: '100%', sm: isSlip ? '100%' : '52%' } }}>
           {(profile.showBankDetails ?? activeSettings.showBankDetails ?? true) && !isSlip && leftBoxMode !== 'none' ? (
             <Box
               sx={{
@@ -888,7 +908,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
         </Box>
 
         {/* Right: Calculations */}
-        <Box sx={{ width: isSlip ? '100%' : '44%' }}>
+        <Box sx={{ width: { xs: '100%', sm: isSlip ? '100%' : '44%' } }}>
           <Box
             style={{
               backgroundColor: theme.totalBoxBg,
@@ -983,14 +1003,14 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
         position: 'relative',
         zIndex: 1,
         display: 'flex',
-        flexDirection: isSlip ? 'column' : 'row',
+        flexDirection: { xs: 'column', sm: isSlip ? 'column' : 'row' },
         justifyContent: 'space-between',
-        alignItems: 'flex-end',
-        gap: 2,
+        alignItems: { xs: 'flex-start', sm: 'flex-end' },
+        gap: 2.5,
         pageBreakInside: 'avoid',
         breakInside: 'avoid'
       }}>
-        <Box sx={{ flex: 1, width: isSlip ? '100%' : '58%' }}>
+        <Box sx={{ flex: 1, width: { xs: '100%', sm: isSlip ? '100%' : '58%' } }}>
           <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary', display: 'block', mb: 0.3 }}>
             Terms & Conditions:
           </Typography>
@@ -1003,7 +1023,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
         </Box>
 
         {!isSlip && (profile.showSignatureStamp ?? activeSettings.showSignatureStamp) && (
-          <Box sx={{ textAlign: 'center', width: '40%', minWidth: 240, position: 'relative' }}>
+          <Box sx={{ textAlign: 'center', width: { xs: '100%', sm: '40%' }, minWidth: { xs: 'auto', sm: 240 }, position: 'relative', pt: { xs: 2, sm: 0 }, borderTop: { xs: '1px dashed #E2E8F0', sm: 'none' } }}>
             {/* Retro Watermark Stamp centered directly behind / over the signature */}
             {isPaidInvoice && (
               <Box
