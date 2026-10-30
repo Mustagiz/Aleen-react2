@@ -14,7 +14,8 @@ import {
   Dialog,
   Avatar,
   Rating,
-  Button
+  Button,
+  LinearProgress
 } from '@mui/material';
 import {
   Fullscreen,
@@ -37,7 +38,10 @@ import {
   Spa,
   Star,
   VolumeUp,
-  VolumeOff
+  VolumeOff,
+  AccountBalanceWallet,
+  WorkspacePremium,
+  ContentCopy
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '../firebase';
@@ -693,6 +697,8 @@ export default function CustomerDisplay() {
   // Luxury Light Theme Accent Palette
   const themeAccent = '#C5A059'; // Royal Champagne Gold
   const themeAccentDeep = '#937230'; // Deep Antique Gold
+  const tierMeta = getTierMeta(customerTier);
+  const storeVpa = crmProfile?.bankDetails?.upiId || crmProfile?.upiId || 'aleenclothing@hdfcbank';
 
   const handleCopyUpi = () => {
     if (upiUrl && navigator?.clipboard?.writeText) {
@@ -2713,9 +2719,17 @@ export default function CustomerDisplay() {
                     }}
                   >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.8 }}>
-                      <Typography variant="overline" sx={{ color: '#937230', letterSpacing: '0.18em', fontWeight: 900, fontSize: '0.74rem' }}>
-                        ATELIER BILL SUMMARY
-                      </Typography>
+                      <Box>
+                        <Stack direction="row" spacing={0.8} alignItems="center">
+                          <AccountBalanceWallet sx={{ fontSize: 18, color: '#937230' }} />
+                          <Typography variant="overline" sx={{ color: '#937230', letterSpacing: '0.18em', fontWeight: 900, fontSize: '0.74rem', lineHeight: 1 }}>
+                            ATELIER BILL SUMMARY
+                          </Typography>
+                        </Stack>
+                        <Typography variant="caption" sx={{ color: '#64748B', display: 'block', fontWeight: 600, fontSize: '0.68rem', mt: 0.3 }}>
+                          Official Tax & Privilege Statement
+                        </Typography>
+                      </Box>
                       <Chip
                         icon={<Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: isSettled ? '#FFFFFF' : '#10B981', mr: 0.5 }} />}
                         label={isSettled ? "PAID & VERIFIED" : "LIVE TENDER"}
@@ -2733,6 +2747,7 @@ export default function CustomerDisplay() {
                     </Box>
 
                     <Stack spacing={1.3} sx={{ mt: 1, mb: 2 }}>
+                      {/* Gross Subtotal */}
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 600 }}>
                           Gross Atelier Subtotal:
@@ -2742,17 +2757,25 @@ export default function CustomerDisplay() {
                         </Typography>
                       </Box>
 
+                      {/* GST Statement */}
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Stack direction="row" spacing={0.6} alignItems="center">
+                        <Stack direction="row" spacing={0.6} alignItems="center" flexWrap="wrap">
                           <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 600 }}>
                             GST ({taxPercent > 0 ? `${taxPercent}%` : '0%'}):
                           </Typography>
                           {taxPercent > 0 && (
-                            <Chip
-                              label={`${(taxPercent / 2).toFixed(1)}% CGST + ${(taxPercent / 2).toFixed(1)}% SGST`}
-                              size="small"
-                              sx={{ height: 18, fontSize: '0.58rem', fontWeight: 700, bgcolor: 'rgba(100, 116, 139, 0.08)' }}
-                            />
+                            <Stack direction="row" spacing={0.5}>
+                              <Chip
+                                label={`CGST ${(taxPercent / 2).toFixed(1)}%: ₹${(cgst || tax / 2).toFixed(2)}`}
+                                size="small"
+                                sx={{ height: 18, fontSize: '0.58rem', fontWeight: 700, bgcolor: 'rgba(100, 116, 139, 0.08)' }}
+                              />
+                              <Chip
+                                label={`SGST ${(taxPercent / 2).toFixed(1)}%: ₹${(sgst || tax / 2).toFixed(2)}`}
+                                size="small"
+                                sx={{ height: 18, fontSize: '0.58rem', fontWeight: 700, bgcolor: 'rgba(100, 116, 139, 0.08)' }}
+                              />
+                            </Stack>
                           )}
                         </Stack>
                         <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
@@ -2760,24 +2783,60 @@ export default function CustomerDisplay() {
                         </Typography>
                       </Box>
 
+                      {/* Courtesy / General Privilege Discount */}
                       {discount > 0 && (
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <Typography variant="body2" sx={{ color: '#DC2626', fontWeight: 700 }}>
-                            Privilege Discount:
-                          </Typography>
+                          <Stack direction="row" spacing={0.6} alignItems="center">
+                            <Typography variant="body2" sx={{ color: '#DC2626', fontWeight: 700 }}>
+                              Privilege Discount:
+                            </Typography>
+                            {percentDiscount > 0 ? (
+                              <Chip
+                                label={`${percentDiscount}% OFF`}
+                                size="small"
+                                sx={{ height: 18, fontSize: '0.6rem', fontWeight: 800, bgcolor: 'rgba(220, 38, 38, 0.1)', color: '#DC2626' }}
+                              />
+                            ) : flatDiscount > 0 ? (
+                              <Chip
+                                label="Flat Courtesy"
+                                size="small"
+                                sx={{ height: 18, fontSize: '0.6rem', fontWeight: 800, bgcolor: 'rgba(220, 38, 38, 0.1)', color: '#DC2626' }}
+                              />
+                            ) : null}
+                          </Stack>
                           <Typography variant="body2" sx={{ fontWeight: 800, color: '#DC2626', fontVariantNumeric: 'tabular-nums' }}>
                             - ₹{discount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                           </Typography>
                         </Box>
                       )}
 
-                      {(cfdState?.loyaltyDiscount > 0) && (
+                      {/* Loyalty Privilege Redemption */}
+                      {(loyaltyDiscount > 0 || loyaltyPointsRedeemed > 0) && (
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <Typography variant="body2" sx={{ color: '#059669', fontWeight: 700 }}>
-                            Points Redeemed:
-                          </Typography>
+                          <Stack direction="row" spacing={0.6} alignItems="center">
+                            <Typography variant="body2" sx={{ color: '#059669', fontWeight: 700 }}>
+                              Loyalty Redemption:
+                            </Typography>
+                            <Chip
+                              label={`${loyaltyPointsRedeemed || Math.round(loyaltyDiscount)} pts`}
+                              size="small"
+                              sx={{ height: 18, fontSize: '0.6rem', fontWeight: 800, bgcolor: 'rgba(16, 185, 129, 0.12)', color: '#059669' }}
+                            />
+                          </Stack>
                           <Typography variant="body2" sx={{ fontWeight: 800, color: '#059669', fontVariantNumeric: 'tabular-nums' }}>
-                            - ₹{Number(cfdState.loyaltyDiscount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                            - ₹{loyaltyDiscount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                          </Typography>
+                        </Box>
+                      )}
+
+                      {/* Round Off */}
+                      {roundOff !== 0 && (
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 600 }}>
+                            Round Off:
+                          </Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
+                            ₹{(roundOff > 0 ? '+' : '') + roundOff.toFixed(2)}
                           </Typography>
                         </Box>
                       )}
@@ -2832,36 +2891,133 @@ export default function CustomerDisplay() {
                       />
                     </Box>
 
-                    {/* Privilege Points Accrual Jewel Ribbon */}
-                    <Box
-                      sx={{
-                        mt: 2,
-                        p: 1.5,
-                        borderRadius: 2.5,
-                        bgcolor: 'rgba(16, 185, 129, 0.08)',
-                        border: '1.5px solid rgba(16, 185, 129, 0.3)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between'
-                      }}
-                    >
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: 'rgba(16, 185, 129, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#059669' }}>
-                          <Stars sx={{ fontSize: 18 }} />
+                    {/* Royal Patron Privilege & Rewards Card */}
+                    {activeCustomerName ? (
+                      <Box
+                        sx={{
+                          mt: 2,
+                          p: 1.8,
+                          borderRadius: 3,
+                          bgcolor: '#FAF8F5',
+                          border: '1.5px solid rgba(197, 160, 89, 0.4)',
+                          boxShadow: '0 4px 15px rgba(180, 140, 75, 0.08)'
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.2 }}>
+                          <Stack direction="row" spacing={1} alignItems="center">
+                            <Box
+                              sx={{
+                                width: 30,
+                                height: 30,
+                                borderRadius: '50%',
+                                background: tierMeta.bg,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '0.95rem',
+                                border: `1.5px solid ${tierMeta.border}`,
+                                color: '#FFFFFF'
+                              }}
+                            >
+                              {tierMeta.icon}
+                            </Box>
+                            <Box>
+                              <Typography sx={{ fontSize: '0.82rem', fontWeight: 900, color: '#0F172A', lineHeight: 1.1 }}>
+                                {tierMeta.label}
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.65rem' }}>
+                                ₹{spendPerPoint}/pt • {tierMultiplier}x Multiplier • Balance: {loyaltyPoints} pts{loyaltyPointsRedeemed > 0 ? ` (${loyaltyPointsRemaining} rem)` : ''}
+                              </Typography>
+                            </Box>
+                          </Stack>
+
+                          <Box sx={{ textAlign: 'right' }}>
+                            <Typography sx={{ fontSize: '1.05rem', fontWeight: 900, color: '#059669', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+                              +{loyaltyPointsEarned} pts
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: '#059669', fontWeight: 700, fontSize: '0.62rem' }}>
+                              {isSettled ? 'Accrued & Credited' : 'Accrues on Payment'}
+                            </Typography>
+                          </Box>
                         </Box>
-                        <Box>
-                          <Typography sx={{ fontSize: '0.78rem', fontWeight: 800, color: '#065F46', lineHeight: 1.2 }}>
-                            Privilege Rewards {isSettled ? 'Credited' : 'To Accrue'}
-                          </Typography>
-                          <Typography sx={{ fontSize: '0.68rem', color: '#047857', fontWeight: 600 }}>
-                            {customerTier} VIP Member Rewards
-                          </Typography>
+
+                        {/* Balance & Progress */}
+                        <Box sx={{ mt: 1, pt: 1, borderTop: '1px dashed rgba(197, 160, 89, 0.25)' }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.6 }}>
+                            <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700, fontSize: '0.68rem' }}>
+                              Privilege Milestone • {tierMeta.nextTier}
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: '#937230', fontWeight: 800, fontSize: '0.68rem' }}>
+                              {Math.round(tierMeta.progress)}%
+                            </Typography>
+                          </Box>
+                          <LinearProgress
+                            variant="determinate"
+                            value={tierMeta.progress}
+                            sx={{
+                              height: 6,
+                              borderRadius: 3,
+                              bgcolor: 'rgba(197, 160, 89, 0.15)',
+                              '& .MuiLinearProgress-bar': {
+                                borderRadius: 3,
+                                background: 'linear-gradient(90deg, #C5A059 0%, #0F766E 100%)'
+                              }
+                            }}
+                          />
                         </Box>
-                      </Stack>
-                      <Typography sx={{ fontSize: '1.05rem', fontWeight: 900, color: '#059669', fontVariantNumeric: 'tabular-nums' }}>
-                        +{loyaltyPointsEarned} pts
-                      </Typography>
-                    </Box>
+                      </Box>
+                    ) : (
+                      <Box
+                        sx={{
+                          mt: 2,
+                          p: 1.6,
+                          borderRadius: 3,
+                          bgcolor: 'rgba(197, 160, 89, 0.08)',
+                          border: '1.5px dashed rgba(197, 160, 89, 0.45)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: 1.5
+                        }}
+                      >
+                        <Stack direction="row" spacing={1.2} alignItems="center">
+                          <Box
+                            sx={{
+                              width: 32,
+                              height: 32,
+                              borderRadius: '50%',
+                              bgcolor: 'rgba(197, 160, 89, 0.2)',
+                              border: '1.5px solid rgba(197, 160, 89, 0.4)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              color: '#937230'
+                            }}
+                          >
+                            <WorkspacePremium sx={{ fontSize: 18 }} />
+                          </Box>
+                          <Box>
+                            <Typography sx={{ fontSize: '0.8rem', fontWeight: 900, color: '#937230', lineHeight: 1.2 }}>
+                              Join Aleen Privilege Club
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.68rem' }}>
+                              Share mobile at billing to earn rewards on this order
+                            </Typography>
+                          </Box>
+                        </Stack>
+                        <Chip
+                          label={`+${loyaltyPointsEarned} pts`}
+                          size="small"
+                          sx={{
+                            bgcolor: '#059669',
+                            color: '#FFFFFF',
+                            fontWeight: 900,
+                            fontSize: '0.72rem',
+                            height: 24
+                          }}
+                        />
+                      </Box>
+                    )}
                   </Paper>
 
                   {/* Dynamic Payment Terminal Card with Tap-to-Zoom */}
@@ -2885,12 +3041,31 @@ export default function CustomerDisplay() {
                     {paymentMethod === 'UPI' && upiUrl ? (
                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
                         {/* Terminal Header */}
-                        <Stack direction="row" spacing={0.8} alignItems="center" sx={{ mb: 1.5 }}>
+                        <Stack direction="row" spacing={0.8} alignItems="center" sx={{ mb: 1.2 }}>
                           <VerifiedUser sx={{ color: '#0F766E', fontSize: 18 }} />
                           <Typography variant="overline" sx={{ color: '#0F766E', fontWeight: 900, letterSpacing: '0.12em', fontSize: '0.7rem' }}>
                             VERIFIED INSTANT UPI CHECKOUT
                           </Typography>
                         </Stack>
+
+                        {/* Store VPA Pill with Copy */}
+                        {storeVpa && (
+                          <Chip
+                            icon={<ContentCopy sx={{ fontSize: '13px !important', color: copiedUpi ? '#059669 !important' : '#937230 !important' }} />}
+                            label={copiedUpi ? "UPI ID Copied!" : `UPI: ${storeVpa}`}
+                            onClick={handleCopyUpi}
+                            size="small"
+                            sx={{
+                              mb: 1.5,
+                              bgcolor: copiedUpi ? 'rgba(16, 185, 129, 0.12)' : 'rgba(197, 160, 89, 0.1)',
+                              color: copiedUpi ? '#059669' : '#937230',
+                              border: '1px solid rgba(197, 160, 89, 0.3)',
+                              fontWeight: 800,
+                              fontSize: '0.68rem',
+                              cursor: 'pointer'
+                            }}
+                          />
+                        )}
 
                         {/* Reticle QR Frame */}
                         <Box
@@ -2944,9 +3119,24 @@ export default function CustomerDisplay() {
                           Scan to Pay ₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                         </Typography>
 
-                        <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, maxWidth: 300, mb: 1.5 }}>
-                          Google Pay • PhonePe • Paytm • BHIM • All UPI Apps
-                        </Typography>
+                        {/* Branded UPI App Badges */}
+                        <Stack direction="row" spacing={0.6} flexWrap="wrap" justifyContent="center" sx={{ mt: 0.5, mb: 1.5 }}>
+                          {['GPay', 'PhonePe', 'Paytm', 'BHIM', 'Cred'].map((appName) => (
+                            <Chip
+                              key={appName}
+                              label={appName}
+                              size="small"
+                              sx={{
+                                height: 20,
+                                fontSize: '0.62rem',
+                                fontWeight: 800,
+                                bgcolor: '#F8FAFC',
+                                color: '#475569',
+                                border: '1px solid #E2E8F0'
+                              }}
+                            />
+                          ))}
+                        </Stack>
 
                         {/* Interactive Experience Rating */}
                         <Box
