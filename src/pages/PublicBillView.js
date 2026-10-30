@@ -567,8 +567,8 @@ const PublicBillView = () => {
               onClick={handleDownloadPDF}
               disabled={downloading}
               sx={{
-                bgcolor: '#D97706',
-                color: '#FFFFFF',
+                bgcolor: '#D97706 !important',
+                color: '#FFFFFF !important',
                 fontWeight: 800,
                 fontSize: '0.86rem',
                 whiteSpace: 'nowrap',
@@ -577,31 +577,33 @@ const PublicBillView = () => {
                 borderRadius: 2.5,
                 textTransform: 'none',
                 boxShadow: '0 4px 12px rgba(217, 119, 6, 0.4)',
-                '&:hover': { bgcolor: '#B45309' },
+                '&:hover': { bgcolor: '#B45309 !important' },
                 width: { xs: '100%', sm: 'auto' }
               }}
             >
               {downloading ? 'Generating PDF...' : 'Download PDF Bill'}
             </Button>
             <Button
-              variant="outlined"
-              startIcon={<Print />}
+              variant="contained"
+              startIcon={<Print sx={{ color: '#0F172A !important' }} />}
               onClick={() => window.print()}
               sx={{
-                borderColor: 'rgba(255,255,255,0.4)',
-                color: '#FFFFFF',
-                fontWeight: 700,
-                fontSize: '0.84rem',
+                bgcolor: '#FFFFFF !important',
+                color: '#0F172A !important',
+                fontWeight: 800,
+                fontSize: '0.86rem',
                 whiteSpace: 'nowrap',
                 height: 44,
                 borderRadius: 2.5,
                 textTransform: 'none',
                 px: 2.5,
-                '&:hover': { borderColor: '#FFFFFF', bgcolor: 'rgba(255,255,255,0.1)' },
+                border: '1.5px solid #FFFFFF',
+                boxShadow: '0 3px 12px rgba(0, 0, 0, 0.15)',
+                '&:hover': { bgcolor: '#F8FAFC !important', boxShadow: '0 4px 14px rgba(0, 0, 0, 0.22)' },
                 width: { xs: '100%', sm: 'auto' }
               }}
             >
-              Print
+              Print Invoice
             </Button>
           </Stack>
         </Paper>
@@ -762,6 +764,74 @@ const PublicBillView = () => {
             profile={profile}
           />
         </Box>
+
+        {/* Bottom Quick Action Bar for Mobile & Desktop */}
+        <Paper
+          elevation={1}
+          className="no-print"
+          sx={{
+            mt: 3,
+            p: 2,
+            borderRadius: 3,
+            bgcolor: '#FFFFFF',
+            border: '1px solid #E2E8F0',
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 1.5,
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.05)',
+            '@media print': { display: 'none !important' }
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Receipt sx={{ color: 'text.secondary', fontSize: 20 }} />
+            <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+              Invoice #{invoice.invoiceNumber || invoice.id}
+            </Typography>
+          </Box>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ width: { xs: '100%', sm: 'auto' } }}>
+            <Button
+              variant="contained"
+              startIcon={downloading ? <CircularProgress size={18} color="inherit" /> : <Download />}
+              onClick={handleDownloadPDF}
+              disabled={downloading}
+              sx={{
+                bgcolor: '#D97706 !important',
+                color: '#FFFFFF !important',
+                fontWeight: 800,
+                fontSize: '0.86rem',
+                textTransform: 'none',
+                height: 42,
+                px: 2.5,
+                borderRadius: 2,
+                boxShadow: '0 2px 8px rgba(217, 119, 6, 0.35)',
+                '&:hover': { bgcolor: '#B45309 !important' }
+              }}
+            >
+              {downloading ? 'Generating PDF...' : 'Download PDF Bill'}
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<Print sx={{ color: '#FFFFFF' }} />}
+              onClick={() => window.print()}
+              sx={{
+                bgcolor: '#0F172A !important',
+                color: '#FFFFFF !important',
+                fontWeight: 800,
+                fontSize: '0.86rem',
+                textTransform: 'none',
+                height: 42,
+                px: 2.5,
+                borderRadius: 2,
+                boxShadow: '0 2px 8px rgba(15, 23, 42, 0.25)',
+                '&:hover': { bgcolor: '#1E293B !important' }
+              }}
+            >
+              Print Invoice
+            </Button>
+          </Stack>
+        </Paper>
 
         {/* Interactive Dynamic UPI QR Modal */}
         <Dialog
