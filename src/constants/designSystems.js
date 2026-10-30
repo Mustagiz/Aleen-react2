@@ -126,10 +126,10 @@ export const DESIGN_SYSTEMS = [
     },
     topBar: {
       style: 'colored', // Office 365 iconic colored banner
-      lightBg: '#0078D4', // Microsoft Cobalt Header
-      darkBg: '#106EBE',
+      lightBg: '#0F6CBD', // Modern Microsoft Fluent 2 Cobalt Header
+      darkBg: '#115EA3',
       textColor: '#FFFFFF',
-      borderColor: '#005A9E'
+      borderColor: 'rgba(255, 255, 255, 0.14)'
     },
     cardStyle: {
       backdropFilter: 'none',

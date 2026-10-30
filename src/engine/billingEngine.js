@@ -24,9 +24,19 @@ export const calculateLineItem = (item, inventory = []) => {
     };
   }
 
-  const invItem = inventory.find(i => i.id === item.id);
-  const variant = (invItem && invItem.hasVariants && item.variantSku)
-    ? invItem.variants.find(v => v.sku === item.variantSku)
+  let invItem = inventory.find(i => i.id === item.id);
+  if (!invItem && item.id && String(item.id).includes('-')) {
+    const parentId = String(item.id).split('-')[0];
+    invItem = inventory.find(i => i.id === parentId);
+  }
+
+  const targetVariantSku = item.variantSku ? String(item.variantSku).trim().toLowerCase() : null;
+  const variant = (invItem && invItem.hasVariants && targetVariantSku)
+    ? invItem.variants?.find(v => 
+        String(v.sku || '').trim().toLowerCase() === targetVariantSku ||
+        String(v.barcode || '').trim().toLowerCase() === targetVariantSku ||
+        String(v.id || '').trim().toLowerCase() === targetVariantSku
+      )
     : null;
 
   const price = variant 

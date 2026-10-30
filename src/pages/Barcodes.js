@@ -108,15 +108,15 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
         fontSize
     } = settings;
 
-    // Dimensions based on template (Standard A4 Sticker Sheets e.g. 3 cols x 8 rows = 24 up)
+    // Dimensions based on template
     const getDimensions = () => {
         switch (template) {
-            case 'small': return { w: '44mm', maxWidth: '44mm', h: '24mm', barH: 18, barW: 1.0 };
-            case 'compact': return { w: '36mm', maxWidth: '36mm', h: '20mm', barH: 15, barW: 0.9 };
-            case 'large': return { w: '90mm', maxWidth: '90mm', h: '42mm', barH: 34, barW: 1.4 };
-            case 'thermal_single': return { w: '52mm', maxWidth: '52mm', h: '32mm', barH: 26, barW: 1.2 };
-            case 'a4_sheet': return { w: '64mm', maxWidth: '64mm', h: '36mm', barH: 28, barW: 1.25 };
-            default: return { w: '64mm', maxWidth: '64mm', h: '34mm', barH: barcodeHeight ? Math.min(barcodeHeight, 30) : 26, barW: 1.15 };
+            case 'small': return { w: '44mm', maxWidth: '44mm', h: '26mm', barH: 18, barW: 1.0 };
+            case 'compact': return { w: '36mm', maxWidth: '36mm', h: '22mm', barH: 15, barW: 0.9 };
+            case 'large': return { w: '90mm', maxWidth: '90mm', h: '46mm', barH: 32, barW: 1.4 };
+            case 'thermal_single': return { w: '52mm', maxWidth: '52mm', h: '34mm', barH: 24, barW: 1.2 };
+            case 'a4_sheet': return { w: '64mm', maxWidth: '64mm', h: '38mm', barH: 26, barW: 1.25 };
+            default: return { w: '64mm', maxWidth: '64mm', h: '36mm', barH: barcodeHeight ? Math.min(barcodeHeight, 28) : 24, barW: 1.15 };
         }
     };
 
@@ -128,21 +128,22 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
     const currency = settings.currencySymbol || '₹';
     const mrpPrefix = settings.mrpPrefix || 'MRP';
 
-    const formattedCode = formatSkuWithHyphen(value) || String(value || '');
+    const rawCode = String(value || product?.variantSku || product?.productId || product?.barcode || '').trim();
+    const displaySku = rawCode;
 
     // Dynamic bar width calculation so barcode fills 82%-88% of tag width, eliminating dead margin space
-    const estimatedModules = (formattedCode.length * 11) + 35;
+    const estimatedModules = (rawCode.length * 11) + 35;
     const targetTagPxWidth = isSmall ? 140 : isLarge ? 290 : template === 'compact' ? 115 : 210;
-    const computedBarW = Math.max(dims.barW, Math.min(2.3, Number(((targetTagPxWidth * 0.86) / estimatedModules).toFixed(2))));
+    const computedBarW = Math.max(dims.barW, Math.min(2.3, Number(((targetTagPxWidth * 0.86) / Math.max(1, estimatedModules)).toFixed(2))));
 
     useEffect(() => {
-        if (barcodeRef.current && value) {
+        if (barcodeRef.current && rawCode) {
             try {
-                JsBarcode(barcodeRef.current, formattedCode, {
+                JsBarcode(barcodeRef.current, rawCode, {
                     format: "CODE128",
                     width: computedBarW,
                     height: dims.barH,
-                    displayValue: false, // Custom luxury typography rendered underneath for razor-sharp clarity
+                    displayValue: false, // Centered monospace SKU rendered underneath exactly as in Pic 2
                     margin: 0,
                     background: "#ffffff",
                     lineColor: "#000000"
@@ -151,7 +152,7 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                 console.warn("Barcode rendering warning:", e);
             }
         }
-    }, [value, formattedCode, computedBarW, dims.barH]);
+    }, [rawCode, computedBarW, dims.barH]);
 
     // Support for Custom Sales Price and Custom MRP per garment
     const sellingPrice = product?.customPrice !== undefined
@@ -162,15 +163,15 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
         ? (product.customMrp === '' ? 0 : Number(product.customMrp))
         : (product?.mrp ? Number(product.mrp) : Math.round(sellingPrice * (settings.mrpMultiplier || 1.25)));
 
-    const sizeDisplay = product?.size && product.size !== 'Free Size' ? product.size : 'FREE SIZE';
-    const colorDisplay = product?.color || null;
+    const sizeDisplay = product?.size && product.size !== 'Free Size' ? product.size.toUpperCase() : 'FREE SIZE';
+    const colorDisplay = product?.color ? String(product.color).trim().toUpperCase() : null;
+    const sizeColorText = [sizeDisplay, colorDisplay].filter(Boolean).join(' / ');
 
     return (
         <Box
             sx={{
-                border: '1.5px solid #0F172A',
-                borderRadius: '4px',
-                overflow: 'hidden',
+                border: '1.5px solid #E2E8F0',
+                borderRadius: '12px',
                 minHeight: dims.h,
                 height: dims.h,
                 width: dims.w,
@@ -178,16 +179,21 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
+                alignItems: 'center',
+                textAlign: 'center',
                 breakInside: 'avoid',
                 bgcolor: '#FFFFFF',
                 color: '#000000',
                 mx: 'auto',
+                p: isSmall ? '3px 6px' : isLarge ? '8px 14px' : '5px 10px',
                 boxSizing: 'border-box',
                 fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                 position: 'relative',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                overflow: 'hidden',
                 '@media print': {
                     border: '1.5px solid #000000 !important',
+                    borderRadius: '8px !important',
                     pageBreakInside: 'avoid',
                     breakInside: 'avoid',
                     boxShadow: 'none !important',
@@ -201,36 +207,18 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                 }
             }}
         >
-            {/* Top Branded Atelier Ribbon */}
-            {showBusiness && (
-                <Box
-                    sx={{
-                        width: '100%',
-                        bgcolor: '#0F172A',
-                        color: '#FFFFFF',
-                        px: isSmall ? 0.6 : 1,
-                        py: isSmall ? 0.2 : 0.35,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        boxSizing: 'border-box',
-                        lineHeight: 1,
-                        '@media print': {
-                            bgcolor: '#000000 !important',
-                            color: '#FFFFFF !important',
-                            WebkitPrintColorAdjust: 'exact',
-                            printColorAdjust: 'exact'
-                        }
-                    }}
-                >
+            {/* Top Text Group: Brand Name, Garment Name, Size / Color (Pic 2 Clean Centered Hierarchy) */}
+            <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: isSmall ? 0.1 : 0.2 }}>
+                {showBusiness && (
                     <Typography
                         sx={{
-                            fontSize: `${(isSmall ? 6.5 : isLarge ? 11 : 8.5) * fontScale}px`,
-                            fontWeight: 900,
-                            lineHeight: 1,
+                            fontSize: `${(isSmall ? 7 : isLarge ? 11 : 9.5) * fontScale}px`,
+                            fontWeight: 800,
+                            lineHeight: 1.15,
                             textTransform: 'uppercase',
-                            letterSpacing: '0.14em',
-                            color: '#FFFFFF',
+                            letterSpacing: '0.08em',
+                            color: '#000000',
+                            maxWidth: '100%',
                             overflow: 'hidden',
                             whiteSpace: 'nowrap',
                             textOverflow: 'ellipsis'
@@ -238,122 +226,46 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                     >
                         {businessName || 'ALEEN CLOTHING'}
                     </Typography>
+                )}
+
+                {showName && (
                     <Typography
                         sx={{
-                            fontSize: `${(isSmall ? 5 : isLarge ? 7.5 : 6) * fontScale}px`,
-                            fontWeight: 800,
-                            lineHeight: 1,
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.18em',
-                            color: 'rgba(255,255,255,0.85)',
-                            display: isSmall && template === 'compact' ? 'none' : 'block'
+                            fontSize: `${(isSmall ? 8.5 : isLarge ? 14 : 12) * fontScale}px`,
+                            fontWeight: 700,
+                            lineHeight: 1.2,
+                            color: '#0F172A',
+                            maxWidth: '100%',
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                            textOverflow: 'ellipsis'
                         }}
                     >
-                        ATELIER
+                        {product?.name || 'Heavy UnStitched'}
                     </Typography>
-                </Box>
-            )}
+                )}
 
-            {/* Product Details Bar (Name + Category on Left, Size/Color Badge on Right - Eliminates Dead Margin Space) */}
-            <Box
-                sx={{
-                    width: '100%',
-                    px: isSmall ? 0.5 : 0.9,
-                    pt: showBusiness ? (isSmall ? 0.25 : 0.35) : (isSmall ? 0.5 : 0.7),
-                    pb: 0.15,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    boxSizing: 'border-box',
-                    gap: 0.5
-                }}
-            >
-                {/* Left Side: Product Name & Category */}
-                <Box sx={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
-                    {showName && (
-                        <Typography
-                            sx={{
-                                fontSize: `${(isSmall ? 7 : isLarge ? 11 : 9) * fontScale}px`,
-                                fontWeight: 800,
-                                lineHeight: 1.15,
-                                color: '#0F172A',
-                                overflow: 'hidden',
-                                whiteSpace: 'nowrap',
-                                textOverflow: 'ellipsis',
-                                letterSpacing: '0.01em',
-                                textTransform: 'uppercase'
-                            }}
-                        >
-                            {product?.name || 'Garment Item'}
-                        </Typography>
-                    )}
-                    {showCategory && product?.category && (
-                        <Typography
-                            sx={{
-                                fontSize: `${(isSmall ? 5 : isLarge ? 7.5 : 6) * fontScale}px`,
-                                fontWeight: 700,
-                                color: '#64748B',
-                                lineHeight: 1,
-                                letterSpacing: '0.05em',
-                                textTransform: 'uppercase',
-                                mt: 0.2
-                            }}
-                        >
-                            {product.category}
-                        </Typography>
-                    )}
-                </Box>
-
-                {/* Right Side: Size Capsule Pill & Color */}
-                {showSizeColor && (
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0, gap: 0.2 }}>
-                        <Box
-                            sx={{
-                                bgcolor: '#0F172A',
-                                color: '#FFFFFF',
-                                px: isSmall ? 0.35 : 0.55,
-                                py: 0.12,
-                                borderRadius: '2px',
-                                lineHeight: 1,
-                                '@media print': {
-                                    bgcolor: '#000000 !important',
-                                    color: '#FFFFFF !important',
-                                    WebkitPrintColorAdjust: 'exact',
-                                    printColorAdjust: 'exact'
-                                }
-                            }}
-                        >
-                            <Typography
-                                sx={{
-                                    fontSize: `${(isSmall ? 5.5 : isLarge ? 8 : 6.5) * fontScale}px`,
-                                    fontWeight: 900,
-                                    lineHeight: 1,
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.04em'
-                                }}
-                            >
-                                {sizeDisplay}
-                            </Typography>
-                        </Box>
-                        {colorDisplay && (
-                            <Typography
-                                sx={{
-                                    fontSize: `${(isSmall ? 5 : isLarge ? 7 : 6) * fontScale}px`,
-                                    fontWeight: 700,
-                                    color: '#475569',
-                                    lineHeight: 1,
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.04em'
-                                }}
-                            >
-                                {colorDisplay}
-                            </Typography>
-                        )}
-                    </Box>
+                {showSizeColor && sizeColorText && (
+                    <Typography
+                        sx={{
+                            fontSize: `${(isSmall ? 6.5 : isLarge ? 10 : 8.5) * fontScale}px`,
+                            fontWeight: 600,
+                            lineHeight: 1.15,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            color: '#334155',
+                            maxWidth: '100%',
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                            textOverflow: 'ellipsis'
+                        }}
+                    >
+                        {sizeColorText}
+                    </Typography>
                 )}
             </Box>
 
-            {/* High-Density Barcode & Framed Monospace SKU Area */}
+            {/* Centered Barcode & Monospace SKU (Pic 2 Layout) */}
             <Box
                 sx={{
                     width: '100%',
@@ -362,7 +274,7 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     my: 'auto',
-                    px: 0.4
+                    px: 0.2
                 }}
             >
                 <svg
@@ -371,154 +283,66 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                         maxWidth: '96%',
                         height: `${dims.barH}px`,
                         display: 'block',
-                        margin: '0 auto'
+                        margin: '1px auto'
                     }}
                 ></svg>
 
-                {/* Monospace SKU with Subtle Flanking Rules */}
-                {showSku && (
-                    <Box
+                {showSku && displaySku && (
+                    <Typography
                         sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '92%',
-                            gap: 0.6,
+                            fontSize: `${(isSmall ? 7.5 : isLarge ? 11.5 : 9.5) * fontScale}px`,
+                            fontWeight: 700,
+                            fontFamily: '"SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace',
+                            letterSpacing: '0.06em',
+                            lineHeight: 1.1,
+                            color: '#0F172A',
                             mt: 0.2
                         }}
                     >
-                        <Box sx={{ flex: 1, height: '1px', bgcolor: '#E2E8F0', '@media print': { bgcolor: '#CBD5E1 !important' } }} />
-                        <Typography
-                            sx={{
-                                fontSize: `${(isSmall ? 6 : isLarge ? 9 : 7.5) * fontScale}px`,
-                                fontWeight: 800,
-                                fontFamily: '"SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace',
-                                letterSpacing: '0.15em',
-                                lineHeight: 1,
-                                color: '#1E293B',
-                                textTransform: 'uppercase',
-                                whiteSpace: 'nowrap'
-                            }}
-                        >
-                            {formattedCode}
-                        </Typography>
-                        <Box sx={{ flex: 1, height: '1px', bgcolor: '#E2E8F0', '@media print': { bgcolor: '#CBD5E1 !important' } }} />
-                    </Box>
+                        {displaySku}
+                    </Typography>
                 )}
             </Box>
 
-            {/* Bottom Commercial & Price Footer */}
+            {/* Bottom Centered Pricing: Side-by-side Strikethrough MRP and Bold Selling Price (Pic 2) */}
             {showPrice && (
                 <Box
                     sx={{
                         width: '100%',
-                        borderTop: '1px solid #0F172A',
-                        bgcolor: '#F8FAFC',
-                        px: isSmall ? 0.6 : 0.9,
-                        py: isSmall ? 0.2 : 0.35,
                         display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        boxSizing: 'border-box',
-                        '@media print': {
-                            borderTop: '1px solid #000000 !important',
-                            bgcolor: '#FFFFFF !important'
-                        }
+                        alignItems: 'baseline',
+                        justifyContent: 'center',
+                        gap: isSmall ? 1 : 1.5,
+                        boxSizing: 'border-box'
                     }}
                 >
-                    {/* Left Side: MRP & Legal Tax Note */}
-                    <Box sx={{ textAlign: 'left', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                        {showMrp && mrpPrice > 0 ? (
-                            <>
-                                <Typography
-                                    sx={{
-                                        fontSize: `${(isSmall ? 5.5 : isLarge ? 8 : 6.8) * fontScale}px`,
-                                        color: '#64748B',
-                                        textDecoration: 'line-through',
-                                        fontWeight: 700,
-                                        lineHeight: 1,
-                                        whiteSpace: 'nowrap'
-                                    }}
-                                >
-                                    {mrpPrefix} {currency}{mrpPrice.toLocaleString('en-IN')}
-                                </Typography>
-                                <Typography
-                                    sx={{
-                                        fontSize: `${(isSmall ? 4.5 : isLarge ? 6 : 5) * fontScale}px`,
-                                        color: '#94A3B8',
-                                        fontWeight: 600,
-                                        lineHeight: 1,
-                                        letterSpacing: '0.04em',
-                                        textTransform: 'uppercase',
-                                        mt: 0.2,
-                                        whiteSpace: 'nowrap'
-                                    }}
-                                >
-                                    (Incl. all taxes)
-                                </Typography>
-                            </>
-                        ) : (
-                            <Typography
-                                sx={{
-                                    fontSize: `${(isSmall ? 5 : isLarge ? 7 : 5.8) * fontScale}px`,
-                                    color: '#64748B',
-                                    fontWeight: 700,
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.05em'
-                                }}
-                            >
-                                Atelier Tag
-                            </Typography>
-                        )}
-                    </Box>
-
-                    {/* Center: Discount Badge if applicable */}
-                    {settings.showDiscountBadge && mrpPrice > sellingPrice && (
-                        <Box
-                            sx={{
-                                bgcolor: '#000000',
-                                color: '#FFFFFF',
-                                px: 0.4,
-                                py: 0.1,
-                                borderRadius: '2px',
-                                mx: 0.4,
-                                '@media print': {
-                                    bgcolor: '#000000 !important',
-                                    color: '#FFFFFF !important',
-                                    WebkitPrintColorAdjust: 'exact',
-                                    printColorAdjust: 'exact'
-                                }
-                            }}
-                        >
-                            <Typography
-                                sx={{
-                                    fontSize: `${(isSmall ? 5 : isLarge ? 7.5 : 6) * fontScale}px`,
-                                    fontWeight: 900,
-                                    lineHeight: 1,
-                                    whiteSpace: 'nowrap',
-                                    letterSpacing: '0.02em'
-                                }}
-                            >
-                                {Math.round(((mrpPrice - sellingPrice) / mrpPrice) * 100)}% OFF
-                            </Typography>
-                        </Box>
-                    )}
-
-                    {/* Right Side: Selling Price */}
-                    <Box sx={{ textAlign: 'right' }}>
+                    {showMrp && mrpPrice > 0 && (
                         <Typography
                             sx={{
-                                fontSize: `${(isSmall ? 8.5 : isLarge ? 13 : 11) * fontScale}px`,
-                                fontWeight: 900,
+                                fontSize: `${(isSmall ? 7.5 : isLarge ? 11.5 : 9.5) * fontScale}px`,
+                                color: '#64748B',
+                                textDecoration: 'line-through',
+                                fontWeight: 600,
                                 lineHeight: 1,
-                                color: '#000000',
-                                whiteSpace: 'nowrap',
-                                letterSpacing: '-0.02em'
+                                whiteSpace: 'nowrap'
                             }}
                         >
-                            {currency}{sellingPrice.toLocaleString('en-IN')}
+                            {mrpPrefix} {currency}{mrpPrice.toLocaleString('en-IN')}
                         </Typography>
-                    </Box>
+                    )}
+
+                    <Typography
+                        sx={{
+                            fontSize: `${(isSmall ? 10 : isLarge ? 16 : 13.5) * fontScale}px`,
+                            fontWeight: 800,
+                            lineHeight: 1,
+                            color: '#000000',
+                            whiteSpace: 'nowrap',
+                            letterSpacing: '-0.02em'
+                        }}
+                    >
+                        {currency}{sellingPrice.toLocaleString('en-IN')}
+                    </Typography>
                 </Box>
             )}
         </Box>
@@ -832,20 +656,31 @@ export default function BarcodeGenerator() {
     const allSearchableProducts = useMemo(() => {
         return inventory.flatMap(item => {
             if (item.hasVariants && item.variants?.length > 0) {
-                return item.variants.map(v => ({
-                    ...item,
-                    id: `${item.id}-${String(v.sku || '').toUpperCase()}`,
-                    name: item.name,
-                    variantName: `${v.size || ''} ${v.color || ''}`.trim(),
-                    productId: String(v.sku || '').toUpperCase(),
-                    price: v.price || item.price,
-                    quantity: v.quantity,
-                    category: item.category
-                }));
+                return item.variants.map(v => {
+                    const variantSku = String(v.sku || '').trim();
+                    const vPrice = v.price !== undefined && v.price !== '' ? Number(v.price) : Number(item.price || 0);
+                    const vMrp = v.mrp !== undefined && v.mrp !== '' ? Number(v.mrp) : (item.mrp !== undefined && item.mrp !== '' ? Number(item.mrp) : Math.round(vPrice * (settings.mrpMultiplier || 1.25)));
+                    return {
+                        ...item,
+                        id: `${item.id}-${variantSku || v.id || 'var'}`,
+                        parentProductId: item.id,
+                        name: item.name,
+                        variantName: `${v.size || ''} ${v.color || ''}`.trim(),
+                        productId: variantSku || item.productId,
+                        variantSku: variantSku,
+                        barcode: v.barcode || variantSku || item.barcode || item.productId,
+                        price: vPrice,
+                        mrp: vMrp,
+                        size: v.size || item.size || 'Free Size',
+                        color: v.color || item.color || '',
+                        quantity: v.quantity !== undefined ? v.quantity : item.quantity,
+                        category: item.category
+                    };
+                });
             }
             return [item];
         });
-    }, [inventory]);
+    }, [inventory, settings.mrpMultiplier]);
 
     // Filter and Sort inventory for selection
     const filteredAndSortedInventory = useMemo(() => {
@@ -1485,7 +1320,7 @@ export default function BarcodeGenerator() {
                                         }}
                                     >
                                         <BarcodeItem
-                                            value={sampleProduct.productId || 'PRD-1001'}
+                                            value={sampleProduct.variantSku || sampleProduct.productId || 'PRD-1001'}
                                             businessName={profile?.businessName || 'Aleen Clothing'}
                                             product={sampleProduct}
                                             settings={settings}
@@ -3173,7 +3008,7 @@ export default function BarcodeGenerator() {
                         Array.from({ length: parseInt(product.labelCount, 10) || 1 }).map((_, i) => (
                             <BarcodeItem
                                 key={`${product.id}-${i}`}
-                                value={formatSkuWithHyphen(product.variantSku || product.productId || product.id)}
+                                value={product.variantSku || product.productId || product.barcode || product.id}
                                 businessName={profile?.businessName || 'Aleen Clothing'}
                                 product={product}
                                 settings={settings}

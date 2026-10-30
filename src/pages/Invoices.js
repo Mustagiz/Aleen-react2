@@ -553,63 +553,102 @@ const Invoices = () => {
     clean = clean.replace(/^["']|["']$/g, '').trim();
     const lower = clean.toLowerCase();
 
-    // 1. Direct match on productId
-    let product = inventory.find(inv => inv.productId && String(inv.productId).trim().toLowerCase() === lower);
+    let product = null;
     let variantSku = null;
 
-    // 2. Direct match on barcode
-    if (!product) {
-      product = inventory.find(inv => inv.barcode && String(inv.barcode).trim().toLowerCase() === lower);
-    }
-
-    // 3. Direct match on database/document id
-    if (!product) {
-      product = inventory.find(inv => inv.id && String(inv.id).trim().toLowerCase() === lower);
-    }
-
-    // 4. Direct match on sku
-    if (!product) {
-      product = inventory.find(inv => inv.sku && String(inv.sku).trim().toLowerCase() === lower);
-    }
-
-    // 5. Direct match on itemCode
-    if (!product) {
-      product = inventory.find(inv => inv.itemCode && String(inv.itemCode).trim().toLowerCase() === lower);
-    }
-
-    // 6. Match within variants (sku, barcode, id)
-    if (!product) {
-      for (const inv of inventory) {
-        if (inv.variants && Array.isArray(inv.variants)) {
-          const v = inv.variants.find(varItem =>
-            (varItem.sku && String(varItem.sku).trim().toLowerCase() === lower) ||
-            (varItem.barcode && String(varItem.barcode).trim().toLowerCase() === lower) ||
-            (varItem.id && String(varItem.id).trim().toLowerCase() === lower)
-          );
-          if (v) {
-            product = inv;
-            variantSku = v.sku || null;
-            break;
-          }
+    // 1. Check if code directly matches a variant SKU, barcode, or ID across all products
+    for (const inv of inventory) {
+      if (inv.variants && Array.isArray(inv.variants)) {
+        const v = inv.variants.find(varItem =>
+          (varItem.sku && String(varItem.sku).trim().toLowerCase() === lower) ||
+          (varItem.barcode && String(varItem.barcode).trim().toLowerCase() === lower) ||
+          (varItem.id && String(varItem.id).trim().toLowerCase() === lower)
+        );
+        if (v) {
+          product = inv;
+          variantSku = String(v.sku || '').trim();
+          break;
         }
       }
     }
 
-    // 7. Case-insensitive exact item name match fallback
+    // 2. Check if code is compound format: parentId-variantSku (e.g. PRD1-RED-M)
+    if (!product && clean.includes('-')) {
+      const parts = clean.split('-');
+      const pId = parts[0].trim().toLowerCase();
+      const vSku = parts.slice(1).join('-').trim().toLowerCase();
+      const parent = inventory.find(inv => 
+        (inv.id && String(inv.id).trim().toLowerCase() === pId) ||
+        (inv.productId && String(inv.productId).trim().toLowerCase() === pId)
+      );
+      if (parent && parent.variants && Array.isArray(parent.variants)) {
+        const v = parent.variants.find(varItem => String(varItem.sku || '').trim().toLowerCase() === vSku);
+        if (v) {
+          product = parent;
+          variantSku = String(v.sku || '').trim();
+        }
+      }
+    }
+
+    // 3. Direct match on productId
+    if (!product) {
+      product = inventory.find(inv => inv.productId && String(inv.productId).trim().toLowerCase() === lower);
+    }
+
+    // 4. Direct match on barcode
+    if (!product) {
+      product = inventory.find(inv => inv.barcode && String(inv.barcode).trim().toLowerCase() === lower);
+    }
+
+    // 5. Direct match on database/document id
+    if (!product) {
+      product = inventory.find(inv => inv.id && String(inv.id).trim().toLowerCase() === lower);
+    }
+
+    // 6. Direct match on sku
+    if (!product) {
+      product = inventory.find(inv => inv.sku && String(inv.sku).trim().toLowerCase() === lower);
+    }
+
+    // 7. Direct match on itemCode
+    if (!product) {
+      product = inventory.find(inv => inv.itemCode && String(inv.itemCode).trim().toLowerCase() === lower);
+    }
+
+    // 8. Case-insensitive exact item name match fallback
     if (!product) {
       product = inventory.find(inv => inv.name && String(inv.name).trim().toLowerCase() === lower);
     }
 
-    // 8. Hyphen-agnostic matching (e.g. barcode scanner reads "ES-50" but DB holds "Es50" or vice-versa)
+    // 9. Hyphen-agnostic matching (e.g. barcode scanner reads "ES-50" but DB holds "Es50" or vice-versa)
     if (!product) {
       const strippedClean = lower.replace(/[-\s]/g, '');
       if (strippedClean) {
-        product = inventory.find(inv => {
-          const pId = String(inv.productId || '').trim().toLowerCase().replace(/[-\s]/g, '');
-          const sId = String(inv.sku || '').trim().toLowerCase().replace(/[-\s]/g, '');
-          const bId = String(inv.barcode || '').trim().toLowerCase().replace(/[-\s]/g, '');
-          return (pId && pId === strippedClean) || (sId && sId === strippedClean) || (bId && bId === strippedClean);
-        });
+        // Check variants hyphen-agnostic first
+        for (const inv of inventory) {
+          if (inv.variants && Array.isArray(inv.variants)) {
+            const v = inv.variants.find(varItem => {
+              const vSku = String(varItem.sku || '').trim().toLowerCase().replace(/[-\s]/g, '');
+              const vBar = String(varItem.barcode || '').trim().toLowerCase().replace(/[-\s]/g, '');
+              return (vSku && vSku === strippedClean) || (vBar && vBar === strippedClean);
+            });
+            if (v) {
+              product = inv;
+              variantSku = String(v.sku || '').trim();
+              break;
+            }
+          }
+        }
+
+        // If still not found, check parent products
+        if (!product) {
+          product = inventory.find(inv => {
+            const pId = String(inv.productId || '').trim().toLowerCase().replace(/[-\s]/g, '');
+            const sId = String(inv.sku || '').trim().toLowerCase().replace(/[-\s]/g, '');
+            const bId = String(inv.barcode || '').trim().toLowerCase().replace(/[-\s]/g, '');
+            return (pId && pId === strippedClean) || (sId && sId === strippedClean) || (bId && bId === strippedClean);
+          });
+        }
       }
     }
 
@@ -4547,10 +4586,7 @@ const Invoices = () => {
                           <Box sx={{ textAlign: 'right' }}>
                             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.68rem' }}>Line Total</Typography>
                             <Typography variant="subtitle2" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>
-                              ₹{item.isCustom
-                                ? (((parseFloat(item.customPrice) || 0) * (parseInt(item.quantity, 10) || 1))).toLocaleString('en-IN')
-                                : (selectedProduct ? (selectedProduct.price * (parseInt(item.quantity, 10) || 1)).toLocaleString('en-IN') : '0')
-                              }
+                              ₹{(calculateLineItem(item, inventory).lineTotal || 0).toLocaleString('en-IN')}
                             </Typography>
                           </Box>
                         </Box>

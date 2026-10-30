@@ -183,25 +183,61 @@ export default function Devices() {
         const code = rawText.trim();
         if (!code) return;
 
-        // Try lookup in catalog
+        // Robust variant-first lookup in catalog
         const lower = code.toLowerCase();
-        let matched = inventory.find(i => 
-            (i.id && String(i.id).toLowerCase() === lower) ||
-            (i.productId && i.productId.toLowerCase() === lower) ||
-            (i.name && i.name.toLowerCase().includes(lower))
-        );
+        const cleanLower = code.replace(/[^A-Za-z0-9]/g, '').toLowerCase();
 
-        if (!matched) {
-            // Check variants
-            for (const item of inventory) {
-                if (item.variants && Array.isArray(item.variants)) {
-                    const v = item.variants.find(varItem => varItem.sku && varItem.sku.toLowerCase() === lower);
-                    if (v) {
-                        matched = { ...item, matchedVariant: v };
-                        break;
-                    }
+        let matched = null;
+
+        // 1. Search variants first to ensure the exact variant price and attributes are resolved
+        for (const item of inventory) {
+            if (item.variants && Array.isArray(item.variants)) {
+                const v = item.variants.find(varItem => {
+                    const vSku = String(varItem.sku || '').trim().toLowerCase();
+                    const vCleanSku = vSku.replace(/[^A-Za-z0-9]/g, '');
+                    const vBarcode = String(varItem.barcode || '').trim().toLowerCase();
+                    const vCleanBarcode = vBarcode.replace(/[^A-Za-z0-9]/g, '');
+                    const compoundId = `${String(item.id || '').toLowerCase()}-${vSku}`;
+                    const compoundClean = compoundId.replace(/[^A-Za-z0-9]/g, '');
+
+                    return vSku === lower ||
+                        vBarcode === lower ||
+                        compoundId === lower ||
+                        (cleanLower && (vCleanSku === cleanLower || vCleanBarcode === cleanLower || compoundClean === cleanLower));
+                });
+
+                if (v) {
+                    const vPrice = v.price !== undefined && v.price !== '' ? Number(v.price) : Number(item.price || 0);
+                    const vMrp = v.mrp !== undefined && v.mrp !== '' ? Number(v.mrp) : item.mrp;
+                    matched = {
+                        ...item,
+                        productId: v.sku || item.productId,
+                        variantSku: v.sku,
+                        price: vPrice,
+                        mrp: vMrp,
+                        size: v.size || item.size,
+                        color: v.color || item.color,
+                        matchedVariant: v
+                    };
+                    break;
                 }
             }
+        }
+
+        // 2. Fall back to parent product matching if no variant matched
+        if (!matched) {
+            matched = inventory.find(i => {
+                const pId = String(i.id || '').toLowerCase();
+                const pSku = String(i.productId || '').toLowerCase();
+                const pCleanSku = pSku.replace(/[^A-Za-z0-9]/g, '');
+                const pBarcode = String(i.barcode || '').toLowerCase();
+                const pCleanBarcode = pBarcode.replace(/[^A-Za-z0-9]/g, '');
+
+                return pId === lower ||
+                    pSku === lower ||
+                    pBarcode === lower ||
+                    (cleanLower && (pCleanSku === cleanLower || pCleanBarcode === cleanLower));
+            });
         }
 
         const scanEntry = {
