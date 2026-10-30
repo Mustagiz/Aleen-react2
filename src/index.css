@@ -13,11 +13,11 @@
   --secondary-rgb: 217, 119, 6;
   --gold-accent: #D97706;
   --gold-champagne: #F59E0B;
-  --radius-card: 16px;
-  --radius-control: 10px;
-  --radius-inner: 8px;
-  --card-radius: 16px;
-  --button-radius: 10px;
+  --radius-card: 14px;
+  --radius-control: 9px;
+  --radius-inner: 9px;
+  --card-radius: 14px;
+  --button-radius: 9px;
   --control-height: 40px;
   --control-height-compact: 32px;
 }
@@ -67,7 +67,7 @@ code, pre, kbd, samp, [style*="font-family: monospace"], [style*="font-family:mo
 ::-webkit-scrollbar-thumb {
   background: var(--emerald-primary);
   opacity: 0.3;
-  border-radius: 9999px;
+  border-radius: 4px;
   transition: background 0.2s ease;
 }
 
@@ -170,24 +170,30 @@ td.invoice-table-header-cell {
   color: var(--emerald-primary) !important;
 }
 
-/* 1. MICROSOFT FLUENT 365: Sharp 4px geometry, enterprise dense tables, Segoe UI */
+/* 1. MICROSOFT FLUENT 365: Balanced 8px controls, 12px cards, Segoe UI */
 [data-design-system="microsoft"] {
-  --radius-card: 4px !important;
-  --radius-control: 4px !important;
-  --radius-inner: 4px !important;
-  --card-radius: 4px !important;
-  --button-radius: 4px !important;
+  --radius-card: 12px !important;
+  --radius-control: 8px !important;
+  --radius-inner: 8px !important;
+  --card-radius: 12px !important;
+  --button-radius: 8px !important;
   --font-sans: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif !important;
 }
 
-[data-design-system="microsoft"] .MuiButton-root,
-[data-design-system="microsoft"] .MuiChip-root,
-[data-design-system="microsoft"] .MuiOutlinedInput-root,
+[data-design-system="microsoft"] .MuiButton-root {
+  border-radius: 8px !important;
+}
+[data-design-system="microsoft"] .MuiChip-root {
+  border-radius: 7px !important;
+}
+[data-design-system="microsoft"] .MuiOutlinedInput-root {
+  border-radius: 8px !important;
+}
 [data-design-system="microsoft"] .MuiPaper-root,
 [data-design-system="microsoft"] .MuiCard-root,
 [data-design-system="microsoft"] .MuiTableContainer-root,
 [data-design-system="microsoft"] .MuiDialog-paper {
-  border-radius: 4px !important;
+  border-radius: 12px !important;
 }
 
 [data-design-system="microsoft"] .MuiTableHead-root {
@@ -195,77 +201,85 @@ td.invoice-table-header-cell {
   border-bottom: 2px solid #E1DFDD !important;
 }
 
-/* 2. GOOGLE MATERIAL YOU 3.0: 9999px full pills, 24px cards, Roboto */
+/* 2. GOOGLE MATERIAL YOU 3.0: Balanced modern squircle, 9px controls, 14px cards, Roboto */
 [data-design-system="material"] {
-  --radius-card: 24px !important;
-  --radius-control: 9999px !important;
-  --radius-inner: 28px !important;
-  --card-radius: 24px !important;
-  --button-radius: 9999px !important;
+  --radius-card: 14px !important;
+  --radius-control: 9px !important;
+  --radius-inner: 9px !important;
+  --card-radius: 14px !important;
+  --button-radius: 9px !important;
   --font-sans: 'Roboto', sans-serif !important;
 }
 
-[data-design-system="material"] .MuiButton-root,
+[data-design-system="material"] .MuiButton-root {
+  border-radius: 9px !important;
+}
 [data-design-system="material"] .MuiChip-root {
-  border-radius: 9999px !important;
+  border-radius: 7px !important;
 }
 
 [data-design-system="material"] .MuiOutlinedInput-root {
-  border-radius: 28px !important;
+  border-radius: 9px !important;
 }
 
 [data-design-system="material"] .MuiPaper-root,
 [data-design-system="material"] .MuiCard-root,
 [data-design-system="material"] .MuiTableContainer-root,
 [data-design-system="material"] .MuiDialog-paper {
-  border-radius: 24px !important;
+  border-radius: 14px !important;
 }
 
-/* 3. APPLE macOS & iOS: 14px-16px super-elliptical squircles, SF Pro */
+/* 3. APPLE macOS & iOS: Balanced 9px controls, 14px cards, SF Pro */
 [data-design-system="apple"] {
-  --radius-card: 16px !important;
-  --radius-control: 10px !important;
-  --radius-inner: 10px !important;
-  --card-radius: 16px !important;
-  --button-radius: 10px !important;
+  --radius-card: 14px !important;
+  --radius-control: 9px !important;
+  --radius-inner: 9px !important;
+  --card-radius: 14px !important;
+  --button-radius: 9px !important;
 }
 
 [data-design-system="apple"] .MuiButton-root {
-  border-radius: 10px !important;
+  border-radius: 9px !important;
 }
 
 [data-design-system="apple"] .MuiChip-root {
-  border-radius: 8px !important;
+  border-radius: 7px !important;
 }
 
 [data-design-system="apple"] .MuiOutlinedInput-root {
-  border-radius: 10px !important;
+  border-radius: 9px !important;
 }
 
 [data-design-system="apple"] .MuiPaper-root,
 [data-design-system="apple"] .MuiCard-root,
 [data-design-system="apple"] .MuiTableContainer-root,
 [data-design-system="apple"] .MuiDialog-paper {
-  border-radius: 16px !important;
+  border-radius: 14px !important;
 }
 
-/* 4. LINEAR SPRINT WORKSPACE: 6px dark obsidian, monospace tags, Inter */
+/* 4. LINEAR SPRINT WORKSPACE: Balanced 8px controls, 12px cards, Inter */
 [data-design-system="linear"] {
-  --radius-card: 6px !important;
-  --radius-control: 6px !important;
-  --radius-inner: 6px !important;
-  --card-radius: 6px !important;
-  --button-radius: 6px !important;
+  --radius-card: 12px !important;
+  --radius-control: 8px !important;
+  --radius-inner: 8px !important;
+  --card-radius: 12px !important;
+  --button-radius: 8px !important;
 }
 
-[data-design-system="linear"] .MuiButton-root,
-[data-design-system="linear"] .MuiChip-root,
-[data-design-system="linear"] .MuiOutlinedInput-root,
+[data-design-system="linear"] .MuiButton-root {
+  border-radius: 8px !important;
+}
+[data-design-system="linear"] .MuiChip-root {
+  border-radius: 7px !important;
+}
+[data-design-system="linear"] .MuiOutlinedInput-root {
+  border-radius: 8px !important;
+}
 [data-design-system="linear"] .MuiPaper-root,
 [data-design-system="linear"] .MuiCard-root,
 [data-design-system="linear"] .MuiTableContainer-root,
 [data-design-system="linear"] .MuiDialog-paper {
-  border-radius: 6px !important;
+  border-radius: 12px !important;
 }
 
 [data-design-system="linear"] .MuiTableHead-root {
@@ -273,27 +287,31 @@ td.invoice-table-header-cell {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
-/* 5. ZOHO CRM ENTERPRISE: 4px controls, 6px cards, Open Sans, signature top border */
+/* 5. ZOHO CRM ENTERPRISE: 8px controls, 12px cards, Open Sans, signature top border */
 [data-design-system="zoho"] {
-  --radius-card: 6px !important;
-  --radius-control: 4px !important;
-  --radius-inner: 4px !important;
-  --card-radius: 6px !important;
-  --button-radius: 4px !important;
+  --radius-card: 12px !important;
+  --radius-control: 8px !important;
+  --radius-inner: 8px !important;
+  --card-radius: 12px !important;
+  --button-radius: 8px !important;
   --font-sans: 'Open Sans', 'Inter', sans-serif !important;
 }
 
-[data-design-system="zoho"] .MuiButton-root,
-[data-design-system="zoho"] .MuiChip-root,
+[data-design-system="zoho"] .MuiButton-root {
+  border-radius: 8px !important;
+}
+[data-design-system="zoho"] .MuiChip-root {
+  border-radius: 7px !important;
+}
 [data-design-system="zoho"] .MuiOutlinedInput-root {
-  border-radius: 4px !important;
+  border-radius: 8px !important;
 }
 
 [data-design-system="zoho"] .MuiPaper-root,
 [data-design-system="zoho"] .MuiCard-root,
 [data-design-system="zoho"] .MuiTableContainer-root,
 [data-design-system="zoho"] .MuiDialog-paper {
-  border-radius: 6px !important;
+  border-radius: 12px !important;
 }
 
 [data-design-system="zoho"] .MuiTableHead-root {
@@ -301,12 +319,12 @@ td.invoice-table-header-cell {
   border-top: 3px solid #F15A24 !important;
 }
 
-/* 6. STRIPE FINTECH PRO: 8px controls, 10px cards, Plus Jakarta Sans */
+/* 6. STRIPE FINTECH PRO: 8px-9px controls, 12px cards, Plus Jakarta Sans */
 [data-design-system="stripe"] {
-  --radius-card: 10px !important;
+  --radius-card: 12px !important;
   --radius-control: 8px !important;
-  --radius-inner: 6px !important;
-  --card-radius: 10px !important;
+  --radius-inner: 8px !important;
+  --card-radius: 12px !important;
   --button-radius: 8px !important;
   --font-sans: 'Plus Jakarta Sans', sans-serif !important;
 }
@@ -315,51 +333,104 @@ td.invoice-table-header-cell {
   border-radius: 8px !important;
 }
 
-[data-design-system="stripe"] .MuiChip-root,
+[data-design-system="stripe"] .MuiChip-root {
+  border-radius: 7px !important;
+}
+
 [data-design-system="stripe"] .MuiOutlinedInput-root {
-  border-radius: 6px !important;
+  border-radius: 8px !important;
 }
 
 [data-design-system="stripe"] .MuiPaper-root,
 [data-design-system="stripe"] .MuiCard-root,
 [data-design-system="stripe"] .MuiTableContainer-root,
 [data-design-system="stripe"] .MuiDialog-paper {
-  border-radius: 10px !important;
+  border-radius: 12px !important;
 }
 
-/* 7. SALESFORCE LIGHTNING: 4px utility controls, 4px cards */
+/* 7. SALESFORCE LIGHTNING: 8px utility controls, 12px cards */
 [data-design-system="salesforce"] {
-  --radius-card: 4px !important;
-  --radius-control: 4px !important;
-  --radius-inner: 4px !important;
-  --card-radius: 4px !important;
-  --button-radius: 4px !important;
+  --radius-card: 12px !important;
+  --radius-control: 8px !important;
+  --radius-inner: 8px !important;
+  --card-radius: 12px !important;
+  --button-radius: 8px !important;
 }
 
-[data-design-system="salesforce"] .MuiButton-root,
-[data-design-system="salesforce"] .MuiChip-root,
-[data-design-system="salesforce"] .MuiOutlinedInput-root,
+[data-design-system="salesforce"] .MuiButton-root {
+  border-radius: 8px !important;
+}
+[data-design-system="salesforce"] .MuiChip-root {
+  border-radius: 7px !important;
+}
+[data-design-system="salesforce"] .MuiOutlinedInput-root {
+  border-radius: 8px !important;
+}
 [data-design-system="salesforce"] .MuiPaper-root,
 [data-design-system="salesforce"] .MuiCard-root,
 [data-design-system="salesforce"] .MuiTableContainer-root,
 [data-design-system="salesforce"] .MuiDialog-paper {
-  border-radius: 4px !important;
+  border-radius: 12px !important;
 }
 
-/* 8. ATELIER LUXURY: 16px cards, 10px buttons, gold & emerald accents */
+/* 8. ATELIER LUXURY: 14px cards, 9px buttons, 9px inputs, gold & emerald accents */
 [data-design-system="atelier"] {
-  --radius-card: 16px !important;
-  --radius-control: 10px !important;
-  --radius-inner: 8px !important;
-  --card-radius: 16px !important;
-  --button-radius: 10px !important;
+  --radius-card: 14px !important;
+  --radius-control: 9px !important;
+  --radius-inner: 9px !important;
+  --card-radius: 14px !important;
+  --button-radius: 9px !important;
 }
 
+[data-design-system="atelier"] .MuiButton-root {
+  border-radius: 9px !important;
+}
+[data-design-system="atelier"] .MuiChip-root {
+  border-radius: 7px !important;
+}
+[data-design-system="atelier"] .MuiOutlinedInput-root {
+  border-radius: 9px !important;
+}
 [data-design-system="atelier"] .MuiPaper-root,
 [data-design-system="atelier"] .MuiCard-root,
 [data-design-system="atelier"] .MuiTableContainer-root,
 [data-design-system="atelier"] .MuiDialog-paper {
-  border-radius: 16px !important;
+  border-radius: 14px !important;
+}
+
+/* UNIVERSAL BALANCED GEOMETRY OVERRIDES (Neither full round nor sharp square) */
+.MuiButton-root {
+  border-radius: var(--button-radius, 9px) !important;
+}
+
+.MuiChip-root {
+  border-radius: 7px !important;
+}
+
+.MuiOutlinedInput-root {
+  border-radius: var(--radius-inner, 9px) !important;
+}
+
+.MuiPaper-root,
+.MuiCard-root {
+  border-radius: var(--radius-card, 14px) !important;
+}
+
+.MuiDialog-paper {
+  border-radius: var(--radius-card, 14px) !important;
+}
+
+.MuiPopover-paper,
+.MuiMenu-paper {
+  border-radius: 10px !important;
+}
+
+.MuiToggleButton-root {
+  border-radius: 8px !important;
+}
+
+.MuiAlert-root {
+  border-radius: 10px !important;
 }
 
 /* Print Utilities */

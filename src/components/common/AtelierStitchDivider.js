@@ -43,7 +43,7 @@ export default function AtelierStitchDivider({
             gap: 0.8,
             px: 1.5,
             py: 0.25,
-            borderRadius: '9999px',
+            borderRadius: '8px',
             bgcolor: isDark ? 'rgba(15, 23, 42, 0.6)' : 'rgba(255, 255, 255, 0.85)',
             border: '1px solid',
             borderColor: threadColor,

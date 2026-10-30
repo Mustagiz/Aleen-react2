@@ -1277,7 +1277,7 @@ export default function CustomerDisplay() {
                   mx: 'auto',
                   p: { xs: 2.2, sm: 3.5, md: 4.5 },
                   textAlign: 'center',
-                  borderRadius: 4,
+                  borderRadius: '14px',
                   bgcolor: '#FFFFFF',
                   border: '1.5px solid rgba(197, 160, 89, 0.35)',
                   boxShadow: '0 25px 60px rgba(180, 140, 75, 0.15), 0 4px 20px rgba(0, 0, 0, 0.05)',
@@ -1351,7 +1351,7 @@ export default function CustomerDisplay() {
                     sx={{
                       flex: 1,
                       p: 2.5,
-                      borderRadius: 4,
+                      borderRadius: '12px',
                       bgcolor: '#FFFFFF',
                       border: '1.5px solid rgba(197, 160, 89, 0.3)',
                       boxShadow: '0 8px 25px rgba(180, 140, 75, 0.08)'
@@ -1373,7 +1373,7 @@ export default function CustomerDisplay() {
                     sx={{
                       flex: 1,
                       p: 2.5,
-                      borderRadius: 4,
+                      borderRadius: '12px',
                       bgcolor: 'rgba(16, 185, 129, 0.08)',
                       border: '1.5px solid rgba(16, 185, 129, 0.35)',
                       boxShadow: '0 8px 25px rgba(16, 185, 129, 0.08)'
@@ -1395,7 +1395,7 @@ export default function CustomerDisplay() {
                 <Box
                   sx={{
                     p: 2.8,
-                    borderRadius: 4,
+                    borderRadius: '12px',
                     bgcolor: '#FFFFFF',
                     border: '1.5px solid rgba(197, 160, 89, 0.3)',
                     boxShadow: '0 8px 25px rgba(180, 140, 75, 0.06)',
@@ -1537,7 +1537,7 @@ export default function CustomerDisplay() {
                     maxWidth: 820,
                     width: '100%',
                     p: { xs: 3, sm: 4, md: 5.5 },
-                    borderRadius: 4.5,
+                    borderRadius: '14px',
                     bgcolor: '#FFFFFF',
                     border: '1.5px solid rgba(197, 160, 89, 0.35)',
                     boxShadow: '0 25px 60px rgba(180, 140, 75, 0.12), 0 4px 16px rgba(0, 0, 0, 0.04)',
@@ -1555,7 +1555,7 @@ export default function CustomerDisplay() {
                         height: 84,
                         mx: 'auto',
                         mb: 2.5,
-                        borderRadius: 3.5,
+                        borderRadius: '10px',
                         background: 'linear-gradient(135deg, #C5A059 0%, #937230 100%)',
                         display: 'flex',
                         alignItems: 'center',
@@ -1866,7 +1866,7 @@ export default function CustomerDisplay() {
                     width: '100%',
                     p: { xs: 2.5, sm: 3.5, md: 5 },
                     textAlign: 'center',
-                    borderRadius: 4.5,
+                    borderRadius: '14px',
                     bgcolor: '#FFFFFF',
                     border: '1.5px solid rgba(197, 160, 89, 0.35)',
                     boxShadow: '0 25px 60px rgba(180, 140, 75, 0.12), 0 4px 16px rgba(0, 0, 0, 0.04)',
@@ -1945,7 +1945,7 @@ export default function CustomerDisplay() {
                             width: '100%',
                             py: 2,
                             my: 2.5,
-                            borderRadius: 3.5,
+                            borderRadius: '12px',
                             bgcolor: '#FAF8F5',
                             border: '1.5px solid rgba(197, 160, 89, 0.35)',
                             boxShadow: '0 8px 25px rgba(197, 160, 89, 0.1)'
@@ -2173,7 +2173,7 @@ export default function CustomerDisplay() {
                               height: 88,
                               mx: 'auto',
                               mb: 2.5,
-                              borderRadius: 4,
+                              borderRadius: '12px',
                               background: 'linear-gradient(135deg, rgba(197, 160, 89, 0.3) 0%, rgba(197, 160, 89, 0.1) 100%)',
                               border: '2px solid rgba(197, 160, 89, 0.6)',
                               display: 'flex',
@@ -2210,7 +2210,7 @@ export default function CustomerDisplay() {
                           <Box
                             sx={{
                               p: 3,
-                              borderRadius: 3.5,
+                              borderRadius: '12px',
                               bgcolor: '#FAF8F5',
                               border: '1.5px solid rgba(197, 160, 89, 0.35)',
                               my: 3,
@@ -2282,7 +2282,7 @@ export default function CustomerDisplay() {
                                   sx={{
                                     width: i === activeSlide ? 24 : 8,
                                     height: 8,
-                                    borderRadius: 4,
+                                    borderRadius: '4px',
                                     bgcolor: i === activeSlide ? '#937230' : 'rgba(197, 160, 89, 0.3)',
                                     cursor: 'pointer',
                                     transition: 'all 0.3s ease'
@@ -2338,7 +2338,7 @@ export default function CustomerDisplay() {
                     display: 'flex',
                     flexDirection: 'column',
                     p: { xs: 2.2, sm: 3 },
-                    borderRadius: 4,
+                    borderRadius: '14px',
                     bgcolor: '#FFFFFF',
                     border: '1.5px solid rgba(197, 160, 89, 0.35)',
                     boxShadow: '0 12px 35px rgba(180, 140, 75, 0.08), 0 2px 10px rgba(0, 0, 0, 0.03)'
@@ -2411,15 +2411,16 @@ export default function CustomerDisplay() {
                       </Stack>
                     </Box>
 
-                    {/* Patron VIP Identification Ribbon */}
+                    {/* Patron VIP Identification Ribbon - Highly Personalized Luxury Concierge */}
                     {activeCustomerName ? (
                       <Box
                         sx={{
                           mt: 1.5,
-                          p: 1.5,
-                          borderRadius: 3,
-                          background: 'linear-gradient(135deg, rgba(254, 243, 199, 0.45) 0%, rgba(240, 253, 250, 0.55) 100%)',
-                          border: '1px solid rgba(197, 160, 89, 0.35)',
+                          p: 1.8,
+                          borderRadius: '12px',
+                          background: 'linear-gradient(135deg, rgba(254, 243, 199, 0.6) 0%, rgba(240, 253, 250, 0.75) 100%)',
+                          border: '1.5px solid rgba(197, 160, 89, 0.45)',
+                          boxShadow: '0 4px 16px rgba(197, 160, 89, 0.12)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
@@ -2427,23 +2428,30 @@ export default function CustomerDisplay() {
                           gap: 1.2
                         }}
                       >
-                        <Stack direction="row" spacing={1.2} alignItems="center">
+                        <Stack direction="row" spacing={1.5} alignItems="center">
                           <Avatar
                             sx={{
-                              width: 38,
-                              height: 38,
+                              width: 44,
+                              height: 44,
                               bgcolor: '#0F766E',
                               color: '#FFFFFF',
-                              fontWeight: 800,
-                              fontSize: '0.95rem',
-                              border: '2px solid #C5A059'
+                              fontWeight: 900,
+                              fontSize: '1.05rem',
+                              borderRadius: '10px',
+                              border: '2px solid #C5A059',
+                              boxShadow: '0 3px 10px rgba(15, 118, 110, 0.25)'
                             }}
                           >
                             {activeCustomerName.charAt(0).toUpperCase()}
                           </Avatar>
                           <Box>
-                            <Stack direction="row" spacing={0.8} alignItems="center">
-                              <Typography sx={{ fontWeight: 900, color: '#0F172A', fontSize: '0.96rem' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, flexWrap: 'wrap' }}>
+                              <Typography variant="caption" sx={{ color: '#937230', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', fontSize: '0.64rem' }}>
+                                Patron Concierge • Honoured Guest
+                              </Typography>
+                            </Box>
+                            <Stack direction="row" spacing={0.8} alignItems="center" sx={{ mt: 0.2 }}>
+                              <Typography sx={{ fontWeight: 900, color: '#0F172A', fontSize: '1.04rem', letterSpacing: '-0.01em' }}>
                                 {renderPatronName(activeCustomerName, { fontSize: 'inherit' })}
                               </Typography>
                               <Chip
@@ -2454,25 +2462,26 @@ export default function CustomerDisplay() {
                                   height: 20,
                                   fontSize: '0.65rem',
                                   fontWeight: 900,
-                                  bgcolor: 'rgba(197, 160, 89, 0.2)',
+                                  borderRadius: '6px',
+                                  bgcolor: 'rgba(197, 160, 89, 0.22)',
                                   color: '#937230',
-                                  border: '1px solid rgba(197, 160, 89, 0.4)'
+                                  border: '1px solid rgba(197, 160, 89, 0.45)'
                                 }}
                               />
                             </Stack>
                             {customerPhone && (
-                              <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600 }}>
-                                Patron Account • {customerPhone}
+                              <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, display: 'block', mt: 0.2, fontSize: '0.72rem' }}>
+                                Account • {customerPhone}
                               </Typography>
                             )}
                           </Box>
                         </Stack>
 
-                        <Box sx={{ bgcolor: '#FFFFFF', px: 1.5, py: 0.6, borderRadius: 2, border: '1px solid rgba(197, 160, 89, 0.25)' }}>
-                          <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700, fontSize: '0.62rem', display: 'block', textTransform: 'uppercase' }}>
+                        <Box sx={{ bgcolor: '#FFFFFF', px: 1.8, py: 0.75, borderRadius: '8px', border: '1.5px solid rgba(197, 160, 89, 0.3)', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
+                          <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700, fontSize: '0.64rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                             Privilege Balance
                           </Typography>
-                          <Typography sx={{ fontWeight: 900, color: '#0F766E', fontSize: '0.88rem' }}>
+                          <Typography sx={{ fontWeight: 900, color: '#0F766E', fontSize: '0.92rem' }}>
                             💎 {loyaltyPoints} pts
                           </Typography>
                         </Box>
@@ -2483,7 +2492,7 @@ export default function CustomerDisplay() {
                           mt: 1.2,
                           px: 1.8,
                           py: 0.8,
-                          borderRadius: 2.5,
+                          borderRadius: '10px',
                           bgcolor: '#FAF8F5',
                           border: '1px dashed rgba(197, 160, 89, 0.35)',
                           display: 'flex',
@@ -2526,9 +2535,9 @@ export default function CustomerDisplay() {
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'space-between',
-                                  borderRadius: 3,
-                                  bgcolor: isJustScanned ? 'rgba(254, 243, 199, 0.35)' : '#FAF8F5',
-                                  border: isJustScanned ? '1.5px solid #D97706' : '1px solid rgba(197, 160, 89, 0.22)',
+                                  borderRadius: '10px',
+                                  bgcolor: isJustScanned ? 'rgba(254, 243, 199, 0.4)' : '#FAF8F5',
+                                  border: isJustScanned ? '1.5px solid #D97706' : '1px solid rgba(197, 160, 89, 0.24)',
                                   boxShadow: isJustScanned ? '0 4px 18px rgba(217, 119, 6, 0.15)' : '0 2px 8px rgba(0, 0, 0, 0.02)',
                                   transition: 'all 0.25s ease',
                                   position: 'relative',
@@ -2561,7 +2570,7 @@ export default function CustomerDisplay() {
                                     sx={{
                                       width: 44,
                                       height: 44,
-                                      borderRadius: 2.5,
+                                      borderRadius: '8px',
                                       bgcolor: '#FFFFFF',
                                       border: '1px solid rgba(197, 160, 89, 0.3)',
                                       display: 'flex',
@@ -2631,7 +2640,7 @@ export default function CustomerDisplay() {
                                       display: 'inline-block',
                                       px: 1,
                                       py: 0.25,
-                                      borderRadius: 1.5,
+                                      borderRadius: '6px',
                                       bgcolor: '#FFFFFF',
                                       border: '1px solid rgba(197, 160, 89, 0.3)',
                                       mb: 0.4
@@ -2669,7 +2678,7 @@ export default function CustomerDisplay() {
                       sx={{
                         mt: 2,
                         p: 1.5,
-                        borderRadius: 3,
+                        borderRadius: '10px',
                         background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(5, 150, 105, 0.18) 100%)',
                         border: '1.5px solid rgba(16, 185, 129, 0.4)',
                         display: 'flex',
@@ -2710,7 +2719,7 @@ export default function CustomerDisplay() {
                     elevation={0}
                     sx={{
                       p: 3,
-                      borderRadius: 4,
+                      borderRadius: '14px',
                       bgcolor: '#FFFFFF',
                       border: '1.5px solid rgba(197, 160, 89, 0.35)',
                       boxShadow: '0 12px 35px rgba(180, 140, 75, 0.08), 0 2px 10px rgba(0, 0, 0, 0.03)'
@@ -2846,7 +2855,7 @@ export default function CustomerDisplay() {
                     <Box
                       sx={{
                         p: 2.2,
-                        borderRadius: 3.5,
+                        borderRadius: '12px',
                         background: 'linear-gradient(135deg, #FFFDF8 0%, #FAF4E5 100%)',
                         border: '2px solid rgba(197, 160, 89, 0.55)',
                         boxShadow: '0 8px 25px rgba(180, 140, 75, 0.15)',
@@ -2895,7 +2904,7 @@ export default function CustomerDisplay() {
                         sx={{
                           mt: 2,
                           p: 1.8,
-                          borderRadius: 3,
+                          borderRadius: '10px',
                           bgcolor: '#FAF8F5',
                           border: '1.5px solid rgba(197, 160, 89, 0.4)',
                           boxShadow: '0 4px 15px rgba(180, 140, 75, 0.08)'
@@ -2954,10 +2963,10 @@ export default function CustomerDisplay() {
                             value={tierMeta.progress}
                             sx={{
                               height: 6,
-                              borderRadius: 3,
+                              borderRadius: '6px',
                               bgcolor: 'rgba(197, 160, 89, 0.15)',
                               '& .MuiLinearProgress-bar': {
-                                borderRadius: 3,
+                                borderRadius: '6px',
                                 background: 'linear-gradient(90deg, #C5A059 0%, #0F766E 100%)'
                               }
                             }}
@@ -2969,7 +2978,7 @@ export default function CustomerDisplay() {
                         sx={{
                           mt: 2,
                           p: 1.6,
-                          borderRadius: 3,
+                          borderRadius: '10px',
                           bgcolor: 'rgba(197, 160, 89, 0.08)',
                           border: '1.5px dashed rgba(197, 160, 89, 0.45)',
                           display: 'flex',
@@ -3024,7 +3033,7 @@ export default function CustomerDisplay() {
                     sx={{
                       flex: 1,
                       p: 2.8,
-                      borderRadius: 4,
+                      borderRadius: '14px',
                       bgcolor: '#FFFFFF',
                       border: '1.5px solid rgba(197, 160, 89, 0.35)',
                       display: 'flex',
@@ -3070,9 +3079,9 @@ export default function CustomerDisplay() {
                           onClick={() => setQrZoomOpen(true)}
                           sx={{
                             p: 2,
-                            borderRadius: 3.5,
+                            borderRadius: '12px',
                             bgcolor: '#FFFFFF',
-                            border: '2px solid rgba(197, 160, 89, 0.5)',
+                            border: '2px solid rgba(197, 160, 89, 0.55)',
                             boxShadow: '0 8px 30px rgba(180, 140, 75, 0.18)',
                             display: 'inline-flex',
                             alignItems: 'center',
@@ -3208,7 +3217,7 @@ export default function CustomerDisplay() {
         fullWidth
         PaperProps={{
           sx: {
-            borderRadius: 4.5,
+            borderRadius: '14px',
             bgcolor: '#FFFFFF',
             border: '2px solid rgba(197, 160, 89, 0.5)',
             boxShadow: '0 25px 60px rgba(180, 140, 75, 0.25)',
@@ -3233,7 +3242,7 @@ export default function CustomerDisplay() {
         <Box
           sx={{
             p: 2,
-            borderRadius: 4,
+            borderRadius: '12px',
             bgcolor: '#FFFFFF',
             border: '1.5px solid rgba(197, 160, 89, 0.35)',
             boxShadow: '0 12px 35px rgba(197, 160, 89, 0.15)',

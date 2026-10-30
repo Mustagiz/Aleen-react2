@@ -3520,7 +3520,7 @@ const Invoices = () => {
         fullScreen={isTablet}
         PaperProps={{
           sx: {
-            borderRadius: isTablet ? 0 : 3.5,
+            borderRadius: isTablet ? 0 : '14px',
             overflow: 'hidden',
             maxHeight: isTablet ? '100%' : '92vh',
             boxShadow: '0 24px 60px rgba(var(--primary-rgb, 15, 118, 110), 0.22)'
@@ -3778,7 +3778,7 @@ const Invoices = () => {
                 p: 2.5,
                 mb: 2.5,
                 bgcolor: 'background.paper',
-                borderRadius: 2.5,
+                borderRadius: '14px',
                 border: '1px solid',
                 borderColor: 'divider',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
@@ -3816,7 +3816,7 @@ const Invoices = () => {
                           }}
                           sx={{
                             textTransform: 'none',
-                            borderRadius: 1.5,
+                            borderRadius: '8px',
                             fontWeight: 700,
                             fontSize: '0.72rem',
                             py: 0.2,
@@ -3991,7 +3991,7 @@ const Invoices = () => {
               <Paper sx={{
                 p: 2.5,
                 bgcolor: 'background.paper',
-                borderRadius: 2.5,
+                borderRadius: '14px',
                 border: '1px solid',
                 borderColor: 'divider',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
@@ -4145,7 +4145,7 @@ const Invoices = () => {
                           </Tooltip>
                         </InputAdornment>
                       ),
-                      sx: { borderRadius: 2.5, bgcolor: 'background.paper' }
+                      sx: { borderRadius: '9px', bgcolor: 'background.paper' }
                     }}
                   />
                   <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem', display: 'block', mt: 0.5, pl: 0.5 }}>
@@ -4202,7 +4202,7 @@ const Invoices = () => {
                   onClose={() => setPhonePairModalOpen(false)}
                   maxWidth="xs"
                   fullWidth
-                  PaperProps={{ sx: { borderRadius: 3.5 } }}
+                  PaperProps={{ sx: { borderRadius: '14px' } }}
                 >
                   <DialogTitle sx={{ fontWeight: 800, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -4246,7 +4246,7 @@ const Invoices = () => {
                       <Box key={index} sx={{
                         p: 1.5,
                         bgcolor: mode === 'light' ? '#F8FAFC' : 'background.default',
-                        borderRadius: 2,
+                        borderRadius: '10px',
                         border: '1px solid',
                         borderColor: 'divider',
                         transition: 'all 0.15s ease-in-out',
@@ -4403,7 +4403,7 @@ const Invoices = () => {
                               size="small"
                               value={item.quantity}
                               onChange={(e) => handleItemChange(index, 'quantity', Math.max(1, parseInt(e.target.value) || 1))}
-                              sx={{ width: 80, '& input': { py: 0.5, textAlign: 'center', fontWeight: 800 } }}
+                              sx={{ width: 80, '& .MuiOutlinedInput-root': { borderRadius: '8px' }, '& input': { py: 0.5, textAlign: 'center', fontWeight: 800 } }}
                             />
                           </Box>
 
@@ -4429,7 +4429,7 @@ const Invoices = () => {
                   fullWidth
                   sx={{
                     py: 1,
-                    borderRadius: 2,
+                    borderRadius: '9px',
                     fontWeight: 700,
                     borderStyle: 'dashed',
                     color: (t) => t.palette.primary.main,
@@ -4450,7 +4450,7 @@ const Invoices = () => {
               <Paper sx={{
                 p: { xs: 2, sm: 2.5 },
                 bgcolor: 'background.paper',
-                borderRadius: 2.5,
+                borderRadius: '14px',
                 border: '1px solid',
                 borderColor: 'divider',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
@@ -4508,7 +4508,7 @@ const Invoices = () => {
                             py: 0.8,
                             fontSize: '0.74rem',
                             fontWeight: 800,
-                            borderRadius: '16px',
+                            borderRadius: '9px',
                             textTransform: 'none',
                             bgcolor: isSelected ? 'primary.main' : 'transparent',
                             borderColor: isSelected ? 'primary.main' : 'divider',
@@ -4609,6 +4609,7 @@ const Invoices = () => {
                           sx={{
                             py: 0.9,
                             fontWeight: 800,
+                            borderRadius: '9px',
                             background: 'linear-gradient(135deg, #C28D4B 0%, #B45309 100%)',
                             color: '#FFFFFF',
                             boxShadow: '0 4px 14px rgba(194, 141, 75, 0.35)',
@@ -4956,7 +4957,7 @@ const Invoices = () => {
                 {/* Luxury Ledger Total Box */}
                 <Box sx={{
                   p: 2.5,
-                  borderRadius: 2.5,
+                  borderRadius: '12px',
                   background: 'linear-gradient(135deg, rgba(15,118,110,0.06) 0%, rgba(217,119,6,0.06) 100%)',
                   border: '1px solid',
                   borderColor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.15)'

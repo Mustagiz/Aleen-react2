@@ -10,10 +10,10 @@ export const DESIGN_SYSTEMS = [
     tagline: 'Iconic Zoho deep navy sidebar with high-contrast orange action pills, structured 6px cards, and enterprise density.',
     icon: '💼',
     shape: {
-      borderRadius: 6,
-      buttonRadius: 6,
-      inputRadius: 4,
-      cardRadius: 8
+      borderRadius: 9,
+      buttonRadius: 8,
+      inputRadius: 8,
+      cardRadius: 12
     },
     typography: {
       fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
@@ -82,10 +82,10 @@ export const DESIGN_SYSTEMS = [
     tagline: 'Signature Microsoft 365 Cobalt Blue header bar, Mica neutral sidebar, Segoe UI typography, and 6px Fluent geometry.',
     icon: '🪟',
     shape: {
-      borderRadius: 8,
-      buttonRadius: 6,
-      inputRadius: 4,
-      cardRadius: 8
+      borderRadius: 9,
+      buttonRadius: 8,
+      inputRadius: 8,
+      cardRadius: 12
     },
     typography: {
       fontFamily: '"Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif',
@@ -154,10 +154,10 @@ export const DESIGN_SYSTEMS = [
     tagline: 'Ultra-refined translucent frosted glass, SF Pro typography, 18px super-elliptical curves, and Apple Blue accents.',
     icon: '🍏',
     shape: {
-      borderRadius: 16,
-      buttonRadius: 12,
-      inputRadius: 10,
-      cardRadius: 18
+      borderRadius: 10,
+      buttonRadius: 9,
+      inputRadius: 9,
+      cardRadius: 14
     },
     typography: {
       fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Plus Jakarta Sans", sans-serif',
@@ -228,7 +228,7 @@ export const DESIGN_SYSTEMS = [
     shape: {
       borderRadius: 10,
       buttonRadius: 8,
-      inputRadius: 6,
+      inputRadius: 8,
       cardRadius: 12
     },
     typography: {
@@ -298,10 +298,10 @@ export const DESIGN_SYSTEMS = [
     tagline: 'Precision obsidian surfaces, ultra-thin 1px borders, Electric Violet accents, and zero visual clutter.',
     icon: '⚡',
     shape: {
-      borderRadius: 8,
-      buttonRadius: 6,
-      inputRadius: 6,
-      cardRadius: 8
+      borderRadius: 9,
+      buttonRadius: 8,
+      inputRadius: 8,
+      cardRadius: 12
     },
     typography: {
       fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, monospace, sans-serif',
@@ -370,10 +370,10 @@ export const DESIGN_SYSTEMS = [
     tagline: 'Classic Salesforce SLDS with Einstein Blue top bar, high-contrast badges, and enterprise cloud tables.',
     icon: '☁️',
     shape: {
-      borderRadius: 6,
-      buttonRadius: 4,
-      inputRadius: 4,
-      cardRadius: 8
+      borderRadius: 9,
+      buttonRadius: 8,
+      inputRadius: 8,
+      cardRadius: 12
     },
     typography: {
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif',
@@ -442,10 +442,10 @@ export const DESIGN_SYSTEMS = [
     tagline: 'Material 3 design language with 24px pill buttons, pastel container surfaces, and fluid touch ergonomics.',
     icon: '🎨',
     shape: {
-      borderRadius: 24, // Iconic M3 extra-rounded
-      buttonRadius: 20,
-      inputRadius: 14,
-      cardRadius: 24
+      borderRadius: 10,
+      buttonRadius: 9,
+      inputRadius: 9,
+      cardRadius: 14
     },
     typography: {
       fontFamily: '"Roboto", "Plus Jakarta Sans", -apple-system, sans-serif',
@@ -514,10 +514,10 @@ export const DESIGN_SYSTEMS = [
     tagline: 'Deep Royal Forest Velvet Emerald sidebar, Burnished Imperial Gold highlights, and Cormorant serif luxury.',
     icon: '👑',
     shape: {
-      borderRadius: 14,
-      buttonRadius: 10,
-      inputRadius: 10,
-      cardRadius: 16
+      borderRadius: 10,
+      buttonRadius: 9,
+      inputRadius: 9,
+      cardRadius: 14
     },
     typography: {
       fontFamily: '"Plus Jakarta Sans", "Inter", -apple-system, sans-serif',

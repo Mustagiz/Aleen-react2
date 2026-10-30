@@ -355,17 +355,38 @@ export const ThemeProvider = ({ children }) => {
                 MuiChip: {
                     styleOverrides: {
                         root: {
-                            borderRadius: activeSystemConfig.shape.buttonRadius,
+                            borderRadius: 7,
                             fontWeight: 700,
                             fontSize: '0.74rem',
                             fontFamily: activeSystemConfig.id === 'linear' ? 'monospace' : activeSystemConfig.typography.fontFamily
                         }
                     }
                 },
+                MuiDialog: {
+                    styleOverrides: {
+                        paper: {
+                            borderRadius: activeSystemConfig.shape.cardRadius || 14
+                        }
+                    }
+                },
+                MuiPopover: {
+                    styleOverrides: {
+                        paper: {
+                            borderRadius: 10
+                        }
+                    }
+                },
+                MuiMenu: {
+                    styleOverrides: {
+                        paper: {
+                            borderRadius: 10
+                        }
+                    }
+                },
                 MuiOutlinedInput: {
                     styleOverrides: {
                         root: {
-                            borderRadius: activeSystemConfig.shape.inputRadius,
+                            borderRadius: activeSystemConfig.shape.inputRadius || 9,
                             minHeight: activeSystemConfig.id === 'zoho' || activeSystemConfig.id === 'microsoft' ? 36 : 40,
                             fontFamily: activeSystemConfig.typography.fontFamily,
                             '&:hover .MuiOutlinedInput-notchedOutline': {

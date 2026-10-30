@@ -97,11 +97,7 @@ export default function Layout() {
   };
 
   const getItemBorderRadius = () => {
-    if (designSystem === 'material') return '9999px';
-    if (designSystem === 'microsoft') return '4px';
-    if (designSystem === 'apple') return '10px';
-    if (designSystem === 'linear') return '6px';
-    return `${activeSystemConfig?.shape?.buttonRadius || 8}px`;
+    return `${activeSystemConfig?.shape?.buttonRadius || 9}px`;
   };
 
   const sidebarConfig = theme.custom?.sidebar || {
@@ -780,7 +776,7 @@ export default function Layout() {
               size="small"
               startIcon={<Search fontSize="small" sx={{ color: topBarConfig.isColored ? '#FFFFFF !important' : 'text.secondary' }} />}
               sx={{
-                borderRadius: topBarConfig.isColored ? `${activeSystemConfig?.shape?.buttonRadius || 6}px !important` : '9999px',
+                borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 9}px !important`,
                 borderColor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.45) !important' : (isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)'),
                 color: topBarConfig.isColored ? '#FFFFFF !important' : 'text.secondary',
                 px: 1.75,
@@ -804,7 +800,7 @@ export default function Layout() {
                   height: 18, 
                   fontSize: '0.65rem', 
                   fontWeight: 800,
-                  borderRadius: topBarConfig.isColored ? '4px !important' : '9999px',
+                  borderRadius: '7px !important',
                   bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.28) !important' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'),
                   color: topBarConfig.isColored ? '#FFFFFF !important' : 'text.secondary'
                 }} 

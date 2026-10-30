@@ -621,7 +621,7 @@ export default function TailoringKanban() {
               sx={{
                 bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : '#FFFFFF',
                 border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.2)',
-                borderRadius: 2,
+                borderRadius: '8px',
                 height: 34
               }}
             >
@@ -654,7 +654,7 @@ export default function TailoringKanban() {
         </Box>
 
         {workshopViewMode === 'list' ? (
-          <GlassCard sx={{ p: 0, overflow: 'hidden', borderRadius: 3, border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.14)' }}>
+          <GlassCard sx={{ p: 0, overflow: 'hidden', borderRadius: '12px', border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.14)' }}>
             <TableContainer>
               <Table size="small">
                 <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)', borderBottom: '2px solid rgba(15, 118, 110, 0.16)' }}>
@@ -825,7 +825,7 @@ export default function TailoringKanban() {
                   bgcolor: 'background.paper',
                   border: '1px solid',
                   borderColor: 'divider',
-                  borderRadius: 3,
+                  borderRadius: '12px',
                   p: 1.5,
                   display: 'flex',
                   flexDirection: 'column',
@@ -875,7 +875,7 @@ export default function TailoringKanban() {
                   }}
                 >
                   {colOrders.length === 0 ? (
-                    <Box sx={{ p: 3, textAlign: 'center', border: '1px dashed', borderColor: 'divider', borderRadius: 2 }}>
+                    <Box sx={{ p: 3, textAlign: 'center', border: '1px dashed', borderColor: 'divider', borderRadius: '10px' }}>
                       <Typography variant="caption" color="text.secondary">
                         No jobs in this phase
                       </Typography>
@@ -1065,7 +1065,7 @@ export default function TailoringKanban() {
                             sx={{
                               mb: 1.2,
                               py: 0.4,
-                              borderRadius: 1.5,
+                              borderRadius: '8px',
                               fontSize: '0.72rem',
                               fontWeight: 800,
                               color: (t) => t.palette.primary.main,
@@ -1088,7 +1088,7 @@ export default function TailoringKanban() {
                               onClick={() => sendWhatsAppUpdate(order, 'ready')}
                               sx={{
                                 py: 0.35,
-                                borderRadius: 1.5,
+                                borderRadius: '8px',
                                 fontSize: '0.72rem',
                                 fontWeight: 800,
                                 color: '#15803D',
@@ -1106,7 +1106,7 @@ export default function TailoringKanban() {
                               onClick={() => markAsDelivered(order.id)}
                               sx={{
                                 py: 0.4,
-                                borderRadius: 1.5,
+                                borderRadius: '8px',
                                 fontSize: '0.72rem',
                                 fontWeight: 800,
                                 background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
@@ -1172,7 +1172,7 @@ export default function TailoringKanban() {
       </Box>
 
       {/* Dedicated Completed & Delivered Garments Section (Down the board) */}
-      <GlassCard sx={{ p: 3, borderRadius: 3, mb: 4 }}>
+      <GlassCard sx={{ p: 3, borderRadius: '14px', mb: 4 }}>
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { sm: 'center' }, gap: 2, mb: 2.5 }}>
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -1202,7 +1202,7 @@ export default function TailoringKanban() {
               InputProps={{
                 startAdornment: <Search sx={{ mr: 1, color: 'text.secondary', fontSize: 18 }} />
               }}
-              sx={{ width: { xs: '100%', sm: 260 }, '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+              sx={{ width: { xs: '100%', sm: 260 }, '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
             />
             <Chip
               label={`${deliveredOrders.length} Delivered`}
@@ -1212,7 +1212,7 @@ export default function TailoringKanban() {
         </Box>
 
         <TableContainer component={Paper} elevation={0} sx={{ 
-          borderRadius: '20px', 
+          borderRadius: '14px', 
           border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.14)',
           boxShadow: (t) => t.palette.mode === 'dark' 
             ? '0 10px 30px rgba(0, 0, 0, 0.4)' 
@@ -1386,7 +1386,7 @@ export default function TailoringKanban() {
         fullWidth
         PaperProps={{
           sx: {
-            borderRadius: 3,
+            borderRadius: '14px',
             overflow: 'hidden'
           }
         }}
@@ -1455,7 +1455,7 @@ export default function TailoringKanban() {
           </Grid>
 
           {/* Visual Silhouette Selector Pills */}
-          <Box sx={{ p: 2, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)', borderRadius: 2.5, border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.15)' }}>
+          <Box sx={{ p: 2, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)', borderRadius: '12px', border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.15)' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
               <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: (t) => t.palette.primary.main }}>
                 Select Anatomical Silhouette Template
@@ -1491,7 +1491,7 @@ export default function TailoringKanban() {
                       justifyContent: 'center',
                       gap: 0.5,
                       textTransform: 'none',
-                      borderRadius: 2,
+                      borderRadius: '8px',
                       bgcolor: isSelected ? 'primary.main' : 'background.paper',
                       color: isSelected ? '#FFFFFF' : 'text.primary',
                       borderColor: isSelected ? 'primary.main' : 'divider',
@@ -1529,7 +1529,7 @@ export default function TailoringKanban() {
                       endAdornment: <InputAdornment position="end"><Typography variant="caption" sx={{ fontWeight: 700 }}>"</Typography></InputAdornment>
                     }}
                     sx={{
-                      '& .MuiInputBase-root': { bgcolor: 'background.paper', borderRadius: 1.5 }
+                      '& .MuiInputBase-root': { bgcolor: 'background.paper', borderRadius: '8px' }
                     }}
                   />
                 ))}
@@ -1687,7 +1687,7 @@ export default function TailoringKanban() {
           </Grid>
 
           {/* Craft Financial Economics & Margin Calculation - Harmoniously Aligned */}
-          <Box sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 2.5, border: '1px solid', borderColor: 'divider' }}>
+          <Box sx={{ p: 2, bgcolor: 'background.paper', borderRadius: '12px', border: '1px solid', borderColor: 'divider' }}>
             <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#D97706', display: 'block', mb: 1.5 }}>
               Craft Economics & Piece-Rate Labor Tracking
             </Typography>
@@ -1782,7 +1782,7 @@ export default function TailoringKanban() {
         fullWidth
         PaperProps={{
           sx: {
-            borderRadius: 3,
+            borderRadius: '14px',
             overflow: 'hidden'
           }
         }}
@@ -1822,7 +1822,7 @@ export default function TailoringKanban() {
             elevation={0}
             sx={{
               p: 2.5,
-              borderRadius: 2.5,
+              borderRadius: '10px',
               border: '1px solid',
               borderColor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
               background: 'rgba(15, 118, 110, 0.03)'
@@ -1833,7 +1833,7 @@ export default function TailoringKanban() {
             </Typography>
 
             {tailorError && (
-              <Alert severity="error" onClose={() => setTailorError('')} sx={{ mb: 2, borderRadius: 2 }}>
+              <Alert severity="error" onClose={() => setTailorError('')} sx={{ mb: 2, borderRadius: '8px' }}>
                 {tailorError}
               </Alert>
             )}
@@ -1930,14 +1930,14 @@ export default function TailoringKanban() {
             </Box>
 
             {tailors.length === 0 ? (
-              <Box sx={{ textAlign: 'center', py: 4, px: 2, bgcolor: 'action.hover', borderRadius: 2 }}>
+              <Box sx={{ textAlign: 'center', py: 4, px: 2, bgcolor: 'action.hover', borderRadius: '8px' }}>
                 <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
                   No master tailors registered yet. Use the form above to add your first master artisan.
                 </Typography>
               </Box>
             ) : (
               <TableContainer component={Paper} elevation={0} sx={{ 
-                borderRadius: '20px', 
+                borderRadius: '14px', 
                 border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.14)',
                 boxShadow: (t) => t.palette.mode === 'dark' 
                   ? '0 10px 30px rgba(0, 0, 0, 0.4)' 
@@ -2088,7 +2088,7 @@ export default function TailoringKanban() {
         onClose={() => setDeleteConfirmTailor(null)}
         maxWidth="xs"
         fullWidth
-        PaperProps={{ sx: { borderRadius: 3 } }}
+        PaperProps={{ sx: { borderRadius: '14px' } }}
       >
         <DialogTitle sx={{ fontWeight: 800, display: 'flex', alignItems: 'center', gap: 1, color: 'error.main' }}>
           <Delete /> Remove Master Tailor?
@@ -2101,7 +2101,7 @@ export default function TailoringKanban() {
             const activeJobs = orders.filter(o => o.tailor === deleteConfirmTailor.name && o.status !== 'delivered').length;
             if (activeJobs > 0) {
               return (
-                <Alert severity="warning" sx={{ borderRadius: 2 }}>
+                <Alert severity="warning" sx={{ borderRadius: '8px' }}>
                   ⚠️ Master {deleteConfirmTailor.name} is currently assigned to <b>{activeJobs} active job(s)</b> on the workshop floor. Existing cards will keep the name for historical records, but new jobs will no longer list them.
                 </Alert>
               );
