@@ -902,10 +902,10 @@ export default function Settings() {
                     fullWidth
                     size="small"
                     label="Public E-Bill Base URL (for WhatsApp & SMS Links)"
-                    placeholder="https://aleen-55164.web.app"
+                    placeholder="https://aleenclothing.vercel.app"
                     value={formProfile.publicBillBaseUrl || ''}
                     onChange={(e) => setFormProfile({ ...formProfile, publicBillBaseUrl: e.target.value })}
-                    helperText="Public web address where patrons view & download official e-bills on mobile (Default: https://aleen-55164.web.app)"
+                    helperText="Public web address where patrons view & download official e-bills on mobile (Default: https://aleenclothing.vercel.app)"
                     InputProps={{
                       startAdornment: <Language sx={{ mr: 1, color: (t) => t.palette.primary.main, fontSize: 20 }} />
                     }}

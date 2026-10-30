@@ -102,18 +102,31 @@ const PublicBillView = () => {
           return;
         }
 
-        const cleanId = decodeURIComponent(String(rawId).replace(/^#/, '').trim());
+        const cleanId = decodeURIComponent(String(rawId).replace(/^[#%23]+/, '').trim());
+        const lowerId = cleanId.toLowerCase();
         let foundInvoice = null;
 
-        // Possible lookup candidates (clean, normalized with/without prefix)
-        const candidates = [cleanId];
+        // Comprehensive lookup candidates (case variations, prefix additions, sequence formats)
+        const candSet = new Set([cleanId, cleanId.toUpperCase(), cleanId.toLowerCase()]);
         if (cleanId.startsWith('INV-')) {
-          candidates.push(cleanId.replace('INV-', 'INV'));
-          candidates.push(cleanId.replace('INV-', ''));
+          candSet.add(cleanId.replace('INV-', 'INV'));
+          candSet.add(cleanId.replace('INV-', ''));
         } else if (cleanId.startsWith('INV')) {
-          candidates.push(cleanId.replace('INV', 'INV-'));
-          candidates.push(cleanId.replace('INV', ''));
+          candSet.add(cleanId.replace('INV', 'INV-'));
+          candSet.add(cleanId.replace('INV', ''));
+        } else if (/^\d+$/.test(cleanId)) {
+          const year = new Date().getFullYear().toString().slice(-2);
+          const month = String(new Date().getMonth() + 1).padStart(2, '0');
+          candSet.add(`INV${cleanId}`);
+          candSet.add(`INV-${cleanId}`);
+          const num = parseInt(cleanId, 10);
+          if (!isNaN(num) && num > 0 && num < 10000) {
+            candSet.add(`INV${year}${month}${String(num).padStart(4, '0')}`);
+            candSet.add(`INV-${year}${month}${String(num).padStart(4, '0')}`);
+          }
         }
+
+        const candidates = Array.from(candSet).filter(Boolean);
 
         // Strategy 1: Direct document ID lookup
         for (const cand of candidates) {
@@ -162,21 +175,51 @@ const PublicBillView = () => {
           }
         }
 
-        // Strategy 4: Flexible scan of collection
+        // Strategy 4: Universal scan of collection with prefix, suffix, and sequence resolution
         if (!foundInvoice) {
           try {
             const allSnap = await getDocs(collection(db, 'invoices'));
-            const lowerId = cleanId.toLowerCase();
+            const allDocs = [];
             allSnap.forEach((d) => {
-              if (foundInvoice) return;
-              const data = d.data();
-              const docId = String(d.id).toLowerCase();
-              const invNo = String(data.invoiceNumber || '').toLowerCase();
-              const fieldId = String(data.id || '').toLowerCase();
-              if (docId === lowerId || invNo === lowerId || fieldId === lowerId) {
-                foundInvoice = { id: d.id, ...data };
-              }
+              allDocs.push({ id: d.id, ...d.data() });
             });
+
+            // 4a. Case-insensitive exact match
+            for (const d of allDocs) {
+              const docId = String(d.id || '').toLowerCase();
+              const invNo = String(d.invoiceNumber || '').toLowerCase();
+              if (candidates.some((c) => c.toLowerCase() === docId || c.toLowerCase() === invNo)) {
+                foundInvoice = { ...d };
+                break;
+              }
+            }
+
+            // 4b. Prefix match for sliced timestamp IDs (e.g., table displayed #17779892 matching 1777989218508)
+            if (!foundInvoice) {
+              for (const d of allDocs) {
+                const docId = String(d.id || '').toLowerCase();
+                if (cleanId.length >= 6 && docId.startsWith(lowerId)) {
+                  foundInvoice = { ...d };
+                  break;
+                }
+              }
+            }
+
+            // 4c. Sequence match for numeric numbers (e.g. invoice ending in 0012 or number 12)
+            if (!foundInvoice) {
+              const seqMatch = cleanId.match(/(\d{1,4})$/);
+              if (seqMatch) {
+                const targetSeq = parseInt(seqMatch[1], 10);
+                allDocs.sort((a, b) => {
+                  const tA = new Date(a.date || parseInt(a.id) || 0).getTime();
+                  const tB = new Date(b.date || parseInt(b.id) || 0).getTime();
+                  return tA - tB;
+                });
+                if (targetSeq > 0 && targetSeq <= allDocs.length) {
+                  foundInvoice = { ...allDocs[targetSeq - 1] };
+                }
+              }
+            }
           } catch (scanErr) {
             console.warn('All invoices scan warning:', scanErr);
           }
@@ -190,7 +233,7 @@ const PublicBillView = () => {
             foundInvoice = localInvoices.find((inv) => {
               const docId = String(inv.id || '').toLowerCase();
               const invNo = String(inv.invoiceNumber || '').toLowerCase();
-              return docId === lowerId || invNo === lowerId;
+              return docId === lowerId || invNo === lowerId || (cleanId.length >= 6 && docId.startsWith(lowerId));
             });
           } catch (localErr) {
             console.warn('Local storage invoice check failed:', localErr);

@@ -1498,6 +1498,7 @@ const Invoices = () => {
 
     const invoice = {
       id: invoiceNumber,
+      invoiceNumber: invoiceNumber,
       date: new Date(invoiceDate).toISOString(),
       customer: finalCustomerName,
       phone,

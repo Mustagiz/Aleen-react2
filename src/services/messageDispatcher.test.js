@@ -49,7 +49,7 @@ describe('MessageDispatcher Module Tests', () => {
     expect(message).toContain('Nov 03, 2026');
   });
 
-  test('buildPublicBillUrl uses configured profile domain or live Firebase default', () => {
+  test('buildPublicBillUrl uses configured profile domain or live Vercel default', () => {
     const customUrl = buildPublicBillUrl('INV-5001', { publicBillBaseUrl: 'https://customboutique.com' });
     expect(customUrl).toBe('https://customboutique.com/bill/INV-5001');
 
@@ -59,5 +59,9 @@ describe('MessageDispatcher Module Tests', () => {
     // Strips leading hash
     const strippedUrl = buildPublicBillUrl('#INV-999', { publicBillBaseUrl: 'https://aleen.in/' });
     expect(strippedUrl).toBe('https://aleen.in/bill/INV-999');
+
+    // Default fallback
+    const defaultUrl = buildPublicBillUrl('INV-26100012');
+    expect(defaultUrl).toBe('https://aleenclothing.vercel.app/bill/INV-26100012');
   });
 });

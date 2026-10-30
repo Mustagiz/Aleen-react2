@@ -45,8 +45,8 @@ export const buildPublicBillUrl = (invoiceId = '', profile = {}, options = {}) =
 
     if (isLocalhost) {
       // Localhost/LAN IP cannot be resolved on customer smartphones over WhatsApp.
-      // Fallback to the production live Firebase Hosting endpoint for this atelier:
-      base = 'https://aleen-55164.web.app';
+      // Fallback to the production live Vercel endpoint for this atelier:
+      base = 'https://aleenclothing.vercel.app';
     } else {
       const origin = window.location.origin || '';
       const publicUrl = (process.env.PUBLIC_URL || '').replace(/\/+$/, '');
@@ -55,7 +55,7 @@ export const buildPublicBillUrl = (invoiceId = '', profile = {}, options = {}) =
   }
 
   if (!base) {
-    base = 'https://aleen-55164.web.app';
+    base = 'https://aleenclothing.vercel.app';
   }
 
   base = base.replace(/\/+$/, '');
