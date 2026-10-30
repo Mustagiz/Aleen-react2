@@ -35,18 +35,32 @@ export const DataProvider = ({ children }) => {
   const [expenses, setExpenses] = useState([]);
   const [expenseCategories, setExpenseCategories] = useState(['General', 'Rent', 'Electricity', 'Water', 'Repairs', 'Staff Welfare', 'Marketing', 'Courier', 'Stationery', 'Others']);
   const [invoiceTemplateSettings, setInvoiceTemplateSettings] = useState(() => getStoredInvoiceSettings());
-  const [loyaltySettings, setLoyaltySettings] = useState({
-    spendPerPoint: 100, // ₹100 spent = 1 point earned
-    pointsPerRupee: 0.01,
-    programStartDate: '',
-    programExpiryDate: '',
-    pointsExpiryDays: 365,
-    tierMultipliers: {
-      Bronze: 1,
-      Silver: 1.25,
-      Gold: 1.5,
-      Platinum: 2
-    }
+  const [loyaltySettings, setLoyaltySettings] = useState(() => {
+    try {
+      const stored = localStorage.getItem('aleen_loyalty_settings');
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (e) {}
+    return {
+      spendPerPoint: 100, // ₹100 spent = 1 point earned
+      pointsPerRupee: 0.01,
+      pointsRedeemRate: 1.0,
+      bronzeMultiplier: 1,
+      silverMultiplier: 1.25,
+      goldMultiplier: 1.5,
+      platinumMultiplier: 2,
+      programStartDate: '',
+      programExpiryDate: '',
+      pointsExpiryDays: 365,
+      enabled: true,
+      tierMultipliers: {
+        Bronze: 1,
+        Silver: 1.25,
+        Gold: 1.5,
+        Platinum: 2
+      }
+    };
   });
   const [loading, setLoading] = useState(true);
 
@@ -133,7 +147,28 @@ export const DataProvider = ({ children }) => {
     const unsubLoyalty = onSnapshot(doc(db, 'settings', 'loyalty'), (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.data();
-        setLoyaltySettings(prev => ({ ...prev, ...data }));
+        const merged = {
+          ...data,
+          spendPerPoint: Number(data.spendPerPoint || 100),
+          pointsRedeemRate: data.pointsRedeemRate !== undefined && !isNaN(parseFloat(data.pointsRedeemRate))
+            ? Math.max(0, parseFloat(data.pointsRedeemRate))
+            : 1.0,
+          pointsExpiryDays: data.pointsExpiryDays !== undefined ? (parseInt(data.pointsExpiryDays, 10) || 365) : 365,
+          bronzeMultiplier: Number(data.bronzeMultiplier ?? data.tierMultipliers?.Bronze ?? 1),
+          silverMultiplier: Number(data.silverMultiplier ?? data.tierMultipliers?.Silver ?? 1.25),
+          goldMultiplier: Number(data.goldMultiplier ?? data.tierMultipliers?.Gold ?? 1.5),
+          platinumMultiplier: Number(data.platinumMultiplier ?? data.tierMultipliers?.Platinum ?? 2),
+          tierMultipliers: {
+            Bronze: Number(data.bronzeMultiplier ?? data.tierMultipliers?.Bronze ?? 1),
+            Silver: Number(data.silverMultiplier ?? data.tierMultipliers?.Silver ?? 1.25),
+            Gold: Number(data.goldMultiplier ?? data.tierMultipliers?.Gold ?? 1.5),
+            Platinum: Number(data.platinumMultiplier ?? data.tierMultipliers?.Platinum ?? 2)
+          }
+        };
+        setLoyaltySettings(prev => ({ ...prev, ...merged }));
+        try {
+          localStorage.setItem('aleen_loyalty_settings', JSON.stringify(merged));
+        } catch (e) {}
       }
     }, onError('loyalty'));
 
@@ -534,11 +569,28 @@ export const DataProvider = ({ children }) => {
       const customerRef = doc(db, 'customers', invoice.customerId);
       const customer = customers.find(c => c.id === invoice.customerId);
       if (customer) {
-        const spendPerPt = loyaltySettings?.spendPerPoint || 100;
-        const tierMultiplier = loyaltySettings?.tierMultipliers?.[customer.loyaltyTier || 'Bronze'] || 1;
-        const calculatedBase = Math.floor((invoice.total / spendPerPt) * tierMultiplier);
+        const isProgramActive = (() => {
+          if (!loyaltySettings) return true;
+          if (loyaltySettings.enabled === false) return false;
+          const today = new Date().toISOString().split('T')[0];
+          if (loyaltySettings.programStartDate && today < loyaltySettings.programStartDate) return false;
+          if (loyaltySettings.programExpiryDate && today > loyaltySettings.programExpiryDate) return false;
+          return true;
+        })();
+
+        const spendPerPt = Number(loyaltySettings?.spendPerPoint) || 100;
+        const tierMultiplier =
+          customer.loyaltyTier === 'Platinum' ? Number(loyaltySettings?.platinumMultiplier ?? loyaltySettings?.tierMultipliers?.Platinum ?? 2.0)
+          : customer.loyaltyTier === 'Gold' ? Number(loyaltySettings?.goldMultiplier ?? loyaltySettings?.tierMultipliers?.Gold ?? 1.5)
+          : customer.loyaltyTier === 'Silver' ? Number(loyaltySettings?.silverMultiplier ?? loyaltySettings?.tierMultipliers?.Silver ?? 1.25)
+          : Number(loyaltySettings?.bronzeMultiplier ?? loyaltySettings?.tierMultipliers?.Bronze ?? 1.0);
+
+        const calculatedBase = isProgramActive ? Math.floor((invoice.total / spendPerPt) * tierMultiplier) : 0;
         const bonusPts = Number(invoice.customBonusPoints || 0);
-        const pointsEarned = invoice.pointsEarned !== undefined ? Number(invoice.pointsEarned) : (calculatedBase + bonusPts);
+        const pointsEarned = invoice.loyaltyPointsEarned !== undefined
+          ? Number(invoice.loyaltyPointsEarned)
+          : (invoice.pointsEarned !== undefined ? Number(invoice.pointsEarned) : (calculatedBase + bonusPts));
+        const pointsRedeemed = Math.max(0, parseInt(invoice.loyaltyPointsRedeemed, 10) || 0);
 
         const newTotalSpent = (customer.totalSpent || 0) + invoice.total;
         const newTotalDue = (customer.totalDue || 0) + balanceDue;
@@ -552,26 +604,42 @@ export const DataProvider = ({ children }) => {
           expiryDate = exp.toISOString().split('T')[0];
         }
 
+        const newLoyaltyPoints = Math.max(0, (customer.loyaltyPoints || 0) - pointsRedeemed + pointsEarned);
+        const newHistoryEntries = [];
+        if (pointsRedeemed > 0) {
+          newHistoryEntries.push({
+            date: new Date().toISOString(),
+            points: -pointsRedeemed,
+            type: 'redeemed',
+            reason: `Points Redeemed - Bill #${id}`,
+            invoiceId: id,
+            redemptionValue: pointsRedeemed
+          });
+        }
+        if (pointsEarned > 0) {
+          newHistoryEntries.push({
+            date: new Date().toISOString(),
+            points: pointsEarned,
+            basePoints: calculatedBase,
+            bonusPoints: bonusPts,
+            type: 'earned',
+            reason: `Purchase - Invoice #${id}${bonusPts > 0 ? ` (Includes +${bonusPts} VIP Bonus)` : ''}`,
+            invoiceId: id,
+            invoiceTotal: invoice.total,
+            startDate: new Date().toISOString().split('T')[0],
+            expiryDate: expiryDate || ''
+          });
+        }
+
         const updatePayload = {
           totalSpent: newTotalSpent,
           totalDue: newTotalDue,
           visitCount: (customer.visitCount || 0) + 1,
-          loyaltyPoints: (customer.loyaltyPoints || 0) + pointsEarned,
+          loyaltyPoints: newLoyaltyPoints,
           loyaltyTier: newTier,
           pointsHistory: [
             ...pointsHistory,
-            {
-              date: new Date().toISOString(),
-              points: pointsEarned,
-              basePoints: calculatedBase,
-              bonusPoints: bonusPts,
-              type: 'earned',
-              reason: `Purchase - Invoice #${id}${bonusPts > 0 ? ` (Includes +${bonusPts} VIP Bonus)` : ''}`,
-              invoiceId: id,
-              invoiceTotal: invoice.total,
-              startDate: new Date().toISOString().split('T')[0],
-              expiryDate: expiryDate || ''
-            }
+            ...newHistoryEntries
           ]
         };
 
@@ -768,8 +836,29 @@ export const DataProvider = ({ children }) => {
   };
 
   const updateLoyaltySettings = async (updates) => {
-    await setDoc(doc(db, 'settings', 'loyalty'), updates, { merge: true });
-    setLoyaltySettings(prev => ({ ...prev, ...updates }));
+    const normalized = {
+      ...updates,
+      spendPerPoint: Number(updates.spendPerPoint || 100),
+      pointsRedeemRate: updates.pointsRedeemRate !== undefined && !isNaN(parseFloat(updates.pointsRedeemRate))
+        ? Math.max(0, parseFloat(updates.pointsRedeemRate))
+        : 1.0,
+      pointsExpiryDays: updates.pointsExpiryDays !== undefined ? (parseInt(updates.pointsExpiryDays, 10) || 365) : 365,
+      bronzeMultiplier: Number(updates.bronzeMultiplier ?? updates.tierMultipliers?.Bronze ?? 1),
+      silverMultiplier: Number(updates.silverMultiplier ?? updates.tierMultipliers?.Silver ?? 1.25),
+      goldMultiplier: Number(updates.goldMultiplier ?? updates.tierMultipliers?.Gold ?? 1.5),
+      platinumMultiplier: Number(updates.platinumMultiplier ?? updates.tierMultipliers?.Platinum ?? 2),
+      tierMultipliers: {
+        Bronze: Number(updates.bronzeMultiplier ?? updates.tierMultipliers?.Bronze ?? 1),
+        Silver: Number(updates.silverMultiplier ?? updates.tierMultipliers?.Silver ?? 1.25),
+        Gold: Number(updates.goldMultiplier ?? updates.tierMultipliers?.Gold ?? 1.5),
+        Platinum: Number(updates.platinumMultiplier ?? updates.tierMultipliers?.Platinum ?? 2)
+      }
+    };
+    await setDoc(doc(db, 'settings', 'loyalty'), normalized, { merge: true });
+    setLoyaltySettings(prev => ({ ...prev, ...normalized }));
+    try {
+      localStorage.setItem('aleen_loyalty_settings', JSON.stringify(normalized));
+    } catch (e) {}
   };
 
   const addCustomLoyaltyPoints = async (customerId, points, reason = 'VIP Courtesy Points', startDate = '', expiryDate = '') => {

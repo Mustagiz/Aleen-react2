@@ -143,6 +143,52 @@ describe('BillingEngine Module Tests', () => {
     expect(result.loyaltyPointsEarned).toBe(450);
   });
 
+  test('calculateInvoiceTotals respects nested tierMultipliers and program validity dates', () => {
+    const items = [{ id: 'item-1', quantity: 1 }]; // 15,000
+
+    // Test nested tierMultipliers
+    const nestedResult = calculateInvoiceTotals({
+      items,
+      inventory: mockInventory,
+      taxPercent: 0,
+      customerTier: 'Gold',
+      loyaltySettings: {
+        spendPerPoint: 100,
+        tierMultipliers: {
+          Gold: 2.5
+        }
+      }
+    });
+    // Math.floor((15000 / 100) * 2.5) = 150 * 2.5 = 375
+    expect(nestedResult.loyaltyPointsEarned).toBe(375);
+
+    // Test expired program
+    const expiredResult = calculateInvoiceTotals({
+      items,
+      inventory: mockInventory,
+      taxPercent: 0,
+      customerTier: 'Gold',
+      loyaltySettings: {
+        spendPerPoint: 100,
+        programExpiryDate: '2020-01-01'
+      }
+    });
+    expect(expiredResult.loyaltyPointsEarned).toBe(0);
+
+    // Test disabled program
+    const disabledResult = calculateInvoiceTotals({
+      items,
+      inventory: mockInventory,
+      taxPercent: 0,
+      customerTier: 'Gold',
+      loyaltySettings: {
+        spendPerPoint: 100,
+        enabled: false
+      }
+    });
+    expect(disabledResult.loyaltyPointsEarned).toBe(0);
+  });
+
   test('calculateCashChange computes tender, change due, and shortages', () => {
     const exact = calculateCashChange({ total: 1450, cashTendered: 1450 });
     expect(exact.changeDue).toBe(0);

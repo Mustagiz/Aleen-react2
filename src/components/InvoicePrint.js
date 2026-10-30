@@ -633,7 +633,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                   {/* All Text Lines Arranged UNDER the QR Codes */}
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.4, px: 0.5, pt: 0.5, borderTop: `1px dashed ${theme.primaryColor || '#0A4D46'}20` }}>
                     <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', lineHeight: 1.3 }}>
-                      <b style={{ color: '#D97706' }}>🎁 Loyalty Club:</b> +{Math.max(1, Math.floor(Number(invoice.total || 0) / 100))} reward pts accrued
+                      <b style={{ color: '#D97706' }}>🎁 Loyalty Club:</b> +{invoice.loyaltyPointsEarned !== undefined ? Number(invoice.loyaltyPointsEarned) : Math.max(0, Math.floor(Number(invoice.total || 0) / 100))} reward pts accrued
                     </Typography>
 
                     <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', lineHeight: 1.3 }}>
@@ -698,7 +698,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                   </Typography>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                     <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem' }}>
-                      🎁 <b>Loyalty Accrual:</b> +{Math.max(1, Math.floor(Number(invoice.total || 0) / 100))} points earned on this invoice
+                      🎁 <b>Loyalty Accrual:</b> +{invoice.loyaltyPointsEarned !== undefined ? Number(invoice.loyaltyPointsEarned) : Math.max(0, Math.floor(Number(invoice.total || 0) / 100))} points earned on this invoice
                     </Typography>
                     <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem' }}>
                       ✂️ <b>Fitting Guarantee:</b> 30-Day complimentary alterations & adjustments
@@ -844,6 +844,15 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                 <Typography variant="body2">Discount ({invoice.discountPercent || invoice.discountPercentage || 0}%):</Typography>
                 <Typography variant="body2" sx={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
                   -₹{Number(invoice.discount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </Typography>
+              </Box>
+            )}
+
+            {(Number(invoice.loyaltyDiscount) > 0 || Number(invoice.loyaltyPointsRedeemed) > 0) && (
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 0.4, color: '#D97706' }}>
+                <Typography variant="body2">Loyalty Points ({invoice.loyaltyPointsRedeemed || 0} pts):</Typography>
+                <Typography variant="body2" sx={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                  -₹{Number(invoice.loyaltyDiscount || invoice.loyaltyPointsRedeemed || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </Typography>
               </Box>
             )}

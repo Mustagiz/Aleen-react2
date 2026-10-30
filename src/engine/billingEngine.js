@@ -80,7 +80,10 @@ export const calculateInvoiceTotals = ({
   const pctDiscount = Number((subtotal * ((parseFloat(discountPercent) || 0) / 100)).toFixed(2));
   const flatDiscount = parseFloat(discountAmount) || 0;
   const pointsRedeemed = Math.max(0, parseInt(loyaltyPointsRedeemed, 10) || 0);
-  const loyaltyDiscount = Number(pointsRedeemed.toFixed(2)); // 1 Point = ₹1
+  const pointsRedeemRate = loyaltySettings?.pointsRedeemRate !== undefined && !isNaN(parseFloat(loyaltySettings.pointsRedeemRate))
+    ? Math.max(0, parseFloat(loyaltySettings.pointsRedeemRate))
+    : 1.0;
+  const loyaltyDiscount = Number((pointsRedeemed * pointsRedeemRate).toFixed(2));
 
   const absDiscount = Number((pctDiscount + flatDiscount + loyaltyDiscount).toFixed(2));
 
@@ -88,19 +91,28 @@ export const calculateInvoiceTotals = ({
   const roundedTotal = Math.round(rawTotal);
   const roundOff = Number((roundedTotal - rawTotal).toFixed(2));
 
-  // Loyalty Points Accrual: Configurable points per rupee, scaled by VIP Tier
+  // Loyalty Points Accrual: Configurable points per rupee, scaled by VIP Tier and program validity
+  const isProgramActive = (() => {
+    if (!loyaltySettings) return true;
+    if (loyaltySettings.enabled === false) return false;
+    const today = new Date().toISOString().split('T')[0];
+    if (loyaltySettings.programStartDate && today < loyaltySettings.programStartDate) return false;
+    if (loyaltySettings.programExpiryDate && today > loyaltySettings.programExpiryDate) return false;
+    return true;
+  })();
+
   const spendPerPoint = loyaltySettings?.spendPerPoint > 0
     ? Number(loyaltySettings.spendPerPoint)
     : (loyaltySettings?.pointsPerRupee > 0 ? (1 / Number(loyaltySettings.pointsPerRupee)) : 100);
 
   const tierMultipliers = {
-    Bronze: Number(loyaltySettings?.bronzeMultiplier) || 1.0,
-    Silver: Number(loyaltySettings?.silverMultiplier) || 1.25,
-    Gold: Number(loyaltySettings?.goldMultiplier) || 1.5,
-    Platinum: Number(loyaltySettings?.platinumMultiplier) || 2.0
+    Bronze: Number(loyaltySettings?.bronzeMultiplier ?? loyaltySettings?.tierMultipliers?.Bronze) || 1.0,
+    Silver: Number(loyaltySettings?.silverMultiplier ?? loyaltySettings?.tierMultipliers?.Silver) || 1.25,
+    Gold: Number(loyaltySettings?.goldMultiplier ?? loyaltySettings?.tierMultipliers?.Gold) || 1.5,
+    Platinum: Number(loyaltySettings?.platinumMultiplier ?? loyaltySettings?.tierMultipliers?.Platinum) || 2.0
   };
   const multiplier = tierMultipliers[customerTier] || 1.0;
-  const basePointsEarned = Math.floor((roundedTotal / spendPerPoint) * multiplier);
+  const basePointsEarned = isProgramActive ? Math.floor((roundedTotal / spendPerPoint) * multiplier) : 0;
   const customBonus = Math.max(0, parseInt(customBonusPoints, 10) || 0);
   const loyaltyPointsEarned = basePointsEarned + customBonus;
 
@@ -115,6 +127,10 @@ export const calculateInvoiceTotals = ({
     loyaltyPointsRedeemed: pointsRedeemed,
     loyaltyDiscount,
     loyaltyPointsEarned,
+    loyaltySpendPerPoint: spendPerPoint,
+    loyaltyMultiplier: multiplier,
+    loyaltyProgramActive: isProgramActive,
+    pointsRedeemRate,
     rawTotal: Number(rawTotal.toFixed(2)),
     total: roundedTotal,
     roundOff,

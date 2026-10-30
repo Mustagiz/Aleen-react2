@@ -22,10 +22,8 @@ import {
   QrCode2,
   CheckCircle,
   Diamond,
-  LocalMall,
   ShoppingBag,
   AccessTime,
-  Wifi,
   AutoAwesome,
   VerifiedUser,
   Payments,
@@ -37,7 +35,6 @@ import {
   Favorite,
   WhatsApp,
   Spa,
-  CropFree,
   Star,
   VolumeUp,
   VolumeOff
@@ -406,6 +403,25 @@ export default function CustomerDisplay() {
     }
   }, []);
 
+  // 2b. Loyalty Program Settings Real-Time Sync
+  const [loyaltySettings, setLoyaltySettings] = useState(null);
+  useEffect(() => {
+    try {
+      const unsubLoyalty = onSnapshot(
+        doc(db, 'settings', 'loyalty'),
+        (snapshot) => {
+          if (snapshot.exists()) {
+            setLoyaltySettings(snapshot.data());
+          }
+        },
+        (err) => console.warn('CFD Loyalty settings sync warning:', err)
+      );
+      return () => unsubLoyalty();
+    } catch (err) {
+      console.warn('Error attaching Loyalty listener:', err);
+    }
+  }, []);
+
   // 3. ZERO-LATENCY INSTANT SYNC (BroadcastChannel, LocalStorage, Window PostMessage)
   useEffect(() => {
     // A. BroadcastChannel for sub-millisecond local cross-window sync
@@ -525,9 +541,81 @@ export default function CustomerDisplay() {
   const total = cfdState?.total || 0;
   const customerName = (cfdState?.customerName || '').trim();
   const customerPhone = (cfdState?.customerPhone || '').trim();
-  const customerTier = cfdState?.customerTier || 'Silver';
-  const loyaltyPoints = cfdState?.loyaltyPoints || 0;
-  const loyaltyPointsEarned = cfdState?.loyaltyPointsEarned || Math.max(15, Math.round(total * 0.05));
+  const customerTier = cfdState?.customerTier || 'Bronze';
+  const loyaltyPoints = typeof cfdState?.loyaltyPoints === 'number' ? cfdState.loyaltyPoints : (Number(cfdState?.loyaltyPoints) || 0);
+  const loyaltyPointsRedeemed = typeof cfdState?.loyaltyPointsRedeemed === 'number' ? cfdState.loyaltyPointsRedeemed : (Number(cfdState?.loyaltyPointsRedeemed) || 0);
+  const loyaltyPointsRemaining = typeof cfdState?.loyaltyPointsRemaining === 'number'
+    ? cfdState.loyaltyPointsRemaining
+    : Math.max(0, loyaltyPoints - loyaltyPointsRedeemed);
+  const loyaltyDiscount = typeof cfdState?.loyaltyDiscount === 'number' ? cfdState.loyaltyDiscount : (Number(cfdState?.loyaltyDiscount) || 0);
+  const flatDiscount = typeof cfdState?.flatDiscount === 'number' ? cfdState.flatDiscount : (Number(cfdState?.flatDiscount) || 0);
+  const percentDiscount = typeof cfdState?.percentDiscount === 'number' ? cfdState.percentDiscount : (Number(cfdState?.percentDiscount) || 0);
+  const cgst = typeof cfdState?.cgst === 'number' ? cfdState.cgst : (Number(cfdState?.cgst) || 0);
+  const sgst = typeof cfdState?.sgst === 'number' ? cfdState.sgst : (Number(cfdState?.sgst) || 0);
+  const roundOff = typeof cfdState?.roundOff === 'number' ? cfdState.roundOff : (Number(cfdState?.roundOff) || 0);
+  const customerTotalSpent = typeof cfdState?.customerTotalSpent === 'number' ? cfdState.customerTotalSpent : (Number(cfdState?.customerTotalSpent) || 0);
+
+  const spendPerPoint = cfdState?.spendPerPoint || loyaltySettings?.spendPerPoint || 100;
+  const tierMultiplier = cfdState?.tierMultiplier || (
+    customerTier === 'Platinum' ? (loyaltySettings?.platinumMultiplier || 2)
+    : customerTier === 'Gold' ? (loyaltySettings?.goldMultiplier || 1.5)
+    : customerTier === 'Silver' ? (loyaltySettings?.silverMultiplier || 1.25)
+    : (loyaltySettings?.bronzeMultiplier || 1)
+  );
+
+  const loyaltyPointsEarned = typeof cfdState?.loyaltyPointsEarned === 'number' && cfdState.loyaltyPointsEarned > 0
+    ? cfdState.loyaltyPointsEarned
+    : Math.floor((total / spendPerPoint) * tierMultiplier);
+
+  // Helper for Tier progression and badge styling
+  const getTierMeta = (tier) => {
+    switch (tier) {
+      case 'Platinum':
+        return {
+          label: 'Platinum VIP',
+          color: '#0F766E',
+          bg: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+          border: '#14B8A6',
+          icon: '👑',
+          nextTier: 'Haute Imperial Elite (Max Tier)',
+          target: 100000,
+          progress: 100
+        };
+      case 'Gold':
+        return {
+          label: 'Gold VIP',
+          color: '#D97706',
+          bg: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
+          border: '#F59E0B',
+          icon: '⚜️',
+          nextTier: 'Platinum (₹1,00,000)',
+          target: 100000,
+          progress: Math.min(100, (customerTotalSpent / 100000) * 100)
+        };
+      case 'Silver':
+        return {
+          label: 'Silver VIP',
+          color: '#64748B',
+          bg: 'linear-gradient(135deg, #64748B 0%, #475569 100%)',
+          border: '#94A3B8',
+          icon: '✦',
+          nextTier: 'Gold (₹50,000)',
+          target: 50000,
+          progress: Math.min(100, (customerTotalSpent / 50000) * 100)
+        };
+      default:
+        return {
+          label: 'Bronze Patron',
+          color: '#B45309',
+          bg: 'linear-gradient(135deg, #B45309 0%, #78350F 100%)',
+          border: '#D97706',
+          icon: '💎',
+          nextTier: 'Silver (₹25,000)',
+          target: 25000,
+          progress: Math.min(100, (customerTotalSpent / 25000) * 100)
+        };
+    }
+  };
   const paymentMethod = cfdState?.paymentMethod || 'Cash';
   const upiUrl = cfdState?.upiUrl || '';
   const isSettled = cfdState?.status === 'settled';
@@ -1529,7 +1617,7 @@ export default function CustomerDisplay() {
                           </Typography>
                         </Stack>
                         <Typography variant="h5" sx={{ fontWeight: 900, color: '#0F172A', mb: 0.5 }}>
-                          {loyaltyPoints || 450} Points
+                          {loyaltyPoints} Points
                         </Typography>
                         <Typography variant="caption" sx={{ color: '#64748B', display: 'block', lineHeight: 1.4 }}>
                           Available to redeem towards today's bespoke bill
@@ -2237,108 +2325,330 @@ export default function CustomerDisplay() {
               style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}
             >
               <Box sx={{ flex: 1, display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, gap: { xs: 2, sm: 2.5, md: 3 }, minHeight: 0, width: '100%' }}>
-                {/* Left Panel: Itemized Live Bill Stream (60%) Matching Box 2 Clean Luxury Style */}
+                {/* Left Panel: Itemized Live Bill Stream (Haute Couture Atelier Styling) */}
                 <Paper
                   elevation={0}
                   sx={{
                     flex: { xs: 'none', lg: 1.5 },
-                    minHeight: { xs: 320, lg: 0 },
+                    minHeight: { xs: 340, lg: 0 },
                     display: 'flex',
                     flexDirection: 'column',
-                    p: 3,
+                    p: { xs: 2.2, sm: 3 },
                     borderRadius: 4,
                     bgcolor: '#FFFFFF',
-                    border: '1.5px solid rgba(197, 160, 89, 0.3)',
+                    border: '1.5px solid rgba(197, 160, 89, 0.35)',
                     boxShadow: '0 12px 35px rgba(180, 140, 75, 0.08), 0 2px 10px rgba(0, 0, 0, 0.03)'
                   }}
                 >
-                  {/* Clean Header Matching Box 2 */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                    <Typography variant="overline" sx={{ color: '#937230', letterSpacing: '0.15em', fontWeight: 900 }}>
-                      {activeCustomerName ? (
-                        <>CURATED ENSEMBLE • {renderPatronName(activeCustomerName, { fontSize: 'inherit' })}</>
-                      ) : (
-                        'CURATED ENSEMBLE'
-                      )}
-                    </Typography>
-                    <Chip
-                      label={`${items.length} ${items.length === 1 ? 'ITEM' : 'ITEMS'}`}
-                      size="small"
-                      sx={{
-                        bgcolor: 'rgba(197, 160, 89, 0.15)',
-                        color: '#937230',
-                        fontWeight: 900,
-                        fontSize: '0.68rem',
-                        height: 22,
-                        px: 0.5,
-                        border: '1px solid rgba(197, 160, 89, 0.3)'
-                      }}
-                    />
+                  {/* Atelier Master Header */}
+                  <Box sx={{ pb: 2, mb: 2, borderBottom: '1px solid rgba(197, 160, 89, 0.2)' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.2 }}>
+                      <Stack direction="row" spacing={1.2} alignItems="center">
+                        <Box
+                          sx={{
+                            width: 34,
+                            height: 34,
+                            borderRadius: '50%',
+                            bgcolor: 'rgba(197, 160, 89, 0.15)',
+                            border: '1.5px solid rgba(197, 160, 89, 0.4)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: '#937230'
+                          }}
+                        >
+                          <Diamond sx={{ fontSize: 19 }} />
+                        </Box>
+                        <Box>
+                          <Typography
+                            variant="overline"
+                            sx={{
+                              color: '#937230',
+                              letterSpacing: '0.18em',
+                              fontWeight: 900,
+                              fontSize: '0.74rem',
+                              lineHeight: 1
+                            }}
+                          >
+                            ALEEN ATELIER • CURATED ENSEMBLE
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: '#64748B', display: 'block', fontWeight: 600, fontSize: '0.7rem' }}>
+                            Sub-Millisecond Mirroring • Live Checkout Stream
+                          </Typography>
+                        </Box>
+                      </Stack>
+
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Chip
+                          icon={<Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#10B981', mr: 0.5 }} />}
+                          label={`${items.reduce((sum, it) => sum + (parseInt(it.quantity) || 1), 0)} Pieces`}
+                          size="small"
+                          sx={{
+                            bgcolor: 'rgba(16, 185, 129, 0.1)',
+                            color: '#059669',
+                            fontWeight: 900,
+                            fontSize: '0.7rem',
+                            height: 24,
+                            border: '1px solid rgba(16, 185, 129, 0.3)'
+                          }}
+                        />
+                        <Chip
+                          label={`${items.length} ${items.length === 1 ? 'ITEM' : 'ITEMS'}`}
+                          size="small"
+                          sx={{
+                            bgcolor: 'rgba(197, 160, 89, 0.15)',
+                            color: '#937230',
+                            fontWeight: 900,
+                            fontSize: '0.68rem',
+                            height: 24,
+                            border: '1px solid rgba(197, 160, 89, 0.3)'
+                          }}
+                        />
+                      </Stack>
+                    </Box>
+
+                    {/* Patron VIP Identification Ribbon */}
+                    {activeCustomerName ? (
+                      <Box
+                        sx={{
+                          mt: 1.5,
+                          p: 1.5,
+                          borderRadius: 3,
+                          background: 'linear-gradient(135deg, rgba(254, 243, 199, 0.45) 0%, rgba(240, 253, 250, 0.55) 100%)',
+                          border: '1px solid rgba(197, 160, 89, 0.35)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          flexWrap: 'wrap',
+                          gap: 1.2
+                        }}
+                      >
+                        <Stack direction="row" spacing={1.2} alignItems="center">
+                          <Avatar
+                            sx={{
+                              width: 38,
+                              height: 38,
+                              bgcolor: '#0F766E',
+                              color: '#FFFFFF',
+                              fontWeight: 800,
+                              fontSize: '0.95rem',
+                              border: '2px solid #C5A059'
+                            }}
+                          >
+                            {activeCustomerName.charAt(0).toUpperCase()}
+                          </Avatar>
+                          <Box>
+                            <Stack direction="row" spacing={0.8} alignItems="center">
+                              <Typography sx={{ fontWeight: 900, color: '#0F172A', fontSize: '0.96rem' }}>
+                                {renderPatronName(activeCustomerName, { fontSize: 'inherit' })}
+                              </Typography>
+                              <Chip
+                                icon={<Stars sx={{ fontSize: '13px !important', color: '#937230 !important' }} />}
+                                label={`${customerTier} VIP`}
+                                size="small"
+                                sx={{
+                                  height: 20,
+                                  fontSize: '0.65rem',
+                                  fontWeight: 900,
+                                  bgcolor: 'rgba(197, 160, 89, 0.2)',
+                                  color: '#937230',
+                                  border: '1px solid rgba(197, 160, 89, 0.4)'
+                                }}
+                              />
+                            </Stack>
+                            {customerPhone && (
+                              <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600 }}>
+                                Patron Account • {customerPhone}
+                              </Typography>
+                            )}
+                          </Box>
+                        </Stack>
+
+                        <Box sx={{ bgcolor: '#FFFFFF', px: 1.5, py: 0.6, borderRadius: 2, border: '1px solid rgba(197, 160, 89, 0.25)' }}>
+                          <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700, fontSize: '0.62rem', display: 'block', textTransform: 'uppercase' }}>
+                            Privilege Balance
+                          </Typography>
+                          <Typography sx={{ fontWeight: 900, color: '#0F766E', fontSize: '0.88rem' }}>
+                            💎 {loyaltyPoints} pts
+                          </Typography>
+                        </Box>
+                      </Box>
+                    ) : (
+                      <Box
+                        sx={{
+                          mt: 1.2,
+                          px: 1.8,
+                          py: 0.8,
+                          borderRadius: 2.5,
+                          bgcolor: '#FAF8F5',
+                          border: '1px dashed rgba(197, 160, 89, 0.35)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1
+                        }}
+                      >
+                        <AutoAwesome sx={{ color: '#C5A059', fontSize: 16 }} />
+                        <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700, fontSize: '0.74rem' }}>
+                          Honoured Atelier Patron • Items reflect automatically as our master stylers curate your ensemble
+                        </Typography>
+                      </Box>
+                    )}
                   </Box>
 
-                  {/* Scanned Items Stream (Open, Clean, Light Aesthetic Matching Box 2) */}
+                  {/* Scanned Items Stream (Bespoke Garment Cards) */}
                   <Box sx={{ flex: 1, overflowY: 'auto', pr: 0.5 }}>
-                    <Stack spacing={1.2} divider={<Divider sx={{ borderColor: 'rgba(197, 160, 89, 0.15)' }} />}>
+                    <Stack spacing={1.3}>
                       <AnimatePresence initial={false}>
                         {items.map((item, idx) => {
                           const garmentMeta = getGarmentMeta(item.name);
                           const itemPrice = parseFloat(item.price) || 0;
                           const itemQty = parseInt(item.quantity) || 1;
                           const lineTotal = itemPrice * itemQty;
+                          const isJustScanned = cfdState?.lastScannedItem && (
+                            cfdState.lastScannedItem.name === item.name || cfdState.lastScannedItem.id === item.id
+                          );
+
                           return (
                             <motion.div
                               key={item.id || idx}
-                              initial={{ opacity: 0, x: -10 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              exit={{ opacity: 0 }}
-                              transition={{ duration: 0.2 }}
+                              initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.95 }}
+                              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                             >
                               <Box
                                 sx={{
-                                  py: 1,
+                                  p: 1.6,
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'space-between',
-                                  borderRadius: 2,
-                                  px: 0.5
+                                  borderRadius: 3,
+                                  bgcolor: isJustScanned ? 'rgba(254, 243, 199, 0.35)' : '#FAF8F5',
+                                  border: isJustScanned ? '1.5px solid #D97706' : '1px solid rgba(197, 160, 89, 0.22)',
+                                  boxShadow: isJustScanned ? '0 4px 18px rgba(217, 119, 6, 0.15)' : '0 2px 8px rgba(0, 0, 0, 0.02)',
+                                  transition: 'all 0.25s ease',
+                                  position: 'relative',
+                                  overflow: 'hidden'
                                 }}
                               >
-                                <Box sx={{ flex: 1, pr: 2 }}>
-                                  <Stack direction="row" spacing={0.8} alignItems="center" sx={{ mb: 0.4 }}>
-                                    <Chip
-                                      label={`${garmentMeta.icon} ${garmentMeta.tag}`}
-                                      size="small"
+                                {isJustScanned && (
+                                  <Box
+                                    sx={{
+                                      position: 'absolute',
+                                      top: 0,
+                                      right: 0,
+                                      bgcolor: '#D97706',
+                                      color: '#FFFFFF',
+                                      px: 1,
+                                      py: 0.2,
+                                      fontSize: '0.62rem',
+                                      fontWeight: 900,
+                                      letterSpacing: '0.05em',
+                                      borderBottomLeftRadius: 6
+                                    }}
+                                  >
+                                    ✦ JUST SCANNED
+                                  </Box>
+                                )}
+
+                                {/* Garment Icon & Typography */}
+                                <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flex: 1, pr: 2 }}>
+                                  <Box
+                                    sx={{
+                                      width: 44,
+                                      height: 44,
+                                      borderRadius: 2.5,
+                                      bgcolor: '#FFFFFF',
+                                      border: '1px solid rgba(197, 160, 89, 0.3)',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      fontSize: '1.4rem',
+                                      flexShrink: 0,
+                                      boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
+                                    }}
+                                  >
+                                    {garmentMeta.icon}
+                                  </Box>
+
+                                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                                    <Stack direction="row" spacing={0.8} alignItems="center" sx={{ mb: 0.3, flexWrap: 'wrap', gap: 0.4 }}>
+                                      <Chip
+                                        label={garmentMeta.label}
+                                        size="small"
+                                        sx={{
+                                          height: 19,
+                                          fontSize: '0.62rem',
+                                          bgcolor: 'rgba(15, 118, 110, 0.1)',
+                                          color: '#0F766E',
+                                          border: '1px solid rgba(15, 118, 110, 0.25)',
+                                          fontWeight: 800
+                                        }}
+                                      />
+                                      {item.variantDetails && (
+                                        <Chip
+                                          label={item.variantDetails}
+                                          size="small"
+                                          sx={{
+                                            height: 19,
+                                            fontSize: '0.62rem',
+                                            bgcolor: 'rgba(197, 160, 89, 0.12)',
+                                            color: '#937230',
+                                            border: '1px solid rgba(197, 160, 89, 0.25)',
+                                            fontWeight: 700
+                                          }}
+                                        />
+                                      )}
+                                    </Stack>
+
+                                    <Typography
+                                      variant="subtitle1"
                                       sx={{
-                                        height: 20,
-                                        fontSize: '0.65rem',
-                                        bgcolor: 'rgba(197, 160, 89, 0.12)',
-                                        color: '#937230',
-                                        border: '1px solid rgba(197, 160, 89, 0.25)',
-                                        fontWeight: 800
+                                        fontWeight: 800,
+                                        color: '#0F172A',
+                                        fontSize: { xs: '0.94rem', sm: '1.04rem' },
+                                        lineHeight: 1.25,
+                                        fontFamily: '"Plus Jakarta Sans", sans-serif'
                                       }}
-                                    />
-                                    {item.variantDetails && (
-                                      <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.72rem' }}>
-                                        {item.variantDetails}
-                                      </Typography>
-                                    )}
-                                  </Stack>
+                                    >
+                                      {item.name}
+                                    </Typography>
 
-                                  <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0F172A', fontSize: { xs: '0.92rem', sm: '1.02rem' }, lineHeight: 1.25 }}>
-                                    {item.name}
-                                  </Typography>
+                                    <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, mt: 0.3, display: 'inline-block' }}>
+                                      ₹{itemPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })} each
+                                    </Typography>
+                                  </Box>
+                                </Stack>
 
-                                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, mt: 0.2, display: 'inline-block' }}>
-                                    ₹{itemPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })} × {itemQty}
-                                  </Typography>
-                                </Box>
-
+                                {/* Quantity & Line Total */}
                                 <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
-                                  <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#937230', fontSize: { xs: '1rem', sm: '1.1rem' } }}>
+                                  <Box
+                                    sx={{
+                                      display: 'inline-block',
+                                      px: 1,
+                                      py: 0.25,
+                                      borderRadius: 1.5,
+                                      bgcolor: '#FFFFFF',
+                                      border: '1px solid rgba(197, 160, 89, 0.3)',
+                                      mb: 0.4
+                                    }}
+                                  >
+                                    <Typography variant="caption" sx={{ color: '#0F172A', fontWeight: 800, fontSize: '0.72rem' }}>
+                                      QTY: {itemQty}
+                                    </Typography>
+                                  </Box>
+
+                                  <Typography
+                                    variant="subtitle1"
+                                    sx={{
+                                      fontWeight: 900,
+                                      color: '#937230',
+                                      fontSize: { xs: '1.02rem', sm: '1.15rem' },
+                                      fontVariantNumeric: 'tabular-nums',
+                                      fontFamily: '"JetBrains Mono", monospace'
+                                    }}
+                                  >
                                     ₹{lineTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                                  </Typography>
-                                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700, fontSize: '0.72rem', display: 'block' }}>
-                                    Qty: {itemQty}
                                   </Typography>
                                 </Box>
                               </Box>
@@ -2349,27 +2659,33 @@ export default function CustomerDisplay() {
                     </Stack>
                   </Box>
 
-                  {/* Valued Patron Privilege Savings Banner Matching Box 2 Green Badge */}
+                  {/* Valued Patron Privilege Savings Banner */}
                   {discount > 0 && (
                     <Box
                       sx={{
                         mt: 2,
-                        p: 1.2,
-                        borderRadius: 2.5,
-                        bgcolor: 'rgba(16, 185, 129, 0.1)',
-                        border: '1px solid rgba(16, 185, 129, 0.35)',
+                        p: 1.5,
+                        borderRadius: 3,
+                        background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(5, 150, 105, 0.18) 100%)',
+                        border: '1.5px solid rgba(16, 185, 129, 0.4)',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'space-between'
+                        justifyContent: 'space-between',
+                        boxShadow: '0 4px 15px rgba(16, 185, 129, 0.08)'
                       }}
                     >
-                      <Stack direction="row" spacing={0.8} alignItems="center">
-                        <AutoAwesome sx={{ color: '#059669', fontSize: 16 }} />
-                        <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, color: '#065F46', lineHeight: 1.2 }}>
-                          Valued Patron Privilege Applied
-                        </Typography>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <AutoAwesome sx={{ color: '#059669', fontSize: 18 }} />
+                        <Box>
+                          <Typography sx={{ fontSize: '0.8rem', fontWeight: 800, color: '#065F46', lineHeight: 1.2 }}>
+                            Valued Patron Privilege Applied
+                          </Typography>
+                          <Typography sx={{ fontSize: '0.68rem', color: '#047857', fontWeight: 600 }}>
+                            Direct couture savings credited to your bespoke invoice
+                          </Typography>
+                        </Box>
                       </Stack>
-                      <Typography sx={{ fontSize: '0.82rem', fontWeight: 900, color: '#059669' }}>
+                      <Typography sx={{ fontSize: '0.95rem', fontWeight: 900, color: '#059669', fontVariantNumeric: 'tabular-nums' }}>
                         Saving ₹{discount.toLocaleString('en-IN', { minimumFractionDigits: 2 })} today!
                       </Typography>
                     </Box>
@@ -2385,136 +2701,178 @@ export default function CustomerDisplay() {
                     gap: 2.5
                   }}
                 >
-                  {/* Financial Summary Card (Light Theme) */}
+                  {/* Financial Summary Card */}
                   <Paper
                     elevation={0}
                     sx={{
                       p: 3,
                       borderRadius: 4,
                       bgcolor: '#FFFFFF',
-                      border: '1.5px solid rgba(197, 160, 89, 0.3)',
+                      border: '1.5px solid rgba(197, 160, 89, 0.35)',
                       boxShadow: '0 12px 35px rgba(180, 140, 75, 0.08), 0 2px 10px rgba(0, 0, 0, 0.03)'
                     }}
                   >
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                      <Typography variant="overline" sx={{ color: '#937230', letterSpacing: '0.15em', fontWeight: 900 }}>
-                        BILL SUMMARY
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.8 }}>
+                      <Typography variant="overline" sx={{ color: '#937230', letterSpacing: '0.18em', fontWeight: 900, fontSize: '0.74rem' }}>
+                        ATELIER BILL SUMMARY
                       </Typography>
                       <Chip
-                        label={isSettled ? "PAID" : "LIVE"}
+                        icon={<Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: isSettled ? '#FFFFFF' : '#10B981', mr: 0.5 }} />}
+                        label={isSettled ? "PAID & VERIFIED" : "LIVE TENDER"}
                         size="small"
                         sx={{
-                          bgcolor: isSettled ? '#059669' : '#10B981',
-                          color: '#FFFFFF',
+                          bgcolor: isSettled ? '#059669' : 'rgba(16, 185, 129, 0.15)',
+                          color: isSettled ? '#FFFFFF' : '#059669',
+                          border: isSettled ? 'none' : '1px solid rgba(16, 185, 129, 0.35)',
                           fontWeight: 900,
                           fontSize: '0.68rem',
-                          height: 22,
+                          height: 24,
                           px: 0.5
                         }}
                       />
                     </Box>
 
-                    <Stack spacing={1.2} sx={{ mt: 1, mb: 1.8 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Stack spacing={1.3} sx={{ mt: 1, mb: 2 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 600 }}>
-                          Gross Subtotal:
+                          Gross Atelier Subtotal:
                         </Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 800, color: '#0F172A' }}>
+                        <Typography variant="body2" sx={{ fontWeight: 800, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
                           ₹{subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                         </Typography>
                       </Box>
 
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 600 }}>
-                          GST ({taxPercent > 0 ? `${taxPercent}%` : '0%'}):
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A' }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Stack direction="row" spacing={0.6} alignItems="center">
+                          <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 600 }}>
+                            GST ({taxPercent > 0 ? `${taxPercent}%` : '0%'}):
+                          </Typography>
+                          {taxPercent > 0 && (
+                            <Chip
+                              label={`${(taxPercent / 2).toFixed(1)}% CGST + ${(taxPercent / 2).toFixed(1)}% SGST`}
+                              size="small"
+                              sx={{ height: 18, fontSize: '0.58rem', fontWeight: 700, bgcolor: 'rgba(100, 116, 139, 0.08)' }}
+                            />
+                          )}
+                        </Stack>
+                        <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A', fontVariantNumeric: 'tabular-nums' }}>
                           ₹{tax.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                         </Typography>
                       </Box>
 
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 600 }}>
-                          Discount Applied:
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 800, color: discount > 0 ? '#DC2626' : '#64748B' }}>
-                          - ₹{discount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                        </Typography>
-                      </Box>
+                      {discount > 0 && (
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Typography variant="body2" sx={{ color: '#DC2626', fontWeight: 700 }}>
+                            Privilege Discount:
+                          </Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 800, color: '#DC2626', fontVariantNumeric: 'tabular-nums' }}>
+                            - ₹{discount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                          </Typography>
+                        </Box>
+                      )}
+
+                      {(cfdState?.loyaltyDiscount > 0) && (
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Typography variant="body2" sx={{ color: '#059669', fontWeight: 700 }}>
+                            Points Redeemed:
+                          </Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 800, color: '#059669', fontVariantNumeric: 'tabular-nums' }}>
+                            - ₹{Number(cfdState.loyaltyDiscount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                          </Typography>
+                        </Box>
+                      )}
                     </Stack>
 
-                    <Divider sx={{ borderColor: 'rgba(197, 160, 89, 0.25)', my: 1.8 }} />
+                    <Divider sx={{ borderColor: 'rgba(197, 160, 89, 0.25)', my: 2 }} />
 
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    {/* Hero Net Payable Jewel Capsule */}
+                    <Box
+                      sx={{
+                        p: 2.2,
+                        borderRadius: 3.5,
+                        background: 'linear-gradient(135deg, #FFFDF8 0%, #FAF4E5 100%)',
+                        border: '2px solid rgba(197, 160, 89, 0.55)',
+                        boxShadow: '0 8px 25px rgba(180, 140, 75, 0.15)',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}
+                    >
                       <Box>
-                        <Typography variant="caption" sx={{ color: '#D97706', fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase', display: 'block' }}>
-                          NET PAYABLE
+                        <Typography variant="caption" sx={{ color: '#937230', fontWeight: 900, letterSpacing: '0.12em', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Diamond sx={{ fontSize: 14 }} /> TOTAL NET PAYABLE
                         </Typography>
                         <Typography
                           variant="h4"
                           sx={{
                             fontWeight: 900,
-                            color: '#937230',
-                            fontSize: { xs: '1.8rem', md: '2.2rem' },
-                            lineHeight: 1.1
+                            color: '#8D6A28',
+                            fontSize: { xs: '1.9rem', md: '2.3rem' },
+                            lineHeight: 1.1,
+                            mt: 0.4,
+                            fontFamily: '"Plus Jakarta Sans", sans-serif',
+                            fontVariantNumeric: 'tabular-nums'
                           }}
                         >
                           ₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                         </Typography>
                       </Box>
+
                       <Chip
-                        label={isSettled ? "PAID" : "DUE"}
+                        label={isSettled ? "SETTLED" : "DUE"}
                         sx={{
-                          bgcolor: isSettled ? 'rgba(16, 185, 129, 0.15)' : 'rgba(197, 160, 89, 0.15)',
-                          color: isSettled ? '#059669' : '#937230',
-                          border: `1.5px solid ${isSettled ? '#10B981' : '#C5A059'}`,
+                          bgcolor: isSettled ? '#059669' : '#D97706',
+                          color: '#FFFFFF',
                           fontWeight: 900,
-                          fontSize: '0.78rem',
-                          height: 28,
-                          px: 1
+                          fontSize: '0.82rem',
+                          height: 32,
+                          px: 1.5,
+                          boxShadow: isSettled ? '0 4px 12px rgba(5, 150, 105, 0.3)' : '0 4px 12px rgba(217, 119, 6, 0.3)'
                         }}
                       />
                     </Box>
 
-                    {/* Privilege Points Earned Banner in Green */}
+                    {/* Privilege Points Accrual Jewel Ribbon */}
                     <Box
                       sx={{
                         mt: 2,
-                        p: 1.2,
+                        p: 1.5,
                         borderRadius: 2.5,
-                        bgcolor: 'rgba(16, 185, 129, 0.1)',
-                        border: '1px solid rgba(16, 185, 129, 0.35)',
+                        bgcolor: 'rgba(16, 185, 129, 0.08)',
+                        border: '1.5px solid rgba(16, 185, 129, 0.3)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between'
                       }}
                     >
-                      <Stack direction="row" spacing={0.8} alignItems="center">
-                        <Box sx={{ fontSize: '1.1rem' }}>✨</Box>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: 'rgba(16, 185, 129, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#059669' }}>
+                          <Stars sx={{ fontSize: 18 }} />
+                        </Box>
                         <Box>
-                          <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, color: '#065F46', lineHeight: 1.2 }}>
-                            Privilege Points {isSettled ? 'Credited' : 'To Earn'}
+                          <Typography sx={{ fontSize: '0.78rem', fontWeight: 800, color: '#065F46', lineHeight: 1.2 }}>
+                            Privilege Rewards {isSettled ? 'Credited' : 'To Accrue'}
                           </Typography>
-                          <Typography sx={{ fontSize: '0.65rem', color: '#047857', fontWeight: 600 }}>
+                          <Typography sx={{ fontSize: '0.68rem', color: '#047857', fontWeight: 600 }}>
                             {customerTier} VIP Member Rewards
                           </Typography>
                         </Box>
                       </Stack>
-                      <Typography sx={{ fontSize: '0.95rem', fontWeight: 900, color: '#059669' }}>
+                      <Typography sx={{ fontSize: '1.05rem', fontWeight: 900, color: '#059669', fontVariantNumeric: 'tabular-nums' }}>
                         +{loyaltyPointsEarned} pts
                       </Typography>
                     </Box>
                   </Paper>
 
-                  {/* Dynamic UPI Payment Card with Tap-to-Zoom */}
+                  {/* Dynamic Payment Terminal Card with Tap-to-Zoom */}
                   <Paper
                     elevation={0}
                     sx={{
                       flex: 1,
-                      p: 2.5,
+                      p: 2.8,
                       borderRadius: 4,
                       bgcolor: '#FFFFFF',
-                      border: '1.5px solid rgba(197, 160, 89, 0.3)',
+                      border: '1.5px solid rgba(197, 160, 89, 0.35)',
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
@@ -2526,44 +2884,51 @@ export default function CustomerDisplay() {
                   >
                     {paymentMethod === 'UPI' && upiUrl ? (
                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-                        {/* Perfect Symmetrical Square QR Frame with Uniform Quiet Zone */}
+                        {/* Terminal Header */}
+                        <Stack direction="row" spacing={0.8} alignItems="center" sx={{ mb: 1.5 }}>
+                          <VerifiedUser sx={{ color: '#0F766E', fontSize: 18 }} />
+                          <Typography variant="overline" sx={{ color: '#0F766E', fontWeight: 900, letterSpacing: '0.12em', fontSize: '0.7rem' }}>
+                            VERIFIED INSTANT UPI CHECKOUT
+                          </Typography>
+                        </Stack>
+
+                        {/* Reticle QR Frame */}
                         <Box
                           onClick={() => setQrZoomOpen(true)}
                           sx={{
-                            p: 2.2,
-                            borderRadius: 3,
+                            p: 2,
+                            borderRadius: 3.5,
                             bgcolor: '#FFFFFF',
-                            border: '2px solid rgba(197, 160, 89, 0.45)',
-                            boxShadow: '0 8px 25px rgba(180, 140, 75, 0.15)',
+                            border: '2px solid rgba(197, 160, 89, 0.5)',
+                            boxShadow: '0 8px 30px rgba(180, 140, 75, 0.18)',
                             display: 'inline-flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             cursor: 'pointer',
                             position: 'relative',
-                            transition: 'all 0.25s ease',
+                            transition: 'all 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
                             '&:hover': {
-                              transform: 'scale(1.03)',
+                              transform: 'scale(1.04)',
                               borderColor: '#937230',
-                              boxShadow: '0 12px 35px rgba(180, 140, 75, 0.25)'
+                              boxShadow: '0 12px 35px rgba(180, 140, 75, 0.28)'
                             }
                           }}
                         >
                           <QRCodeSVG
                             value={upiUrl}
-                            size={180}
+                            size={185}
                             level="M"
                             style={{ display: 'block' }}
                           />
                         </Box>
 
-                        {/* Dedicated Tap to Zoom Chip Placed Cleanly Below (Does NOT overlap QR modules) */}
                         <Chip
                           icon={<ZoomIn sx={{ fontSize: '1.05rem !important', color: '#937230 !important' }} />}
-                          label="Tap QR to Expand Fullscreen"
+                          label="Tap to Expand Fullscreen QR"
                           onClick={() => setQrZoomOpen(true)}
                           size="small"
                           sx={{
-                            mt: 1.4,
+                            mt: 1.5,
                             mb: 1.2,
                             bgcolor: 'rgba(197, 160, 89, 0.12)',
                             color: '#937230',
@@ -2575,18 +2940,15 @@ export default function CustomerDisplay() {
                           }}
                         />
 
-                        <Stack direction="row" spacing={0.8} alignItems="center" sx={{ mb: 0.5 }}>
-                          <QrCode2 sx={{ color: '#937230', fontSize: 20 }} />
-                          <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#0F172A' }}>
-                            Scan to Pay ₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })} via UPI
-                          </Typography>
-                        </Stack>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#0F172A', mb: 0.3 }}>
+                          Scan to Pay ₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                        </Typography>
 
                         <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, maxWidth: 300, mb: 1.5 }}>
                           Google Pay • PhonePe • Paytm • BHIM • All UPI Apps
                         </Typography>
 
-                        {/* Interactive Patron Rating / Compliment Bar during checkout */}
+                        {/* Interactive Experience Rating */}
                         <Box
                           sx={{
                             width: '100%',
@@ -2595,9 +2957,9 @@ export default function CustomerDisplay() {
                             borderTop: '1px solid rgba(197, 160, 89, 0.2)'
                           }}
                         >
-                          <Stack direction="row" spacing={0.5} justifyContent="center" alignItems="center">
+                          <Stack direction="row" spacing={0.8} justifyContent="center" alignItems="center">
                             <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 800, fontSize: '0.74rem' }}>
-                              Experience:
+                              Atelier Service:
                             </Typography>
                             <Rating
                               name="quick-cart-rating"
@@ -2617,11 +2979,11 @@ export default function CustomerDisplay() {
                         </Box>
                       </Box>
                     ) : (
-                      <Box sx={{ py: 3 }}>
+                      <Box sx={{ py: 3, textAlign: 'center', width: '100%' }}>
                         <Box
                           sx={{
-                            width: 68,
-                            height: 68,
+                            width: 72,
+                            height: 72,
                             mx: 'auto',
                             mb: 2,
                             borderRadius: '50%',
@@ -2632,13 +2994,13 @@ export default function CustomerDisplay() {
                             justifyContent: 'center'
                           }}
                         >
-                          <Payments sx={{ color: '#937230', fontSize: 34 }} />
+                          <Payments sx={{ color: '#937230', fontSize: 36 }} />
                         </Box>
                         <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#0F172A' }}>
-                          Tender: {paymentMethod}
+                          Tender Method: {paymentMethod}
                         </Typography>
-                        <Typography variant="body2" sx={{ color: '#64748B', mt: 0.5, maxWidth: 280, fontWeight: 500 }}>
-                          Please proceed with payment at the cashier counter.
+                        <Typography variant="body2" sx={{ color: '#64748B', mt: 0.8, maxWidth: 300, mx: 'auto', fontWeight: 500, fontSize: '0.85rem' }}>
+                          Please proceed with {paymentMethod} settlement at the cashier counter. Your invoice will update instantly upon confirmation.
                         </Typography>
                       </Box>
                     )}

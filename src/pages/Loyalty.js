@@ -25,6 +25,7 @@ import {
     TablePagination,
     Divider,
     InputAdornment,
+    Switch,
     useMediaQuery,
     useTheme
 } from '@mui/material';
@@ -97,12 +98,17 @@ const Loyalty = () => {
     };
 
     const getTierBenefits = (tier) => {
+        const mult = tier === 'Platinum' ? (loyaltySettings?.platinumMultiplier ?? loyaltySettings?.tierMultipliers?.Platinum ?? 2)
+            : tier === 'Gold' ? (loyaltySettings?.goldMultiplier ?? loyaltySettings?.tierMultipliers?.Gold ?? 1.5)
+            : tier === 'Silver' ? (loyaltySettings?.silverMultiplier ?? loyaltySettings?.tierMultipliers?.Silver ?? 1.25)
+            : (loyaltySettings?.bronzeMultiplier ?? loyaltySettings?.tierMultipliers?.Bronze ?? 1);
+
         switch (tier) {
-            case 'Bronze': return '1x points accrual on regular billing';
-            case 'Silver': return '1.25x points + seasonal preview invitations';
-            case 'Gold': return '1.5x points + priority atelier fitting slots';
-            case 'Platinum': return '2x points + bespoke home consultations & private previews';
-            default: return '1x points';
+            case 'Bronze': return `${mult}x points accrual on regular billing`;
+            case 'Silver': return `${mult}x points + seasonal preview invitations`;
+            case 'Gold': return `${mult}x points + priority atelier fitting slots`;
+            case 'Platinum': return `${mult}x points + bespoke home consultations & private previews`;
+            default: return `${mult}x points`;
         }
     };
 
@@ -156,12 +162,15 @@ const Loyalty = () => {
     const handleSettingsOpen = () => {
         setSettingsForm({
             spendPerPoint: loyaltySettings?.spendPerPoint ?? 100,
-            bronzeMultiplier: loyaltySettings?.bronzeMultiplier ?? 1,
-            silverMultiplier: loyaltySettings?.silverMultiplier ?? 1.25,
-            goldMultiplier: loyaltySettings?.goldMultiplier ?? 1.5,
-            platinumMultiplier: loyaltySettings?.platinumMultiplier ?? 2,
+            pointsRedeemRate: loyaltySettings?.pointsRedeemRate ?? 1.0,
+            bronzeMultiplier: loyaltySettings?.bronzeMultiplier ?? loyaltySettings?.tierMultipliers?.Bronze ?? 1,
+            silverMultiplier: loyaltySettings?.silverMultiplier ?? loyaltySettings?.tierMultipliers?.Silver ?? 1.25,
+            goldMultiplier: loyaltySettings?.goldMultiplier ?? loyaltySettings?.tierMultipliers?.Gold ?? 1.5,
+            platinumMultiplier: loyaltySettings?.platinumMultiplier ?? loyaltySettings?.tierMultipliers?.Platinum ?? 2,
             programStartDate: loyaltySettings?.programStartDate ?? '',
-            programExpiryDate: loyaltySettings?.programExpiryDate ?? ''
+            programExpiryDate: loyaltySettings?.programExpiryDate ?? '',
+            pointsExpiryDays: loyaltySettings?.pointsExpiryDays ?? 365,
+            enabled: loyaltySettings?.enabled !== false
         });
         setSettingsOpen(true);
     };
@@ -175,14 +184,17 @@ const Loyalty = () => {
         try {
             await updateLoyaltySettings({
                 spendPerPoint: Number(settingsForm.spendPerPoint),
+                pointsRedeemRate: Math.max(0, parseFloat(settingsForm.pointsRedeemRate) || 1.0),
                 bronzeMultiplier: Number(settingsForm.bronzeMultiplier),
                 silverMultiplier: Number(settingsForm.silverMultiplier),
                 goldMultiplier: Number(settingsForm.goldMultiplier),
                 platinumMultiplier: Number(settingsForm.platinumMultiplier),
-                programStartDate: settingsForm.programStartDate,
-                programExpiryDate: settingsForm.programExpiryDate
+                programStartDate: settingsForm.programStartDate || '',
+                programExpiryDate: settingsForm.programExpiryDate || '',
+                pointsExpiryDays: Number(settingsForm.pointsExpiryDays) || 365,
+                enabled: Boolean(settingsForm.enabled)
             });
-            showToast('Loyalty program settings saved successfully!', 'success');
+            showToast('Loyalty program settings saved successfully and synchronized across platform!', 'success');
             setSettingsOpen(false);
         } catch (err) {
             showToast('Error saving settings: ' + err.message, 'error');
@@ -400,14 +412,19 @@ const Loyalty = () => {
                                 <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(217, 119, 6, 0.12)', color: '#D97706' }}>
                                     <Redeem sx={{ fontSize: 20 }} />
                                 </Box>
-                                <Box>
+                                <Box sx={{ flex: 1 }}>
                                     <Typography variant="body2" sx={{ fontWeight: 750, color: 'text.primary' }}>
                                         Direct Checkout Redemption
                                     </Typography>
                                     <Typography variant="caption" color="text.secondary">
-                                        1 Point = ₹1 immediate discount deduction against any bespoke couture invoice
+                                        1 Point = ₹{loyaltySettings?.pointsRedeemRate ?? 1} immediate discount deduction against any bespoke couture invoice
                                     </Typography>
                                 </Box>
+                                <Chip
+                                    label={`1 pt = ₹${loyaltySettings?.pointsRedeemRate ?? 1}`}
+                                    size="small"
+                                    sx={{ fontWeight: 700, fontSize: '0.7rem', bgcolor: 'rgba(217, 119, 6, 0.12)', color: '#D97706', border: '1px solid rgba(217, 119, 6, 0.3)' }}
+                                />
                             </Box>
 
                             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', p: 1.5, borderRadius: 2.5, bgcolor: 'rgba(16, 185, 129, 0.04)' }}>
@@ -428,14 +445,25 @@ const Loyalty = () => {
                                 <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(100, 116, 139, 0.12)', color: '#64748B' }}>
                                     <History sx={{ fontSize: 20 }} />
                                 </Box>
-                                <Box>
+                                <Box sx={{ flex: 1 }}>
                                     <Typography variant="body2" sx={{ fontWeight: 750, color: 'text.primary' }}>
-                                        Points Validity
+                                        Points Validity & Expiry
                                     </Typography>
                                     <Typography variant="caption" color="text.secondary">
-                                        Reward points remain active for 365 days from date of accrual
+                                        Reward points remain active for {loyaltySettings?.pointsExpiryDays ?? 365} days from date of accrual
                                     </Typography>
+                                    {(loyaltySettings?.programStartDate || loyaltySettings?.programExpiryDate) && (
+                                        <Typography variant="caption" sx={{ display: 'block', color: 'primary.main', fontWeight: 700, mt: 0.2 }}>
+                                            Active Schedule: {loyaltySettings.programStartDate || 'Launch'} to {loyaltySettings.programExpiryDate || 'Continuous'}
+                                        </Typography>
+                                    )}
                                 </Box>
+                                <Chip
+                                    label={loyaltySettings?.enabled === false ? 'PAUSED' : 'ACTIVE'}
+                                    size="small"
+                                    color={loyaltySettings?.enabled === false ? 'default' : 'success'}
+                                    sx={{ fontWeight: 800, fontSize: '0.68rem', height: 22 }}
+                                />
                             </Box>
                         </Box>
                     </Paper>
@@ -799,22 +827,41 @@ const Loyalty = () => {
                 <DialogContent dividers>
                     {settingsForm && (
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}>
-                            <Box>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1.5, color: 'text.primary' }}>Accrual Rate</Typography>
-                                <TextField
-                                    fullWidth
-                                    label="Rupees spent per 1 point earned"
-                                    type="number"
-                                    value={settingsForm.spendPerPoint}
-                                    onChange={(e) => setSettingsForm(p => ({ ...p, spendPerPoint: e.target.value }))}
-                                    InputProps={{
-                                        startAdornment: <InputAdornment position="start">₹</InputAdornment>,
-                                        endAdornment: <InputAdornment position="end">= 1 pt</InputAdornment>,
-                                        inputProps: { min: 1 }
-                                    }}
-                                    helperText="e.g. 100 means every ₹100 spent earns 1 loyalty point"
-                                />
-                            </Box>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1, color: 'text.primary' }}>Accrual Spend Rate</Typography>
+                                    <TextField
+                                        fullWidth
+                                        label="Rupees spent per 1 point earned"
+                                        type="number"
+                                        size="small"
+                                        value={settingsForm.spendPerPoint}
+                                        onChange={(e) => setSettingsForm(p => ({ ...p, spendPerPoint: e.target.value }))}
+                                        InputProps={{
+                                            startAdornment: <InputAdornment position="start">₹</InputAdornment>,
+                                            endAdornment: <InputAdornment position="end">= 1 pt</InputAdornment>,
+                                            inputProps: { min: 1 }
+                                        }}
+                                        helperText="e.g. 100 means ₹100 spent = 1 pt"
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1, color: 'text.primary' }}>Redemption Value</Typography>
+                                    <TextField
+                                        fullWidth
+                                        label="Discount per 1 point redeemed"
+                                        type="number"
+                                        size="small"
+                                        value={settingsForm.pointsRedeemRate}
+                                        onChange={(e) => setSettingsForm(p => ({ ...p, pointsRedeemRate: e.target.value }))}
+                                        InputProps={{
+                                            startAdornment: <InputAdornment position="start">1 pt = ₹</InputAdornment>,
+                                            inputProps: { min: 0.1, step: 0.25 }
+                                        }}
+                                        helperText="e.g. 1 means 1 point = ₹1 discount"
+                                    />
+                                </Grid>
+                            </Grid>
                             <Divider />
                             <Box>
                                 <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1.5, color: 'text.primary' }}>Tier Point Multipliers</Typography>
@@ -836,8 +883,20 @@ const Loyalty = () => {
                             </Box>
                             <Divider />
                             <Box>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1.5, color: 'text.primary' }}>Program Validity Period</Typography>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1.5, color: 'text.primary' }}>Program Validity & Expiry</Typography>
                                 <Grid container spacing={2}>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            fullWidth
+                                            label="Points Validity Period (Days)"
+                                            type="number"
+                                            size="small"
+                                            value={settingsForm.pointsExpiryDays}
+                                            onChange={(e) => setSettingsForm(p => ({ ...p, pointsExpiryDays: e.target.value }))}
+                                            InputProps={{ endAdornment: <InputAdornment position="end">Days</InputAdornment>, inputProps: { min: 30 } }}
+                                            helperText="Earned points expire after this many days (e.g. 365 for 1 year)"
+                                        />
+                                    </Grid>
                                     <Grid item xs={6}>
                                         <TextField
                                             fullWidth
@@ -861,6 +920,22 @@ const Loyalty = () => {
                                         />
                                     </Grid>
                                 </Grid>
+                            </Box>
+                            <Divider />
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <Box>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                                        Loyalty Rewards Status
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                        Enable or pause loyalty accruals across all POS terminals
+                                    </Typography>
+                                </Box>
+                                <Switch
+                                    checked={Boolean(settingsForm.enabled)}
+                                    onChange={(e) => setSettingsForm(p => ({ ...p, enabled: e.target.checked }))}
+                                    color="primary"
+                                />
                             </Box>
                         </Box>
                     )}

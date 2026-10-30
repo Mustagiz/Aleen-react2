@@ -36,7 +36,7 @@ const Invoices = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { inventory, invoices, addInvoice, updateInvoice, deleteInvoice, profile, customers, addCustomer, loading, invoiceTemplateSettings, updateInvoiceTemplateSettings, redeemLoyaltyPoints, updateCustomer } = useData();
+  const { inventory, invoices, addInvoice, updateInvoice, deleteInvoice, profile, customers, addCustomer, loading, invoiceTemplateSettings, updateInvoiceTemplateSettings, loyaltySettings } = useData();
   const { mode } = useThemeContext();
   const isDark = mode === 'dark';
   const [open, setOpen] = useState(false);
@@ -1039,7 +1039,8 @@ const Invoices = () => {
       discountPercent,
       discountAmount,
       loyaltyPointsRedeemed: loyaltyPointsToRedeem,
-      customerTier: matchedCustomer?.loyaltyTier || 'Bronze'
+      customerTier: matchedCustomer?.loyaltyTier || 'Bronze',
+      loyaltySettings
     });
   };
 
@@ -1060,7 +1061,8 @@ const Invoices = () => {
           discountPercent,
           discountAmount,
           loyaltyPointsRedeemed: loyaltyPointsToRedeem,
-          customerTier: matchedCustomer?.loyaltyTier || 'Bronze'
+          customerTier: matchedCustomer?.loyaltyTier || 'Bronze',
+          loyaltySettings
         });
       } else {
         totals = calculateTotal();
@@ -1118,15 +1120,26 @@ const Invoices = () => {
         storeLogo: cleanStoreLogo,
         customerName: cfdCustomer,
         customerPhone: cfdPhone,
-        customerTier: matchedCustomer?.loyaltyTier || 'Silver',
+        hasCustomer: Boolean(cfdCustomer || matchedCustomer),
+        customerTier: matchedCustomer?.loyaltyTier || (cfdCustomer ? 'Bronze' : 'Guest'),
         loyaltyPoints: matchedCustomer?.loyaltyPoints || 0,
+        loyaltyPointsRedeemed: isIdle ? 0 : (totals.loyaltyPointsRedeemed || 0),
+        loyaltyPointsRemaining: isIdle ? 0 : Math.max(0, (matchedCustomer?.loyaltyPoints || 0) - (totals.loyaltyPointsRedeemed || 0)),
         loyaltyDiscount: isIdle ? 0 : (totals.loyaltyDiscount || 0),
-        loyaltyPointsEarned: isIdle ? 0 : (totals.loyaltyPointsEarned || Math.max(15, Math.round((totals.total || 0) * 0.05))),
+        loyaltyPointsEarned: isIdle ? 0 : (totals.loyaltyPointsEarned ?? 0),
+        customerTotalSpent: matchedCustomer?.totalSpent || 0,
+        spendPerPoint: totals.loyaltySpendPerPoint || loyaltySettings?.spendPerPoint || 100,
+        tierMultiplier: totals.loyaltyMultiplier || 1.0,
         items: cfdItems,
         subtotal: isIdle ? 0 : (totals.subtotal || 0),
-        discount: isIdle ? 0 : ((totals.absDiscount || 0) + (totals.loyaltyDiscount || 0)),
+        discount: isIdle ? 0 : (totals.absDiscount || 0),
+        flatDiscount: isIdle ? 0 : (totals.flatDiscount || 0),
+        percentDiscount: isIdle ? 0 : (totals.percentDiscount || 0),
         tax: isIdle ? 0 : (totals.taxAmount || 0),
+        cgst: isIdle ? 0 : (totals.cgst || 0),
+        sgst: isIdle ? 0 : (totals.sgst || 0),
         taxPercent: isIdle ? 0 : (parseFloat(tax) || 0),
+        roundOff: isIdle ? 0 : (totals.roundOff || 0),
         total: isIdle ? 0 : (totals.total || 0),
         paymentMethod: isSplitPayment ? `${paymentMethod} + ${paymentMethod2}` : paymentMethod,
         upiUrl: (!isIdle && (paymentMethod === 'UPI' || (isSplitPayment && (paymentMethod === 'UPI' || paymentMethod2 === 'UPI')))) ? upiUrl : '',
@@ -1295,38 +1308,8 @@ const Invoices = () => {
       }
     }
 
-    // Process Loyalty Points Redemption
-    if (loyaltyPointsToRedeem > 0 && finalCustomerId && redeemLoyaltyPoints) {
-      try {
-        await redeemLoyaltyPoints(finalCustomerId, loyaltyPointsToRedeem);
-      } catch (err) {
-        console.warn('Failed to redeem loyalty points:', err);
-      }
-    }
-
-    // Accrue New Loyalty Points on this purchase
-    let updatedCustomerLoyalty = matchedCustomer?.loyaltyPoints || 0;
-    if (finalCustomerId && loyaltyPointsEarned > 0 && updateCustomer) {
-      updatedCustomerLoyalty = Math.max(0, updatedCustomerLoyalty - loyaltyPointsToRedeem) + loyaltyPointsEarned;
-      try {
-        const history = matchedCustomer?.pointsHistory || [];
-        await updateCustomer(finalCustomerId, {
-          loyaltyPoints: updatedCustomerLoyalty,
-          pointsHistory: [
-            ...history,
-            {
-              date: new Date().toISOString(),
-              points: loyaltyPointsEarned,
-              type: 'earned',
-              reason: `Earned on Bill #${invoiceNumber}`,
-              invoiceId: invoiceNumber
-            }
-          ]
-        });
-      } catch (err) {
-        console.warn('Failed to accrue customer loyalty points:', err);
-      }
-    }
+    // Compute updated customer loyalty points (actual database update is committed atomically in addInvoice batch)
+    const updatedCustomerLoyalty = Math.max(0, (matchedCustomer?.loyaltyPoints || 0) - loyaltyPointsToRedeem) + (loyaltyPointsEarned || 0);
 
     const emiDetails = isEMI ? {
       tenure: emiTenure,
@@ -4958,7 +4941,15 @@ const Invoices = () => {
                       </Box>
                     ) : (
                       <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
-                        Patron will earn points automatically on this bill ({matchedCustomer.loyaltyTier === 'Platinum' ? '2.0x' : matchedCustomer.loyaltyTier === 'Gold' ? '1.5x' : matchedCustomer.loyaltyTier === 'Silver' ? '1.25x' : '1.0x'} VIP multiplier).
+                        {(() => {
+                          const tier = matchedCustomer.loyaltyTier || 'Bronze';
+                          const mult = tier === 'Platinum' ? (loyaltySettings?.platinumMultiplier ?? loyaltySettings?.tierMultipliers?.Platinum ?? 2)
+                            : tier === 'Gold' ? (loyaltySettings?.goldMultiplier ?? loyaltySettings?.tierMultipliers?.Gold ?? 1.5)
+                            : tier === 'Silver' ? (loyaltySettings?.silverMultiplier ?? loyaltySettings?.tierMultipliers?.Silver ?? 1.25)
+                            : (loyaltySettings?.bronzeMultiplier ?? loyaltySettings?.tierMultipliers?.Bronze ?? 1);
+                          const spend = loyaltySettings?.spendPerPoint || 100;
+                          return `Patron will earn points automatically on this bill (${mult}x VIP multiplier • ₹${spend} spent = 1 pt).`;
+                        })()}
                       </Typography>
                     )}
                   </Box>
