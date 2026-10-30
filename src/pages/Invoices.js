@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel, CircularProgress, Alert, Snackbar, InputAdornment, List } from '@mui/material';
-import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, QrCode2, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, PauseCircleOutline, ShoppingCart, RestartAlt, CalendarMonth, Phone, Straighten, Clear, Stars, Redeem, AccountBalanceWallet, Keyboard, Tv, VolumeUp, VolumeOff } from '@mui/icons-material';
+import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel, CircularProgress, Alert, Snackbar, InputAdornment, List, Collapse, Stack } from '@mui/material';
+import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, QrCode2, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, PauseCircleOutline, ShoppingCart, RestartAlt, CalendarMonth, Phone, Straighten, Clear, Stars, Redeem, AccountBalanceWallet, Keyboard, Tv, VolumeUp, VolumeOff, Tune } from '@mui/icons-material';
 import { Html5Qrcode } from 'html5-qrcode';
 import { db } from '../firebase';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
@@ -36,7 +36,7 @@ const Invoices = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { inventory, invoices, addInvoice, updateInvoice, deleteInvoice, profile, customers, addCustomer, loading, invoiceTemplateSettings, updateInvoiceTemplateSettings, loyaltySettings } = useData();
+  const { inventory, invoices, addInvoice, updateInvoice, deleteInvoice, profile, customers, addCustomer, loading, invoiceTemplateSettings, updateInvoiceTemplateSettings, loyaltySettings, updateLoyaltySettings } = useData();
   const { mode } = useThemeContext();
   const isDark = mode === 'dark';
   const [open, setOpen] = useState(false);
@@ -242,6 +242,66 @@ const Invoices = () => {
   const [phone, setPhone] = useState('+91');
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
   const [loyaltyPointsToRedeem, setLoyaltyPointsToRedeem] = useState(0);
+  const [customBonusPoints, setCustomBonusPoints] = useState(0);
+  const [manualPointsEditOpen, setManualPointsEditOpen] = useState(false);
+
+  // Active Dynamic Loyalty Settings (Realtime Context + LocalStorage + BroadcastChannel Sync)
+  const [localLoyaltySettings, setLocalLoyaltySettings] = useState(() => {
+    try {
+      const stored = localStorage.getItem('aleen_loyalty_settings');
+      return stored ? JSON.parse(stored) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+
+  useEffect(() => {
+    const handleStorage = (e) => {
+      if (e.key === 'aleen_loyalty_settings' && e.newValue) {
+        try {
+          setLocalLoyaltySettings(JSON.parse(e.newValue));
+        } catch (err) {}
+      }
+    };
+    const handleCustom = (e) => {
+      if (e.detail) {
+        setLocalLoyaltySettings(prev => ({ ...prev, ...e.detail }));
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('aleen_loyalty_updated', handleCustom);
+
+    let channel;
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        channel = new BroadcastChannel('aleen_pos_sync');
+        channel.onmessage = (event) => {
+          if (event?.data?.type === 'LOYALTY_SETTINGS_UPDATED' && event.data.settings) {
+            setLocalLoyaltySettings(prev => ({ ...prev, ...event.data.settings }));
+          }
+        };
+      }
+    } catch (err) {}
+
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('aleen_loyalty_updated', handleCustom);
+      if (channel) channel.close();
+    };
+  }, []);
+
+  const activeLoyaltySettings = useMemo(() => {
+    return localLoyaltySettings || loyaltySettings || {
+      spendPerPoint: 100,
+      pointsRedeemRate: 1.0,
+      bronzeMultiplier: 1.0,
+      silverMultiplier: 1.25,
+      goldMultiplier: 1.5,
+      platinumMultiplier: 2.0,
+      enabled: true
+    };
+  }, [localLoyaltySettings, loyaltySettings]);
+
   const [cashTendered, setCashTendered] = useState('');
   const [measurementModalOpen, setMeasurementModalOpen] = useState(false);
   const [measurementCustomer, setMeasurementCustomer] = useState(null);
@@ -348,6 +408,8 @@ const Invoices = () => {
     setDiscountAmount('');
     setTax('');
     setLoyaltyPointsToRedeem(0);
+    setCustomBonusPoints(0);
+    setManualPointsEditOpen(false);
     setCashTendered('');
     setPaymentMethod('Cash');
     setIsSplitPayment(false);
@@ -1006,7 +1068,8 @@ const Invoices = () => {
       discountAmount,
       loyaltyPointsRedeemed: loyaltyPointsToRedeem,
       customerTier: matchedCustomer?.loyaltyTier || 'Bronze',
-      loyaltySettings
+      loyaltySettings: activeLoyaltySettings,
+      customBonusPoints: Number(customBonusPoints) || 0
     });
   };
 
@@ -1028,7 +1091,8 @@ const Invoices = () => {
           discountAmount,
           loyaltyPointsRedeemed: loyaltyPointsToRedeem,
           customerTier: matchedCustomer?.loyaltyTier || 'Bronze',
-          loyaltySettings
+          loyaltySettings: activeLoyaltySettings,
+          customBonusPoints: Number(customBonusPoints) || 0
         });
       } else {
         totals = calculateTotal();
@@ -1094,7 +1158,8 @@ const Invoices = () => {
         loyaltyDiscount: isIdle ? 0 : (totals.loyaltyDiscount || 0),
         loyaltyPointsEarned: isIdle ? 0 : (totals.loyaltyPointsEarned ?? 0),
         customerTotalSpent: matchedCustomer?.totalSpent || 0,
-        spendPerPoint: totals.loyaltySpendPerPoint || loyaltySettings?.spendPerPoint || 100,
+        spendPerPoint: totals.loyaltySpendPerPoint || activeLoyaltySettings?.spendPerPoint || 100,
+        pointsRedeemRate: totals.pointsRedeemRate || activeLoyaltySettings?.pointsRedeemRate || 1.0,
         tierMultiplier: totals.loyaltyMultiplier || 1.0,
         items: cfdItems,
         subtotal: isIdle ? 0 : (totals.subtotal || 0),
@@ -1214,7 +1279,7 @@ const Invoices = () => {
   // Sync to CFD whenever cart, payment tender or discount modifies
   useEffect(() => {
     syncCustomerDisplay(null, null, true);
-  }, [selectedItems, customer, phone, discountPercent, discountAmount, tax, loyaltyPointsToRedeem, paymentMethod, isSplitPayment, paymentMethod2, open]);
+  }, [selectedItems, customer, phone, discountPercent, discountAmount, tax, loyaltyPointsToRedeem, customBonusPoints, activeLoyaltySettings, paymentMethod, isSplitPayment, paymentMethod2, open]);
 
   const handleSaveInvoice = async () => {
     // Validate mandatory customer name and 10-digit phone number
@@ -1344,6 +1409,9 @@ const Invoices = () => {
       loyaltyPointsRedeemed: loyaltyPointsToRedeem,
       loyaltyDiscount: loyaltyDiscount || 0,
       loyaltyPointsEarned: loyaltyPointsEarned || 0,
+      customBonusPoints: Number(customBonusPoints) || 0,
+      loyaltySpendPerPoint: loyaltySpendPerPoint || 100,
+      pointsRedeemRate: pointsRedeemRate || 1.0,
       customerLoyaltyBalance: updatedCustomerLoyalty,
       cashTendered: cashChange.cashTendered,
       changeDue: cashChange.changeDue,
@@ -1873,7 +1941,18 @@ const Invoices = () => {
     setDeleteDialogOpen(true);
   };
 
-  const { subtotal, taxAmount, total, absDiscount, loyaltyDiscount, loyaltyPointsEarned } = calculateTotal();
+  const {
+    subtotal,
+    taxAmount,
+    total,
+    absDiscount,
+    loyaltyDiscount,
+    loyaltyPointsEarned,
+    basePointsEarned,
+    loyaltySpendPerPoint,
+    loyaltyMultiplier,
+    pointsRedeemRate
+  } = calculateTotal();
 
   return (
     <Box>
@@ -3528,52 +3607,72 @@ const Invoices = () => {
         }}
       >
         <DialogTitle sx={{
-          background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
+          background: (t) => t.palette.mode === 'dark'
+            ? 'linear-gradient(135deg, #02201E 0%, #042F2E 40%, #0F766E 100%)'
+            : 'linear-gradient(135deg, #042F2E 0%, #0F766E 55%, #115E59 100%)',
           color: '#FFFFFF',
-          px: { xs: 1.5, sm: 2.5 },
-          py: { xs: 1.25, sm: 1.75 },
+          px: { xs: 2, sm: 3 },
+          py: { xs: 1.5, sm: 2 },
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          gap: { xs: 1, sm: 1.5 },
-          borderBottom: '1px solid rgba(255, 255, 255, 0.18)'
+          gap: { xs: 1, sm: 2 },
+          borderBottom: '2px solid rgba(217, 119, 6, 0.45)',
+          position: 'relative'
         }}>
+          {/* Top Metallic Gold Accent */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '3px',
+              background: 'linear-gradient(90deg, #D97706 0%, #F59E0B 50%, #D97706 100%)'
+            }}
+          />
+
           {/* Left: Avatar + Title + Badges */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 }, minWidth: 0, flex: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.25, sm: 2 }, minWidth: 0, flex: 1 }}>
             <Avatar sx={{
-              bgcolor: 'rgba(255, 255, 255, 0.2)',
-              color: '#FFFFFF',
-              width: { xs: 34, sm: 40 },
-              height: { xs: 34, sm: 40 },
+              bgcolor: 'rgba(217, 119, 6, 0.25)',
+              color: '#FDE68A',
+              width: { xs: 38, sm: 44 },
+              height: { xs: 38, sm: 44 },
               flexShrink: 0,
-              border: '1px solid rgba(255, 255, 255, 0.45)',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+              border: '1.5px solid rgba(217, 119, 6, 0.55)',
+              borderRadius: '10px',
+              boxShadow: '0 4px 14px rgba(0, 0, 0, 0.25)'
             }}>
-              <PointOfSale sx={{ fontSize: { xs: 18, sm: 22 }, color: '#FFFFFF !important' }} />
+              <PointOfSale sx={{ fontSize: { xs: 20, sm: 24 }, color: '#FDE68A !important' }} />
             </Avatar>
             <Box sx={{ minWidth: 0, flex: 1 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
                 <Typography sx={{ 
-                  fontWeight: 800, 
-                  fontSize: { xs: '0.92rem', sm: '1.15rem' }, 
-                  letterSpacing: '-0.01em', 
+                  fontWeight: 900, 
+                  fontSize: { xs: '1.15rem', sm: '1.4rem' }, 
+                  letterSpacing: '0.08em', 
                   color: '#FFFFFF !important',
-                  lineHeight: 1.2,
-                  whiteSpace: 'nowrap'
+                  lineHeight: 1.15,
+                  textTransform: 'uppercase',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.25)',
+                  fontFamily: 'inherit'
                 }}>
-                  Create Retail Invoice
+                  INVOICE
                 </Typography>
                 <Chip
-                  label={isMobile ? "POS" : "POS Checkout"}
+                  label={isMobile ? "POS" : "LIVE ATELIER POS"}
                   size="small"
                   sx={{
-                    height: { xs: 18, sm: 20 },
-                    fontSize: { xs: '0.62rem', sm: '0.68rem' },
+                    height: 20,
+                    fontSize: '0.65rem',
                     fontWeight: 800,
-                    bgcolor: 'rgba(255, 255, 255, 0.22)',
-                    color: '#FFFFFF !important',
-                    border: '1px solid rgba(255, 255, 255, 0.45)',
-                    px: { xs: 0.25, sm: 0.5 }
+                    bgcolor: 'rgba(217, 119, 6, 0.25)',
+                    color: '#FDE68A !important',
+                    border: '1px solid rgba(217, 119, 6, 0.45)',
+                    borderRadius: '6px',
+                    letterSpacing: '0.06em',
+                    px: 0.5
                   }}
                 />
               </Box>
@@ -3581,15 +3680,16 @@ const Invoices = () => {
                 variant="caption" 
                 noWrap
                 sx={{ 
-                  color: 'rgba(255, 255, 255, 0.85)', 
+                  color: 'rgba(255, 255, 255, 0.88)', 
                   display: 'block', 
-                  fontSize: { xs: '0.68rem', sm: '0.75rem' },
+                  fontSize: { xs: '0.7rem', sm: '0.78rem' },
                   mt: 0.25,
                   overflow: 'hidden',
-                  textOverflow: 'ellipsis'
+                  textOverflow: 'ellipsis',
+                  letterSpacing: '0.01em'
                 }}
               >
-                Aleen Clothing Luxury Billing & Client Ledger
+                Aleen Luxury Atelier • Retail & Bespoke Billing Console
               </Typography>
             </Box>
           </Box>
@@ -4859,83 +4959,252 @@ const Invoices = () => {
                 })()}
 
                 {/* Loyalty Rewards & Points Redemption Card */}
-                {matchedCustomer && (
+                {matchedCustomer ? (
                   <Box sx={{
-                    p: 1.8,
+                    p: 2,
                     mb: 2,
-                    borderRadius: 2,
-                    bgcolor: 'rgba(217, 119, 6, 0.05)',
-                    border: '1px solid rgba(217, 119, 6, 0.25)'
+                    borderRadius: '12px',
+                    bgcolor: mode === 'dark' ? 'rgba(217, 119, 6, 0.08)' : 'rgba(217, 119, 6, 0.05)',
+                    border: '1px solid rgba(217, 119, 6, 0.3)',
+                    boxShadow: '0 2px 10px rgba(217, 119, 6, 0.06)'
                   }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.2 }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                        <Redeem sx={{ color: '#D97706', fontSize: 18 }} />
-                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#D97706', textTransform: 'uppercase' }}>
+                        <Redeem sx={{ color: '#D97706', fontSize: 20 }} />
+                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#D97706', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                           Loyalty Rewards ({matchedCustomer.loyaltyTier || 'Bronze'})
                         </Typography>
                       </Box>
-                      <Typography variant="caption" sx={{ fontWeight: 700, color: '#475569' }}>
-                        Avail: <strong style={{ color: '#D97706' }}>{matchedCustomer.loyaltyPoints || 0} pts</strong> (₹{(matchedCustomer.loyaltyPoints || 0).toFixed(0)})
+                      <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                        Avail: <strong style={{ color: '#D97706' }}>{matchedCustomer.loyaltyPoints || 0} pts</strong> (₹{((matchedCustomer.loyaltyPoints || 0) * (pointsRedeemRate || 1)).toFixed(0)})
                       </Typography>
                     </Box>
 
-                    {(matchedCustomer.loyaltyPoints || 0) > 0 ? (
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    {/* Redemption Field if patron has points */}
+                    {(matchedCustomer.loyaltyPoints || 0) > 0 && (
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 1.2 }}>
                         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                           <TextField
-                            label="Redeem Points (1 pt = ₹1)"
+                            label={`Redeem Points (1 pt = ₹${pointsRedeemRate || 1})`}
                             type="number"
                             size="small"
                             fullWidth
                             value={loyaltyPointsToRedeem || ''}
                             onChange={(e) => {
-                              const val = Math.max(0, Math.min(matchedCustomer.loyaltyPoints || 0, Math.floor(subtotal), parseInt(e.target.value) || 0));
+                              const maxPts = Math.min(matchedCustomer.loyaltyPoints || 0, Math.floor(subtotal / (pointsRedeemRate || 1)));
+                              const val = Math.max(0, Math.min(maxPts, parseInt(e.target.value) || 0));
                               setLoyaltyPointsToRedeem(val);
                             }}
-                            placeholder={`Max: ${Math.min(matchedCustomer.loyaltyPoints || 0, Math.floor(subtotal))} pts`}
+                            placeholder={`Max: ${Math.min(matchedCustomer.loyaltyPoints || 0, Math.floor(subtotal / (pointsRedeemRate || 1)))} pts`}
+                            InputProps={{ sx: { borderRadius: '9px' } }}
                           />
                           <Button
                             size="small"
                             variant={loyaltyPointsToRedeem > 0 ? 'contained' : 'outlined'}
                             color="warning"
                             onClick={() => {
-                              const maxPoints = Math.min(matchedCustomer.loyaltyPoints || 0, Math.floor(subtotal));
+                              const maxPts = Math.min(matchedCustomer.loyaltyPoints || 0, Math.floor(subtotal / (pointsRedeemRate || 1)));
                               if (loyaltyPointsToRedeem > 0) {
                                 setLoyaltyPointsToRedeem(0);
                               } else {
-                                setLoyaltyPointsToRedeem(maxPoints);
+                                setLoyaltyPointsToRedeem(maxPts);
                               }
                             }}
-                            sx={{ textTransform: 'none', fontWeight: 700, whiteSpace: 'nowrap', minWidth: '90px' }}
+                            sx={{ textTransform: 'none', fontWeight: 700, whiteSpace: 'nowrap', minWidth: '85px', borderRadius: '8px' }}
                           >
                             {loyaltyPointsToRedeem > 0 ? 'Clear' : 'Use Max'}
                           </Button>
                         </Box>
                         {loyaltyPointsToRedeem > 0 && (
-                          <Typography variant="caption" sx={{ color: (t) => t.palette.primary.main, fontWeight: 700 }}>
-                            ✓ ₹{loyaltyPointsToRedeem} discount applied from loyalty points.
+                          <Typography variant="caption" sx={{ color: (t) => t.palette.primary.main, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            ✓ ₹{loyaltyDiscount.toFixed(2)} discount applied ({loyaltyPointsToRedeem} pts redeemed @ ₹{pointsRedeemRate}/pt).
                           </Typography>
                         )}
                       </Box>
-                    ) : (
-                      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
-                        {(() => {
-                          const tier = matchedCustomer.loyaltyTier || 'Bronze';
-                          const mult = tier === 'Platinum' ? (loyaltySettings?.platinumMultiplier ?? loyaltySettings?.tierMultipliers?.Platinum ?? 2)
-                            : tier === 'Gold' ? (loyaltySettings?.goldMultiplier ?? loyaltySettings?.tierMultipliers?.Gold ?? 1.5)
-                            : tier === 'Silver' ? (loyaltySettings?.silverMultiplier ?? loyaltySettings?.tierMultipliers?.Silver ?? 1.25)
-                            : (loyaltySettings?.bronzeMultiplier ?? loyaltySettings?.tierMultipliers?.Bronze ?? 1);
-                          const spend = loyaltySettings?.spendPerPoint || 100;
-                          return `Patron will earn points automatically on this bill (${mult}x VIP multiplier • ₹${spend} spent = 1 pt).`;
-                        })()}
-                      </Typography>
                     )}
+
+                    {/* Dynamic Earning Bar & VIP Settings Details (Always Visible) */}
+                    <Box sx={{
+                      p: 1.2,
+                      borderRadius: '9px',
+                      bgcolor: mode === 'dark' ? 'rgba(15, 118, 110, 0.15)' : 'rgba(15, 118, 110, 0.07)',
+                      border: '1px solid rgba(15, 118, 110, 0.25)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 0.6
+                    }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography variant="caption" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Stars sx={{ fontSize: 16 }} /> Points Earned on this Bill:
+                        </Typography>
+                        <Chip
+                          label={`+${loyaltyPointsEarned} pts`}
+                          size="small"
+                          sx={{
+                            fontWeight: 800,
+                            fontSize: '0.75rem',
+                            bgcolor: (t) => t.palette.primary.main,
+                            color: '#fff',
+                            borderRadius: '6px',
+                            height: 22
+                          }}
+                        />
+                      </Box>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 0.5 }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem' }}>
+                          Rule: ₹{loyaltySpendPerPoint} spent = 1 pt • VIP Tier Multiplier: {loyaltyMultiplier}x
+                          {customBonusPoints > 0 ? ` • Base: +${basePointsEarned} + Bonus: ${customBonusPoints}` : ''}
+                        </Typography>
+                        <Button
+                          size="small"
+                          onClick={() => setManualPointsEditOpen(!manualPointsEditOpen)}
+                          startIcon={<Tune sx={{ fontSize: 14 }} />}
+                          sx={{
+                            py: 0,
+                            px: 0.75,
+                            fontSize: '0.67rem',
+                            fontWeight: 700,
+                            textTransform: 'none',
+                            borderRadius: '6px',
+                            color: (t) => t.palette.primary.main
+                          }}
+                        >
+                          {manualPointsEditOpen ? 'Hide Controls' : 'Adjust / Bonus'}
+                        </Button>
+                      </Box>
+
+                      {/* Manual Bonus & VIP Setting Controls */}
+                      <Collapse in={manualPointsEditOpen}>
+                        <Box sx={{
+                          mt: 1,
+                          pt: 1,
+                          borderTop: '1px dashed rgba(15, 118, 110, 0.25)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 1
+                        }}>
+                          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                            <TextField
+                              label="Manual Bonus Points"
+                              type="number"
+                              size="small"
+                              fullWidth
+                              value={customBonusPoints || ''}
+                              onChange={(e) => setCustomBonusPoints(Math.max(0, parseInt(e.target.value) || 0))}
+                              placeholder="e.g. 50 bonus points"
+                              InputProps={{ sx: { borderRadius: '8px' } }}
+                            />
+                            {customBonusPoints > 0 && (
+                              <Button
+                                size="small"
+                                variant="outlined"
+                                color="secondary"
+                                onClick={() => setCustomBonusPoints(0)}
+                                sx={{ textTransform: 'none', fontWeight: 700, borderRadius: '8px', minWidth: '70px' }}
+                              >
+                                Clear
+                              </Button>
+                            )}
+                          </Box>
+
+                          {/* Quick Bonus Presets */}
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6, flexWrap: 'wrap' }}>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.67rem', fontWeight: 700 }}>
+                              Quick Bonus:
+                            </Typography>
+                            {[10, 25, 50, 100].map((bonus) => (
+                              <Chip
+                                key={bonus}
+                                label={`+${bonus} pts`}
+                                size="small"
+                                clickable
+                                onClick={() => setCustomBonusPoints((prev) => (Number(prev) || 0) + bonus)}
+                                sx={{
+                                  fontWeight: 700,
+                                  fontSize: '0.67rem',
+                                  height: 22,
+                                  borderRadius: '6px',
+                                  bgcolor: 'rgba(217, 119, 6, 0.1)',
+                                  color: '#D97706',
+                                  '&:hover': { bgcolor: 'rgba(217, 119, 6, 0.2)' }
+                                }}
+                              />
+                            ))}
+                          </Box>
+
+                          {/* Quick Spend Rate Setting Syncer */}
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6, flexWrap: 'wrap', pt: 0.5 }}>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.67rem', fontWeight: 700 }}>
+                              Spend Rate:
+                            </Typography>
+                            {[10, 20, 50, 100, 200].map((rate) => (
+                              <Chip
+                                key={rate}
+                                label={`₹${rate}/pt`}
+                                size="small"
+                                clickable
+                                variant={loyaltySpendPerPoint === rate ? 'filled' : 'outlined'}
+                                color={loyaltySpendPerPoint === rate ? 'primary' : 'default'}
+                                onClick={async () => {
+                                  try {
+                                    await updateLoyaltySettings({
+                                      ...activeLoyaltySettings,
+                                      spendPerPoint: rate
+                                    });
+                                  } catch (e) {
+                                    console.error("Error updating rate:", e);
+                                  }
+                                }}
+                                sx={{
+                                  fontWeight: 700,
+                                  fontSize: '0.67rem',
+                                  height: 22,
+                                  borderRadius: '6px'
+                                }}
+                              />
+                            ))}
+                          </Box>
+                        </Box>
+                      </Collapse>
+                    </Box>
+                  </Box>
+                ) : (
+                  <Box sx={{
+                    p: 1.5,
+                    mb: 2,
+                    borderRadius: '10px',
+                    bgcolor: mode === 'dark' ? 'rgba(217, 119, 6, 0.08)' : 'rgba(217, 119, 6, 0.05)',
+                    border: '1px dashed rgba(217, 119, 6, 0.35)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1.2
+                  }}>
+                    <Redeem sx={{ color: '#D97706', fontSize: 20 }} />
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="caption" sx={{ fontWeight: 800, color: '#D97706', display: 'block' }}>
+                        ATELIER VIP REWARDS
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem' }}>
+                        Attach a patron above to redeem loyalty balance and accrue points (₹{loyaltySpendPerPoint} spent = 1 pt).
+                      </Typography>
+                    </Box>
                   </Box>
                 )}
 
                 {/* Taxes & Discounts */}
-                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 1, mb: 2 }}>
-                  <TextField label="GST (%)" type="number" size="small" value={tax} onChange={(e) => setTax(e.target.value)} fullWidth />
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 1.2, mb: 2 }}>
+                  <TextField
+                    label="GST (%)"
+                    type="number"
+                    size="small"
+                    value={tax}
+                    onChange={(e) => setTax(e.target.value)}
+                    fullWidth
+                    InputProps={{
+                      endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                      sx: { borderRadius: '9px' }
+                    }}
+                  />
                   <TextField
                     label="Disc (%)"
                     type="number"
@@ -4943,6 +5212,10 @@ const Invoices = () => {
                     value={discountPercent}
                     onChange={(e) => setDiscountPercent(e.target.value)}
                     fullWidth
+                    InputProps={{
+                      endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                      sx: { borderRadius: '9px' }
+                    }}
                   />
                   <TextField
                     label="Disc (₹)"
@@ -4951,6 +5224,10 @@ const Invoices = () => {
                     value={discountAmount}
                     onChange={(e) => setDiscountAmount(e.target.value)}
                     fullWidth
+                    InputProps={{
+                      startAdornment: <InputAdornment position="start">₹</InputAdornment>,
+                      sx: { borderRadius: '9px' }
+                    }}
                   />
                 </Box>
 
@@ -4958,9 +5235,12 @@ const Invoices = () => {
                 <Box sx={{
                   p: 2.5,
                   borderRadius: '12px',
-                  background: 'linear-gradient(135deg, rgba(15,118,110,0.06) 0%, rgba(217,119,6,0.06) 100%)',
+                  background: mode === 'dark'
+                    ? 'linear-gradient(135deg, rgba(15,118,110,0.18) 0%, rgba(217,119,6,0.12) 100%)'
+                    : 'linear-gradient(135deg, rgba(15,118,110,0.06) 0%, rgba(217,119,6,0.06) 100%)',
                   border: '1px solid',
-                  borderColor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.15)'
+                  borderColor: mode === 'dark' ? 'rgba(217,119,6,0.3)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.2)',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.04)'
                 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                     <Typography variant="body2" color="text.secondary">Gross Subtotal:</Typography>
@@ -4980,7 +5260,7 @@ const Invoices = () => {
                   {loyaltyDiscount > 0 && (
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                       <Typography variant="body2" sx={{ color: '#D97706', fontWeight: 600 }}>
-                        Loyalty Redemption ({loyaltyPointsToRedeem} pts):
+                        Loyalty Redemption ({loyaltyPointsToRedeem} pts @ ₹{pointsRedeemRate}/pt):
                       </Typography>
                       <Typography variant="body2" sx={{ fontWeight: 800, color: '#D97706' }}>
                         - ₹{loyaltyDiscount.toFixed(2).toLocaleString('en-IN')}
@@ -4989,7 +5269,7 @@ const Invoices = () => {
                   )}
 
                   {cashTendered > 0 && (
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, p: 0.8, borderRadius: 1.5, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, p: 0.8, borderRadius: '8px', bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)' }}>
                       <Typography variant="caption" sx={{ fontWeight: 700, color: (t) => t.palette.primary.main }}>
                         Cash Tendered: ₹{cashTendered.toFixed(2)}
                       </Typography>
@@ -5011,7 +5291,7 @@ const Invoices = () => {
                       </Typography>
                       {loyaltyPointsEarned > 0 && (
                         <Typography variant="caption" sx={{ color: (t) => t.palette.primary.main, fontWeight: 700, display: 'block', mt: 0.3 }}>
-                          ✨ +{loyaltyPointsEarned} loyalty pts will be earned
+                          ✨ +{loyaltyPointsEarned} loyalty points will be credited to {matchedCustomer?.name || 'patron'}
                         </Typography>
                       )}
                     </Box>
@@ -5019,7 +5299,7 @@ const Invoices = () => {
                       label={paymentStatus.toUpperCase()}
                       size="small"
                       color={paymentStatus === 'paid' ? 'success' : paymentStatus === 'partial' ? 'warning' : 'default'}
-                      sx={{ fontWeight: 800, fontSize: '0.7rem' }}
+                      sx={{ fontWeight: 800, fontSize: '0.7rem', borderRadius: '6px' }}
                     />
                   </Box>
                 </Box>
@@ -5543,7 +5823,7 @@ const Invoices = () => {
         </DialogTitle>
         <DialogContent sx={{ p: 2.5, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
           {[
-            { key: 'F2', alt: 'Alt+N', label: 'Open New Retail Invoice' },
+            { key: 'F2', alt: 'Alt+N', label: 'Open New INVOICE' },
             { key: 'F4', alt: 'Alt+P', label: 'Instant Pay & Issue Invoice' },
             { key: 'F7', alt: 'Alt+H', label: 'Park or Recall Held Carts' },
             { key: 'F8', alt: '', label: 'Toggle Split Dual-Payment' },

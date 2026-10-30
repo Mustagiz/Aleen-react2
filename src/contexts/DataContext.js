@@ -172,7 +172,39 @@ export const DataProvider = ({ children }) => {
       }
     }, onError('loyalty'));
 
+    // Cross-window and BroadcastChannel listener for zero-latency instant loyalty synchronization
+    const handleStorage = (e) => {
+      if (e.key === 'aleen_loyalty_settings' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          setLoyaltySettings(prev => ({ ...prev, ...parsed }));
+        } catch (err) {}
+      }
+    };
+    const handleCustomUpdate = (e) => {
+      if (e.detail) {
+        setLoyaltySettings(prev => ({ ...prev, ...e.detail }));
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('aleen_loyalty_updated', handleCustomUpdate);
+
+    let loyaltyChannel;
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        loyaltyChannel = new BroadcastChannel('aleen_pos_sync');
+        loyaltyChannel.onmessage = (event) => {
+          if (event?.data?.type === 'LOYALTY_SETTINGS_UPDATED' && event.data.settings) {
+            setLoyaltySettings(prev => ({ ...prev, ...event.data.settings }));
+          }
+        };
+      }
+    } catch (err) {}
+
     return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('aleen_loyalty_updated', handleCustomUpdate);
+      if (loyaltyChannel) loyaltyChannel.close();
       if (unsubInventory) unsubInventory();
       if (unsubInvoices) unsubInvoices();
       if (unsubCustomers) unsubCustomers();
@@ -854,11 +886,33 @@ export const DataProvider = ({ children }) => {
         Platinum: Number(updates.platinumMultiplier ?? updates.tierMultipliers?.Platinum ?? 2)
       }
     };
-    await setDoc(doc(db, 'settings', 'loyalty'), normalized, { merge: true });
+
+    // 1. Immediately update local React context state with zero latency
     setLoyaltySettings(prev => ({ ...prev, ...normalized }));
+
+    // 2. Immediately persist to localStorage for cross-page persistence
     try {
       localStorage.setItem('aleen_loyalty_settings', JSON.stringify(normalized));
     } catch (e) {}
+
+    // 3. Broadcast to all open tabs and windows (POS, Invoices, Customer Display)
+    try {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('aleen_loyalty_updated', { detail: normalized }));
+        if ('BroadcastChannel' in window) {
+          const channel = new BroadcastChannel('aleen_pos_sync');
+          channel.postMessage({ type: 'LOYALTY_SETTINGS_UPDATED', settings: normalized });
+          channel.close();
+        }
+      }
+    } catch (e) {}
+
+    // 4. Persist to Firestore with error resilience
+    try {
+      await setDoc(doc(db, 'settings', 'loyalty'), normalized, { merge: true });
+    } catch (err) {
+      console.warn('Firestore updateLoyaltySettings warning (retained locally):', err);
+    }
   };
 
   const addCustomLoyaltyPoints = async (customerId, points, reason = 'VIP Courtesy Points', startDate = '', expiryDate = '') => {

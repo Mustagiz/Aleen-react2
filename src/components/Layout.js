@@ -864,7 +864,7 @@ export default function Layout() {
                 size="small"
                 startIcon={<Add fontSize="small" sx={{ color: topBarConfig.isColored ? `${theme.palette.primary.main} !important` : '#FFFFFF !important' }} />}
                 onClick={handleQuickBill}
-                title="Create Retail Invoice (Alt + N or F2)"
+                title="INVOICE (Alt + N or F2)"
                 sx={{
                   height: 34,
                   px: 2,

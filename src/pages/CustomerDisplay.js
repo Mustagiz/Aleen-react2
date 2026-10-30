@@ -406,7 +406,15 @@ export default function CustomerDisplay() {
   }, []);
 
   // 2b. Loyalty Program Settings Real-Time Sync
-  const [loyaltySettings, setLoyaltySettings] = useState(null);
+  const [loyaltySettings, setLoyaltySettings] = useState(() => {
+    try {
+      const stored = localStorage.getItem('aleen_loyalty_settings');
+      return stored ? JSON.parse(stored) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+
   useEffect(() => {
     try {
       const unsubLoyalty = onSnapshot(
@@ -418,7 +426,33 @@ export default function CustomerDisplay() {
         },
         (err) => console.warn('CFD Loyalty settings sync warning:', err)
       );
-      return () => unsubLoyalty();
+
+      const handleStorage = (e) => {
+        if (e.key === 'aleen_loyalty_settings' && e.newValue) {
+          try {
+            setLoyaltySettings(JSON.parse(e.newValue));
+          } catch (err) {}
+        }
+      };
+      window.addEventListener('storage', handleStorage);
+
+      let channel;
+      try {
+        if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+          channel = new BroadcastChannel('aleen_pos_sync');
+          channel.onmessage = (event) => {
+            if (event?.data?.type === 'LOYALTY_SETTINGS_UPDATED' && event.data.settings) {
+              setLoyaltySettings(event.data.settings);
+            }
+          };
+        }
+      } catch (err) {}
+
+      return () => {
+        unsubLoyalty();
+        window.removeEventListener('storage', handleStorage);
+        if (channel) channel.close();
+      };
     } catch (err) {
       console.warn('Error attaching Loyalty listener:', err);
     }

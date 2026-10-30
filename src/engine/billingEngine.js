@@ -96,8 +96,8 @@ export const calculateInvoiceTotals = ({
     if (!loyaltySettings) return true;
     if (loyaltySettings.enabled === false) return false;
     const today = new Date().toISOString().split('T')[0];
-    if (loyaltySettings.programStartDate && today < loyaltySettings.programStartDate) return false;
-    if (loyaltySettings.programExpiryDate && today > loyaltySettings.programExpiryDate) return false;
+    if (loyaltySettings.programStartDate && loyaltySettings.programStartDate.trim() !== '' && today < loyaltySettings.programStartDate) return false;
+    if (loyaltySettings.programExpiryDate && loyaltySettings.programExpiryDate.trim() !== '' && today > loyaltySettings.programExpiryDate) return false;
     return true;
   })();
 
@@ -126,6 +126,8 @@ export const calculateInvoiceTotals = ({
     flatDiscount,
     loyaltyPointsRedeemed: pointsRedeemed,
     loyaltyDiscount,
+    basePointsEarned,
+    customBonusPoints: customBonus,
     loyaltyPointsEarned,
     loyaltySpendPerPoint: spendPerPoint,
     loyaltyMultiplier: multiplier,
