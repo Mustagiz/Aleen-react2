@@ -111,25 +111,38 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
     // Dimensions based on template (Standard A4 Sticker Sheets e.g. 3 cols x 8 rows = 24 up)
     const getDimensions = () => {
         switch (template) {
-            case 'small': return { w: '44mm', maxWidth: '44mm', h: '24mm', barH: 22, barW: 1.0 };
-            case 'compact': return { w: '36mm', maxWidth: '36mm', h: '20mm', barH: 18, barW: 0.9 };
-            case 'large': return { w: '90mm', maxWidth: '90mm', h: '42mm', barH: 38, barW: 1.4 };
-            case 'thermal_single': return { w: '52mm', maxWidth: '52mm', h: '32mm', barH: 30, barW: 1.2 };
-            case 'a4_sheet': return { w: '64mm', maxWidth: '64mm', h: '36mm', barH: 32, barW: 1.25 };
-            default: return { w: '64mm', maxWidth: '64mm', h: '34mm', barH: barcodeHeight || 28, barW: 1.15 };
+            case 'small': return { w: '44mm', maxWidth: '44mm', h: '24mm', barH: 18, barW: 1.0 };
+            case 'compact': return { w: '36mm', maxWidth: '36mm', h: '20mm', barH: 15, barW: 0.9 };
+            case 'large': return { w: '90mm', maxWidth: '90mm', h: '42mm', barH: 34, barW: 1.4 };
+            case 'thermal_single': return { w: '52mm', maxWidth: '52mm', h: '32mm', barH: 26, barW: 1.2 };
+            case 'a4_sheet': return { w: '64mm', maxWidth: '64mm', h: '36mm', barH: 28, barW: 1.25 };
+            default: return { w: '64mm', maxWidth: '64mm', h: '34mm', barH: barcodeHeight ? Math.min(barcodeHeight, 30) : 26, barW: 1.15 };
         }
     };
 
     const dims = getDimensions();
+    const isSmall = template === 'small' || template === 'compact';
+    const isLarge = template === 'large' || template === 'a4_sheet';
+
+    const fontScale = fontSize === 'compact' ? 0.85 : fontSize === 'large' ? 1.15 : 1.0;
+    const currency = settings.currencySymbol || '₹';
+    const mrpPrefix = settings.mrpPrefix || 'MRP';
+
+    const formattedCode = formatSkuWithHyphen(value) || String(value || '');
+
+    // Dynamic bar width calculation so barcode fills 82%-88% of tag width, eliminating dead margin space
+    const estimatedModules = (formattedCode.length * 11) + 35;
+    const targetTagPxWidth = isSmall ? 140 : isLarge ? 290 : template === 'compact' ? 115 : 210;
+    const computedBarW = Math.max(dims.barW, Math.min(2.3, Number(((targetTagPxWidth * 0.86) / estimatedModules).toFixed(2))));
 
     useEffect(() => {
         if (barcodeRef.current && value) {
             try {
-                JsBarcode(barcodeRef.current, formatSkuWithHyphen(value) || String(value), {
+                JsBarcode(barcodeRef.current, formattedCode, {
                     format: "CODE128",
-                    width: dims.barW,
+                    width: computedBarW,
                     height: dims.barH,
-                    displayValue: false, // We render custom SKU typography below barcode for razor-sharp clarity
+                    displayValue: false, // Custom luxury typography rendered underneath for razor-sharp clarity
                     margin: 0,
                     background: "#ffffff",
                     lineColor: "#000000"
@@ -138,14 +151,7 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                 console.warn("Barcode rendering warning:", e);
             }
         }
-    }, [value, dims.barH, dims.barW]);
-
-    const isSmall = template === 'small' || template === 'compact';
-    const isLarge = template === 'large' || template === 'a4_sheet';
-
-    const fontScale = fontSize === 'compact' ? 0.85 : fontSize === 'large' ? 1.15 : 1.0;
-    const currency = settings.currencySymbol || '₹';
-    const mrpPrefix = settings.mrpPrefix || 'MRP';
+    }, [value, formattedCode, computedBarW, dims.barH]);
 
     // Support for Custom Sales Price and Custom MRP per garment
     const sellingPrice = product?.customPrice !== undefined
@@ -156,18 +162,13 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
         ? (product.customMrp === '' ? 0 : Number(product.customMrp))
         : (product?.mrp ? Number(product.mrp) : Math.round(sellingPrice * (settings.mrpMultiplier || 1.25)));
 
-    const specText = [
-        product?.size && product.size !== 'Free Size' ? product.size : null,
-        product?.color || null,
-        showCategory && product?.category ? product.category : null
-    ].filter(Boolean).join(' • ') || (product?.variantName || (product?.size ? `${product.size}` : 'Free Size'));
+    const sizeDisplay = product?.size && product.size !== 'Free Size' ? product.size : 'FREE SIZE';
+    const colorDisplay = product?.color || null;
 
     return (
         <Box
             sx={{
-                border: '1px solid #1E293B',
-                p: isSmall ? '2px 4px' : '4px 6px',
-                textAlign: 'center',
+                border: '1.5px solid #0F172A',
                 borderRadius: '4px',
                 overflow: 'hidden',
                 minHeight: dims.h,
@@ -177,7 +178,6 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                alignItems: 'center',
                 breakInside: 'avoid',
                 bgcolor: '#FFFFFF',
                 color: '#000000',
@@ -185,138 +185,330 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                 boxSizing: 'border-box',
                 fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                 position: 'relative',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
                 '@media print': {
-                    border: '1px solid #94A3B8',
+                    border: '1.5px solid #000000 !important',
                     pageBreakInside: 'avoid',
                     breakInside: 'avoid',
-                    boxShadow: 'none',
+                    boxShadow: 'none !important',
                     width: '100% !important',
                     maxWidth: `${dims.maxWidth || dims.w} !important`,
                     height: `${dims.h} !important`,
                     bgcolor: '#FFFFFF !important',
-                    color: '#000000 !important'
+                    color: '#000000 !important',
+                    WebkitPrintColorAdjust: 'exact',
+                    printColorAdjust: 'exact'
                 }
             }}
         >
-            {/* Top Brand & Header Section */}
-            <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                {showBusiness && (
+            {/* Top Branded Atelier Ribbon */}
+            {showBusiness && (
+                <Box
+                    sx={{
+                        width: '100%',
+                        bgcolor: '#0F172A',
+                        color: '#FFFFFF',
+                        px: isSmall ? 0.6 : 1,
+                        py: isSmall ? 0.2 : 0.35,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        boxSizing: 'border-box',
+                        lineHeight: 1,
+                        '@media print': {
+                            bgcolor: '#000000 !important',
+                            color: '#FFFFFF !important',
+                            WebkitPrintColorAdjust: 'exact',
+                            printColorAdjust: 'exact'
+                        }
+                    }}
+                >
                     <Typography
                         sx={{
-                            fontSize: `${(isSmall ? 7 : isLarge ? 10.5 : 9) * fontScale}px`,
+                            fontSize: `${(isSmall ? 6.5 : isLarge ? 11 : 8.5) * fontScale}px`,
                             fontWeight: 900,
-                            lineHeight: 1.1,
+                            lineHeight: 1,
                             textTransform: 'uppercase',
-                            letterSpacing: '0.12em',
-                            color: '#000000',
-                            maxWidth: '100%',
+                            letterSpacing: '0.14em',
+                            color: '#FFFFFF',
                             overflow: 'hidden',
                             whiteSpace: 'nowrap',
-                            textOverflow: 'ellipsis',
-                            pb: 0.2
+                            textOverflow: 'ellipsis'
                         }}
                     >
                         {businessName || 'ALEEN CLOTHING'}
                     </Typography>
-                )}
-
-                {/* Garment Title */}
-                {showName && (
                     <Typography
                         sx={{
-                            fontSize: `${(isSmall ? 7.5 : isLarge ? 11.5 : 9.5) * fontScale}px`,
+                            fontSize: `${(isSmall ? 5 : isLarge ? 7.5 : 6) * fontScale}px`,
                             fontWeight: 800,
-                            lineHeight: 1.15,
-                            width: '100%',
-                            overflow: 'hidden',
-                            whiteSpace: 'nowrap',
-                            textOverflow: 'ellipsis',
-                            color: '#0F172A',
-                            letterSpacing: '0.01em'
+                            lineHeight: 1,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.18em',
+                            color: 'rgba(255,255,255,0.85)',
+                            display: isSmall && template === 'compact' ? 'none' : 'block'
                         }}
                     >
-                        {product?.name || 'Garment Item'}
+                        ATELIER
                     </Typography>
-                )}
+                </Box>
+            )}
 
-                {/* Variant & Spec Capsule */}
-                {showSizeColor && specText && (
-                    <Box
-                        sx={{
-                            display: 'inline-block',
-                            mt: 0.2,
-                            px: 0.6,
-                            py: 0.1,
-                            bgcolor: '#F1F5F9',
-                            borderRadius: '3px',
-                            maxWidth: '96%',
-                            overflow: 'hidden',
-                            whiteSpace: 'nowrap',
-                            textOverflow: 'ellipsis',
-                            lineHeight: 1
-                        }}
-                    >
+            {/* Product Details Bar (Name + Category on Left, Size/Color Badge on Right - Eliminates Dead Margin Space) */}
+            <Box
+                sx={{
+                    width: '100%',
+                    px: isSmall ? 0.5 : 0.9,
+                    pt: showBusiness ? (isSmall ? 0.25 : 0.35) : (isSmall ? 0.5 : 0.7),
+                    pb: 0.15,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    boxSizing: 'border-box',
+                    gap: 0.5
+                }}
+            >
+                {/* Left Side: Product Name & Category */}
+                <Box sx={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
+                    {showName && (
                         <Typography
-                            component="span"
                             sx={{
-                                fontSize: `${(isSmall ? 6.5 : 7.5) * fontScale}px`,
-                                fontWeight: 700,
-                                color: '#475569',
-                                lineHeight: 1,
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.04em'
+                                fontSize: `${(isSmall ? 7 : isLarge ? 11 : 9) * fontScale}px`,
+                                fontWeight: 800,
+                                lineHeight: 1.15,
+                                color: '#0F172A',
+                                overflow: 'hidden',
+                                whiteSpace: 'nowrap',
+                                textOverflow: 'ellipsis',
+                                letterSpacing: '0.01em',
+                                textTransform: 'uppercase'
                             }}
                         >
-                            {specText}
+                            {product?.name || 'Garment Item'}
                         </Typography>
+                    )}
+                    {showCategory && product?.category && (
+                        <Typography
+                            sx={{
+                                fontSize: `${(isSmall ? 5 : isLarge ? 7.5 : 6) * fontScale}px`,
+                                fontWeight: 700,
+                                color: '#64748B',
+                                lineHeight: 1,
+                                letterSpacing: '0.05em',
+                                textTransform: 'uppercase',
+                                mt: 0.2
+                            }}
+                        >
+                            {product.category}
+                        </Typography>
+                    )}
+                </Box>
+
+                {/* Right Side: Size Capsule Pill & Color */}
+                {showSizeColor && (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0, gap: 0.2 }}>
+                        <Box
+                            sx={{
+                                bgcolor: '#0F172A',
+                                color: '#FFFFFF',
+                                px: isSmall ? 0.35 : 0.55,
+                                py: 0.12,
+                                borderRadius: '2px',
+                                lineHeight: 1,
+                                '@media print': {
+                                    bgcolor: '#000000 !important',
+                                    color: '#FFFFFF !important',
+                                    WebkitPrintColorAdjust: 'exact',
+                                    printColorAdjust: 'exact'
+                                }
+                            }}
+                        >
+                            <Typography
+                                sx={{
+                                    fontSize: `${(isSmall ? 5.5 : isLarge ? 8 : 6.5) * fontScale}px`,
+                                    fontWeight: 900,
+                                    lineHeight: 1,
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.04em'
+                                }}
+                            >
+                                {sizeDisplay}
+                            </Typography>
+                        </Box>
+                        {colorDisplay && (
+                            <Typography
+                                sx={{
+                                    fontSize: `${(isSmall ? 5 : isLarge ? 7 : 6) * fontScale}px`,
+                                    fontWeight: 700,
+                                    color: '#475569',
+                                    lineHeight: 1,
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.04em'
+                                }}
+                            >
+                                {colorDisplay}
+                            </Typography>
+                        )}
                     </Box>
                 )}
             </Box>
 
-            {/* Barcode SVG */}
-            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', my: 0.15 }}>
-                <svg ref={barcodeRef} style={{ maxWidth: '98%', height: `${dims.barH}px`, display: 'block' }}></svg>
-            </Box>
+            {/* High-Density Barcode & Framed Monospace SKU Area */}
+            <Box
+                sx={{
+                    width: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    my: 'auto',
+                    px: 0.4
+                }}
+            >
+                <svg
+                    ref={barcodeRef}
+                    style={{
+                        maxWidth: '96%',
+                        height: `${dims.barH}px`,
+                        display: 'block',
+                        margin: '0 auto'
+                    }}
+                ></svg>
 
-            {/* Bottom SKU & Pricing Section */}
-            <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                {/* Monospace SKU with Subtle Flanking Rules */}
                 {showSku && (
-                    <Typography
+                    <Box
                         sx={{
-                            fontSize: `${(isSmall ? 7 : isLarge ? 9.5 : 8.5) * fontScale}px`,
-                            fontWeight: 800,
-                            fontFamily: '"SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace',
-                            letterSpacing: '0.14em',
-                            lineHeight: 1,
-                            color: '#1E293B',
-                            textTransform: 'uppercase',
-                            mb: 0.3
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '92%',
+                            gap: 0.6,
+                            mt: 0.2
                         }}
                     >
-                        {formatSkuWithHyphen(value)}
-                    </Typography>
-                )}
-
-                {/* Price & MRP Row */}
-                {showPrice && (
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.75, width: '100%', flexWrap: 'nowrap' }}>
-                        {showMrp && mrpPrice > 0 && (
-                            <Typography
-                                sx={{
-                                    fontSize: `${(isSmall ? 6.5 : 8) * fontScale}px`,
-                                    color: '#64748B',
-                                    textDecoration: 'line-through',
-                                    fontWeight: 600,
-                                    lineHeight: 1,
-                                    whiteSpace: 'nowrap'
-                                }}
-                            >
-                                {mrpPrefix} {currency}{mrpPrice.toLocaleString('en-IN')}
-                            </Typography>
-                        )}
+                        <Box sx={{ flex: 1, height: '1px', bgcolor: '#E2E8F0', '@media print': { bgcolor: '#CBD5E1 !important' } }} />
                         <Typography
                             sx={{
-                                fontSize: `${(isSmall ? 9.5 : isLarge ? 14 : 11.5) * fontScale}px`,
+                                fontSize: `${(isSmall ? 6 : isLarge ? 9 : 7.5) * fontScale}px`,
+                                fontWeight: 800,
+                                fontFamily: '"SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace',
+                                letterSpacing: '0.15em',
+                                lineHeight: 1,
+                                color: '#1E293B',
+                                textTransform: 'uppercase',
+                                whiteSpace: 'nowrap'
+                            }}
+                        >
+                            {formattedCode}
+                        </Typography>
+                        <Box sx={{ flex: 1, height: '1px', bgcolor: '#E2E8F0', '@media print': { bgcolor: '#CBD5E1 !important' } }} />
+                    </Box>
+                )}
+            </Box>
+
+            {/* Bottom Commercial & Price Footer */}
+            {showPrice && (
+                <Box
+                    sx={{
+                        width: '100%',
+                        borderTop: '1px solid #0F172A',
+                        bgcolor: '#F8FAFC',
+                        px: isSmall ? 0.6 : 0.9,
+                        py: isSmall ? 0.2 : 0.35,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        boxSizing: 'border-box',
+                        '@media print': {
+                            borderTop: '1px solid #000000 !important',
+                            bgcolor: '#FFFFFF !important'
+                        }
+                    }}
+                >
+                    {/* Left Side: MRP & Legal Tax Note */}
+                    <Box sx={{ textAlign: 'left', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                        {showMrp && mrpPrice > 0 ? (
+                            <>
+                                <Typography
+                                    sx={{
+                                        fontSize: `${(isSmall ? 5.5 : isLarge ? 8 : 6.8) * fontScale}px`,
+                                        color: '#64748B',
+                                        textDecoration: 'line-through',
+                                        fontWeight: 700,
+                                        lineHeight: 1,
+                                        whiteSpace: 'nowrap'
+                                    }}
+                                >
+                                    {mrpPrefix} {currency}{mrpPrice.toLocaleString('en-IN')}
+                                </Typography>
+                                <Typography
+                                    sx={{
+                                        fontSize: `${(isSmall ? 4.5 : isLarge ? 6 : 5) * fontScale}px`,
+                                        color: '#94A3B8',
+                                        fontWeight: 600,
+                                        lineHeight: 1,
+                                        letterSpacing: '0.04em',
+                                        textTransform: 'uppercase',
+                                        mt: 0.2,
+                                        whiteSpace: 'nowrap'
+                                    }}
+                                >
+                                    (Incl. all taxes)
+                                </Typography>
+                            </>
+                        ) : (
+                            <Typography
+                                sx={{
+                                    fontSize: `${(isSmall ? 5 : isLarge ? 7 : 5.8) * fontScale}px`,
+                                    color: '#64748B',
+                                    fontWeight: 700,
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.05em'
+                                }}
+                            >
+                                Atelier Tag
+                            </Typography>
+                        )}
+                    </Box>
+
+                    {/* Center: Discount Badge if applicable */}
+                    {settings.showDiscountBadge && mrpPrice > sellingPrice && (
+                        <Box
+                            sx={{
+                                bgcolor: '#000000',
+                                color: '#FFFFFF',
+                                px: 0.4,
+                                py: 0.1,
+                                borderRadius: '2px',
+                                mx: 0.4,
+                                '@media print': {
+                                    bgcolor: '#000000 !important',
+                                    color: '#FFFFFF !important',
+                                    WebkitPrintColorAdjust: 'exact',
+                                    printColorAdjust: 'exact'
+                                }
+                            }}
+                        >
+                            <Typography
+                                sx={{
+                                    fontSize: `${(isSmall ? 5 : isLarge ? 7.5 : 6) * fontScale}px`,
+                                    fontWeight: 900,
+                                    lineHeight: 1,
+                                    whiteSpace: 'nowrap',
+                                    letterSpacing: '0.02em'
+                                }}
+                            >
+                                {Math.round(((mrpPrice - sellingPrice) / mrpPrice) * 100)}% OFF
+                            </Typography>
+                        </Box>
+                    )}
+
+                    {/* Right Side: Selling Price */}
+                    <Box sx={{ textAlign: 'right' }}>
+                        <Typography
+                            sx={{
+                                fontSize: `${(isSmall ? 8.5 : isLarge ? 13 : 11) * fontScale}px`,
                                 fontWeight: 900,
                                 lineHeight: 1,
                                 color: '#000000',
@@ -326,27 +518,9 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                         >
                             {currency}{sellingPrice.toLocaleString('en-IN')}
                         </Typography>
-                        {settings.showDiscountBadge && mrpPrice > sellingPrice && (
-                            <Typography
-                                sx={{
-                                    fontSize: `${(isSmall ? 6 : 7.5) * fontScale}px`,
-                                    fontWeight: 900,
-                                    bgcolor: '#0F172A',
-                                    color: '#FFFFFF',
-                                    px: 0.45,
-                                    py: 0.1,
-                                    borderRadius: '3px',
-                                    lineHeight: 1,
-                                    whiteSpace: 'nowrap',
-                                    letterSpacing: '0.02em'
-                                }}
-                            >
-                                {Math.round(((mrpPrice - sellingPrice) / mrpPrice) * 100)}% OFF
-                            </Typography>
-                        )}
                     </Box>
-                )}
-            </Box>
+                </Box>
+            )}
         </Box>
     );
 };
