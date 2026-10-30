@@ -673,37 +673,14 @@ export default function CustomerDisplay() {
     ? (customerName && customerName.toLowerCase() !== 'honoured patron' ? customerName : (isSettled ? lastKnownCustomerName : ''))
     : '';
 
-  // Celebration state triggered on settlement + Auto return to homepage
+  // Celebration state triggered on settlement (remains on screen until cashier clicks Done)
   const [showCelebration, setShowCelebration] = useState(false);
   useEffect(() => {
     if (isSettled) {
       setShowCelebration(true);
-      const celebrationTimer = setTimeout(() => setShowCelebration(false), 3000);
-
-      // Auto-return to Atelier Home Showcase after 4 seconds
-      const autoReturnTimer = setTimeout(() => {
-        setCfdState((prev) => ({
-          ...prev,
-          status: 'idle',
-          items: [],
-          total: 0,
-          customerName: '',
-          updatedAt: Date.now()
-        }));
-        try {
-          localStorage.setItem('aleen_cfd_state', JSON.stringify({
-            status: 'idle',
-            items: [],
-            total: 0,
-            customerName: '',
-            updatedAt: Date.now()
-          }));
-        } catch (e) {}
-      }, 4000);
-
+      const celebrationTimer = setTimeout(() => setShowCelebration(false), 3500);
       return () => {
         clearTimeout(celebrationTimer);
-        clearTimeout(autoReturnTimer);
       };
     } else {
       setShowCelebration(false);

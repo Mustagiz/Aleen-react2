@@ -50,6 +50,10 @@ const Invoices = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [successInvoice, setSuccessInvoice] = useState(null);
+  const successInvoiceRef = useRef(null);
+  useEffect(() => {
+    successInvoiceRef.current = successInvoice;
+  }, [successInvoice]);
   const [invoiceSettings, setInvoiceSettings] = useState(() => invoiceTemplateSettings || getStoredInvoiceSettings());
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [cashDrawerModalOpen, setCashDrawerModalOpen] = useState(false);
@@ -1107,6 +1111,9 @@ const Invoices = () => {
         status = 'idle';
       } else if (overrideStatus) {
         status = overrideStatus;
+      } else if (successInvoiceRef.current || successInvoice) {
+        // While Bill Generated Successfully modal is open, retain settled display until cashier clicks Done!
+        return;
       } else if (!open) {
         status = 'idle';
       } else if (validItems.length > 0) {
@@ -1118,12 +1125,8 @@ const Invoices = () => {
         cfdLastSettledTimeRef.current = 0;
         status = 'active';
       } else if (cfdLastSettledTimeRef.current > 0) {
-        // Keep settled view on screen during the 4-second thank-you window without clearing items
-        if (Date.now() - cfdLastSettledTimeRef.current < 4500) {
-          return;
-        }
-        cfdLastSettledTimeRef.current = 0;
-        status = 'idle';
+        // Retain settled display until cashier clicks Done
+        return;
       } else {
         status = 'idle';
       }
@@ -1453,35 +1456,23 @@ const Invoices = () => {
     };
     // Broadcast instant settlement to customer screen before database writes (0ms delay)
     const isPaid = computedPaymentStatus === 'paid';
+    cfdLastSettledTimeRef.current = Date.now();
+    syncCustomerDisplay('settled', null, true);
     if (isPaid) {
-      cfdLastSettledTimeRef.current = Date.now();
-      syncCustomerDisplay('settled', null, true);
       speakBillSettlement(total);
+    }
 
-      // Auto-return customer display to homepage (idle) after 4 seconds
-      if (cfdAutoIdleTimerRef.current) {
-        clearTimeout(cfdAutoIdleTimerRef.current);
-      }
-      cfdAutoIdleTimerRef.current = setTimeout(() => {
-        cfdLastSettledTimeRef.current = 0;
-        if (syncCustomerDisplayRef.current) {
-          syncCustomerDisplayRef.current('idle', null, true, []);
-        }
-        cfdAutoIdleTimerRef.current = null;
-      }, 4000);
-    } else {
-      if (cfdAutoIdleTimerRef.current) {
-        clearTimeout(cfdAutoIdleTimerRef.current);
-        cfdAutoIdleTimerRef.current = null;
-      }
-      if (syncCustomerDisplayRef.current) {
-        syncCustomerDisplayRef.current('idle', null, true, []);
-      }
+    // Cancel any old idle timer - screen must remain on settled bill until cashier clicks Done
+    if (cfdAutoIdleTimerRef.current) {
+      clearTimeout(cfdAutoIdleTimerRef.current);
+      cfdAutoIdleTimerRef.current = null;
     }
 
     const savedInvoice = await addInvoice(invoice);
+    const finalInvoice = savedInvoice || invoice;
+    successInvoiceRef.current = finalInvoice;
+    setSuccessInvoice(finalInvoice); // Show success dialog with persisted invoice
     setOpen(false);
-    setSuccessInvoice(savedInvoice || invoice); // Show success dialog with persisted invoice
     resetInvoiceForm();
   };
 
@@ -5569,6 +5560,7 @@ const Invoices = () => {
             cfdAutoIdleTimerRef.current = null;
           }
           cfdLastSettledTimeRef.current = 0;
+          successInvoiceRef.current = null;
           setSuccessInvoice(null);
           if (syncCustomerDisplayRef.current) {
             syncCustomerDisplayRef.current('idle', null, true, []);
@@ -5587,6 +5579,7 @@ const Invoices = () => {
             cfdAutoIdleTimerRef.current = null;
           }
           cfdLastSettledTimeRef.current = 0;
+          successInvoiceRef.current = null;
           setSuccessInvoice(null);
           handleOpenNewInvoice();
         }}
