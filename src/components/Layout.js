@@ -825,41 +825,38 @@ export default function Layout() {
                 variant="outlined"
                 startIcon={<PointOfSale sx={{
                   fontSize: '15px !important',
-                  color: designSystem === 'material'
-                    ? (isDark ? '#8AB4F8 !important' : '#1A73E8 !important')
-                    : (topBarConfig.isColored ? '#FFFFFF !important' : (isDark ? '#34D399 !important' : '#059669 !important'))
+                  color: topBarConfig.isColored 
+                    ? '#FFFFFF !important' 
+                    : (isDark ? `${theme.palette.primary.light} !important` : `${theme.palette.primary.main} !important`)
                 }} />}
                 onClick={() => setCashDrawerOpen(true)}
                 sx={{
                   height: 34,
                   fontSize: '0.74rem',
                   fontWeight: designSystem === 'microsoft' ? 600 : 700,
-                  bgcolor: designSystem === 'material'
-                    ? (isDark ? 'rgba(66, 133, 244, 0.16) !important' : '#E8F0FE !important')
-                    : (designSystem === 'microsoft'
-                      ? 'rgba(255, 255, 255, 0.14) !important'
-                      : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.18) !important' : (isDark ? 'rgba(16, 185, 129, 0.12)' : '#DCFCE7'))),
-                  color: designSystem === 'material'
-                    ? (isDark ? '#8AB4F8 !important' : '#1A73E8 !important')
-                    : (topBarConfig.isColored ? '#FFFFFF !important' : (isDark ? '#34D399' : '#047857')),
-                  borderColor: designSystem === 'material'
-                    ? 'transparent !important'
-                    : (designSystem === 'microsoft'
-                      ? 'rgba(255, 255, 255, 0.35) !important'
-                      : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.5) !important' : 'rgba(16, 185, 129, 0.35)')),
+                  bgcolor: topBarConfig.isColored
+                    ? 'rgba(255, 255, 255, 0.16) !important'
+                    : (isDark ? `${theme.palette.primary.main}1F !important` : `${theme.palette.primary.main}12 !important`),
+                  color: topBarConfig.isColored
+                    ? '#FFFFFF !important'
+                    : (isDark ? theme.palette.primary.light : (theme.palette.primary.dark || theme.palette.primary.main)),
+                  borderColor: topBarConfig.isColored
+                    ? 'rgba(255, 255, 255, 0.35) !important'
+                    : `${theme.palette.primary.main}38 !important`,
                   borderRadius: designSystem === 'material'
                     ? '20px !important'
-                    : (designSystem === 'microsoft' ? '4px !important' : `${activeSystemConfig?.shape?.buttonRadius || 6}px !important`),
+                    : (designSystem === 'microsoft' ? '4px !important' : `${activeSystemConfig?.shape?.buttonRadius || 8}px !important`),
                   px: 1.5,
-                  display: { xs: 'none', lg: 'inline-flex' },
+                  display: { xs: 'none', md: 'inline-flex' },
                   textTransform: 'none',
+                  transition: 'all 0.2s ease',
                   '&:hover': {
-                    bgcolor: designSystem === 'material'
-                      ? (isDark ? 'rgba(66, 133, 244, 0.28) !important' : '#D2E3FC !important')
-                      : (designSystem === 'microsoft'
-                        ? 'rgba(255, 255, 255, 0.24) !important'
-                        : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.28) !important' : (isDark ? 'rgba(16, 185, 129, 0.2)' : '#BBF7D0'))),
-                    borderColor: designSystem === 'material' ? 'transparent !important' : 'rgba(255, 255, 255, 0.7) !important'
+                    bgcolor: topBarConfig.isColored
+                      ? 'rgba(255, 255, 255, 0.26) !important'
+                      : (isDark ? `${theme.palette.primary.main}33 !important` : `${theme.palette.primary.main}22 !important`),
+                    borderColor: topBarConfig.isColored
+                      ? 'rgba(255, 255, 255, 0.6) !important'
+                      : `${theme.palette.primary.main} !important`
                   }
                 }}
               >
@@ -877,10 +874,10 @@ export default function Layout() {
                     width: 36,
                     height: 36,
                     display: { xs: 'inline-flex', sm: 'none' },
-                    borderRadius: designSystem === 'material' ? '50%' : (designSystem === 'microsoft' ? '4px' : `${activeSystemConfig?.shape?.buttonRadius || 6}px`),
-                    bgcolor: designSystem === 'material' ? '#1A73E8' : (topBarConfig.isColored ? '#FFFFFF' : theme.palette.secondary.main),
-                    color: designSystem === 'material' ? '#FFFFFF' : (topBarConfig.isColored ? theme.palette.primary.main : '#FFFFFF'),
-                    boxShadow: designSystem === 'material' ? '0 1px 3px 0 rgba(60,64,67,0.3)' : (topBarConfig.isColored ? '0 2px 8px rgba(0,0,0,0.2)' : `0 2px 8px ${theme.palette.secondary.main}59`),
+                    borderRadius: designSystem === 'material' ? '50%' : (designSystem === 'microsoft' ? '4px' : `${activeSystemConfig?.shape?.buttonRadius || 8}px`),
+                    bgcolor: topBarConfig.isColored ? '#FFFFFF' : theme.palette.primary.main,
+                    color: topBarConfig.isColored ? theme.palette.primary.main : (theme.palette.primary.contrastText || '#FFFFFF'),
+                    boxShadow: topBarConfig.isColored ? '0 2px 8px rgba(0,0,0,0.2)' : `0 2px 8px ${theme.palette.primary.main}59`,
                     '&:hover': {
                       filter: 'brightness(0.92)'
                     }
@@ -895,11 +892,7 @@ export default function Layout() {
                 variant="contained"
                 size="small"
                 startIcon={<Add fontSize="small" sx={{
-                  color: designSystem === 'material'
-                    ? '#FFFFFF !important'
-                    : (designSystem === 'microsoft'
-                      ? '#0F6CBD !important'
-                      : (topBarConfig.isColored ? `${theme.palette.primary.main} !important` : '#FFFFFF !important'))
+                  color: topBarConfig.isColored ? `${theme.palette.primary.main} !important` : `${theme.palette.primary.contrastText || '#FFFFFF'} !important`
                 }} />}
                 onClick={handleQuickBill}
                 title="INVOICE (Alt + N or F2)"
@@ -908,39 +901,26 @@ export default function Layout() {
                   px: 2,
                   borderRadius: designSystem === 'material'
                     ? '24px !important'
-                    : (designSystem === 'microsoft' ? '4px !important' : `${activeSystemConfig?.shape?.buttonRadius || 6}px !important`),
+                    : (designSystem === 'microsoft' ? '4px !important' : `${activeSystemConfig?.shape?.buttonRadius || 8}px !important`),
                   fontWeight: designSystem === 'microsoft' ? 600 : 700,
                   fontSize: '0.825rem',
                   textTransform: 'none',
-                  bgcolor: designSystem === 'material'
-                    ? '#1A73E8 !important'
-                    : (designSystem === 'microsoft'
-                      ? '#FFFFFF !important'
-                      : (topBarConfig.isColored ? '#FFFFFF !important' : `${theme.palette.primary.main} !important`)),
-                  color: designSystem === 'material'
-                    ? '#FFFFFF !important'
-                    : (designSystem === 'microsoft'
-                      ? '#0F6CBD !important'
-                      : (topBarConfig.isColored ? `${theme.palette.primary.main} !important` : '#FFFFFF !important')),
-                  boxShadow: designSystem === 'material'
-                    ? '0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15) !important'
-                    : (designSystem === 'microsoft'
-                      ? '0 1.6px 3.6px 0 rgba(0,0,0,0.13), 0 0.3px 0.9px 0 rgba(0,0,0,0.11)'
-                      : (topBarConfig.isColored ? '0 2px 10px rgba(0, 0, 0, 0.25)' : `0 4px 14px ${theme.palette.secondary.main}4D`)),
+                  bgcolor: topBarConfig.isColored ? '#FFFFFF !important' : `${theme.palette.primary.main} !important`,
+                  color: topBarConfig.isColored ? `${theme.palette.primary.main} !important` : `${theme.palette.primary.contrastText || '#FFFFFF'} !important`,
+                  boxShadow: topBarConfig.isColored
+                    ? '0 2px 10px rgba(0, 0, 0, 0.25)'
+                    : `0 4px 14px ${theme.palette.primary.main}4D`,
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',
                   display: { xs: 'none', sm: 'inline-flex' },
+                  transition: 'all 0.2s ease',
                   '&:hover': {
-                    bgcolor: designSystem === 'material'
-                      ? '#1765CC !important'
-                      : (designSystem === 'microsoft'
-                        ? '#F3F2F1 !important'
-                        : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.92) !important' : `${theme.palette.primary.dark} !important`)),
-                    boxShadow: designSystem === 'material'
-                      ? '0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15) !important'
-                      : (designSystem === 'microsoft'
-                        ? '0 3.2px 7.2px 0 rgba(0,0,0,0.13), 0 0.6px 1.8px 0 rgba(0,0,0,0.11)'
-                        : (topBarConfig.isColored ? '0 4px 14px rgba(0, 0, 0, 0.3)' : `0 6px 18px ${theme.palette.secondary.main}66`))
+                    bgcolor: topBarConfig.isColored
+                      ? 'rgba(255, 255, 255, 0.92) !important'
+                      : `${theme.palette.primary.dark} !important`,
+                    boxShadow: topBarConfig.isColored
+                      ? '0 4px 14px rgba(0, 0, 0, 0.3)'
+                      : `0 6px 18px ${theme.palette.primary.main}66`
                   }
                 }}
               >

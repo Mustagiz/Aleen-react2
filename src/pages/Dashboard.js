@@ -70,6 +70,10 @@ const Dashboard = () => {
   const isDark = theme.palette.mode === 'dark';
 
   const getSystemBannerConfig = () => {
+    const primaryColor = theme.palette.primary.main;
+    const darkPrimary = theme.palette.primary.dark;
+    const lightPrimary = theme.palette.primary.light;
+
     switch (designSystem) {
       case 'zoho':
         return {
@@ -79,46 +83,46 @@ const Dashboard = () => {
           textColor: '#FFFFFF',
           subtextColor: 'rgba(255, 255, 255, 0.88)',
           isDarkBanner: true,
-          borderColor: 'rgba(241, 90, 36, 0.45)',
+          borderColor: `${primaryColor}66`,
           shadow: '0 12px 32px rgba(24, 32, 51, 0.35)',
-          ctaBg: '#F15A24',
-          ctaHover: '#D4380D',
-          badgeBg: 'rgba(241, 90, 36, 0.25)',
+          ctaBg: primaryColor,
+          ctaHover: darkPrimary,
+          badgeBg: `${primaryColor}33`,
           badgeColor: '#FFD8BF',
-          radius: '8px'
+          radius: `${activeSystemConfig?.shape?.cardRadius || 8}px`
         };
       case 'microsoft':
         return {
           badge: 'MICROSOFT FLUENT 365',
           title: 'Dynamics 365 Operations Console',
-          bg: isDark ? 'linear-gradient(135deg, #004E8C 0%, #002B4D 100%)' : 'linear-gradient(135deg, #0078D4 0%, #004E8C 100%)',
+          bg: isDark ? 'linear-gradient(135deg, #004E8C 0%, #002B4D 100%)' : `linear-gradient(135deg, ${primaryColor} 0%, ${darkPrimary} 100%)`,
           textColor: '#FFFFFF',
           subtextColor: 'rgba(255, 255, 255, 0.88)',
           isDarkBanner: true,
           borderColor: 'rgba(255, 255, 255, 0.25)',
-          shadow: '0 8px 24px rgba(0, 120, 212, 0.3)',
-          ctaBg: '#107C41',
-          ctaHover: '#0B5A2E',
+          shadow: `0 8px 24px ${primaryColor}4D`,
+          ctaBg: primaryColor,
+          ctaHover: darkPrimary,
           badgeBg: 'rgba(255, 255, 255, 0.2)',
           badgeColor: '#FFFFFF',
-          radius: '6px'
+          radius: `${activeSystemConfig?.shape?.cardRadius || 6}px`
         };
       case 'apple':
         return {
           badge: 'MACOS LIQUID STUDIO',
           title: 'Executive Studio Overview',
-          bg: isDark ? 'rgba(28, 28, 30, 0.88)' : 'rgba(255, 255, 255, 0.82)',
+          bg: isDark ? 'rgba(28, 28, 30, 0.88)' : 'rgba(255, 255, 255, 0.85)',
           textColor: isDark ? '#FFFFFF' : '#1D1D1F',
           subtextColor: isDark ? 'rgba(255, 255, 255, 0.75)' : '#6E6E73',
           isDarkBanner: isDark,
           borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.08)',
           shadow: isDark ? '0 16px 40px rgba(0, 0, 0, 0.45)' : '0 12px 36px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.03)',
-          ctaBg: theme.palette.primary.main || '#0071E3',
-          ctaHover: theme.palette.primary.dark || '#0051A8',
-          badgeBg: isDark ? 'rgba(0, 113, 227, 0.25)' : 'rgba(0, 113, 227, 0.1)',
-          badgeColor: isDark ? '#93C5FD' : '#0071E3',
+          ctaBg: primaryColor,
+          ctaHover: darkPrimary,
+          badgeBg: isDark ? `${primaryColor}38` : `${primaryColor}18`,
+          badgeColor: isDark ? lightPrimary : primaryColor,
           backdropFilter: 'blur(30px) saturate(180%)',
-          radius: '18px'
+          radius: `${activeSystemConfig?.shape?.cardRadius || 18}px`
         };
       case 'linear':
         return {
@@ -130,27 +134,27 @@ const Dashboard = () => {
           isDarkBanner: true,
           borderColor: '#23252A',
           shadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
-          ctaBg: '#5E6AD2',
-          ctaHover: '#434EAE',
-          badgeBg: 'rgba(94, 106, 210, 0.2)',
-          badgeColor: '#828DF8',
-          radius: '6px'
+          ctaBg: primaryColor,
+          ctaHover: darkPrimary,
+          badgeBg: `${primaryColor}2E`,
+          badgeColor: lightPrimary,
+          radius: `${activeSystemConfig?.shape?.cardRadius || 6}px`
         };
       case 'material':
         return {
           badge: 'MATERIAL YOU M3',
           title: 'Expressive Boutique Summary',
-          bg: isDark ? 'linear-gradient(135deg, #1E2129 0%, #111318 100%)' : 'linear-gradient(135deg, #E8F0FE 0%, #D2E3FC 100%)',
+          bg: isDark ? 'linear-gradient(135deg, #1E2129 0%, #111318 100%)' : `linear-gradient(135deg, ${primaryColor}14 0%, ${primaryColor}2E 100%)`,
           textColor: isDark ? '#FFFFFF' : '#041E49',
           subtextColor: isDark ? 'rgba(255, 255, 255, 0.8)' : '#334155',
           isDarkBanner: isDark,
-          borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(26, 115, 232, 0.25)',
-          shadow: '0 8px 28px rgba(26, 115, 232, 0.12)',
-          ctaBg: '#1A73E8',
-          ctaHover: '#0D47A1',
-          badgeBg: 'rgba(26, 115, 232, 0.18)',
-          badgeColor: isDark ? '#D2E3FC' : '#1A73E8',
-          radius: '24px'
+          borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : `${primaryColor}33`,
+          shadow: `0 8px 28px ${primaryColor}22`,
+          ctaBg: primaryColor,
+          ctaHover: darkPrimary,
+          badgeBg: `${primaryColor}28`,
+          badgeColor: isDark ? lightPrimary : primaryColor,
+          radius: `${activeSystemConfig?.shape?.cardRadius || 24}px`
         };
       case 'stripe':
         return {
@@ -160,50 +164,144 @@ const Dashboard = () => {
           textColor: '#FFFFFF',
           subtextColor: 'rgba(255, 255, 255, 0.88)',
           isDarkBanner: true,
-          borderColor: 'rgba(99, 91, 255, 0.4)',
+          borderColor: `${primaryColor}55`,
           shadow: '0 12px 32px rgba(10, 37, 64, 0.4)',
-          ctaBg: '#635BFF',
-          ctaHover: '#5248E5',
-          badgeBg: 'rgba(0, 212, 178, 0.2)',
-          badgeColor: '#00D4B2',
-          radius: '12px'
+          ctaBg: primaryColor,
+          ctaHover: darkPrimary,
+          badgeBg: `${primaryColor}33`,
+          badgeColor: lightPrimary,
+          radius: `${activeSystemConfig?.shape?.cardRadius || 12}px`
         };
       case 'salesforce':
         return {
           badge: 'SALESFORCE LIGHTNING',
           title: 'Lightning Cloud Operations',
-          bg: isDark ? 'linear-gradient(135deg, #014486 0%, #012852 100%)' : 'linear-gradient(135deg, #0176D3 0%, #014486 100%)',
+          bg: isDark ? 'linear-gradient(135deg, #014486 0%, #012852 100%)' : `linear-gradient(135deg, ${primaryColor} 0%, ${darkPrimary} 100%)`,
           textColor: '#FFFFFF',
           subtextColor: 'rgba(255, 255, 255, 0.92)',
           isDarkBanner: true,
           borderColor: 'rgba(255, 255, 255, 0.25)',
-          shadow: '0 8px 24px rgba(1, 118, 211, 0.3)',
-          ctaBg: '#04844B',
-          ctaHover: '#036838',
+          shadow: `0 8px 24px ${primaryColor}4D`,
+          ctaBg: primaryColor,
+          ctaHover: darkPrimary,
           badgeBg: 'rgba(255, 255, 255, 0.2)',
           badgeColor: '#FFFFFF',
-          radius: '6px'
+          radius: `${activeSystemConfig?.shape?.cardRadius || 6}px`
         };
       default: // Atelier
         return {
           badge: 'HAUTE COUTURE ATELIER',
           title: 'Executive Command & Overview',
-          bg: isDark ? 'linear-gradient(135deg, #071E1C 0%, #041211 100%)' : 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+          bg: isDark ? 'linear-gradient(135deg, #071E1C 0%, #041211 100%)' : `linear-gradient(135deg, ${darkPrimary || '#042F2E'} 0%, ${primaryColor} 100%)`,
           textColor: '#FFFFFF',
           subtextColor: 'rgba(255, 255, 255, 0.88)',
           isDarkBanner: true,
-          borderColor: 'rgba(217, 119, 6, 0.35)',
-          shadow: '0 12px 32px rgba(4, 47, 46, 0.25)',
-          ctaBg: '#D97706',
-          ctaHover: '#B45309',
-          badgeBg: 'rgba(217, 119, 6, 0.25)',
+          borderColor: `${primaryColor}4D`,
+          shadow: `0 12px 32px ${darkPrimary || '#042F2E'}40`,
+          ctaBg: primaryColor,
+          ctaHover: darkPrimary,
+          badgeBg: `${primaryColor}38`,
           badgeColor: '#FEF08A',
-          radius: '16px'
+          radius: `${activeSystemConfig?.shape?.cardRadius || 16}px`
         };
     }
   };
 
   const sysBanner = getSystemBannerConfig();
+
+  // Dynamic Theme Button Styling Helpers for Dashboard Banner Actions
+  const getBannerPrimaryBtnStyle = () => {
+    const radius = activeSystemConfig?.shape?.buttonRadius ?? theme.shape?.borderRadius ?? 8;
+    const ctaBg = sysBanner.ctaBg || theme.palette.primary.main;
+    const ctaHover = sysBanner.ctaHover || theme.palette.primary.dark;
+
+    return {
+      bgcolor: `${ctaBg} !important`,
+      color: `${theme.palette.primary.contrastText || '#FFFFFF'} !important`,
+      fontWeight: 800,
+      fontSize: { xs: '0.82rem', sm: '0.84rem' },
+      borderRadius: `${radius}px !important`,
+      height: { xs: 42, sm: 40 },
+      px: { xs: 2.2, sm: 2.6 },
+      textTransform: activeSystemConfig?.buttonStyle?.textTransform || 'none',
+      boxShadow: `0 4px 14px ${ctaBg}55`,
+      transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+      '& .MuiButton-startIcon': {
+        color: `${theme.palette.primary.contrastText || '#FFFFFF'} !important`
+      },
+      '&:hover': {
+        bgcolor: `${ctaHover} !important`,
+        boxShadow: `0 6px 18px ${ctaBg}88`,
+        transform: 'translateY(-1px)'
+      },
+      '&:active': {
+        transform: 'scale(0.98)'
+      }
+    };
+  };
+
+  const getBannerSecondaryBtnStyle = () => {
+    const radius = activeSystemConfig?.shape?.buttonRadius ?? theme.shape?.borderRadius ?? 8;
+    const isDarkBanner = sysBanner.isDarkBanner;
+
+    if (isDarkBanner) {
+      return {
+        bgcolor: isDark ? 'rgba(255, 255, 255, 0.14) !important' : '#FFFFFF !important',
+        color: isDark ? '#FFFFFF !important' : `${theme.palette.primary.dark || '#042F2E'} !important`,
+        border: isDark ? '1px solid rgba(255, 255, 255, 0.28) !important' : '1px solid rgba(255, 255, 255, 0.9) !important',
+        borderRadius: `${radius}px !important`,
+        fontWeight: 700,
+        fontSize: { xs: '0.8rem', sm: '0.82rem' },
+        height: { xs: 42, sm: 40 },
+        px: { xs: 2, sm: 2.2 },
+        textTransform: activeSystemConfig?.buttonStyle?.textTransform || 'none',
+        boxShadow: isDark ? '0 2px 8px rgba(0, 0, 0, 0.25) !important' : '0 2px 8px rgba(0, 0, 0, 0.15) !important',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+        '& .MuiButton-startIcon': {
+          color: isDark ? '#FFFFFF !important' : `${theme.palette.primary.main} !important`
+        },
+        '&:hover': {
+          bgcolor: isDark ? 'rgba(255, 255, 255, 0.24) !important' : 'rgba(255, 255, 255, 0.95) !important',
+          borderColor: '#FFFFFF !important',
+          boxShadow: isDark ? '0 4px 16px rgba(0, 0, 0, 0.35) !important' : '0 4px 16px rgba(0, 0, 0, 0.25) !important',
+          transform: 'translateY(-1px)'
+        },
+        '&:active': {
+          transform: 'scale(0.98)'
+        }
+      };
+    }
+
+    // Light Banner (e.g. Apple Light or Material Light)
+    return {
+      bgcolor: `${theme.palette.background.paper} !important`,
+      color: `${theme.palette.text.primary} !important`,
+      border: `1px solid ${theme.palette.divider} !important`,
+      borderRadius: `${radius}px !important`,
+      fontWeight: 700,
+      fontSize: { xs: '0.8rem', sm: '0.82rem' },
+      height: { xs: 42, sm: 40 },
+      px: { xs: 2, sm: 2.2 },
+      textTransform: activeSystemConfig?.buttonStyle?.textTransform || 'none',
+      boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08) !important',
+      transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+      '& .MuiButton-startIcon': {
+        color: `${theme.palette.primary.main} !important`
+      },
+      '&:hover': {
+        bgcolor: `${theme.palette.action.hover} !important`,
+        borderColor: `${theme.palette.primary.main} !important`,
+        color: `${theme.palette.primary.main} !important`,
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.12) !important',
+        transform: 'translateY(-1px)'
+      },
+      '&:active': {
+        transform: 'scale(0.98)'
+      }
+    };
+  };
 
   const [dateRange, setDateRange] = useState('7days');
   const [drawerModalOpen, setDrawerModalOpen] = useState(false);
@@ -537,66 +635,45 @@ const Dashboard = () => {
           </Box>
 
           {/* Quick Action Navigation Dock */}
-          <Stack direction={{ xs: 'row' }} spacing={1} flexWrap="wrap" useFlexGap sx={{ alignSelf: { xs: 'stretch', md: 'center' } }}>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={{ xs: 1, sm: 1.25 }}
+            sx={{
+              width: { xs: '100%', md: 'auto' },
+              alignSelf: { xs: 'stretch', md: 'center' },
+              flexWrap: 'wrap',
+              mt: { xs: 1.5, md: 0 }
+            }}
+          >
             <Button
               variant="contained"
-              startIcon={<Add sx={{ color: '#FFFFFF !important' }} />}
+              startIcon={<Add />}
               onClick={() => navigate('/invoices?action=new', { state: { openNewBill: true } })}
               sx={{
-                bgcolor: `${sysBanner.ctaBg} !important`,
-                color: '#FFFFFF !important',
-                fontWeight: 800,
-                fontSize: '0.82rem',
-                borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 8}px !important`,
-                height: 40,
-                px: 2.2,
-                textTransform: 'none',
-                boxShadow: `0 4px 14px ${sysBanner.ctaBg}66`,
-                '&:hover': { bgcolor: `${sysBanner.ctaHover} !important` }
+                ...getBannerPrimaryBtnStyle(),
+                width: { xs: '100%', sm: 'auto' }
               }}
             >
               New Bill
             </Button>
             <Button
-              variant="outlined"
-              startIcon={<PointOfSale sx={{ color: sysBanner.isDarkBanner ? '#FFFFFF !important' : (theme.palette.primary.main + ' !important') }} />}
+              variant="contained"
+              startIcon={<PointOfSale />}
               onClick={() => setDrawerModalOpen(true)}
               sx={{
-                borderColor: sysBanner.isDarkBanner ? 'rgba(255, 255, 255, 0.45) !important' : 'rgba(0, 0, 0, 0.15) !important',
-                color: sysBanner.isDarkBanner ? '#FFFFFF !important' : (theme.palette.text.primary + ' !important'),
-                fontWeight: 700,
-                fontSize: '0.82rem',
-                borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 8}px !important`,
-                height: 40,
-                px: 2,
-                textTransform: 'none',
-                bgcolor: sysBanner.isDarkBanner ? 'rgba(255, 255, 255, 0.12) !important' : (isDark ? 'rgba(255, 255, 255, 0.05) !important' : 'rgba(0, 0, 0, 0.04) !important'),
-                '&:hover': {
-                  borderColor: sysBanner.isDarkBanner ? '#FFFFFF !important' : (theme.palette.primary.main + ' !important'),
-                  bgcolor: sysBanner.isDarkBanner ? 'rgba(255, 255, 255, 0.22) !important' : (isDark ? 'rgba(255, 255, 255, 0.1) !important' : 'rgba(0, 0, 0, 0.08) !important')
-                }
+                ...getBannerSecondaryBtnStyle(),
+                width: { xs: '100%', sm: 'auto' }
               }}
             >
               Shift & Z-Report
             </Button>
             <Button
-              variant="outlined"
-              startIcon={<Straighten sx={{ color: sysBanner.isDarkBanner ? '#FFFFFF !important' : (theme.palette.primary.main + ' !important') }} />}
+              variant="contained"
+              startIcon={<Straighten />}
               onClick={() => navigate('/tailoring')}
               sx={{
-                borderColor: sysBanner.isDarkBanner ? 'rgba(255, 255, 255, 0.45) !important' : 'rgba(0, 0, 0, 0.15) !important',
-                color: sysBanner.isDarkBanner ? '#FFFFFF !important' : (theme.palette.text.primary + ' !important'),
-                fontWeight: 700,
-                fontSize: '0.82rem',
-                borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 8}px !important`,
-                height: 40,
-                px: 2,
-                textTransform: 'none',
-                bgcolor: sysBanner.isDarkBanner ? 'rgba(255, 255, 255, 0.12) !important' : (isDark ? 'rgba(255, 255, 255, 0.05) !important' : 'rgba(0, 0, 0, 0.04) !important'),
-                '&:hover': {
-                  borderColor: sysBanner.isDarkBanner ? '#FFFFFF !important' : (theme.palette.primary.main + ' !important'),
-                  bgcolor: sysBanner.isDarkBanner ? 'rgba(255, 255, 255, 0.22) !important' : (isDark ? 'rgba(255, 255, 255, 0.1) !important' : 'rgba(0, 0, 0, 0.08) !important')
-                }
+                ...getBannerSecondaryBtnStyle(),
+                width: { xs: '100%', sm: 'auto' }
               }}
             >
               Tailoring Board
