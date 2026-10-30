@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel, CircularProgress, Alert, Snackbar, InputAdornment, List, Collapse, Stack } from '@mui/material';
-import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, QrCode2, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, PauseCircleOutline, ShoppingCart, RestartAlt, CalendarMonth, Phone, Straighten, Clear, Stars, Redeem, AccountBalanceWallet, Keyboard, Tv, VolumeUp, VolumeOff, Tune } from '@mui/icons-material';
+import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, QrCode2, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, PauseCircleOutline, ShoppingCart, RestartAlt, CalendarMonth, Phone, Straighten, Clear, Stars, Redeem, AccountBalanceWallet, Keyboard, Tv, VolumeUp, VolumeOff, Tune, Checkroom } from '@mui/icons-material';
 import { Html5Qrcode } from 'html5-qrcode';
 import { db } from '../firebase';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
@@ -1060,6 +1060,47 @@ const Invoices = () => {
       return 0;
     });
   }, [filteredInvoices, orderBy, order]);
+
+  // Comprehensive list of searchable unit SKUs across base products and variant units
+  const allSkuOptions = useMemo(() => {
+    if (!Array.isArray(inventory)) return [];
+    const list = [];
+    inventory.forEach((prod) => {
+      if (prod.hasVariants && Array.isArray(prod.variants) && prod.variants.length > 0) {
+        prod.variants.forEach((v) => {
+          list.push({
+            id: `${prod.id}__${v.sku}`,
+            sku: v.sku,
+            barcode: v.barcode || v.sku,
+            productId: prod.id,
+            variantSku: v.sku,
+            productName: prod.name,
+            variantDetails: `${v.size || ''}${v.size && v.color ? ' / ' : ''}${v.color || ''}`.trim(),
+            price: parseFloat(v.price) || parseFloat(prod.price) || 0,
+            stock: parseInt(v.quantity, 10) || 0,
+            isVariant: true,
+            category: prod.category || 'General'
+          });
+        });
+      }
+      // Base product SKU option
+      const baseSku = prod.productId || prod.sku || prod.id;
+      list.push({
+        id: `${prod.id}__base`,
+        sku: baseSku,
+        barcode: prod.barcode || baseSku,
+        productId: prod.id,
+        variantSku: '',
+        productName: prod.name,
+        variantDetails: prod.hasVariants ? 'Base Model' : '',
+        price: parseFloat(prod.price) || 0,
+        stock: parseInt(prod.quantity, 10) || 0,
+        isVariant: false,
+        category: prod.category || 'General'
+      });
+    });
+    return list;
+  }, [inventory]);
 
   const handleAddItem = () => {
     setSelectedItems(prev => [...(Array.isArray(prev) ? prev : []), { id: '', quantity: 1, isCustom: false, customName: '', customPrice: '', customCost: '', variantSku: '' }]);
@@ -4415,7 +4456,35 @@ const Invoices = () => {
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 2 }}>
                   {selectedItems.map((item, index) => {
                     const selectedProduct = inventory.find(i => i.id === item.id);
-                    const optionsList = inventory;
+                    const activeVariant = (selectedProduct?.hasVariants && item.variantSku)
+                      ? selectedProduct.variants?.find(v => v.sku === item.variantSku)
+                      : null;
+                    const currentDisplayPrice = activeVariant ? (parseFloat(activeVariant.price) || selectedProduct?.price || 0) : (selectedProduct?.price || 0);
+
+                    // Find matching SKU option for this item
+                    const currentSkuOption = allSkuOptions.find(opt => {
+                      if (item.variantSku) {
+                        return opt.productId === item.id && opt.variantSku === item.variantSku;
+                      }
+                      return opt.productId === item.id && !opt.variantSku;
+                    }) || (item.id && selectedProduct ? {
+                      id: `${selectedProduct.id}__current`,
+                      sku: item.variantSku || selectedProduct.productId || selectedProduct.sku || selectedProduct.id,
+                      productId: selectedProduct.id,
+                      variantSku: item.variantSku || '',
+                      productName: selectedProduct.name,
+                      variantDetails: activeVariant ? `${activeVariant.size || ''} / ${activeVariant.color || ''}` : '',
+                      price: currentDisplayPrice,
+                      stock: parseInt(selectedProduct.quantity, 10) || 0
+                    } : null);
+
+                    // Prioritize SKU options of currently selected product at the top of the list
+                    const prioritizedSkuOptions = selectedProduct
+                      ? [
+                          ...allSkuOptions.filter(o => o.productId === selectedProduct.id),
+                          ...allSkuOptions.filter(o => o.productId !== selectedProduct.id)
+                        ]
+                      : allSkuOptions;
 
                     return (
                       <Box key={index} sx={{
@@ -4426,65 +4495,198 @@ const Invoices = () => {
                         borderColor: 'divider',
                         transition: 'all 0.15s ease-in-out',
                         '&:hover': {
-                          bordercolor: (t) => t.palette.primary.main,
+                          borderColor: (t) => t.palette.primary.main,
                           boxShadow: '0 4px 12px rgba(15,118,110,0.06)'
                         }
                       }}>
                         <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}>
                           <Box sx={{ flex: 1, minWidth: 0 }}>
                             {!item.isCustom ? (
-                              <Autocomplete
-                                value={selectedProduct || null}
-                                onChange={(event, newValue) => {
-                                  handleItemChange(index, 'id', newValue ? newValue.id : '');
-                                }}
-                                options={optionsList}
-                                getOptionLabel={(option) => `${option.name} (₹${option.price})`}
-                                filterOptions={(options, { inputValue }) => {
-                                  const term = (inputValue || '').toLowerCase().trim();
-                                  return options.filter(option =>
-                                    (option.name && option.name.toLowerCase().includes(term)) ||
-                                    (option.productId && option.productId.toLowerCase().includes(term)) ||
-                                    (option.barcode && option.barcode.toLowerCase().includes(term)) ||
-                                    (option.sku && option.sku.toLowerCase().includes(term))
-                                  );
-                                }}
-                                renderOption={(props, option) => {
-                                  const stock = parseInt(option.currentQty || option.quantity) || 0;
-                                  return (
-                                    <Box component="li" {...props} key={option.id}>
-                                      <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <Box>
-                                          <Typography variant="body2" sx={{ fontWeight: 700 }}>{option.name}</Typography>
-                                          <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', fontFamily: 'monospace', fontWeight: 600 }}>
-                                            ID: #{formatSkuWithHyphen(option.productId || option.sku || 'N/A')} • ₹{option.price}
-                                          </Typography>
+                              <Grid container spacing={1.5}>
+                                {/* Part 1: Product Name & Price */}
+                                <Grid item xs={12} sm={6.8}>
+                                  <Autocomplete
+                                    value={selectedProduct || null}
+                                    onChange={(event, newValue) => {
+                                      handleItemChange(index, 'id', newValue ? newValue.id : '');
+                                    }}
+                                    options={inventory}
+                                    getOptionLabel={(option) => {
+                                      if (!option) return '';
+                                      const pPrice = option.id === item.id && activeVariant
+                                        ? (activeVariant.price || option.price)
+                                        : option.price;
+                                      return `${option.name} (₹${pPrice})`;
+                                    }}
+                                    isOptionEqualToValue={(option, val) => option?.id === val?.id}
+                                    filterOptions={(options, { inputValue }) => {
+                                      const term = (inputValue || '').toLowerCase().trim();
+                                      return options.filter(option =>
+                                        (option.name && option.name.toLowerCase().includes(term)) ||
+                                        (option.category && option.category.toLowerCase().includes(term)) ||
+                                        (option.price && String(option.price).includes(term)) ||
+                                        (option.productId && option.productId.toLowerCase().includes(term))
+                                      );
+                                    }}
+                                    renderOption={(props, option) => {
+                                      const stock = parseInt(option.currentQty || option.quantity) || 0;
+                                      return (
+                                        <Box component="li" {...props} key={option.id}>
+                                          <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 0.5 }}>
+                                            <Box sx={{ minWidth: 0, pr: 1 }}>
+                                              <Typography variant="body2" sx={{ fontWeight: 700, lineHeight: 1.3 }}>{option.name}</Typography>
+                                              <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                                {option.category || 'Apparel'} • <strong>₹{option.price}</strong>
+                                                {option.hasVariants && option.variants?.length ? ` (${option.variants.length} unit variants)` : ''}
+                                              </Typography>
+                                            </Box>
+                                            <Chip
+                                              label={`Stock: ${stock}`}
+                                              size="small"
+                                              sx={{
+                                                height: 18,
+                                                fontSize: '0.62rem',
+                                                fontWeight: 800,
+                                                bgcolor: stock > 0 ? 'rgba(5, 150, 105, 0.1)' : 'rgba(220, 38, 38, 0.1)',
+                                                color: stock > 0 ? '#059669' : '#DC2626'
+                                              }}
+                                            />
+                                          </Box>
                                         </Box>
-                                        <Chip
-                                          label={`Stock: ${stock}`}
-                                          size="small"
-                                          sx={{
-                                            height: 18,
-                                            fontSize: '0.62rem',
-                                            fontWeight: 800,
-                                            bgcolor: stock > 0 ? 'rgba(5, 150, 105, 0.1)' : 'rgba(220, 38, 38, 0.1)',
-                                            color: stock > 0 ? '#059669' : '#DC2626'
-                                          }}
-                                        />
-                                      </Box>
-                                    </Box>
-                                  );
-                                }}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    label="Select Garment / Product"
-                                    size="small"
-                                    fullWidth
-                                    error={!item.id && selectedItems.length > 0}
+                                      );
+                                    }}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        label="1. Product Name & Price"
+                                        placeholder="Search product name / price..."
+                                        size="small"
+                                        fullWidth
+                                        error={!item.id && selectedItems.length > 0}
+                                        InputProps={{
+                                          ...params.InputProps,
+                                          startAdornment: (
+                                            <>
+                                              <Checkroom sx={{ fontSize: 18, color: 'text.secondary', mr: 0.5 }} />
+                                              {params.InputProps.startAdornment}
+                                            </>
+                                          )
+                                        }}
+                                      />
+                                    )}
                                   />
-                                )}
-                              />
+                                </Grid>
+
+                                {/* Part 2: Unit SKU / Barcode */}
+                                <Grid item xs={12} sm={5.2}>
+                                  <Autocomplete
+                                    value={currentSkuOption || null}
+                                    onChange={(event, newSkuOption) => {
+                                      if (!newSkuOption) {
+                                        handleItemChange(index, 'id', '');
+                                        return;
+                                      }
+                                      setSelectedItems(prev => {
+                                        const updated = [...prev];
+                                        if (!updated[index]) return prev;
+                                        updated[index] = {
+                                          ...updated[index],
+                                          id: newSkuOption.productId,
+                                          isCustom: false,
+                                          variantSku: newSkuOption.variantSku || ''
+                                        };
+                                        if (syncCustomerDisplayRef.current) {
+                                          syncCustomerDisplayRef.current('active', null, true, updated);
+                                        }
+                                        return updated;
+                                      });
+                                    }}
+                                    options={prioritizedSkuOptions}
+                                    getOptionLabel={(option) => {
+                                      if (!option) return '';
+                                      const skuFormatted = formatSkuWithHyphen(option.sku || option.productId || '');
+                                      return `${skuFormatted}${option.variantDetails ? ` (${option.variantDetails})` : ''} - ₹${option.price}`;
+                                    }}
+                                    isOptionEqualToValue={(option, val) => {
+                                      if (!option || !val) return false;
+                                      if (option.variantSku || val.variantSku) {
+                                        return option.productId === val.productId && option.variantSku === val.variantSku;
+                                      }
+                                      return option.productId === val.productId;
+                                    }}
+                                    filterOptions={(options, { inputValue }) => {
+                                      const term = (inputValue || '').toLowerCase().trim();
+                                      const unhyphenated = term.replace(/-/g, '');
+                                      return options.filter(option => {
+                                        const optSku = (option.sku || '').toLowerCase();
+                                        const optBarcode = (option.barcode || '').toLowerCase();
+                                        const optName = (option.productName || '').toLowerCase();
+                                        const optDetails = (option.variantDetails || '').toLowerCase();
+                                        return optSku.includes(term) ||
+                                          optSku.replace(/-/g, '').includes(unhyphenated) ||
+                                          optBarcode.includes(term) ||
+                                          optName.includes(term) ||
+                                          optDetails.includes(term);
+                                      });
+                                    }}
+                                    renderOption={(props, option) => {
+                                      const isBelongsToCurrent = selectedProduct && option.productId === selectedProduct.id;
+                                      return (
+                                        <Box component="li" {...props} key={option.id}>
+                                          <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 0.5 }}>
+                                            <Box sx={{ minWidth: 0, pr: 1 }}>
+                                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, flexWrap: 'wrap' }}>
+                                                <Typography variant="body2" sx={{ fontWeight: 800, fontFamily: 'monospace', fontSize: '0.82rem', color: isBelongsToCurrent ? 'primary.main' : 'text.primary' }}>
+                                                  #{formatSkuWithHyphen(option.sku)}
+                                                </Typography>
+                                                {option.variantDetails && (
+                                                  <Chip
+                                                    label={option.variantDetails}
+                                                    size="small"
+                                                    sx={{ height: 18, fontSize: '0.62rem', fontWeight: 700, bgcolor: 'rgba(15, 118, 110, 0.08)', color: '#0F766E' }}
+                                                  />
+                                                )}
+                                              </Box>
+                                              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.7rem' }}>
+                                                {option.productName} • ₹{option.price}
+                                              </Typography>
+                                            </Box>
+                                            <Chip
+                                              label={`Qty: ${option.stock}`}
+                                              size="small"
+                                              sx={{
+                                                height: 18,
+                                                fontSize: '0.62rem',
+                                                fontWeight: 800,
+                                                bgcolor: option.stock > 0 ? 'rgba(5, 150, 105, 0.1)' : 'rgba(220, 38, 38, 0.1)',
+                                                color: option.stock > 0 ? '#059669' : '#DC2626'
+                                              }}
+                                            />
+                                          </Box>
+                                        </Box>
+                                      );
+                                    }}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        label="2. Unit SKU / Barcode"
+                                        placeholder="Search SKU or scan tag..."
+                                        size="small"
+                                        fullWidth
+                                        InputProps={{
+                                          ...params.InputProps,
+                                          startAdornment: (
+                                            <>
+                                              <QrCode2 sx={{ fontSize: 18, color: 'text.secondary', mr: 0.5 }} />
+                                              {params.InputProps.startAdornment}
+                                            </>
+                                          )
+                                        }}
+                                      />
+                                    )}
+                                  />
+                                </Grid>
+                              </Grid>
                             ) : (
                               <Box sx={{ display: 'flex', gap: 1, flexDirection: 'column' }}>
                                 <TextField

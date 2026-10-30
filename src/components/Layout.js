@@ -748,31 +748,54 @@ export default function Layout() {
               onClick={() => setSearchOpen(true)}
               variant="outlined"
               size="small"
-              startIcon={<Search fontSize="small" sx={{ color: designSystem === 'microsoft' ? '#616161 !important' : (topBarConfig.isColored ? '#FFFFFF !important' : 'text.secondary') }} />}
+              startIcon={<Search fontSize="small" sx={{
+                color: designSystem === 'material'
+                  ? (isDark ? '#9AA0A6 !important' : '#5F6368 !important')
+                  : (designSystem === 'microsoft' ? '#616161 !important' : (topBarConfig.isColored ? '#FFFFFF !important' : 'text.secondary'))
+              }} />}
               sx={{
-                borderRadius: designSystem === 'microsoft' ? '4px !important' : `${activeSystemConfig?.shape?.buttonRadius || 9}px !important`,
-                borderColor: designSystem === 'microsoft'
+                borderRadius: designSystem === 'material'
+                  ? '24px !important'
+                  : (designSystem === 'microsoft' ? '4px !important' : `${activeSystemConfig?.shape?.buttonRadius || 9}px !important`),
+                borderColor: (designSystem === 'microsoft' || designSystem === 'material')
                   ? 'transparent !important'
                   : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.45) !important' : (isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)')),
-                color: designSystem === 'microsoft'
-                  ? '#242424 !important'
-                  : (topBarConfig.isColored ? '#FFFFFF !important' : 'text.secondary'),
+                color: designSystem === 'material'
+                  ? (isDark ? '#E8EAED !important' : '#3C4043 !important')
+                  : (designSystem === 'microsoft'
+                    ? '#242424 !important'
+                    : (topBarConfig.isColored ? '#FFFFFF !important' : 'text.secondary')),
                 px: 1.75,
                 py: 0.5,
                 height: 36,
-                bgcolor: designSystem === 'microsoft'
-                  ? '#FFFFFF !important'
-                  : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.18) !important' : (isDark ? 'rgba(0, 0, 0, 0.2)' : '#F8FAFC')),
+                bgcolor: designSystem === 'material'
+                  ? (isDark ? 'rgba(255, 255, 255, 0.08) !important' : '#F1F3F4 !important')
+                  : (designSystem === 'microsoft'
+                    ? '#FFFFFF !important'
+                    : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.18) !important' : (isDark ? 'rgba(0, 0, 0, 0.2)' : '#F8FAFC'))),
                 boxShadow: designSystem === 'microsoft' ? '0 1.6px 3.6px 0 rgba(0,0,0,0.13), 0 0.3px 0.9px 0 rgba(0,0,0,0.11)' : 'none',
                 display: { xs: 'none', md: 'inline-flex' },
                 '&:hover': {
-                  borderColor: designSystem === 'microsoft' ? '#0F6CBD !important' : (topBarConfig.isColored ? '#FFFFFF !important' : 'primary.main'),
-                  bgcolor: designSystem === 'microsoft' ? '#FFFFFF !important' : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.28) !important' : (isDark ? 'rgba(20, 184, 166, 0.08)' : '#F0FDFA')),
+                  borderColor: (designSystem === 'microsoft' || designSystem === 'material')
+                    ? (designSystem === 'microsoft' ? '#0F6CBD !important' : 'transparent !important')
+                    : (topBarConfig.isColored ? '#FFFFFF !important' : 'primary.main'),
+                  bgcolor: designSystem === 'material'
+                    ? (isDark ? 'rgba(255, 255, 255, 0.14) !important' : '#E8EAED !important')
+                    : (designSystem === 'microsoft'
+                      ? '#FFFFFF !important'
+                      : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.28) !important' : (isDark ? 'rgba(20, 184, 166, 0.08)' : '#F0FDFA'))),
                   boxShadow: designSystem === 'microsoft' ? '0 3.2px 7.2px 0 rgba(0,0,0,0.13), 0 0.6px 1.8px 0 rgba(0,0,0,0.11)' : 'none'
                 }
               }}
             >
-              <Typography sx={{ fontSize: '0.8rem', fontWeight: designSystem === 'microsoft' ? 500 : 700, mr: 1, color: designSystem === 'microsoft' ? '#424242 !important' : (topBarConfig.isColored ? '#FFFFFF !important' : 'inherit') }}>
+              <Typography sx={{
+                fontSize: '0.8rem',
+                fontWeight: designSystem === 'microsoft' ? 500 : 600,
+                mr: 1,
+                color: designSystem === 'material'
+                  ? (isDark ? '#E8EAED !important' : '#3C4043 !important')
+                  : (designSystem === 'microsoft' ? '#424242 !important' : (topBarConfig.isColored ? '#FFFFFF !important' : 'inherit'))
+              }}>
                 Search CRM...
               </Typography>
               <Chip 
@@ -782,9 +805,15 @@ export default function Layout() {
                   height: 18, 
                   fontSize: '0.65rem', 
                   fontWeight: 700,
-                  borderRadius: designSystem === 'microsoft' ? '3px !important' : '7px !important',
-                  bgcolor: designSystem === 'microsoft' ? '#F3F2F1 !important' : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.28) !important' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0')),
-                  color: designSystem === 'microsoft' ? '#616161 !important' : (topBarConfig.isColored ? '#FFFFFF !important' : 'text.secondary')
+                  borderRadius: designSystem === 'material'
+                    ? '12px !important'
+                    : (designSystem === 'microsoft' ? '3px !important' : '7px !important'),
+                  bgcolor: designSystem === 'material'
+                    ? (isDark ? 'rgba(255, 255, 255, 0.12) !important' : '#FFFFFF !important')
+                    : (designSystem === 'microsoft' ? '#F3F2F1 !important' : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.28) !important' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'))),
+                  color: designSystem === 'material'
+                    ? (isDark ? '#E8EAED !important' : '#5F6368 !important')
+                    : (designSystem === 'microsoft' ? '#616161 !important' : (topBarConfig.isColored ? '#FFFFFF !important' : 'text.secondary'))
                 }} 
               />
             </Button>
@@ -794,22 +823,43 @@ export default function Layout() {
               <Button
                 size="small"
                 variant="outlined"
-                startIcon={<PointOfSale sx={{ fontSize: '15px !important', color: topBarConfig.isColored ? '#FFFFFF !important' : (isDark ? '#34D399 !important' : '#059669 !important') }} />}
+                startIcon={<PointOfSale sx={{
+                  fontSize: '15px !important',
+                  color: designSystem === 'material'
+                    ? (isDark ? '#8AB4F8 !important' : '#1A73E8 !important')
+                    : (topBarConfig.isColored ? '#FFFFFF !important' : (isDark ? '#34D399 !important' : '#059669 !important'))
+                }} />}
                 onClick={() => setCashDrawerOpen(true)}
                 sx={{
-                  height: 32,
+                  height: 34,
                   fontSize: '0.74rem',
-                  fontWeight: designSystem === 'microsoft' ? 600 : 800,
-                  bgcolor: designSystem === 'microsoft' ? 'rgba(255, 255, 255, 0.14) !important' : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.18) !important' : (isDark ? 'rgba(16, 185, 129, 0.12)' : '#DCFCE7')),
-                  color: topBarConfig.isColored ? '#FFFFFF !important' : (isDark ? '#34D399' : '#047857'),
-                  borderColor: designSystem === 'microsoft' ? 'rgba(255, 255, 255, 0.35) !important' : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.5) !important' : 'rgba(16, 185, 129, 0.35)'),
-                  borderRadius: designSystem === 'microsoft' ? '4px !important' : `${activeSystemConfig?.shape?.buttonRadius || 6}px !important`,
+                  fontWeight: designSystem === 'microsoft' ? 600 : 700,
+                  bgcolor: designSystem === 'material'
+                    ? (isDark ? 'rgba(66, 133, 244, 0.16) !important' : '#E8F0FE !important')
+                    : (designSystem === 'microsoft'
+                      ? 'rgba(255, 255, 255, 0.14) !important'
+                      : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.18) !important' : (isDark ? 'rgba(16, 185, 129, 0.12)' : '#DCFCE7'))),
+                  color: designSystem === 'material'
+                    ? (isDark ? '#8AB4F8 !important' : '#1A73E8 !important')
+                    : (topBarConfig.isColored ? '#FFFFFF !important' : (isDark ? '#34D399' : '#047857')),
+                  borderColor: designSystem === 'material'
+                    ? 'transparent !important'
+                    : (designSystem === 'microsoft'
+                      ? 'rgba(255, 255, 255, 0.35) !important'
+                      : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.5) !important' : 'rgba(16, 185, 129, 0.35)')),
+                  borderRadius: designSystem === 'material'
+                    ? '20px !important'
+                    : (designSystem === 'microsoft' ? '4px !important' : `${activeSystemConfig?.shape?.buttonRadius || 6}px !important`),
                   px: 1.5,
                   display: { xs: 'none', lg: 'inline-flex' },
                   textTransform: 'none',
                   '&:hover': {
-                    bgcolor: designSystem === 'microsoft' ? 'rgba(255, 255, 255, 0.24) !important' : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.28) !important' : (isDark ? 'rgba(16, 185, 129, 0.2)' : '#BBF7D0')),
-                    borderColor: 'rgba(255, 255, 255, 0.7) !important'
+                    bgcolor: designSystem === 'material'
+                      ? (isDark ? 'rgba(66, 133, 244, 0.28) !important' : '#D2E3FC !important')
+                      : (designSystem === 'microsoft'
+                        ? 'rgba(255, 255, 255, 0.24) !important'
+                        : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.28) !important' : (isDark ? 'rgba(16, 185, 129, 0.2)' : '#BBF7D0'))),
+                    borderColor: designSystem === 'material' ? 'transparent !important' : 'rgba(255, 255, 255, 0.7) !important'
                   }
                 }}
               >
@@ -827,10 +877,10 @@ export default function Layout() {
                     width: 36,
                     height: 36,
                     display: { xs: 'inline-flex', sm: 'none' },
-                    borderRadius: designSystem === 'microsoft' ? '4px' : `${activeSystemConfig?.shape?.buttonRadius || 6}px`,
-                    bgcolor: topBarConfig.isColored ? '#FFFFFF' : theme.palette.secondary.main,
-                    color: topBarConfig.isColored ? theme.palette.primary.main : '#FFFFFF',
-                    boxShadow: topBarConfig.isColored ? '0 2px 8px rgba(0,0,0,0.2)' : `0 2px 8px ${theme.palette.secondary.main}59`,
+                    borderRadius: designSystem === 'material' ? '50%' : (designSystem === 'microsoft' ? '4px' : `${activeSystemConfig?.shape?.buttonRadius || 6}px`),
+                    bgcolor: designSystem === 'material' ? '#1A73E8' : (topBarConfig.isColored ? '#FFFFFF' : theme.palette.secondary.main),
+                    color: designSystem === 'material' ? '#FFFFFF' : (topBarConfig.isColored ? theme.palette.primary.main : '#FFFFFF'),
+                    boxShadow: designSystem === 'material' ? '0 1px 3px 0 rgba(60,64,67,0.3)' : (topBarConfig.isColored ? '0 2px 8px rgba(0,0,0,0.2)' : `0 2px 8px ${theme.palette.secondary.main}59`),
                     '&:hover': {
                       filter: 'brightness(0.92)'
                     }
@@ -844,25 +894,53 @@ export default function Layout() {
               <Button
                 variant="contained"
                 size="small"
-                startIcon={<Add fontSize="small" sx={{ color: designSystem === 'microsoft' ? '#0F6CBD !important' : (topBarConfig.isColored ? `${theme.palette.primary.main} !important` : '#FFFFFF !important') }} />}
+                startIcon={<Add fontSize="small" sx={{
+                  color: designSystem === 'material'
+                    ? '#FFFFFF !important'
+                    : (designSystem === 'microsoft'
+                      ? '#0F6CBD !important'
+                      : (topBarConfig.isColored ? `${theme.palette.primary.main} !important` : '#FFFFFF !important'))
+                }} />}
                 onClick={handleQuickBill}
                 title="INVOICE (Alt + N or F2)"
                 sx={{
                   height: 34,
                   px: 2,
-                  borderRadius: designSystem === 'microsoft' ? '4px !important' : `${activeSystemConfig?.shape?.buttonRadius || 6}px !important`,
-                  fontWeight: designSystem === 'microsoft' ? 600 : 800,
+                  borderRadius: designSystem === 'material'
+                    ? '24px !important'
+                    : (designSystem === 'microsoft' ? '4px !important' : `${activeSystemConfig?.shape?.buttonRadius || 6}px !important`),
+                  fontWeight: designSystem === 'microsoft' ? 600 : 700,
                   fontSize: '0.825rem',
                   textTransform: 'none',
-                  bgcolor: '#FFFFFF !important',
-                  color: designSystem === 'microsoft' ? '#0F6CBD !important' : (topBarConfig.isColored ? `${theme.palette.primary.main} !important` : '#FFFFFF !important'),
-                  boxShadow: designSystem === 'microsoft' ? '0 1.6px 3.6px 0 rgba(0,0,0,0.13), 0 0.3px 0.9px 0 rgba(0,0,0,0.11)' : (topBarConfig.isColored ? '0 2px 10px rgba(0, 0, 0, 0.25)' : `0 4px 14px ${theme.palette.secondary.main}4D`),
+                  bgcolor: designSystem === 'material'
+                    ? '#1A73E8 !important'
+                    : (designSystem === 'microsoft'
+                      ? '#FFFFFF !important'
+                      : (topBarConfig.isColored ? '#FFFFFF !important' : `${theme.palette.primary.main} !important`)),
+                  color: designSystem === 'material'
+                    ? '#FFFFFF !important'
+                    : (designSystem === 'microsoft'
+                      ? '#0F6CBD !important'
+                      : (topBarConfig.isColored ? `${theme.palette.primary.main} !important` : '#FFFFFF !important')),
+                  boxShadow: designSystem === 'material'
+                    ? '0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15) !important'
+                    : (designSystem === 'microsoft'
+                      ? '0 1.6px 3.6px 0 rgba(0,0,0,0.13), 0 0.3px 0.9px 0 rgba(0,0,0,0.11)'
+                      : (topBarConfig.isColored ? '0 2px 10px rgba(0, 0, 0, 0.25)' : `0 4px 14px ${theme.palette.secondary.main}4D`)),
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',
                   display: { xs: 'none', sm: 'inline-flex' },
                   '&:hover': {
-                    bgcolor: '#F3F2F1 !important',
-                    boxShadow: designSystem === 'microsoft' ? '0 3.2px 7.2px 0 rgba(0,0,0,0.13), 0 0.6px 1.8px 0 rgba(0,0,0,0.11)' : (topBarConfig.isColored ? '0 4px 14px rgba(0, 0, 0, 0.3)' : `0 6px 18px ${theme.palette.secondary.main}66`)
+                    bgcolor: designSystem === 'material'
+                      ? '#1765CC !important'
+                      : (designSystem === 'microsoft'
+                        ? '#F3F2F1 !important'
+                        : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.92) !important' : `${theme.palette.primary.dark} !important`)),
+                    boxShadow: designSystem === 'material'
+                      ? '0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15) !important'
+                      : (designSystem === 'microsoft'
+                        ? '0 3.2px 7.2px 0 rgba(0,0,0,0.13), 0 0.6px 1.8px 0 rgba(0,0,0,0.11)'
+                        : (topBarConfig.isColored ? '0 4px 14px rgba(0, 0, 0, 0.3)' : `0 6px 18px ${theme.palette.secondary.main}66`))
                   }
                 }}
               >
@@ -881,13 +959,13 @@ export default function Layout() {
                 sx={{ 
                   width: 36, 
                   height: 36, 
-                  borderRadius: designSystem === 'microsoft' ? '4px' : `${activeSystemConfig?.shape?.buttonRadius || 6}px`,
-                  border: topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.35)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)'),
+                  borderRadius: designSystem === 'material' ? '50% !important' : (designSystem === 'microsoft' ? '4px' : `${activeSystemConfig?.shape?.buttonRadius || 6}px`),
+                  border: designSystem === 'material' ? 'none' : (topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.35)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)')),
                   color: density === 'compact' ? (topBarConfig.isColored ? '#FFFFFF' : (isDark ? '#2DD4BF' : theme.palette.primary.main)) : (topBarConfig.isColored ? '#FFFFFF' : 'text.secondary'),
-                  bgcolor: density === 'compact' ? (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.25)' : (isDark ? 'rgba(20, 184, 166, 0.14)' : `${theme.palette.primary.main}14`)) : 'transparent',
+                  bgcolor: density === 'compact' ? (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.25)' : (isDark ? 'rgba(20, 184, 166, 0.14)' : `${theme.palette.primary.main}14`)) : (designSystem === 'material' ? (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)') : 'transparent'),
                   display: { xs: 'none', sm: 'inline-flex' },
                   '&:hover': {
-                    bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.2)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)')
+                    bgcolor: designSystem === 'material' ? (isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)') : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.2)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)'))
                   }
                 }}
               >
@@ -903,12 +981,13 @@ export default function Layout() {
                 sx={{ 
                   width: 36, 
                   height: 36, 
-                  borderRadius: designSystem === 'microsoft' ? '4px' : `${activeSystemConfig?.shape?.buttonRadius || 6}px`,
-                  border: topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.35)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : `1px solid ${theme.palette.primary.main}26`),
-                  color: topBarConfig.isColored ? '#FFFFFF' : 'primary.main',
+                  borderRadius: designSystem === 'material' ? '50% !important' : (designSystem === 'microsoft' ? '4px' : `${activeSystemConfig?.shape?.buttonRadius || 6}px`),
+                  border: designSystem === 'material' ? 'none' : (topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.35)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : `1px solid ${theme.palette.primary.main}26`)),
+                  color: topBarConfig.isColored ? '#FFFFFF' : (designSystem === 'material' ? (isDark ? '#8AB4F8' : '#1A73E8') : 'primary.main'),
+                  bgcolor: designSystem === 'material' ? (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)') : 'transparent',
                   display: { xs: 'none', sm: 'inline-flex' },
                   '&:hover': {
-                    bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.2)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : `${theme.palette.primary.main}0E`)
+                    bgcolor: designSystem === 'material' ? (isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)') : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.2)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : `${theme.palette.primary.main}0E`))
                   }
                 }}
               >
@@ -923,16 +1002,17 @@ export default function Layout() {
                 sx={{ 
                   width: 36, 
                   height: 36, 
-                  borderRadius: designSystem === 'microsoft' ? '4px' : `${activeSystemConfig?.shape?.buttonRadius || 6}px`,
-                  border: topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.35)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : `1px solid ${theme.palette.primary.main}26`),
+                  borderRadius: designSystem === 'material' ? '50% !important' : (designSystem === 'microsoft' ? '4px' : `${activeSystemConfig?.shape?.buttonRadius || 6}px`),
+                  border: designSystem === 'material' ? 'none' : (topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.35)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : `1px solid ${theme.palette.primary.main}26`)),
                   color: topBarConfig.textColor,
+                  bgcolor: designSystem === 'material' ? (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)') : 'transparent',
                   '&:hover': {
-                    bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.2)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)')
+                    bgcolor: designSystem === 'material' ? (isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)') : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.2)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)'))
                   }
                 }}
                 title={mode === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
-              {mode === 'dark' ? <Brightness7 fontSize="small" sx={{ color: '#F59E0B' }} /> : <Brightness4 fontSize="small" sx={{ color: topBarConfig.isColored ? '#FFFFFF' : theme.palette.primary.main }} />}
+              {mode === 'dark' ? <Brightness7 fontSize="small" sx={{ color: '#F59E0B' }} /> : <Brightness4 fontSize="small" sx={{ color: topBarConfig.isColored ? '#FFFFFF' : (designSystem === 'material' ? '#1A73E8' : theme.palette.primary.main) }} />}
             </IconButton>
 
             {/* Top Right Logout Button */}

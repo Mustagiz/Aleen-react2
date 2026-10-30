@@ -40,7 +40,7 @@ import {
   DoneAll,
   PictureAsPdf
 } from '@mui/icons-material';
-import { dispatchMessage, normalizePhoneNumber } from '../services/messageDispatcher';
+import { dispatchMessage, normalizePhoneNumber, buildPublicBillUrl } from '../services/messageDispatcher';
 
 export const INVOICE_WHATSAPP_TEMPLATES = [
   {
@@ -286,9 +286,8 @@ export const generateInvoiceWhatsAppText = (templateText, invoice, profile) => {
   const businessName = profile?.businessName || 'Aleen Clothing';
   const address = profile?.address || 'Pune, Maharashtra';
   const businessPhone = profile?.phone || '+91 98765 43210';
-  const origin = typeof window !== 'undefined' ? window.location.origin : '';
-  const billLink = invoiceId && invoiceId !== 'N/A' ? `${origin}/bill/${invoiceId}` : `${origin}/invoices`;
-  const downloadPdfLink = invoiceId && invoiceId !== 'N/A' ? `${origin}/bill/${invoiceId}?download=true` : '';
+  const billLink = buildPublicBillUrl(invoiceId, profile);
+  const downloadPdfLink = buildPublicBillUrl(invoiceId, profile, { download: true });
 
   const invoiceRawDate = invoice.date ? new Date(invoice.date) : new Date();
   const expiryRawDate = new Date(invoiceRawDate.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -724,9 +723,8 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
                   label="+ PDF Bill Link"
                   size="small"
                   onClick={() => {
-                    const origin = typeof window !== 'undefined' ? window.location.origin : '';
                     const invRef = invoice.invoiceNumber || invoice.id;
-                    const link = invRef ? `${origin}/bill/${invRef}` : '';
+                    const link = buildPublicBillUrl(invRef, profile);
                     handleInsertVariable(`📥 *Download PDF Bill:* ${link}`);
                   }}
                   sx={{ cursor: 'pointer', height: 22, fontSize: '0.7rem', fontWeight: 700, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main }}

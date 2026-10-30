@@ -2,7 +2,8 @@ import {
   normalizePhoneNumber,
   buildWhatsAppUrl,
   buildSmsUrl,
-  formatInvoiceReceiptMessage
+  formatInvoiceReceiptMessage,
+  buildPublicBillUrl
 } from './messageDispatcher';
 
 describe('MessageDispatcher Module Tests', () => {
@@ -46,5 +47,17 @@ describe('MessageDispatcher Module Tests', () => {
     expect(message).toContain('2,500');
     expect(message).toContain('https://aleen.app/bill/INV-1001');
     expect(message).toContain('Nov 03, 2026');
+  });
+
+  test('buildPublicBillUrl uses configured profile domain or live Firebase default', () => {
+    const customUrl = buildPublicBillUrl('INV-5001', { publicBillBaseUrl: 'https://customboutique.com' });
+    expect(customUrl).toBe('https://customboutique.com/bill/INV-5001');
+
+    const downloadUrl = buildPublicBillUrl('INV-5001', { publicBillBaseUrl: 'https://customboutique.com' }, { download: true });
+    expect(downloadUrl).toBe('https://customboutique.com/bill/INV-5001?download=true');
+
+    // Strips leading hash
+    const strippedUrl = buildPublicBillUrl('#INV-999', { publicBillBaseUrl: 'https://aleen.in/' });
+    expect(strippedUrl).toBe('https://aleen.in/bill/INV-999');
   });
 });

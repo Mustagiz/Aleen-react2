@@ -35,6 +35,7 @@ import {
   OpenInNew
 } from '@mui/icons-material';
 import { INVOICE_WHATSAPP_TEMPLATES, generateInvoiceWhatsAppText } from './InvoiceWhatsAppDialog';
+import { buildPublicBillUrl } from '../services/messageDispatcher';
 import ThermalReceipt from './ThermalReceipt';
 import { printInvoiceElement } from '../utils/printInvoice';
 
@@ -105,9 +106,8 @@ const BillSuccessModal = ({
   };
 
   const getCustomerBillLink = () => {
-    const origin = typeof window !== 'undefined' ? window.location.origin : '';
     const invRef = invoice?.invoiceNumber || invoice?.id;
-    return invRef ? `${origin}/bill/${invRef}` : `${origin}/invoices`;
+    return buildPublicBillUrl(invRef, profile);
   };
 
   // Compile WhatsApp text template (now includes direct PDF download link)

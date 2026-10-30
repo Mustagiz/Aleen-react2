@@ -75,6 +75,7 @@ const AnimatedRoutes = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/mobile-scanner" element={<Suspense fallback={<AtelierPageLoader />}><MobileScanner /></Suspense>} />
         <Route path="/customer-display" element={<Suspense fallback={<AtelierPageLoader />}><CustomerDisplay /></Suspense>} />
+        <Route path="/bill" element={<Suspense fallback={<AtelierPageLoader />}><PublicBillView /></Suspense>} />
         <Route path="/bill/:id" element={<Suspense fallback={<AtelierPageLoader />}><PublicBillView /></Suspense>} />
         <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
           <Route index element={<PageWrapper><Dashboard /></PageWrapper>} />

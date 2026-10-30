@@ -24,6 +24,46 @@ export const normalizePhoneNumber = (phone = '', defaultCountryCode = '91') => {
 };
 
 /**
+ * Builds reliable public bill viewing / downloading URL
+ * Resolves boutique domain or live Firebase Hosting endpoint if running on localhost,
+ * ensuring links sent on WhatsApp work flawlessly on mobile devices.
+ */
+export const buildPublicBillUrl = (invoiceId = '', profile = {}, options = {}) => {
+  if (!invoiceId || invoiceId === 'N/A') return '';
+  const cleanId = String(invoiceId).replace(/^#/, '').trim();
+
+  // 1. Explicitly configured domain/URL from boutique profile settings
+  let base = (profile?.publicBillBaseUrl || profile?.websiteUrl || profile?.website || '').trim();
+
+  // 2. Runtime inspection fallback
+  if (!base && typeof window !== 'undefined') {
+    const hostname = window.location.hostname || '';
+    const isLocalhost = hostname === 'localhost' ||
+                        hostname === '127.0.0.1' ||
+                        hostname.startsWith('192.168.') ||
+                        hostname.startsWith('10.');
+
+    if (isLocalhost) {
+      // Localhost/LAN IP cannot be resolved on customer smartphones over WhatsApp.
+      // Fallback to the production live Firebase Hosting endpoint for this atelier:
+      base = 'https://aleen-55164.web.app';
+    } else {
+      const origin = window.location.origin || '';
+      const publicUrl = (process.env.PUBLIC_URL || '').replace(/\/+$/, '');
+      base = `${origin}${publicUrl}`;
+    }
+  }
+
+  if (!base) {
+    base = 'https://aleen-55164.web.app';
+  }
+
+  base = base.replace(/\/+$/, '');
+  const downloadParam = options.download ? '?download=true' : '';
+  return `${base}/bill/${encodeURIComponent(cleanId)}${downloadParam}`;
+};
+
+/**
  * Builds standard WhatsApp Web / App deep link
  */
 export const buildWhatsAppUrl = (phone = '', message = '') => {

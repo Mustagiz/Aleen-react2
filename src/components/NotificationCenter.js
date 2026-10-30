@@ -194,16 +194,16 @@ const NotificationCenter = () => {
                     sx={{
                         width: 36,
                         height: 36,
-                        borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 6}px`,
-                        border: topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.35)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)'),
+                        borderRadius: activeSystemConfig?.id === 'material' ? '50% !important' : `${activeSystemConfig?.shape?.buttonRadius || 6}px`,
+                        border: activeSystemConfig?.id === 'material' ? 'none' : (topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.35)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)')),
                         color: topBarConfig.isColored 
                             ? '#FFFFFF' 
                             : (unreadCount > 0 ? theme.palette.primary.main : 'text.primary'),
                         bgcolor: topBarConfig.isColored 
                             ? (unreadCount > 0 ? 'rgba(255, 255, 255, 0.22)' : 'transparent') 
-                            : (unreadCount > 0 ? `${theme.palette.primary.main}12` : 'transparent'),
+                            : (unreadCount > 0 ? `${theme.palette.primary.main}12` : (activeSystemConfig?.id === 'material' ? (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)') : 'transparent')),
                         '&:hover': {
-                            bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.2)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)')
+                            bgcolor: activeSystemConfig?.id === 'material' ? (isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)') : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.2)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)'))
                         }
                     }}
                 >

@@ -96,49 +96,69 @@ const PublicBillView = () => {
         }
 
         // B. Fetch Invoice
-        if (!id) {
+        const rawId = id || searchParams.get('id') || searchParams.get('bill') || searchParams.get('inv') || '';
+        if (!rawId) {
           setError('No invoice ID specified.');
           return;
         }
 
-        const cleanId = String(id).trim();
+        const cleanId = decodeURIComponent(String(rawId).replace(/^#/, '').trim());
         let foundInvoice = null;
 
+        // Possible lookup candidates (clean, normalized with/without prefix)
+        const candidates = [cleanId];
+        if (cleanId.startsWith('INV-')) {
+          candidates.push(cleanId.replace('INV-', 'INV'));
+          candidates.push(cleanId.replace('INV-', ''));
+        } else if (cleanId.startsWith('INV')) {
+          candidates.push(cleanId.replace('INV', 'INV-'));
+          candidates.push(cleanId.replace('INV', ''));
+        }
+
         // Strategy 1: Direct document ID lookup
-        try {
-          const invoiceSnap = await getDoc(doc(db, 'invoices', cleanId));
-          if (invoiceSnap.exists()) {
-            foundInvoice = { id: invoiceSnap.id, ...invoiceSnap.data() };
+        for (const cand of candidates) {
+          if (foundInvoice) break;
+          try {
+            const invoiceSnap = await getDoc(doc(db, 'invoices', cand));
+            if (invoiceSnap.exists()) {
+              foundInvoice = { id: invoiceSnap.id, ...invoiceSnap.data() };
+            }
+          } catch (dbErr) {
+            console.warn('Direct Firestore fetch warning:', dbErr);
           }
-        } catch (dbErr) {
-          console.warn('Direct Firestore fetch warning:', dbErr);
         }
 
         // Strategy 2: Query by 'invoiceNumber' field (e.g. INV26100012)
         if (!foundInvoice) {
-          try {
-            const qInvNum = query(collection(db, 'invoices'), where('invoiceNumber', '==', cleanId));
-            const snapInvNum = await getDocs(qInvNum);
-            if (!snapInvNum.empty) {
-              const d = snapInvNum.docs[0];
-              foundInvoice = { id: d.id, ...d.data() };
+          for (const cand of candidates) {
+            if (foundInvoice) break;
+            try {
+              const qInvNum = query(collection(db, 'invoices'), where('invoiceNumber', '==', cand));
+              const snapInvNum = await getDocs(qInvNum);
+              if (!snapInvNum.empty) {
+                const d = snapInvNum.docs[0];
+                foundInvoice = { id: d.id, ...d.data() };
+              }
+            } catch (qErr) {
+              console.warn('Query by invoiceNumber warning:', qErr);
             }
-          } catch (qErr) {
-            console.warn('Query by invoiceNumber warning:', qErr);
           }
         }
 
         // Strategy 3: Query by 'id' field
         if (!foundInvoice) {
-          try {
-            const qId = query(collection(db, 'invoices'), where('id', '==', cleanId));
-            const snapId = await getDocs(qId);
-            if (!snapId.empty) {
-              const d = snapId.docs[0];
-              foundInvoice = { id: d.id, ...d.data() };
+          for (const cand of candidates) {
+            if (foundInvoice) break;
+            try {
+              const qId = query(collection(db, 'invoices'), where('id', '==', cand));
+              const snapId = await getDocs(qId);
+              if (!snapId.empty) {
+                const d = snapId.docs[0];
+                foundInvoice = { id: d.id, ...d.data() };
+              }
+            } catch (qErr) {
+              console.warn('Query by id warning:', qErr);
             }
-          } catch (qErr) {
-            console.warn('Query by id warning:', qErr);
           }
         }
 
@@ -191,7 +211,7 @@ const PublicBillView = () => {
     };
 
     fetchInvoiceData();
-  }, [id]);
+  }, [id, searchParams]);
 
   // Determine active template: current CRM template takes precedence
   const activeTemplate = invoiceSettings?.template || invoice?.template || 'atelier-emerald';

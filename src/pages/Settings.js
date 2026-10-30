@@ -60,7 +60,8 @@ import {
   AutoAwesome,
   QrCode2,
   Palette,
-  Tv
+  Tv,
+  Language
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -127,6 +128,7 @@ export default function Settings() {
     pan: profile.pan || '',
     stateCode: profile.stateCode || '27 - Maharashtra',
     description: profile.description || 'Premium bespoke couture and luxury apparel studio.',
+    publicBillBaseUrl: profile.publicBillBaseUrl || '',
     
     // Bank & Settlement (reflected on invoices)
     showBankDetails: profile.showBankDetails ?? true,
@@ -892,6 +894,20 @@ export default function Settings() {
                     onChange={(e) => setFormProfile({ ...formProfile, address: e.target.value })}
                     InputProps={{
                       startAdornment: <LocationOn sx={{ mr: 1, color: (t) => t.palette.primary.main, fontSize: 20, mt: 0.5 }} />
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="Public E-Bill Base URL (for WhatsApp & SMS Links)"
+                    placeholder="https://aleen-55164.web.app"
+                    value={formProfile.publicBillBaseUrl || ''}
+                    onChange={(e) => setFormProfile({ ...formProfile, publicBillBaseUrl: e.target.value })}
+                    helperText="Public web address where patrons view & download official e-bills on mobile (Default: https://aleen-55164.web.app)"
+                    InputProps={{
+                      startAdornment: <Language sx={{ mr: 1, color: (t) => t.palette.primary.main, fontSize: 20 }} />
                     }}
                   />
                 </Grid>

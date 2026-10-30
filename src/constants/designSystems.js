@@ -442,10 +442,10 @@ export const DESIGN_SYSTEMS = [
     tagline: 'Material 3 design language with 24px pill buttons, pastel container surfaces, and fluid touch ergonomics.',
     icon: '🎨',
     shape: {
-      borderRadius: 10,
-      buttonRadius: 9,
-      inputRadius: 9,
-      cardRadius: 14
+      borderRadius: 12,
+      buttonRadius: 20,
+      inputRadius: 12,
+      cardRadius: 16
     },
     typography: {
       fontFamily: '"Roboto", "Plus Jakarta Sans", -apple-system, sans-serif',
