@@ -214,20 +214,28 @@ const Dashboard = () => {
     const radius = activeSystemConfig?.shape?.buttonRadius ?? theme.shape?.borderRadius ?? 8;
     const ctaBg = sysBanner.ctaBg || theme.palette.primary.main;
     const ctaHover = sysBanner.ctaHover || theme.palette.primary.dark;
+    const contrastText = theme.palette.primary.contrastText || '#FFFFFF';
 
     return {
       bgcolor: `${ctaBg} !important`,
-      color: `${theme.palette.primary.contrastText || '#FFFFFF'} !important`,
-      fontWeight: 800,
-      fontSize: { xs: '0.82rem', sm: '0.84rem' },
+      color: `${contrastText} !important`,
+      fontWeight: 700,
+      fontSize: { xs: '0.84rem', sm: '0.84rem' },
       borderRadius: `${radius}px !important`,
-      height: { xs: 42, sm: 40 },
-      px: { xs: 2.2, sm: 2.6 },
+      minHeight: { xs: 44, sm: 40 },
+      px: { xs: 2.4, sm: 2.6 },
       textTransform: activeSystemConfig?.buttonStyle?.textTransform || 'none',
       boxShadow: `0 4px 14px ${ctaBg}55`,
+      border: '1px solid rgba(255, 255, 255, 0.25) !important',
       transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-      '& .MuiButton-startIcon': {
-        color: `${theme.palette.primary.contrastText || '#FFFFFF'} !important`
+      cursor: 'pointer',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 0.75,
+      '& .MuiSvgIcon-root, & .MuiButton-startIcon, & .MuiButton-startIcon > *:first-of-type': {
+        color: `${contrastText} !important`,
+        fontSize: '1.2rem !important'
       },
       '&:hover': {
         bgcolor: `${ctaHover} !important`,
@@ -236,6 +244,10 @@ const Dashboard = () => {
       },
       '&:active': {
         transform: 'scale(0.98)'
+      },
+      '&:focus-visible': {
+        outline: `2px solid ${ctaBg}`,
+        outlineOffset: 2
       }
     };
   };
@@ -245,60 +257,93 @@ const Dashboard = () => {
     const isDarkBanner = sysBanner.isDarkBanner;
 
     if (isDarkBanner) {
+      // Saturated or dark hero banners (Atelier, Zoho, Microsoft, Stripe, Salesforce, Linear, or Dark Mode)
       return {
-        bgcolor: isDark ? 'rgba(255, 255, 255, 0.14) !important' : '#FFFFFF !important',
-        color: isDark ? '#FFFFFF !important' : `${theme.palette.primary.dark || '#042F2E'} !important`,
-        border: isDark ? '1px solid rgba(255, 255, 255, 0.28) !important' : '1px solid rgba(255, 255, 255, 0.9) !important',
+        bgcolor: 'rgba(255, 255, 255, 0.12) !important',
+        color: '#FFFFFF !important',
+        border: '1px solid rgba(255, 255, 255, 0.28) !important',
         borderRadius: `${radius}px !important`,
-        fontWeight: 700,
-        fontSize: { xs: '0.8rem', sm: '0.82rem' },
-        height: { xs: 42, sm: 40 },
-        px: { xs: 2, sm: 2.2 },
+        fontWeight: 600,
+        fontSize: { xs: '0.82rem', sm: '0.83rem' },
+        minHeight: { xs: 44, sm: 40 },
+        px: { xs: 2.2, sm: 2.4 },
         textTransform: activeSystemConfig?.buttonStyle?.textTransform || 'none',
-        boxShadow: isDark ? '0 2px 8px rgba(0, 0, 0, 0.25) !important' : '0 2px 8px rgba(0, 0, 0, 0.15) !important',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2) !important',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
         transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-        '& .MuiButton-startIcon': {
-          color: isDark ? '#FFFFFF !important' : `${theme.palette.primary.main} !important`
+        cursor: 'pointer',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 0.75,
+        '& .MuiSvgIcon-root, & .MuiButton-startIcon, & .MuiButton-startIcon > *:first-of-type': {
+          color: '#FFFFFF !important',
+          fontSize: '1.15rem !important'
         },
         '&:hover': {
-          bgcolor: isDark ? 'rgba(255, 255, 255, 0.24) !important' : 'rgba(255, 255, 255, 0.95) !important',
-          borderColor: '#FFFFFF !important',
-          boxShadow: isDark ? '0 4px 16px rgba(0, 0, 0, 0.35) !important' : '0 4px 16px rgba(0, 0, 0, 0.25) !important',
-          transform: 'translateY(-1px)'
+          bgcolor: 'rgba(255, 255, 255, 0.22) !important',
+          borderColor: 'rgba(255, 255, 255, 0.6) !important',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3) !important',
+          transform: 'translateY(-1px)',
+          '& .MuiSvgIcon-root, & .MuiButton-startIcon, & .MuiButton-startIcon > *:first-of-type': {
+            color: '#FFFFFF !important'
+          }
         },
         '&:active': {
-          transform: 'scale(0.98)'
+          transform: 'scale(0.98)',
+          bgcolor: 'rgba(255, 255, 255, 0.28) !important'
+        },
+        '&:focus-visible': {
+          outline: '2px solid rgba(255, 255, 255, 0.8)',
+          outlineOffset: 2
         }
       };
     }
 
-    // Light Banner (e.g. Apple Light or Material Light)
+    // Light Banner (e.g. Google Material 3 Light or Apple Liquid Light)
+    const primaryMain = theme.palette.primary.main;
+    const textPrimary = theme.palette.text.primary || '#0F172A';
+
     return {
-      bgcolor: `${theme.palette.background.paper} !important`,
-      color: `${theme.palette.text.primary} !important`,
-      border: `1px solid ${theme.palette.divider} !important`,
+      bgcolor: 'rgba(255, 255, 255, 0.85) !important',
+      color: `${textPrimary} !important`,
+      border: `1px solid ${primaryMain}30 !important`,
       borderRadius: `${radius}px !important`,
-      fontWeight: 700,
-      fontSize: { xs: '0.8rem', sm: '0.82rem' },
-      height: { xs: 42, sm: 40 },
-      px: { xs: 2, sm: 2.2 },
+      fontWeight: 600,
+      fontSize: { xs: '0.82rem', sm: '0.83rem' },
+      minHeight: { xs: 44, sm: 40 },
+      px: { xs: 2.2, sm: 2.4 },
       textTransform: activeSystemConfig?.buttonStyle?.textTransform || 'none',
-      boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08) !important',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05) !important',
+      backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
       transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-      '& .MuiButton-startIcon': {
-        color: `${theme.palette.primary.main} !important`
+      cursor: 'pointer',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 0.75,
+      '& .MuiSvgIcon-root, & .MuiButton-startIcon, & .MuiButton-startIcon > *:first-of-type': {
+        color: `${primaryMain} !important`,
+        fontSize: '1.15rem !important'
       },
       '&:hover': {
-        bgcolor: `${theme.palette.action.hover} !important`,
-        borderColor: `${theme.palette.primary.main} !important`,
-        color: `${theme.palette.primary.main} !important`,
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.12) !important',
-        transform: 'translateY(-1px)'
+        bgcolor: '#FFFFFF !important',
+        borderColor: `${primaryMain} !important`,
+        color: `${theme.palette.primary.dark || primaryMain} !important`,
+        boxShadow: `0 4px 14px ${primaryMain}22 !important`,
+        transform: 'translateY(-1px)',
+        '& .MuiSvgIcon-root, & .MuiButton-startIcon, & .MuiButton-startIcon > *:first-of-type': {
+          color: `${theme.palette.primary.dark || primaryMain} !important`
+        }
       },
       '&:active': {
         transform: 'scale(0.98)'
+      },
+      '&:focus-visible': {
+        outline: `2px solid ${primaryMain}`,
+        outlineOffset: 2
       }
     };
   };
@@ -647,7 +692,7 @@ const Dashboard = () => {
           >
             <Button
               variant="contained"
-              startIcon={<Add />}
+              startIcon={<Add sx={{ fontSize: '1.2rem !important' }} />}
               onClick={() => navigate('/invoices?action=new', { state: { openNewBill: true } })}
               sx={{
                 ...getBannerPrimaryBtnStyle(),
@@ -658,7 +703,7 @@ const Dashboard = () => {
             </Button>
             <Button
               variant="contained"
-              startIcon={<PointOfSale />}
+              startIcon={<PointOfSale sx={{ fontSize: '1.15rem !important' }} />}
               onClick={() => setDrawerModalOpen(true)}
               sx={{
                 ...getBannerSecondaryBtnStyle(),
@@ -669,7 +714,7 @@ const Dashboard = () => {
             </Button>
             <Button
               variant="contained"
-              startIcon={<Straighten />}
+              startIcon={<Straighten sx={{ fontSize: '1.15rem !important' }} />}
               onClick={() => navigate('/tailoring')}
               sx={{
                 ...getBannerSecondaryBtnStyle(),

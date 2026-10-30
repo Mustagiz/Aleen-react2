@@ -134,6 +134,10 @@ export const ThemeProvider = ({ children }) => {
             root.style.setProperty('--emerald-primary', activePalette.primary.main);
             root.style.setProperty('--emerald-light', activePalette.primary.light);
             root.style.setProperty('--emerald-dark', activePalette.primary.dark);
+            root.style.setProperty('--primary-main', activePalette.primary.main);
+            root.style.setProperty('--primary-light', activePalette.primary.light);
+            root.style.setProperty('--primary-dark', activePalette.primary.dark);
+            root.style.setProperty('--primary-contrast', activePalette.primary.contrastText || '#FFFFFF');
             root.style.setProperty('--primary-rgb', hexToRgb(activePalette.primary.main));
             root.style.setProperty('--secondary-rgb', hexToRgb(activePalette.secondary.main));
             root.style.setProperty('--gold-accent', activePalette.secondary.main);

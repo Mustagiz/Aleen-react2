@@ -110,36 +110,34 @@ td.invoice-table-header-cell {
   border-color: var(--emerald-primary) !important;
 }
 
-/* Universal Button Overrides: bind all buttons to dynamic ecosystem radius and colors */
+/* Universal Button Overrides: bind all buttons to dynamic ecosystem radius and typography */
 .MuiButton-root {
-  border-radius: var(--button-radius, 8px) !important;
-  font-family: var(--font-sans) !important;
+  border-radius: var(--button-radius, 8px);
+  font-family: var(--font-sans);
 }
 
-/* Contained action buttons & legacy hardcoded emerald gradient buttons */
-.MuiButton-contained,
-.MuiButton-containedPrimary {
-  background: var(--button-bg, var(--emerald-primary)) !important;
-  color: #FFFFFF !important;
-  border-radius: var(--button-radius, 8px) !important;
+/* Default contained button fallback (only when not explicitly styled) */
+.MuiButton-contained:not([style*="background"]):not([style*="bgcolor"]):not([class*="custom-btn"]) {
+  background: var(--button-bg, var(--emerald-primary));
+  color: #FFFFFF;
 }
 
-.MuiButton-contained .MuiSvgIcon-root,
-.MuiButton-containedPrimary .MuiSvgIcon-root {
-  color: #FFFFFF !important;
+/* Default outlined button fallback (only when not explicitly styled) */
+.MuiButton-outlined:not([style*="border"]):not([style*="color"]) {
+  border-color: var(--emerald-primary);
+  color: var(--emerald-primary);
 }
 
-/* Outlined action buttons & legacy hardcoded emerald borders/text */
-.MuiButton-outlined,
-.MuiButton-outlinedPrimary {
-  border-color: var(--emerald-primary) !important;
-  color: var(--emerald-primary) !important;
-  border-radius: var(--button-radius, 8px) !important;
+.MuiButton-outlined:hover:not([style*="border"]):not([style*="background"]) {
+  border-color: var(--emerald-dark);
+  background-color: rgba(var(--primary-rgb, 15, 118, 110), 0.06);
 }
 
-.MuiButton-outlined .MuiSvgIcon-root,
-.MuiButton-outlinedPrimary .MuiSvgIcon-root {
-  color: var(--emerald-primary) !important;
+/* Icons inside buttons inherit color naturally from the button text */
+.MuiButton-root .MuiSvgIcon-root {
+  color: inherit;
+  font-size: 1.15rem;
+  transition: color 0.18s ease, transform 0.18s ease;
 }
 
 /* Header & Modal Title Glassmorphic Contrast Exemption: Always crisp white on colored gradients */
@@ -155,19 +153,6 @@ td.invoice-table-header-cell {
 .MuiAppBar-root .header-contrast-btn .MuiSvgIcon-root,
 .header-contrast-btn .MuiSvgIcon-root {
   color: #FFFFFF !important;
-}
-
-.MuiButton-outlined:hover,
-.MuiButton-outlinedPrimary:hover {
-  border-color: var(--emerald-dark) !important;
-  background-color: rgba(var(--primary-rgb, 15, 118, 110), 0.06) !important;
-}
-
-.MuiButton-root[style*="border: 1.5px solid #0F766E"] .MuiSvgIcon-root,
-.MuiButton-root[style*="border: 1.5px solid #0f766e"] .MuiSvgIcon-root,
-.MuiButton-root[style*="color: #0F766E"] .MuiSvgIcon-root,
-.MuiButton-root[style*="color: #0f766e"] .MuiSvgIcon-root {
-  color: var(--emerald-primary) !important;
 }
 
 /* 1. MICROSOFT FLUENT 365: Balanced 8px controls, 12px cards, Segoe UI */
