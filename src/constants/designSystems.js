@@ -344,7 +344,7 @@ export const DESIGN_SYSTEMS = [
       style: 'clean',
       lightBg: '#FFFFFF',
       darkBg: '#121316',
-      textColor: '#F8FAFC',
+      textColor: '#0F172A',
       borderColor: '#23252A'
     },
     cardStyle: {

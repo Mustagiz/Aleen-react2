@@ -156,13 +156,19 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
         ? (product.customMrp === '' ? 0 : Number(product.customMrp))
         : (product?.mrp ? Number(product.mrp) : Math.round(sellingPrice * (settings.mrpMultiplier || 1.25)));
 
+    const specText = [
+        product?.size && product.size !== 'Free Size' ? product.size : null,
+        product?.color || null,
+        showCategory && product?.category ? product.category : null
+    ].filter(Boolean).join(' • ') || (product?.variantName || (product?.size ? `${product.size}` : 'Free Size'));
+
     return (
         <Box
             sx={{
-                border: '1px solid #d1d5db',
-                p: isSmall ? 0.4 : 0.75,
+                border: '1px solid #1E293B',
+                p: isSmall ? '2px 4px' : '4px 6px',
                 textAlign: 'center',
-                borderRadius: 0.5,
+                borderRadius: '4px',
                 overflow: 'hidden',
                 minHeight: dims.h,
                 height: dims.h,
@@ -177,7 +183,8 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                 color: '#000000',
                 mx: 'auto',
                 boxSizing: 'border-box',
-                fontFamily: 'system-ui, -apple-system, sans-serif',
+                fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                position: 'relative',
                 '@media print': {
                     border: '1px solid #94A3B8',
                     pageBreakInside: 'avoid',
@@ -185,136 +192,161 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                     boxShadow: 'none',
                     width: '100% !important',
                     maxWidth: `${dims.maxWidth || dims.w} !important`,
-                    height: `${dims.h} !important`
+                    height: `${dims.h} !important`,
+                    bgcolor: '#FFFFFF !important',
+                    color: '#000000 !important'
                 }
             }}
         >
-            {/* Store / Business Name */}
-            {showBusiness && (
-                <Typography
-                    sx={{
-                        fontSize: `${(isSmall ? 7 : isLarge ? 10 : 8.5) * fontScale}px`,
-                        fontWeight: 900,
-                        lineHeight: 1,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.04em',
-                        color: '#000000',
-                        maxWidth: '100%',
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap',
-                        textOverflow: 'ellipsis'
-                    }}
-                >
-                    {businessName || 'ALEEN CLOTHING'}
-                </Typography>
-            )}
+            {/* Top Brand & Header Section */}
+            <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                {showBusiness && (
+                    <Typography
+                        sx={{
+                            fontSize: `${(isSmall ? 7 : isLarge ? 10.5 : 9) * fontScale}px`,
+                            fontWeight: 900,
+                            lineHeight: 1.1,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.12em',
+                            color: '#000000',
+                            maxWidth: '100%',
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                            textOverflow: 'ellipsis',
+                            pb: 0.2
+                        }}
+                    >
+                        {businessName || 'ALEEN CLOTHING'}
+                    </Typography>
+                )}
 
-            {/* Product Name & Category */}
-            {showName && (
-                <Typography
-                    sx={{
-                        fontSize: `${(isSmall ? 7.5 : isLarge ? 11 : 9) * fontScale}px`,
-                        fontWeight: 700,
-                        lineHeight: 1.1,
-                        width: '100%',
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap',
-                        textOverflow: 'ellipsis',
-                        color: '#111827'
-                    }}
-                >
-                    {product?.name || 'Garment Item'}
-                    {showCategory && product?.category && (
-                        <span style={{ fontWeight: 400, color: '#4b5563' }}> • {product.category}</span>
-                    )}
-                </Typography>
-            )}
+                {/* Garment Title */}
+                {showName && (
+                    <Typography
+                        sx={{
+                            fontSize: `${(isSmall ? 7.5 : isLarge ? 11.5 : 9.5) * fontScale}px`,
+                            fontWeight: 800,
+                            lineHeight: 1.15,
+                            width: '100%',
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                            textOverflow: 'ellipsis',
+                            color: '#0F172A',
+                            letterSpacing: '0.01em'
+                        }}
+                    >
+                        {product?.name || 'Garment Item'}
+                    </Typography>
+                )}
 
-            {/* Size & Color Spec if enabled */}
-            {showSizeColor && (product?.size || product?.color || product?.variantName) && (
-                <Typography
-                    sx={{
-                        fontSize: `${(isSmall ? 6.5 : 7.5) * fontScale}px`,
-                        fontWeight: 600,
-                        color: '#374151',
-                        lineHeight: 1,
-                        textTransform: 'uppercase'
-                    }}
-                >
-                    {product?.variantName || `${product?.size || 'Free Size'} / ${product?.color || 'Std'}`}
-                </Typography>
-            )}
+                {/* Variant & Spec Capsule */}
+                {showSizeColor && specText && (
+                    <Box
+                        sx={{
+                            display: 'inline-block',
+                            mt: 0.2,
+                            px: 0.6,
+                            py: 0.1,
+                            bgcolor: '#F1F5F9',
+                            borderRadius: '3px',
+                            maxWidth: '96%',
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                            textOverflow: 'ellipsis',
+                            lineHeight: 1
+                        }}
+                    >
+                        <Typography
+                            component="span"
+                            sx={{
+                                fontSize: `${(isSmall ? 6.5 : 7.5) * fontScale}px`,
+                                fontWeight: 700,
+                                color: '#475569',
+                                lineHeight: 1,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.04em'
+                            }}
+                        >
+                            {specText}
+                        </Typography>
+                    </Box>
+                )}
+            </Box>
 
-            {/* The SVG Barcode */}
-            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', my: 0.2 }}>
+            {/* Barcode SVG */}
+            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', my: 0.15 }}>
                 <svg ref={barcodeRef} style={{ maxWidth: '98%', height: `${dims.barH}px`, display: 'block' }}></svg>
             </Box>
 
-            {/* Product ID / SKU Under Barcode */}
-            {showSku && (
-                <Typography
-                    sx={{
-                        fontSize: `${(isSmall ? 7 : isLarge ? 9.5 : 8) * fontScale}px`,
-                        fontWeight: 800,
-                        fontFamily: 'monospace',
-                        letterSpacing: '0.08em',
-                        lineHeight: 1,
-                        color: '#111827',
-                        textTransform: 'uppercase'
-                    }}
-                >
-                    {formatSkuWithHyphen(value)}
-                </Typography>
-            )}
-
-            {/* Price & M.R.P. Row */}
-            {showPrice && (
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.75, width: '100%', flexWrap: 'nowrap' }}>
-                    {showMrp && mrpPrice > 0 && (
-                        <Typography
-                            sx={{
-                                fontSize: `${(isSmall ? 7 : 8.5) * fontScale}px`,
-                                color: '#6b7280',
-                                textDecoration: 'line-through',
-                                fontWeight: 600,
-                                lineHeight: 1,
-                                whiteSpace: 'nowrap'
-                            }}
-                        >
-                            {mrpPrefix} {currency}{mrpPrice.toLocaleString('en-IN')}
-                        </Typography>
-                    )}
+            {/* Bottom SKU & Pricing Section */}
+            <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                {showSku && (
                     <Typography
                         sx={{
-                            fontSize: `${(isSmall ? 9.5 : isLarge ? 14 : 11.5) * fontScale}px`,
-                            fontWeight: 900,
+                            fontSize: `${(isSmall ? 7 : isLarge ? 9.5 : 8.5) * fontScale}px`,
+                            fontWeight: 800,
+                            fontFamily: '"SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace',
+                            letterSpacing: '0.14em',
                             lineHeight: 1,
-                            color: '#000000',
-                            whiteSpace: 'nowrap'
+                            color: '#1E293B',
+                            textTransform: 'uppercase',
+                            mb: 0.3
                         }}
                     >
-                        {currency}{sellingPrice.toLocaleString('en-IN')}
+                        {formatSkuWithHyphen(value)}
                     </Typography>
-                    {settings.showDiscountBadge && mrpPrice > sellingPrice && (
+                )}
+
+                {/* Price & MRP Row */}
+                {showPrice && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.75, width: '100%', flexWrap: 'nowrap' }}>
+                        {showMrp && mrpPrice > 0 && (
+                            <Typography
+                                sx={{
+                                    fontSize: `${(isSmall ? 6.5 : 8) * fontScale}px`,
+                                    color: '#64748B',
+                                    textDecoration: 'line-through',
+                                    fontWeight: 600,
+                                    lineHeight: 1,
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                {mrpPrefix} {currency}{mrpPrice.toLocaleString('en-IN')}
+                            </Typography>
+                        )}
                         <Typography
                             sx={{
-                                fontSize: `${(isSmall ? 6 : 7.2) * fontScale}px`,
+                                fontSize: `${(isSmall ? 9.5 : isLarge ? 14 : 11.5) * fontScale}px`,
                                 fontWeight: 900,
-                                bgcolor: '#000000',
-                                color: '#FFFFFF',
-                                px: 0.4,
-                                py: 0.1,
-                                borderRadius: 0.25,
                                 lineHeight: 1,
+                                color: '#000000',
                                 whiteSpace: 'nowrap',
-                                letterSpacing: '0.02em'
+                                letterSpacing: '-0.02em'
                             }}
                         >
-                            {Math.round(((mrpPrice - sellingPrice) / mrpPrice) * 100)}% OFF
+                            {currency}{sellingPrice.toLocaleString('en-IN')}
                         </Typography>
-                    )}
-                </Box>
-            )}
+                        {settings.showDiscountBadge && mrpPrice > sellingPrice && (
+                            <Typography
+                                sx={{
+                                    fontSize: `${(isSmall ? 6 : 7.5) * fontScale}px`,
+                                    fontWeight: 900,
+                                    bgcolor: '#0F172A',
+                                    color: '#FFFFFF',
+                                    px: 0.45,
+                                    py: 0.1,
+                                    borderRadius: '3px',
+                                    lineHeight: 1,
+                                    whiteSpace: 'nowrap',
+                                    letterSpacing: '0.02em'
+                                }}
+                            >
+                                {Math.round(((mrpPrice - sellingPrice) / mrpPrice) * 100)}% OFF
+                            </Typography>
+                        )}
+                    </Box>
+                )}
+            </Box>
         </Box>
     );
 };
@@ -2327,21 +2359,88 @@ export default function BarcodeGenerator() {
                 maxWidth="md" 
                 fullWidth
                 fullScreen={isTablet}
-                PaperProps={{ sx: { borderRadius: isTablet ? 0 : 3.5 } }}
+                PaperProps={{ 
+                    sx: { 
+                        borderRadius: isTablet ? 0 : 3.5,
+                        overflow: 'hidden',
+                        boxShadow: '0 24px 60px rgba(0,0,0,0.22)'
+                    } 
+                }}
             >
-                <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 800 }}>
-                    Bulk Select Products for Barcode Batch
-                    <IconButton onClick={() => setIsBulkSelectOpen(false)} size="small"><Close /></IconButton>
-                </DialogTitle>
-                <DialogContent>
-                    <Box sx={{ mb: 2.5, mt: 1, display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+                {/* Luxury Atelier Header Banner */}
+                <Box
+                    sx={{
+                        p: { xs: 2, sm: 2.5 },
+                        background: (t) => t.custom?.designSystem?.topBar?.background || 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)',
+                        color: '#FFFFFF',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        borderBottom: '1px solid rgba(255,255,255,0.1)'
+                    }}
+                >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <Box
+                            sx={{
+                                width: 42,
+                                height: 42,
+                                borderRadius: 2.5,
+                                bgcolor: 'rgba(255, 255, 255, 0.12)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backdropFilter: 'blur(8px)',
+                                border: '1px solid rgba(255, 255, 255, 0.2)'
+                            }}
+                        >
+                            <Layers sx={{ color: '#FFFFFF', fontSize: 24 }} />
+                        </Box>
+                        <Box>
+                            <Typography variant="h6" sx={{ fontWeight: 800, color: '#FFFFFF', fontSize: { xs: '1rem', sm: '1.15rem' }, lineHeight: 1.2 }}>
+                                Bulk Select Products for Barcode Batch
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: '0.78rem' }}>
+                                Queue catalog garments for batch sticker printing with custom pricing and layout
+                            </Typography>
+                        </Box>
+                    </Box>
+                    <IconButton 
+                        onClick={() => setIsBulkSelectOpen(false)} 
+                        size="small"
+                        sx={{ 
+                            color: 'rgba(255,255,255,0.8)', 
+                            '&:hover': { color: '#FFFFFF', bgcolor: 'rgba(255,255,255,0.15)' } 
+                        }}
+                    >
+                        <Close fontSize="small" />
+                    </IconButton>
+                </Box>
+
+                <DialogContent sx={{ p: { xs: 2, sm: 2.5 }, bgcolor: (t) => t.palette.background.default }}>
+                    {/* Search & Category Filter Bar */}
+                    <Box sx={{ mb: 2, display: 'flex', gap: 1.5, flexDirection: { xs: 'column', sm: 'row' }, alignItems: { sm: 'center' } }}>
                         <TextField
                             size="small"
-                            placeholder="Search by Name or Product ID..."
+                            placeholder="Search by garment name, SKU or fabric..."
                             value={dialogSearch}
                             onChange={(e) => setDialogSearch(e.target.value)}
-                            InputProps={{ startAdornment: <Search sx={{ mr: 1, color: 'text.secondary', fontSize: 18 }} /> }}
-                            sx={{ flexGrow: 1, '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                            InputProps={{ 
+                                startAdornment: <Search sx={{ mr: 1, color: 'text.secondary', fontSize: 19 }} />,
+                                ...(dialogSearch ? {
+                                    endAdornment: (
+                                        <IconButton size="small" onClick={() => setDialogSearch('')}>
+                                            <Close sx={{ fontSize: 16 }} />
+                                        </IconButton>
+                                    )
+                                } : {})
+                            }}
+                            sx={{ 
+                                flexGrow: 1, 
+                                '& .MuiOutlinedInput-root': { 
+                                    borderRadius: 2.5,
+                                    bgcolor: (t) => t.palette.background.paper 
+                                } 
+                            }}
                         />
                         <TextField
                             select
@@ -2349,19 +2448,69 @@ export default function BarcodeGenerator() {
                             label="Category"
                             value={dialogCategory}
                             onChange={(e) => setDialogCategory(e.target.value)}
-                            sx={{ minWidth: 180, '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                            sx={{ 
+                                minWidth: { xs: '100%', sm: 190 }, 
+                                '& .MuiOutlinedInput-root': { 
+                                    borderRadius: 2.5,
+                                    bgcolor: (t) => t.palette.background.paper 
+                                } 
+                            }}
                         >
-                            <MenuItem value="">All Categories</MenuItem>
+                            <MenuItem value="">All Categories ({categories.length})</MenuItem>
                             {categories.map(cat => (
                                 <MenuItem key={cat} value={cat}>{cat}</MenuItem>
                             ))}
                         </TextField>
                     </Box>
 
-                    <TableContainer sx={{ maxHeight: 420, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-                        <Table stickyHeader size="small" sx={{ minWidth: 540 }}>
+                    {/* Quick Selection Toolbar */}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5, px: 0.5 }}>
+                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                            Showing {dialogFilteredInventory.length} products
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                            <Button
+                                size="small"
+                                onClick={() => toggleSelectAll(dialogFilteredInventory)}
+                                sx={{ textTransform: 'none', fontWeight: 700, fontSize: '0.78rem', py: 0.3 }}
+                            >
+                                {tempSelectedIds.length === dialogFilteredInventory.length && dialogFilteredInventory.length > 0 
+                                    ? 'Deselect All' 
+                                    : `Select All (${dialogFilteredInventory.length})`}
+                            </Button>
+                            {tempSelectedIds.length > 0 && (
+                                <Button
+                                    size="small"
+                                    color="error"
+                                    onClick={() => setTempSelectedIds([])}
+                                    sx={{ textTransform: 'none', fontWeight: 700, fontSize: '0.78rem', py: 0.3 }}
+                                >
+                                    Clear ({tempSelectedIds.length})
+                                </Button>
+                            )}
+                        </Box>
+                    </Box>
+
+                    {/* Table Container with Ample Height to Prevent 10th Row Cutoff (Pic 5) */}
+                    <TableContainer 
+                        sx={{ 
+                            minHeight: 380,
+                            maxHeight: { xs: 380, sm: 490, md: 530 }, 
+                            overflowX: 'auto', 
+                            overflowY: 'auto',
+                            WebkitOverflowScrolling: 'touch',
+                            borderRadius: 2.5,
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            bgcolor: (t) => t.palette.background.paper,
+                            boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
+                            '&::-webkit-scrollbar': { width: '6px', height: '6px' },
+                            '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(0,0,0,0.18)', borderRadius: '3px' }
+                        }}
+                    >
+                        <Table stickyHeader size="small" sx={{ minWidth: 600 }}>
                             <TableHead>
-                                <TableRow>
+                                <TableRow sx={{ '& th': { bgcolor: (t) => t.palette.mode === 'dark' ? '#1E293B' : '#F8FAFC', py: 1.2 } }}>
                                     <TableCell padding="checkbox">
                                         <Checkbox
                                             indeterminate={tempSelectedIds.length > 0 && tempSelectedIds.length < dialogFilteredInventory.length}
@@ -2374,7 +2523,7 @@ export default function BarcodeGenerator() {
                                             active={dialogOrderBy === 'name'}
                                             direction={dialogOrderBy === 'name' ? dialogOrder : 'asc'}
                                             onClick={() => handleDialogSort('name')}
-                                            sx={{ fontWeight: 800 }}
+                                            sx={{ fontWeight: 800, fontSize: '0.82rem' }}
                                         >
                                             Garment Name
                                         </TableSortLabel>
@@ -2384,18 +2533,18 @@ export default function BarcodeGenerator() {
                                             active={dialogOrderBy === 'productId'}
                                             direction={dialogOrderBy === 'productId' ? dialogOrder : 'asc'}
                                             onClick={() => handleDialogSort('productId')}
-                                            sx={{ fontWeight: 800 }}
+                                            sx={{ fontWeight: 800, fontSize: '0.82rem' }}
                                         >
                                             Product ID / SKU
                                         </TableSortLabel>
                                     </TableCell>
-                                    <TableCell sx={{ fontWeight: 800 }}>Category</TableCell>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.82rem' }}>Category</TableCell>
                                     <TableCell align="right">
                                         <TableSortLabel
                                             active={dialogOrderBy === 'price'}
                                             direction={dialogOrderBy === 'price' ? dialogOrder : 'asc'}
                                             onClick={() => handleDialogSort('price')}
-                                            sx={{ fontWeight: 800 }}
+                                            sx={{ fontWeight: 800, fontSize: '0.82rem' }}
                                         >
                                             Price (₹)
                                         </TableSortLabel>
@@ -2405,7 +2554,7 @@ export default function BarcodeGenerator() {
                                             active={dialogOrderBy === 'quantity'}
                                             direction={dialogOrderBy === 'quantity' ? dialogOrder : 'asc'}
                                             onClick={() => handleDialogSort('quantity')}
-                                            sx={{ fontWeight: 800 }}
+                                            sx={{ fontWeight: 800, fontSize: '0.82rem' }}
                                         >
                                             Stock
                                         </TableSortLabel>
@@ -2413,38 +2562,102 @@ export default function BarcodeGenerator() {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {paginatedDialogInventory.map((item) => (
-                                    <TableRow
-                                        key={item.id}
-                                        hover
-                                        onClick={() => {
-                                            setTempSelectedIds(prev =>
-                                                prev.includes(item.id) ? prev.filter(id => id !== item.id) : [...prev, item.id]
-                                            );
-                                        }}
-                                        sx={{ cursor: 'pointer' }}
-                                    >
-                                        <TableCell padding="checkbox">
-                                            <Checkbox checked={tempSelectedIds.includes(item.id)} />
-                                        </TableCell>
-                                        <TableCell sx={{ fontWeight: 700 }}>
-                                            {item.name}
-                                            {item.variantName && <span style={{ color: '#6b7280', fontWeight: 500 }}> ({item.variantName})</span>}
-                                        </TableCell>
-                                        <TableCell sx={{ fontFamily: 'monospace', textTransform: 'uppercase' }}>{formatSkuWithHyphen(item.productId)}</TableCell>
-                                        <TableCell>
-                                            <Chip label={item.category || 'General'} size="small" variant="outlined" sx={{ height: 22 }} />
-                                        </TableCell>
-                                        <TableCell align="right" sx={{ fontWeight: 800 }}>₹{item.price}</TableCell>
-                                        <TableCell align="right" sx={{ fontWeight: 700, color: (item.quantity || 0) > 0 ? 'text.primary' : 'error.main' }}>
-                                            {item.quantity || 0}
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                                {paginatedDialogInventory.map((item) => {
+                                    const isSelected = tempSelectedIds.includes(item.id);
+                                    const catStyle = getCategoryStyle(item.category);
+                                    const inStock = (item.quantity || 0) > 0;
+
+                                    return (
+                                        <TableRow
+                                            key={item.id}
+                                            hover
+                                            selected={isSelected}
+                                            onClick={() => {
+                                                setTempSelectedIds(prev =>
+                                                    prev.includes(item.id) ? prev.filter(id => id !== item.id) : [...prev, item.id]
+                                                );
+                                            }}
+                                            sx={{ 
+                                                cursor: 'pointer',
+                                                transition: 'background-color 0.15s ease',
+                                                '&.Mui-selected': {
+                                                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(59, 130, 246, 0.15)' : 'rgba(59, 130, 246, 0.08)',
+                                                    '&:hover': {
+                                                        bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(59, 130, 246, 0.22)' : 'rgba(59, 130, 246, 0.14)'
+                                                    }
+                                                }
+                                            }}
+                                        >
+                                            <TableCell padding="checkbox">
+                                                <Checkbox checked={isSelected} />
+                                            </TableCell>
+                                            <TableCell sx={{ py: 1.15 }}>
+                                                <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.25 }}>
+                                                    {item.name}
+                                                </Typography>
+                                                {item.variantName && (
+                                                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                                                        {item.variantName}
+                                                    </Typography>
+                                                )}
+                                            </TableCell>
+                                            <TableCell sx={{ py: 1.15 }}>
+                                                <Typography
+                                                    component="span"
+                                                    sx={{
+                                                        fontFamily: '"SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace',
+                                                        fontWeight: 700,
+                                                        fontSize: '0.78rem',
+                                                        letterSpacing: '0.04em',
+                                                        bgcolor: 'rgba(0,0,0,0.04)',
+                                                        px: 0.8,
+                                                        py: 0.2,
+                                                        borderRadius: 1,
+                                                        color: 'text.primary'
+                                                    }}
+                                                >
+                                                    {formatSkuWithHyphen(item.productId)}
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell sx={{ py: 1.15 }}>
+                                                <Chip 
+                                                    label={item.category || 'General'} 
+                                                    size="small" 
+                                                    sx={{ 
+                                                        height: 22,
+                                                        fontSize: '0.72rem',
+                                                        fontWeight: 700,
+                                                        bgcolor: catStyle.bg,
+                                                        color: catStyle.color,
+                                                        border: `1px solid ${catStyle.border}`
+                                                    }} 
+                                                />
+                                            </TableCell>
+                                            <TableCell align="right" sx={{ py: 1.15, fontWeight: 800, fontSize: '0.88rem' }}>
+                                                ₹{Number(item.price || 0).toLocaleString('en-IN')}
+                                            </TableCell>
+                                            <TableCell align="right" sx={{ py: 1.15 }}>
+                                                <Chip
+                                                    label={inStock ? `${item.quantity || 0} in stock` : 'Out of stock'}
+                                                    size="small"
+                                                    sx={{
+                                                        height: 20,
+                                                        fontSize: '0.7rem',
+                                                        fontWeight: 700,
+                                                        bgcolor: inStock ? '#ECFDF5' : '#FEF2F2',
+                                                        color: inStock ? '#047857' : '#DC2626',
+                                                        border: `1px solid ${inStock ? '#A7F3D0' : '#FECACA'}`
+                                                    }}
+                                                />
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
                             </TableBody>
                         </Table>
                     </TableContainer>
 
+                    {/* Pagination Bar Cleanly Positioned Below Container */}
                     <TablePagination
                         rowsPerPageOptions={[10, 20, 50]}
                         component="div"
@@ -2459,26 +2672,43 @@ export default function BarcodeGenerator() {
                         sx={{
                             borderTop: '1px solid',
                             borderColor: 'divider',
-                            '& .MuiTablePagination-toolbar': { minHeight: 44 }
+                            mt: 1.5,
+                            '& .MuiTablePagination-toolbar': { minHeight: 46 }
                         }}
                     />
                 </DialogContent>
-                <DialogActions sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider' }}>
-                    <Typography variant="body2" sx={{ flexGrow: 1, ml: 1, fontWeight: 700 }}>
-                        {tempSelectedIds.length} garments selected
-                    </Typography>
-                    <Button onClick={() => setIsBulkSelectOpen(false)} sx={{ fontWeight: 700 }}>
+
+                {/* Footer with Selection Count and Luxury Actions */}
+                <DialogActions sx={{ p: { xs: 2, sm: 2.5 }, borderTop: '1px solid', borderColor: 'divider', bgcolor: (t) => t.palette.background.paper }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexGrow: 1, ml: 0.5 }}>
+                        <Chip
+                            label={`${tempSelectedIds.length} garments selected`}
+                            color={tempSelectedIds.length > 0 ? "primary" : "default"}
+                            variant={tempSelectedIds.length > 0 ? "filled" : "outlined"}
+                            size="medium"
+                            sx={{ fontWeight: 800, fontSize: '0.82rem' }}
+                        />
+                    </Box>
+                    <Button 
+                        onClick={() => setIsBulkSelectOpen(false)} 
+                        sx={{ fontWeight: 700, borderRadius: 2, textTransform: 'none', px: 2 }}
+                    >
                         Cancel
                     </Button>
                     <Button
                         variant="contained"
                         onClick={handleBulkSelectAdd}
                         disabled={tempSelectedIds.length === 0}
+                        startIcon={<Add />}
                         sx={{
                             background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                             color: '#FFFFFF',
                             fontWeight: 800,
-                            px: 3
+                            borderRadius: 2,
+                            px: 3,
+                            py: 1,
+                            textTransform: 'none',
+                            boxShadow: '0 4px 14px rgba(0,0,0,0.15)'
                         }}
                     >
                         Add {tempSelectedIds.length} to Print Queue
@@ -2753,7 +2983,17 @@ export default function BarcodeGenerator() {
             </Dialog>
 
             {/* Print Output Grid (Hidden on Screen, Active on Print) */}
-            <Box className="print-only" sx={{ display: 'none', '@media print': { display: 'block' } }}>
+            <Box 
+                className="print-only" 
+                sx={{ 
+                    display: 'none', 
+                    '@media print': { 
+                        display: 'block !important',
+                        bgcolor: '#FFFFFF !important',
+                        color: '#000000 !important'
+                    } 
+                }}
+            >
                 <Box
                     sx={{
                         display: 'grid',
@@ -2795,25 +3035,40 @@ export default function BarcodeGenerator() {
                 margin: ${settings.template === 'thermal_single' ? '0 !important' : '6mm !important'}; 
                 size: ${settings.template === 'thermal_single' ? '58mm 40mm' : 'A4 portrait'};
             }
+            *, *::before, *::after {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                box-sizing: border-box !important;
+            }
             html, body { 
                 margin: 0 !important; 
                 padding: 0 !important;
                 background: #ffffff !important;
+                background-color: #ffffff !important;
+                color: #000000 !important;
                 width: 100% !important;
                 height: auto !important;
+                min-height: 100% !important;
+                overflow: visible !important;
             }
-            aside, header, nav, footer, .no-print, .app-sidebar, .app-topbar, .MuiDrawer-root, .MuiBackdrop-root {
+            /* Hide UI overlays, dialogs, and navigation to prevent black screen and page shifts */
+            aside, header, nav, footer, .no-print, .app-sidebar, .app-topbar, 
+            .MuiDrawer-root, .MuiBackdrop-root, .MuiDialog-root, .MuiModal-root, 
+            .MuiPopover-root, .MuiSnackbar-root {
                 display: none !important;
+                visibility: hidden !important;
                 width: 0 !important;
                 height: 0 !important;
                 margin: 0 !important;
                 padding: 0 !important;
+                opacity: 0 !important;
             }
             #root, #root > div, main, main > div {
                 display: block !important;
                 position: static !important;
                 width: 100% !important;
                 max-width: 100% !important;
+                height: auto !important;
                 overflow: visible !important;
                 margin: 0 !important;
                 padding: 0 !important;
@@ -2826,13 +3081,20 @@ export default function BarcodeGenerator() {
                 visibility: visible !important; 
             }
             .print-only {
-              position: static !important;
-              display: block !important;
-              width: 100% !important;
-              max-width: 100% !important;
-              margin: 0 auto !important;
-              padding: ${settings.template === 'thermal_single' ? '1mm' : '2mm 0'} !important;
-              box-sizing: border-box !important;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                right: 0 !important;
+                display: block !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 auto !important;
+                padding: ${settings.template === 'thermal_single' ? '1mm' : '2mm 0'} !important;
+                box-sizing: border-box !important;
+                background: #ffffff !important;
+                background-color: #ffffff !important;
+                color: #000000 !important;
+                z-index: 9999999 !important;
             }
           }
         `}

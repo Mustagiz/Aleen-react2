@@ -97,7 +97,9 @@ export const ThemeProvider = ({ children }) => {
         const bg = mode === 'light' ? sysTopBar.lightBg : sysTopBar.darkBg;
         const textColor = (isColored && mode === 'light') 
             ? '#FFFFFF' 
-            : (mode === 'light' ? sysTopBar.textColor || '#0F172A' : '#F8FAFC');
+            : (mode === 'light' 
+                ? ((sysTopBar.textColor && sysTopBar.textColor !== '#FFFFFF' && sysTopBar.textColor !== '#F8FAFC') ? sysTopBar.textColor : '#0F172A')
+                : '#F8FAFC');
 
         return {
             bg,

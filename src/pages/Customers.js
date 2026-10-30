@@ -48,7 +48,12 @@ import {
     Stars,
     WarningAmber,
     CheckCircle,
-    CalendarMonth
+    CalendarMonth,
+    PersonAdd,
+    Person,
+    Email,
+    AutoAwesome,
+    Close
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import PageHeader from '../components/crm/PageHeader';
@@ -1054,64 +1059,205 @@ const Customers = () => {
                 maxWidth="sm" 
                 fullWidth 
                 fullScreen={isTablet}
-                PaperProps={{ sx: { borderRadius: isTablet ? 0 : 4 } }}
+                PaperProps={{ 
+                    sx: { 
+                        borderRadius: isTablet ? 0 : 3.5,
+                        overflow: 'hidden',
+                        boxShadow: '0 24px 60px rgba(0,0,0,0.18)'
+                    } 
+                }}
             >
                 <DialogTitle sx={{ 
-                    fontWeight: 800, 
-                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)', 
-                    borderBottom: '1px solid', 
-                    borderColor: 'divider',
-                    color: 'text.primary'
+                    p: 0,
+                    position: 'relative',
+                    background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
+                    color: '#FFFFFF'
                 }}>
-                    {editCustomer ? 'Update Guest Profile' : 'Register New Atelier Guest'}
+                    <Box sx={{ p: 2.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                            <Box sx={{ 
+                                width: 44, 
+                                height: 44, 
+                                borderRadius: '12px', 
+                                bgcolor: 'rgba(255, 255, 255, 0.15)',
+                                backdropFilter: 'blur(8px)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                border: '1px solid rgba(255, 255, 255, 0.25)',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                            }}>
+                                <PersonAdd sx={{ color: '#FCD34D', fontSize: 24 }} />
+                            </Box>
+                            <Box>
+                                <Typography variant="h6" sx={{ fontWeight: 800, color: '#FFFFFF', lineHeight: 1.2, letterSpacing: '-0.01em' }}>
+                                    {editCustomer ? 'Update Guest Profile' : 'Register New Atelier Guest'}
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25 }}>
+                                    <AutoAwesome sx={{ fontSize: 13, color: '#FCD34D' }} />
+                                    VIP Clientele & Tailoring Bespoke Registry
+                                </Typography>
+                            </Box>
+                        </Box>
+                        <IconButton 
+                            onClick={() => setOpen(false)} 
+                            size="small" 
+                            sx={{ 
+                                color: '#FFFFFF', 
+                                bgcolor: 'rgba(255, 255, 255, 0.12)',
+                                '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.25)' }
+                            }}
+                        >
+                            <Close fontSize="small" />
+                        </IconButton>
+                    </Box>
                 </DialogTitle>
-                <DialogContent sx={{ pt: 3 }}>
-                    <TextField
-                        fullWidth 
-                        label="Full Name *" 
-                        margin="normal"
-                        value={formData.name}
-                        onChange={(e) => {
-                            const val = e.target.value.replace(/\b\w/g, (l) => l.toUpperCase());
-                            setFormData({ ...formData, name: val });
-                        }}
-                    />
-                    <TextField
-                        fullWidth 
-                        label="Mobile Number (+91) *" 
-                        margin="normal"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    />
-                    <TextField
-                        fullWidth 
-                        label="Email Address" 
-                        margin="normal"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    />
-                    <TextField
-                        fullWidth 
-                        label="Residential Address" 
-                        margin="normal" 
-                        multiline 
-                        rows={2}
-                        value={formData.address}
-                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    />
-                    <TextField
-                        fullWidth 
-                        label="Style Notes & Custom Preferences" 
-                        margin="normal" 
-                        multiline 
-                        rows={2}
-                        value={formData.notes}
-                        onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                        placeholder="e.g. Prefers Pure Katan Silk, loves antique gold zardozi borders"
-                    />
+
+                <DialogContent sx={{ p: { xs: 2, sm: 3 }, bgcolor: (t) => t.palette.mode === 'dark' ? 'background.default' : '#FBFBFB' }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+                        {/* Section 1: Guest Identity */}
+                        <Box sx={{ p: 2, bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#FFFFFF', borderRadius: 2.5, border: '1px solid', borderColor: 'divider', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+                            <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: (t) => t.palette.primary.main, mb: 1.5, display: 'block' }}>
+                                Primary Contact & Identity
+                            </Typography>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        fullWidth 
+                                        size="small"
+                                        label="Full Name *" 
+                                        value={formData.name}
+                                        onChange={(e) => {
+                                            const val = e.target.value.replace(/\b\w/g, (l) => l.toUpperCase());
+                                            setFormData({ ...formData, name: val });
+                                        }}
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <Person sx={{ fontSize: 18, color: 'text.secondary' }} />
+                                                </InputAdornment>
+                                            )
+                                        }}
+                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                                        placeholder="e.g. Ayesha Khan"
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        fullWidth 
+                                        size="small"
+                                        label="Mobile Number (+91) *" 
+                                        value={formData.phone}
+                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <Phone sx={{ fontSize: 18, color: 'text.secondary' }} />
+                                                </InputAdornment>
+                                            )
+                                        }}
+                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                                        placeholder="+91 9876543210"
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        fullWidth 
+                                        size="small"
+                                        label="Email Address" 
+                                        value={formData.email}
+                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <Email sx={{ fontSize: 18, color: 'text.secondary' }} />
+                                                </InputAdornment>
+                                            )
+                                        }}
+                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                                        placeholder="client@luxury.com"
+                                    />
+                                </Grid>
+                            </Grid>
+                        </Box>
+
+                        {/* Section 2: Residential & Bespoke Preferences */}
+                        <Box sx={{ p: 2, bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#FFFFFF', borderRadius: 2.5, border: '1px solid', borderColor: 'divider', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+                            <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: (t) => t.palette.primary.main, mb: 1.5, display: 'block' }}>
+                                Atelier Concierge & Styling Notes
+                            </Typography>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                                <TextField
+                                    fullWidth 
+                                    size="small"
+                                    label="Residential / Shipping Address" 
+                                    multiline 
+                                    rows={2}
+                                    value={formData.address}
+                                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                                    placeholder="Villa / Suite, Street, City, Pincode"
+                                />
+                                <TextField
+                                    fullWidth 
+                                    size="small"
+                                    label="Style Notes & Custom Preferences" 
+                                    multiline 
+                                    rows={2}
+                                    value={formData.notes}
+                                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                                    placeholder="e.g. Prefers Pure Katan Silk, loves antique gold zardozi borders, measurements on file"
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                                />
+                            </Box>
+                        </Box>
+
+                        {/* VIP Hospitality Banner */}
+                        <Box sx={{
+                            p: 1.5,
+                            borderRadius: 2,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            bgcolor: 'rgba(217, 119, 6, 0.08)',
+                            border: '1px solid rgba(217, 119, 6, 0.25)'
+                        }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Stars sx={{ color: '#D97706', fontSize: 20 }} />
+                                <Box>
+                                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#B45309', display: 'block' }}>
+                                        Automatic VIP Loyalty Enrollment
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem' }}>
+                                        Guest is immediately enrolled in Atelier Bronze Tier with points accrued on billing.
+                                    </Typography>
+                                </Box>
+                            </Box>
+                            <Chip 
+                                label="Bronze VIP" 
+                                size="small" 
+                                sx={{ 
+                                    height: 22, 
+                                    fontSize: '0.65rem', 
+                                    fontWeight: 800, 
+                                    bgcolor: '#D97706', 
+                                    color: '#FFFFFF' 
+                                }} 
+                            />
+                        </Box>
+                    </Box>
                 </DialogContent>
-                <DialogActions sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider' }}>
-                    <Button onClick={() => setOpen(false)} sx={{ fontWeight: 700, color: 'text.secondary' }}>
+
+                <DialogActions sx={{ p: 2.5, bgcolor: (t) => t.palette.mode === 'dark' ? 'background.default' : '#FFFFFF', borderTop: '1px solid', borderColor: 'divider', justifyContent: 'space-between' }}>
+                    <Button 
+                        onClick={() => setOpen(false)} 
+                        sx={{ 
+                            fontWeight: 700, 
+                            color: 'text.secondary',
+                            textTransform: 'none',
+                            px: 2
+                        }}
+                    >
                         Cancel
                     </Button>
                     <Button 
@@ -1119,12 +1265,16 @@ const Customers = () => {
                         onClick={handleSave} 
                         sx={{ 
                             px: 3.5, 
+                            py: 1,
                             borderRadius: 2.5, 
-                            fontWeight: 700,
+                            fontWeight: 800,
+                            textTransform: 'none',
+                            color: '#FFFFFF',
+                            boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
                             background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`
                         }}
                     >
-                        Save Guest Details
+                        {editCustomer ? 'Update Guest Profile' : 'Save Guest Details'}
                     </Button>
                 </DialogActions>
             </Dialog>

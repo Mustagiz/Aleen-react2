@@ -383,18 +383,6 @@ export default function Layout() {
           )}
         </Box>
 
-        {/* Linear Ecosystem Workspace Pill */}
-        {designSystem === 'linear' && !showCollapsed && (
-          <Box sx={{ px: 2, py: 0.8, mx: 1.5, mt: 1.5, mb: 0.5, bgcolor: 'rgba(255,255,255,0.04)', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.06em', color: '#A78BFA' }}>
-              WORKSPACE / ALEEN
-            </Typography>
-            <Typography sx={{ fontSize: '0.62rem', fontFamily: 'monospace', color: '#64748B' }}>
-              v2.4
-            </Typography>
-          </Box>
-        )}
-
         {/* Navigation List */}
         <Box sx={{ 
           flex: 1, 
@@ -424,7 +412,6 @@ export default function Layout() {
               <List disablePadding>
                 {section.items.map((item) => {
                   const isActive = location.pathname === item.path;
-                  const shortcut = getLinearShortcut(item.path);
                   const linkButton = (
                     <ListItem
                       button
@@ -482,20 +469,6 @@ export default function Layout() {
                             color: isActive ? sidebarConfig.activePillText : (sidebarConfig.isDark ? '#F8FAFC' : 'text.primary')
                           }}
                         />
-                      )}
-                      {!showCollapsed && designSystem === 'linear' && shortcut && (
-                        <Typography sx={{
-                          fontSize: '0.62rem',
-                          fontFamily: 'monospace',
-                          px: 0.8,
-                          py: 0.2,
-                          borderRadius: '4px',
-                          bgcolor: isActive ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.06)',
-                          color: isActive ? '#FFFFFF' : '#94A3B8',
-                          letterSpacing: '0.05em'
-                        }}>
-                          {shortcut}
-                        </Typography>
                       )}
                     </ListItem>
                   );
