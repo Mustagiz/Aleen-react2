@@ -972,7 +972,7 @@ export default function BarcodeGenerator() {
                 <Collapse in={showAdvancedSettings}>
                     <Grid container spacing={3} alignItems="flex-start">
                         {/* Settings Form Controls */}
-                        <Grid item xs={12} md={8}>
+                        <Grid item xs={12} lg={7.5} xl={8}>
                             {/* Row 1: Label Dimensions & Density */}
                             <Grid container spacing={2} sx={{ mb: 2 }}>
                                 <Grid item xs={12} sm={6}>
@@ -1239,22 +1239,24 @@ export default function BarcodeGenerator() {
                         </Grid>
 
                         {/* Live Visual Preview Panel */}
-                        <Grid item xs={12} md={4}>
+                        <Grid item xs={12} lg={4.5} xl={4}>
                             <Box
                                 sx={{
-                                    p: 2,
+                                    p: 2.5,
                                     borderRadius: 3,
-                                    bgcolor: 'action.hover',
-                                    border: '1px dashed',
+                                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#F8FAFC',
+                                    border: '1px solid',
                                     borderColor: 'divider',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    minHeight: 220
+                                    overflow: 'hidden',
+                                    width: '100%',
+                                    boxSizing: 'border-box'
                                 }}
                             >
-                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', mb: 1, flexWrap: 'wrap', gap: 0.5 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', mb: 1.5, flexWrap: 'wrap', gap: 0.5 }}>
                                     <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>
                                         ✨ Live Sticker Preview:
                                     </Typography>
@@ -1264,70 +1266,45 @@ export default function BarcodeGenerator() {
                                                 {previewIndex + 1}/{selectedProducts.length}
                                             </Typography>
                                         )}
-                                        <Chip
-                                            label="1x"
-                                            size="small"
-                                            clickable
-                                            onClick={() => setPreviewZoom(1.0)}
-                                            sx={{
-                                                height: 19,
-                                                fontSize: '0.62rem',
-                                                fontWeight: previewZoom === 1.0 ? 800 : 500,
-                                                bgcolor: previewZoom === 1.0 ? '#0F766E' : 'background.paper',
-                                                color: previewZoom === 1.0 ? '#FFFFFF' : 'text.secondary',
-                                                border: '1px solid',
-                                                borderColor: previewZoom === 1.0 ? '#0F766E' : 'divider'
-                                            }}
-                                        />
-                                        <Chip
-                                            label="1.35x"
-                                            size="small"
-                                            clickable
-                                            onClick={() => setPreviewZoom(1.35)}
-                                            sx={{
-                                                height: 19,
-                                                fontSize: '0.62rem',
-                                                fontWeight: previewZoom === 1.35 ? 800 : 500,
-                                                bgcolor: previewZoom === 1.35 ? '#0F766E' : 'background.paper',
-                                                color: previewZoom === 1.35 ? '#FFFFFF' : 'text.secondary',
-                                                border: '1px solid',
-                                                borderColor: previewZoom === 1.35 ? '#0F766E' : 'divider'
-                                            }}
-                                        />
-                                        <Chip
-                                            label="1.6x"
-                                            size="small"
-                                            clickable
-                                            onClick={() => setPreviewZoom(1.6)}
-                                            sx={{
-                                                height: 19,
-                                                fontSize: '0.62rem',
-                                                fontWeight: previewZoom === 1.6 ? 800 : 500,
-                                                bgcolor: previewZoom === 1.6 ? '#0F766E' : 'background.paper',
-                                                color: previewZoom === 1.6 ? '#FFFFFF' : 'text.secondary',
-                                                border: '1px solid',
-                                                borderColor: previewZoom === 1.6 ? '#0F766E' : 'divider'
-                                            }}
-                                        />
+                                        {[1.0, 1.15, 1.25].map((z) => (
+                                            <Chip
+                                                key={z}
+                                                label={`${z}x`}
+                                                size="small"
+                                                clickable
+                                                onClick={() => setPreviewZoom(z)}
+                                                sx={{
+                                                    height: 20,
+                                                    fontSize: '0.65rem',
+                                                    fontWeight: previewZoom === z ? 800 : 500,
+                                                    bgcolor: previewZoom === z ? '#0F766E' : 'background.paper',
+                                                    color: previewZoom === z ? '#FFFFFF' : 'text.primary',
+                                                    border: '1px solid',
+                                                    borderColor: previewZoom === z ? '#0F766E' : 'divider'
+                                                }}
+                                            />
+                                        ))}
                                     </Box>
                                 </Box>
 
-                                {/* Scaled Live Sticker Container (Pic 1: Lil Bigger) */}
+                                {/* Scaled Live Sticker Container with layout-reserving margins */}
                                 <Box
                                     sx={{
-                                        py: 2.5,
+                                        py: 1,
                                         px: 1,
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                         width: '100%',
-                                        overflow: 'visible'
+                                        overflow: 'hidden'
                                     }}
                                 >
                                     <Box
                                         sx={{
-                                            transform: `scale(${previewZoom})`,
+                                            transform: `scale(${Math.min(previewZoom, 1.25)})`,
                                             transformOrigin: 'center center',
+                                            my: `${Math.max(4, Math.round((140 * (Math.min(previewZoom, 1.25) - 1)) / 2) + 6)}px`,
+                                            mx: `${Math.max(4, Math.round((245 * (Math.min(previewZoom, 1.25) - 1)) / 2) + 6)}px`,
                                             boxShadow: '0 8px 22px rgba(0,0,0,0.08)',
                                             borderRadius: 0.8,
                                             transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
@@ -2720,12 +2697,13 @@ export default function BarcodeGenerator() {
             <Dialog
                 open={previewModalOpen}
                 onClose={() => setPreviewModalOpen(false)}
-                maxWidth="sm"
+                maxWidth="md"
                 fullWidth
                 PaperProps={{
                     sx: {
                         borderRadius: 3.5,
                         overflow: 'hidden',
+                        minWidth: { sm: 540, md: 620 },
                         boxShadow: '0 24px 60px rgba(0,0,0,0.2)'
                     }
                 }}
@@ -2796,10 +2774,10 @@ export default function BarcodeGenerator() {
                         </Box>
                     </Box>
 
-                    {/* Sticker Render Stage */}
+                    {/* Sticker Render Stage with Dynamic Margin & Auto Height to Prevent Overlapping (Pic 1) */}
                     <Box
                         sx={{
-                            p: 3,
+                            p: { xs: 2, sm: 3 },
                             bgcolor: '#FFFFFF',
                             borderRadius: 3,
                             border: '1px solid',
@@ -2809,17 +2787,21 @@ export default function BarcodeGenerator() {
                             flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            minHeight: 180,
-                            overflow: 'visible'
+                            minHeight: Math.max(220, Math.round(180 * previewZoom)),
+                            overflow: 'hidden',
+                            width: '100%',
+                            boxSizing: 'border-box'
                         }}
                     >
                         <Box
                             sx={{
                                 transform: `scale(${previewZoom})`,
                                 transformOrigin: 'center center',
+                                my: `${Math.max(8, Math.round((140 * (previewZoom - 1)) / 2) + 12)}px`,
+                                mx: `${Math.max(8, Math.round((245 * (previewZoom - 1)) / 2) + 12)}px`,
                                 boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
                                 borderRadius: 0.8,
-                                transition: 'transform 0.15s ease-out'
+                                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
                             }}
                         >
                             <BarcodeItem

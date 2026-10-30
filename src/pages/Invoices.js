@@ -658,47 +658,28 @@ const Invoices = () => {
         const baseItems = Array.isArray(prev) ? [...prev] : [];
         let updatedCartItems = [];
 
-        // 1. If item already exists in the cart with the same variantSku, increment quantity
-        const existingIndex = baseItems.findIndex(item =>
-          item.id === product.id && (!variantSku || item.variantSku === variantSku) && !item.isCustom
-        );
+        // In luxury atelier boutique POS, each barcode scanned represents an individual physical garment piece!
+        // Instead of grouping multiple barcode scans into a single product row with incremented quantity,
+        // each scanned barcode creates its own distinct line item in the invoice (Qty: 1 per piece).
+        const newItem = {
+          id: product.id,
+          quantity: 1,
+          variantSku: resolvedVariantSku,
+          scannedBarcode: cleanCode,
+          isCustom: false,
+          customName: '',
+          customPrice: 0,
+          customCost: 0
+        };
 
-        if (existingIndex !== -1) {
-          const currentQty = parseInt(baseItems[existingIndex].quantity) || 1;
-          baseItems[existingIndex] = {
-            ...baseItems[existingIndex],
-            quantity: currentQty + 1
-          };
+        // 1. Populate first unselected empty row if present
+        const emptyIndex = baseItems.findIndex(item => !item.id && !item.isCustom);
+        if (emptyIndex !== -1) {
+          baseItems[emptyIndex] = newItem;
           updatedCartItems = baseItems;
         } else {
-          // 2. Populate first unselected empty row if present
-          const emptyIndex = baseItems.findIndex(item => !item.id && !item.isCustom);
-          if (emptyIndex !== -1) {
-            baseItems[emptyIndex] = {
-              id: product.id,
-              quantity: 1,
-              variantSku: resolvedVariantSku,
-              isCustom: false,
-              customName: '',
-              customPrice: 0,
-              customCost: 0
-            };
-            updatedCartItems = baseItems;
-          } else {
-            // 3. Otherwise append new line item
-            updatedCartItems = [
-              ...baseItems,
-              {
-                id: product.id,
-                quantity: 1,
-                variantSku: resolvedVariantSku,
-                isCustom: false,
-                customName: '',
-                customPrice: 0,
-                customCost: 0
-              }
-            ];
-          }
+          // 2. Otherwise append as an individual garment line item
+          updatedCartItems = [...baseItems, newItem];
         }
 
         // INSTANT 0ms Customer Facing Display Broadcast upon scanning
