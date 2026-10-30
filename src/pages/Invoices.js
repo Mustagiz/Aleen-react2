@@ -136,6 +136,16 @@ const Invoices = () => {
     }
     cfdLastSettledTimeRef.current = 0;
     setOpen(false);
+    // Immediately clear cart items and search so closed modal never reverts to active
+    setSelectedItems([{ id: '', quantity: 1, isCustom: false, customName: '', customPrice: 0, customCost: 0, variantSku: '' }]);
+    setCustomer('');
+    setPhone('+91');
+    setSelectedCustomerId(null);
+    setDiscountPercent('');
+    setDiscountAmount('');
+    setTax('');
+    setLoyaltyPointsToRedeem(0);
+    setItemSearchTerm('');
     if (syncCustomerDisplayRef.current) {
       syncCustomerDisplayRef.current('idle', null, true, []);
     }
@@ -1007,6 +1017,8 @@ const Invoices = () => {
         status = 'idle';
       } else if (overrideStatus) {
         status = overrideStatus;
+      } else if (!open) {
+        status = 'idle';
       } else if (validItems.length > 0) {
         // Active cart items present: cancel settlement idle timer and display live bill
         if (cfdAutoIdleTimerRef.current) {
@@ -1021,8 +1033,6 @@ const Invoices = () => {
           return;
         }
         cfdLastSettledTimeRef.current = 0;
-        status = 'idle';
-      } else if (!open) {
         status = 'idle';
       } else {
         status = 'idle';
@@ -1042,9 +1052,12 @@ const Invoices = () => {
         invoiceNumber: generateInvoiceNumber(invoices?.length || 0)
       });
 
+      // Avoid passing large base64 data URLs in live session sync (CustomerDisplay already syncs and caches logo from crmProfile)
+      const cleanStoreLogo = (profile?.logoUrl && !profile.logoUrl.startsWith('data:')) ? profile.logoUrl : null;
+
       const payload = {
         storeName,
-        storeLogo: profile?.logoUrl || null,
+        storeLogo: cleanStoreLogo,
         customerName: cfdCustomer,
         customerPhone: cfdPhone,
         customerTier: matchedCustomer?.loyaltyTier || 'Silver',
@@ -4095,7 +4108,7 @@ const Invoices = () => {
                       // If exact match found while typing or scanner pasted
                       if (val.trim().length >= 3) {
                         const directMatch = findProductByCode(val.trim());
-                        if (directMatch) {
+                        if (directMatch && directMatch.product) {
                           handleProcessBarcode(val.trim(), 'Barcode Scanner');
                         }
                       }

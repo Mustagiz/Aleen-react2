@@ -116,9 +116,16 @@ export default function CustomerDisplay() {
   const [cfdState, setCfdState] = useState(() => {
     try {
       const saved = localStorage.getItem('aleen_cfd_state');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // If an active session was left open over 60 seconds ago without activity, default to idle
+        if (parsed.status === 'active' && parsed.updatedAt && (Date.now() - parsed.updatedAt > 60000)) {
+          return { status: 'idle', items: [] };
+        }
+        return parsed;
+      }
     } catch (e) {}
-    return null;
+    return { status: 'idle', items: [] };
   });
 
   // Sync mode badge state ('instant' | 'cloud')
@@ -231,6 +238,7 @@ export default function CustomerDisplay() {
 
   // BroadcastChannel Reference for 0ms cross-tab dual screen sync
   const channelRef = useRef(null);
+  const lastAppliedUpdateRef = useRef({ seq: 0, updatedAt: 0 });
 
   // Live Digital Clock
   useEffect(() => {
@@ -248,6 +256,32 @@ export default function CustomerDisplay() {
 
   const applyCfdUpdate = (data, source = 'cloud') => {
     if (!data) return;
+    const packetSeq = typeof data.seq === 'number' ? data.seq : 0;
+    const packetTime = typeof data.updatedAt === 'number' ? data.updatedAt : 0;
+
+    // Detect new cashier billing session (e.g. cashier refreshed or new invoice started)
+    if (packetTime > lastAppliedUpdateRef.current.updatedAt + 1200) {
+      lastAppliedUpdateRef.current = { seq: packetSeq, updatedAt: packetTime };
+      setCfdState(data);
+      if (source === 'local') {
+        setSyncChannel('instant');
+      }
+      return;
+    }
+
+    // Monotonic guard: reject out-of-order stale packets
+    if (packetSeq && lastAppliedUpdateRef.current.seq && packetSeq < lastAppliedUpdateRef.current.seq) {
+      return;
+    }
+    if (packetTime && lastAppliedUpdateRef.current.updatedAt && packetTime < lastAppliedUpdateRef.current.updatedAt) {
+      return;
+    }
+
+    lastAppliedUpdateRef.current = {
+      seq: Math.max(lastAppliedUpdateRef.current.seq, packetSeq),
+      updatedAt: Math.max(lastAppliedUpdateRef.current.updatedAt, packetTime)
+    };
+
     setCfdState(data);
     if (source === 'local') {
       setSyncChannel('instant');
