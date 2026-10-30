@@ -30,7 +30,7 @@ import ThermalReceipt from '../components/ThermalReceipt';
 import CustomerMeasurementModal from '../components/crm/CustomerMeasurementModal';
 import UpiPaymentQrModal from '../components/pos/UpiPaymentQrModal';
 import PairCustomerDisplayModal from '../components/pos/PairCustomerDisplayModal';
-import { speakItemScan, speakItemNotFound, speakBillSettlement, getVoiceSettings, setVoiceSettings, playLuxuryChime, speakVoice } from '../utils/posVoiceEngine';
+import { speakBillSettlement, getVoiceSettings, setVoiceSettings } from '../utils/posVoiceEngine';
 
 const Invoices = () => {
   const location = useLocation();
@@ -102,10 +102,6 @@ const Invoices = () => {
     };
     setPosVoiceSettings(updated);
     setVoiceSettings(updated);
-    if (nextState) {
-      playLuxuryChime('scan');
-      speakVoice('Voice and sound enabled');
-    }
   };
 
   // Customer Facing Display (CFD) - High-Speed Sync & Window Launcher
@@ -567,31 +563,6 @@ const Invoices = () => {
     if (matchResult && matchResult.product) {
       const { product, variantSku } = matchResult;
 
-      // Extract variant & remaining stock for voice confirmation
-      const variantObj = (product.hasVariants && variantSku && product.variants?.length)
-        ? product.variants.find(v => v.sku === variantSku)
-        : null;
-      const remainingStock = typeof variantObj?.stock === 'number' ? variantObj.stock : (typeof product.stock === 'number' ? product.stock : null);
-
-      const existingItem = selectedItems.find(item =>
-        item.id === product.id && (!variantSku || item.variantSku === variantSku) && !item.isCustom
-      );
-      const isIncrement = Boolean(existingItem);
-      const newQty = isIncrement ? (parseInt(existingItem.quantity) || 1) + 1 : 1;
-
-      // Native Speech & Audio Feedback
-      speakItemScan(
-        {
-          name: product.name,
-          size: variantObj?.size,
-          color: variantObj?.color
-        },
-        {
-          isIncrement,
-          newQty,
-          remainingStock
-        }
-      );
       playVibration();
 
       // Cancel any running post-settlement auto-idle timer and reset settlement tracker
@@ -664,7 +635,6 @@ const Invoices = () => {
       });
     } else {
       const codeToShow = matchResult?.resolvedCode || cleanCode;
-      speakItemNotFound(codeToShow);
       setUnrecognizedScan(codeToShow);
       setScanFeedback({
         type: 'warning',
@@ -995,10 +965,6 @@ const Invoices = () => {
         id: value,
         variantSku: defaultVariantSku
       };
-      if (prod && value !== 'custom') {
-        playLuxuryChime('scan');
-        speakVoice(`${prod.name} added`);
-      }
     } else {
       updated[index] = {
         ...updated[index],
@@ -1014,7 +980,6 @@ const Invoices = () => {
   const handleRemoveItem = (index) => {
     const updated = selectedItems.filter((_, i) => i !== index);
     setSelectedItems(updated);
-    playLuxuryChime('warning');
     if (syncCustomerDisplayRef.current) {
       const remainingValid = updated.filter(item => item && (item.id || (item.isCustom && item.customName && item.customPrice > 0)));
       syncCustomerDisplayRef.current(remainingValid.length > 0 ? 'active' : 'idle', null, true, updated);
@@ -1418,21 +1383,32 @@ const Invoices = () => {
       ]
     };
     // Broadcast instant settlement to customer screen before database writes (0ms delay)
-    cfdLastSettledTimeRef.current = Date.now();
-    syncCustomerDisplay('settled', null, true);
-    speakBillSettlement(total);
+    const isPaid = computedPaymentStatus === 'paid';
+    if (isPaid) {
+      cfdLastSettledTimeRef.current = Date.now();
+      syncCustomerDisplay('settled', null, true);
+      speakBillSettlement(total);
 
-    // Auto-return customer display to homepage (idle) after 4 seconds
-    if (cfdAutoIdleTimerRef.current) {
-      clearTimeout(cfdAutoIdleTimerRef.current);
-    }
-    cfdAutoIdleTimerRef.current = setTimeout(() => {
-      cfdLastSettledTimeRef.current = 0;
+      // Auto-return customer display to homepage (idle) after 4 seconds
+      if (cfdAutoIdleTimerRef.current) {
+        clearTimeout(cfdAutoIdleTimerRef.current);
+      }
+      cfdAutoIdleTimerRef.current = setTimeout(() => {
+        cfdLastSettledTimeRef.current = 0;
+        if (syncCustomerDisplayRef.current) {
+          syncCustomerDisplayRef.current('idle', null, true, []);
+        }
+        cfdAutoIdleTimerRef.current = null;
+      }, 4000);
+    } else {
+      if (cfdAutoIdleTimerRef.current) {
+        clearTimeout(cfdAutoIdleTimerRef.current);
+        cfdAutoIdleTimerRef.current = null;
+      }
       if (syncCustomerDisplayRef.current) {
         syncCustomerDisplayRef.current('idle', null, true, []);
       }
-      cfdAutoIdleTimerRef.current = null;
-    }, 4000);
+    }
 
     const savedInvoice = await addInvoice(invoice);
     setOpen(false);

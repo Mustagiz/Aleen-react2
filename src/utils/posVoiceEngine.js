@@ -84,9 +84,12 @@ export const setVoiceSettings = (settings) => {
  * - 'error': Low frequency double-buzz for item not found
  * - 'success': Cash register triumphant harmonic chord on bill settlement
  */
-export const playLuxuryChime = (type = 'scan') => {
+export const playLuxuryChime = (type = 'success') => {
   const settings = getVoiceSettings();
   if (!settings.soundEnabled) return;
+
+  // Sound ONLY when the bill is paid / settled
+  if (type !== 'success') return;
 
   try {
     const ctx = getAudioContext();
@@ -245,31 +248,11 @@ export const speakVoice = (text, options = {}) => {
  * High-level POS Voice actions
  */
 export const speakItemScan = (item, options = {}) => {
-  const { isIncrement = false, newQty = 1, remainingStock = null } = options;
-  const name = item.name || 'Item';
-  const variant = [item.size ? `Size ${item.size}` : '', item.color || ''].filter(Boolean).join(' ');
-  const itemDesc = variant ? `${name}, ${variant}` : name;
-
-  if (isIncrement) {
-    playLuxuryChime('duplicate');
-    speakVoice(`Quantity ${newQty} for ${itemDesc}`);
-  } else {
-    playLuxuryChime('scan');
-    speakVoice(`${itemDesc} added`);
-  }
-
-  // Stock warning if low stock (<= 2)
-  if (typeof remainingStock === 'number' && remainingStock <= 2 && remainingStock >= 0) {
-    setTimeout(() => {
-      playLuxuryChime('warning');
-      speakVoice(remainingStock === 0 ? `Stock exhausted for ${name}` : `Low stock alert, ${remainingStock} left`);
-    }, 900);
-  }
+  // Silent: sound only when the bill is paid
 };
 
 export const speakItemNotFound = (barcode) => {
-  playLuxuryChime('error');
-  speakVoice(`Barcode not found`);
+  // Silent: sound only when the bill is paid
 };
 
 export const speakBillSettlement = (amount) => {

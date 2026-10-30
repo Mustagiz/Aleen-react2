@@ -325,13 +325,11 @@ export default function CustomerDisplay() {
       return;
     }
 
-    // 2. Play chime when active bill arrives or updates
-    if (data.status === 'active' && data.items?.length > 0) {
-      if (cfdState?.status !== 'active' || (data.items?.length !== cfdState?.items?.length)) {
-        playLuxuryChime('scan');
+    // 2. Play chime ONLY when bill is paid / settled
+    if (data.status === 'settled') {
+      if (cfdState?.status !== 'settled') {
+        playLuxuryChime('success');
       }
-    } else if (data.status === 'settled') {
-      playLuxuryChime('success');
     }
 
     // 3. Detect new cashier billing session (e.g. cashier refreshed or new invoice started)
