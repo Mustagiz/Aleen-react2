@@ -88,8 +88,8 @@ export const playLuxuryChime = (type = 'success') => {
   const settings = getVoiceSettings();
   if (!settings.soundEnabled) return;
 
-  // Sound ONLY when the bill is paid / settled
-  if (type !== 'success') return;
+  // Sound on valid barcode ('scan' -> ting), unrecognized barcode ('error' -> buzz), and bill settlement ('success' -> paid chord)
+  if (type !== 'success' && type !== 'scan' && type !== 'error') return;
 
   try {
     const ctx = getAudioContext();

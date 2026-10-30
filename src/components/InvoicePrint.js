@@ -113,8 +113,8 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
           primaryColor: '#334155',
           darkColor: '#1E293B',
           accentColor: '#0F766E',
-          tableHeadBg: '#F1F5F9',
-          tableHeadText: '#0F172A',
+          tableHeadBg: '#1E293B',
+          tableHeadText: '#FFFFFF',
           totalBoxBg: '#F8FAFC',
           totalBoxBorder: '#CBD5E1',
           watermarkColor: 'rgba(51, 65, 85, 0.02)',
@@ -191,7 +191,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
     <Box
       ref={ref}
       id="printable-invoice"
-      className="printable-area"
+      className="printable-area invoice-print-container"
       sx={{
         p: isSlip ? 2.5 : 4,
         bgcolor: '#FFFFFF',
@@ -454,24 +454,98 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
         <Table size={isSlip ? 'small' : 'medium'} sx={{ tableLayout: 'fixed', width: '100%', borderCollapse: 'collapse' }}>
           <TableHead>
             <TableRow
-              style={{ backgroundColor: theme.tableHeadBg, color: theme.tableHeadText, WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
-              sx={{ bgcolor: theme.tableHeadBg, WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
+              className="invoice-table-header-row"
+              style={{ backgroundColor: theme.tableHeadBg, color: '#FFFFFF', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
+              sx={{ bgcolor: `${theme.tableHeadBg} !important`, WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
             >
-              <TableCell style={{ backgroundColor: theme.tableHeadBg, color: theme.tableHeadText }} sx={{ width: isSlip ? '48%' : '42%', color: theme.tableHeadText, fontWeight: 800, fontSize: '0.78rem', textTransform: 'uppercase', py: 1.2 }}>
+              <TableCell
+                className="invoice-table-header-cell"
+                style={{ backgroundColor: theme.tableHeadBg, color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF' }}
+                sx={{
+                  width: isSlip ? '48%' : '42%',
+                  color: '#FFFFFF !important',
+                  bgcolor: `${theme.tableHeadBg} !important`,
+                  WebkitTextFillColor: '#FFFFFF !important',
+                  '&.MuiTableCell-head': { color: '#FFFFFF !important', WebkitTextFillColor: '#FFFFFF !important' },
+                  fontWeight: 800,
+                  fontSize: '0.78rem',
+                  textTransform: 'uppercase',
+                  py: 1.2
+                }}
+              >
                 Garment / Merchandise
               </TableCell>
               {!isSlip && (
-                <TableCell style={{ backgroundColor: theme.tableHeadBg, color: theme.tableHeadText }} sx={{ width: '18%', color: theme.tableHeadText, fontWeight: 800, fontSize: '0.78rem', textTransform: 'uppercase', py: 1.2 }}>
+                <TableCell
+                  className="invoice-table-header-cell"
+                  style={{ backgroundColor: theme.tableHeadBg, color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF' }}
+                  sx={{
+                    width: '18%',
+                    color: '#FFFFFF !important',
+                    bgcolor: `${theme.tableHeadBg} !important`,
+                    WebkitTextFillColor: '#FFFFFF !important',
+                    '&.MuiTableCell-head': { color: '#FFFFFF !important', WebkitTextFillColor: '#FFFFFF !important' },
+                    fontWeight: 800,
+                    fontSize: '0.78rem',
+                    textTransform: 'uppercase',
+                    py: 1.2
+                  }}
+                >
                   Category
                 </TableCell>
               )}
-              <TableCell align="center" style={{ backgroundColor: theme.tableHeadBg, color: theme.tableHeadText }} sx={{ width: isSlip ? '14%' : '10%', color: theme.tableHeadText, fontWeight: 800, fontSize: '0.78rem', textTransform: 'uppercase', py: 1.2 }}>
+              <TableCell
+                align="center"
+                className="invoice-table-header-cell"
+                style={{ backgroundColor: theme.tableHeadBg, color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF' }}
+                sx={{
+                  width: isSlip ? '14%' : '10%',
+                  color: '#FFFFFF !important',
+                  bgcolor: `${theme.tableHeadBg} !important`,
+                  WebkitTextFillColor: '#FFFFFF !important',
+                  '&.MuiTableCell-head': { color: '#FFFFFF !important', WebkitTextFillColor: '#FFFFFF !important' },
+                  fontWeight: 800,
+                  fontSize: '0.78rem',
+                  textTransform: 'uppercase',
+                  py: 1.2
+                }}
+              >
                 Qty
               </TableCell>
-              <TableCell align="right" style={{ backgroundColor: theme.tableHeadBg, color: theme.tableHeadText }} sx={{ width: isSlip ? '18%' : '15%', color: theme.tableHeadText, fontWeight: 800, fontSize: '0.78rem', textTransform: 'uppercase', py: 1.2 }}>
+              <TableCell
+                align="right"
+                className="invoice-table-header-cell"
+                style={{ backgroundColor: theme.tableHeadBg, color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF' }}
+                sx={{
+                  width: isSlip ? '18%' : '15%',
+                  color: '#FFFFFF !important',
+                  bgcolor: `${theme.tableHeadBg} !important`,
+                  WebkitTextFillColor: '#FFFFFF !important',
+                  '&.MuiTableCell-head': { color: '#FFFFFF !important', WebkitTextFillColor: '#FFFFFF !important' },
+                  fontWeight: 800,
+                  fontSize: '0.78rem',
+                  textTransform: 'uppercase',
+                  py: 1.2
+                }}
+              >
                 Rate
               </TableCell>
-              <TableCell align="right" style={{ backgroundColor: theme.tableHeadBg, color: theme.tableHeadText }} sx={{ width: isSlip ? '20%' : '15%', color: theme.tableHeadText, fontWeight: 800, fontSize: '0.78rem', textTransform: 'uppercase', py: 1.2 }}>
+              <TableCell
+                align="right"
+                className="invoice-table-header-cell"
+                style={{ backgroundColor: theme.tableHeadBg, color: '#FFFFFF', WebkitTextFillColor: '#FFFFFF' }}
+                sx={{
+                  width: isSlip ? '20%' : '15%',
+                  color: '#FFFFFF !important',
+                  bgcolor: `${theme.tableHeadBg} !important`,
+                  WebkitTextFillColor: '#FFFFFF !important',
+                  '&.MuiTableCell-head': { color: '#FFFFFF !important', WebkitTextFillColor: '#FFFFFF !important' },
+                  fontWeight: 800,
+                  fontSize: '0.78rem',
+                  textTransform: 'uppercase',
+                  py: 1.2
+                }}
+              >
                 Amount
               </TableCell>
             </TableRow>

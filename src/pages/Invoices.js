@@ -30,7 +30,7 @@ import ThermalReceipt from '../components/ThermalReceipt';
 import CustomerMeasurementModal from '../components/crm/CustomerMeasurementModal';
 import UpiPaymentQrModal from '../components/pos/UpiPaymentQrModal';
 import PairCustomerDisplayModal from '../components/pos/PairCustomerDisplayModal';
-import { speakBillSettlement, getVoiceSettings, setVoiceSettings } from '../utils/posVoiceEngine';
+import { speakBillSettlement, getVoiceSettings, setVoiceSettings, playLuxuryChime } from '../utils/posVoiceEngine';
 
 const Invoices = () => {
   const location = useLocation();
@@ -557,12 +557,12 @@ const Invoices = () => {
     if (!rawCode) return;
     const cleanCode = String(rawCode).trim();
     if (!cleanCode) return;
-
     const matchResult = findProductByCode(cleanCode);
 
     if (matchResult && matchResult.product) {
       const { product, variantSku } = matchResult;
 
+      playLuxuryChime('scan');
       playVibration();
 
       // Cancel any running post-settlement auto-idle timer and reset settlement tracker
@@ -635,6 +635,7 @@ const Invoices = () => {
       });
     } else {
       const codeToShow = matchResult?.resolvedCode || cleanCode;
+      playLuxuryChime('error');
       setUnrecognizedScan(codeToShow);
       setScanFeedback({
         type: 'warning',

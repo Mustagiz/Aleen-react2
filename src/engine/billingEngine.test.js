@@ -250,5 +250,58 @@ describe('BillingEngine Module Tests', () => {
     expect(released.customer.name).toBe('Zoya Khan');
     expect(getHeldCarts()['1']).toBeUndefined();
   });
+
+  test('₹1,000 purchase accrues points according to spendPerPoint configuration', () => {
+    // Custom item with total ₹1,000
+    const items = [{
+      id: 'custom-1',
+      isCustom: true,
+      customName: 'Dupatta Stitching',
+      customPrice: 1000,
+      quantity: 1
+    }];
+
+    // 1. Default spendPerPoint: 100 -> ₹1000 / 100 = 10 points
+    const defaultResult = calculateInvoiceTotals({
+      items,
+      inventory: [],
+      taxPercent: 0,
+      customerTier: 'Bronze',
+      loyaltySettings: { spendPerPoint: 100 }
+    });
+    expect(defaultResult.total).toBe(1000);
+    expect(defaultResult.loyaltyPointsEarned).toBe(10);
+
+    // 2. spendPerPoint: 10 -> ₹1000 / 10 = 100 points
+    const rate10Result = calculateInvoiceTotals({
+      items,
+      inventory: [],
+      taxPercent: 0,
+      customerTier: 'Bronze',
+      loyaltySettings: { spendPerPoint: 10 }
+    });
+    expect(rate10Result.loyaltyPointsEarned).toBe(100);
+
+    // 3. spendPerPoint: 1 -> ₹1000 / 1 = 1000 points
+    const rate1Result = calculateInvoiceTotals({
+      items,
+      inventory: [],
+      taxPercent: 0,
+      customerTier: 'Bronze',
+      loyaltySettings: { spendPerPoint: 1 }
+    });
+    expect(rate1Result.loyaltyPointsEarned).toBe(1000);
+
+    // 4. Gold tier (1.5x) with spendPerPoint: 10 -> Math.floor((1000 / 10) * 1.5) = 150 points
+    const goldResult = calculateInvoiceTotals({
+      items,
+      inventory: [],
+      taxPercent: 0,
+      customerTier: 'Gold',
+      loyaltySettings: { spendPerPoint: 10, goldMultiplier: 1.5 }
+    });
+    expect(goldResult.loyaltyPointsEarned).toBe(150);
+  });
 });
+
 

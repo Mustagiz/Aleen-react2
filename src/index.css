@@ -81,6 +81,16 @@ code, pre, kbd, samp, [style*="font-family: monospace"], [style*="font-family:mo
   font-family: var(--font-sans) !important;
 }
 
+/* Invoice Print & PDF Table Header Overrides: Must be crisp white across all templates */
+.invoice-print-container .MuiTableHead-root .MuiTableCell-head,
+.invoice-print-container th,
+.invoice-table-header-cell,
+th.invoice-table-header-cell,
+td.invoice-table-header-cell {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+
 .MuiTableHead-root .MuiTableCell-head .MuiTableSortLabel-root {
   color: var(--emerald-primary) !important;
 }

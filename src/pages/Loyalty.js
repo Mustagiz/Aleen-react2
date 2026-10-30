@@ -26,6 +26,13 @@ import {
     Divider,
     InputAdornment,
     Switch,
+    Stack,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    ToggleButton,
+    ToggleButtonGroup,
     useMediaQuery,
     useTheme
 } from '@mui/material';
@@ -41,7 +48,10 @@ import {
     WorkspacePremium,
     Settings,
     CardGiftcard,
-    Save
+    Save,
+    Tune,
+    Calculate,
+    CheckCircle
 } from '@mui/icons-material';
 import { useData } from '../contexts/DataContext';
 import PageHeader from '../components/crm/PageHeader';
@@ -52,7 +62,7 @@ import { useFeedback } from '../contexts/FeedbackContext';
 const Loyalty = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    const { customers, redeemLoyaltyPoints, addBirthdayBonus, loyaltySettings, updateLoyaltySettings, addCustomLoyaltyPoints } = useData();
+    const { customers, redeemLoyaltyPoints, addBirthdayBonus, loyaltySettings, updateLoyaltySettings, addCustomLoyaltyPoints, updateCustomer } = useData();
     const { showToast } = useFeedback();
     const [redeemDialog, setRedeemDialog] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -75,6 +85,16 @@ const Loyalty = () => {
     const [awardExpiry, setAwardExpiry] = useState('');
     const [awardError, setAwardError] = useState('');
     const [awardSaving, setAwardSaving] = useState(false);
+
+    // Manual points & tier adjustment dialog state
+    const [adjustDialog, setAdjustDialog] = useState(false);
+    const [adjustCustomer, setAdjustCustomer] = useState(null);
+    const [adjustMode, setAdjustMode] = useState('set'); // 'set' | 'add' | 'deduct'
+    const [adjustPoints, setAdjustPoints] = useState('');
+    const [adjustTier, setAdjustTier] = useState('Bronze');
+    const [adjustReason, setAdjustReason] = useState('Manual points balance correction');
+    const [adjustError, setAdjustError] = useState('');
+    const [adjustSaving, setAdjustSaving] = useState(false);
 
     // Calculate tier statistics
     const tierStats = {
@@ -232,6 +252,78 @@ const Loyalty = () => {
             setAwardError(err.message);
         }
         setAwardSaving(false);
+    };
+
+    // Manual adjust points and tier handlers
+    const handleAdjustOpen = (customer) => {
+        setAdjustCustomer(customer);
+        setAdjustPoints(String(customer.loyaltyPoints || 0));
+        setAdjustMode('set');
+        setAdjustTier(customer.loyaltyTier || 'Bronze');
+        setAdjustReason('Manual VIP points balance adjustment');
+        setAdjustError('');
+        setAdjustDialog(true);
+    };
+
+    const handleAdjustSave = async () => {
+        if (!adjustCustomer) return;
+        const pts = parseInt(adjustPoints, 10);
+        if (isNaN(pts)) {
+            setAdjustError('Please enter a valid points value');
+            return;
+        }
+
+        const currentPts = adjustCustomer.loyaltyPoints || 0;
+        let newBalance = currentPts;
+        if (adjustMode === 'set') {
+            if (pts < 0) {
+                setAdjustError('Points balance cannot be negative');
+                return;
+            }
+            newBalance = pts;
+        } else if (adjustMode === 'add') {
+            if (pts <= 0) {
+                setAdjustError('Points to add must be greater than 0');
+                return;
+            }
+            newBalance = currentPts + pts;
+        } else if (adjustMode === 'deduct') {
+            if (pts <= 0) {
+                setAdjustError('Points to deduct must be greater than 0');
+                return;
+            }
+            if (pts > currentPts) {
+                setAdjustError(`Cannot deduct more than current balance (${currentPts} pts)`);
+                return;
+            }
+            newBalance = Math.max(0, currentPts - pts);
+        }
+
+        setAdjustSaving(true);
+        try {
+            const diff = newBalance - currentPts;
+            const history = adjustCustomer.pointsHistory || [];
+            const newHistoryEntry = {
+                date: new Date().toISOString(),
+                points: diff,
+                type: 'manual_adjustment',
+                reason: adjustReason.trim() || 'Manual Privilege Adjustment',
+                previousBalance: currentPts,
+                newBalance
+            };
+
+            await updateCustomer(adjustCustomer.id, {
+                loyaltyPoints: newBalance,
+                loyaltyTier: adjustTier,
+                pointsHistory: [...history, newHistoryEntry]
+            });
+
+            showToast(`Updated ${adjustCustomer.name}: ${newBalance} points (${adjustTier} VIP)`, 'success');
+            setAdjustDialog(false);
+        } catch (err) {
+            setAdjustError(err.message || 'Failed to update customer loyalty details');
+        }
+        setAdjustSaving(false);
     };
 
     // Sorted loyalty patrons
@@ -396,14 +488,15 @@ const Loyalty = () => {
                                         Reward Accrual Rate
                                     </Typography>
                                     <Typography variant="caption" color="text.secondary">
-                                        ₹{loyaltySettings?.spendPerPoint ?? 100} invoiced spend = 1 Loyalty Point automatically credited to guest wallet
+                                        ₹{loyaltySettings?.spendPerPoint ?? 100} invoiced spend = 1 Loyalty Point (e.g. ₹1,000 shop = {Math.round(1000 / (loyaltySettings?.spendPerPoint || 100))} pts)
                                     </Typography>
                                 </Box>
                                 <Chip
-                                    label={`₹${loyaltySettings?.spendPerPoint ?? 100}/pt`}
+                                    label={`₹${loyaltySettings?.spendPerPoint ?? 100}/pt • Change`}
                                     size="small"
                                     color="primary"
-                                    variant="outlined"
+                                    clickable
+                                    onClick={handleSettingsOpen}
                                     sx={{ fontWeight: 700, fontSize: '0.7rem' }}
                                 />
                             </Box>
@@ -708,6 +801,29 @@ const Loyalty = () => {
                                                                 <CardGiftcard sx={{ fontSize: 15 }} />
                                                             </IconButton>
                                                         </Tooltip>
+                                                        <Tooltip title="Manually Set / Adjust Points & Tier">
+                                                            <IconButton
+                                                                size="small"
+                                                                onClick={() => handleAdjustOpen(customer)}
+                                                                sx={{
+                                                                    width: 30,
+                                                                    height: 30,
+                                                                    color: '#7C3AED',
+                                                                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+                                                                    border: '1px solid rgba(124, 58, 237, 0.25)',
+                                                                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                                                                    transition: 'all 0.18s ease',
+                                                                    '&:hover': {
+                                                                        bgcolor: '#7C3AED',
+                                                                        color: '#FFFFFF',
+                                                                        transform: 'translateY(-1px)',
+                                                                        boxShadow: '0 4px 10px rgba(124, 58, 237, 0.3)'
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <Tune sx={{ fontSize: 15 }} />
+                                                            </IconButton>
+                                                        </Tooltip>
                                                     </Box>
                                                 </TableCell>
                                             </TableRow>
@@ -842,8 +958,33 @@ const Loyalty = () => {
                                             endAdornment: <InputAdornment position="end">= 1 pt</InputAdornment>,
                                             inputProps: { min: 1 }
                                         }}
-                                        helperText="e.g. 100 means ₹100 spent = 1 pt"
+                                        helperText="e.g. 10 means ₹10 spent = 1 pt (₹1,000 gives 100 pts)"
                                     />
+                                    <Box sx={{ mt: 1 }}>
+                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mb: 0.5 }}>
+                                            Quick Conversion Presets:
+                                        </Typography>
+                                        <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
+                                            {[
+                                                { label: '₹10 = 1 pt (100 pts/₹1k)', value: 10 },
+                                                { label: '₹20 = 1 pt (50 pts/₹1k)', value: 20 },
+                                                { label: '₹50 = 1 pt (20 pts/₹1k)', value: 50 },
+                                                { label: '₹100 = 1 pt (10 pts/₹1k)', value: 100 },
+                                                { label: '₹1 = 1 pt (1000 pts/₹1k)', value: 1 }
+                                            ].map((preset) => (
+                                                <Chip
+                                                    key={preset.value}
+                                                    label={preset.label}
+                                                    size="small"
+                                                    clickable
+                                                    color={Number(settingsForm.spendPerPoint) === preset.value ? 'primary' : 'default'}
+                                                    variant={Number(settingsForm.spendPerPoint) === preset.value ? 'filled' : 'outlined'}
+                                                    onClick={() => setSettingsForm(p => ({ ...p, spendPerPoint: preset.value }))}
+                                                    sx={{ fontSize: '0.68rem', fontWeight: 700, mb: 0.5 }}
+                                                />
+                                            ))}
+                                        </Stack>
+                                    </Box>
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
                                     <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1, color: 'text.primary' }}>Redemption Value</Typography>
@@ -862,6 +1003,45 @@ const Loyalty = () => {
                                     />
                                 </Grid>
                             </Grid>
+
+                            {/* Live Calculation Simulation Card for ₹1,000 Spend */}
+                            {Number(settingsForm.spendPerPoint) > 0 && (
+                                <Box sx={{ p: 2, borderRadius: 2.5, bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(15, 118, 110, 0.15)' : 'rgba(15, 118, 110, 0.06)', border: '1px solid rgba(15, 118, 110, 0.2)' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                        <Calculate sx={{ fontSize: 18, color: 'primary.main' }} />
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'primary.main' }}>
+                                            Live Simulation: Points accrued on a ₹1,000 Purchase
+                                        </Typography>
+                                    </Box>
+                                    <Grid container spacing={1.5}>
+                                        {[
+                                            { tier: 'Bronze', mult: Number(settingsForm.bronzeMultiplier) || 1, color: '#B45309' },
+                                            { tier: 'Silver', mult: Number(settingsForm.silverMultiplier) || 1.25, color: '#64748B' },
+                                            { tier: 'Gold', mult: Number(settingsForm.goldMultiplier) || 1.5, color: '#D97706' },
+                                            { tier: 'Platinum', mult: Number(settingsForm.platinumMultiplier) || 2, color: '#0F766E' }
+                                        ].map(({ tier, mult, color }) => {
+                                            const base = 1000 / Number(settingsForm.spendPerPoint);
+                                            const pts = Math.round(base * mult);
+                                            const credit = (pts * (parseFloat(settingsForm.pointsRedeemRate) || 1.0)).toFixed(0);
+                                            return (
+                                                <Grid item xs={6} sm={3} key={tier}>
+                                                    <Paper variant="outlined" sx={{ p: 1, textAlign: 'center', borderColor: 'divider', borderRadius: 2 }}>
+                                                        <Typography variant="caption" sx={{ fontWeight: 800, color, display: 'block' }}>
+                                                            {tier} ({mult}×)
+                                                        </Typography>
+                                                        <Typography variant="body1" sx={{ fontWeight: 850, color: 'text.primary' }}>
+                                                            {pts} pts
+                                                        </Typography>
+                                                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
+                                                            (₹{credit} discount)
+                                                        </Typography>
+                                                    </Paper>
+                                                </Grid>
+                                            );
+                                        })}
+                                    </Grid>
+                                </Box>
+                            )}
                             <Divider />
                             <Box>
                                 <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1.5, color: 'text.primary' }}>Tier Point Multipliers</Typography>
@@ -1039,6 +1219,198 @@ const Loyalty = () => {
                         sx={{ px: 3.5, borderRadius: 2.5, fontWeight: 700, bgcolor: '#059669', '&:hover': { bgcolor: '#047857' } }}
                     >
                         {awardSaving ? 'Awarding…' : 'Award Points'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* ── Manual Points & Tier Adjustment Dialog ── */}
+            <Dialog
+                open={adjustDialog}
+                onClose={() => setAdjustDialog(false)}
+                maxWidth="sm"
+                fullWidth
+                fullScreen={isMobile}
+                PaperProps={{ sx: { borderRadius: isMobile ? 0 : 4, p: 0.5 } }}
+            >
+                <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <Box sx={{ p: 1, borderRadius: 2, bgcolor: '#7C3AED', color: '#fff' }}>
+                            <Tune sx={{ fontSize: 20 }} />
+                        </Box>
+                        <Box>
+                            <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', lineHeight: 1.2 }}>
+                                Manual Points & Tier Adjustment
+                            </Typography>
+                            {adjustCustomer && (
+                                <Typography variant="caption" color="text.secondary">
+                                    {adjustCustomer.name} • Current: <strong>{adjustCustomer.loyaltyPoints || 0} pts</strong> ({adjustCustomer.loyaltyTier || 'Bronze'})
+                                </Typography>
+                            )}
+                        </Box>
+                    </Box>
+                    <IconButton onClick={() => setAdjustDialog(false)} size="small"><Close fontSize="small" /></IconButton>
+                </DialogTitle>
+                <DialogContent dividers>
+                    {adjustCustomer && (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
+                            {adjustError && <Alert severity="error" sx={{ borderRadius: 2 }}>{adjustError}</Alert>}
+
+                            {/* Adjustment Mode Switcher */}
+                            <Box>
+                                <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', display: 'block', mb: 1, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                    Adjustment Action
+                                </Typography>
+                                <ToggleButtonGroup
+                                    value={adjustMode}
+                                    exclusive
+                                    onChange={(e, val) => {
+                                        if (val) {
+                                            setAdjustMode(val);
+                                            setAdjustError('');
+                                            if (val === 'set') setAdjustPoints(String(adjustCustomer.loyaltyPoints || 0));
+                                            else setAdjustPoints('');
+                                        }
+                                    }}
+                                    fullWidth
+                                    size="small"
+                                    sx={{
+                                        '& .MuiToggleButton-root': {
+                                            fontWeight: 700,
+                                            borderRadius: 2,
+                                            py: 0.8,
+                                            textTransform: 'none'
+                                        }
+                                    }}
+                                >
+                                    <ToggleButton value="set">Set Exact Balance</ToggleButton>
+                                    <ToggleButton value="add" sx={{ color: '#059669 !important' }}>Add Points (+)</ToggleButton>
+                                    <ToggleButton value="deduct" sx={{ color: '#DC2626 !important' }}>Deduct Points (-)</ToggleButton>
+                                </ToggleButtonGroup>
+                            </Box>
+
+                            {/* Points Value Input & Quick Chips */}
+                            <Box>
+                                <TextField
+                                    fullWidth
+                                    label={adjustMode === 'set' ? 'New Points Balance *' : adjustMode === 'add' ? 'Points to Add (+)' : 'Points to Deduct (-)'}
+                                    type="number"
+                                    value={adjustPoints}
+                                    onChange={(e) => { setAdjustPoints(e.target.value); setAdjustError(''); }}
+                                    InputProps={{
+                                        endAdornment: <InputAdornment position="end">pts</InputAdornment>,
+                                        inputProps: { min: 0 }
+                                    }}
+                                    helperText={adjustMode === 'set' ? 'Directly sets the customer\'s total balance' : adjustMode === 'add' ? 'Adds to current balance' : 'Subtracts from current balance'}
+                                />
+                                {adjustMode !== 'set' && (
+                                    <Box sx={{ mt: 1 }}>
+                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', mr: 1 }}>
+                                            Quick amount:
+                                        </Typography>
+                                        <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap" sx={{ display: 'inline-flex' }}>
+                                            {[10, 25, 50, 100, 250, 500].map((amt) => (
+                                                <Chip
+                                                    key={amt}
+                                                    label={`${adjustMode === 'add' ? '+' : '-'}${amt}`}
+                                                    size="small"
+                                                    clickable
+                                                    onClick={() => setAdjustPoints(String(amt))}
+                                                    sx={{ fontSize: '0.7rem', fontWeight: 700 }}
+                                                />
+                                            ))}
+                                        </Stack>
+                                    </Box>
+                                )}
+                            </Box>
+
+                            {/* VIP Membership Tier Override */}
+                            <FormControl fullWidth size="small">
+                                <InputLabel id="adjust-tier-label">VIP Membership Tier</InputLabel>
+                                <Select
+                                    labelId="adjust-tier-label"
+                                    value={adjustTier}
+                                    label="VIP Membership Tier"
+                                    onChange={(e) => setAdjustTier(e.target.value)}
+                                >
+                                    {['Bronze', 'Silver', 'Gold', 'Platinum'].map((tier) => (
+                                        <MenuItem key={tier} value={tier}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <EmojiEvents sx={{ fontSize: 16, color: getTierColor(tier) }} />
+                                                <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                                                    {tier} Tier
+                                                </Typography>
+                                            </Box>
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+
+                            {/* Reason for Audit Log */}
+                            <TextField
+                                fullWidth
+                                label="Reason / Audit Note *"
+                                placeholder="e.g. In-store courtesy correction, order return, VIP promotion…"
+                                value={adjustReason}
+                                onChange={(e) => { setAdjustReason(e.target.value); setAdjustError(''); }}
+                                size="small"
+                            />
+
+                            {/* Live Result Calculation Preview Card */}
+                            {(() => {
+                                const current = adjustCustomer.loyaltyPoints || 0;
+                                const parsed = parseInt(adjustPoints, 10);
+                                const valid = !isNaN(parsed);
+                                let finalBalance = current;
+                                if (valid) {
+                                    if (adjustMode === 'set') finalBalance = Math.max(0, parsed);
+                                    else if (adjustMode === 'add') finalBalance = current + parsed;
+                                    else if (adjustMode === 'deduct') finalBalance = Math.max(0, current - parsed);
+                                }
+                                const diff = finalBalance - current;
+                                const redeemRate = loyaltySettings?.pointsRedeemRate ?? 1.0;
+                                const discountValue = (finalBalance * redeemRate).toFixed(0);
+
+                                return (
+                                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 2.5, bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(124, 58, 237, 0.1)' : 'rgba(124, 58, 237, 0.04)', borderColor: 'rgba(124, 58, 237, 0.25)' }}>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                                            <Typography variant="caption" sx={{ fontWeight: 800, color: '#7C3AED', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                                Resulting Patron Balance
+                                            </Typography>
+                                            <Chip
+                                                label={adjustTier}
+                                                size="small"
+                                                sx={{ bgcolor: getTierColor(adjustTier), color: '#fff', fontWeight: 800, fontSize: '0.68rem', height: 20 }}
+                                            />
+                                        </Box>
+                                        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
+                                            <Typography variant="h5" sx={{ fontWeight: 850, color: 'text.primary' }}>
+                                                {finalBalance.toLocaleString()} pts
+                                            </Typography>
+                                            {diff !== 0 && (
+                                                <Typography variant="body2" sx={{ fontWeight: 750, color: diff > 0 ? '#059669' : '#DC2626' }}>
+                                                    ({diff > 0 ? `+${diff}` : diff} pts)
+                                                </Typography>
+                                            )}
+                                        </Box>
+                                        <Typography variant="caption" color="text.secondary">
+                                            Equivalent to <strong>₹{discountValue}</strong> store credit at checkout
+                                        </Typography>
+                                    </Paper>
+                                );
+                            })()}
+                        </Box>
+                    )}
+                </DialogContent>
+                <DialogActions sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider' }}>
+                    <Button onClick={() => setAdjustDialog(false)} sx={{ fontWeight: 700, color: 'text.secondary' }}>Cancel</Button>
+                    <Button
+                        variant="contained"
+                        startIcon={<CheckCircle />}
+                        onClick={handleAdjustSave}
+                        disabled={adjustSaving || !adjustPoints}
+                        sx={{ px: 3.5, borderRadius: 2.5, fontWeight: 700, bgcolor: '#7C3AED', '&:hover': { bgcolor: '#6D28D9' } }}
+                    >
+                        {adjustSaving ? 'Saving…' : 'Apply Adjustment'}
                     </Button>
                 </DialogActions>
             </Dialog>
