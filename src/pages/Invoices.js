@@ -525,57 +525,62 @@ const Invoices = () => {
       );
       playVibration();
 
+      // Cancel any running post-settlement auto-idle timer and reset settlement tracker
+      if (cfdAutoIdleTimerRef.current) {
+        clearTimeout(cfdAutoIdleTimerRef.current);
+        cfdAutoIdleTimerRef.current = null;
+      }
+      cfdLastSettledTimeRef.current = 0;
+
+      const baseItems = Array.isArray(selectedItems) ? [...selectedItems] : [];
       let updatedCartItems = [];
-      setSelectedItems(prevItems => {
-        // 1. If item already exists in the cart with the same variantSku, increment quantity
-        const existingIndex = prevItems.findIndex(item =>
-          item.id === product.id && (!variantSku || item.variantSku === variantSku) && !item.isCustom
-        );
+      const resolvedVariantSku = variantSku || (product.hasVariants && product.variants?.length ? product.variants[0].sku : '');
 
-        if (existingIndex !== -1) {
-          const updated = [...prevItems];
-          const currentQty = parseInt(updated[existingIndex].quantity) || 1;
-          updated[existingIndex] = {
-            ...updated[existingIndex],
-            quantity: currentQty + 1
-          };
-          updatedCartItems = updated;
-          return updated;
-        }
+      // 1. If item already exists in the cart with the same variantSku, increment quantity
+      const existingIndex = baseItems.findIndex(item =>
+        item.id === product.id && (!variantSku || item.variantSku === variantSku) && !item.isCustom
+      );
 
+      if (existingIndex !== -1) {
+        const currentQty = parseInt(baseItems[existingIndex].quantity) || 1;
+        baseItems[existingIndex] = {
+          ...baseItems[existingIndex],
+          quantity: currentQty + 1
+        };
+        updatedCartItems = baseItems;
+      } else {
         // 2. Populate first unselected empty row if present
-        const emptyIndex = prevItems.findIndex(item => !item.id && !item.isCustom);
+        const emptyIndex = baseItems.findIndex(item => !item.id && !item.isCustom);
         if (emptyIndex !== -1) {
-          const updated = [...prevItems];
-          updated[emptyIndex] = {
+          baseItems[emptyIndex] = {
             id: product.id,
             quantity: 1,
-            variantSku: variantSku || (product.hasVariants && product.variants?.length ? product.variants[0].sku : ''),
+            variantSku: resolvedVariantSku,
             isCustom: false,
             customName: '',
             customPrice: 0,
             customCost: 0
           };
-          updatedCartItems = updated;
-          return updated;
+          updatedCartItems = baseItems;
+        } else {
+          // 3. Otherwise append new line item
+          updatedCartItems = [
+            ...baseItems,
+            {
+              id: product.id,
+              quantity: 1,
+              variantSku: resolvedVariantSku,
+              isCustom: false,
+              customName: '',
+              customPrice: 0,
+              customCost: 0
+            }
+          ];
         }
+      }
 
-        // 3. Otherwise append new line item
-        const updated = [
-          ...prevItems,
-          {
-            id: product.id,
-            quantity: 1,
-            variantSku: variantSku || (product.hasVariants && product.variants?.length ? product.variants[0].sku : ''),
-            isCustom: false,
-            customName: '',
-            customPrice: 0,
-            customCost: 0
-          }
-        ];
-        updatedCartItems = updated;
-        return updated;
-      });
+      setSelectedItems(updatedCartItems);
+      setOpen(true);
 
       // INSTANT 0ms Customer Facing Display Broadcast upon scanning
       if (syncCustomerDisplayRef.current && updatedCartItems.length > 0) {
@@ -613,8 +618,6 @@ const Invoices = () => {
 
   // Global Hardware Scanner Gun Listener (Keyboard wedge / HID)
   useEffect(() => {
-    if (!open) return;
-
     let timeout = null;
     const handleGlobalKeyDown = (e) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -668,8 +671,6 @@ const Invoices = () => {
 
   // Realtime Wireless Smartphone Scanner Bridge (Firebase Firestore + BroadcastChannel + LocalStorage)
   useEffect(() => {
-    if (!open) return; // Do not attach scanner listeners or open modal when dialog is closed
-
     const token = getActiveWorkstationToken();
     let unsubSession = null;
     let unsubGlobal = null;
@@ -927,10 +928,25 @@ const Invoices = () => {
 
   const handleItemChange = (index, field, value) => {
     const updated = [...selectedItems];
-    updated[index][field] = value;
+    if (field === 'id') {
+      const prod = inventory.find(i => i.id === value);
+      const defaultVariantSku = (prod && prod.hasVariants && prod.variants?.length)
+        ? (prod.variants.find(v => (parseInt(v.quantity) || 0) > 0)?.sku || prod.variants[0].sku)
+        : '';
+      updated[index] = {
+        ...updated[index],
+        id: value,
+        variantSku: defaultVariantSku
+      };
+    } else {
+      updated[index] = {
+        ...updated[index],
+        [field]: value
+      };
+    }
     setSelectedItems(updated);
     if (syncCustomerDisplayRef.current) {
-      syncCustomerDisplayRef.current(null, null, true, updated);
+      syncCustomerDisplayRef.current('active', null, true, updated);
     }
   };
 
@@ -938,7 +954,8 @@ const Invoices = () => {
     const updated = selectedItems.filter((_, i) => i !== index);
     setSelectedItems(updated);
     if (syncCustomerDisplayRef.current) {
-      syncCustomerDisplayRef.current(null, null, true, updated);
+      const remainingValid = updated.filter(item => item && (item.id || (item.isCustom && item.customName && item.customPrice > 0)));
+      syncCustomerDisplayRef.current(remainingValid.length > 0 ? 'active' : 'idle', null, true, updated);
     }
   };
 
@@ -970,11 +987,12 @@ const Invoices = () => {
       if (overrideItems !== null) {
         totals = calculateInvoiceTotals({
           items: validItems,
+          inventory,
+          taxPercent: tax,
           discountPercent,
           discountAmount,
-          tax,
-          loyaltyPointsToRedeem,
-          matchedCustomer
+          loyaltyPointsRedeemed: loyaltyPointsToRedeem,
+          customerTier: matchedCustomer?.loyaltyTier || 'Bronze'
         });
       } else {
         totals = calculateTotal();
@@ -989,16 +1007,31 @@ const Invoices = () => {
         status = 'idle';
       } else if (overrideStatus) {
         status = overrideStatus;
+      } else if (validItems.length > 0) {
+        // Active cart items present: cancel settlement idle timer and display live bill
+        if (cfdAutoIdleTimerRef.current) {
+          clearTimeout(cfdAutoIdleTimerRef.current);
+          cfdAutoIdleTimerRef.current = null;
+        }
+        cfdLastSettledTimeRef.current = 0;
+        status = 'active';
+      } else if (cfdLastSettledTimeRef.current > 0) {
+        // Keep settled view on screen during the 4-second thank-you window without clearing items
+        if (Date.now() - cfdLastSettledTimeRef.current < 4500) {
+          return;
+        }
+        cfdLastSettledTimeRef.current = 0;
+        status = 'idle';
       } else if (!open) {
-        status = cfdLastSettledTimeRef.current > 0 ? 'settled' : 'idle';
+        status = 'idle';
       } else {
-        status = validItems.length > 0 ? 'active' : 'idle';
+        status = 'idle';
       }
 
       const isIdle = status === 'idle';
       const cfdItems = isIdle ? [] : validItems;
-      const cfdCustomer = (overrideStatus === 'idle' || (!open && status !== 'settled')) ? '' : (customer || matchedCustomer?.name || '');
-      const cfdPhone = (overrideStatus === 'idle' || (!open && status !== 'settled')) ? '' : (phone || matchedCustomer?.phone || '');
+      const cfdCustomer = (isIdle || (!open && status !== 'settled')) ? '' : (customer || matchedCustomer?.name || '');
+      const cfdPhone = (isIdle || (!open && status !== 'settled')) ? '' : (phone || matchedCustomer?.phone || '');
 
       const storeVpa = profile?.bankDetails?.upiId || profile?.upiId || 'aleenclothing@hdfcbank';
       const storeName = profile?.businessName || 'Aleen Clothing';
