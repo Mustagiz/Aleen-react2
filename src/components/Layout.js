@@ -54,8 +54,7 @@ import {
   Close,
   ViewHeadline,
   Palette,
-  Apps,
-  Info
+  Apps
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
@@ -661,24 +660,6 @@ export default function Layout() {
 
         {/* Notifications */}
         <NotificationCenter plain />
-
-        {/* Info */}
-        <Tooltip title={`${profile?.businessName || 'Aleen Clothing'} — Boutique POS & CRM`}>
-          <IconButton
-            size="small"
-            sx={{
-              width: 32,
-              height: 32,
-              borderRadius: '50%',
-              border: 'none',
-              color: 'text.secondary',
-              display: { xs: 'none', sm: 'inline-flex' },
-              '&:hover': { bgcolor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#F1EFFC', color: theme.palette.primary.main }
-            }}
-          >
-            <Info sx={{ fontSize: '1.05rem' }} />
-          </IconButton>
-        </Tooltip>
 
         {/* Theme Toggle (Porcelain / Dark Mode) */}
         <IconButton

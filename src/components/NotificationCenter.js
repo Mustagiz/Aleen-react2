@@ -249,10 +249,14 @@ const NotificationCenter = ({ plain = false }) => {
                         width: { xs: 320, sm: 380 },
                         maxWidth: 'calc(100vw - 28px)',
                         maxHeight: 480,
-                        borderRadius: 3,
+                        borderRadius: '14px',
                         mt: 1.5,
-                        boxShadow: '0 16px 40px rgba(var(--primary-rgb, 124, 111, 232), 0.15), 0 4px 16px rgba(0,0,0,0.08)',
-                        border: '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.12)',
+                        boxShadow: isDark
+                            ? '0 16px 40px rgba(0, 0, 0, 0.5)'
+                            : '0 16px 40px rgba(112, 114, 176, 0.18), 0 1px 3px rgba(31, 27, 46, 0.06)',
+                        border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'}`,
+                        bgcolor: 'background.paper',
+                        backgroundImage: 'none',
                         overflow: 'hidden',
                         display: 'flex',
                         flexDirection: 'column'
@@ -274,9 +278,9 @@ const NotificationCenter = ({ plain = false }) => {
                                         height: 20,
                                         fontSize: '0.68rem',
                                         fontWeight: 800,
-                                        bgcolor: 'rgba(239, 68, 68, 0.1)',
-                                        color: '#EF4444',
-                                        border: '1px solid rgba(239, 68, 68, 0.2)'
+                                        bgcolor: isDark ? 'rgba(124, 111, 232, 0.2)' : 'rgba(124, 111, 232, 0.1)',
+                                        color: isDark ? theme.palette.primary.light : '#5B4BD1',
+                                        border: 'none'
                                     }}
                                 />
                             ) : (
@@ -287,9 +291,9 @@ const NotificationCenter = ({ plain = false }) => {
                                         height: 20,
                                         fontSize: '0.68rem',
                                         fontWeight: 700,
-                                        bgcolor: 'rgba(16, 185, 129, 0.1)',
-                                        color: '#059669',
-                                        border: '1px solid rgba(16, 185, 129, 0.2)'
+                                        bgcolor: isDark ? 'rgba(16, 185, 129, 0.18)' : 'rgba(16, 185, 129, 0.1)',
+                                        color: isDark ? '#34D399' : '#059669',
+                                        border: 'none'
                                     }}
                                 />
                             )}
@@ -310,7 +314,7 @@ const NotificationCenter = ({ plain = false }) => {
                                 px: 1,
                                 py: 0.35,
                                 borderRadius: '6px',
-                                '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)' },
+                                '&:hover': { bgcolor: 'action.hover' },
                                 '&.Mui-disabled': { color: 'text.disabled' }
                             }}
                         >
@@ -326,13 +330,15 @@ const NotificationCenter = ({ plain = false }) => {
                             clickable
                             onClick={() => setActiveTab('all')}
                             sx={{
-                                height: 24,
+                                height: 26,
+                                px: 0.75,
                                 fontSize: '0.72rem',
-                                fontWeight: activeTab === 'all' ? 800 : 600,
-                                bgcolor: activeTab === 'all' ? '#7C6FE8' : 'action.hover',
-                                color: activeTab === 'all' ? '#FFFFFF' : 'text.secondary',
+                                fontWeight: 700,
+                                bgcolor: activeTab === 'all' ? (isDark ? 'rgba(124, 111, 232, 0.18)' : 'rgba(124, 111, 232, 0.1)') : 'transparent',
+                                color: activeTab === 'all' ? (isDark ? theme.palette.primary.light : '#5B4BD1') : 'text.secondary',
+                                border: 'none',
                                 '&:hover': {
-                                    bgcolor: activeTab === 'all' ? '#0D6860' : 'action.selected'
+                                    bgcolor: activeTab === 'all' ? (isDark ? 'rgba(124, 111, 232, 0.24)' : 'rgba(124, 111, 232, 0.14)') : 'action.hover'
                                 }
                             }}
                         />
@@ -342,13 +348,15 @@ const NotificationCenter = ({ plain = false }) => {
                             clickable
                             onClick={() => setActiveTab('unread')}
                             sx={{
-                                height: 24,
+                                height: 26,
+                                px: 0.75,
                                 fontSize: '0.72rem',
-                                fontWeight: activeTab === 'unread' ? 800 : 600,
-                                bgcolor: activeTab === 'unread' ? '#7C6FE8' : 'action.hover',
-                                color: activeTab === 'unread' ? '#FFFFFF' : 'text.secondary',
+                                fontWeight: 700,
+                                bgcolor: activeTab === 'unread' ? (isDark ? 'rgba(124, 111, 232, 0.18)' : 'rgba(124, 111, 232, 0.1)') : 'transparent',
+                                color: activeTab === 'unread' ? (isDark ? theme.palette.primary.light : '#5B4BD1') : 'text.secondary',
+                                border: 'none',
                                 '&:hover': {
-                                    bgcolor: activeTab === 'unread' ? '#0D6860' : 'action.selected'
+                                    bgcolor: activeTab === 'unread' ? (isDark ? 'rgba(124, 111, 232, 0.24)' : 'rgba(124, 111, 232, 0.14)') : 'action.hover'
                                 }
                             }}
                         />
@@ -361,7 +369,7 @@ const NotificationCenter = ({ plain = false }) => {
                 <Box sx={{ flex: 1, overflowY: 'auto', maxHeight: 300 }}>
                     {displayedNotifications.length === 0 ? (
                         <Box sx={{ p: 4, textAlign: 'center' }}>
-                            <CheckCircleOutline sx={{ fontSize: 44, color: '#10B981', mb: 1, opacity: 0.8 }} />
+                            <CheckCircleOutline sx={{ fontSize: 40, color: isDark ? '#34D399' : '#10B981', mb: 1, opacity: 0.8 }} />
                             <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary' }}>
                                 {activeTab === 'unread' ? 'No unread notifications' : 'All caught up!'}
                             </Typography>
@@ -383,16 +391,29 @@ const NotificationCenter = ({ plain = false }) => {
                                         py: 1.25,
                                         borderBottom: '1px solid',
                                         borderColor: 'divider',
-                                        bgcolor: notif.isRead ? 'transparent' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
+                                        bgcolor: notif.isRead ? 'transparent' : (isDark ? 'rgba(124, 111, 232, 0.08)' : 'rgba(124, 111, 232, 0.04)'),
                                         transition: 'background-color 0.15s ease',
                                         '&:hover': {
-                                            bgcolor: notif.isRead ? 'action.hover' : 'rgba(124, 111, 232, 0.09)'
+                                            bgcolor: isDark ? 'rgba(255, 255, 255, 0.06)' : (notif.isRead ? 'action.hover' : 'rgba(124, 111, 232, 0.09)')
                                         }
                                     }}
                                 >
-                                    {/* Icon */}
-                                    <ListItemIcon sx={{ minWidth: 38 }}>
-                                        {notif.icon}
+                                    {/* Icon tile */}
+                                    <ListItemIcon sx={{ minWidth: 0, mr: 1.5 }}>
+                                        <Box sx={{
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: '8px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            bgcolor: notif.type === 'error'
+                                                ? (isDark ? 'rgba(239, 68, 68, 0.16)' : 'rgba(239, 68, 68, 0.1)')
+                                                : (isDark ? 'rgba(245, 158, 11, 0.16)' : 'rgba(245, 158, 11, 0.14)'),
+                                            '& svg': { fontSize: '1.05rem' }
+                                        }}>
+                                            {notif.icon}
+                                        </Box>
                                     </ListItemIcon>
 
                                     {/* Title & Message */}
@@ -402,9 +423,11 @@ const NotificationCenter = ({ plain = false }) => {
                                                 <Typography
                                                     variant="subtitle2"
                                                     sx={{
-                                                        fontSize: '0.82rem',
-                                                        fontWeight: notif.isRead ? 600 : 800,
-                                                        color: notif.isRead ? 'text.secondary' : 'text.primary'
+                                                        fontSize: '0.76rem',
+                                                        fontWeight: notif.isRead ? 600 : 700,
+                                                        color: notif.isRead ? 'text.secondary' : 'text.primary',
+                                                        textTransform: 'uppercase',
+                                                        letterSpacing: '0.04em'
                                                     }}
                                                 >
                                                     {notif.title}
@@ -415,7 +438,8 @@ const NotificationCenter = ({ plain = false }) => {
                                                             width: 6,
                                                             height: 6,
                                                             borderRadius: '50%',
-                                                            bgcolor: (t) => t.palette.primary.main
+                                                            bgcolor: (t) => t.palette.primary.main,
+                                                            flexShrink: 0
                                                         }}
                                                     />
                                                 )}
@@ -445,19 +469,19 @@ const NotificationCenter = ({ plain = false }) => {
                                             onClick={(e) => handleToggleSingleRead(notif.id, e)}
                                             sx={{
                                                 ml: 1,
-                                                color: notif.isRead ? 'text.disabled' : '#7C6FE8',
-                                                '&:hover': { color: (t) => t.palette.primary.main, bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)' }
+                                                color: notif.isRead ? 'text.disabled' : (isDark ? theme.palette.primary.light : '#7C6FE8'),
+                                                '&:hover': { color: (t) => t.palette.primary.main, bgcolor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(124, 111, 232, 0.08)' }
                                             }}
                                         >
                                             {notif.isRead ? (
-                                                <RadioButtonUnchecked sx={{ fontSize: '1rem' }} />
+                                                <RadioButtonUnchecked sx={{ fontSize: '0.95rem' }} />
                                             ) : (
-                                                <CheckCircleOutline sx={{ fontSize: '1.05rem' }} />
+                                                <CheckCircleOutline sx={{ fontSize: '1rem' }} />
                                             )}
                                         </IconButton>
                                     </Tooltip>
 
-                                    <ChevronRight fontSize="small" sx={{ color: 'text.disabled', ml: 0.5 }} />
+                                    <ChevronRight sx={{ fontSize: '1.1rem', color: 'text.disabled', ml: 0.25 }} />
                                 </ListItem>
                             ))}
                         </List>
