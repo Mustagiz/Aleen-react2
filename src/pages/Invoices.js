@@ -2071,6 +2071,29 @@ const Invoices = () => {
     pointsRedeemRate
   } = calculateTotal();
 
+  // Horizon ghost action button style (secondary header actions)
+  const ghostBtnSx = {
+    height: { xs: 36, sm: 40 },
+    minHeight: { xs: 36, sm: 40 },
+    px: { xs: 1.5, sm: 2 },
+    borderRadius: '10px',
+    border: 'none',
+    color: 'primary.main',
+    bgcolor: 'transparent',
+    fontWeight: 700,
+    fontSize: { xs: '0.76rem', sm: '0.82rem' },
+    textTransform: 'none',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxSizing: 'border-box',
+    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+    '&:hover': {
+      bgcolor: isDark ? 'rgba(155, 143, 245, 0.14)' : 'rgba(124, 111, 232, 0.08)',
+      transform: 'translateY(-1px)'
+    }
+  };
+
   return (
     <Box>
       {/* Atelier Page Header with Breadcrumbs & Actions */}
@@ -2088,28 +2111,7 @@ const Invoices = () => {
               variant="outlined"
               startIcon={<Palette sx={{ fontSize: 18, color: (t) => t.palette.primary.main }} />}
               onClick={() => setTemplateModalOpen(true)}
-              sx={{
-                height: { xs: 36, sm: 40 },
-                minHeight: { xs: 36, sm: 40 },
-                px: { xs: 1.5, sm: 2 },
-                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                border: (t) => `1.5px solid ${t.palette.primary.main}`,
-                color: (t) => t.palette.primary.main,
-                bgcolor: 'background.paper',
-                fontWeight: 700,
-                fontSize: { xs: '0.76rem', sm: '0.82rem' },
-                textTransform: 'none',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxSizing: 'border-box',
-                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                '&:hover': {
-                  border: (t) => `1.5px solid ${t.palette.primary.dark}`,
-                  bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)',
-                  transform: 'translateY(-1px)'
-                }
-              }}
+              sx={ghostBtnSx}
             >
               Templates
             </Button>
@@ -2117,28 +2119,7 @@ const Invoices = () => {
               variant="outlined"
               startIcon={<PointOfSale sx={{ fontSize: 18, color: (t) => t.palette.primary.main }} />}
               onClick={() => setCashDrawerModalOpen(true)}
-              sx={{
-                height: { xs: 36, sm: 40 },
-                minHeight: { xs: 36, sm: 40 },
-                px: { xs: 1.5, sm: 2 },
-                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                border: (t) => `1.5px solid ${t.palette.primary.main}`,
-                color: (t) => t.palette.primary.main,
-                bgcolor: 'background.paper',
-                fontWeight: 700,
-                fontSize: { xs: '0.76rem', sm: '0.82rem' },
-                textTransform: 'none',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxSizing: 'border-box',
-                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                '&:hover': {
-                  border: (t) => `1.5px solid ${t.palette.primary.dark}`,
-                  bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)',
-                  transform: 'translateY(-1px)'
-                }
-              }}
+              sx={ghostBtnSx}
             >
               Shift Close
             </Button>
@@ -2146,28 +2127,7 @@ const Invoices = () => {
               variant="outlined"
               startIcon={<Download sx={{ fontSize: 18, color: (t) => t.palette.primary.main }} />}
               onClick={downloadInvoices}
-              sx={{
-                height: { xs: 36, sm: 40 },
-                minHeight: { xs: 36, sm: 40 },
-                px: { xs: 1.5, sm: 2 },
-                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                border: (t) => `1.5px solid ${t.palette.primary.main}`,
-                color: (t) => t.palette.primary.main,
-                bgcolor: 'background.paper',
-                fontWeight: 700,
-                fontSize: { xs: '0.76rem', sm: '0.82rem' },
-                textTransform: 'none',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxSizing: 'border-box',
-                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                '&:hover': {
-                  border: (t) => `1.5px solid ${t.palette.primary.dark}`,
-                  bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)',
-                  transform: 'translateY(-1px)'
-                }
-              }}
+              sx={ghostBtnSx}
             >
               Export
             </Button>
@@ -2177,20 +2137,10 @@ const Invoices = () => {
                 startIcon={<PauseCircle sx={{ fontSize: 18, color: '#D97706' }} />}
                 onClick={() => setHeldCartsDialogOpen(true)}
                 sx={{
-                  height: { xs: 36, sm: 40 },
-                  minHeight: { xs: 36, sm: 40 },
-                  px: { xs: 1.5, sm: 2 },
-                  borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                  fontWeight: 700,
-                  fontSize: { xs: '0.76rem', sm: '0.82rem' },
-                  textTransform: 'none',
-                  border: '1.5px solid #D97706',
+                  ...ghostBtnSx,
                   color: '#D97706',
-                  bgcolor: 'rgba(217, 119, 6, 0.08)',
-                  boxSizing: 'border-box',
                   '&:hover': {
-                    border: '1.5px solid #B45309',
-                    bgcolor: 'rgba(217, 119, 6, 0.16)',
+                    bgcolor: isDark ? 'rgba(217, 119, 6, 0.16)' : 'rgba(217, 119, 6, 0.1)',
                     transform: 'translateY(-1px)'
                   }
                 }}
@@ -2204,26 +2154,13 @@ const Invoices = () => {
               startIcon={<Keyboard sx={{ fontSize: 17, color: 'text.secondary' }} />}
               onClick={() => setShortcutHelpOpen(true)}
               sx={{
-                height: { xs: 36, sm: 40 },
-                minHeight: { xs: 36, sm: 40 },
-                px: { xs: 1.25, sm: 1.75 },
-                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                fontWeight: 700,
-                fontSize: { xs: '0.76rem', sm: '0.82rem' },
-                textTransform: 'none',
-                display: { xs: 'none', md: 'inline-flex' },
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 0.75,
-                border: isDark ? '1.5px solid rgba(255, 255, 255, 0.12)' : '1.5px solid rgba(124, 111, 232, 0.18)',
+                ...ghostBtnSx,
                 color: 'text.secondary',
-                bgcolor: isDark ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
-                boxSizing: 'border-box',
-                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                display: { xs: 'none', md: 'inline-flex' },
+                gap: 0.75,
                 '&:hover': {
-                  borderColor: isDark ? '#2DD4BF' : '#7C6FE8',
-                  color: isDark ? '#2DD4BF' : '#7C6FE8',
-                  bgcolor: isDark ? 'rgba(155, 143, 245, 0.08)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
+                  bgcolor: 'action.hover',
+                  color: isDark ? 'primary.light' : 'primary.main',
                   transform: 'translateY(-1px)'
                 }
               }}
@@ -2246,28 +2183,7 @@ const Invoices = () => {
               variant="outlined"
               startIcon={<QrCode2 sx={{ fontSize: 18, color: (t) => t.palette.primary.main }} />}
               onClick={() => setPairModalOpen(true)}
-              sx={{
-                height: { xs: 36, sm: 40 },
-                minHeight: { xs: 36, sm: 40 },
-                px: { xs: 1.5, sm: 2 },
-                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                border: (t) => `1.5px solid ${t.palette.primary.main}`,
-                color: (t) => t.palette.primary.main,
-                bgcolor: 'background.paper',
-                fontWeight: 700,
-                fontSize: { xs: '0.76rem', sm: '0.82rem' },
-                textTransform: 'none',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxSizing: 'border-box',
-                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                '&:hover': {
-                  border: (t) => `1.5px solid ${t.palette.primary.dark}`,
-                  bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)',
-                  transform: 'translateY(-1px)'
-                }
-              }}
+              sx={ghostBtnSx}
             >
               Pair 2nd Screen
             </Button>
@@ -2275,28 +2191,7 @@ const Invoices = () => {
               variant="outlined"
               startIcon={<Tv sx={{ fontSize: 18, color: (t) => t.palette.primary.main }} />}
               onClick={handleOpenCustomerDisplay}
-              sx={{
-                height: { xs: 36, sm: 40 },
-                minHeight: { xs: 36, sm: 40 },
-                px: { xs: 1.5, sm: 2 },
-                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                border: (t) => `1.5px solid ${t.palette.primary.main}`,
-                color: (t) => t.palette.primary.main,
-                bgcolor: 'background.paper',
-                fontWeight: 700,
-                fontSize: { xs: '0.76rem', sm: '0.82rem' },
-                textTransform: 'none',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxSizing: 'border-box',
-                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                '&:hover': {
-                  border: (t) => `1.5px solid ${t.palette.primary.dark}`,
-                  bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)',
-                  transform: 'translateY(-1px)'
-                }
-              }}
+              sx={ghostBtnSx}
             >
               Customer Screen
             </Button>
@@ -2317,16 +2212,16 @@ const Invoices = () => {
                 justifyContent: 'center',
                 gap: 1,
                 boxSizing: 'border-box',
-                background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
+                background: (t) => t.palette.primary.main,
                 color: '#FFFFFF !important',
-                boxShadow: '0 4px 14px rgba(124, 111, 232, 0.3)',
+                boxShadow: '0 4px 14px rgba(124, 111, 232, 0.28)',
                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                 '& .MuiSvgIcon-root': {
                   color: '#FFFFFF !important'
                 },
                 '&:hover': {
                   background: (t) => t.palette.primary.dark,
-                  boxShadow: '0 6px 18px rgba(124, 111, 232, 0.45)',
+                  boxShadow: '0 6px 18px rgba(124, 111, 232, 0.4)',
                   transform: 'translateY(-1px)'
                 }
               }}
@@ -3104,7 +2999,7 @@ const Invoices = () => {
             <TableContainer>
               <Table>
                 <TableHead>
-                  <TableRow>
+                  <TableRow sx={{ bgcolor: isDark ? 'rgba(124, 111, 232, 0.06)' : 'rgba(124, 111, 232, 0.045)' }}>
                     <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       <TableSortLabel active={orderBy === 'id'} direction={orderBy === 'id' ? order : 'asc'} onClick={() => handleRequestSort('id')}>
                         Invoice Details
@@ -3144,6 +3039,8 @@ const Invoices = () => {
                         key={inv.id}
                         hover
                         sx={{
+                          animation: 'aleenRowEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both',
+                          animationDelay: `${Math.min(idx, 12) * 35}ms`,
                           '&:hover': { bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(124, 111, 232, 0.03)' },
                           transition: 'background-color 0.15s ease'
                         }}

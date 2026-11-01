@@ -71,6 +71,24 @@ code, pre, kbd, samp, [style*="font-family: monospace"], [style*="font-family:mo
   transition: background 0.2s ease;
 }
 
+/* Staggered table row entrance */
+@keyframes aleenRowEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .MuiTableRow-root {
+    animation: none !important;
+  }
+}
+
 /* ==========================================================================
    DYNAMIC ECOSYSTEM THEME ENFORCEMENT FOR HEADERS, TABLES, BUTTONS, CARDS & FILTERS
    ========================================================================== */
