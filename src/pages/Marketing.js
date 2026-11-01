@@ -60,18 +60,15 @@ import {
     Add,
     Campaign,
     ContentCopy,
-    Stars,
     Cake,
     CheckCircle,
     Chat,
     Person,
     DoneAll,
-    Diamond,
     GridView,
     ViewList,
     CalendarMonth,
     History,
-    ShoppingBag,
     AutoAwesome,
     Close,
     PlayArrow,
@@ -171,6 +168,7 @@ const DEFAULT_KEYWORDS = [
 
 const Marketing = () => {
     const theme = useTheme();
+    const isDark = theme.palette.mode === 'dark';
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const {
         customers,
@@ -859,6 +857,11 @@ const Marketing = () => {
         tier: 'Platinum'
     };
 
+    // Horizon surface tokens (design-only helpers)
+    const horizonShadow = isDark ? '0 4px 24px rgba(0, 0, 0, 0.35)' : '0 2px 12px rgba(112, 114, 176, 0.08)';
+    const lavenderTint = isDark ? 'rgba(155, 143, 245, 0.1)' : 'rgba(124, 111, 232, 0.05)';
+    const amberTint = isDark ? 'rgba(217, 119, 6, 0.1)' : 'rgba(217, 119, 6, 0.04)';
+
     return (
         <Box sx={{ maxWidth: 1440, mx: 'auto', p: { xs: 1.5, sm: 2.5, md: 3.5 } }}>
             {/* Atelier Page Header */}
@@ -868,20 +871,19 @@ const Marketing = () => {
                 actions={
                     <Stack direction="row" spacing={1.5} alignItems="center">
                         <Button
-                            variant="outlined"
                             startIcon={<Settings />}
                             onClick={() => setGatewayModalOpen(true)}
                             sx={{
                                 px: 2.5,
                                 py: 1,
-                                borderRadius: 2.5,
-                                fontWeight: 750,
+                                borderRadius: '10px',
+                                border: 'none',
+                                fontWeight: 700,
                                 textTransform: 'none',
-                                borderColor: 'rgba(124, 111, 232, 0.3)',
-                                color: (t) => t.palette.primary.main,
+                                color: 'primary.main',
+                                bgcolor: 'transparent',
                                 '&:hover': {
-                                    bordercolor: (t) => t.palette.primary.main,
-                                    bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)'
+                                    bgcolor: isDark ? 'rgba(155, 143, 245, 0.14)' : 'rgba(124, 111, 232, 0.08)'
                                 }
                             }}
                         >
@@ -894,14 +896,14 @@ const Marketing = () => {
                             sx={{
                                 px: 3,
                                 py: 1,
-                                borderRadius: 2.5,
-                                fontWeight: 750,
+                                borderRadius: '10px',
+                                fontWeight: 700,
                                 textTransform: 'none',
-                                background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
+                                bgcolor: (t) => t.palette.primary.main,
                                 color: '#ffffff',
-                                boxShadow: '0 4px 14px rgba(var(--primary-rgb, 124, 111, 232), 0.25)',
+                                boxShadow: 'none',
                                 '&:hover': {
-                                    background: 'linear-gradient(135deg, #5B4BD1 0%, #7C6FE8 100%)'
+                                    bgcolor: (t) => t.palette.primary.dark
                                 }
                             }}
                         >
@@ -963,11 +965,12 @@ const Marketing = () => {
                 elevation={0}
                 sx={{
                     mb: 3,
-                    borderRadius: 3,
+                    borderRadius: '14px',
                     border: '1px solid',
                     borderColor: 'divider',
                     bgcolor: 'background.paper',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    boxShadow: horizonShadow
                 }}
             >
                 <Tabs
@@ -985,8 +988,8 @@ const Marketing = () => {
                         },
                         '& .MuiTab-root': {
                             textTransform: 'none',
-                            fontWeight: 750,
-                            fontSize: '0.92rem',
+                            fontWeight: 700,
+                            fontSize: '0.88rem',
                             minHeight: 52,
                             color: 'text.secondary',
                             gap: 1,
@@ -1005,7 +1008,7 @@ const Marketing = () => {
                             </Badge>
                         }
                         iconPosition="start"
-                        label="⚡ Automations & Auto-Pilot"
+                        label="Automations & Auto-Pilot"
                     />
                     <Tab icon={<Campaign sx={{ fontSize: '1.15rem' }} />} iconPosition="start" label={`Template Studio (${marketingTemplates.length})`} />
                     <Tab
@@ -1033,11 +1036,12 @@ const Marketing = () => {
                             elevation={0}
                             sx={{
                                 p: 2.5,
-                                borderRadius: 3.5,
+                                borderRadius: '14px',
                                 border: '1px solid',
                                 borderColor: 'divider',
                                 mb: 2.5,
-                                boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
+                                bgcolor: 'background.paper',
+                                boxShadow: horizonShadow
                             }}
                         >
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
@@ -1057,61 +1061,55 @@ const Marketing = () => {
                                     color={selectedSegment === 'all' ? 'primary' : 'default'}
                                     variant={selectedSegment === 'all' ? 'filled' : 'outlined'}
                                     onClick={() => setSelectedSegment('all')}
-                                    sx={{ fontWeight: 700, borderRadius: 2 }}
+                                    sx={{ height: 26, fontWeight: 700, fontSize: '0.72rem', borderRadius: '8px' }}
                                 />
                                 <Chip
-                                    icon={<Warning sx={{ fontSize: '1rem !important' }} />}
                                     label={`Dormant 30d+ (${segmentCounts.dormant30})`}
                                     clickable
                                     color={selectedSegment === 'dormant30' ? 'warning' : 'default'}
                                     variant={selectedSegment === 'dormant30' ? 'filled' : 'outlined'}
                                     onClick={() => setSelectedSegment('dormant30')}
-                                    sx={{ fontWeight: 700, borderRadius: 2 }}
+                                    sx={{ height: 26, fontWeight: 700, fontSize: '0.72rem', borderRadius: '8px' }}
                                 />
                                 <Chip
-                                    icon={<Warning sx={{ fontSize: '1rem !important' }} />}
                                     label={`Deep Dormant 60d+ (${segmentCounts.dormant60})`}
                                     clickable
                                     color={selectedSegment === 'dormant60' ? 'error' : 'default'}
                                     variant={selectedSegment === 'dormant60' ? 'filled' : 'outlined'}
                                     onClick={() => setSelectedSegment('dormant60')}
-                                    sx={{ fontWeight: 700, borderRadius: 2 }}
+                                    sx={{ height: 26, fontWeight: 700, fontSize: '0.72rem', borderRadius: '8px' }}
                                 />
                                 <Chip
-                                    icon={<Diamond sx={{ fontSize: '1rem !important' }} />}
                                     label={`VIP & High Spenders (${segmentCounts.vip})`}
                                     clickable
                                     color={selectedSegment === 'vip' ? 'secondary' : 'default'}
                                     variant={selectedSegment === 'vip' ? 'filled' : 'outlined'}
                                     onClick={() => setSelectedSegment('vip')}
-                                    sx={{ fontWeight: 700, borderRadius: 2 }}
+                                    sx={{ height: 26, fontWeight: 700, fontSize: '0.72rem', borderRadius: '8px' }}
                                 />
                                 <Chip
-                                    icon={<ShoppingBag sx={{ fontSize: '1rem !important' }} />}
                                     label={`Recent Shoppers (${segmentCounts.recent})`}
                                     clickable
                                     color={selectedSegment === 'recent' ? 'success' : 'default'}
                                     variant={selectedSegment === 'recent' ? 'filled' : 'outlined'}
                                     onClick={() => setSelectedSegment('recent')}
-                                    sx={{ fontWeight: 700, borderRadius: 2 }}
+                                    sx={{ height: 26, fontWeight: 700, fontSize: '0.72rem', borderRadius: '8px' }}
                                 />
                                 <Chip
-                                    icon={<Celebration sx={{ fontSize: '1rem !important' }} />}
                                     label={`Celebrants (${segmentCounts.celebrants})`}
                                     clickable
                                     color={selectedSegment === 'celebrants' ? 'warning' : 'default'}
                                     variant={selectedSegment === 'celebrants' ? 'filled' : 'outlined'}
                                     onClick={() => setSelectedSegment('celebrants')}
-                                    sx={{ fontWeight: 700, borderRadius: 2 }}
+                                    sx={{ height: 26, fontWeight: 700, fontSize: '0.72rem', borderRadius: '8px' }}
                                 />
                                 <Chip
-                                    icon={<Stars sx={{ fontSize: '1rem !important' }} />}
                                     label={`Loyalty Points (${segmentCounts.loyalty})`}
                                     clickable
                                     color={selectedSegment === 'loyalty' ? 'info' : 'default'}
                                     variant={selectedSegment === 'loyalty' ? 'filled' : 'outlined'}
                                     onClick={() => setSelectedSegment('loyalty')}
-                                    sx={{ fontWeight: 700, borderRadius: 2 }}
+                                    sx={{ height: 26, fontWeight: 700, fontSize: '0.72rem', borderRadius: '8px' }}
                                 />
                             </Stack>
 
@@ -1212,17 +1210,17 @@ const Marketing = () => {
                                                     onClick={() => setActiveCustomerForPreview(customer)}
                                                     sx={{
                                                         cursor: 'pointer',
-                                                        borderRadius: 3,
-                                                        border: '2px solid',
-                                                        borderColor: isPreviewActive ? '#7C6FE8' : isSelected ? 'rgba(124, 111, 232, 0.5)' : 'divider',
-                                                        bgcolor: isPreviewActive ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)' : 'background.paper',
-                                                        boxShadow: isPreviewActive ? '0 6px 20px rgba(var(--primary-rgb, 124, 111, 232), 0.15)' : 'none',
-                                                        transition: 'all 0.2s',
+                                                        borderRadius: '14px',
+                                                        border: '1px solid',
+                                                        borderColor: isPreviewActive ? 'primary.main' : isSelected ? 'rgba(124, 111, 232, 0.5)' : 'divider',
+                                                        bgcolor: isPreviewActive ? lavenderTint : 'background.paper',
+                                                        boxShadow: isPreviewActive ? horizonShadow : 'none',
+                                                        transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                                         position: 'relative',
                                                         overflow: 'hidden',
                                                         '&:hover': {
-                                                            bordercolor: (t) => t.palette.primary.main,
-                                                            boxShadow: '0 4px 16px rgba(var(--primary-rgb, 124, 111, 232), 0.12)',
+                                                            borderColor: (t) => t.palette.primary.main,
+                                                            boxShadow: horizonShadow,
                                                             transform: 'translateY(-2px)'
                                                         }
                                                     }}
@@ -1286,8 +1284,9 @@ const Marketing = () => {
                                                                 gap: 1,
                                                                 p: 1.25,
                                                                 borderRadius: 2,
-                                                                bgcolor: 'rgba(0,0,0,0.02)',
-                                                                border: '1px solid rgba(0,0,0,0.04)',
+                                                                bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(124, 111, 232, 0.045)',
+                                                                border: '1px solid',
+                                                                borderColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(124, 111, 232, 0.1)',
                                                                 mb: 1.5,
                                                                 textAlign: 'center'
                                                             }}
@@ -1326,7 +1325,7 @@ const Marketing = () => {
                                                                     sx={{
                                                                         fontWeight: 800,
                                                                         fontSize: '0.72rem',
-                                                                        color: isPreviewActive ? '#7C6FE8' : 'text.secondary',
+                                                                        color: isPreviewActive ? 'primary.main' : 'text.secondary',
                                                                         display: 'flex',
                                                                         alignItems: 'center',
                                                                         gap: 0.5
@@ -1369,10 +1368,10 @@ const Marketing = () => {
                             <TableContainer
                                 component={Paper}
                                 elevation={0}
-                                sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider' }}
+                                sx={{ borderRadius: '14px', border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', boxShadow: horizonShadow }}
                             >
                                 <Table size="small">
-                                    <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' }}>
+                                    <TableHead sx={{ bgcolor: isDark ? 'rgba(155, 143, 245, 0.08)' : 'rgba(124, 111, 232, 0.045)' }}>
                                         <TableRow>
                                             <TableCell padding="checkbox">
                                                 <Checkbox
@@ -1512,12 +1511,13 @@ const Marketing = () => {
                             elevation={0}
                             sx={{
                                 p: 3,
-                                borderRadius: 4,
+                                borderRadius: '14px',
                                 border: '1px solid',
                                 borderColor: 'divider',
                                 position: 'sticky',
                                 top: 88,
-                                boxShadow: '0 4px 20px rgba(0,0,0,0.04)'
+                                bgcolor: 'background.paper',
+                                boxShadow: horizonShadow
                             }}
                         >
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -1555,16 +1555,16 @@ const Marketing = () => {
                                                 showToast(`Loaded ${preset.shortTitle || preset.title} campaign template`, 'info');
                                             }}
                                             sx={{
+                                                height: 26,
                                                 fontWeight: 800,
                                                 fontSize: '0.74rem',
-                                                bgcolor: isActive ? '#7C6FE8' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)',
-                                                color: isActive ? '#FFFFFF' : '#7C6FE8',
-                                                border: '1.5px solid',
-                                                borderColor: isActive ? '#7C6FE8' : 'transparent',
-                                                boxShadow: isActive ? '0 2px 8px rgba(var(--primary-rgb, 124, 111, 232), 0.25)' : 'none',
+                                                bgcolor: isActive ? 'primary.main' : (isDark ? 'rgba(155, 143, 245, 0.12)' : 'rgba(124, 111, 232, 0.08)'),
+                                                color: isActive ? '#FFFFFF' : 'primary.main',
+                                                border: '1px solid',
+                                                borderColor: isActive ? 'primary.main' : 'transparent',
                                                 transition: 'all 0.18s ease',
                                                 '&:hover': {
-                                                    bgcolor: isActive ? '#5B4BD1' : 'rgba(124, 111, 232, 0.16)'
+                                                    bgcolor: isActive ? 'primary.dark' : (isDark ? 'rgba(155, 143, 245, 0.2)' : 'rgba(124, 111, 232, 0.14)')
                                                 }
                                             }}
                                         />
@@ -1710,7 +1710,7 @@ const Marketing = () => {
 
                             {/* Dynamic Merge Tag Inserters */}
                             <Box sx={{ mt: 2.5 }}>
-                                <Typography variant="caption" sx={{ fontWeight: 750, color: 'text.secondary', display: 'block', mb: 0.75 }}>
+                                <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mb: 0.75 }}>
                                     Dynamic Personalization Tags:
                                 </Typography>
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
@@ -1718,31 +1718,31 @@ const Marketing = () => {
                                         size="small"
                                         label="+ {customer_name}"
                                         onClick={() => insertMergeTag('{customer_name}')}
-                                        sx={{ fontSize: '0.7rem', fontWeight: 750, cursor: 'pointer' }}
+                                        sx={{ height: 24, fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer', bgcolor: lavenderTint, color: 'primary.main', border: 'none' }}
                                     />
                                     <Chip
                                         size="small"
                                         label="+ {store_name}"
                                         onClick={() => insertMergeTag('{store_name}')}
-                                        sx={{ fontSize: '0.7rem', fontWeight: 750, cursor: 'pointer' }}
+                                        sx={{ height: 24, fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer', bgcolor: lavenderTint, color: 'primary.main', border: 'none' }}
                                     />
                                     <Chip
                                         size="small"
                                         label="+ {loyalty_points}"
                                         onClick={() => insertMergeTag('{loyalty_points}')}
-                                        sx={{ fontSize: '0.7rem', fontWeight: 750, cursor: 'pointer' }}
+                                        sx={{ height: 24, fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer', bgcolor: lavenderTint, color: 'primary.main', border: 'none' }}
                                     />
                                     <Chip
                                         size="small"
                                         label="+ {tier_name}"
                                         onClick={() => insertMergeTag('{tier_name}')}
-                                        sx={{ fontSize: '0.7rem', fontWeight: 750, cursor: 'pointer' }}
+                                        sx={{ height: 24, fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer', bgcolor: lavenderTint, color: 'primary.main', border: 'none' }}
                                     />
                                     <Chip
                                         size="small"
                                         label="+ {offer_code}"
                                         onClick={() => insertMergeTag('{offer_code}')}
-                                        sx={{ fontSize: '0.7rem', fontWeight: 750, cursor: 'pointer', bgcolor: 'rgba(217, 119, 6, 0.1)', color: '#B45309' }}
+                                        sx={{ height: 24, fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer', bgcolor: amberTint, color: '#B45309', border: 'none' }}
                                     />
                                 </Box>
 
@@ -1805,8 +1805,8 @@ const Marketing = () => {
                                 FormHelperTextProps={{ sx: { fontSize: '0.68rem', color: 'text.secondary', mx: 0.5 } }}
                                 sx={{
                                     '& .MuiOutlinedInput-root': {
-                                        borderRadius: 2.5,
-                                        bgcolor: '#FFFFFF',
+                                        borderRadius: '10px',
+                                        bgcolor: 'background.paper',
                                         fontSize: '0.82rem',
                                         lineHeight: 1.45
                                     }
@@ -1855,16 +1855,17 @@ const Marketing = () => {
                         elevation={0}
                         sx={{
                             p: 3,
-                            borderRadius: 3.5,
-                            border: '1.5px solid',
-                            borderColor: gatewayConfig.mode !== 'browser' ? '#7C6FE8' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.25)',
-                            bgcolor: 'rgba(124, 111, 232, 0.03)',
+                            borderRadius: '14px',
+                            border: '1px solid',
+                            borderColor: gatewayConfig.mode !== 'browser' ? 'rgba(124, 111, 232, 0.35)' : 'divider',
+                            bgcolor: lavenderTint,
                             mb: 3.5,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
                             flexWrap: 'wrap',
-                            gap: 2
+                            gap: 2,
+                            boxShadow: horizonShadow
                         }}
                     >
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -1880,9 +1881,10 @@ const Marketing = () => {
                                         size="small"
                                         label={gatewayConfig.mode === 'meta_cloud' ? 'Meta Cloud API (Headless)' : gatewayConfig.mode === 'webhook' ? 'Custom Webhook Gateway' : 'Click-to-Chat (wa.me)'}
                                         sx={{
+                                            height: 22,
                                             fontWeight: 800,
                                             fontSize: '0.72rem',
-                                            bgcolor: gatewayConfig.mode !== 'browser' ? '#7C6FE8' : 'rgba(0,0,0,0.08)',
+                                            bgcolor: gatewayConfig.mode !== 'browser' ? 'primary.main' : 'action.hover',
                                             color: gatewayConfig.mode !== 'browser' ? '#ffffff' : 'text.primary'
                                         }}
                                     />
@@ -1941,7 +1943,7 @@ const Marketing = () => {
                     )}
 
                     {/* Automation Trigger Rules Grid */}
-                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', mb: 2 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, fontSize: '0.78rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'text.secondary', mb: 2 }}>
                         Automated Lifecycle & Event Triggers
                     </Typography>
 
@@ -1952,14 +1954,15 @@ const Marketing = () => {
                                 elevation={0}
                                 sx={{
                                     p: 2.5,
-                                    borderRadius: 3,
-                                    border: '1.5px solid',
-                                    borderColor: automationRules.birthdayAutoDrip ? '#D97706' : 'divider',
+                                    borderRadius: '14px',
+                                    border: '1px solid',
+                                    borderColor: automationRules.birthdayAutoDrip ? 'rgba(217, 119, 6, 0.4)' : 'divider',
                                     bgcolor: 'background.paper',
                                     height: '100%',
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    justifyContent: 'space-between'
+                                    justifyContent: 'space-between',
+                                    boxShadow: horizonShadow
                                 }}
                             >
                                 <Box>
@@ -2011,14 +2014,15 @@ const Marketing = () => {
                                 elevation={0}
                                 sx={{
                                     p: 2.5,
-                                    borderRadius: 3,
-                                    border: '1.5px solid',
-                                    borderColor: automationRules.dormancyWinback ? '#7C6FE8' : 'divider',
+                                    borderRadius: '14px',
+                                    border: '1px solid',
+                                    borderColor: automationRules.dormancyWinback ? 'rgba(124, 111, 232, 0.4)' : 'divider',
                                     bgcolor: 'background.paper',
                                     height: '100%',
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    justifyContent: 'space-between'
+                                    justifyContent: 'space-between',
+                                    boxShadow: horizonShadow
                                 }}
                             >
                                 <Box>
@@ -2067,14 +2071,15 @@ const Marketing = () => {
                                 elevation={0}
                                 sx={{
                                     p: 2.5,
-                                    borderRadius: 3,
-                                    border: '1.5px solid',
-                                    borderColor: automationRules.invoiceReceiptAuto ? '#7C6FE8' : 'divider',
+                                    borderRadius: '14px',
+                                    border: '1px solid',
+                                    borderColor: automationRules.invoiceReceiptAuto ? 'rgba(124, 111, 232, 0.4)' : 'divider',
                                     bgcolor: 'background.paper',
                                     height: '100%',
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    justifyContent: 'space-between'
+                                    justifyContent: 'space-between',
+                                    boxShadow: horizonShadow
                                 }}
                             >
                                 <Box>
@@ -2115,14 +2120,15 @@ const Marketing = () => {
                                 elevation={0}
                                 sx={{
                                     p: 2.5,
-                                    borderRadius: 3,
-                                    border: '1.5px solid',
-                                    borderColor: automationRules.tailoringReadyAlert ? '#7C6FE8' : 'divider',
+                                    borderRadius: '14px',
+                                    border: '1px solid',
+                                    borderColor: automationRules.tailoringReadyAlert ? 'rgba(124, 111, 232, 0.4)' : 'divider',
                                     bgcolor: 'background.paper',
                                     height: '100%',
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    justifyContent: 'space-between'
+                                    justifyContent: 'space-between',
+                                    boxShadow: horizonShadow
                                 }}
                             >
                                 <Box>
@@ -2178,7 +2184,7 @@ const Marketing = () => {
                                         setTemplateFilterCategory(cat);
                                         setTemplatePage(1);
                                     }}
-                                    sx={{ fontWeight: 800, fontSize: '0.75rem', borderRadius: 2 }}
+                                    sx={{ height: 26, fontWeight: 800, fontSize: '0.72rem', borderRadius: '8px' }}
                                 />
                             ))}
                         </Box>
@@ -2215,24 +2221,25 @@ const Marketing = () => {
                                     elevation={0}
                                     sx={{
                                         p: 3,
-                                        borderRadius: 3.5,
-                                        border: '1.5px solid',
+                                        borderRadius: '14px',
+                                        border: '1px solid',
                                         borderColor: 'divider',
                                         bgcolor: 'background.paper',
                                         display: 'flex',
                                         flexDirection: 'column',
                                         height: '100%',
                                         position: 'relative',
-                                        transition: 'all 0.22s',
+                                        transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
+                                        boxShadow: 'none',
                                         '&:hover': {
-                                            bordercolor: (t) => t.palette.primary.main,
+                                            borderColor: (t) => t.palette.primary.main,
                                             transform: 'translateY(-3px)',
-                                            boxShadow: '0 8px 24px rgba(var(--primary-rgb, 124, 111, 232), 0.08)'
+                                            boxShadow: horizonShadow
                                         }
                                     }}
                                 >
                                     {template.imageUrl && (
-                                        <Box sx={{ mb: 2, borderRadius: 2, overflow: 'hidden', height: 120, border: '1px solid divider' }}>
+                                        <Box sx={{ mb: 2, borderRadius: 2, overflow: 'hidden', height: 120, border: '1px solid', borderColor: 'divider' }}>
                                             <img
                                                 src={template.imageUrl}
                                                 alt={template.title}
@@ -2263,7 +2270,7 @@ const Marketing = () => {
                                             mb: 2.5,
                                             lineHeight: 1.5,
                                             fontStyle: 'italic',
-                                            bgcolor: 'rgba(0,0,0,0.02)',
+                                            bgcolor: lavenderTint,
                                             p: 1.5,
                                             borderRadius: 2
                                         }}
@@ -2356,7 +2363,7 @@ const Marketing = () => {
                                 shape="rounded"
                                 sx={{
                                     '& .Mui-selected': {
-                                        bgcolor: '#7C6FE8 !important',
+                                        bgcolor: (t) => `${t.palette.primary.main} !important`,
                                         color: '#FFFFFF !important',
                                         fontWeight: 800
                                     }
@@ -2377,10 +2384,13 @@ const Marketing = () => {
                             elevation={0}
                             sx={{
                                 p: 3.5,
-                                borderRadius: 4,
-                                background: 'linear-gradient(135deg, rgba(217, 119, 6, 0.08) 0%, rgba(245, 158, 11, 0.02) 100%)',
-                                border: '1.5px solid rgba(217, 119, 6, 0.3)',
-                                mb: 2
+                                borderRadius: '14px',
+                                background: amberTint,
+                                border: '1px solid',
+                                borderColor: isDark ? 'rgba(217, 119, 6, 0.35)' : 'rgba(217, 119, 6, 0.2)',
+                                mb: 2,
+                                bgcolor: 'background.paper',
+                                boxShadow: horizonShadow
                             }}
                         >
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, flexWrap: 'wrap', gap: 2 }}>
@@ -2389,7 +2399,7 @@ const Marketing = () => {
                                         <Celebration sx={{ color: '#ffffff' }} />
                                     </Avatar>
                                     <Box>
-                                        <Typography variant="h6" sx={{ fontWeight: 800, color: '#92400E' }}>
+                                        <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                             Today's Birthday Patrons ({todayCelebrants.length})
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
@@ -2436,9 +2446,10 @@ const Marketing = () => {
                                                 elevation={0}
                                                 sx={{
                                                     p: 2,
-                                                    borderRadius: 3,
-                                                    bgcolor: '#FFFFFF',
-                                                    border: '1px solid rgba(217, 119, 6, 0.25)',
+                                                    borderRadius: '14px',
+                                                    bgcolor: 'background.paper',
+                                                    border: '1px solid',
+                                                    borderColor: isDark ? 'rgba(217, 119, 6, 0.35)' : 'rgba(217, 119, 6, 0.2)',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'space-between'
@@ -2482,7 +2493,7 @@ const Marketing = () => {
                     </Grid>
 
                     <Grid item xs={12} md={6}>
-                        <Paper elevation={0} sx={{ p: 3, borderRadius: 3.5, border: '1px solid', borderColor: 'divider' }}>
+                        <Paper elevation={0} sx={{ p: 3, borderRadius: '14px', border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', boxShadow: horizonShadow }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                                 <CalendarMonth sx={{ color: (t) => t.palette.primary.main }} />
                                 <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
@@ -2528,7 +2539,7 @@ const Marketing = () => {
                     </Grid>
 
                     <Grid item xs={12} md={6}>
-                        <Paper elevation={0} sx={{ p: 3, borderRadius: 3.5, border: '1px solid', borderColor: 'divider' }}>
+                        <Paper elevation={0} sx={{ p: 3, borderRadius: '14px', border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', boxShadow: horizonShadow }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                                 <Cake sx={{ color: '#D97706' }} />
                                 <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
@@ -2616,14 +2627,15 @@ const Marketing = () => {
                                         elevation={0}
                                         sx={{
                                             p: 2.5,
-                                            borderRadius: 3,
-                                            border: '1.5px solid',
+                                            borderRadius: '14px',
+                                            border: '1px solid',
                                             borderColor: 'divider',
                                             bgcolor: 'background.paper',
                                             height: '100%',
                                             display: 'flex',
                                             flexDirection: 'column',
-                                            justifyContent: 'space-between'
+                                            justifyContent: 'space-between',
+                                            boxShadow: horizonShadow
                                         }}
                                     >
                                         <Box>
@@ -2675,8 +2687,9 @@ const Marketing = () => {
                                                 sx={{
                                                     p: 1.5,
                                                     borderRadius: 2,
-                                                    bgcolor: 'rgba(0,0,0,0.02)',
-                                                    border: '1px solid rgba(0,0,0,0.04)',
+                                                    bgcolor: lavenderTint,
+                                                    border: '1px solid',
+                                                    borderColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(124, 111, 232, 0.1)',
                                                     fontSize: '0.82rem',
                                                     lineHeight: 1.4,
                                                     fontStyle: 'italic',
@@ -2729,7 +2742,7 @@ const Marketing = () => {
             {/* SUB-TAB 5: DISPATCH LOGS & AUDIT                               */}
             {/* ============================================================== */}
             {activeSubTab === 5 && (
-                <Paper elevation={0} sx={{ p: 3, borderRadius: 3.5, border: '1px solid', borderColor: 'divider' }}>
+                <Paper elevation={0} sx={{ p: 3, borderRadius: '14px', border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', boxShadow: horizonShadow }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5, flexWrap: 'wrap', gap: 1 }}>
                         <Box>
                             <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
@@ -2773,7 +2786,7 @@ const Marketing = () => {
                     ) : (
                         <TableContainer>
                             <Table size="small">
-                                <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' }}>
+                                <TableHead sx={{ bgcolor: isDark ? 'rgba(155, 143, 245, 0.08)' : 'rgba(124, 111, 232, 0.045)' }}>
                                     <TableRow>
                                         <TableCell sx={{ fontWeight: 800 }}>Dispatched Time</TableCell>
                                         <TableCell sx={{ fontWeight: 800 }}>Patron</TableCell>
@@ -2839,8 +2852,8 @@ const Marketing = () => {
                         transform: 'translateX(-50%)',
                         zIndex: 1300,
                         px: 3,
-                        py: 1.5,
-                        borderRadius: 10,
+                        py: 1.25,
+                        borderRadius: '50px',
                         bgcolor: 'text.primary',
                         color: '#FFFFFF',
                         display: 'flex',
@@ -2848,7 +2861,7 @@ const Marketing = () => {
                         gap: 2.5,
                         minWidth: { xs: '92%', sm: 540 },
                         justifyContent: 'space-between',
-                        boxShadow: '0 16px 40px rgba(91, 75, 209, 0.5)',
+                        boxShadow: '0 16px 40px rgba(91, 75, 209, 0.35)',
                         border: '1px solid rgba(255,255,255,0.1)'
                     }}
                 >
@@ -2898,7 +2911,7 @@ const Marketing = () => {
                                 '&:hover': { bgcolor: '#128C7E' }
                             }}
                         >
-                            ⚡ Launch Auto-Pilot
+                            Launch Auto-Pilot
                         </Button>
                     </Box>
                 </Paper>
@@ -2916,7 +2929,7 @@ const Marketing = () => {
                 maxWidth="sm"
                 fullWidth
                 fullScreen={isMobile}
-                PaperProps={{ sx: { borderRadius: isMobile ? 0 : 4, overflow: 'hidden' } }}
+                PaperProps={{ sx: { borderRadius: isMobile ? 0 : '14px', overflow: 'hidden' } }}
             >
                 <DialogTitle
                     sx={{
@@ -2933,7 +2946,7 @@ const Marketing = () => {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <ElectricBolt sx={{ color: (t) => t.palette.primary.main }} />
                         <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
-                            ⚡ Hands-Free Auto-Pilot Broadcast
+                            Hands-Free Auto-Pilot Broadcast
                         </Typography>
                     </Box>
                     <IconButton size="small" onClick={() => {
@@ -2967,7 +2980,7 @@ const Marketing = () => {
                     </Box>
 
                     {/* Throttle Speed Selector */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2.5, p: 1.5, borderRadius: 2, bgcolor: 'rgba(0,0,0,0.02)' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2.5, p: 1.5, borderRadius: 2, bgcolor: lavenderTint }}>
                         <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>
                             Dispatch Throttle (Anti-Spam Delay):
                         </Typography>
@@ -3003,10 +3016,10 @@ const Marketing = () => {
                                 elevation={0}
                                 sx={{
                                     p: 2.5,
-                                    borderRadius: 3,
-                                    border: '1.5px solid',
-                                    borderColor: isAlreadyDispatched ? '#059669' : '#7C6FE8',
-                                    bgcolor: isAlreadyDispatched ? 'rgba(5, 150, 105, 0.03)' : 'rgba(124, 111, 232, 0.03)',
+                                    borderRadius: '14px',
+                                    border: '1px solid',
+                                    borderColor: isAlreadyDispatched ? 'rgba(5, 150, 105, 0.4)' : 'rgba(124, 111, 232, 0.35)',
+                                    bgcolor: isAlreadyDispatched ? (isDark ? 'rgba(5, 150, 105, 0.08)' : 'rgba(5, 150, 105, 0.03)') : lavenderTint,
                                     mb: 2.5
                                 }}
                             >
@@ -3039,7 +3052,7 @@ const Marketing = () => {
                                     sx={{
                                         p: 1.5,
                                         borderRadius: 2,
-                                        bgcolor: '#FFFFFF',
+                                        bgcolor: 'background.paper',
                                         border: '1px solid',
                                         borderColor: 'divider',
                                         fontSize: '0.8rem',
@@ -3125,7 +3138,7 @@ const Marketing = () => {
                 maxWidth="sm"
                 fullWidth
                 fullScreen={isMobile}
-                PaperProps={{ sx: { borderRadius: isMobile ? 0 : 4 } }}
+                PaperProps={{ sx: { borderRadius: isMobile ? 0 : '14px' } }}
             >
                 <DialogTitle
                     sx={{
@@ -3164,10 +3177,10 @@ const Marketing = () => {
                                 sx={{
                                     p: 1.5,
                                     mb: 1,
-                                    borderRadius: 2.5,
-                                    border: '1.5px solid',
-                                    borderColor: gatewayConfig.mode === 'browser' ? '#7C6FE8' : 'divider',
-                                    bgcolor: gatewayConfig.mode === 'browser' ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' : 'transparent'
+                                    borderRadius: '10px',
+                                    border: '1px solid',
+                                    borderColor: gatewayConfig.mode === 'browser' ? 'primary.main' : 'divider',
+                                    bgcolor: gatewayConfig.mode === 'browser' ? lavenderTint : 'transparent'
                                 }}
                             >
                                 <FormControlLabel
@@ -3191,10 +3204,10 @@ const Marketing = () => {
                                 sx={{
                                     p: 1.5,
                                     mb: 1,
-                                    borderRadius: 2.5,
-                                    border: '1.5px solid',
-                                    borderColor: gatewayConfig.mode === 'meta_cloud' ? '#7C6FE8' : 'divider',
-                                    bgcolor: gatewayConfig.mode === 'meta_cloud' ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' : 'transparent'
+                                    borderRadius: '10px',
+                                    border: '1px solid',
+                                    borderColor: gatewayConfig.mode === 'meta_cloud' ? 'primary.main' : 'divider',
+                                    bgcolor: gatewayConfig.mode === 'meta_cloud' ? lavenderTint : 'transparent'
                                 }}
                             >
                                 <FormControlLabel
@@ -3217,10 +3230,10 @@ const Marketing = () => {
                                 elevation={0}
                                 sx={{
                                     p: 1.5,
-                                    borderRadius: 2.5,
-                                    border: '1.5px solid',
-                                    borderColor: gatewayConfig.mode === 'webhook' ? '#7C6FE8' : 'divider',
-                                    bgcolor: gatewayConfig.mode === 'webhook' ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' : 'transparent'
+                                    borderRadius: '10px',
+                                    border: '1px solid',
+                                    borderColor: gatewayConfig.mode === 'webhook' ? 'primary.main' : 'divider',
+                                    bgcolor: gatewayConfig.mode === 'webhook' ? lavenderTint : 'transparent'
                                 }}
                             >
                                 <FormControlLabel
@@ -3243,7 +3256,7 @@ const Marketing = () => {
 
                     {/* Meta Cloud Credentials Form */}
                     {gatewayConfig.mode === 'meta_cloud' && (
-                        <Stack spacing={2} sx={{ mt: 1, p: 2, borderRadius: 2.5, bgcolor: 'rgba(0,0,0,0.02)', border: '1px solid divider' }}>
+                        <Stack spacing={2} sx={{ mt: 1, p: 2, borderRadius: '10px', bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(124, 111, 232, 0.03)', border: '1px solid', borderColor: 'divider' }}>
                             <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                 Meta Graph API Parameters:
                             </Typography>
@@ -3277,7 +3290,7 @@ const Marketing = () => {
 
                     {/* Webhook Gateway Credentials Form */}
                     {gatewayConfig.mode === 'webhook' && (
-                        <Stack spacing={2} sx={{ mt: 1, p: 2, borderRadius: 2.5, bgcolor: 'rgba(0,0,0,0.02)', border: '1px solid divider' }}>
+                        <Stack spacing={2} sx={{ mt: 1, p: 2, borderRadius: '10px', bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(124, 111, 232, 0.03)', border: '1px solid', borderColor: 'divider' }}>
                             <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                 Gateway Microservice Endpoint:
                             </Typography>
@@ -3342,7 +3355,7 @@ const Marketing = () => {
                 maxWidth="sm"
                 fullWidth
                 fullScreen={isMobile}
-                PaperProps={{ sx: { borderRadius: isMobile ? 0 : 4 } }}
+                PaperProps={{ sx: { borderRadius: isMobile ? 0 : '14px' } }}
             >
                 <DialogTitle
                     sx={{
@@ -3422,7 +3435,7 @@ const Marketing = () => {
                 maxWidth="sm"
                 fullWidth
                 fullScreen={isMobile}
-                PaperProps={{ sx: { borderRadius: isMobile ? 0 : 4 } }}
+                PaperProps={{ sx: { borderRadius: isMobile ? 0 : '14px' } }}
             >
                 <DialogTitle
                     sx={{
