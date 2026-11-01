@@ -4,8 +4,11 @@ import {
   Typography,
   Box,
   Button,
+  IconButton,
   useTheme,
-  Stack
+  Stack,
+  Menu,
+  MenuItem
 } from '@mui/material';
 import {
   TrendingUp,
@@ -20,7 +23,9 @@ import {
   AccountBalanceWallet,
   Straighten,
   PointOfSale,
-  Add
+  Add,
+  ExpandMore,
+  Check
 } from '@mui/icons-material';
 import {
   Chart as ChartJS,
@@ -75,6 +80,24 @@ const Dashboard = () => {
 
   const [dateRange, setDateRange] = useState('7days');
   const [drawerModalOpen, setDrawerModalOpen] = useState(false);
+
+  // Horizon-style customizable KPI row: which metric fills each of the 6 slots
+  const DEFAULT_KPI_SLOTS = ['revenue', 'stock', 'lowStock', 'atv', 'grossProfit', 'netCash'];
+  const [kpiSlots, setKpiSlots] = useState(() => {
+    try {
+      const saved = localStorage.getItem('aleen_dashboard_kpi_slots');
+      if (saved) {
+        const arr = JSON.parse(saved);
+        if (Array.isArray(arr) && arr.length === 6) return arr;
+      }
+    } catch (e) {}
+    return DEFAULT_KPI_SLOTS;
+  });
+  const [kpiMenu, setKpiMenu] = useState(null); // { index, anchorEl } of the open slot dropdown
+
+  useEffect(() => {
+    try { localStorage.setItem('aleen_dashboard_kpi_slots', JSON.stringify(kpiSlots)); } catch (e) {}
+  }, [kpiSlots]);
 
   // Live bespoke tailoring orders from localStorage
   const [tailoringOrders, setTailoringOrders] = useState(() => {
@@ -348,35 +371,150 @@ const Dashboard = () => {
   const greetingBtnSx = {
     textTransform: 'none',
     fontWeight: 600,
-    fontSize: '0.78rem',
+    fontSize: '0.75rem',
     borderRadius: `${buttonRadius}px`,
-    minHeight: { xs: 40, sm: 34 },
-    px: 1.8,
+    minHeight: { xs: 36, sm: 32 },
+    px: 1.5,
     transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
     '&:hover': { transform: 'translateY(-1px)' },
     '&:active': { transform: 'scale(0.98)' }
   };
 
+  // Horizon KPI slot registry: every metric that can fill a slot
+  const kpiMetrics = [
+    {
+      id: 'revenue',
+      title: salesKpiInfo.title,
+      value: `₹${totalRevenue.toLocaleString('en-IN')}`,
+      icon: <AttachMoney fontSize="small" />,
+      trend: dateRange === '7days' || dateRange === 'today' ? (salesTrend !== undefined ? `${Math.abs(salesTrend)}%` : null) : null,
+      trendPositive: salesTrend >= 0,
+      goldAccent: true,
+      subtitle: salesKpiInfo.subtitle,
+      onClick: () => navigate('/sales-reports')
+    },
+    {
+      id: 'stock',
+      title: 'Garment Inventory Stock',
+      value: `${totalItems.toLocaleString('en-IN')} pcs`,
+      icon: <Inventory2 fontSize="small" />,
+      sapphireAccent: true,
+      subtitle: 'Available boutique pieces',
+      onClick: () => navigate('/inventory')
+    },
+    {
+      id: 'lowStock',
+      title: 'Low Stock Reorders',
+      value: lowStockCount,
+      icon: <Warning fontSize="small" />,
+      trend: lowStockCount > 0 ? `${lowStockCount} items low` : 'Stock Healthy',
+      trendPositive: lowStockCount === 0,
+      redAccent: lowStockCount > 0,
+      subtitle: 'Below threshold alert',
+      onClick: () => navigate('/inventory')
+    },
+    {
+      id: 'atv',
+      title: 'Avg Ticket Value (ATV)',
+      value: `₹${atv.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
+      icon: <ShoppingCart fontSize="small" />,
+      subtitle: `${filteredInvoices.length} invoices registered`,
+      onClick: () => navigate('/sales-reports')
+    },
+    {
+      id: 'grossProfit',
+      title: 'Gross Trading Profit',
+      value: `₹${grossProfit.toLocaleString('en-IN')}`,
+      icon: <Assessment fontSize="small" />,
+      goldAccent: true,
+      subtitle: 'Revenue minus garment cost',
+      adminOnly: true,
+      onClick: () => navigate('/profit-loss')
+    },
+    {
+      id: 'netCash',
+      title: 'Net Cash Position',
+      value: `₹${netCash.toLocaleString('en-IN')}`,
+      icon: <TrendingUp fontSize="small" />,
+      sapphireAccent: true,
+      subtitle: 'Sales minus vendor payouts',
+      adminOnly: true,
+      onClick: () => navigate('/profit-loss')
+    },
+    {
+      id: 'inventoryCapital',
+      title: 'Inventory Capital',
+      value: `₹${totalInventoryValue.toLocaleString('en-IN')}`,
+      icon: <AccountBalanceWallet fontSize="small" />,
+      subtitle: 'Cost basis asset valuation',
+      adminOnly: true,
+      onClick: () => navigate('/inventory')
+    },
+    {
+      id: 'vendorProcurement',
+      title: 'Vendor Procurement',
+      value: `₹${totalPurchasesCost.toLocaleString('en-IN')}`,
+      icon: <Receipt fontSize="small" />,
+      redAccent: true,
+      subtitle: 'Mill & fabric purchases',
+      adminOnly: true,
+      onClick: () => navigate('/purchases')
+    }
+  ];
+
+  // Resolve saved slot ids to role-visible metrics (admin sees all 8, staff the 4 public ones)
+  const availableKpiMetrics = kpiMetrics.filter(m => !m.adminOnly || user?.role === 'admin');
+  const kpiSlotCount = Math.min(6, availableKpiMetrics.length);
+  const usedKpiIds = new Set();
+  const effectiveKpiSlots = [];
+  for (let i = 0; i < kpiSlotCount; i++) {
+    const metric = availableKpiMetrics.find(m => m.id === kpiSlots[i] && !usedKpiIds.has(m.id))
+      || availableKpiMetrics.find(m => !usedKpiIds.has(m.id))
+      || availableKpiMetrics[0];
+    usedKpiIds.add(metric.id);
+    effectiveKpiSlots.push(metric);
+  }
+
+  const handleKpiSelect = (slotIndex, metricId) => {
+    if (kpiSlots[slotIndex] === metricId) {
+      setKpiMenu(null);
+      return;
+    }
+    setKpiSlots(prev => {
+      const next = [...prev];
+      const otherIndex = next.indexOf(metricId);
+      if (otherIndex !== -1) next[otherIndex] = prev[slotIndex];
+      next[slotIndex] = metricId;
+      return next;
+    });
+    setKpiMenu(null);
+  };
+
   return (
-    <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
+    <Box sx={{ maxWidth: 1280, mx: 'auto' }}>
       {/* ============================================================== */}
-      {/* 1. GREETING HEADER                                             */}
+      {/* 1. HORIZON-STYLE PAGE HEADER                                    */}
       {/* ============================================================== */}
-      <Box sx={{ mb: 2.5, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: { xs: 'flex-start', md: 'center' }, justifyContent: 'space-between', gap: 2 }}>
+      <Box sx={{ mb: 2, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: { xs: 'flex-start', md: 'flex-end' }, justifyContent: 'space-between', gap: { xs: 1.5, md: 1 } }}>
         <Box>
+          <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: 'text.secondary', display: 'flex', alignItems: 'center', gap: 0.6, mb: 0.3, letterSpacing: '0.02em' }}>
+            Pages
+            <Box component="span" sx={{ opacity: 0.5 }}>/</Box>
+            <Box component="span" sx={{ color: 'primary.main', fontWeight: 700 }}>Main Dashboard</Box>
+          </Typography>
           <Typography
-            variant="h4"
+            variant="h6"
             sx={{
               fontFamily: 'inherit',
-              fontWeight: 800,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.2,
-              fontSize: { xs: '1.35rem', sm: '1.55rem', md: '1.65rem' }
+              fontWeight: 700,
+              letterSpacing: '-0.01em',
+              lineHeight: 1.25,
+              fontSize: { xs: '1.1rem', sm: '1.18rem', md: '1.28rem' }
             }}
           >
             {greeting}, {user?.name || user?.email?.split('@')[0] || 'Store Stylist'}
           </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4, fontSize: '0.82rem' }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', mt: 0.3, display: 'block', fontSize: '0.74rem' }}>
             Here's what's happening at Aleen today.
           </Typography>
         </Box>
@@ -384,7 +522,7 @@ const Dashboard = () => {
         {/* Quick Action Navigation Dock */}
         <Stack
           direction={{ xs: 'column', sm: 'row' }}
-          spacing={{ xs: 1, sm: 1.25 }}
+          spacing={{ xs: 1, sm: 1 }}
           sx={{
             width: { xs: '100%', md: 'auto' },
             alignSelf: { xs: 'stretch', md: 'center' },
@@ -397,14 +535,14 @@ const Dashboard = () => {
               display: { xs: 'none', lg: 'flex' },
               alignItems: 'center',
               alignSelf: 'center',
-              px: 1.4,
-              py: 0.4,
+              px: 1.3,
+              py: 0.35,
               mr: 0.5,
               borderRadius: '999px',
               border: '1px solid #EFEFF4',
               bgcolor: isDark ? 'rgba(255, 255, 255, 0.06)' : '#FFFFFF',
               color: 'text.secondary',
-              fontSize: '0.72rem',
+              fontSize: '0.7rem',
               fontWeight: 600,
               whiteSpace: 'nowrap'
             }}
@@ -465,8 +603,8 @@ const Dashboard = () => {
       {/* ============================================================== */}
       {/* 2. TIMEFRAME SELECTOR FILTER BAR                               */}
       {/* ============================================================== */}
-      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-        <Typography sx={{ fontWeight: 600, color: 'text.secondary', fontSize: '0.85rem' }}>
+      <Box sx={{ mb: 1.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1.5 }}>
+        <Typography sx={{ fontWeight: 600, color: 'text.secondary', fontSize: '0.78rem' }}>
           Financial overview · {rangeLabel}
         </Typography>
 
@@ -505,114 +643,85 @@ const Dashboard = () => {
       </Box>
 
       {/* ============================================================== */}
-      {/* 3. KPI METRICS GRID: Responsive 2x2 Grid on Mobile             */}
+      {/* 3. KPI METRICS ROW: 6 Horizon mini-stat slots, each with a     */}
+      {/*    dropdown to swap in any metric                              */}
       {/* ============================================================== */}
-      <Grid container spacing={{ xs: 1.5, sm: 2, md: 2 }} sx={{ mb: { xs: 2.5, sm: 2.5 } }}>
-        {/* Sales Revenue */}
-        <Grid item xs={6} sm={6} lg={3}>
-          <AtelierKpiCard
-            title={salesKpiInfo.title}
-            value={`₹${totalRevenue.toLocaleString('en-IN')}`}
-            icon={<AttachMoney fontSize="small" />}
-            trend={dateRange === '7days' || dateRange === 'today' ? (salesTrend !== undefined ? `${Math.abs(salesTrend)}%` : null) : null}
-            trendPositive={salesTrend >= 0}
-            goldAccent={true}
-            onClick={() => navigate('/sales-reports')}
-            subtitle={salesKpiInfo.subtitle}
-          />
-        </Grid>
-
-        {/* Total Stock Units */}
-        <Grid item xs={6} sm={6} lg={3}>
-          <AtelierKpiCard
-            title="Garment Inventory Stock"
-            value={`${totalItems.toLocaleString('en-IN')} pcs`}
-            icon={<Inventory2 fontSize="small" />}
-            sapphireAccent={true}
-            onClick={() => navigate('/inventory')}
-            subtitle="Available boutique pieces"
-          />
-        </Grid>
-
-        {/* Low Stock Warning */}
-        <Grid item xs={6} sm={6} lg={3}>
-          <AtelierKpiCard
-            title="Low Stock Reorders"
-            value={lowStockCount}
-            icon={<Warning fontSize="small" />}
-            trend={lowStockCount > 0 ? `${lowStockCount} items low` : 'Stock Healthy'}
-            trendPositive={lowStockCount === 0}
-            redAccent={lowStockCount > 0}
-            onClick={() => navigate('/inventory')}
-            subtitle="Below threshold alert"
-          />
-        </Grid>
-
-        {/* Average Transaction Value (ATV) */}
-        <Grid item xs={6} sm={6} lg={3}>
-          <AtelierKpiCard
-            title="Avg Ticket Value (ATV)"
-            value={`₹${atv.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`}
-            icon={<ShoppingCart fontSize="small" />}
-            onClick={() => navigate('/sales-reports')}
-            subtitle={`${filteredInvoices.length} invoices registered`}
-          />
-        </Grid>
-
-        {/* Admin Exclusive Financial Ledger KPIs */}
-        {user?.role === 'admin' && (
-          <>
-            <Grid item xs={6} sm={6} lg={3}>
-              <AtelierKpiCard
-                title="Gross Trading Profit"
-                value={`₹${grossProfit.toLocaleString('en-IN')}`}
-                icon={<Assessment fontSize="small" />}
-                goldAccent={true}
-                onClick={() => navigate('/profit-loss')}
-                subtitle="Revenue minus garment cost"
-              />
-            </Grid>
-
-            <Grid item xs={6} sm={6} lg={3}>
-              <AtelierKpiCard
-                title="Net Cash Position"
-                value={`₹${netCash.toLocaleString('en-IN')}`}
-                icon={<TrendingUp fontSize="small" />}
-                sapphireAccent={true}
-                onClick={() => navigate('/profit-loss')}
-                subtitle="Sales minus vendor payouts"
-              />
-            </Grid>
-
-            <Grid item xs={6} sm={6} lg={3}>
-              <AtelierKpiCard
-                title="Inventory Capital"
-                value={`₹${totalInventoryValue.toLocaleString('en-IN')}`}
-                icon={<AccountBalanceWallet fontSize="small" />}
-                onClick={() => navigate('/inventory')}
-                subtitle="Cost basis asset valuation"
-              />
-            </Grid>
-
-            <Grid item xs={6} sm={6} lg={3}>
-              <AtelierKpiCard
-                title="Vendor Procurement"
-                value={`₹${totalPurchasesCost.toLocaleString('en-IN')}`}
-                icon={<Receipt fontSize="small" />}
-                redAccent={true}
-                onClick={() => navigate('/purchases')}
-                subtitle="Mill & fabric purchases"
-              />
-            </Grid>
-          </>
-        )}
+      <Grid container spacing={{ xs: 1.5, sm: 1.75, md: 2 }} sx={{ mb: 2 }}>
+        {effectiveKpiSlots.map((metric, i) => (
+          <Grid item xs={6} sm={6} md={4} lg={12 / kpiSlotCount} key={metric.id}>
+            <AtelierKpiCard
+              title={metric.title}
+              value={metric.value}
+              icon={metric.icon}
+              subtitle={metric.subtitle}
+              trend={metric.trend}
+              trendPositive={metric.trendPositive}
+              goldAccent={metric.goldAccent}
+              redAccent={metric.redAccent}
+              sapphireAccent={metric.sapphireAccent}
+              onClick={metric.onClick}
+              headerAction={
+                <IconButton
+                  size="small"
+                  aria-label={`Change metric ${i + 1}`}
+                  onClick={(e) => { e.stopPropagation(); setKpiMenu({ index: i, anchorEl: e.currentTarget }); }}
+                  sx={{ p: 0.25, color: 'text.secondary', '&:hover': { color: 'primary.main', bgcolor: 'transparent' } }}
+                >
+                  <ExpandMore sx={{ fontSize: 15 }} />
+                </IconButton>
+              }
+            />
+          </Grid>
+        ))}
       </Grid>
+
+      {/* KPI slot metric picker dropdown */}
+      <Menu
+        anchorEl={kpiMenu?.anchorEl || null}
+        open={Boolean(kpiMenu)}
+        onClose={() => setKpiMenu(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        PaperProps={{
+          sx: {
+            mt: 0.5,
+            minWidth: 236,
+            maxHeight: 344,
+            borderRadius: `${cardRadius}px`,
+            border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : '#EFEFF4'}`,
+            boxShadow: isDark ? '0 12px 32px rgba(0, 0, 0, 0.55)' : '0 12px 32px -8px rgba(31, 27, 46, 0.16)',
+            backgroundImage: 'none',
+            bgcolor: isDark ? '#1D1A2E' : '#FFFFFF',
+            '& .MuiList-root': { py: 0.75 }
+          }
+        }}
+      >
+        <MenuItem disabled sx={{ opacity: '1 !important', fontSize: '0.64rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'text.secondary', py: 0.5 }}>
+          Select metric
+        </MenuItem>
+        {availableKpiMetrics.map(m => {
+          const isSelected = kpiMenu !== null && effectiveKpiSlots[kpiMenu.index]?.id === m.id;
+          return (
+            <MenuItem
+              key={m.id}
+              dense
+              selected={isSelected}
+              onClick={() => handleKpiSelect(kpiMenu.index, m.id)}
+              sx={{ fontSize: '0.8rem', fontWeight: 600, gap: 1.1, py: 0.75, borderRadius: '8px', mx: 0.5, my: 0.1 }}
+            >
+              <Box sx={{ color: isSelected ? 'primary.main' : 'text.secondary', display: 'inline-flex', '& svg': { fontSize: '1.05rem' } }}>{m.icon}</Box>
+              {m.title}
+              {isSelected && <Check sx={{ ml: 'auto', fontSize: '1rem !important', color: 'primary.main' }} />}
+            </MenuItem>
+          );
+        })}
+      </Menu>
 
       {/* ============================================================== */}
       {/* 4. WORKSHOP PULSE & FITTINGS DUE TODAY                         */}
       {/* ============================================================== */}
-      <GlassCard sx={{ p: 2, mb: 2.5 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5, flexWrap: 'wrap', gap: 1 }}>
+      <GlassCard sx={{ p: 1.75, mb: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.25, flexWrap: 'wrap', gap: 1 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
             <Box
               sx={{
@@ -714,7 +823,7 @@ const Dashboard = () => {
       {/* ============================================================== */}
       {/* 5. CHARTS ROW: REVENUE TRENDS & STOCK HEALTH                   */}
       {/* ============================================================== */}
-      <Grid container spacing={2} sx={{ mb: 2.5 }}>
+      <Grid container spacing={2} sx={{ mb: 2 }}>
         {/* Left: Revenue Overview */}
         <Grid item xs={12} md={7} lg={8}>
           <GlassCard sx={{ p: 2.25, height: '100%' }}>
@@ -734,7 +843,7 @@ const Dashboard = () => {
                 </Box>
               </Box>
             </Box>
-            <Box sx={{ height: 260 }}>
+            <Box sx={{ height: 230 }}>
               <Line data={salesChartData} options={commonChartOptions} />
             </Box>
           </GlassCard>
@@ -780,7 +889,7 @@ const Dashboard = () => {
       {/* ============================================================== */}
       {/* 6. BOTTOM ROW: TOP PRODUCTS & LATEST ORDERS                    */}
       {/* ============================================================== */}
-      <Grid container spacing={2} sx={{ mb: 3 }}>
+      <Grid container spacing={2} sx={{ mb: 2.5 }}>
         {/* Left: Top Products Bar Chart */}
         <Grid item xs={12} md={7} lg={7}>
           <GlassCard sx={{ p: 2.25, height: '100%' }}>
@@ -798,7 +907,7 @@ const Dashboard = () => {
                 Full Analytics
               </Button>
             </Box>
-            <Box sx={{ height: 230 }}>
+            <Box sx={{ height: 210 }}>
               <Bar data={topProductsChartData} options={{ ...commonChartOptions, indexAxis: 'y' }} />
             </Box>
           </GlassCard>
@@ -827,7 +936,7 @@ const Dashboard = () => {
                 <Box
                   sx={{
                     px: 2,
-                    py: 1,
+                    py: 0.75,
                     display: 'grid',
                     gridTemplateColumns: { xs: '44px 1fr auto', sm: '44px 1.1fr 1.3fr 44px 88px 74px' },
                     gap: 1,
@@ -860,7 +969,7 @@ const Dashboard = () => {
                     key={inv.id}
                     sx={{
                       px: 2,
-                      py: 1.05,
+                      py: 0.9,
                       display: 'grid',
                       gridTemplateColumns: { xs: '44px 1fr auto', sm: '44px 1.1fr 1.3fr 44px 88px 74px' },
                       gap: 1,

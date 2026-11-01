@@ -12,6 +12,7 @@ export default function AtelierKpiCard({
   goldAccent = false,
   redAccent = false,
   sapphireAccent = false,
+  headerAction,
   onClick
 }) {
   const theme = useTheme();
@@ -88,7 +89,7 @@ export default function AtelierKpiCard({
         }}
       >
         <CardContent sx={{
-          p: { xs: '16px 16px !important', sm: '18px 20px !important', md: '20px 22px !important' },
+          p: { xs: '12px 12px !important', sm: '12px 14px !important', md: '14px 16px !important' },
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
@@ -96,14 +97,14 @@ export default function AtelierKpiCard({
           position: 'relative',
           zIndex: 1
         }}>
-          {/* Header: Icon Tile Left + Label */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: { xs: 1.5, md: 2 } }}>
+          {/* Header: Icon Tile Left + Label + Optional Action */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: { xs: 1, md: 1.25 } }}>
             {icon && (
               <Box
                 sx={{
-                  width: { xs: 34, sm: 38, md: 40 },
-                  height: { xs: 34, sm: 38, md: 40 },
-                  borderRadius: '12px',
+                  width: { xs: 30, sm: 32, md: 34 },
+                  height: { xs: 30, sm: 32, md: 34 },
+                  borderRadius: '10px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -112,7 +113,7 @@ export default function AtelierKpiCard({
                   color: getIconColor(),
                   transition: 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
                   '& svg': {
-                    fontSize: { xs: '1.05rem', sm: '1.15rem', md: '1.3rem' }
+                    fontSize: { xs: '0.95rem', sm: '1rem', md: '1.1rem' }
                   }
                 }}
               >
@@ -125,7 +126,7 @@ export default function AtelierKpiCard({
               sx={{
                 color: isDark ? 'rgba(203, 213, 225, 0.9)' : '#5B5B66',
                 fontWeight: 600,
-                fontSize: { xs: '0.74rem', sm: '0.78rem', md: '0.82rem' },
+                fontSize: { xs: '0.68rem', sm: '0.72rem', md: '0.74rem' },
                 letterSpacing: '0.01em',
                 flex: 1,
                 minWidth: 0,
@@ -136,38 +137,37 @@ export default function AtelierKpiCard({
             >
               {title}
             </Typography>
+            {headerAction}
           </Box>
 
-          {/* Giant Numeric Value */}
+          {/* Numeric Value */}
           <Typography
             variant="h3"
             noWrap
             sx={{
-              fontWeight: 800,
+              fontWeight: 700,
               color: 'text.primary',
               letterSpacing: '-0.02em',
-              fontSize: { xs: '1.55rem', sm: '1.75rem', md: '2rem' },
+              fontSize: { xs: '1.25rem', sm: '1.35rem', md: '1.45rem' },
               lineHeight: 1.15,
               fontVariantNumeric: 'tabular-nums',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              mb: { xs: 1.25, md: 1.5 }
+              mb: { xs: 0.9, md: 1 }
             }}
           >
             {value}
           </Typography>
 
-          {/* Footer: Hairline Divider + Subtitle & Status Pill */}
+          {/* Footer: Subtitle & Status Pill */}
           <Box
             sx={{
               mt: 'auto',
-              pt: 1.1,
-              borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #EFEFF4',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              gap: 1,
-              minHeight: 22
+              gap: 0.75,
+              minHeight: 20
             }}
           >
             <Typography
@@ -176,7 +176,7 @@ export default function AtelierKpiCard({
               sx={{
                 color: isDark ? 'rgba(148, 163, 184, 0.85)' : '#9A9AA6',
                 fontWeight: 500,
-                fontSize: { xs: '0.7rem', sm: '0.74rem' },
+                fontSize: { xs: '0.66rem', sm: '0.7rem' },
                 flex: 1,
                 minWidth: 0,
                 overflow: 'hidden',
@@ -191,9 +191,9 @@ export default function AtelierKpiCard({
                 sx={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: 0.5,
-                  px: 1,
-                  py: '2px',
+                  gap: 0.4,
+                  px: 0.8,
+                  py: '1.5px',
                   borderRadius: '999px',
                   bgcolor: statusBg,
                   border: statusBorder,
@@ -201,10 +201,10 @@ export default function AtelierKpiCard({
                   maxWidth: '55%'
                 }}
               >
-                <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: statusColor, flexShrink: 0 }} />
+                <Box sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: statusColor, flexShrink: 0 }} />
                 <Typography
                   sx={{
-                    fontSize: '0.68rem',
+                    fontSize: '0.62rem',
                     fontWeight: 700,
                     color: statusColor,
                     whiteSpace: 'nowrap',
