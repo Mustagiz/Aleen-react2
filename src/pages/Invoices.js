@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableHead, TableRow, IconButton, TextField, MenuItem, Paper, Typography, TableContainer, Chip, Card, CardContent, Grid, Divider, Tooltip, useMediaQuery, useTheme, AppBar, Toolbar, TablePagination, Menu, ListItemIcon, ListItemText, Autocomplete, Switch, FormControlLabel, Avatar, TableSortLabel, CircularProgress, Alert, Snackbar, InputAdornment, List, Collapse, Stack } from '@mui/material';
-import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, Palette, DesignServices, QrCodeScanner, QrCode2, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, PauseCircleOutline, ShoppingCart, RestartAlt, CalendarMonth, Phone, Straighten, Clear, Stars, Redeem, AccountBalanceWallet, Keyboard, Tv, VolumeUp, VolumeOff, Tune, Checkroom } from '@mui/icons-material';
+import { Add, Delete, Print, Visibility, WhatsApp, Download, Search, Receipt, Share, Close, MoreVert, AttachMoney, TrendingUp, CameraAlt, PointOfSale, PersonOutline, ShoppingBagOutlined, PaymentsOutlined, ReceiptLong, DesignServices, QrCodeScanner, QrCode2, CheckCircle, Sensors, PhoneAndroid, ContentCopy, PauseCircle, PauseCircleOutline, ShoppingCart, RestartAlt, CalendarMonth, Phone, Straighten, Clear, Stars, Redeem, AccountBalanceWallet, Keyboard, Tv, VolumeUp, VolumeOff, Tune, Checkroom } from '@mui/icons-material';
 import { Html5Qrcode } from 'html5-qrcode';
 import { db } from '../firebase';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
@@ -2109,14 +2109,6 @@ const Invoices = () => {
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap', width: '100%', justifyContent: { xs: 'flex-start', lg: 'flex-end' } }}>
             <Button
               variant="outlined"
-              startIcon={<Palette sx={{ fontSize: 18, color: (t) => t.palette.primary.main }} />}
-              onClick={() => setTemplateModalOpen(true)}
-              sx={ghostBtnSx}
-            >
-              Templates
-            </Button>
-            <Button
-              variant="outlined"
               startIcon={<PointOfSale sx={{ fontSize: 18, color: (t) => t.palette.primary.main }} />}
               onClick={() => setCashDrawerModalOpen(true)}
               sx={ghostBtnSx}
@@ -2149,36 +2141,6 @@ const Invoices = () => {
               </Button>
             )}
             {/* POS Keyboard Accelerators Help */}
-            <Button
-              variant="outlined"
-              startIcon={<Keyboard sx={{ fontSize: 17, color: 'text.secondary' }} />}
-              onClick={() => setShortcutHelpOpen(true)}
-              sx={{
-                ...ghostBtnSx,
-                color: 'text.secondary',
-                display: { xs: 'none', md: 'inline-flex' },
-                gap: 0.75,
-                '&:hover': {
-                  bgcolor: 'action.hover',
-                  color: isDark ? 'primary.light' : 'primary.main',
-                  transform: 'translateY(-1px)'
-                }
-              }}
-            >
-              <span>Hotkeys</span>
-              <Chip
-                label="F1"
-                size="small"
-                sx={{
-                  height: 18,
-                  fontSize: '0.64rem',
-                  fontWeight: 800,
-                  bgcolor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.06)',
-                  color: 'text.secondary',
-                  borderRadius: '5px'
-                }}
-              />
-            </Button>
             <Button
               variant="outlined"
               startIcon={<QrCode2 sx={{ fontSize: 18, color: (t) => t.palette.primary.main }} />}

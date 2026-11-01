@@ -6,7 +6,6 @@ import {
   Button,
   IconButton,
   useTheme,
-  Stack,
   Menu,
   MenuItem
 } from '@mui/material';
@@ -22,8 +21,6 @@ import {
   ShoppingCart,
   AccountBalanceWallet,
   Straighten,
-  PointOfSale,
-  Add,
   ExpandMore,
   Check
 } from '@mui/icons-material';
@@ -77,7 +74,6 @@ const Dashboard = () => {
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-  const todayLabel = new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
 
   const [dateRange, setDateRange] = useState('7days');
   const [drawerModalOpen, setDrawerModalOpen] = useState(false);
@@ -369,18 +365,6 @@ const Dashboard = () => {
 
   const rangeLabel = dateRange === '7days' ? 'Last 7 days' : dateRange === '30days' ? 'Last 30 days' : dateRange === 'thisMonth' ? 'This month' : 'All time';
 
-  const greetingBtnSx = {
-    textTransform: 'none',
-    fontWeight: 600,
-    fontSize: '0.75rem',
-    borderRadius: `${buttonRadius}px`,
-    minHeight: { xs: 36, sm: 32 },
-    px: 1.5,
-    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-    '&:hover': { transform: 'translateY(-1px)' },
-    '&:active': { transform: 'scale(0.98)' }
-  };
-
   // Horizon KPI slot registry: every metric that can fill a slot
   const kpiMetrics = [
     {
@@ -514,86 +498,6 @@ const Dashboard = () => {
             Here's what's happening at Aleen today.
           </Typography>
         </Box>
-
-        {/* Quick Action Navigation Dock */}
-        <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          spacing={{ xs: 1, sm: 1 }}
-          sx={{
-            width: { xs: '100%', md: 'auto' },
-            alignSelf: { xs: 'stretch', md: 'center' },
-            flexWrap: 'wrap',
-            mt: { xs: 0.5, md: 0 }
-          }}
-        >
-          <Box
-            sx={{
-              display: { xs: 'none', lg: 'flex' },
-              alignItems: 'center',
-              alignSelf: 'center',
-              px: 1.3,
-              py: 0.35,
-              mr: 0.5,
-              borderRadius: '999px',
-              border: '1px solid #EFEFF4',
-              bgcolor: isDark ? 'rgba(255, 255, 255, 0.06)' : '#FFFFFF',
-              color: 'text.secondary',
-              fontSize: '0.7rem',
-              fontWeight: 600,
-              whiteSpace: 'nowrap'
-            }}
-          >
-            {todayLabel}
-          </Box>
-          <Button
-            variant="contained"
-            startIcon={<Add sx={{ fontSize: '1.1rem !important' }} />}
-            onClick={() => navigate('/invoices?action=new', { state: { openNewBill: true } })}
-            sx={{
-              ...greetingBtnSx,
-              bgcolor: 'primary.main',
-              color: 'primary.contrastText',
-              boxShadow: '0 1px 2px rgba(124, 111, 232, 0.3)',
-              '&:hover': { ...greetingBtnSx['&:hover'], bgcolor: 'primary.dark' },
-              '&:active': { transform: 'scale(0.98)' },
-              width: { xs: '100%', sm: 'auto' }
-            }}
-          >
-            New Bill
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<PointOfSale sx={{ fontSize: '1.1rem !important' }} />}
-            onClick={() => setDrawerModalOpen(true)}
-            sx={{
-              ...greetingBtnSx,
-              bgcolor: isDark ? 'transparent' : '#FFFFFF',
-              borderColor: isDark ? 'rgba(255, 255, 255, 0.16)' : '#EFEFF4',
-              color: 'text.secondary',
-              '&:hover': { ...greetingBtnSx['&:hover'], borderColor: 'primary.main', color: 'primary.main', bgcolor: isDark ? 'transparent' : '#FFFFFF' },
-              '&:active': { transform: 'scale(0.98)' },
-              width: { xs: '100%', sm: 'auto' }
-            }}
-          >
-            Shift & Z-Report
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<Straighten sx={{ fontSize: '1.1rem !important' }} />}
-            onClick={() => navigate('/tailoring')}
-            sx={{
-              ...greetingBtnSx,
-              bgcolor: isDark ? 'transparent' : '#FFFFFF',
-              borderColor: isDark ? 'rgba(255, 255, 255, 0.16)' : '#EFEFF4',
-              color: 'text.secondary',
-              '&:hover': { ...greetingBtnSx['&:hover'], borderColor: 'primary.main', color: 'primary.main', bgcolor: isDark ? 'transparent' : '#FFFFFF' },
-              '&:active': { transform: 'scale(0.98)' },
-              width: { xs: '100%', sm: 'auto' }
-            }}
-          >
-            Tailoring Board
-          </Button>
-        </Stack>
       </Box>
 
       {/* ============================================================== */}

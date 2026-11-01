@@ -79,6 +79,13 @@ export default function Layout() {
   const isDark = mode === 'dark';
   const isAtelier = designSystem === 'atelier';
 
+  // Live header clock (date + time)
+  const [clockNow, setClockNow] = useState(new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setClockNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   const getSystemSubtitle = () => {
     if (profile?.tagline && profile.tagline.trim()) {
       return profile.tagline.trim();
@@ -614,6 +621,27 @@ export default function Layout() {
           }}
         >
           {getBreadcrumbTitle()}
+        </Typography>
+      </Box>
+
+      {/* Center: Live Date & Time */}
+      <Box
+        sx={{
+          display: { xs: 'none', lg: 'flex' },
+          alignItems: 'baseline',
+          gap: 0.75,
+          flexShrink: 0,
+          px: 1.5,
+          py: 0.5,
+          borderRadius: '999px',
+          whiteSpace: 'nowrap'
+        }}
+      >
+        <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: 'text.primary', letterSpacing: '0.01em' }}>
+          {clockNow.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+        </Typography>
+        <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: 'text.secondary' }}>
+          · {clockNow.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true })}
         </Typography>
       </Box>
 
