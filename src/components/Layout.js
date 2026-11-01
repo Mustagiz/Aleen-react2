@@ -394,7 +394,17 @@ export default function Layout() {
           overflowY: 'auto', 
           overflowX: 'hidden',
           py: 1.25,
-          px: showCollapsed ? 1 : 1.5
+          px: showCollapsed ? 1 : 1.5,
+          ...(isAtelier ? {
+            scrollbarWidth: 'thin',
+            scrollbarColor: `${sidebarConfig.isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(0, 0, 0, 0.14)'} transparent`,
+            '&::-webkit-scrollbar': { width: 4 },
+            '&::-webkit-scrollbar-track': { background: 'transparent' },
+            '&::-webkit-scrollbar-thumb': {
+              background: sidebarConfig.isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(0, 0, 0, 0.14)',
+              borderRadius: 2
+            }
+          } : {})
         }}>
           {workflowSections.map((section) => (
             <Box key={section.title} sx={{ mb: 1 }}>
