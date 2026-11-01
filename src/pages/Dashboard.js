@@ -498,11 +498,6 @@ const Dashboard = () => {
       {/* ============================================================== */}
       <Box sx={{ mb: 2, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: { xs: 'flex-start', md: 'flex-end' }, justifyContent: 'space-between', gap: { xs: 1.5, md: 1 } }}>
         <Box>
-          <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: 'text.secondary', display: 'flex', alignItems: 'center', gap: 0.6, mb: 0.3, letterSpacing: '0.02em' }}>
-            Pages
-            <Box component="span" sx={{ opacity: 0.5 }}>/</Box>
-            <Box component="span" sx={{ color: 'primary.main', fontWeight: 700 }}>Main Dashboard</Box>
-          </Typography>
           <Typography
             variant="h6"
             sx={{

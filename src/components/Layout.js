@@ -52,7 +52,8 @@ import {
   Close,
   ViewHeadline,
   Palette,
-  Apps
+  Apps,
+  Info
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
@@ -244,7 +245,7 @@ export default function Layout() {
   // Derive active breadcrumb text from route
   const getBreadcrumbTitle = () => {
     const path = location.pathname;
-    if (path === '/') return 'Dashboard Overview';
+    if (path === '/') return 'Main Dashboard';
     if (path === '/invoices') return 'Sales & Invoices';
     if (path === '/customers') return 'Clientele Directory';
     if (path === '/inventory') return 'Atelier Inventory';
@@ -550,6 +551,258 @@ export default function Layout() {
     );
   };
 
+  // Horizon-style icon button shell for the Atelier top bar
+  const horizonIconBtnSx = (active = false) => ({
+    width: 34,
+    height: 34,
+    borderRadius: '10px',
+    border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : '#EFEFF4'}`,
+    bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : '#FFFFFF',
+    color: active ? theme.palette.primary.main : 'text.secondary',
+    flexShrink: 0,
+    '&:hover': {
+      bgcolor: isDark ? 'rgba(124, 111, 232, 0.16)' : '#F1EFFC',
+      color: theme.palette.primary.main
+    }
+  });
+
+  // Horizon FREE-style top bar: breadcrumb + page title on the left,
+  // search pill + icon cluster + avatar on the right
+  const renderHorizonTopBar = () => (
+    <>
+      {/* Left: Collapse Toggle + Breadcrumb + Page Title */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.75 }, minWidth: 0 }}>
+        <IconButton
+          onClick={isMobile ? () => setMobileOpen(true) : toggleSidebarCollapse}
+          size="small"
+          sx={horizonIconBtnSx()}
+          title={isMobile ? "Open menu" : (isCollapsed ? "Expand sidebar" : "Collapse sidebar")}
+        >
+          {isMobile ? <Menu fontSize="small" /> : (isCollapsed ? <ChevronRight fontSize="small" /> : <ChevronLeft fontSize="small" />)}
+        </IconButton>
+
+        <Box sx={{ display: { xs: 'none', md: 'block' }, minWidth: 0 }}>
+          <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: 'text.secondary', letterSpacing: '0.02em', lineHeight: 1.3 }} noWrap>
+            Pages / <Box component="span" sx={{ color: 'primary.main' }}>{getBreadcrumbTitle()}</Box>
+          </Typography>
+          <Typography sx={{ fontSize: '1.15rem', fontWeight: 800, color: 'text.primary', letterSpacing: '-0.015em', lineHeight: 1.25 }} noWrap>
+            {getBreadcrumbTitle()}
+          </Typography>
+        </Box>
+
+        <Typography
+          noWrap
+          sx={{
+            display: { xs: 'block', md: 'none' },
+            fontSize: '0.9rem',
+            fontWeight: 800,
+            color: 'text.primary',
+            letterSpacing: '-0.015em',
+            maxWidth: { xs: 150, xxs: 110 }
+          }}
+        >
+          {getBreadcrumbTitle()}
+        </Typography>
+      </Box>
+
+      {/* Right: Search Pill + Icon Cluster + Avatar */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.75, sm: 1 }, flexShrink: 0 }}>
+        {/* Mobile / Tablet Quick Search Icon (<900px) */}
+        <IconButton
+          onClick={() => setSearchOpen(true)}
+          size="small"
+          sx={{ ...horizonIconBtnSx(), display: { xs: 'inline-flex', md: 'none' } }}
+          title="Search CRM (⌘K)"
+        >
+          <Search fontSize="small" />
+        </IconButton>
+
+        {/* Desktop Search Pill (>=900px) */}
+        <Button
+          onClick={() => setSearchOpen(true)}
+          size="small"
+          startIcon={<Search fontSize="small" />}
+          sx={{
+            height: 34,
+            minWidth: { md: 190, lg: 220 },
+            px: 1.5,
+            justifyContent: 'flex-start',
+            borderRadius: '10px',
+            textTransform: 'none',
+            border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : '#EFEFF4'}`,
+            bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : '#F9F9FC',
+            color: 'text.secondary',
+            display: { xs: 'none', md: 'inline-flex' },
+            '& .MuiButton-startIcon': { color: 'text.secondary', mr: 1 },
+            '&:hover': {
+              bgcolor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#F1EFFC',
+              borderColor: `${theme.palette.primary.main}59`
+            }
+          }}
+        >
+          <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, mr: 'auto' }}>Search...</Typography>
+          <Chip
+            label="⌘K"
+            size="small"
+            sx={{
+              height: 17,
+              fontSize: '0.62rem',
+              fontWeight: 700,
+              borderRadius: '6px',
+              bgcolor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
+              color: 'text.secondary',
+              border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'}`
+            }}
+          />
+        </Button>
+
+        {/* Live Cash Drawer & Z-Report */}
+        <Tooltip title="View Cash Drawer & Close Shift (Z-Report)">
+          <IconButton
+            onClick={() => setCashDrawerOpen(true)}
+            size="small"
+            sx={{ ...horizonIconBtnSx(), display: { xs: 'none', md: 'inline-flex' } }}
+          >
+            <PointOfSale fontSize="small" />
+          </IconButton>
+        </Tooltip>
+
+        {/* Quick Bill (icon on phones, labeled on larger screens) */}
+        {canQuickBill && (
+          <IconButton
+            onClick={handleQuickBill}
+            size="small"
+            title="Quick POS Bill (Alt + N or F2)"
+            sx={{
+              ...horizonIconBtnSx(),
+              display: { xs: 'inline-flex', sm: 'none' },
+              bgcolor: theme.palette.primary.main,
+              color: '#FFFFFF',
+              border: `1px solid ${theme.palette.primary.main}`,
+              '&:hover': { bgcolor: theme.palette.primary.dark, color: '#FFFFFF' }
+            }}
+          >
+            <Add fontSize="small" />
+          </IconButton>
+        )}
+        {canQuickBill && (
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<Add fontSize="small" sx={{ color: `${theme.palette.primary.contrastText || '#FFFFFF'} !important` }} />}
+            onClick={handleQuickBill}
+            title="INVOICE (Alt + N or F2)"
+            sx={{
+              height: 34,
+              px: 1.75,
+              borderRadius: '10px',
+              fontWeight: 700,
+              fontSize: '0.78rem',
+              textTransform: 'none',
+              bgcolor: `${theme.palette.primary.main} !important`,
+              color: `${theme.palette.primary.contrastText || '#FFFFFF'} !important`,
+              boxShadow: `0 4px 14px ${theme.palette.primary.main}4D`,
+              whiteSpace: 'nowrap',
+              display: { xs: 'none', sm: 'inline-flex' },
+              '&:hover': { bgcolor: `${theme.palette.primary.dark} !important` }
+            }}
+          >
+            Quick Bill
+          </Button>
+        )}
+
+        {/* Notification Bell */}
+        <NotificationCenter />
+
+        {/* Table Density Toggle (Comfortable vs Compact) */}
+        <Tooltip title={density === 'compact' ? "Table Layout: Compact (Click for Comfortable)" : "Table Layout: Comfortable (Click for Compact)"}>
+          <IconButton
+            onClick={toggleDensity}
+            size="small"
+            sx={{ ...horizonIconBtnSx(density === 'compact'), display: { xs: 'none', sm: 'inline-flex' } }}
+          >
+            <ViewHeadline fontSize="small" />
+          </IconButton>
+        </Tooltip>
+
+        {/* Quick CRM Color Palette Switcher */}
+        <Tooltip title="CRM Color Themes & Appearance">
+          <IconButton
+            onClick={() => navigate('/settings?tab=colors')}
+            size="small"
+            sx={{ ...horizonIconBtnSx(), display: { xs: 'none', sm: 'inline-flex' } }}
+          >
+            <Palette fontSize="small" />
+          </IconButton>
+        </Tooltip>
+
+        {/* Boutique Info */}
+        <Tooltip title={`${profile?.businessName || 'Aleen Clothing'} — Boutique POS & CRM`}>
+          <IconButton
+            size="small"
+            sx={{ ...horizonIconBtnSx(), display: { xs: 'none', lg: 'inline-flex' } }}
+          >
+            <Info fontSize="small" />
+          </IconButton>
+        </Tooltip>
+
+        {/* Theme Toggle (Porcelain / Dark Mode) */}
+        <IconButton
+          onClick={toggleTheme}
+          size="small"
+          sx={horizonIconBtnSx()}
+          title={mode === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
+        >
+          {mode === 'dark'
+            ? <Brightness7 fontSize="small" sx={{ color: '#F59E0B' }} />
+            : <Brightness4 fontSize="small" sx={{ color: theme.palette.primary.main }} />}
+        </IconButton>
+
+        {/* Logout (subtle red) */}
+        <Tooltip title="Log out of Aleen Clothing">
+          <IconButton
+            onClick={handleLogout}
+            size="small"
+            sx={{ ...horizonIconBtnSx(), color: isDark ? '#FCA5A5' : '#DC2626', display: { xs: 'none', sm: 'inline-flex' }, '&:hover': { bgcolor: isDark ? 'rgba(239, 68, 68, 0.18)' : '#FEE2E2', color: isDark ? '#FCA5A5' : '#DC2626' } }}
+          >
+            <Logout fontSize="small" />
+          </IconButton>
+        </Tooltip>
+
+        {/* Profile Avatar + Identity */}
+        <Divider orientation="vertical" flexItem sx={{ height: 22, my: 'auto', mx: 0.25, display: { xs: 'none', lg: 'block' }, borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#EFEFF4' }} />
+        <Box sx={{ display: { xs: 'none', lg: 'flex' }, alignItems: 'center', gap: 1.25, pl: 0.25 }}>
+          <Box sx={{ textAlign: 'right', lineHeight: 1.2 }}>
+            <Typography sx={{ fontSize: '0.76rem', fontWeight: 800, color: 'text.primary', letterSpacing: '-0.01em' }} noWrap>
+              {profile?.businessName || 'Aleen Clothing'}
+            </Typography>
+            <Typography sx={{ fontSize: '0.68rem', fontWeight: 600, color: 'text.secondary' }} noWrap>
+              {user?.name || 'Boutique Owner'}
+            </Typography>
+          </Box>
+          <Avatar
+            src={profile?.logoUrl || undefined}
+            alt={profile?.businessName || 'Aleen'}
+            sx={{
+              width: 34,
+              height: 34,
+              borderRadius: '10px',
+              bgcolor: '#F1EFFC',
+              color: '#5B4BD1',
+              fontSize: '0.72rem',
+              fontWeight: 800,
+              border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.12)' : '#EFEFF4'}`,
+              objectFit: 'contain',
+              p: profile?.logoUrl ? 0.25 : 0
+            }}
+          >
+            {(profile?.businessName || 'A').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()}
+          </Avatar>
+        </Box>
+      </Box>
+    </>
+  );
+
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: 'background.default' }}>
       {/* Desktop Collapsible Sidebar */}
@@ -600,7 +853,7 @@ export default function Layout() {
         <Box
           component="header"
           sx={{
-            height: { xs: 58, sm: 64 },
+            height: isAtelier ? { xs: 58, sm: 66 } : { xs: 58, sm: 64 },
             px: { xs: 1.5, sm: 2.5, md: 3 },
             display: 'flex',
             alignItems: 'center',
@@ -617,6 +870,10 @@ export default function Layout() {
             gap: 1
           }}
         >
+          {isAtelier ? (
+            renderHorizonTopBar()
+          ) : (
+          <>
           {/* Left: Collapse Toggle + Breadcrumbs */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 }, minWidth: 0 }}>
             {/* Microsoft 365 Waffle Icon */}
@@ -1028,6 +1285,8 @@ export default function Layout() {
               </Button>
             </Tooltip>
           </Box>
+          </>
+          )}
         </Box>
 
         {/* Scrollable Viewport Content Area */}
