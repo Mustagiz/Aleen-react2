@@ -23,6 +23,7 @@ import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import FinanceNavTabs from '../components/crm/FinanceNavTabs';
 import { getThemeChartOptions, getDoughnutMotion } from '../utils/chartTheme';
+import ChartRangeSelect, { getActiveRangePreset, computeRangePreset } from '../components/crm/ChartRangeSelect';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, ChartTooltip, Legend);
 
@@ -42,6 +43,15 @@ const ProfitLoss = () => {
 
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    const activeRangePreset = getActiveRangePreset(dateFrom, dateTo);
+
+    const applyRangePreset = (preset) => {
+        const { from, to } = computeRangePreset(preset);
+        setDateFrom(from);
+        setDateTo(to);
         setPage(0);
     };
 
@@ -403,10 +413,16 @@ const ProfitLoss = () => {
             <Grid container spacing={3} sx={{ mb: 3.5 }}>
                 <Grid item xs={12} md={7}>
                     <GlassCard sx={{ p: 2.5, height: '100%' }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <BarChartIcon sx={{ color: (t) => t.palette.primary.main }} />
-                            Category Profitability Breakdown
-                        </Typography>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 800, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <BarChartIcon sx={{ color: (t) => t.palette.primary.main }} />
+                                Category Profitability Breakdown
+                            </Typography>
+                            <ChartRangeSelect
+                                value={activeRangePreset}
+                                onChange={applyRangePreset}
+                            />
+                        </Box>
                         <Box sx={{ height: 260 }}>
                             <Bar 
                                 data={chartData} 

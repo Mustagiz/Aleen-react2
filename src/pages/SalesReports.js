@@ -45,6 +45,7 @@ import { formatCurrencyForPDF, generateReportPDF } from '../utils/helpers';
 import PageHeader from '../components/crm/PageHeader';
 import FinanceNavTabs from '../components/crm/FinanceNavTabs';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
+import ChartRangeSelect, { getActiveRangePreset, computeRangePreset } from '../components/crm/ChartRangeSelect';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler);
 
@@ -65,6 +66,15 @@ const SalesReports = () => {
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const activeRangePreset = getActiveRangePreset(dateFrom, dateTo);
+
+  const applyRangePreset = (preset) => {
+    const { from, to } = computeRangePreset(preset);
+    setDateFrom(from);
+    setDateTo(to);
     setPage(0);
   };
 
@@ -340,9 +350,15 @@ const SalesReports = () => {
               boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
             }}
           >
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 2, color: 'text.primary' }}>
-              Sales Revenue Timeline
-            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                Sales Revenue Timeline
+              </Typography>
+              <ChartRangeSelect
+                value={activeRangePreset}
+                onChange={applyRangePreset}
+              />
+            </Box>
             <Box sx={{ height: 260 }}>
               <Line
                 data={chartData}

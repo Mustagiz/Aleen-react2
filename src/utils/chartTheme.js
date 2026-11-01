@@ -75,7 +75,7 @@ export const getChartMotion = () => {
     },
     transitions: {
       active: {
-        animation: { duration: reduced ? 0 : 260, easing: 'easeOutQuad' }
+        animation: { duration: reduced ? 0 : 700, easing: 'easeOutQuart' }
       }
     }
   };
@@ -95,7 +95,7 @@ export const getDoughnutMotion = () => {
     },
     transitions: {
       active: {
-        animation: { duration: reduced ? 0 : 260, easing: 'easeOutQuad' }
+        animation: { duration: reduced ? 0 : 700, easing: 'easeOutQuart' }
       }
     }
   };

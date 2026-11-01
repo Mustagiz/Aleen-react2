@@ -75,6 +75,7 @@ export default function Layout() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isDark = mode === 'dark';
+  const isAtelier = designSystem === 'atelier';
 
   const getSystemSubtitle = () => {
     if (profile?.tagline && profile.tagline.trim()) {
@@ -276,12 +277,12 @@ export default function Layout() {
 
         {/* Brand Header with Luxury Monogram & Mobile Close Button */}
         <Box sx={{
-          p: showCollapsed ? 2 : 2.5,
+          p: showCollapsed ? 2 : 2,
           display: 'flex',
           alignItems: 'center',
           justifyContent: showCollapsed ? 'center' : 'space-between',
           borderBottom: sidebarConfig.borderColor,
-          minHeight: 70
+          minHeight: 64
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, overflow: 'hidden' }}>
             {/* Emerald & Gold Crest Monogram or Custom Logo */}
@@ -388,22 +389,22 @@ export default function Layout() {
           flex: 1, 
           overflowY: 'auto', 
           overflowX: 'hidden',
-          py: 1.5,
+          py: 1.25,
           px: showCollapsed ? 1 : 1.5
         }}>
           {workflowSections.map((section) => (
-            <Box key={section.title} sx={{ mb: 1.5 }}>
+            <Box key={section.title} sx={{ mb: 1 }}>
               {!showCollapsed && (
                 <ListSubheader sx={{
                   bgcolor: 'transparent',
                   color: sidebarConfig.subheadColor,
-                  fontSize: '0.7rem',
+                  fontSize: '0.66rem',
                   fontWeight: 800,
                   textTransform: 'uppercase',
                   letterSpacing: '0.08em',
                   px: 1.5,
-                  py: 0.5,
-                  lineHeight: '1.6rem'
+                  py: 0.25,
+                  lineHeight: '1.5rem'
                 }}>
                   {section.title}
                 </ListSubheader>
@@ -422,39 +423,37 @@ export default function Layout() {
                       }}
                       sx={{
                         borderRadius: getItemBorderRadius(),
-                        mb: 0.5,
-                        py: { xs: 1.1, sm: 1 },
-                        minHeight: { xs: 44, sm: 40 },
+                        mb: 0.35,
+                        py: { xs: 0.85, sm: 0.75 },
+                        minHeight: { xs: 38, sm: 34 },
                         px: showCollapsed ? 1 : 1.5,
                         justifyContent: showCollapsed ? 'center' : 'flex-start',
-                        bgcolor: isActive 
-                          ? sidebarConfig.activePillBg 
+                        bgcolor: isActive
+                          ? (isAtelier && sidebarConfig.isDark ? 'rgba(124, 111, 232, 0.16)' : sidebarConfig.activePillBg)
                           : 'transparent',
-                        color: isActive 
-                          ? sidebarConfig.activePillText 
+                        color: isActive
+                          ? (isAtelier && sidebarConfig.isDark ? theme.palette.primary.light : sidebarConfig.activePillText)
                           : (sidebarConfig.isDark ? '#CBD5E1' : 'text.secondary'),
-                        borderLeft: (isActive && !sidebarConfig.isDark) 
-                          ? `3px solid ${theme.palette.primary.main}` 
-                          : '3px solid transparent',
-                        boxShadow: isActive && sidebarConfig.isDark
-                          ? `0 2px 10px ${theme.palette.primary.main}40`
-                          : 'none',
                         transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                         '&:hover': {
-                          bgcolor: isActive 
-                            ? sidebarConfig.activePillBg 
+                          bgcolor: isActive
+                            ? (isAtelier && sidebarConfig.isDark ? 'rgba(124, 111, 232, 0.16)' : sidebarConfig.activePillBg)
                             : (sidebarConfig.isDark ? 'rgba(255, 255, 255, 0.08)' : `${theme.palette.primary.main}12`),
-                          color: isActive ? sidebarConfig.activePillText : (sidebarConfig.isDark ? '#FFFFFF' : 'primary.main'),
-                          transform: showCollapsed ? 'none' : 'translateX(3px)'
+                          color: isActive
+                            ? (isAtelier && sidebarConfig.isDark ? theme.palette.primary.light : sidebarConfig.activePillText)
+                            : (sidebarConfig.isDark ? '#FFFFFF' : 'primary.main'),
+                          transform: showCollapsed ? 'none' : 'translateX(2px)'
                         }
                       }}
                     >
                       <ListItemIcon sx={{
-                        minWidth: showCollapsed ? 'auto' : 34,
+                        minWidth: showCollapsed ? 'auto' : 30,
                         justifyContent: 'center',
-                        color: isActive ? sidebarConfig.activePillText : (sidebarConfig.isDark ? '#94A3B8' : 'inherit'),
+                        color: isActive
+                          ? (isAtelier && sidebarConfig.isDark ? theme.palette.primary.light : sidebarConfig.activePillText)
+                          : (sidebarConfig.isDark ? '#94A3B8' : 'inherit'),
                         '& .MuiSvgIcon-root': {
-                          fontSize: 20
+                          fontSize: 18
                         }
                       }}>
                         {item.icon}
@@ -463,10 +462,12 @@ export default function Layout() {
                         <ListItemText
                           primary={item.text}
                           primaryTypographyProps={{
-                            fontWeight: isActive ? 800 : 500,
-                            fontSize: '0.84rem',
+                            fontWeight: isActive ? 700 : 500,
+                            fontSize: '0.78rem',
                             letterSpacing: '-0.01em',
-                            color: isActive ? sidebarConfig.activePillText : (sidebarConfig.isDark ? '#F8FAFC' : 'text.primary')
+                            color: isActive
+                              ? (isAtelier && sidebarConfig.isDark ? theme.palette.primary.light : sidebarConfig.activePillText)
+                              : (sidebarConfig.isDark ? '#F8FAFC' : 'text.primary')
                           }}
                         />
                       )}

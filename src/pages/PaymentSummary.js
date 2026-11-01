@@ -45,6 +45,7 @@ import CashDrawerShiftModal from '../components/crm/CashDrawerShiftModal';
 const PaymentSummary = () => {
     const { invoices } = useData();
     const theme = useTheme();
+    const isDark = theme.palette.mode === 'dark';
     const [cashDrawerModalOpen, setCashDrawerModalOpen] = useState(false);
     const [dateRange, setDateRange] = useState('today');
 
@@ -528,41 +529,54 @@ const PaymentSummary = () => {
 
                         return (
                             <Grid item xs={6} sm={6} md={2.4} key={method}>
-                                <GlassCard sx={{ p: { xs: 1.5, sm: 2.25 }, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                                    <Box>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
-                                            <Box sx={{ p: 1, borderRadius: 2, bgcolor: `${color}18`, color: color, display: 'flex' }}>
-                                                {React.cloneElement(getPaymentIcon(method), { sx: { fontSize: '1.25rem' } })}
-                                            </Box>
-                                            <Chip 
-                                                label={`${pctShare}% Share`} 
-                                                size="small" 
-                                                sx={{ height: 20, fontSize: '0.68rem', fontWeight: 800, bgcolor: `${color}15`, color: color }}
-                                            />
+                                <GlassCard sx={{ p: { xs: '12px 12px', sm: '12px 14px', md: '14px 16px' }, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: { xs: 1, md: 1.25 } }}>
+                                        <Box sx={{ width: { xs: 30, sm: 32, md: 34 }, height: { xs: 30, sm: 32, md: 34 }, borderRadius: '10px', bgcolor: `${color}18`, color: color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                            {React.cloneElement(getPaymentIcon(method), { sx: { fontSize: '1.05rem' } })}
                                         </Box>
-                                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.25 }}>
-                                            {method}
-                                        </Typography>
-                                        <Typography variant="h6" sx={{ fontWeight: 900, color: (t) => t.palette.primary.main, fontSize: '1.15rem' }}>
-                                            ₹{data.total.toLocaleString('en-IN')}
-                                        </Typography>
+                                        <Box
+                                            sx={{
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: 0.4,
+                                                px: 0.8,
+                                                py: '1.5px',
+                                                borderRadius: '999px',
+                                                bgcolor: `${color}15`,
+                                                border: `1px solid ${color}30`,
+                                                flexShrink: 0,
+                                                maxWidth: '58%'
+                                            }}
+                                        >
+                                            <Box sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: color, flexShrink: 0 }} />
+                                            <Typography sx={{ fontSize: '0.62rem', fontWeight: 700, color: color, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.4 }}>
+                                                {pctShare}% Share
+                                            </Typography>
+                                        </Box>
                                     </Box>
+
+                                    <Typography noWrap sx={{ fontWeight: 600, fontSize: { xs: '0.68rem', md: '0.72rem' }, color: isDark ? 'rgba(203, 213, 225, 0.9)' : '#5B5B66', lineHeight: 1.3, mb: 0.2 }}>
+                                        {method}
+                                    </Typography>
+                                    <Typography sx={{ fontWeight: 700, color: 'text.primary', letterSpacing: '-0.02em', fontSize: { xs: '1.25rem', md: '1.35rem' }, lineHeight: 1.15, fontVariantNumeric: 'tabular-nums', mb: { xs: 0.9, md: 1 }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                        ₹{data.total.toLocaleString('en-IN')}
+                                    </Typography>
 
                                     {/* Breakdown of UPI providers if present */}
                                     {method === 'UPI' && data.providers && Object.keys(data.providers).length > 0 && (
-                                        <Box sx={{ mt: 1.5, pt: 1, borderTop: '1px dashed', borderColor: 'divider' }}>
+                                        <Box sx={{ mb: 0.75, pb: 0.75, borderBottom: '1px dashed', borderColor: 'divider' }}>
                                             {Object.entries(data.providers).map(([provider, amt]) => (
-                                                <Box key={provider} sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.3 }}>
-                                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>{provider}</Typography>
-                                                    <Typography variant="caption" sx={{ fontWeight: 700 }}>₹{amt.toLocaleString('en-IN')}</Typography>
+                                                <Box key={provider} sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.15 }}>
+                                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, fontSize: '0.64rem' }}>{provider}</Typography>
+                                                    <Typography variant="caption" sx={{ fontWeight: 700, fontSize: '0.64rem' }}>₹{amt.toLocaleString('en-IN')}</Typography>
                                                 </Box>
                                             ))}
                                         </Box>
                                     )}
 
-                                    <Box sx={{ mt: 1.5, pt: 1, borderTop: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between' }}>
-                                        <Typography variant="caption" color="text.secondary">{data.count} slips</Typography>
-                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                                    <Box sx={{ mt: 'auto', pt: 0.75, borderTop: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', gap: 0.5 }}>
+                                        <Typography noWrap sx={{ fontSize: '0.66rem', color: isDark ? 'rgba(148, 163, 184, 0.85)' : '#9A9AA6', fontWeight: 500 }}>{data.count} slips</Typography>
+                                        <Typography sx={{ fontSize: '0.66rem', fontWeight: 700, color: isDark ? 'rgba(148, 163, 184, 0.85)' : '#9A9AA6', whiteSpace: 'nowrap' }}>
                                             Avg ₹{(data.total / data.count).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                                         </Typography>
                                     </Box>

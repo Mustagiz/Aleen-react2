@@ -46,6 +46,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import GlassCard from '../components/GlassCard';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
+import ChartRangeSelect, { CHART_RANGE_OPTIONS } from '../components/crm/ChartRangeSelect';
 import CashDrawerShiftModal from '../components/crm/CashDrawerShiftModal';
 import { useThemeContext } from '../contexts/ThemeContext';
 import { getThemeChartPalette, getChartMotion, getDoughnutMotion } from '../utils/chartTheme';
@@ -601,45 +602,12 @@ const Dashboard = () => {
       </Box>
 
       {/* ============================================================== */}
-      {/* 2. TIMEFRAME SELECTOR FILTER BAR                               */}
+      {/* 2. FINANCIAL OVERVIEW LABEL (range set per chart card)          */}
       {/* ============================================================== */}
       <Box sx={{ mb: 1.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1.5 }}>
         <Typography sx={{ fontWeight: 600, color: 'text.secondary', fontSize: '0.78rem' }}>
           Financial overview · {rangeLabel}
         </Typography>
-
-        <Box sx={{ display: 'flex', gap: 0.6, p: 0.45, borderRadius: `${buttonRadius}px`, bgcolor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF', border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : '#EFEFF4'}` }}>
-          {[
-            { id: '7days', label: '7 Days' },
-            { id: '30days', label: '30 Days' },
-            { id: 'thisMonth', label: 'Month' },
-            { id: 'all', label: 'All' }
-          ].map((item) => (
-            <Button
-              key={item.id}
-              onClick={() => setDateRange(item.id)}
-              variant={dateRange === item.id ? 'contained' : 'text'}
-              size="small"
-              sx={{
-                px: 1.8,
-                py: 0.45,
-                minWidth: 0,
-                borderRadius: `${Math.max(buttonRadius - 2, 8)}px`,
-                fontSize: '0.78rem',
-                fontWeight: 600,
-                textTransform: 'none',
-                bgcolor: dateRange === item.id ? theme.palette.primary.main : 'transparent',
-                color: dateRange === item.id ? (theme.palette.primary.contrastText || '#FFFFFF') : 'text.secondary',
-                boxShadow: dateRange === item.id ? '0 1px 2px rgba(124, 111, 232, 0.3)' : 'none',
-                '&:hover': {
-                  bgcolor: dateRange === item.id ? theme.palette.primary.dark : 'action.hover'
-                }
-              }}
-            >
-              {item.label}
-            </Button>
-          ))}
-        </Box>
       </Box>
 
       {/* ============================================================== */}
@@ -832,15 +800,22 @@ const Dashboard = () => {
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>Revenue overview</Typography>
                 <Typography variant="caption" color="text.secondary">Gross sales vs operating cash expenses</Typography>
               </Box>
-              <Box sx={{ display: 'flex', gap: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                  <Circle sx={{ fontSize: 10, color: 'primary.main' }} />
-                  <Typography variant="caption" sx={{ fontWeight: 600 }}>Gross Sales</Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                    <Circle sx={{ fontSize: 10, color: 'primary.main' }} />
+                    <Typography variant="caption" sx={{ fontWeight: 600 }}>Gross Sales</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                    <Circle sx={{ fontSize: 10, color: 'secondary.main' }} />
+                    <Typography variant="caption" sx={{ fontWeight: 600 }}>Expenses</Typography>
+                  </Box>
                 </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                  <Circle sx={{ fontSize: 10, color: 'secondary.main' }} />
-                  <Typography variant="caption" sx={{ fontWeight: 600 }}>Expenses</Typography>
-                </Box>
+                <ChartRangeSelect
+                  value={dateRange}
+                  onChange={setDateRange}
+                  options={CHART_RANGE_OPTIONS}
+                />
               </Box>
             </Box>
             <Box sx={{ height: 230 }}>
@@ -893,19 +868,26 @@ const Dashboard = () => {
         {/* Left: Top Products Bar Chart */}
         <Grid item xs={12} md={7} lg={7}>
           <GlassCard sx={{ p: 2.25, height: '100%' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2, alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2, alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>Top products</Typography>
                 <Typography variant="caption" color="text.secondary">Best-selling pieces by units sold</Typography>
               </Box>
-              <Button
-                size="small"
-                endIcon={<ArrowForward sx={{ fontSize: 16 }} />}
-                onClick={() => navigate('/sales-reports')}
-                sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.76rem', color: 'primary.main' }}
-              >
-                Full Analytics
-              </Button>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <ChartRangeSelect
+                  value={dateRange}
+                  onChange={setDateRange}
+                  options={CHART_RANGE_OPTIONS}
+                />
+                <Button
+                  size="small"
+                  endIcon={<ArrowForward sx={{ fontSize: 16 }} />}
+                  onClick={() => navigate('/sales-reports')}
+                  sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.76rem', color: 'primary.main' }}
+                >
+                  Full Analytics
+                </Button>
+              </Box>
             </Box>
             <Box sx={{ height: 210 }}>
               <Bar data={topProductsChartData} options={{ ...commonChartOptions, indexAxis: 'y' }} />
