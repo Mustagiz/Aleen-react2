@@ -931,7 +931,7 @@ const Loyalty = () => {
                 onClose={() => setSettingsOpen(false)}
                 maxWidth="sm"
                 fullWidth
-                PaperProps={{ sx: { borderRadius: 4, p: 0.5 } }}
+                PaperProps={{ sx: { borderRadius: '14px' } }}
             >
                 <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -977,10 +977,26 @@ const Loyalty = () => {
                                                     label={preset.label}
                                                     size="small"
                                                     clickable
-                                                    color={Number(settingsForm.spendPerPoint) === preset.value ? 'primary' : 'default'}
-                                                    variant={Number(settingsForm.spendPerPoint) === preset.value ? 'filled' : 'outlined'}
                                                     onClick={() => setSettingsForm(p => ({ ...p, spendPerPoint: preset.value }))}
-                                                    sx={{ fontSize: '0.68rem', fontWeight: 700, mb: 0.5 }}
+                                                    sx={{
+                                                        fontSize: '0.68rem',
+                                                        fontWeight: 700,
+                                                        mb: 0.5,
+                                                        height: 26,
+                                                        bgcolor: Number(settingsForm.spendPerPoint) === preset.value
+                                                            ? ((t) => t.palette.mode === 'dark' ? 'rgba(124, 111, 232, 0.2)' : 'rgba(124, 111, 232, 0.1)')
+                                                            : 'transparent',
+                                                        color: Number(settingsForm.spendPerPoint) === preset.value
+                                                            ? ((t) => t.palette.mode === 'dark' ? t.palette.primary.light : '#5B4BD1')
+                                                            : 'text.secondary',
+                                                        border: Number(settingsForm.spendPerPoint) === preset.value ? 'none' : '1px solid',
+                                                        borderColor: 'divider',
+                                                        '&:hover': {
+                                                            bgcolor: Number(settingsForm.spendPerPoint) === preset.value
+                                                                ? ((t) => t.palette.mode === 'dark' ? 'rgba(124, 111, 232, 0.26)' : 'rgba(124, 111, 232, 0.14)')
+                                                                : 'action.hover'
+                                                        }
+                                                    }}
                                                 />
                                             ))}
                                         </Stack>
@@ -1006,7 +1022,7 @@ const Loyalty = () => {
 
                             {/* Live Calculation Simulation Card for ₹1,000 Spend */}
                             {Number(settingsForm.spendPerPoint) > 0 && (
-                                <Box sx={{ p: 2, borderRadius: 2.5, bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(124, 111, 232, 0.15)' : 'rgba(124, 111, 232, 0.06)', border: '1px solid rgba(124, 111, 232, 0.2)' }}>
+                                <Box sx={{ p: 2, borderRadius: '14px', bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(124, 111, 232, 0.12)' : 'rgba(124, 111, 232, 0.05)', border: '1px solid', borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.25)' : 'rgba(124, 111, 232, 0.14)' }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                                         <Calculate sx={{ fontSize: 18, color: 'primary.main' }} />
                                         <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'primary.main' }}>

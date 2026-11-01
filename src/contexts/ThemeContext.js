@@ -371,7 +371,42 @@ export const ThemeProvider = ({ children }) => {
                 MuiDialog: {
                     styleOverrides: {
                         paper: {
-                            borderRadius: activeSystemConfig.shape.cardRadius || 14
+                            borderRadius: activeSystemConfig.shape.cardRadius || 14,
+                            backgroundImage: 'none',
+                            backgroundColor: 'background.paper',
+                            border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'}`,
+                            boxShadow: mode === 'dark'
+                                ? '0 24px 60px rgba(0, 0, 0, 0.55)'
+                                : '0 24px 60px rgba(112, 114, 176, 0.2), 0 2px 6px rgba(31, 27, 46, 0.06)',
+                            overflow: 'hidden'
+                        }
+                    }
+                },
+                MuiDialogTitle: {
+                    styleOverrides: {
+                        root: {
+                            fontWeight: 800,
+                            fontSize: '1.05rem',
+                            letterSpacing: '-0.01em',
+                            padding: '20px 24px 12px'
+                        }
+                    }
+                },
+                MuiDialogContent: {
+                    styleOverrides: {
+                        root: {
+                            padding: '12px 24px 20px'
+                        },
+                        dividers: {
+                            borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#F1EFFC'
+                        }
+                    }
+                },
+                MuiDialogActions: {
+                    styleOverrides: {
+                        root: {
+                            padding: '14px 24px',
+                            gap: 8
                         }
                     }
                 },
