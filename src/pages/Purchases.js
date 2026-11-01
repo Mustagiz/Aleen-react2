@@ -1548,29 +1548,31 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
             >
                 <DialogTitle 
                     sx={{
-                        background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
-                        color: '#ffffff',
+                        bgcolor: 'background.paper',
+                        color: 'text.primary',
                         px: 3,
                         py: 2.25,
+                        borderBottom: '1px solid',
+                        borderColor: 'divider',
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center'
                     }}
                 >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.15)', color: '#ffffff' }}>
+                        <Avatar sx={{ bgcolor: (t) => `${t.palette.primary.main}1F`, color: 'primary.main' }}>
                             <ReceiptLong />
                         </Avatar>
                         <Box>
                             <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.15rem', letterSpacing: '0.02em' }}>
                                 {editMode ? 'Edit Purchase Order' : 'Create Purchase Order'}
                             </Typography>
-                            <Typography variant="caption" sx={{ opacity: 0.85, fontWeight: 500 }}>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
                                 Procurement & Supplier Stock Inward Management
                             </Typography>
                         </Box>
                     </Box>
-                    <IconButton onClick={() => setOpen(false)} sx={{ color: 'white' }}>
+                    <IconButton onClick={() => setOpen(false)} sx={{ color: 'text.secondary' }}>
                         <Close />
                     </IconButton>
                 </DialogTitle>
@@ -1922,9 +1924,9 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                 fullWidth 
                 PaperProps={{ sx: { borderRadius: 3.5, overflow: 'hidden' } }}
             >
-                <DialogTitle sx={{ background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`, color: 'white', px: 3, py: 2 }}>
+                <DialogTitle sx={{ bgcolor: 'background.paper', color: 'text.primary', px: 3, py: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
                     <Typography variant="h6" sx={{ fontWeight: 800 }}>Quick Add Product to Inventory</Typography>
-                    <Typography variant="caption" sx={{ opacity: 0.85 }}>Adds product directly to boutique catalog</Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>Adds product directly to boutique catalog</Typography>
                 </DialogTitle>
                 <DialogContent sx={{ p: 3, mt: 1 }}>
                     <Grid container spacing={2}>
@@ -2061,24 +2063,26 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                         <>
                             <DialogTitle 
                                 sx={{
-                                    background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
-                                    color: '#ffffff',
+                                    bgcolor: 'background.paper',
+                                    color: 'text.primary',
                                     px: 3,
                                     py: 2.25,
+                                    borderBottom: '1px solid',
+                                    borderColor: 'divider',
                                     display: 'flex',
                                     justifyContent: 'space-between',
                                     alignItems: 'center'
                                 }}
                             >
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                    <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.15)', color: '#ffffff' }}>
+                                    <Avatar sx={{ bgcolor: (t) => `${t.palette.primary.main}1F`, color: 'primary.main' }}>
                                         <ReceiptLong />
                                     </Avatar>
                                     <Box>
                                         <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.15rem' }}>
                                             PO #{po.id.length > 8 ? po.id.slice(-6).toUpperCase() : po.id.toUpperCase()}
                                         </Typography>
-                                        <Typography variant="caption" sx={{ opacity: 0.9, fontWeight: 500 }}>
+                                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
                                             Placed on {new Date(po.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}
                                         </Typography>
                                     </Box>
@@ -2088,13 +2092,14 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                         label={isReceived ? 'Received in Warehouse' : 'Pending Delivery'}
                                         size="small"
                                         sx={{ 
-                                            bgcolor: isReceived ? 'rgba(5, 150, 105, 0.25)' : 'rgba(217, 119, 6, 0.3)',
-                                            color: '#ffffff',
+                                            bgcolor: isReceived ? (t) => `${t.palette.success.main}1F` : (t) => `${t.palette.warning.main}1F`,
+                                            color: isReceived ? 'success.main' : 'warning.main',
                                             fontWeight: 800,
-                                            border: '1px solid rgba(255,255,255,0.3)'
+                                            border: '1px solid',
+                                            borderColor: 'divider'
                                         }}
                                     />
-                                    <IconButton onClick={() => setViewPoModalOpen(false)} sx={{ color: 'white' }}>
+                                    <IconButton onClick={() => setViewPoModalOpen(false)} sx={{ color: 'text.secondary' }}>
                                         <Close />
                                     </IconButton>
                                 </Box>
@@ -2461,9 +2466,9 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                 fullWidth
                 PaperProps={{ sx: { borderRadius: 3.5, overflow: 'hidden' } }}
             >
-                <DialogTitle sx={{ background: 'linear-gradient(135deg, #4F46E5 0%, #3730A3 100%)', color: 'white', px: 3, py: 2 }}>
+                <DialogTitle sx={{ bgcolor: 'background.paper', color: 'text.primary', px: 3, py: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
                     <Typography variant="h6" sx={{ fontWeight: 800 }}>Record Supplier Payment</Typography>
-                    <Typography variant="caption" sx={{ opacity: 0.85 }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                         PO #{payingPo?.id ? (payingPo.id.length > 8 ? payingPo.id.slice(-6).toUpperCase() : payingPo.id.toUpperCase()) : ''} • {payingPo?.vendorName}
                     </Typography>
                 </DialogTitle>
@@ -2579,9 +2584,9 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                 fullWidth
                 PaperProps={{ sx: { borderRadius: 3.5, overflow: 'hidden' } }}
             >
-                <DialogTitle sx={{ background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)', color: 'white', px: 3, py: 2 }}>
+                <DialogTitle sx={{ bgcolor: 'background.paper', color: 'text.primary', px: 3, py: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
                     <Typography variant="h6" sx={{ fontWeight: 800 }}>Vendor WhatsApp Contact</Typography>
-                    <Typography variant="caption" sx={{ opacity: 0.9 }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                         {whatsAppTargetPo?.vendorName || 'Supplier'} has no phone on file
                     </Typography>
                 </DialogTitle>

@@ -102,7 +102,7 @@ export default function Layout() {
   };
 
   const getItemBorderRadius = () => {
-    return `${activeSystemConfig?.shape?.buttonRadius || 9}px`;
+    return '10px';
   };
 
   const sidebarConfig = theme.custom?.sidebar || {
@@ -299,7 +299,7 @@ export default function Layout() {
                 sx={{
                   width: 40,
                   height: 40,
-                  borderRadius: designSystem === 'material' ? '50%' : (designSystem === 'microsoft' ? '4px' : '12px'),
+                  borderRadius: '12px',
                   objectFit: 'contain',
                   border: '1.5px solid rgba(217, 119, 6, 0.4)',
                   boxShadow: `0 4px 12px ${theme.palette.primary.main}40`,
@@ -315,7 +315,7 @@ export default function Layout() {
               <Box sx={{
                 width: 40,
                 height: 40,
-                borderRadius: designSystem === 'material' ? '50%' : (designSystem === 'microsoft' ? '4px' : '12px'),
+                borderRadius: '12px',
                 background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.dark} 100%)`,
                 border: '1.5px solid rgba(217, 119, 6, 0.4)',
                 boxShadow: `0 4px 12px ${theme.palette.primary.main}40`,
@@ -396,16 +396,14 @@ export default function Layout() {
           overflowX: 'hidden',
           py: 1.25,
           px: showCollapsed ? 1 : 1.5,
-          ...(isAtelier ? {
-            scrollbarWidth: 'thin',
-            scrollbarColor: `${sidebarConfig.isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(0, 0, 0, 0.14)'} transparent`,
-            '&::-webkit-scrollbar': { width: 4 },
-            '&::-webkit-scrollbar-track': { background: 'transparent' },
-            '&::-webkit-scrollbar-thumb': {
-              background: sidebarConfig.isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(0, 0, 0, 0.14)',
-              borderRadius: 2
-            }
-          } : {})
+          scrollbarWidth: 'thin',
+          scrollbarColor: `${sidebarConfig.isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(0, 0, 0, 0.14)'} transparent`,
+          '&::-webkit-scrollbar': { width: 4 },
+          '&::-webkit-scrollbar-track': { background: 'transparent' },
+          '&::-webkit-scrollbar-thumb': {
+            background: sidebarConfig.isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(0, 0, 0, 0.14)',
+            borderRadius: 2
+          }
         }}>
           {workflowSections.map((section) => (
             <Box key={section.title} sx={{ mb: 1 }}>

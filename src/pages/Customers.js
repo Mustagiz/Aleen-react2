@@ -1075,8 +1075,9 @@ const Customers = () => {
                 <DialogTitle sx={{ 
                     p: 0,
                     position: 'relative',
-                    background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
-                    color: '#FFFFFF'
+                    bgcolor: 'background.paper',
+                    borderBottom: '1px solid',
+                    borderColor: 'divider'
                 }}>
                     <Box sx={{ p: 2.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -1084,22 +1085,21 @@ const Customers = () => {
                                 width: 44, 
                                 height: 44, 
                                 borderRadius: '12px', 
-                                bgcolor: 'rgba(255, 255, 255, 0.15)',
-                                backdropFilter: 'blur(8px)',
+                                bgcolor: (t) => `${t.palette.primary.main}14`,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                border: '1px solid rgba(255, 255, 255, 0.25)',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                                border: '1px solid',
+                                borderColor: (t) => `${t.palette.primary.main}26`
                             }}>
-                                <PersonAdd sx={{ color: '#FCD34D', fontSize: 24 }} />
+                                <PersonAdd sx={{ color: 'primary.main', fontSize: 24 }} />
                             </Box>
                             <Box>
-                                <Typography variant="h6" sx={{ fontWeight: 800, color: '#FFFFFF', lineHeight: 1.2, letterSpacing: '-0.01em' }}>
+                                <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.2, letterSpacing: '-0.01em' }}>
                                     {editCustomer ? 'Update Guest Profile' : 'Register New Atelier Guest'}
                                 </Typography>
-                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25 }}>
-                                    <AutoAwesome sx={{ fontSize: 13, color: '#FCD34D' }} />
+                                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25 }}>
+                                    <AutoAwesome sx={{ fontSize: 13, color: 'primary.main' }} />
                                     VIP Clientele & Tailoring Bespoke Registry
                                 </Typography>
                             </Box>
@@ -1108,9 +1108,9 @@ const Customers = () => {
                             onClick={() => setOpen(false)} 
                             size="small" 
                             sx={{ 
-                                color: '#FFFFFF', 
-                                bgcolor: 'rgba(255, 255, 255, 0.12)',
-                                '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.25)' }
+                                color: 'text.secondary',
+                                bgcolor: 'transparent',
+                                '&:hover': { bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)' }
                             }}
                         >
                             <Close fontSize="small" />

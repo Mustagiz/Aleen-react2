@@ -3601,44 +3601,30 @@ const Invoices = () => {
         }}
       >
         <DialogTitle sx={{
-          background: (t) => t.palette.mode === 'dark'
-            ? `linear-gradient(135deg, ${t.palette.background.paper} 0%, ${t.palette.primary.dark} 100%)`
-            : `linear-gradient(135deg, ${t.palette.primary.dark} 0%, ${t.palette.primary.main} 100%)`,
-          color: '#FFFFFF',
+          bgcolor: 'background.paper',
+          color: 'text.primary',
           px: { xs: 2, sm: 3 },
           py: { xs: 1.5, sm: 2 },
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           gap: { xs: 1, sm: 2 },
-          borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
-          position: 'relative'
+          borderBottom: '1px solid',
+          borderColor: 'divider'
         }}>
-          {/* Top Metallic Primary Accent */}
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: '3px',
-              background: (t) => `linear-gradient(90deg, ${t.palette.primary.light} 0%, ${t.palette.secondary?.main || t.palette.primary.main} 50%, ${t.palette.primary.light} 100%)`
-            }}
-          />
-
           {/* Left: Avatar + Title + Badges */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.75 }, minWidth: 0, flexShrink: 0 }}>
             <Avatar sx={{
-              bgcolor: 'rgba(255, 255, 255, 0.18)',
-              color: '#FFFFFF',
+              bgcolor: (t) => `${t.palette.primary.main}1F`,
+              color: 'primary.main',
               width: { xs: 32, sm: 42 },
               height: { xs: 32, sm: 42 },
               flexShrink: 0,
-              border: '1.5px solid rgba(255, 255, 255, 0.35)',
-              borderRadius: { xs: '7px', sm: '10px' },
-              boxShadow: '0 4px 14px rgba(0, 0, 0, 0.2)'
+              border: '1px solid',
+              borderColor: (t) => `${t.palette.primary.main}40`,
+              borderRadius: { xs: '7px', sm: '10px' }
             }}>
-              <PointOfSale sx={{ fontSize: { xs: 18, sm: 22 }, color: '#FFFFFF !important' }} />
+              <PointOfSale sx={{ fontSize: { xs: 18, sm: 22 } }} />
             </Avatar>
             <Box sx={{ minWidth: 0 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexWrap: 'nowrap' }}>
@@ -3646,10 +3632,9 @@ const Invoices = () => {
                   fontWeight: 900, 
                   fontSize: { xs: '1.05rem', sm: '1.35rem' }, 
                   letterSpacing: '0.06em', 
-                  color: '#FFFFFF !important',
+                  color: 'text.primary',
                   lineHeight: 1.2,
                   textTransform: 'uppercase',
-                  textShadow: '0 2px 4px rgba(0,0,0,0.25)',
                   fontFamily: 'inherit',
                   whiteSpace: 'nowrap'
                 }}>
@@ -3662,9 +3647,10 @@ const Invoices = () => {
                     height: 18,
                     fontSize: '0.62rem',
                     fontWeight: 800,
-                    bgcolor: 'rgba(255, 255, 255, 0.2)',
-                    color: '#FFFFFF !important',
-                    border: '1px solid rgba(255, 255, 255, 0.35)',
+                    bgcolor: (t) => `${t.palette.primary.main}14`,
+                    color: 'primary.main',
+                    border: '1px solid',
+                    borderColor: (t) => `${t.palette.primary.main}40`,
                     borderRadius: '5px',
                     letterSpacing: '0.05em',
                     px: 0.5
@@ -3675,7 +3661,7 @@ const Invoices = () => {
                 variant="caption" 
                 noWrap
                 sx={{ 
-                  color: 'rgba(255, 255, 255, 0.88)', 
+                  color: 'text.secondary', 
                   display: { xs: 'none', md: 'block' }, 
                   fontSize: '0.76rem',
                   mt: 0.2,
@@ -3696,21 +3682,21 @@ const Invoices = () => {
                 onClick={handleToggleVoice}
                 className="header-contrast-btn"
                 sx={{
-                  color: '#FFFFFF !important',
-                  bgcolor: voiceSettings.voiceEnabled ? 'rgba(255, 255, 255, 0.28) !important' : 'rgba(255, 255, 255, 0.12) !important',
-                  border: '1px solid rgba(255, 255, 255, 0.45) !important',
+                  color: 'primary.main',
+                  bgcolor: voiceSettings.voiceEnabled ? (t) => `${t.palette.primary.main}26` : (t) => `${t.palette.primary.main}14`,
+                  border: '1px solid',
+                  borderColor: (t) => `${t.palette.primary.main}40`,
                   width: { xs: 32, sm: 36 },
                   height: { xs: 32, sm: 36 },
                   minWidth: { xs: 32, sm: 36 },
                   borderRadius: '8px !important',
-                  boxShadow: voiceSettings.voiceEnabled ? '0 0 10px rgba(255, 255, 255, 0.25)' : 'none',
                   transition: 'all 0.2s ease',
                   '&:hover': {
-                    bgcolor: 'rgba(255, 255, 255, 0.36) !important',
-                    borderColor: '#FFFFFF !important'
+                    bgcolor: (t) => `${t.palette.primary.main}33`,
+                    borderColor: (t) => `${t.palette.primary.main}66`
                   },
                   '& .MuiSvgIcon-root': {
-                    color: '#FFFFFF !important'
+                    color: 'inherit'
                   }
                 }}
               >
@@ -3723,13 +3709,13 @@ const Invoices = () => {
               <Button
                 size="small"
                 onClick={() => setPairModalOpen(true)}
-                startIcon={<QrCode2 sx={{ fontSize: { xs: 16, sm: 17 }, color: '#FFFFFF !important', mr: { xs: -0.5, sm: 0 } }} />}
+                startIcon={<QrCode2 sx={{ fontSize: { xs: 16, sm: 17 }, mr: { xs: -0.5, sm: 0 } }} />}
                 className="header-contrast-btn"
                 sx={{
-                  color: '#FFFFFF !important',
-                  background: 'rgba(255, 255, 255, 0.2) !important',
-                  border: '1px solid rgba(255, 255, 255, 0.45) !important',
-                  backdropFilter: 'blur(8px)',
+                  color: 'text.primary',
+                  background: 'transparent',
+                  border: '1px solid',
+                  borderColor: 'divider',
                   borderRadius: '8px !important',
                   height: { xs: 32, sm: 36 },
                   minHeight: { xs: 32, sm: 36 },
@@ -3742,15 +3728,14 @@ const Invoices = () => {
                   fontSize: { xs: '0.72rem', sm: '0.8rem' },
                   letterSpacing: '0.02em',
                   whiteSpace: 'nowrap',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)',
                   transition: 'all 0.2s ease',
                   '& .MuiSvgIcon-root': {
-                    color: '#FFFFFF !important'
+                    color: 'inherit'
                   },
                   '&:hover': {
-                    background: 'rgba(255, 255, 255, 0.32) !important',
-                    borderColor: '#FFFFFF !important',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
+                    background: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
+                    borderColor: (t) => `${t.palette.primary.main}40`,
+                    boxShadow: 'none'
                   }
                 }}
               >
@@ -3763,13 +3748,13 @@ const Invoices = () => {
               <Button
                 size="small"
                 onClick={handleOpenCustomerDisplay}
-                startIcon={<Tv sx={{ fontSize: { xs: 16, sm: 17 }, color: '#FFFFFF !important', mr: { xs: -0.5, md: 0 } }} />}
+                startIcon={<Tv sx={{ fontSize: { xs: 16, sm: 17 }, mr: { xs: -0.5, md: 0 } }} />}
                 className="header-contrast-btn"
                 sx={{
-                  color: '#FFFFFF !important',
-                  background: 'rgba(255, 255, 255, 0.2) !important',
-                  border: '1px solid rgba(255, 255, 255, 0.45) !important',
-                  backdropFilter: 'blur(8px)',
+                  color: 'text.primary',
+                  background: 'transparent',
+                  border: '1px solid',
+                  borderColor: 'divider',
                   borderRadius: '8px !important',
                   height: { xs: 32, sm: 36 },
                   minHeight: { xs: 32, sm: 36 },
@@ -3782,15 +3767,14 @@ const Invoices = () => {
                   fontSize: { xs: '0.72rem', sm: '0.8rem' },
                   letterSpacing: '0.02em',
                   whiteSpace: 'nowrap',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)',
                   transition: 'all 0.2s ease',
                   '& .MuiSvgIcon-root': {
-                    color: '#FFFFFF !important'
+                    color: 'inherit'
                   },
                   '&:hover': {
-                    background: 'rgba(255, 255, 255, 0.32) !important',
-                    borderColor: '#FFFFFF !important',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
+                    background: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
+                    borderColor: (t) => `${t.palette.primary.main}40`,
+                    boxShadow: 'none'
                   }
                 }}
               >
@@ -3803,13 +3787,13 @@ const Invoices = () => {
               <Button
                 size="small"
                 onClick={handleParkCart}
-                startIcon={<PauseCircleOutline sx={{ fontSize: { xs: 16, sm: 17 }, color: '#FFFFFF !important', mr: { xs: -0.5, sm: 0 } }} />}
+                startIcon={<PauseCircleOutline sx={{ fontSize: { xs: 16, sm: 17 }, mr: { xs: -0.5, sm: 0 } }} />}
                 className="header-contrast-btn"
                 sx={{
-                  color: '#FFFFFF !important',
-                  background: 'rgba(255, 255, 255, 0.2) !important',
-                  border: '1px solid rgba(255, 255, 255, 0.45) !important',
-                  backdropFilter: 'blur(8px)',
+                  color: 'text.primary',
+                  background: 'transparent',
+                  border: '1px solid',
+                  borderColor: 'divider',
                   borderRadius: '8px !important',
                   height: { xs: 32, sm: 36 },
                   minHeight: { xs: 32, sm: 36 },
@@ -3822,15 +3806,14 @@ const Invoices = () => {
                   fontSize: { xs: '0.72rem', sm: '0.8rem' },
                   letterSpacing: '0.02em',
                   whiteSpace: 'nowrap',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)',
                   transition: 'all 0.2s ease',
                   '& .MuiSvgIcon-root': {
-                    color: '#FFFFFF !important'
+                    color: 'inherit'
                   },
                   '&:hover': {
-                    background: 'rgba(255, 255, 255, 0.32) !important',
-                    borderColor: '#FFFFFF !important',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
+                    background: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
+                    borderColor: (t) => `${t.palette.primary.main}40`,
+                    boxShadow: 'none'
                   }
                 }}
               >
@@ -3844,21 +3827,22 @@ const Invoices = () => {
               size="small"
               className="header-contrast-btn"
               sx={{ 
-                color: '#FFFFFF !important',
-                background: 'rgba(255, 255, 255, 0.15) !important',
-                border: '1px solid rgba(255, 255, 255, 0.35) !important',
+                color: 'text.secondary',
+                background: 'transparent',
+                border: '1px solid',
+                borderColor: 'divider',
                 borderRadius: '8px !important',
                 width: { xs: 32, sm: 36 },
                 height: { xs: 32, sm: 36 },
                 minWidth: { xs: 32, sm: 36 },
                 transition: 'all 0.2s ease',
                 '&:hover': { 
-                  color: '#FFFFFF !important', 
-                  background: 'rgba(255, 255, 255, 0.32) !important', 
-                  borderColor: '#FFFFFF !important' 
+                  color: 'text.primary', 
+                  background: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)', 
+                  borderColor: (t) => `${t.palette.primary.main}40`
                 },
                 '& .MuiSvgIcon-root': {
-                  color: '#FFFFFF !important'
+                  color: 'inherit'
                 }
               }}
             >
@@ -5767,27 +5751,29 @@ const Invoices = () => {
         }}
       >
         <DialogTitle sx={{
-          background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
-          color: 'white',
+          bgcolor: 'background.paper',
+          color: 'text.primary',
           p: 2.5,
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
+          borderBottom: '1px solid',
+          borderColor: 'divider'
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <Avatar sx={{ bgcolor: 'rgba(217, 119, 6, 0.25)', color: '#FBBF24', width: 40, height: 40 }}>
+            <Avatar sx={{ bgcolor: (t) => `${t.palette.warning.main}1F`, color: 'warning.main', width: 40, height: 40 }}>
               <PauseCircle />
             </Avatar>
             <Box>
-              <Typography sx={{ fontWeight: 800, fontSize: '1.15rem', color: '#FFFFFF' }}>
+              <Typography sx={{ fontWeight: 800, fontSize: '1.15rem', color: 'text.primary' }}>
                 Held & Parked Carts ({parkedCarts.length})
               </Typography>
-              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.75)' }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                 Resume browsing customers without losing entered cart lines
               </Typography>
             </Box>
           </Box>
-          <IconButton onClick={() => setHeldCartsDialogOpen(false)} sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+          <IconButton onClick={() => setHeldCartsDialogOpen(false)} sx={{ color: 'text.secondary' }}>
             <Close />
           </IconButton>
         </DialogTitle>
@@ -5961,22 +5947,24 @@ const Invoices = () => {
       >
         <DialogTitle
           sx={{
-            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.dark || '#5B4BD1'} 0%, ${t.palette.primary.main} 100%)`,
-            color: '#FFFFFF',
+            bgcolor: 'background.paper',
+            color: 'text.primary',
             px: 2.5,
             py: 2,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            borderBottom: '1px solid',
+            borderColor: 'divider'
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
-            <Keyboard sx={{ color: (t) => t.palette.mode === 'dark' ? t.palette.primary.light : '#FEF08A', fontSize: 22 }} />
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#FFFFFF' }}>
+            <Keyboard sx={{ color: 'primary.main', fontSize: 22 }} />
+            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
               POS Cashier Hotkeys
             </Typography>
           </Box>
-          <IconButton size="small" onClick={() => setShortcutHelpOpen(false)} sx={{ color: '#FFFFFF' }}>
+          <IconButton size="small" onClick={() => setShortcutHelpOpen(false)} sx={{ color: 'text.secondary' }}>
             <Close fontSize="small" />
           </IconButton>
         </DialogTitle>

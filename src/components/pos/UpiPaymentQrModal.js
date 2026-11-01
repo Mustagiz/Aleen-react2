@@ -121,11 +121,13 @@ export default function UpiPaymentQrModal({
         sx={{
           py: 2,
           px: 3,
-          background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.dark || '#5B4BD1'} 0%, ${t.palette.primary.main} 100%)`,
-          color: '#FFFFFF',
+          bgcolor: 'background.paper',
+          color: 'text.primary',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between'
+          justifyContent: 'space-between',
+          borderBottom: '1px solid',
+          borderColor: 'divider'
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -134,24 +136,26 @@ export default function UpiPaymentQrModal({
               width: 38,
               height: 38,
               borderRadius: 2,
-              bgcolor: 'rgba(255, 255, 255, 0.12)',
+              bgcolor: (t) => `${t.palette.primary.main}14`,
+              border: '1px solid',
+              borderColor: (t) => `${t.palette.primary.main}26`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}
           >
-            <QrCode2 sx={{ color: '#F59E0B', fontSize: 24 }} />
+            <QrCode2 sx={{ color: 'primary.main', fontSize: 24 }} />
           </Box>
           <Box>
             <Typography variant="subtitle1" sx={{ fontWeight: 800, letterSpacing: '0.02em', lineHeight: 1.2 }}>
               Scan & Pay via UPI
             </Typography>
-            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: '0.72rem' }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem' }}>
               {storeName} • Instant Verification
             </Typography>
           </Box>
         </Box>
-        <IconButton size="small" onClick={onClose} sx={{ color: '#FFFFFF', opacity: 0.85, '&:hover': { opacity: 1 } }}>
+        <IconButton size="small" onClick={onClose} sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary' } }}>
           <Close fontSize="small" />
         </IconButton>
       </DialogTitle>

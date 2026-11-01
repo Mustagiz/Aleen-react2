@@ -185,14 +185,15 @@ export default function CustomerMeasurementModal({
     >
       <DialogTitle
         sx={{
-          background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.dark || '#5B4BD1'} 0%, ${t.palette.primary.main} 100%)`,
-          color: '#FFFFFF',
+          bgcolor: 'background.paper',
+          color: 'text.primary',
           px: 3,
           py: 2.25,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          borderBottom: isDark ? '1px solid rgba(155, 143, 245, 0.2)' : '1px solid rgba(194, 141, 75, 0.3)'
+          borderBottom: '1px solid',
+          borderColor: 'divider'
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -201,28 +202,28 @@ export default function CustomerMeasurementModal({
               width: 42,
               height: 42,
               borderRadius: 2.5,
-              background: 'rgba(255, 255, 255, 0.12)',
-              backdropFilter: 'blur(8px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              bgcolor: (t) => `${t.palette.primary.main}14`,
+              border: '1px solid',
+              borderColor: (t) => `${t.palette.primary.main}26`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}
           >
-            <Straighten sx={{ fontSize: 24, color: '#2DD4BF' }} />
+            <Straighten sx={{ fontSize: 24, color: 'primary.main' }} />
           </Box>
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.08rem', lineHeight: 1.2, letterSpacing: '-0.01em' }}>
               Bespoke Measurement Profile
             </Typography>
-            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.85)', display: 'flex', alignItems: 'center', gap: 0.75, mt: 0.3 }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'flex', alignItems: 'center', gap: 0.75, mt: 0.3 }}>
               <span>Client:</span>
-              <strong style={{ color: '#FCD34D' }}>{customer.name}</strong>
+              <strong style={{ color: 'var(--primary-main, #5B4BD1)' }}>{customer.name}</strong>
               {customer.phone && <span>• {customer.phone}</span>}
             </Typography>
           </Box>
         </Box>
-        <IconButton size="small" onClick={onClose} sx={{ color: '#FFFFFF', '&:hover': { bgcolor: 'rgba(255,255,255,0.15)' } }}>
+        <IconButton size="small" onClick={onClose} sx={{ color: 'text.secondary', '&:hover': { bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)' } }}>
           <Close fontSize="small" />
         </IconButton>
       </DialogTitle>

@@ -72,23 +72,19 @@ export const ThemeProvider = ({ children }) => {
         };
     }, [colorTheme, activeSystemConfig]);
 
-    // Computed sidebar styles for the active ecosystem & color
+    // Computed sidebar styles — one unified Horizon look across every design system
     const computedSidebar = useMemo(() => {
-        const sysSidebar = activeSystemConfig.sidebar;
-        const isDarkSys = sysSidebar.isDarkSidebar || mode === 'dark';
-        const bg = mode === 'light' ? sysSidebar.lightBg : sysSidebar.darkBg;
-        
         return {
-            bg,
-            isDark: isDarkSys,
-            textColor: isDarkSys ? (sysSidebar.textColor || '#CBD5E1') : (sysSidebar.textColor || '#334155'),
-            textActiveColor: sysSidebar.textActiveColor || '#FFFFFF',
-            subheadColor: sysSidebar.subheadColor || (isDarkSys ? '#94A3B8' : '#64748B'),
-            activePillBg: sysSidebar.activePillBg || activePalette.primary.main,
-            activePillText: sysSidebar.activePillText || '#FFFFFF',
-            borderColor: mode === 'dark' ? 'transparent' : (sysSidebar.borderColor || 'rgba(0,0,0,0.08)')
+            bg: mode === 'light' ? '#FFFFFF' : '#1D1A2E',
+            isDark: mode === 'dark',
+            textColor: mode === 'dark' ? '#CBD5E1' : '#5B5B66',
+            textActiveColor: '#7C6FE8',
+            subheadColor: mode === 'dark' ? '#94A3B8' : '#9A9AA6',
+            activePillBg: mode === 'light' ? '#F1EFFC' : 'rgba(124, 111, 232, 0.16)',
+            activePillText: mode === 'light' ? '#5B4BD1' : '#9B8FF5',
+            borderColor: mode === 'dark' ? 'transparent' : '#EFEFF4'
         };
-    }, [activeSystemConfig, mode, activePalette]);
+    }, [mode]);
 
     // Computed top navigation bar styles
     const computedTopBar = useMemo(() => {
@@ -292,9 +288,11 @@ export const ThemeProvider = ({ children }) => {
                 MuiTableContainer: {
                     styleOverrides: {
                         root: {
-                            borderRadius: activeSystemConfig.shape.cardRadius,
-                            border: mode === 'light' ? activeSystemConfig.cardStyle.borderLight : activeSystemConfig.cardStyle.borderDark,
-                            boxShadow: mode === 'light' ? activeSystemConfig.cardStyle.boxShadowLight : activeSystemConfig.cardStyle.boxShadowDark,
+                            borderRadius: 14,
+                            border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'}`,
+                            boxShadow: mode === 'dark'
+                                ? '0 4px 24px rgba(0, 0, 0, 0.35)'
+                                : '0 2px 12px rgba(112, 114, 176, 0.08)',
                             overflow: 'hidden'
                         }
                     }
@@ -302,24 +300,16 @@ export const ThemeProvider = ({ children }) => {
                 MuiTableHead: {
                     styleOverrides: {
                         root: {
-                            backgroundColor: activeSystemConfig.id === 'microsoft' 
-                                ? (mode === 'light' ? '#F3F2F1' : '#292929')
-                                : (activeSystemConfig.id === 'zoho'
-                                    ? (mode === 'light' ? '#F8FAFC' : '#182033')
-                                    : (activeSystemConfig.id === 'linear'
-                                        ? '#0F1012'
-                                        : (activeSystemConfig.id === 'salesforce'
-                                            ? (mode === 'light' ? '#FAFAF9' : '#1A212D')
-                                            : (mode === 'light' ? `${activePalette.primary.main}0A` : 'rgba(255, 255, 255, 0.03)')))),
-                            borderTop: activeSystemConfig.id === 'zoho' ? `3px solid ${activePalette.primary.main}` : (activeSystemConfig.id === 'salesforce' ? `2px solid ${activePalette.primary.main}` : 'none'),
+                            backgroundColor: mode === 'light' ? 'rgba(0, 0, 0, 0.02)' : 'rgba(255, 255, 255, 0.03)',
+                            borderTop: 'none',
                             '& .MuiTableCell-head': {
-                                color: mode === 'light' ? (activeSystemConfig.id === 'salesforce' ? '#0176D3' : activePalette.primary.dark) : '#F8FAFC',
-                                fontWeight: activeSystemConfig.id === 'microsoft' ? 600 : 800,
-                                fontSize: activeSystemConfig.id === 'zoho' || activeSystemConfig.id === 'microsoft' ? '0.74rem' : '0.78rem',
-                                textTransform: activeSystemConfig.id === 'microsoft' ? 'none' : 'uppercase',
-                                letterSpacing: activeSystemConfig.id === 'linear' ? '0.08em' : '0.04em',
+                                color: mode === 'dark' ? '#94A3B8' : '#5A6A80',
+                                fontWeight: 800,
+                                fontSize: '0.72rem',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.07em',
                                 fontFamily: activeSystemConfig.typography.fontFamily,
-                                borderBottom: mode === 'light' ? `1px solid ${activePalette.primary.main}1A` : '1px solid rgba(255, 255, 255, 0.08)'
+                                borderBottom: mode === 'light' ? '1px solid #EFEFF4' : '1px solid rgba(255, 255, 255, 0.08)'
                             }
                         }
                     }
@@ -329,14 +319,10 @@ export const ThemeProvider = ({ children }) => {
                         root: {
                             transition: 'background-color 0.15s ease',
                             '&:nth-of-type(even)': {
-                                backgroundColor: (activeSystemConfig.id === 'zoho' || activeSystemConfig.id === 'microsoft')
-                                    ? (mode === 'light' ? 'rgba(0, 0, 0, 0.018)' : 'rgba(255, 255, 255, 0.018)')
-                                    : 'transparent'
+                                backgroundColor: 'transparent'
                             },
                             '&:hover': {
-                                backgroundColor: activeSystemConfig.id === 'linear'
-                                    ? 'rgba(139, 92, 246, 0.08)'
-                                    : (mode === 'light' ? `${activePalette.primary.main}0C` : 'rgba(255, 255, 255, 0.04)')
+                                backgroundColor: mode === 'light' ? `${activePalette.primary.main}0C` : 'rgba(255, 255, 255, 0.04)'
                             },
                             '&:last-child td': {
                                 borderBottom: 0
@@ -347,14 +333,30 @@ export const ThemeProvider = ({ children }) => {
                 MuiTableCell: {
                     styleOverrides: {
                         root: {
-                            padding: activeSystemConfig.id === 'material'
-                                ? (density === 'compact' ? '10px 14px' : '16px 20px')
-                                : (activeSystemConfig.id === 'microsoft' || activeSystemConfig.id === 'zoho'
-                                    ? (density === 'compact' ? '6px 10px' : '10px 14px')
-                                    : (density === 'compact' ? '8px 12px' : '14px 18px')),
+                            padding: density === 'compact' ? '8px 12px' : '14px 18px',
                             fontFamily: activeSystemConfig.typography.fontFamily,
                             fontFeatureSettings: '"tnum"',
-                            borderColor: mode === 'light' ? `${activePalette.primary.main}12` : 'rgba(255, 255, 255, 0.06)'
+                            borderColor: mode === 'light' ? '#EFEFF4' : 'rgba(255, 255, 255, 0.06)'
+                        }
+                    }
+                },
+                MuiTablePagination: {
+                    styleOverrides: {
+                        root: {
+                            borderTop: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'}`
+                        },
+                        toolbar: {
+                            minHeight: 52,
+                            paddingLeft: 16,
+                            paddingRight: 16
+                        },
+                        selectLabel: {
+                            fontSize: '0.78rem',
+                            fontWeight: 600
+                        },
+                        displayedRows: {
+                            fontSize: '0.78rem',
+                            fontWeight: 600
                         }
                     }
                 },
@@ -371,14 +373,23 @@ export const ThemeProvider = ({ children }) => {
                 MuiDialog: {
                     styleOverrides: {
                         paper: {
-                            borderRadius: activeSystemConfig.shape.cardRadius || 14,
+                            borderRadius: 14,
                             backgroundImage: 'none',
                             backgroundColor: 'background.paper',
                             border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'}`,
                             boxShadow: mode === 'dark'
                                 ? '0 24px 60px rgba(0, 0, 0, 0.55)'
-                                : '0 24px 60px rgba(112, 114, 176, 0.2), 0 2px 6px rgba(31, 27, 46, 0.06)',
+                                : '0 24px 60px rgba(112, 114, 176, 0.18), 0 2px 6px rgba(31, 27, 46, 0.06)',
                             overflow: 'hidden'
+                        }
+                    }
+                },
+                MuiBackdrop: {
+                    styleOverrides: {
+                        root: {
+                            backgroundColor: mode === 'dark' ? 'rgba(0, 0, 0, 0.6)' : 'rgba(15, 23, 42, 0.35)',
+                            backdropFilter: 'blur(3px)',
+                            WebkitBackdropFilter: 'blur(3px)'
                         }
                     }
                 },
@@ -386,8 +397,10 @@ export const ThemeProvider = ({ children }) => {
                     styleOverrides: {
                         root: {
                             fontWeight: 800,
-                            fontSize: '1.05rem',
+                            fontSize: '1.02rem',
                             letterSpacing: '-0.01em',
+                            lineHeight: 1.3,
+                            color: 'text.primary',
                             padding: '20px 24px 12px'
                         }
                     }
@@ -395,10 +408,19 @@ export const ThemeProvider = ({ children }) => {
                 MuiDialogContent: {
                     styleOverrides: {
                         root: {
-                            padding: '12px 24px 20px'
+                            padding: '12px 24px 22px'
                         },
                         dividers: {
-                            borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#F1EFFC'
+                            borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'
+                        }
+                    }
+                },
+                MuiDialogContentText: {
+                    styleOverrides: {
+                        root: {
+                            color: 'text.secondary',
+                            fontSize: '0.85rem',
+                            lineHeight: 1.6
                         }
                     }
                 },
@@ -406,7 +428,9 @@ export const ThemeProvider = ({ children }) => {
                     styleOverrides: {
                         root: {
                             padding: '14px 24px',
-                            gap: 8
+                            gap: 8,
+                            borderTop: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'}`,
+                            backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.015)'
                         }
                     }
                 },

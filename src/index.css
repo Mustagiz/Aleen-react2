@@ -158,20 +158,7 @@ td.invoice-table-header-cell {
   transition: color 0.18s ease, transform 0.18s ease;
 }
 
-/* Header & Modal Title Glassmorphic Contrast Exemption: Always crisp white on colored gradients */
-.MuiDialogTitle-root .MuiButton-root,
-.MuiDialogTitle-root .MuiIconButton-root,
-.MuiAppBar-root .header-contrast-btn,
-.header-contrast-btn {
-  color: #FFFFFF !important;
-}
-
-.MuiDialogTitle-root .MuiButton-root .MuiSvgIcon-root,
-.MuiDialogTitle-root .MuiIconButton-root .MuiSvgIcon-root,
-.MuiAppBar-root .header-contrast-btn .MuiSvgIcon-root,
-.header-contrast-btn .MuiSvgIcon-root {
-  color: #FFFFFF !important;
-}
+/* Dialog title buttons inherit the title color — all dialog headers now share one clean Horizon style */
 
 /* 1. MICROSOFT FLUENT 365: Balanced 8px controls, 12px cards, Segoe UI */
 [data-design-system="microsoft"] {

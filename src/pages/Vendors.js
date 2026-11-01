@@ -654,8 +654,10 @@ const Vendors = () => {
             >
                 <DialogTitle 
                     sx={{ 
-                        background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`, 
-                        color: '#ffffff',
+                        bgcolor: 'background.paper',
+                        borderBottom: '1px solid',
+                        borderColor: 'divider',
+                        color: 'text.primary',
                         px: 3,
                         py: 2.25,
                         display: 'flex',
@@ -664,19 +666,19 @@ const Vendors = () => {
                     }}
                 >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.15)', color: '#ffffff' }}>
+                        <Avatar sx={{ bgcolor: (t) => `${t.palette.primary.main}1F`, color: 'primary.main' }}>
                             <Store />
                         </Avatar>
                         <Box>
                             <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.1rem', letterSpacing: '0.02em' }}>
                                 {editItem ? 'Edit Vendor / Mill Profile' : 'Register New Vendor / Mill'}
                             </Typography>
-                            <Typography variant="caption" sx={{ opacity: 0.85, fontWeight: 500 }}>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
                                 Aleen Clothing Supplier & Textile Partner Directory
                             </Typography>
                         </Box>
                     </Box>
-                    <IconButton size="small" onClick={() => setOpen(false)} sx={{ color: 'white' }}>
+                    <IconButton size="small" onClick={() => setOpen(false)} sx={{ color: 'text.secondary' }}>
                         <Close />
                     </IconButton>
                 </DialogTitle>

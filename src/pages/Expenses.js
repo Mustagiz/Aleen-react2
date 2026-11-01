@@ -670,8 +670,10 @@ const Expenses = () => {
             >
                 <DialogTitle 
                     sx={{ 
-                        background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`, 
-                        color: 'white', 
+                        bgcolor: 'background.paper',
+                        borderBottom: '1px solid',
+                        borderColor: 'divider',
+                        color: 'text.primary', 
                         px: 3, 
                         py: 2.25,
                         display: 'flex',
@@ -680,19 +682,19 @@ const Expenses = () => {
                     }}
                 >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.15)', color: 'white' }}>
+                        <Avatar sx={{ bgcolor: (t) => `${t.palette.primary.main}1F`, color: 'primary.main' }}>
                             <ReceiptLong />
                         </Avatar>
                         <Box>
                             <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.1rem' }}>
                                 {editItem ? 'Edit Overhead Expense' : 'Log New Boutique Expense'}
                             </Typography>
-                            <Typography variant="caption" sx={{ opacity: 0.85 }}>
+                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                                 Aleen Clothing Internal Expense Ledger
                             </Typography>
                         </Box>
                     </Box>
-                    <IconButton size="small" onClick={() => setOpen(false)} sx={{ color: 'white' }}>
+                    <IconButton size="small" onClick={() => setOpen(false)} sx={{ color: 'text.secondary' }}>
                         <Close />
                     </IconButton>
                 </DialogTitle>

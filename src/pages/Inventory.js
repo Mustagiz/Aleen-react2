@@ -1775,8 +1775,10 @@ const Inventory = () => {
         {/* Modern Luxury Header */}
         <DialogTitle
           sx={{
-            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
-            color: 'white',
+            bgcolor: 'background.paper',
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            color: 'text.primary',
             p: 2.5,
             display: 'flex',
             alignItems: 'center',
@@ -1789,20 +1791,21 @@ const Inventory = () => {
                 width: 44,
                 height: 44,
                 borderRadius: 2.5,
-                bgcolor: 'rgba(255, 255, 255, 0.12)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
+                bgcolor: (t) => `${t.palette.primary.main}14`,
+                border: '1px solid',
+                borderColor: (t) => `${t.palette.primary.main}26`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}
             >
-              <Checkroom sx={{ color: '#F59E0B', fontSize: 24 }} />
+              <Checkroom sx={{ color: 'primary.main', fontSize: 24 }} />
             </Box>
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.15rem', color: '#ffffff', lineHeight: 1.2 }}>
+              <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.15rem', color: 'text.primary', lineHeight: 1.2 }}>
                 {editItem ? 'Edit Atelier Garment' : 'Add New Atelier Garment'}
               </Typography>
-              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.78rem' }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.78rem' }}>
                 Catalog bespoke apparel, sizing, fabric specs, margins & inventory
               </Typography>
             </Box>
@@ -1812,9 +1815,9 @@ const Inventory = () => {
             onClick={() => setOpen(false)}
             size="small"
             sx={{
-              color: 'rgba(255, 255, 255, 0.85)',
-              bgcolor: 'rgba(255, 255, 255, 0.08)',
-              '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.2)', color: '#ffffff' }
+              color: 'text.secondary',
+              bgcolor: 'transparent',
+              '&:hover': { bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)' }
             }}
           >
             <Close fontSize="small" />

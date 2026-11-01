@@ -468,41 +468,42 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
     >
       {/* Emerald & WhatsApp Themed Dialog Title */}
       <DialogTitle sx={{
-        background: 'linear-gradient(135deg, #075E54 0%, #128C7E 50%, #042F2E 100%)',
-        color: '#FFFFFF',
+        bgcolor: 'background.paper',
+        color: 'text.primary',
         p: { xs: 2, sm: 2.5 },
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.15)'
+        borderBottom: '1px solid',
+        borderColor: 'divider'
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <Avatar sx={{ bgcolor: '#25D366', color: '#FFFFFF', width: 42, height: 42, boxShadow: '0 4px 12px rgba(37, 211, 102, 0.4)' }}>
+          <Avatar sx={{ bgcolor: '#25D366', color: '#FFFFFF', width: 42, height: 42 }}>
             <WhatsApp />
           </Avatar>
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-              <Typography sx={{ fontWeight: 800, fontSize: { xs: '1.05rem', sm: '1.25rem' }, color: '#FFFFFF', letterSpacing: '-0.01em' }}>
+              <Typography sx={{ fontWeight: 800, fontSize: { xs: '1.05rem', sm: '1.25rem' }, color: 'text.primary', letterSpacing: '-0.01em' }}>
                 Dispatch Invoice via WhatsApp
               </Typography>
               <Chip
                 label={`#${invoice.id}`}
                 size="small"
                 sx={{
-                  bgcolor: 'rgba(255, 255, 255, 0.2)',
-                  color: '#FFFFFF',
+                  bgcolor: 'rgba(37, 211, 102, 0.12)',
+                  color: '#128C7E',
                   fontWeight: 800,
                   fontSize: '0.72rem',
                   height: 22
                 }}
               />
             </Box>
-            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.8)', display: 'block' }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
               Select a luxury boutique template, edit text in real-time, and dispatch with 1-click
             </Typography>
           </Box>
         </Box>
-        <IconButton onClick={onClose} sx={{ color: 'rgba(255, 255, 255, 0.85)', '&:hover': { color: '#FFFFFF', bgcolor: 'rgba(255, 255, 255, 0.12)' } }}>
+        <IconButton onClick={onClose} sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary', bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)' } }}>
           <Close />
         </IconButton>
       </DialogTitle>
