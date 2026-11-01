@@ -13,16 +13,13 @@ export default function AtelierKpiCard({
   goldAccent = false,
   redAccent = false,
   sapphireAccent = false,
-  showJewelBadge = false,
   onClick
 }) {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const primaryColor = theme.palette.primary.main;
-  const secondaryColor = theme.palette.secondary?.main || '#D97706';
-  const primaryLight = theme.palette.primary.light;
-  const primaryDark = theme.palette.primary.dark;
-  const cardRadius = theme.custom?.designSystem?.shape?.cardRadius ?? (theme.shape?.borderRadius || 12);
+  const secondaryColor = theme.palette.secondary?.main || '#2DD4BF';
+  const cardRadius = theme.custom?.designSystem?.shape?.cardRadius ?? (theme.shape?.borderRadius || 14);
 
   // Safely extract trend label and positive state
   const trendLabel = (typeof trend === 'object' && trend !== null)
@@ -33,88 +30,18 @@ export default function AtelierKpiCard({
     ? Boolean(trend.isPositive)
     : Boolean(trendPositive);
 
-  const getBorderColor = () => {
-    if (redAccent) return isDark ? '1px solid rgba(239, 68, 68, 0.35)' : '1px solid rgba(239, 68, 68, 0.22)';
-    if (goldAccent) return isDark ? `1px solid ${secondaryColor}59` : `1px solid ${secondaryColor}38`;
-    if (sapphireAccent) return isDark ? '1px solid rgba(56, 189, 248, 0.35)' : '1px solid rgba(2, 132, 199, 0.22)';
-    return isDark ? '1px solid rgba(255, 255, 255, 0.08)' : `1px solid ${primaryColor}24`;
-  };
-
-  const getTopGradient = () => {
-    if (redAccent) return 'linear-gradient(90deg, #991B1B 0%, #DC2626 35%, #F87171 70%, #EF4444 100%)';
-    if (goldAccent) return `linear-gradient(90deg, ${secondaryColor}99 0%, ${secondaryColor} 50%, #FBBF24 100%)`;
-    if (sapphireAccent) return 'linear-gradient(90deg, #0F172A 0%, #0284C7 35%, #38BDF8 70%, #2563EB 100%)';
-    return `linear-gradient(90deg, ${primaryDark} 0%, ${primaryColor} 50%, ${primaryLight} 100%)`;
-  };
-
-  const getAmbientGlow = () => {
-    if (redAccent) {
-      return isDark
-        ? 'radial-gradient(circle at 92% 82%, rgba(239, 68, 68, 0.16) 0%, rgba(220, 38, 38, 0.05) 38%, transparent 70%)'
-        : 'radial-gradient(circle at 92% 82%, rgba(239, 68, 68, 0.10) 0%, rgba(254, 226, 226, 0.45) 42%, transparent 70%)';
-    }
-    if (goldAccent) {
-      return isDark
-        ? `radial-gradient(circle at 92% 82%, ${secondaryColor}26 0%, ${secondaryColor}0D 38%, transparent 70%)`
-        : `radial-gradient(circle at 92% 82%, ${secondaryColor}1A 0%, rgba(254, 243, 199, 0.45) 42%, transparent 70%)`;
-    }
-    if (sapphireAccent) {
-      return isDark
-        ? 'radial-gradient(circle at 92% 82%, rgba(56, 189, 248, 0.16) 0%, rgba(2, 132, 199, 0.05) 38%, transparent 70%)'
-        : 'radial-gradient(circle at 92% 82%, rgba(56, 189, 248, 0.10) 0%, rgba(224, 242, 254, 0.45) 42%, transparent 70%)';
-    }
-    return isDark
-      ? `radial-gradient(circle at 92% 82%, ${primaryColor}26 0%, ${primaryColor}0D 38%, transparent 70%)`
-      : `radial-gradient(circle at 92% 82%, ${primaryColor}1A 0%, rgba(255, 255, 255, 0.7) 42%, transparent 70%)`;
-  };
-
-  const getHoverBorderColor = () => {
-    if (redAccent) return isDark ? '#F87171' : '#DC2626';
-    if (goldAccent) return secondaryColor;
-    if (sapphireAccent) return isDark ? '#38BDF8' : '#0284C7';
-    return primaryColor;
-  };
-
-  const getHoverShadow = () => {
-    if (redAccent) {
-      return isDark
-        ? '0 20px 44px -4px rgba(0, 0, 0, 0.7), 0 0 32px rgba(239, 68, 68, 0.35)'
-        : '0 18px 40px -4px rgba(239, 68, 68, 0.25), 0 0 24px rgba(248, 113, 113, 0.2)';
-    }
-    if (goldAccent) {
-      return isDark
-        ? `0 20px 44px -4px rgba(0, 0, 0, 0.7), 0 0 32px ${secondaryColor}59`
-        : `0 18px 40px -4px ${secondaryColor}40, 0 0 24px ${secondaryColor}33`;
-    }
-    if (sapphireAccent) {
-      return isDark
-        ? '0 20px 44px -4px rgba(0, 0, 0, 0.7), 0 0 32px rgba(2, 132, 199, 0.35)'
-        : '0 18px 40px -4px rgba(2, 132, 199, 0.25), 0 0 24px rgba(56, 189, 248, 0.2)';
-    }
-    return isDark
-      ? `0 20px 44px -4px rgba(0, 0, 0, 0.7), 0 0 32px ${primaryColor}59`
-      : `0 18px 40px -4px ${primaryColor}38, 0 0 24px ${primaryColor}29`;
-  };
-
   const getIconBg = () => {
-    if (redAccent) return isDark ? 'rgba(239, 68, 68, 0.16)' : 'rgba(254, 226, 226, 0.85)';
-    if (goldAccent) return isDark ? `${secondaryColor}26` : `${secondaryColor}1A`;
-    if (sapphireAccent) return isDark ? 'rgba(2, 132, 199, 0.16)' : 'rgba(224, 242, 254, 0.85)';
-    return isDark ? `${primaryColor}26` : `${primaryColor}14`;
-  };
-
-  const getIconBorder = () => {
-    if (redAccent) return isDark ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(239, 68, 68, 0.15)';
-    if (goldAccent) return isDark ? `1px solid ${secondaryColor}4D` : `1px solid ${secondaryColor}29`;
-    if (sapphireAccent) return isDark ? '1px solid rgba(56, 189, 248, 0.3)' : '1px solid rgba(2, 132, 199, 0.15)';
-    return isDark ? `1px solid ${primaryColor}4D` : `1px solid ${primaryColor}26`;
+    if (redAccent) return isDark ? 'rgba(239, 68, 68, 0.16)' : 'rgba(220, 38, 38, 0.07)';
+    if (goldAccent) return isDark ? `${secondaryColor}26` : 'rgba(45, 212, 191, 0.1)';
+    if (sapphireAccent) return isDark ? 'rgba(59, 130, 246, 0.16)' : 'rgba(37, 99, 235, 0.07)';
+    return isDark ? `${primaryColor}26` : '#F1EFFC';
   };
 
   const getIconColor = () => {
     if (redAccent) return isDark ? '#F87171' : '#DC2626';
-    if (goldAccent) return secondaryColor;
-    if (sapphireAccent) return isDark ? '#38BDF8' : '#0284C7';
-    return primaryColor;
+    if (goldAccent) return isDark ? secondaryColor : '#0D9488';
+    if (sapphireAccent) return isDark ? '#60A5FA' : '#2563EB';
+    return isDark ? '#9B8FF5' : '#5B4BD1';
   };
 
   return (
@@ -136,146 +63,63 @@ export default function AtelierKpiCard({
           borderRadius: `${cardRadius}px`,
           cursor: onClick ? 'pointer' : 'default',
           transition: 'box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.28s ease',
-          background: `${getAmbientGlow()}, ${isDark
-            ? 'linear-gradient(145deg, rgba(17, 24, 39, 0.98) 0%, rgba(13, 27, 27, 0.96) 100%)'
-            : 'linear-gradient(145deg, #FFFFFF 0%, #FAFCFC 100%)'}`,
-          border: getBorderColor(),
+          background: isDark ? '#1D1A2E' : '#FFFFFF',
+          border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #EFEFF4',
           boxShadow: isDark
-            ? 'inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 26px rgba(0, 0, 0, 0.45)'
-            : `inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 4px 20px -2px ${primaryColor}14, 0 1px 3px rgba(0, 0, 0, 0.02)`,
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: '-100%',
-            width: '60%',
-            height: '100%',
-            background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent)',
-            transform: 'skewX(-25deg)',
-            transition: 'left 0.75s ease',
-            zIndex: 1,
-            pointerEvents: 'none'
-          },
+            ? '0 4px 20px rgba(0, 0, 0, 0.4)'
+            : '0 1px 2px rgba(31, 27, 46, 0.04), 0 4px 16px -4px rgba(31, 27, 46, 0.06)',
           '&:hover': {
-            boxShadow: getHoverShadow(),
-            borderColor: getHoverBorderColor(),
-            '&::before': {
-              left: '180%'
-            },
-            '& .kpi-icon-jewel': {
-              transform: 'scale(1.08) rotate(3deg)'
-            },
-            '& .kpi-bg-watermark-icon': {
-              transform: 'rotate(-4deg) scale(1.15)',
-              opacity: isDark ? 0.22 : 0.15
-            }
+            boxShadow: isDark
+              ? '0 12px 32px rgba(0, 0, 0, 0.55)'
+              : '0 12px 28px -6px rgba(124, 111, 232, 0.16), 0 1px 2px rgba(31, 27, 46, 0.05)',
+            borderColor: isDark ? 'rgba(155, 143, 245, 0.35)' : '#7C6FE8'
           }
         }}
       >
-        {/* Decorative top accent metallic hairline */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '3.5px',
-            background: getTopGradient(),
-            borderRadius: `${cardRadius}px ${cardRadius}px 0 0`,
-            zIndex: 2
-          }}
-        />
-
-        {/* Ambient Oversized Watermark Icon in Card Background */}
-        {icon && (
-          <Box
-            className="kpi-bg-watermark-icon"
-            sx={{
-              position: 'absolute',
-              right: { xs: -14, sm: -16, md: -20 },
-              bottom: { xs: -14, sm: -16, md: -20 },
-              zIndex: 0,
-              pointerEvents: 'none',
-              userSelect: 'none',
-              color: getIconColor(),
-              opacity: isDark ? 0.12 : 0.08,
-              transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-              transform: 'rotate(-10deg)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              filter: isDark
-                ? 'drop-shadow(0 4px 16px rgba(0, 0, 0, 0.6))'
-                : 'drop-shadow(0 4px 10px rgba(var(--primary-rgb, 124, 111, 232), 0.12))',
-              '& .MuiSvgIcon-root, & svg': {
-                width: { xs: 90, sm: 108, md: 126 },
-                height: { xs: 90, sm: 108, md: 126 },
-                fontSize: { xs: '5.8rem !important', sm: '7rem !important', md: '8.2rem !important' },
-                display: 'block'
-              }
-            }}
-          >
-            {icon}
-          </Box>
-        )}
-
         <CardContent sx={{
-          p: { xs: '14px 15px !important', sm: '18px 20px !important', md: '22px 24px !important' },
+          p: { xs: '16px 16px !important', sm: '18px 20px !important', md: '20px 22px !important' },
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'space-between',
           height: '100%',
           boxSizing: 'border-box',
           position: 'relative',
-          zIndex: 1
+          zIndex: 1,
+          gap: 1
         }}>
-          {/* Header: Title with glowing jewel dot indicator */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.9, mb: 0.6 }}>
-            <Box
-              sx={{
-                width: 6,
-                height: 6,
-                borderRadius: '50%',
-                bgcolor: getIconColor(),
-                boxShadow: `0 0 6px ${getIconColor()}`,
-                flexShrink: 0
-              }}
-            />
+          {/* Header: Label + Icon Tile */}
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.25 }}>
             <Typography
               variant="subtitle2"
               noWrap
               sx={{
-                color: isDark ? 'rgba(203, 213, 225, 0.9)' : '#475569',
-                fontWeight: 800,
-                fontSize: { xs: '0.67rem', sm: '0.74rem', md: '0.78rem' },
-                textTransform: 'uppercase',
-                letterSpacing: '0.06em',
+                color: isDark ? 'rgba(203, 213, 225, 0.9)' : '#5B5B66',
+                fontWeight: 600,
+                fontSize: { xs: '0.72rem', sm: '0.78rem', md: '0.8rem' },
+                letterSpacing: '0.01em',
                 flex: 1,
                 overflow: 'hidden',
-                textOverflow: 'ellipsis'
+                textOverflow: 'ellipsis',
+                lineHeight: 1.35
               }}
             >
               {title}
             </Typography>
 
-            {icon && showJewelBadge && (
+            {icon && (
               <Box
-                className="kpi-icon-jewel"
                 sx={{
-                  width: { xs: 28, sm: 36, md: 40 },
-                  height: { xs: 28, sm: 36, md: 40 },
-                  borderRadius: '8px',
+                  width: { xs: 32, sm: 36, md: 40 },
+                  height: { xs: 32, sm: 36, md: 40 },
+                  borderRadius: '12px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
                   background: getIconBg(),
-                  border: getIconBorder(),
                   color: getIconColor(),
-                  boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 6px rgba(var(--primary-rgb, 124, 111, 232), 0.08)',
                   transition: 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
                   '& svg': {
-                    fontSize: { xs: '1rem', sm: '1.15rem', md: '1.25rem' }
+                    fontSize: { xs: '1.05rem', sm: '1.15rem', md: '1.25rem' }
                   }
                 }}
               >
@@ -289,12 +133,12 @@ export default function AtelierKpiCard({
             variant="h3"
             noWrap
             sx={{
-              fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
+              fontFamily: 'inherit',
               fontWeight: 800,
               color: 'text.primary',
-              letterSpacing: '-0.025em',
-              my: { xs: 0.2, sm: 0.5 },
-              fontSize: { xs: '1.15rem', sm: '1.45rem', md: '1.85rem' },
+              letterSpacing: '-0.02em',
+              fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' },
+              lineHeight: 1.2,
               fontVariantNumeric: 'tabular-nums',
               overflow: 'hidden',
               textOverflow: 'ellipsis'
@@ -304,15 +148,15 @@ export default function AtelierKpiCard({
           </Typography>
 
           {/* Footer: Subtitle & Micro-Trend Badge */}
-          <Box sx={{ mt: 'auto', pt: 0.75 }}>
+          <Box sx={{ mt: 'auto', pt: 0.5 }}>
             {subtitle ? (
               <Typography
                 variant="caption"
                 noWrap
                 sx={{
-                  color: isDark ? 'rgba(148, 163, 184, 0.85)' : '#64748B',
+                  color: isDark ? 'rgba(148, 163, 184, 0.85)' : '#9A9AA6',
                   fontWeight: 500,
-                  fontSize: { xs: '0.68rem', sm: '0.73rem' },
+                  fontSize: { xs: '0.7rem', sm: '0.74rem' },
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   display: 'block',
@@ -335,7 +179,7 @@ export default function AtelierKpiCard({
                     height: 22,
                     fontSize: '0.68rem',
                     fontWeight: 700,
-                    borderRadius: '8px',
+                    borderRadius: '999px',
                     backgroundColor: isTrendPositive
                       ? isDark ? 'rgba(16, 185, 129, 0.18)' : '#ECFDF5'
                       : isDark ? 'rgba(239, 68, 68, 0.18)' : '#FEF2F2',

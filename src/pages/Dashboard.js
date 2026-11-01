@@ -4,10 +4,7 @@ import {
   Typography,
   Box,
   Button,
-  Chip,
   useTheme,
-  Avatar,
-  Paper,
   Stack
 } from '@mui/material';
 import {
@@ -66,287 +63,15 @@ const Dashboard = () => {
   const { inventory = [], invoices = [], purchases = [], vendors = [], expenses = [], getLowStockItems, profile = {} } = useData();
   const navigate = useNavigate();
   const theme = useTheme();
-  const { designSystem, activeSystemConfig } = useThemeContext();
+  const { activeSystemConfig } = useThemeContext();
   const isDark = theme.palette.mode === 'dark';
 
-  const getSystemBannerConfig = () => {
-    const primaryColor = theme.palette.primary.main;
-    const darkPrimary = theme.palette.primary.dark;
-    const lightPrimary = theme.palette.primary.light;
+  const buttonRadius = activeSystemConfig?.shape?.buttonRadius || 12;
+  const cardRadius = activeSystemConfig?.shape?.cardRadius || 14;
 
-    switch (designSystem) {
-      case 'zoho':
-        return {
-          badge: 'ZOHO CRM ENTERPRISE',
-          title: 'Enterprise Command & Operations',
-          bg: isDark ? 'linear-gradient(135deg, #182033 0%, #0F1522 100%)' : 'linear-gradient(135deg, #182033 0%, #253352 100%)',
-          textColor: '#FFFFFF',
-          subtextColor: 'rgba(255, 255, 255, 0.88)',
-          isDarkBanner: true,
-          borderColor: `${primaryColor}66`,
-          shadow: '0 12px 32px rgba(24, 32, 51, 0.35)',
-          ctaBg: primaryColor,
-          ctaHover: darkPrimary,
-          badgeBg: `${primaryColor}33`,
-          badgeColor: '#FFD8BF',
-          radius: `${activeSystemConfig?.shape?.cardRadius || 8}px`
-        };
-      case 'microsoft':
-        return {
-          badge: 'MICROSOFT FLUENT 365',
-          title: 'Dynamics 365 Operations Console',
-          bg: isDark ? 'linear-gradient(135deg, #004E8C 0%, #002B4D 100%)' : `linear-gradient(135deg, ${primaryColor} 0%, ${darkPrimary} 100%)`,
-          textColor: '#FFFFFF',
-          subtextColor: 'rgba(255, 255, 255, 0.88)',
-          isDarkBanner: true,
-          borderColor: 'rgba(255, 255, 255, 0.25)',
-          shadow: `0 8px 24px ${primaryColor}4D`,
-          ctaBg: primaryColor,
-          ctaHover: darkPrimary,
-          badgeBg: 'rgba(255, 255, 255, 0.2)',
-          badgeColor: '#FFFFFF',
-          radius: `${activeSystemConfig?.shape?.cardRadius || 6}px`
-        };
-      case 'apple':
-        return {
-          badge: 'MACOS LIQUID STUDIO',
-          title: 'Executive Studio Overview',
-          bg: isDark ? 'rgba(28, 28, 30, 0.88)' : 'rgba(255, 255, 255, 0.85)',
-          textColor: isDark ? '#FFFFFF' : '#1D1D1F',
-          subtextColor: isDark ? 'rgba(255, 255, 255, 0.75)' : '#6E6E73',
-          isDarkBanner: isDark,
-          borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.08)',
-          shadow: isDark ? '0 16px 40px rgba(0, 0, 0, 0.45)' : '0 12px 36px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.03)',
-          ctaBg: primaryColor,
-          ctaHover: darkPrimary,
-          badgeBg: isDark ? `${primaryColor}38` : `${primaryColor}18`,
-          badgeColor: isDark ? lightPrimary : primaryColor,
-          backdropFilter: 'blur(30px) saturate(180%)',
-          radius: `${activeSystemConfig?.shape?.cardRadius || 18}px`
-        };
-      case 'linear':
-        return {
-          badge: 'LINEAR PRECISION CORE',
-          title: 'Workspace Metrics & Revenue Pulse',
-          bg: '#0D0E11',
-          textColor: '#FFFFFF',
-          subtextColor: 'rgba(255, 255, 255, 0.8)',
-          isDarkBanner: true,
-          borderColor: '#23252A',
-          shadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
-          ctaBg: primaryColor,
-          ctaHover: darkPrimary,
-          badgeBg: `${primaryColor}2E`,
-          badgeColor: lightPrimary,
-          radius: `${activeSystemConfig?.shape?.cardRadius || 6}px`
-        };
-      case 'material':
-        return {
-          badge: 'MATERIAL YOU M3',
-          title: 'Expressive Boutique Summary',
-          bg: isDark ? 'linear-gradient(135deg, #1E2129 0%, #111318 100%)' : `linear-gradient(135deg, ${primaryColor}14 0%, ${primaryColor}2E 100%)`,
-          textColor: isDark ? '#FFFFFF' : '#041E49',
-          subtextColor: isDark ? 'rgba(255, 255, 255, 0.8)' : '#334155',
-          isDarkBanner: isDark,
-          borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : `${primaryColor}33`,
-          shadow: `0 8px 28px ${primaryColor}22`,
-          ctaBg: primaryColor,
-          ctaHover: darkPrimary,
-          badgeBg: `${primaryColor}28`,
-          badgeColor: isDark ? lightPrimary : primaryColor,
-          radius: `${activeSystemConfig?.shape?.cardRadius || 24}px`
-        };
-      case 'stripe':
-        return {
-          badge: 'STRIPE FINTECH PLATFORM',
-          title: 'Financial Revenue & Orders Intel',
-          bg: 'linear-gradient(135deg, #0A2540 0%, #071A2E 100%)',
-          textColor: '#FFFFFF',
-          subtextColor: 'rgba(255, 255, 255, 0.88)',
-          isDarkBanner: true,
-          borderColor: `${primaryColor}55`,
-          shadow: '0 12px 32px rgba(10, 37, 64, 0.4)',
-          ctaBg: primaryColor,
-          ctaHover: darkPrimary,
-          badgeBg: `${primaryColor}33`,
-          badgeColor: lightPrimary,
-          radius: `${activeSystemConfig?.shape?.cardRadius || 12}px`
-        };
-      case 'salesforce':
-        return {
-          badge: 'SALESFORCE LIGHTNING',
-          title: 'Lightning Cloud Operations',
-          bg: isDark ? 'linear-gradient(135deg, #014486 0%, #012852 100%)' : `linear-gradient(135deg, ${primaryColor} 0%, ${darkPrimary} 100%)`,
-          textColor: '#FFFFFF',
-          subtextColor: 'rgba(255, 255, 255, 0.92)',
-          isDarkBanner: true,
-          borderColor: 'rgba(255, 255, 255, 0.25)',
-          shadow: `0 8px 24px ${primaryColor}4D`,
-          ctaBg: primaryColor,
-          ctaHover: darkPrimary,
-          badgeBg: 'rgba(255, 255, 255, 0.2)',
-          badgeColor: '#FFFFFF',
-          radius: `${activeSystemConfig?.shape?.cardRadius || 6}px`
-        };
-      default: // Atelier
-        return {
-          badge: 'HAUTE COUTURE ATELIER',
-          title: 'Executive Command & Overview',
-          bg: isDark ? 'linear-gradient(135deg, #1D1A2E 0%, #14121F 100%)' : `linear-gradient(135deg, ${darkPrimary || '#5B4BD1'} 0%, ${primaryColor} 100%)`,
-          textColor: '#FFFFFF',
-          subtextColor: 'rgba(255, 255, 255, 0.88)',
-          isDarkBanner: true,
-          borderColor: `${primaryColor}4D`,
-          shadow: `0 12px 32px ${darkPrimary || '#5B4BD1'}40`,
-          ctaBg: primaryColor,
-          ctaHover: darkPrimary,
-          badgeBg: `${primaryColor}38`,
-          badgeColor: '#FEF08A',
-          radius: `${activeSystemConfig?.shape?.cardRadius || 16}px`
-        };
-    }
-  };
-
-  const sysBanner = getSystemBannerConfig();
-
-  // Dynamic Theme Button Styling Helpers for Dashboard Banner Actions
-  const getBannerPrimaryBtnStyle = () => {
-    const radius = activeSystemConfig?.shape?.buttonRadius ?? theme.shape?.borderRadius ?? 8;
-    const ctaBg = sysBanner.ctaBg || theme.palette.primary.main;
-    const ctaHover = sysBanner.ctaHover || theme.palette.primary.dark;
-    const contrastText = theme.palette.primary.contrastText || '#FFFFFF';
-
-    return {
-      bgcolor: `${ctaBg} !important`,
-      color: `${contrastText} !important`,
-      fontWeight: 700,
-      fontSize: { xs: '0.84rem', sm: '0.84rem' },
-      borderRadius: `${radius}px !important`,
-      minHeight: { xs: 44, sm: 40 },
-      px: { xs: 2.4, sm: 2.6 },
-      textTransform: activeSystemConfig?.buttonStyle?.textTransform || 'none',
-      boxShadow: `0 4px 14px ${ctaBg}55`,
-      border: '1px solid rgba(255, 255, 255, 0.25) !important',
-      transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-      cursor: 'pointer',
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 0.75,
-      '& .MuiSvgIcon-root, & .MuiButton-startIcon, & .MuiButton-startIcon > *:first-of-type': {
-        color: `${contrastText} !important`,
-        fontSize: '1.2rem !important'
-      },
-      '&:hover': {
-        bgcolor: `${ctaHover} !important`,
-        boxShadow: `0 6px 18px ${ctaBg}88`,
-        transform: 'translateY(-1px)'
-      },
-      '&:active': {
-        transform: 'scale(0.98)'
-      },
-      '&:focus-visible': {
-        outline: `2px solid ${ctaBg}`,
-        outlineOffset: 2
-      }
-    };
-  };
-
-  const getBannerSecondaryBtnStyle = () => {
-    const radius = activeSystemConfig?.shape?.buttonRadius ?? theme.shape?.borderRadius ?? 8;
-    const isDarkBanner = sysBanner.isDarkBanner;
-
-    if (isDarkBanner) {
-      // Saturated or dark hero banners (Atelier, Zoho, Microsoft, Stripe, Salesforce, Linear, or Dark Mode)
-      return {
-        bgcolor: 'rgba(255, 255, 255, 0.12) !important',
-        color: '#FFFFFF !important',
-        border: '1px solid rgba(255, 255, 255, 0.28) !important',
-        borderRadius: `${radius}px !important`,
-        fontWeight: 600,
-        fontSize: { xs: '0.82rem', sm: '0.83rem' },
-        minHeight: { xs: 44, sm: 40 },
-        px: { xs: 2.2, sm: 2.4 },
-        textTransform: activeSystemConfig?.buttonStyle?.textTransform || 'none',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2) !important',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-        cursor: 'pointer',
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 0.75,
-        '& .MuiSvgIcon-root, & .MuiButton-startIcon, & .MuiButton-startIcon > *:first-of-type': {
-          color: '#FFFFFF !important',
-          fontSize: '1.15rem !important'
-        },
-        '&:hover': {
-          bgcolor: 'rgba(255, 255, 255, 0.22) !important',
-          borderColor: 'rgba(255, 255, 255, 0.6) !important',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3) !important',
-          transform: 'translateY(-1px)',
-          '& .MuiSvgIcon-root, & .MuiButton-startIcon, & .MuiButton-startIcon > *:first-of-type': {
-            color: '#FFFFFF !important'
-          }
-        },
-        '&:active': {
-          transform: 'scale(0.98)',
-          bgcolor: 'rgba(255, 255, 255, 0.28) !important'
-        },
-        '&:focus-visible': {
-          outline: '2px solid rgba(255, 255, 255, 0.8)',
-          outlineOffset: 2
-        }
-      };
-    }
-
-    // Light Banner (e.g. Google Material 3 Light or Apple Liquid Light)
-    const primaryMain = theme.palette.primary.main;
-    const textPrimary = theme.palette.text.primary || '#0F172A';
-
-    return {
-      bgcolor: 'rgba(255, 255, 255, 0.85) !important',
-      color: `${textPrimary} !important`,
-      border: `1px solid ${primaryMain}30 !important`,
-      borderRadius: `${radius}px !important`,
-      fontWeight: 600,
-      fontSize: { xs: '0.82rem', sm: '0.83rem' },
-      minHeight: { xs: 44, sm: 40 },
-      px: { xs: 2.2, sm: 2.4 },
-      textTransform: activeSystemConfig?.buttonStyle?.textTransform || 'none',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05) !important',
-      backdropFilter: 'blur(12px)',
-      WebkitBackdropFilter: 'blur(12px)',
-      transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-      cursor: 'pointer',
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 0.75,
-      '& .MuiSvgIcon-root, & .MuiButton-startIcon, & .MuiButton-startIcon > *:first-of-type': {
-        color: `${primaryMain} !important`,
-        fontSize: '1.15rem !important'
-      },
-      '&:hover': {
-        bgcolor: '#FFFFFF !important',
-        borderColor: `${primaryMain} !important`,
-        color: `${theme.palette.primary.dark || primaryMain} !important`,
-        boxShadow: `0 4px 14px ${primaryMain}22 !important`,
-        transform: 'translateY(-1px)',
-        '& .MuiSvgIcon-root, & .MuiButton-startIcon, & .MuiButton-startIcon > *:first-of-type': {
-          color: `${theme.palette.primary.dark || primaryMain} !important`
-        }
-      },
-      '&:active': {
-        transform: 'scale(0.98)'
-      },
-      '&:focus-visible': {
-        outline: `2px solid ${primaryMain}`,
-        outlineOffset: 2
-      }
-    };
-  };
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const todayLabel = new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
 
   const [dateRange, setDateRange] = useState('7days');
   const [drawerModalOpen, setDrawerModalOpen] = useState(false);
@@ -617,125 +342,134 @@ const Dashboard = () => {
     }
   };
 
+  const rangeLabel = dateRange === '7days' ? 'Last 7 days' : dateRange === '30days' ? 'Last 30 days' : dateRange === 'thisMonth' ? 'This month' : 'All time';
+
+  const greetingBtnSx = {
+    textTransform: 'none',
+    fontWeight: 600,
+    fontSize: '0.82rem',
+    borderRadius: `${buttonRadius}px`,
+    minHeight: { xs: 40, sm: 38 },
+    px: 2.2,
+    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+    '&:hover': { transform: 'translateY(-1px)' },
+    '&:active': { transform: 'scale(0.98)' }
+  };
+
   return (
     <Box sx={{ maxWidth: 1600, mx: 'auto' }}>
       {/* ============================================================== */}
-      {/* 1. ECOSYSTEM EXECUTIVE COMMAND BANNER                          */}
+      {/* 1. GREETING HEADER                                             */}
       {/* ============================================================== */}
-      <Paper
-        elevation={0}
-        sx={{
-          p: { xs: 2.5, sm: 3.5 },
-          mb: 3.5,
-          borderRadius: sysBanner.radius,
-          background: sysBanner.bg,
-          color: sysBanner.textColor,
-          border: `1.5px solid ${sysBanner.borderColor}`,
-          boxShadow: sysBanner.shadow,
-          backdropFilter: sysBanner.backdropFilter || 'none',
-          WebkitBackdropFilter: sysBanner.backdropFilter || 'none',
-          position: 'relative',
-          overflow: 'hidden',
-          transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
-        }}
-      >
-        <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: { xs: 'flex-start', md: 'center' }, justifyContent: 'space-between', gap: 2.5 }}>
-          <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.8, flexWrap: 'wrap' }}>
-              <Chip
-                label={sysBanner.badge}
-                size="small"
-                sx={{
-                  bgcolor: sysBanner.badgeBg,
-                  color: sysBanner.badgeColor,
-                  fontWeight: 900,
-                  fontSize: '0.66rem',
-                  letterSpacing: '0.1em',
-                  border: `1px solid ${sysBanner.borderColor}`,
-                  height: 22,
-                  borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 6}px`
-                }}
-              />
-              <Typography variant="caption" sx={{ color: sysBanner.subtextColor, fontWeight: 600 }}>
-                {profile.businessName || 'Aleen Clothing'} • CRM Studio
-              </Typography>
-            </Box>
-
-            <Typography
-              variant="h3"
-              sx={{
-                fontFamily: 'inherit',
-                fontWeight: 800,
-                letterSpacing: '-0.025em',
-                lineHeight: 1.15,
-                color: sysBanner.textColor
-              }}
-            >
-              {sysBanner.title}
-            </Typography>
-
-            <Typography variant="body2" sx={{ color: sysBanner.subtextColor, mt: 0.8, maxWidth: 650, fontSize: '0.86rem' }}>
-              Welcome back, <strong>{user?.name || user?.email?.split('@')[0] || 'Store Stylist'}</strong>. Live pulse of retail billing, custom bridal tailoring, and garment inventory.
-            </Typography>
-          </Box>
-
-          {/* Quick Action Navigation Dock */}
-          <Stack
-            direction={{ xs: 'column', sm: 'row' }}
-            spacing={{ xs: 1, sm: 1.25 }}
+      <Box sx={{ mb: 3.5, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: { xs: 'flex-start', md: 'center' }, justifyContent: 'space-between', gap: 2.5 }}>
+        <Box>
+          <Typography
+            variant="h4"
             sx={{
-              width: { xs: '100%', md: 'auto' },
-              alignSelf: { xs: 'stretch', md: 'center' },
-              flexWrap: 'wrap',
-              mt: { xs: 1.5, md: 0 }
+              fontFamily: 'inherit',
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.2,
+              fontSize: { xs: '1.5rem', sm: '1.8rem', md: '2rem' }
             }}
           >
-            <Button
-              variant="contained"
-              startIcon={<Add sx={{ fontSize: '1.2rem !important' }} />}
-              onClick={() => navigate('/invoices?action=new', { state: { openNewBill: true } })}
-              sx={{
-                ...getBannerPrimaryBtnStyle(),
-                width: { xs: '100%', sm: 'auto' }
-              }}
-            >
-              New Bill
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<PointOfSale sx={{ fontSize: '1.15rem !important' }} />}
-              onClick={() => setDrawerModalOpen(true)}
-              sx={{
-                ...getBannerSecondaryBtnStyle(),
-                width: { xs: '100%', sm: 'auto' }
-              }}
-            >
-              Shift & Z-Report
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<Straighten sx={{ fontSize: '1.15rem !important' }} />}
-              onClick={() => navigate('/tailoring')}
-              sx={{
-                ...getBannerSecondaryBtnStyle(),
-                width: { xs: '100%', sm: 'auto' }
-              }}
-            >
-              Tailoring Board
-            </Button>
-          </Stack>
+            {greeting}, {user?.name || user?.email?.split('@')[0] || 'Store Stylist'}
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.6, fontSize: '0.9rem' }}>
+            Here's what's happening at Aleen today.
+          </Typography>
         </Box>
-      </Paper>
+
+        {/* Quick Action Navigation Dock */}
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={{ xs: 1, sm: 1.25 }}
+          sx={{
+            width: { xs: '100%', md: 'auto' },
+            alignSelf: { xs: 'stretch', md: 'center' },
+            flexWrap: 'wrap',
+            mt: { xs: 0.5, md: 0 }
+          }}
+        >
+          <Box
+            sx={{
+              display: { xs: 'none', lg: 'flex' },
+              alignItems: 'center',
+              alignSelf: 'center',
+              px: 1.8,
+              py: 0.6,
+              mr: 0.5,
+              borderRadius: '999px',
+              border: '1px solid #EFEFF4',
+              bgcolor: isDark ? 'rgba(255, 255, 255, 0.06)' : '#FFFFFF',
+              color: 'text.secondary',
+              fontSize: '0.78rem',
+              fontWeight: 600,
+              whiteSpace: 'nowrap'
+            }}
+          >
+            {todayLabel}
+          </Box>
+          <Button
+            variant="contained"
+            startIcon={<Add sx={{ fontSize: '1.1rem !important' }} />}
+            onClick={() => navigate('/invoices?action=new', { state: { openNewBill: true } })}
+            sx={{
+              ...greetingBtnSx,
+              bgcolor: 'primary.main',
+              color: 'primary.contrastText',
+              boxShadow: '0 1px 2px rgba(124, 111, 232, 0.3)',
+              '&:hover': { ...greetingBtnSx['&:hover'], bgcolor: 'primary.dark' },
+              '&:active': { transform: 'scale(0.98)' },
+              width: { xs: '100%', sm: 'auto' }
+            }}
+          >
+            New Bill
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<PointOfSale sx={{ fontSize: '1.1rem !important' }} />}
+            onClick={() => setDrawerModalOpen(true)}
+            sx={{
+              ...greetingBtnSx,
+              bgcolor: isDark ? 'transparent' : '#FFFFFF',
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.16)' : '#EFEFF4',
+              color: 'text.secondary',
+              '&:hover': { ...greetingBtnSx['&:hover'], borderColor: 'primary.main', color: 'primary.main', bgcolor: isDark ? 'transparent' : '#FFFFFF' },
+              '&:active': { transform: 'scale(0.98)' },
+              width: { xs: '100%', sm: 'auto' }
+            }}
+          >
+            Shift & Z-Report
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<Straighten sx={{ fontSize: '1.1rem !important' }} />}
+            onClick={() => navigate('/tailoring')}
+            sx={{
+              ...greetingBtnSx,
+              bgcolor: isDark ? 'transparent' : '#FFFFFF',
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.16)' : '#EFEFF4',
+              color: 'text.secondary',
+              '&:hover': { ...greetingBtnSx['&:hover'], borderColor: 'primary.main', color: 'primary.main', bgcolor: isDark ? 'transparent' : '#FFFFFF' },
+              '&:active': { transform: 'scale(0.98)' },
+              width: { xs: '100%', sm: 'auto' }
+            }}
+          >
+            Tailoring Board
+          </Button>
+        </Stack>
+      </Box>
 
       {/* ============================================================== */}
       {/* 2. TIMEFRAME SELECTOR FILTER BAR                               */}
       {/* ============================================================== */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5, fontSize: '0.78rem' }}>
-          Atelier Financial Metrics ({dateRange === '7days' ? 'Last 7 Days' : dateRange === '30days' ? 'Last 30 Days' : dateRange === 'thisMonth' ? 'This Month' : 'All-Time'})
+        <Typography sx={{ fontWeight: 600, color: 'text.secondary', fontSize: '0.85rem' }}>
+          Financial overview · {rangeLabel}
         </Typography>
 
-        <GlassCard sx={{ p: 0.4, borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 8}px`, display: 'flex', gap: 0.5 }}>
+        <Box sx={{ display: 'flex', gap: 0.6, p: 0.45, borderRadius: `${buttonRadius}px`, bgcolor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF', border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : '#EFEFF4'}` }}>
           {[
             { id: '7days', label: '7 Days' },
             { id: '30days', label: '30 Days' },
@@ -748,13 +482,16 @@ const Dashboard = () => {
               variant={dateRange === item.id ? 'contained' : 'text'}
               size="small"
               sx={{
-                px: 2,
-                py: 0.4,
-                borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 8}px`,
-                fontSize: '0.76rem',
-                fontWeight: 800,
+                px: 1.8,
+                py: 0.45,
+                minWidth: 0,
+                borderRadius: `${Math.max(buttonRadius - 2, 8)}px`,
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                textTransform: 'none',
                 bgcolor: dateRange === item.id ? theme.palette.primary.main : 'transparent',
                 color: dateRange === item.id ? (theme.palette.primary.contrastText || '#FFFFFF') : 'text.secondary',
+                boxShadow: dateRange === item.id ? '0 1px 2px rgba(124, 111, 232, 0.3)' : 'none',
                 '&:hover': {
                   bgcolor: dateRange === item.id ? theme.palette.primary.dark : 'action.hover'
                 }
@@ -763,11 +500,11 @@ const Dashboard = () => {
               {item.label}
             </Button>
           ))}
-        </GlassCard>
+        </Box>
       </Box>
 
       {/* ============================================================== */}
-      {/* 3. EDITORIAL KPI METRICS GRID: Responsive 2x2 Grid on Mobile   */}
+      {/* 3. KPI METRICS GRID: Responsive 2x2 Grid on Mobile             */}
       {/* ============================================================== */}
       <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} sx={{ mb: { xs: 2.5, sm: 3.5 } }}>
         {/* Sales Revenue */}
@@ -873,22 +610,27 @@ const Dashboard = () => {
       {/* ============================================================== */}
       {/* 4. WORKSHOP PULSE & FITTINGS DUE TODAY                         */}
       {/* ============================================================== */}
-      <Paper
-        elevation={0}
-        sx={{
-          p: 2.5,
-          mb: 3.5,
-          borderRadius: 3,
-          border: '1.5px solid #CBD5E1',
-          bgcolor: isDark ? 'rgba(124, 111, 232, 0.06)' : '#FFFFFF'
-        }}
-      >
+      <GlassCard sx={{ p: 2.5, mb: 3.5 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, flexWrap: 'wrap', gap: 1 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
-            <Straighten sx={{ color: 'primary.main' }} />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.4 }}>
+            <Box
+              sx={{
+                width: 38,
+                height: 38,
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                bgcolor: isDark ? 'rgba(124, 111, 232, 0.16)' : '#F1EFFC',
+                color: isDark ? '#9B8FF5' : '#5B4BD1',
+                flexShrink: 0
+              }}
+            >
+              <Straighten sx={{ fontSize: 20 }} />
+            </Box>
             <Box>
-              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.2 }}>
-                Bespoke Atelier Workshop Pulse
+              <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.2 }}>
+                Workshop pulse
               </Typography>
               <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                 Active custom tailoring jobs, fittings, and patron deliveries
@@ -898,15 +640,17 @@ const Dashboard = () => {
           <Button
             size="small"
             variant="outlined"
-            endIcon={<ArrowForward />}
+            endIcon={<ArrowForward sx={{ fontSize: 16 }} />}
             onClick={() => navigate('/tailoring')}
             sx={{
               textTransform: 'none',
-              fontWeight: 800,
+              fontWeight: 600,
               fontSize: '0.78rem',
-              borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-              borderColor: 'primary.main',
-              color: 'primary.main'
+              borderRadius: `${buttonRadius}px`,
+              borderColor: isDark ? 'rgba(155, 143, 245, 0.4)' : '#7C6FE8',
+              color: isDark ? '#9B8FF5' : '#5B4BD1',
+              bgcolor: isDark ? 'transparent' : '#FFFFFF',
+              '&:hover': { borderColor: 'primary.main', color: 'primary.main', bgcolor: isDark ? 'transparent' : '#FFFFFF' }
             }}
           >
             Open Tailoring Board ({activeTailoringJobs.length} Active)
@@ -915,11 +659,11 @@ const Dashboard = () => {
 
         <Grid container spacing={2}>
           <Grid item xs={12} sm={4}>
-            <Box sx={{ p: 2, borderRadius: 2, bgcolor: isDark ? 'rgba(0,0,0,0.2)' : '#F8FAFC', border: '1px solid #E2E8F0' }}>
-              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, textTransform: 'uppercase' }}>
-                Active Garments on Board
+            <Box sx={{ p: 2, borderRadius: '12px', bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : '#F9F9FC', border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'}` }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                Active garments on board
               </Typography>
-              <Typography variant="h5" sx={{ fontWeight: 900, color: 'primary.main', mt: 0.5 }}>
+              <Typography variant="h5" sx={{ fontWeight: 800, color: 'primary.main', mt: 0.5 }}>
                 {activeTailoringJobs.length} Orders
               </Typography>
               <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}>
@@ -932,16 +676,16 @@ const Dashboard = () => {
             <Box
               sx={{
                 p: 2,
-                borderRadius: 2,
-                bgcolor: urgentFittingsToday.length > 0 ? 'rgba(217, 119, 6, 0.08)' : (isDark ? 'rgba(0,0,0,0.2)' : '#F8FAFC'),
+                borderRadius: '12px',
+                bgcolor: urgentFittingsToday.length > 0 ? 'rgba(217, 119, 6, 0.08)' : (isDark ? 'rgba(255, 255, 255, 0.04)' : '#F9F9FC'),
                 border: '1px solid',
-                borderColor: urgentFittingsToday.length > 0 ? '#D97706' : '#E2E8F0'
+                borderColor: urgentFittingsToday.length > 0 ? '#D97706' : (isDark ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4')
               }}
             >
-              <Typography variant="caption" sx={{ color: urgentFittingsToday.length > 0 ? '#B45309' : 'text.secondary', fontWeight: 800, textTransform: 'uppercase' }}>
-                Trials & Deliveries Due Today
+              <Typography variant="caption" sx={{ color: urgentFittingsToday.length > 0 ? '#B45309' : 'text.secondary', fontWeight: 600 }}>
+                Trials & deliveries due today
               </Typography>
-              <Typography variant="h5" sx={{ fontWeight: 900, color: urgentFittingsToday.length > 0 ? '#D97706' : '#0F172A', mt: 0.5 }}>
+              <Typography variant="h5" sx={{ fontWeight: 800, color: urgentFittingsToday.length > 0 ? '#D97706' : 'text.primary', mt: 0.5 }}>
                 {urgentFittingsToday.length} Fittings
               </Typography>
               <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}>
@@ -951,11 +695,11 @@ const Dashboard = () => {
           </Grid>
 
           <Grid item xs={12} sm={4}>
-            <Box sx={{ p: 2, borderRadius: 2, bgcolor: isDark ? 'rgba(0,0,0,0.2)' : '#F8FAFC', border: '1px solid #E2E8F0' }}>
-              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, textTransform: 'uppercase' }}>
-                Register Cash Status
+            <Box sx={{ p: 2, borderRadius: '12px', bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : '#F9F9FC', border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'}` }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                Register cash status
               </Typography>
-              <Typography variant="h5" sx={{ fontWeight: 900, color: '#10B981', mt: 0.5 }}>
+              <Typography variant="h5" sx={{ fontWeight: 800, color: '#10B981', mt: 0.5 }}>
                 Active & Balanced
               </Typography>
               <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}>
@@ -964,28 +708,28 @@ const Dashboard = () => {
             </Box>
           </Grid>
         </Grid>
-      </Paper>
+      </GlassCard>
 
       {/* ============================================================== */}
       {/* 5. CHARTS ROW: REVENUE TRENDS & STOCK HEALTH                   */}
       {/* ============================================================== */}
       <Grid container spacing={3} sx={{ mb: 3.5 }}>
-        {/* Left: Financial Performance Trajectory */}
+        {/* Left: Revenue Overview */}
         <Grid item xs={12} md={7} lg={8}>
           <GlassCard sx={{ p: 3, height: '100%' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 1.5 }}>
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 800 }}>Financial Trajectory & Inflow</Typography>
-                <Typography variant="caption" color="text.secondary">Gross Sales vs Operating Cash Expenses</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>Revenue overview</Typography>
+                <Typography variant="caption" color="text.secondary">Gross sales vs operating cash expenses</Typography>
               </Box>
               <Box sx={{ display: 'flex', gap: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
                   <Circle sx={{ fontSize: 10, color: 'primary.main' }} />
-                  <Typography variant="caption" sx={{ fontWeight: 700 }}>Gross Sales</Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 600 }}>Gross Sales</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
                   <Circle sx={{ fontSize: 10, color: 'secondary.main' }} />
-                  <Typography variant="caption" sx={{ fontWeight: 700 }}>Expenses</Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 600 }}>Expenses</Typography>
                 </Box>
               </Box>
             </Box>
@@ -998,7 +742,7 @@ const Dashboard = () => {
         {/* Right: Garment Stock Distribution */}
         <Grid item xs={12} md={5} lg={4}>
           <GlassCard sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Typography variant="h6" sx={{ fontWeight: 800, mb: 0.5 }}>Garment Inventory Health</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>Inventory health</Typography>
             <Typography variant="caption" color="text.secondary" sx={{ mb: 3 }}>Distribution by inventory tier</Typography>
 
             <Box sx={{ flexGrow: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -1012,8 +756,8 @@ const Dashboard = () => {
                 }}
               />
               <Box sx={{ position: 'absolute', textAlign: 'center' }}>
-                <Typography variant="h4" sx={{ fontWeight: 900, color: 'primary.main' }}>{totalItems}</Typography>
-                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>Total Pieces</Typography>
+                <Typography variant="h4" sx={{ fontWeight: 800, color: 'primary.main' }}>{totalItems}</Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>Total Pieces</Typography>
               </Box>
             </Box>
 
@@ -1021,7 +765,7 @@ const Dashboard = () => {
               {stockData.labels.map((label, i) => (
                 <Box key={label} sx={{ display: 'flex', alignItems: 'center', gap: 0.7 }}>
                   <Circle sx={{ fontSize: 9, color: stockData.datasets[0].backgroundColor[i] }} />
-                  <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.72rem' }}>
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', fontSize: '0.72rem' }}>
                     {label}
                   </Typography>
                 </Box>
@@ -1032,7 +776,7 @@ const Dashboard = () => {
       </Grid>
 
       {/* ============================================================== */}
-      {/* 6. BOTTOM ROW: TOP GARMENTS & RECENT CHECKOUT STREAM          */}
+      {/* 6. BOTTOM ROW: TOP PRODUCTS & LATEST ORDERS                    */}
       {/* ============================================================== */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {/* Left: Top Products Bar Chart */}
@@ -1040,14 +784,14 @@ const Dashboard = () => {
           <GlassCard sx={{ p: 3, height: '100%' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3, alignItems: 'center' }}>
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 800 }}>Top Couture & Garment Silhouettes</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>Top products</Typography>
                 <Typography variant="caption" color="text.secondary">Best-selling pieces by units sold</Typography>
               </Box>
               <Button
                 size="small"
-                endIcon={<ArrowForward />}
+                endIcon={<ArrowForward sx={{ fontSize: 16 }} />}
                 onClick={() => navigate('/sales-reports')}
-                sx={{ textTransform: 'none', fontWeight: 800, fontSize: '0.76rem', color: 'primary.main' }}
+                sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.76rem', color: 'primary.main' }}
               >
                 Full Analytics
               </Button>
@@ -1058,33 +802,67 @@ const Dashboard = () => {
           </GlassCard>
         </Grid>
 
-        {/* Right: Live Checkout Stream */}
+        {/* Right: Latest Orders Table */}
         <Grid item xs={12} md={5} lg={5}>
           <GlassCard sx={{ p: 0, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography variant="h6" sx={{ fontWeight: 800 }}>Recent Patron Checkouts</Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>Latest orders</Typography>
               <Button
                 size="small"
                 onClick={() => navigate('/invoices')}
-                sx={{ textTransform: 'none', fontWeight: 800, fontSize: '0.76rem', color: 'primary.main' }}
+                sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.76rem', color: 'primary.main' }}
               >
-                All Invoices
+                View all
               </Button>
             </Box>
-            <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
-              {recentInvoices.length === 0 ? (
-                <Box sx={{ p: 4, textAlign: 'center' }}>
-                  <Typography variant="body2" color="text.secondary">No invoices issued yet.</Typography>
+
+            {recentInvoices.length === 0 ? (
+              <Box sx={{ p: 4, textAlign: 'center' }}>
+                <Typography variant="body2" color="text.secondary">No invoices issued yet.</Typography>
+              </Box>
+            ) : (
+              <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
+                <Box
+                  sx={{
+                    px: 2.5,
+                    py: 1.25,
+                    display: 'grid',
+                    gridTemplateColumns: { xs: '44px 1fr auto', sm: '44px 1.1fr 1.3fr 44px 88px 74px' },
+                    gap: 1,
+                    alignItems: 'center',
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                    bgcolor: isDark ? 'rgba(255, 255, 255, 0.03)' : '#F9F9FC'
+                  }}
+                >
+                  {['#', 'Date', 'Customer', 'Items', 'Total', 'Payment'].map((col, i) => (
+                    <Typography
+                      key={col}
+                      variant="caption"
+                      sx={{
+                        fontWeight: 700,
+                        color: 'text.secondary',
+                        fontSize: '0.68rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.06em',
+                        display: { xs: i === 0 || i === 2 || i === 4 ? 'block' : 'none', sm: 'block' }
+                      }}
+                    >
+                      {col}
+                    </Typography>
+                  ))}
                 </Box>
-              ) : (
-                recentInvoices.map((inv, index) => (
+
+                {recentInvoices.map((inv, index) => (
                   <Box
                     key={inv.id}
                     sx={{
-                      p: 2,
-                      display: 'flex',
+                      px: 2.5,
+                      py: 1.4,
+                      display: 'grid',
+                      gridTemplateColumns: { xs: '44px 1fr auto', sm: '44px 1.1fr 1.3fr 44px 88px 74px' },
+                      gap: 1,
                       alignItems: 'center',
-                      gap: 1.5,
                       borderBottom: index !== recentInvoices.length - 1 ? '1px solid' : 'none',
                       borderColor: 'divider',
                       transition: 'background 0.2s',
@@ -1093,24 +871,28 @@ const Dashboard = () => {
                     }}
                     onClick={() => navigate('/invoices')}
                   >
-                    <Avatar sx={{ bgcolor: (t) => `${t.palette.primary.main}18`, color: 'primary.main', borderRadius: (t) => `${t.shape?.borderRadius || 8}px`, width: 38, height: 38 }}>
-                      <Receipt sx={{ fontSize: 20 }} />
-                    </Avatar>
-                    <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 800, fontSize: '0.82rem' }} noWrap>
-                        {inv.customer || 'Walk-in Patron'} • #{inv.invoiceNumber || inv.id}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.72rem' }}>
-                        {inv.date ? new Date(inv.date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : 'Recent'} • {inv.items?.length || 1} pieces • <span style={{ color: 'var(--emerald-primary)', fontWeight: 700 }}>{inv.paymentMethod || 'Cash'}</span>
-                      </Typography>
-                    </Box>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'primary.main', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', fontVariantNumeric: 'tabular-nums' }}>
+                      #{inv.invoiceNumber || inv.id}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem', display: { xs: 'none', sm: 'block' } }} noWrap>
+                      {inv.date ? new Date(inv.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : 'Recent'} · {inv.date ? new Date(inv.date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '—'}
+                    </Typography>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.82rem' }} noWrap>
+                      {inv.customer || 'Walk-in Patron'}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontVariantNumeric: 'tabular-nums', display: { xs: 'none', sm: 'block' } }}>
+                      {inv.items?.length || 1}
+                    </Typography>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'primary.main', fontVariantNumeric: 'tabular-nums', fontSize: '0.82rem' }}>
                       ₹{Number(inv.total || 0).toLocaleString('en-IN')}
                     </Typography>
+                    <Typography variant="caption" sx={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--emerald-primary)', display: { xs: 'none', sm: 'block' } }} noWrap>
+                      {inv.paymentMethod || 'Cash'}
+                    </Typography>
                   </Box>
-                ))
-              )}
-            </Box>
+                ))}
+              </Box>
+            )}
           </GlassCard>
         </Grid>
       </Grid>
