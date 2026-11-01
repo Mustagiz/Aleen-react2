@@ -2241,86 +2241,86 @@ const Invoices = () => {
       {/* Date Range Selection & Filter Studio */}
       <GlassCard sx={{ p: 2.5, mb: 3, border: '1px solid', borderColor: isFiltered ? 'primary.light' : 'divider' }}>
         {/* Row 1: Search Capsule + Quick Date Range Presets */}
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={5}>
-            <Box sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1.5,
-              px: 2,
-              py: 0.6,
-              borderRadius: 2.5,
-              border: '1px solid',
-              borderColor: 'divider',
-              bgcolor: 'background.paper'
-            }}>
-              <Search sx={{ color: 'text.secondary', fontSize: 20 }} />
-              <TextField
-                placeholder="Search invoice #, customer, phone..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                variant="standard"
-                fullWidth
-                InputProps={{ disableUnderline: true }}
-                sx={{ fontSize: '0.85rem' }}
-              />
-              {searchTerm && (
-                <IconButton size="small" onClick={() => setSearchTerm('')} sx={{ p: 0.5 }}>
-                  <Close fontSize="small" />
-                </IconButton>
-              )}
-            </Box>
-          </Grid>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: { xs: 1.25, sm: 1.5, md: 2 } }}>
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            height: 38,
+            px: 1.75,
+            flex: { xs: '1 1 100%', sm: '1 1 340px', md: '0 1 360px' },
+            borderRadius: '999px',
+            border: '1px solid',
+            borderColor: 'divider',
+            bgcolor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F7F7FA'
+          }}>
+            <Search sx={{ color: 'text.secondary', fontSize: 18, flexShrink: 0 }} />
+            <TextField
+              placeholder="Search invoice #, customer, phone..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              variant="standard"
+              fullWidth
+              InputProps={{ disableUnderline: true }}
+              sx={{ fontSize: '0.84rem' }}
+            />
+            {searchTerm && (
+              <IconButton size="small" onClick={() => setSearchTerm('')} sx={{ p: 0.25, flexShrink: 0 }}>
+                <Close fontSize="small" />
+              </IconButton>
+            )}
+          </Box>
 
           {/* Quick Date Presets */}
-          <Grid item xs={12} md={7}>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 0.75 }}>
-              <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', mr: 0.5, display: { xs: 'none', sm: 'inline' } }}>
-                Filter Dates:
-              </Typography>
-              {[
-                { id: 'all', label: 'All Dates' },
-                { id: 'today', label: 'Today' },
-                { id: 'yesterday', label: 'Yesterday' },
-                { id: 'this_week', label: 'Last 7 Days' },
-                { id: 'this_month', label: 'This Month' },
-                { id: 'last_30_days', label: 'Last 30 Days' }
-              ].map(p => {
-                const isSelected = datePreset === p.id && (!dateFrom || p.id !== 'all');
-                const isAllSelected = datePreset === 'all' && !dateFrom && !dateTo && p.id === 'all';
-                const active = isSelected || isAllSelected;
-                return (
-                  <Chip
-                    key={p.id}
-                    label={p.label}
-                    size="small"
-                    clickable
-                    onClick={() => handleDatePreset(p.id)}
-                    sx={{
-                      fontWeight: 700,
-                      fontSize: '0.72rem',
-                      height: 28,
-                      borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                      bgcolor: active ? 'primary.main' : 'action.hover',
-                      color: active ? '#FFFFFF' : 'text.primary',
-                      border: '1px solid',
-                      borderColor: active ? 'primary.main' : 'divider',
-                      '&:hover': {
-                        bgcolor: active ? 'primary.dark' : 'action.selected'
-                      }
-                    }}
-                  />
-                );
-              })}
-            </Box>
-          </Grid>
-        </Grid>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 0.75, flex: '1 1 auto', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
+            <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.72rem', color: 'text.secondary', letterSpacing: '0.02em', mr: 0.25 }}>
+              Filter Dates:
+            </Typography>
+            {[
+              { id: 'all', label: 'All Dates' },
+              { id: 'today', label: 'Today' },
+              { id: 'yesterday', label: 'Yesterday' },
+              { id: 'this_week', label: 'Last 7 Days' },
+              { id: 'this_month', label: 'This Month' },
+              { id: 'last_30_days', label: 'Last 30 Days' }
+            ].map(p => {
+              const isSelected = datePreset === p.id && (!dateFrom || p.id !== 'all');
+              const isAllSelected = datePreset === 'all' && !dateFrom && !dateTo && p.id === 'all';
+              const active = isSelected || isAllSelected;
+              return (
+                <Chip
+                  key={p.id}
+                  label={p.label}
+                  size="small"
+                  clickable
+                  onClick={() => handleDatePreset(p.id)}
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: '0.72rem',
+                    height: 30,
+                    px: 0.25,
+                    borderRadius: '999px',
+                    bgcolor: active ? 'primary.main' : (isDark ? 'rgba(255, 255, 255, 0.04)' : 'transparent'),
+                    color: active ? '#FFFFFF' : 'text.secondary',
+                    border: '1px solid',
+                    borderColor: active ? 'primary.main' : 'divider',
+                    transition: 'background-color 0.15s ease, border-color 0.15s ease',
+                    '&:hover': {
+                      bgcolor: active ? 'primary.dark' : (isDark ? 'rgba(155, 143, 245, 0.18)' : 'rgba(124, 111, 232, 0.08)'),
+                      color: active ? '#FFFFFF' : 'primary.main'
+                    }
+                  }}
+                />
+              );
+            })}
+          </Box>
+        </Box>
 
         {/* Row 2: Selected Dates (From - To), Payment Method, Sorting & Actions */}
         <Box sx={{
           display: 'flex',
           flexWrap: 'wrap',
-          alignItems: 'center',
+          alignItems: 'flex-end',
           gap: 1.5,
           pt: 2,
           mt: 2,
@@ -2328,77 +2328,95 @@ const Invoices = () => {
           borderColor: 'divider'
         }}>
           {/* From Date Picker */}
-          <TextField
-            label="From Date"
-            type="date"
-            size="small"
-            value={dateFrom}
-            onChange={(e) => {
-              setDateFrom(e.target.value);
-              setDatePreset('custom');
-            }}
-            InputLabelProps={{ shrink: true }}
-            sx={{ width: { xs: '100%', sm: 165 } }}
-          />
+          <Box sx={{ flex: { xs: '1 1 calc(50% - 0.75rem)', sm: '0 1 165px' } }}>
+            <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: 'text.secondary', letterSpacing: '0.02em', mb: 0.5 }}>
+              From Date
+            </Typography>
+            <TextField
+              type="date"
+              size="small"
+              value={dateFrom}
+              onChange={(e) => {
+                setDateFrom(e.target.value);
+                setDatePreset('custom');
+              }}
+              sx={{ width: '100%', '& .MuiInputBase-root': { height: 38, borderRadius: '10px', fontSize: '0.82rem' } }}
+            />
+          </Box>
 
           {/* To Date Picker */}
-          <TextField
-            label="To Date"
-            type="date"
-            size="small"
-            value={dateTo}
-            onChange={(e) => {
-              setDateTo(e.target.value);
-              setDatePreset('custom');
-            }}
-            InputLabelProps={{ shrink: true }}
-            sx={{ width: { xs: '100%', sm: 165 } }}
-          />
+          <Box sx={{ flex: { xs: '1 1 calc(50% - 0.75rem)', sm: '0 1 165px' } }}>
+            <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: 'text.secondary', letterSpacing: '0.02em', mb: 0.5 }}>
+              To Date
+            </Typography>
+            <TextField
+              type="date"
+              size="small"
+              value={dateTo}
+              onChange={(e) => {
+                setDateTo(e.target.value);
+                setDatePreset('custom');
+              }}
+              sx={{ width: '100%', '& .MuiInputBase-root': { height: 38, borderRadius: '10px', fontSize: '0.82rem' } }}
+            />
+          </Box>
 
           {/* Payment Method Filter */}
-          <TextField
-            select
-            size="small"
-            label="Payment Method"
-            value={paymentFilter}
-            onChange={(e) => setPaymentFilter(e.target.value)}
-            sx={{ minWidth: 145 }}
-          >
-            <MenuItem value="All">All Payment Methods</MenuItem>
-            <MenuItem value="Cash">Cash</MenuItem>
-            <MenuItem value="Card">Card</MenuItem>
-            <MenuItem value="UPI">UPI</MenuItem>
-            <MenuItem value="Net Banking">Net Banking</MenuItem>
-            <MenuItem value="Credit">Credit / Due</MenuItem>
-          </TextField>
+          <Box sx={{ flex: { xs: '1 1 100%', sm: '0 1 195px' } }}>
+            <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: 'text.secondary', letterSpacing: '0.02em', mb: 0.5 }}>
+              Payment Method
+            </Typography>
+            <TextField
+              select
+              size="small"
+              value={paymentFilter}
+              onChange={(e) => setPaymentFilter(e.target.value)}
+              sx={{ width: '100%', '& .MuiInputBase-root': { height: 38, borderRadius: '10px', fontSize: '0.82rem' } }}
+            >
+              <MenuItem value="All">All Payment Methods</MenuItem>
+              <MenuItem value="Cash">Cash</MenuItem>
+              <MenuItem value="Card">Card</MenuItem>
+              <MenuItem value="UPI">UPI</MenuItem>
+              <MenuItem value="Net Banking">Net Banking</MenuItem>
+              <MenuItem value="Credit">Credit / Due</MenuItem>
+            </TextField>
+          </Box>
 
           {/* Sort Column */}
-          <TextField
-            select
-            size="small"
-            label="Sort By"
-            value={orderBy}
-            onChange={(e) => setOrderBy(e.target.value)}
-            sx={{ minWidth: 120 }}
-          >
-            <MenuItem value="date">Date</MenuItem>
-            <MenuItem value="total">Amount</MenuItem>
-            <MenuItem value="customer">Customer</MenuItem>
-            <MenuItem value="paymentMethod">Payment</MenuItem>
-          </TextField>
+          <Box sx={{ flex: { xs: '1 1 100%', sm: '0 1 130px' } }}>
+            <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: 'text.secondary', letterSpacing: '0.02em', mb: 0.5 }}>
+              Sort By
+            </Typography>
+            <TextField
+              select
+              size="small"
+              value={orderBy}
+              onChange={(e) => setOrderBy(e.target.value)}
+              sx={{ width: '100%', '& .MuiInputBase-root': { height: 38, borderRadius: '10px', fontSize: '0.82rem' } }}
+            >
+              <MenuItem value="date">Date</MenuItem>
+              <MenuItem value="total">Amount</MenuItem>
+              <MenuItem value="customer">Customer</MenuItem>
+              <MenuItem value="paymentMethod">Payment</MenuItem>
+            </TextField>
+          </Box>
 
           {/* Sort Direction */}
-          <TextField
-            select
-            size="small"
-            label="Order"
-            value={order}
-            onChange={(e) => setOrder(e.target.value)}
-            sx={{ minWidth: 125 }}
-          >
-            <MenuItem value="desc">Newest First</MenuItem>
-            <MenuItem value="asc">Oldest First</MenuItem>
-          </TextField>
+          <Box sx={{ flex: { xs: '1 1 100%', sm: '0 1 145px' } }}>
+            <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: 'text.secondary', letterSpacing: '0.02em', mb: 0.5 }}>
+              Order
+            </Typography>
+            <TextField
+              select
+              size="small"
+              value={order}
+              onChange={(e) => setOrder(e.target.value)}
+              sx={{ width: '100%', '& .MuiInputBase-root': { height: 38, borderRadius: '10px', fontSize: '0.82rem' } }}
+            >
+              <MenuItem value="desc">Newest First</MenuItem>
+              <MenuItem value="asc">Oldest First</MenuItem>
+            </TextField>
+          </Box>
 
           {/* Reset Filters CTA */}
           {isFiltered && (
@@ -2409,14 +2427,14 @@ const Invoices = () => {
               onClick={handleClearFilters}
               sx={{
                 height: 38,
-                borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                borderRadius: '10px',
                 px: 2,
                 borderColor: 'primary.main',
                 color: 'primary.main',
                 textTransform: 'none',
                 fontWeight: 700,
                 fontSize: '0.8rem',
-                ml: { sm: 'auto' },
+                ml: { xs: 0, sm: 'auto' },
                 '&:hover': {
                   borderColor: 'primary.dark',
                   bgcolor: (t) => `${t.palette.primary.main}12`

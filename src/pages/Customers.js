@@ -432,10 +432,12 @@ const Customers = () => {
                 sx={{
                     p: 2.5,
                     mb: 3.5,
-                    borderRadius: 3.5,
+                    borderRadius: '14px',
                     border: '1px solid',
                     borderColor: 'divider',
-                    boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+                    boxShadow: (t) => t.palette.mode === 'dark'
+                        ? '0 4px 24px rgba(0, 0, 0, 0.35)'
+                        : '0 2px 12px rgba(112, 114, 176, 0.08)'
                 }}
             >
                 <Grid container spacing={2} alignItems="center">
@@ -446,6 +448,7 @@ const Customers = () => {
                             placeholder="Search by client name, mobile (+91), or email..."
                             value={searchTerm}
                             onChange={(e) => { setSearchTerm(e.target.value); setPage(0); }}
+                            sx={{ '& .MuiInputBase-root': { height: 38, borderRadius: '999px', fontSize: '0.82rem' } }}
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
@@ -476,16 +479,20 @@ const Customers = () => {
                                     size="small"
                                     onClick={() => { setSegmentFilter(pill.id); setPage(0); }}
                                     sx={{
+                                        height: 30,
                                         px: 2,
-                                        py: 0.6,
-                                        borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                                        borderRadius: '999px',
                                         textTransform: 'none',
                                         fontWeight: 700,
                                         fontSize: '0.8rem',
                                         color: segmentFilter === pill.id ? '#FFFFFF' : 'text.secondary',
-                                        bgcolor: segmentFilter === pill.id ? 'primary.main' : 'action.hover',
+                                        bgcolor: segmentFilter === pill.id ? 'primary.main' : 'transparent',
+                                        border: '1px solid',
+                                        borderColor: segmentFilter === pill.id ? 'primary.main' : 'divider',
+                                        transition: 'background-color 0.15s ease, border-color 0.15s ease',
                                         '&:hover': {
-                                            bgcolor: segmentFilter === pill.id ? 'primary.dark' : 'action.selected'
+                                            bgcolor: segmentFilter === pill.id ? 'primary.dark' : (t) => t.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.18)' : 'rgba(124, 111, 232, 0.08)',
+                                            color: segmentFilter === pill.id ? '#FFFFFF' : 'primary.main'
                                         }
                                     }}
                                 >
@@ -502,31 +509,26 @@ const Customers = () => {
                 elevation={0}
                 sx={{
                     overflow: 'hidden',
-                    background: (t) => t.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.95)' : '#FFFFFF',
+                    borderRadius: '14px',
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    background: 'background.paper',
                     boxShadow: (t) => t.palette.mode === 'dark'
-                        ? '0 12px 36px rgba(0, 0, 0, 0.5), 0 0 24px rgba(155, 143, 245, 0.12)'
-                        : '0 12px 32px -4px rgba(var(--primary-rgb, 124, 111, 232), 0.08), 0 2px 6px rgba(0, 0, 0, 0.02)',
+                        ? '0 4px 24px rgba(0, 0, 0, 0.35)'
+                        : '0 2px 12px rgba(112, 114, 176, 0.08)',
                     position: 'relative'
                 }}
             >
-                {/* Decorative Atelier Emerald Hairline */}
-                <Box
-                    sx={{
-                        height: '3px',
-                        background: (t) => `linear-gradient(90deg, ${t.palette.primary.dark} 0%, ${t.palette.primary.main} 50%, ${t.palette.secondary.main} 100%)`
-                    }}
-                />
-
                 <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-                    <Table sx={{ minWidth: 700 }}>
+                    <Table sx={{ minWidth: 700, '& .MuiTableCell-root': { verticalAlign: 'middle' } }}>
                         <TableHead>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'primary.main', py: 1.8 }}>Guest & Contact Details</TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'primary.main', py: 1.8 }} align="right">Lifetime Spend</TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'primary.main', py: 1.8 }} align="center">Loyalty Points</TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'primary.main', py: 1.8 }} align="right">Balance Due</TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'primary.main', py: 1.8 }} align="center">Last Visit</TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'primary.main', py: 1.8, pr: 2.5 }} align="right">Actions</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4 }}>Guest & Contact Details</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4 }} align="right">Lifetime Spend</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4 }} align="center">Loyalty Points</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4 }} align="right">Balance Due</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4 }} align="center">Last Visit</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4, pr: 2.5 }} align="right">Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -564,7 +566,7 @@ const Customers = () => {
                                                 }}
                                             >
                                                 {/* Customer Name, Avatar & Specs */}
-                                                <TableCell sx={{ py: 1.6 }}>
+                                                <TableCell sx={{ py: 1.5 }}>
                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.8 }}>
                                                         <Avatar
                                                             onClick={() => handleOpen360(cust)}
@@ -613,14 +615,14 @@ const Customers = () => {
                                                                         size="small"
                                                                         icon={<Stars sx={{ fontSize: '11px !important', color: '#D97706' }} />}
                                                                         sx={{
-                                                                            height: 19,
+                                                                            height: 20,
                                                                             fontSize: '0.62rem',
                                                                             fontWeight: 900,
                                                                             bgcolor: 'rgba(217, 119, 6, 0.14)',
                                                                             color: '#B45309',
                                                                             border: '1px solid rgba(217, 119, 6, 0.35)',
                                                                             letterSpacing: '0.05em',
-                                                                            boxShadow: '0 1px 4px rgba(217, 119, 6, 0.15)'
+                                                                            borderRadius: '999px'
                                                                         }}
                                                                     />
                                                                 )}
@@ -629,13 +631,14 @@ const Customers = () => {
                                                                         label="PREMIER"
                                                                         size="small"
                                                                         sx={{
-                                                                            height: 18,
+                                                                            height: 20,
                                                                             fontSize: '0.58rem',
                                                                             fontWeight: 800,
                                                                             bgcolor: palette.chipBg,
                                                                             color: palette.chipText,
                                                                             border: `1px solid ${palette.border}`,
-                                                                            letterSpacing: '0.04em'
+                                                                            letterSpacing: '0.04em',
+                                                                            borderRadius: '999px'
                                                                         }}
                                                                     />
                                                                 )}
@@ -655,7 +658,7 @@ const Customers = () => {
                                                                             textDecoration: 'none',
                                                                             px: 0.85,
                                                                             py: 0.2,
-                                                                            borderRadius: '6px',
+                                                                            borderRadius: '8px',
                                                                             bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)',
                                                                             border: '1px solid',
                                                                             borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
@@ -670,10 +673,10 @@ const Customers = () => {
                                                                         <Typography
                                                                             variant="caption"
                                                                             sx={{
-                                                                                fontFamily: 'Roboto Mono, monospace',
                                                                                 fontWeight: 600,
                                                                                 fontSize: '0.74rem',
-                                                                                color: 'text.secondary'
+                                                                                color: 'text.secondary',
+                                                                                fontVariantNumeric: 'tabular-nums'
                                                                             }}
                                                                         >
                                                                             {cust.phone}
@@ -687,7 +690,7 @@ const Customers = () => {
                                                                             gap: 0.4,
                                                                             px: 0.75,
                                                                             py: 0.15,
-                                                                            borderRadius: '5px',
+                                                                            borderRadius: '8px',
                                                                             bgcolor: 'rgba(0,0,0,0.03)',
                                                                             border: '1px dashed rgba(0,0,0,0.1)'
                                                                         }}
@@ -731,12 +734,13 @@ const Customers = () => {
                                                                         label={`Bust: ${cust.measurements.bust}" • ${cust.measurements.preferredFit || 'Custom'}`}
                                                                         size="small"
                                                                         sx={{
-                                                                            height: 19,
+                                                                            height: 20,
                                                                             fontSize: '0.67rem',
                                                                             bgcolor: palette.chipBg,
                                                                             color: palette.chipText,
                                                                             fontWeight: 700,
-                                                                            border: `1px solid ${palette.border}`
+                                                                            border: `1px solid ${palette.border}`,
+                                                                            borderRadius: '999px'
                                                                         }}
                                                                     />
                                                                 )}
@@ -783,12 +787,14 @@ const Customers = () => {
                                                         label={`${(cust.loyaltyPoints || 0).toLocaleString()} pts`}
                                                         size="small"
                                                         sx={{
+                                                            height: 24,
+                                                            px: 1.1,
+                                                            borderRadius: '999px',
                                                             bgcolor: (cust.loyaltyPoints || 0) > 0 ? 'rgba(217, 119, 6, 0.12)' : (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
                                                             color: (cust.loyaltyPoints || 0) > 0 ? '#B45309' : 'text.secondary',
                                                             border: (cust.loyaltyPoints || 0) > 0 ? '1px solid rgba(217, 119, 6, 0.28)' : '1px solid rgba(0,0,0,0.06)',
                                                             fontWeight: 800,
-                                                            fontSize: '0.73rem',
-                                                            px: 0.5
+                                                            fontSize: '0.73rem'
                                                         }}
                                                     />
                                                 </TableCell>
@@ -813,12 +819,13 @@ const Customers = () => {
                                                                 size="small"
                                                                 onClick={() => handleOpenPaymentDialog(cust.id)}
                                                                 sx={{
-                                                                    height: 18,
+                                                                    height: 20,
                                                                     fontSize: '0.62rem',
                                                                     fontWeight: 800,
                                                                     bgcolor: 'rgba(220, 38, 38, 0.1)',
                                                                     color: '#DC2626',
                                                                     border: '1px solid rgba(220, 38, 38, 0.3)',
+                                                                    borderRadius: '999px',
                                                                     cursor: 'pointer',
                                                                     mt: 0.3,
                                                                     '&:hover': { bgcolor: 'rgba(220, 38, 38, 0.2)' }
@@ -831,12 +838,13 @@ const Customers = () => {
                                                             label="Settled • ₹0"
                                                             size="small"
                                                             sx={{
-                                                                height: 22,
+                                                                height: 24,
                                                                 fontSize: '0.72rem',
                                                                 fontWeight: 800,
                                                                 bgcolor: 'rgba(5, 150, 105, 0.08)',
                                                                 color: '#059669',
-                                                                border: '1px solid rgba(5, 150, 105, 0.22)'
+                                                                border: '1px solid rgba(5, 150, 105, 0.22)',
+                                                                borderRadius: '999px'
                                                             }}
                                                         />
                                                     )}
@@ -849,12 +857,13 @@ const Customers = () => {
                                                             label="New Guest"
                                                             size="small"
                                                             sx={{
-                                                                height: 22,
+                                                                height: 24,
                                                                 fontSize: '0.71rem',
                                                                 fontWeight: 600,
                                                                 bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
                                                                 color: 'text.secondary',
-                                                                border: '1px solid rgba(0,0,0,0.06)'
+                                                                border: '1px solid rgba(0,0,0,0.06)',
+                                                                borderRadius: '999px'
                                                             }}
                                                         />
                                                     ) : (
@@ -873,11 +882,7 @@ const Customers = () => {
                                                         sx={{
                                                             display: 'inline-flex',
                                                             alignItems: 'center',
-                                                            gap: 0.65,
-                                                            p: '3px 6px',
-                                                            borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.08)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
-                                                            border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(155, 143, 245, 0.2)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.12)'
+                                                            gap: 0.5
                                                         }}
                                                     >
                                                         <Tooltip title="View 360° Profile & Sizing Specs">
