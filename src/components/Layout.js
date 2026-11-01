@@ -112,14 +112,14 @@ export default function Layout() {
     subheadColor: isDark ? '#94A3B8' : '#64748B',
     activePillBg: theme.palette.primary.main,
     activePillText: '#FFFFFF',
-    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'
+    borderColor: isDark ? 'transparent' : 'rgba(0, 0, 0, 0.08)'
   };
 
   const topBarConfig = theme.custom?.topBar || {
     bg: isDark ? 'rgba(15, 30, 29, 0.88)' : 'rgba(255, 255, 255, 0.92)',
     textColor: isDark ? '#F8FAFC' : '#0F172A',
     isColored: false,
-    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'
+    borderColor: isDark ? 'transparent' : 'rgba(0, 0, 0, 0.08)'
   };
 
   // Desktop sidebar collapsed state with local storage persistence
@@ -841,7 +841,7 @@ export default function Layout() {
             color: topBarConfig.textColor,
             backdropFilter: topBarConfig.isTranslucent ? 'blur(20px)' : 'none',
             WebkitBackdropFilter: topBarConfig.isTranslucent ? 'blur(20px)' : 'none',
-            borderBottom: designSystem === 'microsoft' ? '1px solid rgba(255, 255, 255, 0.14)' : `1px solid ${topBarConfig.borderColor}`,
+            borderBottom: designSystem === 'microsoft' && !isDark ? '1px solid rgba(255, 255, 255, 0.14)' : `1px solid ${topBarConfig.borderColor}`,
             transition: 'background-color 0.25s ease, border-color 0.25s ease',
             zIndex: 10,
             flexShrink: 0,

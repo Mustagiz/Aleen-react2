@@ -86,7 +86,7 @@ export const ThemeProvider = ({ children }) => {
             subheadColor: sysSidebar.subheadColor || (isDarkSys ? '#94A3B8' : '#64748B'),
             activePillBg: sysSidebar.activePillBg || activePalette.primary.main,
             activePillText: sysSidebar.activePillText || '#FFFFFF',
-            borderColor: sysSidebar.borderColor || (mode === 'light' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)')
+            borderColor: mode === 'dark' ? 'transparent' : (sysSidebar.borderColor || 'rgba(0,0,0,0.08)')
         };
     }, [activeSystemConfig, mode, activePalette]);
 
@@ -105,7 +105,7 @@ export const ThemeProvider = ({ children }) => {
             bg,
             textColor,
             isColored,
-            borderColor: sysTopBar.borderColor || (mode === 'light' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)')
+            borderColor: mode === 'dark' ? 'transparent' : (sysTopBar.borderColor || 'rgba(0,0,0,0.08)')
         };
     }, [activeSystemConfig, mode]);
 
