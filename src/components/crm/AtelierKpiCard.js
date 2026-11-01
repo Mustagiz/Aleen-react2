@@ -80,22 +80,22 @@ export default function AtelierKpiCard({
         }}
       >
         <CardContent sx={{
-          p: { xs: '14px 14px !important', sm: '15px 20px !important' },
+          p: { xs: '13px 14px !important', sm: '14px 18px !important' },
           display: 'flex',
           alignItems: 'center',
-          gap: { xs: 1.25, sm: 1.5 },
+          gap: { xs: 1, sm: 1.25 },
           height: '100%',
           boxSizing: 'border-box',
           position: 'relative',
           zIndex: 1,
-          '&:last-child': { pb: { xs: '14px !important', sm: '15px !important' } }
+          '&:last-child': { pb: { xs: '13px !important', sm: '14px !important' } }
         }}>
           {/* Horizon-style circular pastel icon tile */}
           {icon && (
             <Box
               sx={{
-                width: { xs: 40, sm: 48, md: 52 },
-                height: { xs: 40, sm: 48, md: 52 },
+                width: { xs: 32, sm: 36, md: 38 },
+                height: { xs: 32, sm: 36, md: 38 },
                 borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
@@ -105,7 +105,7 @@ export default function AtelierKpiCard({
                 color: getIconColor(),
                 transition: 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
                 '& svg': {
-                  fontSize: { xs: '1.15rem', sm: '1.35rem', md: '1.5rem' }
+                  fontSize: { xs: '0.95rem', sm: '1rem', md: '1.1rem' }
                 }
               }}
             >
@@ -120,7 +120,7 @@ export default function AtelierKpiCard({
               sx={{
                 color: isDark ? 'rgba(203, 213, 225, 0.9)' : '#5B5B66',
                 fontWeight: 600,
-                fontSize: { xs: '0.7rem', sm: '0.74rem', md: '0.76rem' },
+                fontSize: { xs: '0.66rem', sm: '0.7rem', md: '0.72rem' },
                 lineHeight: 1.2,
                 letterSpacing: '0.01em',
                 overflow: 'hidden',
@@ -135,13 +135,13 @@ export default function AtelierKpiCard({
                 fontWeight: 700,
                 color: 'text.primary',
                 letterSpacing: '-0.02em',
-                fontSize: { xs: '1.25rem', sm: '1.4rem', md: '1.5rem' },
+                fontSize: { xs: '1.12rem', sm: '1.22rem', md: '1.3rem' },
                 lineHeight: 1.2,
                 fontVariantNumeric: 'tabular-nums',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                mt: { xs: 0.35, md: 0.5 },
-                mb: { xs: 0.35, md: 0.5 }
+                mt: { xs: 0.3, md: 0.35 },
+                mb: { xs: 0.3, md: 0.35 }
               }}
             >
               {value}
@@ -152,7 +152,7 @@ export default function AtelierKpiCard({
                   <Typography
                     noWrap
                     sx={{
-                      fontSize: { xs: '0.64rem', sm: '0.68rem' },
+                      fontSize: { xs: '0.6rem', sm: '0.63rem' },
                       fontWeight: 700,
                       color: trendColor,
                       flexShrink: 0
@@ -165,7 +165,7 @@ export default function AtelierKpiCard({
                   <Typography
                     noWrap
                     sx={{
-                      fontSize: { xs: '0.64rem', sm: '0.68rem' },
+                      fontSize: { xs: '0.6rem', sm: '0.63rem' },
                       fontWeight: 400,
                       color: isDark ? 'rgba(148, 163, 184, 0.85)' : '#9A9AA6',
                       flex: 1,

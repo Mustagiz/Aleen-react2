@@ -143,7 +143,7 @@ const ProfitLoss = () => {
                 Math.max(0, totalProfit)
             ],
             backgroundColor: [
-                theme.palette.info.main,
+                theme.palette.warning.main,
                 theme.palette.secondary?.main || theme.palette.warning.main,
                 theme.palette.primary.main
             ],
@@ -425,6 +425,7 @@ const ProfitLoss = () => {
                         </Box>
                         <Box sx={{ height: 260 }}>
                             <Bar 
+                                key={`${activeRangePreset}|${categoryFilter}|${itemFilter}`}
                                 data={chartData} 
                                 options={getThemeChartOptions(theme, { currency: '₹' })} 
                             />
@@ -438,6 +439,7 @@ const ProfitLoss = () => {
                         </Typography>
                         <Box sx={{ height: 260, display: 'flex', justifyContent: 'center' }}>
                             <Doughnut 
+                                key={`${activeRangePreset}|split`}
                                 data={distributionData} 
                                 options={{ 
                                     responsive: true, 
