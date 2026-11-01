@@ -13,7 +13,6 @@ import {
   useTheme, 
   Avatar, 
   Divider, 
-  Chip, 
   ListSubheader, 
   Tooltip,
   Paper,
@@ -42,8 +41,6 @@ import {
   Campaign, 
   Stars, 
   Search,
-  PointOfSale,
-  Add,
   Circle,
   Straighten,
   ReceiptLong,
@@ -52,9 +49,7 @@ import {
   FactCheck,
   QrCodeScanner,
   Close,
-  ViewHeadline,
-  Palette,
-  Apps
+  Palette
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
@@ -71,7 +66,7 @@ const SIDEBAR_COLLAPSED_WIDTH = 74;
 export default function Layout() {
   const { logout, user } = useAuth();
   const { profile } = useData();
-  const { mode, toggleTheme, density, toggleDensity, designSystem, activeSystemConfig } = useThemeContext();
+  const { mode, toggleTheme, designSystem, activeSystemConfig } = useThemeContext();
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
@@ -840,440 +835,23 @@ export default function Layout() {
         <Box
           component="header"
           sx={{
-            height: isAtelier ? { xs: 58, sm: 66 } : { xs: 58, sm: 64 },
+            height: { xs: 58, sm: 66 },
             px: { xs: 1.5, sm: 2.5, md: 3 },
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            bgcolor: isAtelier && !isDark ? 'background.default' : topBarConfig.bg,
-            background: designSystem === 'microsoft' && !isDark ? 'linear-gradient(90deg, #0B5A9E 0%, #0F6CBD 60%, #115EA3 100%)' : undefined,
+            bgcolor: !isDark ? 'background.default' : topBarConfig.bg,
             color: topBarConfig.textColor,
             backdropFilter: topBarConfig.isTranslucent ? 'blur(20px)' : 'none',
             WebkitBackdropFilter: topBarConfig.isTranslucent ? 'blur(20px)' : 'none',
-            borderBottom: designSystem === 'microsoft' && !isDark ? '1px solid rgba(255, 255, 255, 0.14)' : `1px solid ${topBarConfig.borderColor}`,
+            borderBottom: `1px solid ${topBarConfig.borderColor}`,
             transition: 'background-color 0.25s ease, border-color 0.25s ease',
             zIndex: 10,
             flexShrink: 0,
             gap: 1
           }}
         >
-          {isAtelier ? (
-            renderHorizonTopBar()
-          ) : (
-          <>
-          {/* Left: Collapse Toggle + Breadcrumbs */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 }, minWidth: 0 }}>
-            {/* Microsoft 365 Waffle Icon */}
-            {designSystem === 'microsoft' && (
-              <Tooltip title="Microsoft 365 Apps">
-                <IconButton
-                  size="small"
-                  sx={{
-                    width: 34,
-                    height: 34,
-                    color: '#FFFFFF',
-                    p: 0.5,
-                    borderRadius: '4px',
-                    '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.14)' }
-                  }}
-                >
-                  <Apps fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            )}
-
-            <IconButton
-              onClick={isMobile ? () => setMobileOpen(true) : toggleSidebarCollapse}
-              size="small"
-              sx={{
-                width: 36,
-                height: 36,
-                flexShrink: 0,
-                borderRadius: designSystem === 'microsoft' ? '4px' : (designSystem === 'material' ? '50%' : '9px'),
-                border: topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.25)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)'),
-                color: topBarConfig.textColor,
-                '&:hover': { bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.15)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)') }
-              }}
-              title={isMobile ? "Open menu" : (isCollapsed ? "Expand sidebar" : "Collapse sidebar")}
-            >
-              {isMobile ? <Menu fontSize="small" /> : (isCollapsed ? <ChevronRight fontSize="small" /> : <ChevronLeft fontSize="small" />)}
-            </IconButton>
-
-            {/* Mobile View: Compact active page title */}
-            <Typography
-              noWrap
-              sx={{
-                display: { xs: 'block', sm: 'none' },
-                fontSize: '0.86rem',
-                fontWeight: 800,
-                color: topBarConfig.textColor,
-                letterSpacing: '-0.015em',
-                maxWidth: { xs: 150, xxs: 110 }
-              }}
-            >
-              {getBreadcrumbTitle()}
-            </Typography>
-
-            {/* Tablet / iPad / Desktop Breadcrumbs */}
-            <Box sx={{ display: { xs: 'none', sm: 'block' }, minWidth: 0 }}>
-              <Typography sx={{ fontSize: '0.72rem', color: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.75)' : 'text.secondary', fontWeight: 600, lineHeight: 1.2 }} noWrap>
-                {profile?.businessName || 'Aleen Clothing'} • {getSystemSubtitle()}
-              </Typography>
-              <Typography sx={{ fontSize: '0.95rem', color: topBarConfig.textColor, fontWeight: 800, letterSpacing: '-0.015em', lineHeight: 1.2 }} noWrap>
-                {getBreadcrumbTitle()}
-              </Typography>
-            </Box>
-
-            {/* Zoho CRM Module Navigation Bar */}
-            {designSystem === 'zoho' && (
-              <Box sx={{ display: { xs: 'none', xl: 'flex' }, alignItems: 'center', gap: 0.5, ml: 2, pl: 2, borderLeft: '1px solid rgba(0,0,0,0.1)' }}>
-                {[
-                  { label: 'Sales & Invoices', path: '/invoices' },
-                  { label: 'Customers', path: '/customers' },
-                  { label: 'Workshop', path: '/tailoring' },
-                  { label: 'Inventory', path: '/inventory' },
-                  { label: 'Analytics', path: '/advanced-reports' }
-                ].map(tab => (
-                  <Button
-                    key={tab.label}
-                    onClick={() => navigate(tab.path)}
-                    size="small"
-                    sx={{
-                      textTransform: 'none',
-                      fontSize: '0.78rem',
-                      fontWeight: location.pathname === tab.path ? 700 : 500,
-                      color: location.pathname === tab.path ? '#EA580C' : (isDark ? '#CBD5E1' : '#475569'),
-                      borderBottom: location.pathname === tab.path ? '2px solid #EA580C' : '2px solid transparent',
-                      borderRadius: 0,
-                      px: 1,
-                      py: 0.5,
-                      minWidth: 0,
-                      '&:hover': { bgcolor: 'rgba(234, 88, 12, 0.08)' }
-                    }}
-                  >
-                    {tab.label}
-                  </Button>
-                ))}
-              </Box>
-            )}
-
-            {/* Stripe FinTech Live Badge */}
-            {designSystem === 'stripe' && (
-              <Box sx={{ display: { xs: 'none', lg: 'inline-flex' }, alignItems: 'center', gap: 0.75, ml: 1.5, px: 1.2, py: 0.35, borderRadius: '6px', bgcolor: 'rgba(99, 91, 255, 0.1)', border: '1px solid rgba(99, 91, 255, 0.25)' }}>
-                <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#00D924', boxShadow: '0 0 6px #00D924' }} />
-                <Typography sx={{ fontSize: '0.68rem', fontFamily: 'monospace', fontWeight: 700, color: '#635BFF' }}>
-                  FINTECH API • v2.4 LIVE
-                </Typography>
-              </Box>
-            )}
-          </Box>
-
-          {/* Right: Actions, Search Capsule, Register Status, Quick Bill, Theme Toggle */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.75, sm: 1.25, md: 1.5 }, flexShrink: 0 }}>
-            {/* Mobile / Tablet Quick Search Icon Button (<900px) */}
-            <IconButton
-              onClick={() => setSearchOpen(true)}
-              size="small"
-              sx={{
-                display: { xs: 'inline-flex', md: 'none' },
-                width: 36,
-                height: 36,
-                borderRadius: '9px',
-                border: topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.25)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)'),
-                color: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.9)' : 'text.secondary',
-                '&:hover': { bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.15)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)') }
-              }}
-              title="Search CRM (⌘K)"
-            >
-              <Search fontSize="small" />
-            </IconButton>
-
-            {/* Desktop Cmd+K Global Search Capsule (>=900px) */}
-            <Button
-              onClick={() => setSearchOpen(true)}
-              variant="outlined"
-              size="small"
-              startIcon={<Search fontSize="small" sx={{
-                color: designSystem === 'material'
-                  ? (isDark ? '#9AA0A6 !important' : '#5F6368 !important')
-                  : (designSystem === 'microsoft' ? '#616161 !important' : (topBarConfig.isColored ? '#FFFFFF !important' : 'text.secondary'))
-              }} />}
-              sx={{
-                borderRadius: designSystem === 'material'
-                  ? '24px !important'
-                  : (designSystem === 'microsoft' ? '4px !important' : `${activeSystemConfig?.shape?.buttonRadius || 9}px !important`),
-                borderColor: (designSystem === 'microsoft' || designSystem === 'material')
-                  ? 'transparent !important'
-                  : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.45) !important' : (isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)')),
-                color: designSystem === 'material'
-                  ? (isDark ? '#E8EAED !important' : '#3C4043 !important')
-                  : (designSystem === 'microsoft'
-                    ? '#242424 !important'
-                    : (topBarConfig.isColored ? '#FFFFFF !important' : 'text.secondary')),
-                px: 1.75,
-                py: 0.5,
-                height: 36,
-                bgcolor: designSystem === 'material'
-                  ? (isDark ? 'rgba(255, 255, 255, 0.08) !important' : '#F1F3F4 !important')
-                  : (designSystem === 'microsoft'
-                    ? '#FFFFFF !important'
-                    : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.18) !important' : (isDark ? 'rgba(0, 0, 0, 0.2)' : '#F8FAFC'))),
-                boxShadow: designSystem === 'microsoft' ? '0 1.6px 3.6px 0 rgba(0,0,0,0.13), 0 0.3px 0.9px 0 rgba(0,0,0,0.11)' : 'none',
-                display: { xs: 'none', md: 'inline-flex' },
-                '&:hover': {
-                  borderColor: (designSystem === 'microsoft' || designSystem === 'material')
-                    ? (designSystem === 'microsoft' ? '#0F6CBD !important' : 'transparent !important')
-                    : (topBarConfig.isColored ? '#FFFFFF !important' : 'primary.main'),
-                  bgcolor: designSystem === 'material'
-                    ? (isDark ? 'rgba(255, 255, 255, 0.14) !important' : '#E8EAED !important')
-                    : (designSystem === 'microsoft'
-                      ? '#FFFFFF !important'
-                      : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.28) !important' : (isDark ? 'rgba(155, 143, 245, 0.08)' : '#F0FDFA'))),
-                  boxShadow: designSystem === 'microsoft' ? '0 3.2px 7.2px 0 rgba(0,0,0,0.13), 0 0.6px 1.8px 0 rgba(0,0,0,0.11)' : 'none'
-                }
-              }}
-            >
-              <Typography sx={{
-                fontSize: '0.8rem',
-                fontWeight: designSystem === 'microsoft' ? 500 : 600,
-                mr: 1,
-                color: designSystem === 'material'
-                  ? (isDark ? '#E8EAED !important' : '#3C4043 !important')
-                  : (designSystem === 'microsoft' ? '#424242 !important' : (topBarConfig.isColored ? '#FFFFFF !important' : 'inherit'))
-              }}>
-                Search CRM...
-              </Typography>
-              <Chip 
-                label="⌘K" 
-                size="small" 
-                sx={{ 
-                  height: 18, 
-                  fontSize: '0.65rem', 
-                  fontWeight: 700,
-                  borderRadius: designSystem === 'material'
-                    ? '12px !important'
-                    : (designSystem === 'microsoft' ? '3px !important' : '7px !important'),
-                  bgcolor: designSystem === 'material'
-                    ? (isDark ? 'rgba(255, 255, 255, 0.12) !important' : '#FFFFFF !important')
-                    : (designSystem === 'microsoft' ? '#F3F2F1 !important' : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.28) !important' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'))),
-                  color: designSystem === 'material'
-                    ? (isDark ? '#E8EAED !important' : '#5F6368 !important')
-                    : (designSystem === 'microsoft' ? '#616161 !important' : (topBarConfig.isColored ? '#FFFFFF !important' : 'text.secondary'))
-                }} 
-              />
-            </Button>
-
-            {/* Live Register & Cash Drawer Quick Console */}
-            <Tooltip title="View Cash Drawer & Close Shift (Z-Report)">
-              <Button
-                size="small"
-                variant="outlined"
-                startIcon={<PointOfSale sx={{
-                  fontSize: '15px !important',
-                  color: topBarConfig.isColored 
-                    ? '#FFFFFF !important' 
-                    : (isDark ? `${theme.palette.primary.light} !important` : `${theme.palette.primary.main} !important`)
-                }} />}
-                onClick={() => setCashDrawerOpen(true)}
-                sx={{
-                  height: 34,
-                  fontSize: '0.74rem',
-                  fontWeight: designSystem === 'microsoft' ? 600 : 700,
-                  bgcolor: topBarConfig.isColored
-                    ? 'rgba(255, 255, 255, 0.16) !important'
-                    : (isDark ? `${theme.palette.primary.main}1F !important` : `${theme.palette.primary.main}12 !important`),
-                  color: topBarConfig.isColored
-                    ? '#FFFFFF !important'
-                    : (isDark ? theme.palette.primary.light : (theme.palette.primary.dark || theme.palette.primary.main)),
-                  borderColor: topBarConfig.isColored
-                    ? 'rgba(255, 255, 255, 0.35) !important'
-                    : `${theme.palette.primary.main}38 !important`,
-                  borderRadius: designSystem === 'material'
-                    ? '20px !important'
-                    : (designSystem === 'microsoft' ? '4px !important' : `${activeSystemConfig?.shape?.buttonRadius || 8}px !important`),
-                  px: 1.5,
-                  display: { xs: 'none', md: 'inline-flex' },
-                  textTransform: 'none',
-                  transition: 'all 0.2s ease',
-                  '&:hover': {
-                    bgcolor: topBarConfig.isColored
-                      ? 'rgba(255, 255, 255, 0.26) !important'
-                      : (isDark ? `${theme.palette.primary.main}33 !important` : `${theme.palette.primary.main}22 !important`),
-                    borderColor: topBarConfig.isColored
-                      ? 'rgba(255, 255, 255, 0.6) !important'
-                      : `${theme.palette.primary.main} !important`
-                  }
-                }}
-              >
-                Drawer & Z-Report
-              </Button>
-            </Tooltip>
-
-            {/* Quick Bill CTA */}
-            {canQuickBill && (
-              <Tooltip title="Quick POS Bill (Alt + N or F2)">
-                <IconButton
-                  onClick={handleQuickBill}
-                  size="small"
-                  sx={{
-                    width: 36,
-                    height: 36,
-                    display: { xs: 'inline-flex', sm: 'none' },
-                    borderRadius: designSystem === 'material' ? '50%' : (designSystem === 'microsoft' ? '4px' : `${activeSystemConfig?.shape?.buttonRadius || 8}px`),
-                    bgcolor: topBarConfig.isColored ? '#FFFFFF' : theme.palette.primary.main,
-                    color: topBarConfig.isColored ? theme.palette.primary.main : (theme.palette.primary.contrastText || '#FFFFFF'),
-                    boxShadow: topBarConfig.isColored ? '0 2px 8px rgba(0,0,0,0.2)' : `0 2px 8px ${theme.palette.primary.main}59`,
-                    '&:hover': {
-                      filter: 'brightness(0.92)'
-                    }
-                  }}
-                >
-                  <Add fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            )}
-            {canQuickBill && (
-              <Button
-                variant="contained"
-                size="small"
-                startIcon={<Add fontSize="small" sx={{
-                  color: topBarConfig.isColored ? `${theme.palette.primary.main} !important` : `${theme.palette.primary.contrastText || '#FFFFFF'} !important`
-                }} />}
-                onClick={handleQuickBill}
-                title="INVOICE (Alt + N or F2)"
-                sx={{
-                  height: 34,
-                  px: 2,
-                  borderRadius: designSystem === 'material'
-                    ? '24px !important'
-                    : (designSystem === 'microsoft' ? '4px !important' : `${activeSystemConfig?.shape?.buttonRadius || 8}px !important`),
-                  fontWeight: designSystem === 'microsoft' ? 600 : 700,
-                  fontSize: '0.825rem',
-                  textTransform: 'none',
-                  bgcolor: topBarConfig.isColored ? '#FFFFFF !important' : `${theme.palette.primary.main} !important`,
-                  color: topBarConfig.isColored ? `${theme.palette.primary.main} !important` : `${theme.palette.primary.contrastText || '#FFFFFF'} !important`,
-                  boxShadow: topBarConfig.isColored
-                    ? '0 2px 10px rgba(0, 0, 0, 0.25)'
-                    : `0 4px 14px ${theme.palette.primary.main}4D`,
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  display: { xs: 'none', sm: 'inline-flex' },
-                  transition: 'all 0.2s ease',
-                  '&:hover': {
-                    bgcolor: topBarConfig.isColored
-                      ? 'rgba(255, 255, 255, 0.92) !important'
-                      : `${theme.palette.primary.dark} !important`,
-                    boxShadow: topBarConfig.isColored
-                      ? '0 4px 14px rgba(0, 0, 0, 0.3)'
-                      : `0 6px 18px ${theme.palette.primary.main}66`
-                  }
-                }}
-              >
-                Quick Bill
-              </Button>
-            )}
-
-            {/* Notification Center */}
-            <NotificationCenter />
-
-            {/* Table Density Toggle (Comfortable vs Compact) */}
-            <Tooltip title={density === 'compact' ? "Table Layout: Compact (Click for Comfortable)" : "Table Layout: Comfortable (Click for Compact)"}>
-              <IconButton 
-                onClick={toggleDensity} 
-                size="small"
-                sx={{ 
-                  width: 36, 
-                  height: 36, 
-                  borderRadius: designSystem === 'material' ? '50% !important' : (designSystem === 'microsoft' ? '4px' : `${activeSystemConfig?.shape?.buttonRadius || 6}px`),
-                  border: designSystem === 'material' ? 'none' : (topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.35)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)')),
-                  color: density === 'compact' ? (topBarConfig.isColored ? '#FFFFFF' : (isDark ? '#2DD4BF' : theme.palette.primary.main)) : (topBarConfig.isColored ? '#FFFFFF' : 'text.secondary'),
-                  bgcolor: density === 'compact' ? (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.25)' : (isDark ? 'rgba(155, 143, 245, 0.14)' : `${theme.palette.primary.main}14`)) : (designSystem === 'material' ? (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)') : 'transparent'),
-                  display: { xs: 'none', sm: 'inline-flex' },
-                  '&:hover': {
-                    bgcolor: designSystem === 'material' ? (isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)') : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.2)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)'))
-                  }
-                }}
-              >
-                <ViewHeadline fontSize="small" />
-              </IconButton>
-            </Tooltip>
-
-            {/* Quick CRM Color Palette Switcher */}
-            <Tooltip title="CRM Color Themes & Appearance">
-              <IconButton 
-                onClick={() => navigate('/settings?tab=colors')} 
-                size="small"
-                sx={{ 
-                  width: 36, 
-                  height: 36, 
-                  borderRadius: designSystem === 'material' ? '50% !important' : (designSystem === 'microsoft' ? '4px' : `${activeSystemConfig?.shape?.buttonRadius || 6}px`),
-                  border: designSystem === 'material' ? 'none' : (topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.35)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : `1px solid ${theme.palette.primary.main}26`)),
-                  color: topBarConfig.isColored ? '#FFFFFF' : (designSystem === 'material' ? (isDark ? '#8AB4F8' : '#1A73E8') : 'primary.main'),
-                  bgcolor: designSystem === 'material' ? (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)') : 'transparent',
-                  display: { xs: 'none', sm: 'inline-flex' },
-                  '&:hover': {
-                    bgcolor: designSystem === 'material' ? (isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)') : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.2)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : `${theme.palette.primary.main}0E`))
-                  }
-                }}
-              >
-                <Palette fontSize="small" />
-              </IconButton>
-            </Tooltip>
-
-            {/* Theme Toggle (Porcelain / Dark Mode) */}
-            <IconButton 
-                onClick={toggleTheme} 
-                size="small"
-                sx={{ 
-                  width: 36, 
-                  height: 36, 
-                  borderRadius: designSystem === 'material' ? '50% !important' : (designSystem === 'microsoft' ? '4px' : `${activeSystemConfig?.shape?.buttonRadius || 6}px`),
-                  border: designSystem === 'material' ? 'none' : (topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.35)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : `1px solid ${theme.palette.primary.main}26`)),
-                  color: topBarConfig.textColor,
-                  bgcolor: designSystem === 'material' ? (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)') : 'transparent',
-                  '&:hover': {
-                    bgcolor: designSystem === 'material' ? (isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)') : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.2)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)'))
-                  }
-                }}
-                title={mode === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            >
-              {mode === 'dark' ? <Brightness7 fontSize="small" sx={{ color: '#F59E0B' }} /> : <Brightness4 fontSize="small" sx={{ color: topBarConfig.isColored ? '#FFFFFF' : (designSystem === 'material' ? '#1A73E8' : theme.palette.primary.main) }} />}
-            </IconButton>
-
-            {/* Top Right Logout Button */}
-            <Tooltip title="Log out of Aleen Clothing">
-              <Button
-                onClick={handleLogout}
-                size="small"
-                variant={topBarConfig.isColored ? "contained" : "outlined"}
-                startIcon={<Logout fontSize="small" sx={{ color: topBarConfig.isColored ? '#FFFFFF !important' : 'inherit' }} />}
-                sx={{
-                  height: 34,
-                  borderRadius: `${activeSystemConfig?.shape?.buttonRadius || 6}px !important`,
-                  textTransform: 'none',
-                  fontWeight: 700,
-                  fontSize: '0.78rem',
-                  borderColor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.45) !important' : (isDark ? 'rgba(239, 68, 68, 0.35)' : 'rgba(239, 68, 68, 0.25)'),
-                  color: topBarConfig.isColored ? '#FFFFFF !important' : (isDark ? '#FCA5A5' : '#DC2626'),
-                  bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.2) !important' : (isDark ? 'rgba(239, 68, 68, 0.08)' : 'rgba(254, 242, 242, 0.7)'),
-                  px: { xs: 1, sm: 1.6 },
-                  display: { xs: 'none', sm: 'inline-flex' },
-                  '& .MuiButton-startIcon': {
-                    mr: { xs: 0, sm: 1 },
-                    ml: { xs: 0, sm: -0.5 }
-                  },
-                  '&:hover': {
-                    borderColor: topBarConfig.isColored ? '#FFFFFF !important' : 'error.main',
-                    bgcolor: topBarConfig.isColored ? 'rgba(255, 255, 255, 0.3) !important' : (isDark ? 'rgba(239, 68, 68, 0.18)' : '#FEE2E2')
-                  }
-                }}
-              >
-                <span>Logout</span>
-              </Button>
-            </Tooltip>
-          </Box>
-          </>
-          )}
+          {renderHorizonTopBar()}
         </Box>
 
         {/* Scrollable Viewport Content Area */}
