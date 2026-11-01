@@ -18,7 +18,9 @@ import {
   Tooltip,
   Paper,
   Button,
-  Fab
+  Fab,
+  Menu as MuiMenu,
+  MenuItem
 } from '@mui/material';
 import { 
   Menu, 
@@ -129,6 +131,7 @@ export default function Layout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [cashDrawerOpen, setCashDrawerOpen] = useState(false);
+  const [profileMenuAnchor, setProfileMenuAnchor] = useState(null);
 
   const toggleSidebarCollapse = () => {
     setIsCollapsed(prev => {
@@ -556,7 +559,7 @@ export default function Layout() {
     width: 34,
     height: 34,
     borderRadius: '10px',
-    border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : '#EFEFF4'}`,
+    border: isDark ? '1px solid transparent' : '1px solid #EFEFF4',
     bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : '#FFFFFF',
     color: active ? theme.palette.primary.main : 'text.secondary',
     flexShrink: 0,
@@ -612,8 +615,8 @@ export default function Layout() {
           alignItems: 'center',
           gap: { xs: 0.25, sm: 0.5 },
           flexShrink: 0,
-          bgcolor: isDark ? '#1D1A2E' : '#FFFFFF',
-          border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'}`,
+          bgcolor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+          border: '1px solid transparent',
           borderRadius: '999px',
           px: { xs: 0.5, sm: 1 },
           py: 0.5,
@@ -690,6 +693,8 @@ export default function Layout() {
         <Avatar
           src={profile?.logoUrl || undefined}
           alt={profile?.businessName || 'Aleen'}
+          onClick={(e) => setProfileMenuAnchor(e.currentTarget)}
+          title="Account menu"
           sx={{
             width: 32,
             height: 32,
@@ -699,15 +704,69 @@ export default function Layout() {
             fontSize: '0.7rem',
             fontWeight: 800,
             ml: 0.25,
-            border: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid #FFFFFF',
+            cursor: 'pointer',
+            border: isDark ? '1px solid transparent' : '2px solid rgba(124, 111, 232, 0.4)',
             objectFit: 'contain',
             p: profile?.logoUrl ? 0.25 : 0,
-            boxShadow: '0 2px 8px rgba(124, 111, 232, 0.35)'
+            boxShadow: '0 2px 8px rgba(124, 111, 232, 0.35)',
+            transition: 'box-shadow 0.2s ease, transform 0.2s ease',
+            '&:hover': {
+              boxShadow: '0 0 0 4px rgba(124, 111, 232, 0.18), 0 2px 8px rgba(124, 111, 232, 0.35)',
+              transform: 'translateY(-1px)'
+            }
           }}
         >
           {(profile?.businessName || 'A').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()}
         </Avatar>
       </Box>
+
+      {/* Profile dropdown menu */}
+      <MuiMenu
+        anchorEl={profileMenuAnchor}
+        open={Boolean(profileMenuAnchor)}
+        onClose={() => setProfileMenuAnchor(null)}
+        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        PaperProps={{
+          sx: {
+            mt: 1.25,
+            minWidth: 220,
+            borderRadius: '14px',
+            bgcolor: isDark ? '#1D1A2E' : '#FFFFFF',
+            backgroundImage: 'none',
+            border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'}`,
+            boxShadow: isDark ? '0 16px 40px rgba(0, 0, 0, 0.5)' : '0 16px 40px rgba(112, 114, 176, 0.2)'
+          }
+        }}
+      >
+        <Box sx={{ px: 2, py: 1.25, borderBottom: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.06)' : '#F1EFFC'}` }}>
+          <Typography sx={{ fontSize: '0.82rem', fontWeight: 800, color: 'text.primary', letterSpacing: '-0.01em' }}>
+            {profile?.businessName || 'Aleen Clothing'}
+          </Typography>
+          <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: 'text.secondary' }}>
+            {user?.name || user?.email || 'Boutique Owner'}
+          </Typography>
+        </Box>
+        <MenuItem
+          onClick={() => { setProfileMenuAnchor(null); navigate('/settings'); }}
+          sx={{ fontSize: '0.8rem', fontWeight: 600, gap: 1.25, py: 1.1, color: 'text.primary' }}
+        >
+          <Settings fontSize="small" sx={{ color: 'text.secondary' }} /> Boutique Settings
+        </MenuItem>
+        <MenuItem
+          onClick={() => { setProfileMenuAnchor(null); navigate('/settings?tab=colors'); }}
+          sx={{ fontSize: '0.8rem', fontWeight: 600, gap: 1.25, py: 1.1, color: 'text.primary' }}
+        >
+          <Palette fontSize="small" sx={{ color: theme.palette.primary.main }} /> Color Themes
+        </MenuItem>
+        <Divider sx={{ my: 0.5, borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4' }} />
+        <MenuItem
+          onClick={() => { setProfileMenuAnchor(null); handleLogout(); }}
+          sx={{ fontSize: '0.8rem', fontWeight: 700, gap: 1.25, py: 1.1, color: isDark ? '#FCA5A5' : '#DC2626' }}
+        >
+          <Logout fontSize="small" sx={{ color: 'inherit' }} /> Logout
+        </MenuItem>
+      </MuiMenu>
     </>
   );
 
@@ -767,7 +826,7 @@ export default function Layout() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            bgcolor: topBarConfig.bg,
+            bgcolor: isAtelier && !isDark ? 'background.default' : topBarConfig.bg,
             background: designSystem === 'microsoft' && !isDark ? 'linear-gradient(90deg, #0B5A9E 0%, #0F6CBD 60%, #115EA3 100%)' : undefined,
             color: topBarConfig.textColor,
             backdropFilter: topBarConfig.isTranslucent ? 'blur(20px)' : 'none',
