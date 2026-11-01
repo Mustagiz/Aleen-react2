@@ -113,7 +113,7 @@ export default function UpiPaymentQrModal({
           borderRadius: 3.5,
           overflow: 'hidden',
           boxShadow: '0 24px 60px rgba(0,0,0,0.3)',
-          border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.2)'
+          border: '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.2)'
         }
       }}
     >
@@ -121,7 +121,7 @@ export default function UpiPaymentQrModal({
         sx={{
           py: 2,
           px: 3,
-          background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.dark || '#042F2E'} 0%, ${t.palette.primary.main} 100%)`,
+          background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.dark || '#5B4BD1'} 0%, ${t.palette.primary.main} 100%)`,
           color: '#FFFFFF',
           display: 'flex',
           alignItems: 'center',
@@ -172,7 +172,7 @@ export default function UpiPaymentQrModal({
               <Chip
                 label={`Invoice #${invoiceNumber}`}
                 size="small"
-                sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)', color: 'primary.main', fontWeight: 700, fontSize: '0.72rem' }}
+                sx={{ bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)', color: 'primary.main', fontWeight: 700, fontSize: '0.72rem' }}
               />
             )}
             {tenderLabel && (
@@ -194,7 +194,7 @@ export default function UpiPaymentQrModal({
             display: 'inline-block',
             borderRadius: 3,
             bgcolor: '#FFFFFF',
-            border: '2px solid rgba(var(--primary-rgb, 15, 118, 110), 0.2)',
+            border: '2px solid rgba(var(--primary-rgb, 124, 111, 232), 0.2)',
             boxShadow: '0 8px 30px rgba(10, 77, 70, 0.12)'
           }}
         >
@@ -253,7 +253,7 @@ export default function UpiPaymentQrModal({
                     setSnackbarMsg(`Using UPI ID: ${storeVpa}`);
                     setSnackbarOpen(true);
                   }}
-                  sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: 'primary.main' }}
+                  sx={{ bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)', color: 'primary.main' }}
                 >
                   <Check fontSize="small" />
                 </IconButton>

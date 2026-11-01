@@ -54,18 +54,18 @@ export default function GarmentSilhouetteBadge({
           flexShrink: 0,
           background: isDark
             ? 'rgba(255, 255, 255, 0.05)'
-            : 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
+            : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
           border: '1px solid',
           borderColor: isDark
             ? 'rgba(255, 255, 255, 0.1)'
-            : 'rgba(var(--primary-rgb, 15, 118, 110), 0.15)',
+            : 'rgba(var(--primary-rgb, 124, 111, 232), 0.15)',
           ...sx
         }}
       >
         <IconComponent
           sx={{
             fontSize: isSmall ? 14 : 17,
-            color: isDark ? '#2DD4BF' : '#0F766E',
+            color: isDark ? '#2DD4BF' : '#7C6FE8',
             flexShrink: 0
           }}
         />

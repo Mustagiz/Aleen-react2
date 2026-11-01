@@ -558,7 +558,7 @@ const PublicBillView = () => {
             gap: 2,
             background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
             color: '#FFFFFF',
-            boxShadow: '0 8px 24px rgba(4, 47, 46, 0.2)',
+            boxShadow: '0 8px 24px rgba(91, 75, 209, 0.2)',
             '@media print': {
               display: 'none !important'
             }
@@ -727,7 +727,7 @@ const PublicBillView = () => {
                   px: 2.8,
                   borderRadius: 2.5,
                   textTransform: 'none',
-                  boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
+                  boxShadow: '0 4px 14px rgba(124, 111, 232, 0.35)',
                   '&:hover': { bgcolor: 'text.primary' }
                 }}
               >
@@ -762,8 +762,8 @@ const PublicBillView = () => {
               p: 1.5,
               px: 2,
               borderRadius: 2.5,
-              bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)',
-              border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.2)',
+              bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)',
+              border: '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.2)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
@@ -887,7 +887,7 @@ const PublicBillView = () => {
               borderRadius: 3.5,
               overflow: 'hidden',
               p: 0,
-              boxShadow: '0 24px 60px rgba(4, 47, 46, 0.3)'
+              boxShadow: '0 24px 60px rgba(91, 75, 209, 0.3)'
             }
           }}
         >
@@ -938,8 +938,8 @@ const PublicBillView = () => {
                 p: 1.5,
                 borderRadius: 3,
                 bgcolor: '#FFFFFF',
-                border: '2px solid #0F766E',
-                boxShadow: '0 10px 30px rgba(var(--primary-rgb, 15, 118, 110), 0.15)',
+                border: '2px solid #7C6FE8',
+                boxShadow: '0 10px 30px rgba(var(--primary-rgb, 124, 111, 232), 0.15)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -1008,10 +1008,10 @@ const PublicBillView = () => {
                   fontWeight: 800,
                   fontSize: '0.74rem',
                   borderRadius: 2,
-                  bgcolor: copiedVpa ? '#0F766E' : 'transparent',
+                  bgcolor: copiedVpa ? '#7C6FE8' : 'transparent',
                   bordercolor: (t) => t.palette.primary.main,
-                  color: copiedVpa ? '#FFFFFF' : '#0F766E',
-                  '&:hover': { bgcolor: copiedVpa ? '#042F2E' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)' }
+                  color: copiedVpa ? '#FFFFFF' : '#7C6FE8',
+                  '&:hover': { bgcolor: copiedVpa ? '#042F2E' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)' }
                 }}
               >
                 {copiedVpa ? 'Copied!' : 'Copy'}
@@ -1032,7 +1032,7 @@ const PublicBillView = () => {
                 borderRadius: 2.5,
                 textTransform: 'none',
                 mb: 1.5,
-                boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
+                boxShadow: '0 4px 14px rgba(124, 111, 232, 0.35)',
                 '&:hover': { bgcolor: 'text.primary' }
               }}
             >

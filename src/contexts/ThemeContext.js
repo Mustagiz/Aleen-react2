@@ -120,7 +120,7 @@ export const ThemeProvider = ({ children }) => {
         const root = document.documentElement;
         if (activeSystemConfig && activePalette) {
             const hexToRgb = (hex) => {
-                if (!hex) return '15, 118, 110';
+                if (!hex) return '124, 111, 232';
                 let c = hex.replace('#', '');
                 if (c.length === 3) {
                     c = c.split('').map(char => char + char).join('');
@@ -190,7 +190,7 @@ export const ThemeProvider = ({ children }) => {
                 background: {
                     default: mode === 'light' 
                         ? (activeSystemConfig.palette.background?.lightDefault || '#F8FAFC') 
-                        : (activeSystemConfig.palette.background?.darkDefault || '#081212'),
+                        : (activeSystemConfig.palette.background?.darkDefault || '#14121F'),
                     paper: mode === 'light' 
                         ? (activeSystemConfig.palette.background?.lightPaper || '#FFFFFF') 
                         : (activeSystemConfig.palette.background?.darkPaper || '#161618')
@@ -231,7 +231,7 @@ export const ThemeProvider = ({ children }) => {
                             minHeight: activeSystemConfig.id === 'zoho' || activeSystemConfig.id === 'microsoft' ? 36 : 40,
                             padding: activeSystemConfig.id === 'material' ? '10px 24px' : (activeSystemConfig.id === 'microsoft' || activeSystemConfig.id === 'zoho' ? '6px 16px' : '8px 20px'),
                             boxShadow: 'none',
-                            fontWeight: activeSystemConfig.id === 'microsoft' ? 600 : 700,
+                            fontWeight: activeSystemConfig.id === 'microsoft' || activeSystemConfig.id === 'atelier' ? 600 : 700,
                             fontSize: activeSystemConfig.id === 'zoho' || activeSystemConfig.id === 'microsoft' ? '0.81rem' : '0.84rem',
                             letterSpacing: activeSystemConfig.typography.letterSpacing || '0.015em',
                             transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',

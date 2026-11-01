@@ -293,7 +293,7 @@ const AdvancedReports = () => {
                 p.quantity
             ]),
             theme: 'grid',
-            headStyles: { fillColor: [15, 118, 110] },
+            headStyles: { fillColor: [124, 111, 232] },
             columnStyles: {
                 1: { halign: 'right' },
                 2: { halign: 'right' },
@@ -321,7 +321,7 @@ const AdvancedReports = () => {
                 s.stock
             ]),
             theme: 'grid',
-            headStyles: { fillColor: [15, 118, 110] },
+            headStyles: { fillColor: [124, 111, 232] },
             columnStyles: {
                 2: { halign: 'right' },
                 3: { halign: 'right' },
@@ -354,7 +354,7 @@ const AdvancedReports = () => {
                             height: 42,
                             boxSizing: 'border-box',
                             borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                            border: '1.5px solid rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
+                            border: '1.5px solid rgba(var(--primary-rgb, 124, 111, 232), 0.25)',
                             boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
                         }}>
                             {[
@@ -407,7 +407,7 @@ const AdvancedReports = () => {
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
                                     border: (t) => `1.5px solid ${t.palette.primary.dark}`,
-                                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
+                                    bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
                             }}
@@ -436,7 +436,7 @@ const AdvancedReports = () => {
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
                                     border: (t) => `1.5px solid ${t.palette.primary.dark}`,
-                                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
+                                    bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
                             }}
@@ -465,7 +465,7 @@ const AdvancedReports = () => {
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
                                     border: (t) => `1.5px solid ${t.palette.primary.dark}`,
-                                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
+                                    bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
                             }}
@@ -531,10 +531,10 @@ const AdvancedReports = () => {
                     border: '1px solid',
                     borderColor: 'divider',
                     overflow: 'hidden',
-                    boxShadow: '0 4px 20px -4px rgba(var(--primary-rgb, 15, 118, 110), 0.08)'
+                    boxShadow: '0 4px 20px -4px rgba(var(--primary-rgb, 124, 111, 232), 0.08)'
                 }}
             >
-                <Box sx={{ borderBottom: '1px solid', borderColor: 'divider', px: 2, pt: 1, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.02)' }}>
+                <Box sx={{ borderBottom: '1px solid', borderColor: 'divider', px: 2, pt: 1, bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.02)' }}>
                     <Tabs
                         value={activeTab}
                         onChange={(e, newValue) => setActiveTab(newValue)}
@@ -570,7 +570,7 @@ const AdvancedReports = () => {
                     {activeTab === 0 && (
                         <TableContainer sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                             <Table>
-                                <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }}>
+                                <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' }}>
                                     <TableRow>
                                         <TableCell sx={{ fontWeight: 800, color: 'text.primary' }}>Category</TableCell>
                                         <TableCell sx={{ fontWeight: 800, color: 'text.primary' }} align="right">Gross Revenue</TableCell>
@@ -589,7 +589,7 @@ const AdvancedReports = () => {
                                         </TableRow>
                                     ) : (
                                         profitData.map((row) => (
-                                            <TableRow key={row.category} hover sx={{ '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.02)' } }}>
+                                            <TableRow key={row.category} hover sx={{ '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.02)' } }}>
                                                 <TableCell sx={{ fontWeight: 700, color: 'text.primary' }}>
                                                     {row.category}
                                                 </TableCell>
@@ -599,7 +599,7 @@ const AdvancedReports = () => {
                                                 <TableCell align="right" sx={{ color: 'text.secondary' }}>
                                                     ₹{row.cost.toLocaleString('en-IN')}
                                                 </TableCell>
-                                                <TableCell align="right" sx={{ fontWeight: 800, color: row.profit >= 0 ? '#0F766E' : '#DC2626' }}>
+                                                <TableCell align="right" sx={{ fontWeight: 800, color: row.profit >= 0 ? '#7C6FE8' : '#DC2626' }}>
                                                     ₹{row.profit.toLocaleString('en-IN')}
                                                 </TableCell>
                                                 <TableCell align="right">
@@ -607,8 +607,8 @@ const AdvancedReports = () => {
                                                         label={`${row.margin.toFixed(1)}%`}
                                                         size="small"
                                                         sx={{
-                                                            bgcolor: row.margin >= 30 ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)' : row.margin >= 15 ? 'rgba(217, 119, 6, 0.1)' : 'rgba(220, 38, 38, 0.1)',
-                                                            color: row.margin >= 30 ? '#0F766E' : row.margin >= 15 ? '#D97706' : '#DC2626',
+                                                            bgcolor: row.margin >= 30 ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)' : row.margin >= 15 ? 'rgba(217, 119, 6, 0.1)' : 'rgba(220, 38, 38, 0.1)',
+                                                            color: row.margin >= 30 ? '#7C6FE8' : row.margin >= 15 ? '#D97706' : '#DC2626',
                                                             fontWeight: 800,
                                                             fontSize: '0.75rem'
                                                         }}
@@ -629,7 +629,7 @@ const AdvancedReports = () => {
                     {activeTab === 1 && (
                         <TableContainer sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                             <Table>
-                                <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }}>
+                                <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' }}>
                                     <TableRow>
                                         <TableCell sx={{ fontWeight: 800, color: 'text.primary', width: 80 }} align="center">Rank</TableCell>
                                         <TableCell sx={{ fontWeight: 800, color: 'text.primary' }}>Creations / Item</TableCell>
@@ -649,7 +649,7 @@ const AdvancedReports = () => {
                                         </TableRow>
                                     ) : (
                                         bestSellers.map((product, index) => (
-                                            <TableRow key={product.id} hover sx={{ '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.02)' } }}>
+                                            <TableRow key={product.id} hover sx={{ '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.02)' } }}>
                                                 <TableCell align="center">
                                                     <Chip
                                                         label={`#${index + 1}`}
@@ -687,8 +687,8 @@ const AdvancedReports = () => {
                                                         label={product.stock > 10 ? `${product.stock} in stock` : product.stock > 0 ? `Low: ${product.stock}` : 'Out of stock'}
                                                         size="small"
                                                         sx={{
-                                                            bgcolor: product.stock > 10 ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)' : product.stock > 0 ? 'rgba(217, 119, 6, 0.1)' : 'rgba(220, 38, 38, 0.1)',
-                                                            color: product.stock > 10 ? '#0F766E' : product.stock > 0 ? '#D97706' : '#DC2626',
+                                                            bgcolor: product.stock > 10 ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)' : product.stock > 0 ? 'rgba(217, 119, 6, 0.1)' : 'rgba(220, 38, 38, 0.1)',
+                                                            color: product.stock > 10 ? '#7C6FE8' : product.stock > 0 ? '#D97706' : '#DC2626',
                                                             fontWeight: 700,
                                                             fontSize: '0.72rem'
                                                         }}
@@ -706,7 +706,7 @@ const AdvancedReports = () => {
                     {activeTab === 2 && (
                         <TableContainer sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                             <Table>
-                                <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }}>
+                                <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' }}>
                                     <TableRow>
                                         <TableCell sx={{ fontWeight: 800, color: 'text.primary' }}>Client</TableCell>
                                         <TableCell sx={{ fontWeight: 800, color: 'text.primary' }} align="right">Total Orders</TableCell>
@@ -719,7 +719,7 @@ const AdvancedReports = () => {
                                 </TableHead>
                                 <TableBody>
                                     {customerFrequency.slice(0, 25).map((customer) => (
-                                        <TableRow key={customer.id} hover sx={{ '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.02)' } }}>
+                                        <TableRow key={customer.id} hover sx={{ '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.02)' } }}>
                                             <TableCell>
                                                 <Box>
                                                     <Typography variant="body2" sx={{ fontWeight: 700 }}>{customer.name}</Typography>
@@ -743,8 +743,8 @@ const AdvancedReports = () => {
                                                     label={customer.segment}
                                                     size="small"
                                                     sx={{
-                                                        bgcolor: customer.segment === 'VIP' ? 'rgba(217, 119, 6, 0.15)' : customer.segment === 'Loyal' ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.12)' : 'rgba(0,0,0,0.06)',
-                                                        color: customer.segment === 'VIP' ? '#D97706' : customer.segment === 'Loyal' ? '#0F766E' : 'text.primary',
+                                                        bgcolor: customer.segment === 'VIP' ? 'rgba(217, 119, 6, 0.15)' : customer.segment === 'Loyal' ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.12)' : 'rgba(0,0,0,0.06)',
+                                                        color: customer.segment === 'VIP' ? '#D97706' : customer.segment === 'Loyal' ? '#7C6FE8' : 'text.primary',
                                                         fontWeight: 800,
                                                         fontSize: '0.72rem'
                                                     }}
@@ -767,7 +767,7 @@ const AdvancedReports = () => {
                                                         label="Active"
                                                         size="small"
                                                         sx={{
-                                                            bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
+                                                            bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)',
                                                             color: (t) => t.palette.primary.main,
                                                             fontWeight: 700,
                                                             fontSize: '0.72rem'
@@ -807,7 +807,7 @@ const AdvancedReports = () => {
                             </Box>
                             <TableContainer sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                                 <Table size="small">
-                                    <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }}>
+                                    <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' }}>
                                         <TableRow>
                                             <TableCell sx={{ fontWeight: 800, color: 'text.primary' }}>Date</TableCell>
                                             <TableCell sx={{ fontWeight: 800, color: 'text.primary' }} align="right">Orders</TableCell>
@@ -817,7 +817,7 @@ const AdvancedReports = () => {
                                     </TableHead>
                                     <TableBody>
                                         {aovTrends.slice(-15).reverse().map((day) => (
-                                            <TableRow key={day.date} hover sx={{ '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.02)' } }}>
+                                            <TableRow key={day.date} hover sx={{ '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.02)' } }}>
                                                 <TableCell sx={{ fontWeight: 600 }}>{day.date}</TableCell>
                                                 <TableCell align="right" sx={{ fontWeight: 700 }}>{day.orders}</TableCell>
                                                 <TableCell align="right">₹{day.revenue.toLocaleString('en-IN')}</TableCell>

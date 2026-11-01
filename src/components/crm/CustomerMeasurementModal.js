@@ -176,7 +176,7 @@ export default function CustomerMeasurementModal({
           borderRadius: 3.5,
           overflow: 'hidden',
           backgroundColor: isDark ? '#0F1E1D' : '#FFFFFF',
-          border: isDark ? '1px solid rgba(20, 184, 166, 0.22)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.14)',
+          border: isDark ? '1px solid rgba(20, 184, 166, 0.22)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.14)',
           boxShadow: isDark
             ? '0 24px 60px rgba(0, 0, 0, 0.75), 0 0 35px rgba(20, 184, 166, 0.15)'
             : '0 24px 60px -8px rgba(10, 77, 70, 0.22), 0 4px 16px rgba(0, 0, 0, 0.06)'
@@ -185,7 +185,7 @@ export default function CustomerMeasurementModal({
     >
       <DialogTitle
         sx={{
-          background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.dark || '#042F2E'} 0%, ${t.palette.primary.main} 100%)`,
+          background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.dark || '#5B4BD1'} 0%, ${t.palette.primary.main} 100%)`,
           color: '#FFFFFF',
           px: 3,
           py: 2.25,
@@ -260,14 +260,14 @@ export default function CustomerMeasurementModal({
             gap: 1.5,
             p: 1.75,
             borderRadius: 2.5,
-            bgcolor: isDark ? 'rgba(20, 184, 166, 0.05)' : 'rgba(15, 118, 110, 0.035)',
+            bgcolor: isDark ? 'rgba(20, 184, 166, 0.05)' : 'rgba(124, 111, 232, 0.035)',
             border: '1px solid',
-            borderColor: isDark ? 'rgba(20, 184, 166, 0.14)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)'
+            borderColor: isDark ? 'rgba(20, 184, 166, 0.14)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)'
           }}
         >
           {/* Fit Selector */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
-            <Tune sx={{ fontSize: 20, color: isDark ? '#2DD4BF' : '#0F766E' }} />
+            <Tune sx={{ fontSize: 20, color: isDark ? '#2DD4BF' : '#7C6FE8' }} />
             <Box>
               <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.68rem', letterSpacing: '0.05em' }}>
                 Fit Silhouette
@@ -348,7 +348,7 @@ export default function CustomerMeasurementModal({
                       <Typography
                         variant="caption"
                         sx={{
-                          color: isDark ? '#2DD4BF' : '#0F766E',
+                          color: isDark ? '#2DD4BF' : '#7C6FE8',
                           fontWeight: 800,
                           fontSize: '0.72rem',
                           fontFamily: 'monospace'
@@ -376,7 +376,7 @@ export default function CustomerMeasurementModal({
           ))}
         </Grid>
 
-        <Divider sx={{ my: 0.5, borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)' }} />
+        <Divider sx={{ my: 0.5, borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)' }} />
 
         {/* Tailor & Styling Notes */}
         <TextField
@@ -402,7 +402,7 @@ export default function CustomerMeasurementModal({
           px: 3,
           py: 2,
           borderTop: '1px solid',
-          borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
+          borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)',
           display: 'flex',
           justifyContent: 'space-between'
         }}
@@ -417,8 +417,8 @@ export default function CustomerMeasurementModal({
           disabled={saving}
           sx={{
             background: isDark
-              ? 'linear-gradient(135deg, #0F766E 0%, #14B8A6 100%)'
-              : 'linear-gradient(135deg, #0A4D46 0%, #0F766E 100%)',
+              ? 'linear-gradient(135deg, #7C6FE8 0%, #9B8FF5 100%)'
+              : 'linear-gradient(135deg, #5B4BD1 0%, #7C6FE8 100%)',
             color: '#FFFFFF',
             fontWeight: 800,
             borderRadius: 2,

@@ -15,8 +15,8 @@ export default function AtelierStitchDivider({
   const isDark = theme.palette.mode === 'dark';
 
   const threadColor = gold
-    ? (isDark ? 'rgba(217, 119, 6, 0.45)' : 'rgba(217, 119, 6, 0.35)')
-    : (isDark ? 'rgba(20, 184, 166, 0.4)' : 'rgba(15, 118, 110, 0.3)');
+    ? (isDark ? 'rgba(155, 143, 245, 0.45)' : 'rgba(124, 111, 232, 0.35)')
+    : (isDark ? 'rgba(45, 212, 191, 0.4)' : 'rgba(124, 111, 232, 0.3)');
 
   return (
     <Box
@@ -60,8 +60,8 @@ export default function AtelierStitchDivider({
                 letterSpacing: '0.08em',
                 fontSize: '0.68rem',
                 color: gold
-                  ? (isDark ? '#FBBF24' : '#D97706')
-                  : (isDark ? '#2DD4BF' : '#0F766E')
+                  ? (isDark ? '#9B8FF5' : '#7C6FE8')
+                  : (isDark ? '#2DD4BF' : '#7C6FE8')
               }}
             >
               {label}

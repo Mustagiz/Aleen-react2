@@ -5,9 +5,9 @@ import { motion } from 'framer-motion';
 /**
  * AtelierBespokeLoader
  * 
- * Signature haute couture loading state for Aleen.
- * Features an animated golden needle & thread monogram ring,
- * radial emerald caustics, and elegant luxury serif typography.
+ * Signature loading state for Aleen.
+ * Features an animated needle & thread monogram ring,
+ * soft lavender caustics, and crisp Outfit typography.
  */
 export default function AtelierBespokeLoader({
   message = 'Preparing Atelier Console...',
@@ -40,8 +40,8 @@ export default function AtelierBespokeLoader({
           height: compact ? 120 : 220,
           borderRadius: '50%',
           background: isDark
-            ? 'radial-gradient(circle, rgba(20, 184, 166, 0.18) 0%, rgba(217, 119, 6, 0.08) 50%, transparent 70%)'
-            : 'radial-gradient(circle, rgba(var(--primary-rgb, 15, 118, 110), 0.12) 0%, rgba(245, 158, 11, 0.08) 50%, transparent 70%)',
+            ? 'radial-gradient(circle, rgba(155, 143, 245, 0.18) 0%, rgba(45, 212, 191, 0.08) 50%, transparent 70%)'
+            : 'radial-gradient(circle, rgba(var(--primary-rgb, 124, 111, 232), 0.12) 0%, rgba(45, 212, 191, 0.08) 50%, transparent 70%)',
           filter: 'blur(30px)',
           pointerEvents: 'none',
           animation: 'atelierPulse 3s ease-in-out infinite'
@@ -74,7 +74,7 @@ export default function AtelierBespokeLoader({
             cx="50"
             cy="50"
             r="42"
-            stroke={isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(10, 77, 70, 0.1)'}
+            stroke={isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(124, 111, 232, 0.12)'}
             strokeWidth="3"
             strokeDasharray="4 4"
           />
@@ -103,14 +103,14 @@ export default function AtelierBespokeLoader({
 
           <defs>
             <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#78350F" />
-              <stop offset="35%" stopColor="#D97706" />
-              <stop offset="70%" stopColor="#FDE68A" />
-              <stop offset="100%" stopColor="#F59E0B" />
+              <stop offset="0%" stopColor="#5B4BD1" />
+              <stop offset="35%" stopColor="#7C6FE8" />
+              <stop offset="70%" stopColor="#9B8FF5" />
+              <stop offset="100%" stopColor="#C7D2FE" />
             </linearGradient>
             <linearGradient id="emeraldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#042F2E" />
-              <stop offset="50%" stopColor="#14B8A6" />
+              <stop offset="0%" stopColor="#5B4BD1" />
+              <stop offset="50%" stopColor="#9B8FF5" />
               <stop offset="100%" stopColor="#2DD4BF" />
             </linearGradient>
           </defs>
@@ -124,17 +124,17 @@ export default function AtelierBespokeLoader({
             height: compact ? 26 : 38,
             borderRadius: '50%',
             background: isDark
-              ? 'linear-gradient(135deg, #042F2E 0%, #0F1E1D 100%)'
-              : 'linear-gradient(135deg, #0A4D46 0%, #0F766E 100%)',
-            border: isDark ? '1.5px solid #F59E0B' : '1.5px solid #C28D4B',
+              ? 'linear-gradient(135deg, #1D1A2E 0%, #14121F 100%)'
+              : 'linear-gradient(135deg, #7C6FE8 0%, #5B4BD1 100%)',
+            border: isDark ? '1.5px solid #2DD4BF' : '1.5px solid #0D9488',
             boxShadow: '0 4px 14px rgba(0, 0, 0, 0.25)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#FDE68A',
+            color: '#FFFFFF',
             fontSize: compact ? '0.75rem' : '0.95rem',
             fontWeight: 800,
-            fontFamily: '"Cormorant Garamond", Georgia, serif'
+            fontFamily: '"Outfit", "Plus Jakarta Sans", sans-serif'
           }}
         >
           ⚜
@@ -145,7 +145,7 @@ export default function AtelierBespokeLoader({
       <Box sx={{ textAlign: 'center', zIndex: 1, maxWidth: 320 }}>
         <Typography
           sx={{
-            fontFamily: '"Cormorant Garamond", "Playfair Display", Georgia, serif',
+            fontFamily: '"Outfit", "Plus Jakarta Sans", sans-serif',
             fontWeight: 700,
             fontSize: compact ? '0.95rem' : '1.18rem',
             letterSpacing: '0.04em',
@@ -166,7 +166,7 @@ export default function AtelierBespokeLoader({
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
               fontSize: '0.68rem',
-              color: isDark ? '#2DD4BF' : '#0F766E',
+              color: isDark ? '#2DD4BF' : '#7C6FE8',
               opacity: 0.9
             }}
           >
@@ -180,7 +180,7 @@ export default function AtelierBespokeLoader({
             width: compact ? 100 : 160,
             height: 3,
             borderRadius: 9999,
-            bgcolor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(10, 77, 70, 0.1)',
+            bgcolor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(124, 111, 232, 0.12)',
             overflow: 'hidden',
             mx: 'auto',
             mt: compact ? 1 : 1.75,
@@ -194,7 +194,7 @@ export default function AtelierBespokeLoader({
             sx={{
               width: '60%',
               height: '100%',
-              background: 'linear-gradient(90deg, transparent 0%, #14B8A6 35%, #F59E0B 70%, transparent 100%)',
+              background: 'linear-gradient(90deg, transparent 0%, #9B8FF5 35%, #2DD4BF 70%, transparent 100%)',
               borderRadius: 9999
             }}
           />

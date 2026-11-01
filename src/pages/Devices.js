@@ -578,7 +578,7 @@ export default function Devices() {
                                 fontWeight: 700,
                                 textTransform: 'none',
                                 px: 2.5,
-                                '&:hover': { borderColor: (t) => t.palette.primary.dark, bgcolor: 'rgba(15, 118, 110, 0.06)' }
+                                '&:hover': { borderColor: (t) => t.palette.primary.dark, bgcolor: 'rgba(124, 111, 232, 0.06)' }
                             }}
                         >
                             Open Camera Scanner
@@ -612,9 +612,9 @@ export default function Devices() {
                                 fontWeight: 700,
                                 textTransform: 'none',
                                 px: 3,
-                                boxShadow: '0 4px 14px rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
+                                boxShadow: '0 4px 14px rgba(var(--primary-rgb, 124, 111, 232), 0.25)',
                                 '&:hover': {
-                                    background: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)'
+                                    background: 'linear-gradient(135deg, #5B4BD1 0%, #7C6FE8 100%)'
                                 }
                             }}
                         >
@@ -754,7 +754,7 @@ export default function Devices() {
                                             p: 2.5,
                                             borderRadius: 3,
                                             border: '1px solid',
-                                            borderColor: isConnected ? (isPulsing ? '#D97706' : '#0F766E') : 'divider',
+                                            borderColor: isConnected ? (isPulsing ? '#D97706' : '#7C6FE8') : 'divider',
                                             bgcolor: isConnected ? 'background.paper' : 'rgba(0,0,0,0.02)',
                                             transition: 'all 0.3s ease',
                                             transform: isPulsing ? 'scale(1.02)' : 'none',
@@ -768,10 +768,10 @@ export default function Devices() {
                                                         width: 46,
                                                         height: 46,
                                                         bgcolor: isConnected 
-                                                            ? (device.type === 'phone_camera' ? 'rgba(217, 119, 6, 0.12)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.12)')
+                                                            ? (device.type === 'phone_camera' ? 'rgba(217, 119, 6, 0.12)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.12)')
                                                             : 'rgba(0,0,0,0.06)',
                                                         color: isConnected 
-                                                            ? (device.type === 'phone_camera' ? '#D97706' : '#0F766E')
+                                                            ? (device.type === 'phone_camera' ? '#D97706' : '#7C6FE8')
                                                             : 'text.secondary'
                                                     }}
                                                 >
@@ -789,8 +789,8 @@ export default function Devices() {
                                                                 height: 20,
                                                                 fontSize: '0.68rem',
                                                                 fontWeight: 800,
-                                                                bgcolor: isConnected ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)' : 'rgba(0,0,0,0.08)',
-                                                                color: isConnected ? '#0F766E' : 'text.secondary'
+                                                                bgcolor: isConnected ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)' : 'rgba(0,0,0,0.08)',
+                                                                color: isConnected ? '#7C6FE8' : 'text.secondary'
                                                             }}
                                                         />
                                                     </Box>
@@ -874,7 +874,7 @@ export default function Devices() {
                                                     <IconButton
                                                         size="small"
                                                         onClick={() => toggleDeviceConnection(device.id)}
-                                                        sx={{ color: isConnected ? '#0F766E' : 'text.secondary' }}
+                                                        sx={{ color: isConnected ? '#7C6FE8' : 'text.secondary' }}
                                                     >
                                                         {isConnected ? <Link /> : <LinkOff />}
                                                     </IconButton>
@@ -957,7 +957,7 @@ export default function Devices() {
                                     <IconButton
                                         size="small"
                                         onClick={() => setSoundEnabled(!soundEnabled)}
-                                        sx={{ color: soundEnabled ? '#0F766E' : 'text.secondary' }}
+                                        sx={{ color: soundEnabled ? '#7C6FE8' : 'text.secondary' }}
                                     >
                                         {soundEnabled ? <VolumeUp fontSize="small" /> : <VolumeOff fontSize="small" />}
                                     </IconButton>
@@ -1017,8 +1017,8 @@ export default function Devices() {
                                     sx={{
                                         p: 2.5,
                                         borderRadius: 3,
-                                        bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
-                                        border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.25)'
+                                        bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)',
+                                        border: '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.25)'
                                     }}
                                 >
                                     <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 1.5 }}>
@@ -1147,7 +1147,7 @@ export default function Devices() {
 
                             <TableContainer sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, maxHeight: 220 }}>
                                 <Table size="small">
-                                    <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }}>
+                                    <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' }}>
                                         <TableRow>
                                             <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem' }}>Timestamp</TableCell>
                                             <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem' }}>Barcode / QR</TableCell>
@@ -1201,7 +1201,7 @@ export default function Devices() {
             >
                 <DialogTitle sx={{
                     fontWeight: 800,
-                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
+                    bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
                     borderBottom: '1px solid',
                     borderColor: 'divider',
                     color: 'text.primary',
@@ -1327,7 +1327,7 @@ export default function Devices() {
                                         Scanning for nearby hardware scanners...
                                     </Typography>
                                 </Box>
-                                <LinearProgress sx={{ borderRadius: 2, height: 6, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', '& .MuiLinearProgress-bar': { bgcolor: (t) => t.palette.primary.main } }} />
+                                <LinearProgress sx={{ borderRadius: 2, height: 6, bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)', '& .MuiLinearProgress-bar': { bgcolor: (t) => t.palette.primary.main } }} />
                             </Box>
                         )}
 
@@ -1372,9 +1372,9 @@ export default function Devices() {
                                         fontSize: '0.72rem',
                                         fontWeight: 700,
                                         borderRadius: 2,
-                                        bgcolor: customDeviceType === 'bluetooth_scanner' ? '#0F766E' : 'transparent',
+                                        bgcolor: customDeviceType === 'bluetooth_scanner' ? '#7C6FE8' : 'transparent',
                                         bordercolor: (t) => t.palette.primary.main,
-                                        color: customDeviceType === 'bluetooth_scanner' ? '#fff' : '#0F766E'
+                                        color: customDeviceType === 'bluetooth_scanner' ? '#fff' : '#7C6FE8'
                                     }}
                                 >
                                     Bluetooth Scanner Gun
@@ -1466,9 +1466,9 @@ export default function Devices() {
                         p: 2,
                         display: 'inline-block',
                         borderRadius: 3,
-                        border: '2px solid #0F766E',
+                        border: '2px solid #7C6FE8',
                         bgcolor: '#FFFFFF',
-                        boxShadow: '0 8px 24px rgba(var(--primary-rgb, 15, 118, 110), 0.15)',
+                        boxShadow: '0 8px 24px rgba(var(--primary-rgb, 124, 111, 232), 0.15)',
                         mb: 2.5
                     }}>
                         <img
@@ -1479,7 +1479,7 @@ export default function Devices() {
                     </Box>
 
                     {/* Step by Step Guide */}
-                    <Box sx={{ textAlign: 'left', p: 2, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)', borderRadius: 2.5, mb: 2.5 }}>
+                    <Box sx={{ textAlign: 'left', p: 2, bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)', borderRadius: 2.5, mb: 2.5 }}>
                         <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1, color: 'text.primary' }}>
                             How to pair your phone:
                         </Typography>
@@ -1500,7 +1500,7 @@ export default function Devices() {
                             <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary' }}>
                                 Computer Wi-Fi Address:
                             </Typography>
-                            <Chip label={networkHost} size="small" sx={{ fontWeight: 700, fontSize: '0.72rem', bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main }} />
+                            <Chip label={networkHost} size="small" sx={{ fontWeight: 700, fontSize: '0.72rem', bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)', color: (t) => t.palette.primary.main }} />
                         </Box>
                         <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
                             Ensure your smartphone is connected to the same Wi-Fi network as this register.
@@ -1545,7 +1545,7 @@ export default function Devices() {
                                 textTransform: 'none',
                                 bordercolor: (t) => t.palette.primary.main,
                                 color: (t) => t.palette.primary.main,
-                                '&:hover': { bgcolor: 'rgba(15, 118, 110, 0.06)' }
+                                '&:hover': { bgcolor: 'rgba(124, 111, 232, 0.06)' }
                             }}
                         >
                             Open Scanner Viewfinder
@@ -1588,7 +1588,7 @@ export default function Devices() {
             >
                 <DialogTitle sx={{
                     fontWeight: 800,
-                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
+                    bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)',
                     borderBottom: '1px solid',
                     borderColor: 'divider',
                     color: 'text.primary',
@@ -1683,7 +1683,7 @@ export default function Devices() {
                         </Box>
                     )}
 
-                    <Alert severity="info" sx={{ mb: 2, borderRadius: 2, bgcolor: 'rgba(15, 118, 110, 0.06)', border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.2)' }}>
+                    <Alert severity="info" sx={{ mb: 2, borderRadius: 2, bgcolor: 'rgba(124, 111, 232, 0.06)', border: '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.2)' }}>
                         <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary', display: 'block', mb: 0.3 }}>
                             ℹ️ Phone Camera Compatibility:
                         </Typography>
@@ -1704,7 +1704,7 @@ export default function Devices() {
                             position: 'relative',
                             borderRadius: 3,
                             overflow: 'hidden',
-                            border: '2px solid #0F766E',
+                            border: '2px solid #7C6FE8',
                             bgcolor: '#000000',
                             minHeight: 280,
                             display: 'flex',
@@ -1715,7 +1715,7 @@ export default function Devices() {
                         </Box>
                     )}
 
-                    <Box sx={{ mt: 2, p: 2, borderRadius: 2.5, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)', border: '1px solid', borderColor: 'divider' }}>
+                    <Box sx={{ mt: 2, p: 2, borderRadius: 2.5, bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)', border: '1px solid', borderColor: 'divider' }}>
                         <Typography variant="caption" sx={{ fontWeight: 700, color: (t) => t.palette.primary.main, display: 'flex', alignItems: 'center', gap: 0.8 }}>
                             <Sensors fontSize="small" /> Real-time Inventory Matcher Active
                         </Typography>

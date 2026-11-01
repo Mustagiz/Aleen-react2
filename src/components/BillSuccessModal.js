@@ -268,7 +268,7 @@ const BillSuccessModal = ({
         {/* Atelier Header Banner */}
         <Box
           sx={{
-            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.dark || '#042F2E'} 0%, ${t.palette.primary.main} 100%)`,
+            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.dark || '#5B4BD1'} 0%, ${t.palette.primary.main} 100%)`,
             color: '#FFFFFF',
             px: { xs: 2.5, sm: 3.5 },
             py: { xs: 2.5, sm: 3 },
@@ -356,7 +356,7 @@ const BillSuccessModal = ({
                   width: 40,
                   height: 40,
                   borderRadius: 2,
-                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.2)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
+                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.2)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)',
                   color: (t) => t.palette.primary.main,
                   display: 'flex',
                   alignItems: 'center',
@@ -404,8 +404,8 @@ const BillSuccessModal = ({
               p: 2.25,
               borderRadius: 3,
               border: '1.5px solid',
-              borderColor: '#0F766E',
-              bgcolor: theme.palette.mode === 'dark' ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)' : '#F0FDFA',
+              borderColor: '#7C6FE8',
+              bgcolor: theme.palette.mode === 'dark' ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)' : '#F0FDFA',
               display: 'flex',
               flexDirection: 'column',
               gap: 1.75
@@ -577,7 +577,7 @@ const BillSuccessModal = ({
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, textAlign: 'left' }}>
                   <Box>
-                    <Typography sx={{ fontWeight: 800, fontSize: { xs: '0.84rem', sm: '0.9rem' }, lineHeight: 1.2, color: theme.palette.mode === 'dark' ? '#34D399' : '#042F2E' }}>
+                    <Typography sx={{ fontWeight: 800, fontSize: { xs: '0.84rem', sm: '0.9rem' }, lineHeight: 1.2, color: theme.palette.mode === 'dark' ? '#34D399' : '#5B4BD1' }}>
                       {isSendingWhatsApp ? 'Opening WhatsApp...' : 'Send on WhatsApp (with PDF Link)'}
                     </Typography>
                     <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary', fontWeight: 500 }}>
@@ -612,10 +612,10 @@ const BillSuccessModal = ({
                     fontWeight: 700,
                     fontSize: '0.74rem',
                     color: (t) => t.palette.primary.main,
-                    bgcolor: 'rgba(15, 118, 110, 0.06)',
+                    bgcolor: 'rgba(124, 111, 232, 0.06)',
                     borderRadius: 1.5,
                     py: 0.6,
-                    '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.12)' }
+                    '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.12)' }
                   }}
                 >
                   Copy Bill Link
@@ -700,8 +700,8 @@ const BillSuccessModal = ({
                   flexDirection: 'column',
                   gap: 0.3,
                   '&:hover': {
-                    borderColor: '#0F766E',
-                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)'
+                    borderColor: '#7C6FE8',
+                    bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)'
                   }
                 }}
               >
@@ -713,7 +713,7 @@ const BillSuccessModal = ({
               <Button
                 variant="outlined"
                 size="small"
-                startIcon={<Print sx={{ color: '#0D9488', fontSize: 16 }} />}
+                startIcon={<Print sx={{ color: '#7C6FE8', fontSize: 16 }} />}
                 onClick={() => {
                   const el = document.getElementById('bill-success-thermal-58mm');
                   if (el) {
@@ -738,7 +738,7 @@ const BillSuccessModal = ({
                   flexDirection: 'column',
                   gap: 0.3,
                   '&:hover': {
-                    borderColor: '#0D9488',
+                    borderColor: '#7C6FE8',
                     bgcolor: 'rgba(13, 148, 136, 0.05)'
                   }
                 }}

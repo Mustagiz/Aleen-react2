@@ -2,29 +2,29 @@
 export const COLOR_THEMES = [
   {
     id: 'atelier-emerald',
-    name: 'Atelier Emerald',
-    tagline: 'Velvet Royal Emerald & Burnished Imperial Gold',
+    name: 'Aleen Lavender',
+    tagline: 'Light Lavender & Fresh Mint',
     badge: 'Signature',
     primary: {
-      main: '#0A4D46',
-      light: '#14B8A6',
-      dark: '#042F2E',
+      main: '#7C6FE8',
+      light: '#9B8FF5',
+      dark: '#5B4BD1',
       contrastText: '#FFFFFF'
     },
     secondary: {
-      main: '#C28D4B',
-      light: '#F59E0B',
-      dark: '#92400E',
+      main: '#2DD4BF',
+      light: '#5EEAD4',
+      dark: '#0D9488',
       contrastText: '#FFFFFF'
     },
     background: {
-      lightDefault: '#FBFBF9',
+      lightDefault: '#F9F9FC',
       lightPaper: '#FFFFFF',
-      darkDefault: '#081212',
-      darkPaper: '#0F1E1D'
+      darkDefault: '#14121F',
+      darkPaper: '#1D1A2E'
     },
-    previewColors: ['#0A4D46', '#14B8A6', '#C28D4B', '#042F2E'],
-    accentGlow: 'rgba(10, 77, 70, 0.22)'
+    previewColors: ['#7C6FE8', '#9B8FF5', '#2DD4BF', '#5B4BD1'],
+    accentGlow: 'rgba(124, 111, 232, 0.22)'
   },
   {
     id: 'royal-sapphire',

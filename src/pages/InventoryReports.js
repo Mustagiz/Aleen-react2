@@ -184,7 +184,7 @@ const InventoryReports = () => {
                 px: 3,
                 boxShadow: '0 4px 14px rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)'
+                  background: 'linear-gradient(135deg, #5B4BD1 0%, #7C6FE8 100%)'
                 }
               }}
             >
@@ -405,7 +405,7 @@ const InventoryReports = () => {
                                   fontWeight: 800,
                                   fontSize: '0.72rem',
                                   bgcolor: item.quantity < 2 ? 'rgba(220, 38, 38, 0.1)' : item.quantity < 20 ? 'rgba(217, 119, 6, 0.1)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
-                                  color: item.quantity < 2 ? '#DC2626' : item.quantity < 20 ? '#D97706' : '#0F766E'
+                                  color: item.quantity < 2 ? '#DC2626' : item.quantity < 20 ? '#D97706' : '#7C6FE8'
                                 }}
                               />
                             </TableCell>
@@ -474,7 +474,7 @@ const InventoryReports = () => {
                                 size="small"
                                 sx={{
                                   bgcolor: log.change > 0 ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)' : 'rgba(220, 38, 38, 0.1)',
-                                  color: log.change > 0 ? '#0F766E' : '#DC2626',
+                                  color: log.change > 0 ? '#7C6FE8' : '#DC2626',
                                   fontWeight: 800,
                                   fontSize: '0.75rem'
                                 }}

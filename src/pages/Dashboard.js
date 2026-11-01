@@ -192,12 +192,12 @@ const Dashboard = () => {
         return {
           badge: 'HAUTE COUTURE ATELIER',
           title: 'Executive Command & Overview',
-          bg: isDark ? 'linear-gradient(135deg, #071E1C 0%, #041211 100%)' : `linear-gradient(135deg, ${darkPrimary || '#042F2E'} 0%, ${primaryColor} 100%)`,
+          bg: isDark ? 'linear-gradient(135deg, #1D1A2E 0%, #14121F 100%)' : `linear-gradient(135deg, ${darkPrimary || '#5B4BD1'} 0%, ${primaryColor} 100%)`,
           textColor: '#FFFFFF',
           subtextColor: 'rgba(255, 255, 255, 0.88)',
           isDarkBanner: true,
           borderColor: `${primaryColor}4D`,
-          shadow: `0 12px 32px ${darkPrimary || '#042F2E'}40`,
+          shadow: `0 12px 32px ${darkPrimary || '#5B4BD1'}40`,
           ctaBg: primaryColor,
           ctaHover: darkPrimary,
           badgeBg: `${primaryColor}38`,
@@ -880,7 +880,7 @@ const Dashboard = () => {
           mb: 3.5,
           borderRadius: 3,
           border: '1.5px solid #CBD5E1',
-          bgcolor: isDark ? 'rgba(15, 118, 110, 0.06)' : '#FFFFFF'
+          bgcolor: isDark ? 'rgba(124, 111, 232, 0.06)' : '#FFFFFF'
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, flexWrap: 'wrap', gap: 1 }}>

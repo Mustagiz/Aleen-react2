@@ -348,8 +348,8 @@ const GlobalSearch = ({ open, onClose }) => {
           width: { xs: 'calc(100% - 24px)', sm: '85vw', md: 680 },
           maxWidth: '100%',
           bgcolor: 'background.paper',
-          backgroundImage: 'linear-gradient(180deg, rgba(15, 118, 110, 0.03) 0%, rgba(0, 0, 0, 0) 100%)',
-          boxShadow: '0 25px 50px -12px rgba(4, 47, 46, 0.35), 0 0 0 1px rgba(var(--primary-rgb, 15, 118, 110), 0.2)',
+          backgroundImage: 'linear-gradient(180deg, rgba(124, 111, 232, 0.03) 0%, rgba(0, 0, 0, 0) 100%)',
+          boxShadow: '0 25px 50px -12px rgba(4, 47, 46, 0.35), 0 0 0 1px rgba(var(--primary-rgb, 124, 111, 232), 0.2)',
           overflow: 'hidden'
         }
       }}
@@ -363,7 +363,7 @@ const GlobalSearch = ({ open, onClose }) => {
           gap: 1.5,
           borderBottom: '1px solid',
           borderColor: 'divider',
-          bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)'
+          bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)'
         }}>
           <Search sx={{ color: (t) => t.palette.primary.main, fontSize: 26 }} />
           <TextField
@@ -449,11 +449,11 @@ const GlobalSearch = ({ open, onClose }) => {
                     mb: 0.5,
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
-                    bgcolor: isSelected ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)' : 'transparent',
+                    bgcolor: isSelected ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)' : 'transparent',
                     border: '1px solid',
-                    borderColor: isSelected ? 'rgba(15, 118, 110, 0.3)' : 'transparent',
+                    borderColor: isSelected ? 'rgba(124, 111, 232, 0.3)' : 'transparent',
                     '&:hover': {
-                      bgcolor: 'rgba(15, 118, 110, 0.06)'
+                      bgcolor: 'rgba(124, 111, 232, 0.06)'
                     }
                   }}
                 >

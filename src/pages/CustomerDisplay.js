@@ -609,9 +609,9 @@ export default function CustomerDisplay() {
       case 'Platinum':
         return {
           label: 'Platinum VIP',
-          color: '#0F766E',
-          bg: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
-          border: '#14B8A6',
+          color: '#7C6FE8',
+          bg: 'linear-gradient(135deg, #7C6FE8 0%, #5B4BD1 100%)',
+          border: '#9B8FF5',
           icon: '👑',
           nextTier: 'Haute Imperial Elite (Max Tier)',
           target: 100000,
@@ -2444,13 +2444,13 @@ export default function CustomerDisplay() {
                             sx={{
                               width: 44,
                               height: 44,
-                              bgcolor: '#0F766E',
+                              bgcolor: '#7C6FE8',
                               color: '#FFFFFF',
                               fontWeight: 900,
                               fontSize: '1.05rem',
                               borderRadius: '10px',
                               border: '2px solid #C5A059',
-                              boxShadow: '0 3px 10px rgba(15, 118, 110, 0.25)'
+                              boxShadow: '0 3px 10px rgba(124, 111, 232, 0.25)'
                             }}
                           >
                             {activeCustomerName.charAt(0).toUpperCase()}
@@ -2492,7 +2492,7 @@ export default function CustomerDisplay() {
                           <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700, fontSize: '0.64rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                             Privilege Balance
                           </Typography>
-                          <Typography sx={{ fontWeight: 900, color: '#0F766E', fontSize: '0.92rem' }}>
+                          <Typography sx={{ fontWeight: 900, color: '#7C6FE8', fontSize: '0.92rem' }}>
                             💎 {loyaltyPoints} pts
                           </Typography>
                         </Box>
@@ -2603,9 +2603,9 @@ export default function CustomerDisplay() {
                                         sx={{
                                           height: 19,
                                           fontSize: '0.62rem',
-                                          bgcolor: 'rgba(15, 118, 110, 0.1)',
-                                          color: '#0F766E',
-                                          border: '1px solid rgba(15, 118, 110, 0.25)',
+                                          bgcolor: 'rgba(124, 111, 232, 0.1)',
+                                          color: '#7C6FE8',
+                                          border: '1px solid rgba(124, 111, 232, 0.25)',
                                           fontWeight: 800
                                         }}
                                       />
@@ -2978,7 +2978,7 @@ export default function CustomerDisplay() {
                               bgcolor: 'rgba(197, 160, 89, 0.15)',
                               '& .MuiLinearProgress-bar': {
                                 borderRadius: '6px',
-                                background: 'linear-gradient(90deg, #C5A059 0%, #0F766E 100%)'
+                                background: 'linear-gradient(90deg, #C5A059 0%, #7C6FE8 100%)'
                               }
                             }}
                           />
@@ -3060,8 +3060,8 @@ export default function CustomerDisplay() {
                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
                         {/* Terminal Header */}
                         <Stack direction="row" spacing={0.8} alignItems="center" sx={{ mb: 1.2 }}>
-                          <VerifiedUser sx={{ color: '#0F766E', fontSize: 18 }} />
-                          <Typography variant="overline" sx={{ color: '#0F766E', fontWeight: 900, letterSpacing: '0.12em', fontSize: '0.7rem' }}>
+                          <VerifiedUser sx={{ color: '#7C6FE8', fontSize: 18 }} />
+                          <Typography variant="overline" sx={{ color: '#7C6FE8', fontWeight: 900, letterSpacing: '0.12em', fontSize: '0.7rem' }}>
                             VERIFIED INSTANT UPI CHECKOUT
                           </Typography>
                         </Stack>

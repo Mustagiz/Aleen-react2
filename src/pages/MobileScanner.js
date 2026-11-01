@@ -382,7 +382,7 @@ export default function MobileScanner() {
                             left: 0,
                             right: 0,
                             height: '2px',
-                            background: 'linear-gradient(90deg, transparent, #D97706, #0F766E, transparent)',
+                            background: 'linear-gradient(90deg, transparent, #7C6FE8, #2DD4BF, transparent)',
                             boxShadow: '0 0 8px #D97706',
                             animation: 'scannerLaser 2s ease-in-out infinite'
                         },
@@ -407,9 +407,9 @@ export default function MobileScanner() {
                             zIndex: 10,
                             textAlign: 'center',
                             p: 3,
-                            bgcolor: 'rgba(4, 47, 46, 0.92)',
+                            bgcolor: 'rgba(91, 75, 209, 0.92)',
                             borderRadius: 3.5,
-                            border: '1px solid #0F766E',
+                            border: '1px solid #7C6FE8',
                             maxWidth: 320
                         }}
                     >
@@ -511,9 +511,9 @@ export default function MobileScanner() {
                         fontWeight: 800,
                         textTransform: 'none',
                         fontSize: '0.92rem',
-                        background: 'linear-gradient(135deg, #0F766E 0%, #D97706 100%)',
+                        background: 'linear-gradient(135deg, #7C6FE8 0%, #2DD4BF 100%)',
                         color: '#FFFFFF',
-                        boxShadow: '0 4px 16px rgba(15, 118, 110, 0.4)'
+                        boxShadow: '0 4px 16px rgba(124, 111, 232, 0.4)'
                     }}
                 >
                     Snap & Scan via Native Camera

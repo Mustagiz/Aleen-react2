@@ -877,11 +877,11 @@ const Marketing = () => {
                                 borderRadius: 2.5,
                                 fontWeight: 750,
                                 textTransform: 'none',
-                                borderColor: 'rgba(15, 118, 110, 0.3)',
+                                borderColor: 'rgba(124, 111, 232, 0.3)',
                                 color: (t) => t.palette.primary.main,
                                 '&:hover': {
                                     bordercolor: (t) => t.palette.primary.main,
-                                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)'
+                                    bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)'
                                 }
                             }}
                         >
@@ -899,9 +899,9 @@ const Marketing = () => {
                                 textTransform: 'none',
                                 background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                                 color: '#ffffff',
-                                boxShadow: '0 4px 14px rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
+                                boxShadow: '0 4px 14px rgba(var(--primary-rgb, 124, 111, 232), 0.25)',
                                 '&:hover': {
-                                    background: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)'
+                                    background: 'linear-gradient(135deg, #5B4BD1 0%, #7C6FE8 100%)'
                                 }
                             }}
                         >
@@ -1214,15 +1214,15 @@ const Marketing = () => {
                                                         cursor: 'pointer',
                                                         borderRadius: 3,
                                                         border: '2px solid',
-                                                        borderColor: isPreviewActive ? '#0F766E' : isSelected ? 'rgba(15, 118, 110, 0.5)' : 'divider',
-                                                        bgcolor: isPreviewActive ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)' : 'background.paper',
-                                                        boxShadow: isPreviewActive ? '0 6px 20px rgba(var(--primary-rgb, 15, 118, 110), 0.15)' : 'none',
+                                                        borderColor: isPreviewActive ? '#7C6FE8' : isSelected ? 'rgba(124, 111, 232, 0.5)' : 'divider',
+                                                        bgcolor: isPreviewActive ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)' : 'background.paper',
+                                                        boxShadow: isPreviewActive ? '0 6px 20px rgba(var(--primary-rgb, 124, 111, 232), 0.15)' : 'none',
                                                         transition: 'all 0.2s',
                                                         position: 'relative',
                                                         overflow: 'hidden',
                                                         '&:hover': {
                                                             bordercolor: (t) => t.palette.primary.main,
-                                                            boxShadow: '0 4px 16px rgba(var(--primary-rgb, 15, 118, 110), 0.12)',
+                                                            boxShadow: '0 4px 16px rgba(var(--primary-rgb, 124, 111, 232), 0.12)',
                                                             transform: 'translateY(-2px)'
                                                         }
                                                     }}
@@ -1249,7 +1249,7 @@ const Marketing = () => {
                                                                         height: 36,
                                                                         fontSize: '0.85rem',
                                                                         fontWeight: 800,
-                                                                        bgcolor: customer.tier === 'Platinum' ? '#042F2E' : customer.tier === 'Gold' ? '#D97706' : '#0F766E',
+                                                                        bgcolor: customer.tier === 'Platinum' ? '#5B4BD1' : customer.tier === 'Gold' ? '#D97706' : '#7C6FE8',
                                                                         color: '#ffffff'
                                                                     }}
                                                                 >
@@ -1272,8 +1272,8 @@ const Marketing = () => {
                                                                     height: 20,
                                                                     fontSize: '0.65rem',
                                                                     fontWeight: 800,
-                                                                    bgcolor: customer.tier === 'Platinum' ? 'rgba(4, 47, 46, 0.1)' : customer.tier === 'Gold' ? 'rgba(217, 119, 6, 0.12)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
-                                                                    color: customer.tier === 'Platinum' ? '#042F2E' : customer.tier === 'Gold' ? '#B45309' : '#0F766E'
+                                                                    bgcolor: customer.tier === 'Platinum' ? 'rgba(91, 75, 209, 0.1)' : customer.tier === 'Gold' ? 'rgba(217, 119, 6, 0.12)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)',
+                                                                    color: customer.tier === 'Platinum' ? '#5B4BD1' : customer.tier === 'Gold' ? '#B45309' : '#7C6FE8'
                                                                 }}
                                                             />
                                                         </Box>
@@ -1326,7 +1326,7 @@ const Marketing = () => {
                                                                     sx={{
                                                                         fontWeight: 800,
                                                                         fontSize: '0.72rem',
-                                                                        color: isPreviewActive ? '#0F766E' : 'text.secondary',
+                                                                        color: isPreviewActive ? '#7C6FE8' : 'text.secondary',
                                                                         display: 'flex',
                                                                         alignItems: 'center',
                                                                         gap: 0.5
@@ -1372,7 +1372,7 @@ const Marketing = () => {
                                 sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider' }}
                             >
                                 <Table size="small">
-                                    <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }}>
+                                    <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' }}>
                                         <TableRow>
                                             <TableCell padding="checkbox">
                                                 <Checkbox
@@ -1410,7 +1410,7 @@ const Marketing = () => {
                                                         onClick={() => setActiveCustomerForPreview(customer)}
                                                         sx={{
                                                             cursor: 'pointer',
-                                                            bgcolor: isPreviewActive ? 'rgba(15, 118, 110, 0.06)' : 'inherit'
+                                                            bgcolor: isPreviewActive ? 'rgba(124, 111, 232, 0.06)' : 'inherit'
                                                         }}
                                                     >
                                                         <TableCell padding="checkbox" onClick={(e) => e.stopPropagation()}>
@@ -1443,8 +1443,8 @@ const Marketing = () => {
                                                                 sx={{
                                                                     fontWeight: 800,
                                                                     fontSize: '0.65rem',
-                                                                    bgcolor: customer.tier === 'Platinum' ? 'rgba(4, 47, 46, 0.1)' : 'rgba(217, 119, 6, 0.1)',
-                                                                    color: customer.tier === 'Platinum' ? '#042F2E' : '#B45309'
+                                                                    bgcolor: customer.tier === 'Platinum' ? 'rgba(91, 75, 209, 0.1)' : 'rgba(217, 119, 6, 0.1)',
+                                                                    color: customer.tier === 'Platinum' ? '#5B4BD1' : '#B45309'
                                                                 }}
                                                             />
                                                         </TableCell>
@@ -1531,7 +1531,7 @@ const Marketing = () => {
                                     size="small"
                                     icon={<Person sx={{ fontSize: '0.9rem !important' }} />}
                                     label={toSentenceCase(samplePreviewCustomer.name).split(' ')[0]}
-                                    sx={{ fontWeight: 750, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)', color: (t) => t.palette.primary.main }}
+                                    sx={{ fontWeight: 750, bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)', color: (t) => t.palette.primary.main }}
                                 />
                             </Box>
 
@@ -1557,14 +1557,14 @@ const Marketing = () => {
                                             sx={{
                                                 fontWeight: 800,
                                                 fontSize: '0.74rem',
-                                                bgcolor: isActive ? '#0F766E' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)',
-                                                color: isActive ? '#FFFFFF' : '#0F766E',
+                                                bgcolor: isActive ? '#7C6FE8' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)',
+                                                color: isActive ? '#FFFFFF' : '#7C6FE8',
                                                 border: '1.5px solid',
-                                                borderColor: isActive ? '#0F766E' : 'transparent',
-                                                boxShadow: isActive ? '0 2px 8px rgba(var(--primary-rgb, 15, 118, 110), 0.25)' : 'none',
+                                                borderColor: isActive ? '#7C6FE8' : 'transparent',
+                                                boxShadow: isActive ? '0 2px 8px rgba(var(--primary-rgb, 124, 111, 232), 0.25)' : 'none',
                                                 transition: 'all 0.18s ease',
                                                 '&:hover': {
-                                                    bgcolor: isActive ? '#115E59' : 'rgba(15, 118, 110, 0.16)'
+                                                    bgcolor: isActive ? '#5B4BD1' : 'rgba(124, 111, 232, 0.16)'
                                                 }
                                             }}
                                         />
@@ -1857,8 +1857,8 @@ const Marketing = () => {
                             p: 3,
                             borderRadius: 3.5,
                             border: '1.5px solid',
-                            borderColor: gatewayConfig.mode !== 'browser' ? '#0F766E' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
-                            bgcolor: 'rgba(15, 118, 110, 0.03)',
+                            borderColor: gatewayConfig.mode !== 'browser' ? '#7C6FE8' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.25)',
+                            bgcolor: 'rgba(124, 111, 232, 0.03)',
                             mb: 3.5,
                             display: 'flex',
                             alignItems: 'center',
@@ -1882,7 +1882,7 @@ const Marketing = () => {
                                         sx={{
                                             fontWeight: 800,
                                             fontSize: '0.72rem',
-                                            bgcolor: gatewayConfig.mode !== 'browser' ? '#0F766E' : 'rgba(0,0,0,0.08)',
+                                            bgcolor: gatewayConfig.mode !== 'browser' ? '#7C6FE8' : 'rgba(0,0,0,0.08)',
                                             color: gatewayConfig.mode !== 'browser' ? '#ffffff' : 'text.primary'
                                         }}
                                     />
@@ -1907,7 +1907,7 @@ const Marketing = () => {
                                     fontWeight: 750,
                                     textTransform: 'none',
                                     color: (t) => t.palette.primary.main,
-                                    borderColor: 'rgba(15, 118, 110, 0.4)'
+                                    borderColor: 'rgba(124, 111, 232, 0.4)'
                                 }}
                             >
                                 Gateway Config
@@ -2013,7 +2013,7 @@ const Marketing = () => {
                                     p: 2.5,
                                     borderRadius: 3,
                                     border: '1.5px solid',
-                                    borderColor: automationRules.dormancyWinback ? '#0F766E' : 'divider',
+                                    borderColor: automationRules.dormancyWinback ? '#7C6FE8' : 'divider',
                                     bgcolor: 'background.paper',
                                     height: '100%',
                                     display: 'flex',
@@ -2044,7 +2044,7 @@ const Marketing = () => {
                                     <Chip
                                         size="small"
                                         label={`${segmentCounts.dormant30} In Dormancy Queue`}
-                                        sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: '0.7rem' }}
+                                        sx={{ bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)', color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: '0.7rem' }}
                                     />
                                     <Button
                                         size="small"
@@ -2069,7 +2069,7 @@ const Marketing = () => {
                                     p: 2.5,
                                     borderRadius: 3,
                                     border: '1.5px solid',
-                                    borderColor: automationRules.invoiceReceiptAuto ? '#0F766E' : 'divider',
+                                    borderColor: automationRules.invoiceReceiptAuto ? '#7C6FE8' : 'divider',
                                     bgcolor: 'background.paper',
                                     height: '100%',
                                     display: 'flex',
@@ -2117,7 +2117,7 @@ const Marketing = () => {
                                     p: 2.5,
                                     borderRadius: 3,
                                     border: '1.5px solid',
-                                    borderColor: automationRules.tailoringReadyAlert ? '#0F766E' : 'divider',
+                                    borderColor: automationRules.tailoringReadyAlert ? '#7C6FE8' : 'divider',
                                     bgcolor: 'background.paper',
                                     height: '100%',
                                     display: 'flex',
@@ -2148,7 +2148,7 @@ const Marketing = () => {
                                     <Chip
                                         size="small"
                                         label="Connected to Tailoring Kanban"
-                                        sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: '0.7rem' }}
+                                        sx={{ bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)', color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: '0.7rem' }}
                                     />
                                     <Typography variant="caption" color="text.secondary">
                                         Includes delivery target date
@@ -2227,7 +2227,7 @@ const Marketing = () => {
                                         '&:hover': {
                                             bordercolor: (t) => t.palette.primary.main,
                                             transform: 'translateY(-3px)',
-                                            boxShadow: '0 8px 24px rgba(var(--primary-rgb, 15, 118, 110), 0.08)'
+                                            boxShadow: '0 8px 24px rgba(var(--primary-rgb, 124, 111, 232), 0.08)'
                                         }
                                     }}
                                 >
@@ -2243,7 +2243,7 @@ const Marketing = () => {
 
                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: template.color || '#0F766E' }} />
+                                            <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: template.color || '#7C6FE8' }} />
                                             <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
                                                 {template.title}
                                             </Typography>
@@ -2280,7 +2280,7 @@ const Marketing = () => {
                                                     setTemplateFormData({
                                                         title: template.title,
                                                         message: template.message,
-                                                        color: template.color || '#0F766E',
+                                                        color: template.color || '#7C6FE8',
                                                         category: template.category || template.type || 'festive',
                                                         imageUrl: template.imageUrl || ''
                                                     });
@@ -2336,8 +2336,8 @@ const Marketing = () => {
                                 mb: 1,
                                 p: 2,
                                 borderRadius: 3,
-                                bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
-                                border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.12)',
+                                bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
+                                border: '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.12)',
                                 flexWrap: 'wrap',
                                 gap: 2
                             }}
@@ -2356,7 +2356,7 @@ const Marketing = () => {
                                 shape="rounded"
                                 sx={{
                                     '& .Mui-selected': {
-                                        bgcolor: '#0F766E !important',
+                                        bgcolor: '#7C6FE8 !important',
                                         color: '#FFFFFF !important',
                                         fontWeight: 800
                                     }
@@ -2630,7 +2630,7 @@ const Marketing = () => {
                                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                                                 <Chip
                                                     label={`Trigger: "${kw.keyword}"`}
-                                                    sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main, fontWeight: 800 }}
+                                                    sx={{ bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)', color: (t) => t.palette.primary.main, fontWeight: 800 }}
                                                 />
                                                 <Box sx={{ display: 'flex', gap: 0.5 }}>
                                                     <IconButton
@@ -2773,7 +2773,7 @@ const Marketing = () => {
                     ) : (
                         <TableContainer>
                             <Table size="small">
-                                <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }}>
+                                <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' }}>
                                     <TableRow>
                                         <TableCell sx={{ fontWeight: 800 }}>Dispatched Time</TableCell>
                                         <TableCell sx={{ fontWeight: 800 }}>Patron</TableCell>
@@ -2848,7 +2848,7 @@ const Marketing = () => {
                         gap: 2.5,
                         minWidth: { xs: '92%', sm: 540 },
                         justifyContent: 'space-between',
-                        boxShadow: '0 16px 40px rgba(4, 47, 46, 0.5)',
+                        boxShadow: '0 16px 40px rgba(91, 75, 209, 0.5)',
                         border: '1px solid rgba(255,255,255,0.1)'
                     }}
                 >
@@ -2921,7 +2921,7 @@ const Marketing = () => {
                 <DialogTitle
                     sx={{
                         fontWeight: 800,
-                        bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
+                        bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)',
                         borderBottom: '1px solid',
                         borderColor: 'divider',
                         color: 'text.primary',
@@ -2960,7 +2960,7 @@ const Marketing = () => {
                             sx={{
                                 height: 8,
                                 borderRadius: 4,
-                                bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
+                                bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)',
                                 '& .MuiLinearProgress-bar': { bgcolor: (t) => t.palette.primary.main }
                             }}
                         />
@@ -3005,8 +3005,8 @@ const Marketing = () => {
                                     p: 2.5,
                                     borderRadius: 3,
                                     border: '1.5px solid',
-                                    borderColor: isAlreadyDispatched ? '#059669' : '#0F766E',
-                                    bgcolor: isAlreadyDispatched ? 'rgba(5, 150, 105, 0.03)' : 'rgba(15, 118, 110, 0.03)',
+                                    borderColor: isAlreadyDispatched ? '#059669' : '#7C6FE8',
+                                    bgcolor: isAlreadyDispatched ? 'rgba(5, 150, 105, 0.03)' : 'rgba(124, 111, 232, 0.03)',
                                     mb: 2.5
                                 }}
                             >
@@ -3130,7 +3130,7 @@ const Marketing = () => {
                 <DialogTitle
                     sx={{
                         fontWeight: 800,
-                        bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
+                        bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)',
                         borderBottom: '1px solid',
                         borderColor: 'divider',
                         color: 'text.primary',
@@ -3166,8 +3166,8 @@ const Marketing = () => {
                                     mb: 1,
                                     borderRadius: 2.5,
                                     border: '1.5px solid',
-                                    borderColor: gatewayConfig.mode === 'browser' ? '#0F766E' : 'divider',
-                                    bgcolor: gatewayConfig.mode === 'browser' ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' : 'transparent'
+                                    borderColor: gatewayConfig.mode === 'browser' ? '#7C6FE8' : 'divider',
+                                    bgcolor: gatewayConfig.mode === 'browser' ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' : 'transparent'
                                 }}
                             >
                                 <FormControlLabel
@@ -3193,8 +3193,8 @@ const Marketing = () => {
                                     mb: 1,
                                     borderRadius: 2.5,
                                     border: '1.5px solid',
-                                    borderColor: gatewayConfig.mode === 'meta_cloud' ? '#0F766E' : 'divider',
-                                    bgcolor: gatewayConfig.mode === 'meta_cloud' ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' : 'transparent'
+                                    borderColor: gatewayConfig.mode === 'meta_cloud' ? '#7C6FE8' : 'divider',
+                                    bgcolor: gatewayConfig.mode === 'meta_cloud' ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' : 'transparent'
                                 }}
                             >
                                 <FormControlLabel
@@ -3219,8 +3219,8 @@ const Marketing = () => {
                                     p: 1.5,
                                     borderRadius: 2.5,
                                     border: '1.5px solid',
-                                    borderColor: gatewayConfig.mode === 'webhook' ? '#0F766E' : 'divider',
-                                    bgcolor: gatewayConfig.mode === 'webhook' ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' : 'transparent'
+                                    borderColor: gatewayConfig.mode === 'webhook' ? '#7C6FE8' : 'divider',
+                                    bgcolor: gatewayConfig.mode === 'webhook' ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' : 'transparent'
                                 }}
                             >
                                 <FormControlLabel
@@ -3347,7 +3347,7 @@ const Marketing = () => {
                 <DialogTitle
                     sx={{
                         fontWeight: 800,
-                        bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
+                        bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
                         borderBottom: '1px solid',
                         borderColor: 'divider',
                         color: 'text.primary'
@@ -3427,7 +3427,7 @@ const Marketing = () => {
                 <DialogTitle
                     sx={{
                         fontWeight: 800,
-                        bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
+                        bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
                         borderBottom: '1px solid',
                         borderColor: 'divider',
                         color: 'text.primary'
@@ -3589,8 +3589,8 @@ const Marketing = () => {
             >
                 <DialogTitle sx={{ fontWeight: 800, color: 'text.primary', display: 'flex', alignItems: 'center', gap: 1.5, pb: 1 }}>
                     <Avatar sx={{
-                        bgcolor: confirmDialog.isDanger ? 'rgba(220, 38, 38, 0.1)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
-                        color: confirmDialog.isDanger ? '#DC2626' : '#0F766E',
+                        bgcolor: confirmDialog.isDanger ? 'rgba(220, 38, 38, 0.1)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)',
+                        color: confirmDialog.isDanger ? '#DC2626' : '#7C6FE8',
                         width: 40,
                         height: 40
                     }}>
@@ -3619,8 +3619,8 @@ const Marketing = () => {
                             setConfirmDialog(prev => ({ ...prev, open: false }));
                         }}
                         sx={{
-                            bgcolor: confirmDialog.isDanger ? '#DC2626' : '#0F766E',
-                            '&:hover': { bgcolor: confirmDialog.isDanger ? '#B91C1C' : '#042F2E' },
+                            bgcolor: confirmDialog.isDanger ? '#DC2626' : '#7C6FE8',
+                            '&:hover': { bgcolor: confirmDialog.isDanger ? '#B91C1C' : '#5B4BD1' },
                             fontWeight: 750,
                             textTransform: 'none',
                             borderRadius: 2.5,

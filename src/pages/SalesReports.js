@@ -429,14 +429,14 @@ const SalesReports = () => {
         elevation={0}
         sx={{
           borderRadius: '20px',
-          border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.14)',
+          border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.14)',
           overflow: 'hidden',
           boxShadow: (t) => t.palette.mode === 'dark' 
             ? '0 10px 30px rgba(0, 0, 0, 0.4)' 
-            : '0 10px 30px -10px rgba(var(--primary-rgb, 15, 118, 110), 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
+            : '0 10px 30px -10px rgba(var(--primary-rgb, 124, 111, 232), 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
         }}
       >
-        <Box sx={{ px: 3, py: 2, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.02)', borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box sx={{ px: 3, py: 2, bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.02)', borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
             Detailed Sales Ledger ({filteredInvoices.length} entries)
           </Typography>

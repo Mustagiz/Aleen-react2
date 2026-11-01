@@ -52,7 +52,7 @@ export default function PageHeader({
       case 'atelier':
       default:
         return {
-          fontFamily: 'Playfair Display, Cormorant Garamond, serif'
+          fontFamily: '"Outfit", "Plus Jakarta Sans", sans-serif'
         };
     }
   };

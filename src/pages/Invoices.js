@@ -1697,7 +1697,7 @@ const Invoices = () => {
     const activeTemplate = customTemplate || activeSettings.template || 'atelier-emerald';
 
     // Theme Colors
-    let primaryRGB = [15, 118, 110]; // Atelier Emerald
+    let primaryRGB = [124, 111, 232]; // Atelier Emerald
     let accentRGB = [217, 119, 6];   // Champagne Gold
 
     if (activeTemplate === 'champagne-gold') {
@@ -1708,7 +1708,7 @@ const Invoices = () => {
       accentRGB = [82, 82, 91];
     } else if (activeTemplate === 'boutique-slip') {
       primaryRGB = [51, 65, 85];
-      accentRGB = [15, 118, 110];
+      accentRGB = [124, 111, 232];
     }
 
     let startY = 18;
@@ -2106,7 +2106,7 @@ const Invoices = () => {
                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                 '&:hover': {
                   border: (t) => `1.5px solid ${t.palette.primary.dark}`,
-                  bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
+                  bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)',
                   transform: 'translateY(-1px)'
                 }
               }}
@@ -2135,7 +2135,7 @@ const Invoices = () => {
                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                 '&:hover': {
                   border: (t) => `1.5px solid ${t.palette.primary.dark}`,
-                  bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
+                  bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)',
                   transform: 'translateY(-1px)'
                 }
               }}
@@ -2164,7 +2164,7 @@ const Invoices = () => {
                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                 '&:hover': {
                   border: (t) => `1.5px solid ${t.palette.primary.dark}`,
-                  bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
+                  bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)',
                   transform: 'translateY(-1px)'
                 }
               }}
@@ -2215,15 +2215,15 @@ const Invoices = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: 0.75,
-                border: isDark ? '1.5px solid rgba(255, 255, 255, 0.12)' : '1.5px solid rgba(15, 118, 110, 0.18)',
+                border: isDark ? '1.5px solid rgba(255, 255, 255, 0.12)' : '1.5px solid rgba(124, 111, 232, 0.18)',
                 color: 'text.secondary',
                 bgcolor: isDark ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
                 boxSizing: 'border-box',
                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                 '&:hover': {
-                  borderColor: isDark ? '#2DD4BF' : '#0F766E',
-                  color: isDark ? '#2DD4BF' : '#0F766E',
-                  bgcolor: isDark ? 'rgba(20, 184, 166, 0.08)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
+                  borderColor: isDark ? '#2DD4BF' : '#7C6FE8',
+                  color: isDark ? '#2DD4BF' : '#7C6FE8',
+                  bgcolor: isDark ? 'rgba(20, 184, 166, 0.08)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
                   transform: 'translateY(-1px)'
                 }
               }}
@@ -2264,7 +2264,7 @@ const Invoices = () => {
                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                 '&:hover': {
                   border: (t) => `1.5px solid ${t.palette.primary.dark}`,
-                  bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
+                  bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)',
                   transform: 'translateY(-1px)'
                 }
               }}
@@ -2293,7 +2293,7 @@ const Invoices = () => {
                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                 '&:hover': {
                   border: (t) => `1.5px solid ${t.palette.primary.dark}`,
-                  bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
+                  bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)',
                   transform: 'translateY(-1px)'
                 }
               }}
@@ -2319,14 +2319,14 @@ const Invoices = () => {
                 boxSizing: 'border-box',
                 background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                 color: '#FFFFFF !important',
-                boxShadow: '0 4px 14px rgba(15, 118, 110, 0.3)',
+                boxShadow: '0 4px 14px rgba(124, 111, 232, 0.3)',
                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                 '& .MuiSvgIcon-root': {
                   color: '#FFFFFF !important'
                 },
                 '&:hover': {
                   background: (t) => t.palette.primary.dark,
-                  boxShadow: '0 6px 18px rgba(15, 118, 110, 0.45)',
+                  boxShadow: '0 6px 18px rgba(124, 111, 232, 0.45)',
                   transform: 'translateY(-1px)'
                 }
               }}
@@ -2578,8 +2578,8 @@ const Invoices = () => {
             p: 1.25,
             px: 2,
             borderRadius: 2,
-            bgcolor: 'rgba(15, 118, 110, 0.06)',
-            border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.2)',
+            bgcolor: 'rgba(124, 111, 232, 0.06)',
+            border: '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.2)',
             display: 'flex',
             flexWrap: 'wrap',
             alignItems: 'center',
@@ -2636,10 +2636,10 @@ const Invoices = () => {
                   borderRadius: '16px',
                   position: 'relative',
                   overflow: 'hidden',
-                  border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.18)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.12)',
+                  border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.18)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.12)',
                   boxShadow: (t) => t.palette.mode === 'dark'
                     ? 'inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 4px 16px rgba(0, 0, 0, 0.35)'
-                    : 'inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 2px 12px rgba(var(--primary-rgb, 15, 118, 110), 0.04)'
+                    : 'inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 2px 12px rgba(var(--primary-rgb, 124, 111, 232), 0.04)'
                 }}
               >
                 {/* Top Metallic Accent Bar */}
@@ -2667,7 +2667,7 @@ const Invoices = () => {
                           px: 0.8,
                           py: 0.2,
                           borderRadius: '6px',
-                          bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)',
+                          bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)',
                           display: 'inline-block',
                           mb: 0.5
                         }}
@@ -2686,9 +2686,9 @@ const Invoices = () => {
                         fontWeight: 700,
                         fontSize: '0.68rem',
                         height: 22,
-                        bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.18)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.12)',
-                        color: (t) => t.palette.mode === 'dark' ? '#2DD4BF' : '#0F766E',
-                        border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.3)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.2)'}`
+                        bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.18)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.12)',
+                        color: (t) => t.palette.mode === 'dark' ? '#2DD4BF' : '#7C6FE8',
+                        border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.3)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.2)'}`
                       }}
                     />
                   </Box>
@@ -2756,8 +2756,8 @@ const Invoices = () => {
                             width: 28,
                             height: 28,
                             color: (t) => t.palette.primary.main,
-                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)',
-                            border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.2)'
+                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)',
+                            border: '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.2)'
                           }}
                         >
                           <Visibility sx={{ fontSize: 14 }} />
@@ -2821,10 +2821,10 @@ const Invoices = () => {
                         width: 270,
                         p: '8px',
                         borderRadius: '16px',
-                        border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.22)' : '1px solid rgba(15, 118, 110, 0.16)',
+                        border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.22)' : '1px solid rgba(124, 111, 232, 0.16)',
                         background: (t) => t.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.96)' : 'rgba(255, 255, 255, 0.96)',
                         backdropFilter: 'blur(20px)',
-                        boxShadow: '0 20px 44px -10px rgba(var(--primary-rgb, 15, 118, 110), 0.2), 0 8px 24px -6px rgba(0, 0, 0, 0.1)'
+                        boxShadow: '0 20px 44px -10px rgba(var(--primary-rgb, 124, 111, 232), 0.2), 0 8px 24px -6px rgba(0, 0, 0, 0.1)'
                       }
                     }}
                   >
@@ -2834,8 +2834,8 @@ const Invoices = () => {
                         py: 1.1,
                         mb: 0.75,
                         borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                        bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.1)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
-                        border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.1)'
+                        bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.1)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)',
+                        border: '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.1)'
                       }}
                     >
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -2889,7 +2889,7 @@ const Invoices = () => {
                         my: 0.25,
                         transition: 'all 0.15s ease',
                         '&:hover': {
-                          bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(15, 118, 110, 0.07)',
+                          bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(124, 111, 232, 0.07)',
                           transform: 'translateX(3px)'
                         }
                       }}
@@ -2902,7 +2902,7 @@ const Invoices = () => {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
+                          bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)',
                           color: (t) => t.palette.primary.main,
                           mr: 1.4,
                           flexShrink: 0
@@ -3144,7 +3144,7 @@ const Invoices = () => {
                         key={inv.id}
                         hover
                         sx={{
-                          '&:hover': { bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(15, 118, 110, 0.03)' },
+                          '&:hover': { bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(124, 111, 232, 0.03)' },
                           transition: 'background-color 0.15s ease'
                         }}
                       >
@@ -3158,12 +3158,12 @@ const Invoices = () => {
                                   fontWeight: 800,
                                   color: (t) => t.palette.primary.main,
                                   fontSize: '0.76rem',
-                                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)',
+                                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)',
                                   px: 0.85,
                                   py: 0.25,
                                   borderRadius: '6px',
                                   border: '1px solid',
-                                  borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.25)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.15)',
+                                  borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.25)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.15)',
                                   letterSpacing: '0.02em',
                                   whiteSpace: 'nowrap'
                                 }}
@@ -3197,9 +3197,9 @@ const Invoices = () => {
                                 height: 32,
                                 fontSize: '0.75rem',
                                 fontWeight: 800,
-                                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.18)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.12)',
+                                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.18)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.12)',
                                 color: (t) => t.palette.primary.main,
-                                border: '1.5px solid rgba(var(--primary-rgb, 15, 118, 110), 0.22)'
+                                border: '1.5px solid rgba(var(--primary-rgb, 124, 111, 232), 0.22)'
                               }}
                             >
                               {(inv.customer || 'W').charAt(0).toUpperCase()}
@@ -3276,8 +3276,8 @@ const Invoices = () => {
                               gap: 0.75,
                               p: '3px 6px',
                               borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                              bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
-                              border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.12)'
+                              bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
+                              border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.12)'
                             }}
                           >
                             <Tooltip title="View Invoice">
@@ -3289,14 +3289,14 @@ const Invoices = () => {
                                   height: 30,
                                   color: (t) => t.palette.primary.main,
                                   bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
-                                  border: '1px solid rgba(15, 118, 110, 0.16)',
+                                  border: '1px solid rgba(124, 111, 232, 0.16)',
                                   boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
                                   transition: 'all 0.18s ease',
                                   '&:hover': {
                                     bgcolor: (t) => t.palette.primary.main,
                                     color: '#FFFFFF',
                                     transform: 'translateY(-1px)',
-                                    boxShadow: '0 4px 10px rgba(15, 118, 110, 0.3)'
+                                    boxShadow: '0 4px 10px rgba(124, 111, 232, 0.3)'
                                   }
                                 }}
                               >
@@ -3356,16 +3356,16 @@ const Invoices = () => {
                                 sx={{
                                   width: 30,
                                   height: 30,
-                                  color: selectedInvoiceId === inv.id ? '#0F766E' : 'text.secondary',
+                                  color: selectedInvoiceId === inv.id ? '#7C6FE8' : 'text.secondary',
                                   bgcolor: selectedInvoiceId === inv.id
-                                    ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.14)'
+                                    ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.14)'
                                     : (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : '#FFFFFF',
                                   border: '1px solid rgba(0, 0, 0, 0.08)',
                                   transition: 'all 0.18s ease',
                                   '&:hover': {
-                                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
+                                    bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)',
                                     color: (t) => t.palette.primary.main,
-                                    borderColor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.25)'
+                                    borderColor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.25)'
                                   }
                                 }}
                               >
@@ -3385,10 +3385,10 @@ const Invoices = () => {
                                 width: 270,
                                 p: '8px',
                                 borderRadius: '16px',
-                                border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.22)' : '1px solid rgba(15, 118, 110, 0.16)',
+                                border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.22)' : '1px solid rgba(124, 111, 232, 0.16)',
                                 background: (t) => t.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.96)' : 'rgba(255, 255, 255, 0.96)',
                                 backdropFilter: 'blur(20px)',
-                                boxShadow: '0 20px 44px -10px rgba(var(--primary-rgb, 15, 118, 110), 0.2), 0 8px 24px -6px rgba(0, 0, 0, 0.1)'
+                                boxShadow: '0 20px 44px -10px rgba(var(--primary-rgb, 124, 111, 232), 0.2), 0 8px 24px -6px rgba(0, 0, 0, 0.1)'
                               }
                             }}
                           >
@@ -3398,8 +3398,8 @@ const Invoices = () => {
                                 py: 1.1,
                                 mb: 0.75,
                                 borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.1)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
-                                border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.1)'
+                                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.1)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)',
+                                border: '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.1)'
                               }}
                             >
                               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -3453,7 +3453,7 @@ const Invoices = () => {
                                 my: 0.25,
                                 transition: 'all 0.15s ease',
                                 '&:hover': {
-                                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(15, 118, 110, 0.07)',
+                                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(124, 111, 232, 0.07)',
                                   transform: 'translateX(3px)'
                                 }
                               }}
@@ -3466,7 +3466,7 @@ const Invoices = () => {
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
+                                  bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)',
                                   color: (t) => t.palette.primary.main,
                                   mr: 1.4,
                                   flexShrink: 0
@@ -4016,15 +4016,15 @@ const Invoices = () => {
                       <>
                         <Chip
                           size="small"
-                          icon={<Stars sx={{ '&&': { color: matchedCustomer.loyaltyTier === 'Platinum' ? '#7C3AED' : matchedCustomer.loyaltyTier === 'Gold' ? '#D97706' : '#0F766E', fontSize: 16 } }} />}
+                          icon={<Stars sx={{ '&&': { color: matchedCustomer.loyaltyTier === 'Platinum' ? '#7C3AED' : matchedCustomer.loyaltyTier === 'Gold' ? '#D97706' : '#7C6FE8', fontSize: 16 } }} />}
                           label={`${matchedCustomer.loyaltyTier || 'Bronze'} VIP • ${matchedCustomer.loyaltyPoints || 0} pts`}
                           sx={{
-                            bgcolor: matchedCustomer.loyaltyTier === 'Platinum' ? 'rgba(124, 58, 237, 0.1)' : matchedCustomer.loyaltyTier === 'Gold' ? 'rgba(217, 119, 6, 0.12)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
-                            color: matchedCustomer.loyaltyTier === 'Platinum' ? '#7C3AED' : matchedCustomer.loyaltyTier === 'Gold' ? '#D97706' : '#0F766E',
+                            bgcolor: matchedCustomer.loyaltyTier === 'Platinum' ? 'rgba(124, 58, 237, 0.1)' : matchedCustomer.loyaltyTier === 'Gold' ? 'rgba(217, 119, 6, 0.12)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)',
+                            color: matchedCustomer.loyaltyTier === 'Platinum' ? '#7C3AED' : matchedCustomer.loyaltyTier === 'Gold' ? '#D97706' : '#7C6FE8',
                             fontWeight: 700,
                             height: 24,
                             border: '1px solid',
-                            borderColor: matchedCustomer.loyaltyTier === 'Platinum' ? 'rgba(124, 58, 237, 0.25)' : matchedCustomer.loyaltyTier === 'Gold' ? 'rgba(217, 119, 6, 0.25)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.25)'
+                            borderColor: matchedCustomer.loyaltyTier === 'Platinum' ? 'rgba(124, 58, 237, 0.25)' : matchedCustomer.loyaltyTier === 'Gold' ? 'rgba(217, 119, 6, 0.25)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.25)'
                           }}
                         />
                         <Button
@@ -4044,7 +4044,7 @@ const Invoices = () => {
                             px: 1,
                             bordercolor: (t) => t.palette.primary.main,
                             color: (t) => t.palette.primary.main,
-                            '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)', bordercolor: (t) => t.palette.primary.main }
+                            '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)', bordercolor: (t) => t.palette.primary.main }
                           }}
                         >
                           {matchedCustomer.measurements ? 'Fitted' : 'Measure'}
@@ -4128,8 +4128,8 @@ const Invoices = () => {
                           sx={{
                             fontSize: '0.68rem',
                             fontWeight: 700,
-                            bgcolor: option.loyaltyTier === 'Platinum' ? 'rgba(124, 58, 237, 0.1)' : option.loyaltyTier === 'Gold' ? 'rgba(217, 119, 6, 0.1)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
-                            color: option.loyaltyTier === 'Platinum' ? '#7C3AED' : option.loyaltyTier === 'Gold' ? '#D97706' : '#0F766E'
+                            bgcolor: option.loyaltyTier === 'Platinum' ? 'rgba(124, 58, 237, 0.1)' : option.loyaltyTier === 'Gold' ? 'rgba(217, 119, 6, 0.1)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)',
+                            color: option.loyaltyTier === 'Platinum' ? '#7C3AED' : option.loyaltyTier === 'Gold' ? '#D97706' : '#7C6FE8'
                           }}
                         />
                       </Box>
@@ -4435,7 +4435,7 @@ const Invoices = () => {
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontSize: '0.82rem' }}>
                       Scan this QR code with your iPhone or Android camera to instantly stream scans into this invoice:
                     </Typography>
-                    <Box sx={{ display: 'inline-block', p: 1.5, bgcolor: '#fff', borderRadius: 3, border: '2px solid #0F766E', mb: 2 }}>
+                    <Box sx={{ display: 'inline-block', p: 1.5, bgcolor: '#fff', borderRadius: 3, border: '2px solid #7C6FE8', mb: 2 }}>
                       <Box component="img" src={phoneQrApiUrl} alt="Pairing QR Code" sx={{ width: 200, height: 200, display: 'block' }} />
                     </Box>
                     <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary', mb: 2 }}>
@@ -4648,7 +4648,7 @@ const Invoices = () => {
                                                   <Chip
                                                     label={option.variantDetails}
                                                     size="small"
-                                                    sx={{ height: 18, fontSize: '0.62rem', fontWeight: 700, bgcolor: 'rgba(15, 118, 110, 0.08)', color: '#0F766E' }}
+                                                    sx={{ height: 18, fontSize: '0.62rem', fontWeight: 700, bgcolor: 'rgba(124, 111, 232, 0.08)', color: '#7C6FE8' }}
                                                   />
                                                 )}
                                               </Box>
@@ -4892,7 +4892,7 @@ const Invoices = () => {
                             textTransform: 'none',
                             bgcolor: isSelected ? 'primary.main' : 'transparent',
                             borderColor: isSelected ? 'primary.main' : 'divider',
-                            boxShadow: isSelected ? '0 2px 8px rgba(var(--primary-rgb, 15, 118, 110), 0.25)' : 'none',
+                            boxShadow: isSelected ? '0 2px 8px rgba(var(--primary-rgb, 124, 111, 232), 0.25)' : 'none',
                             '&:hover': {
                               bgcolor: isSelected ? (t) => `${t.palette.primary.dark} !important` : (t) => `${t.palette.primary.main}14`,
                               borderColor: (t) => t.palette.primary.main
@@ -4933,15 +4933,15 @@ const Invoices = () => {
                             borderRadius: '8px',
                             textTransform: 'none',
                             color: (t) => t.palette.primary.main,
-                            borderColor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
-                            bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
+                            borderColor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.25)',
+                            bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
                             transition: 'all 0.15s ease',
                             '&:active': {
                               transform: 'scale(0.95)'
                             },
                             '&:hover': {
                               bordercolor: (t) => t.palette.primary.main,
-                              bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)'
+                              bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)'
                             }
                           }}
                         >
@@ -5043,8 +5043,8 @@ const Invoices = () => {
                     <Box sx={{ 
                       p: 1.5, 
                       borderRadius: 2, 
-                      bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)', 
-                      border: '1px dashed rgba(var(--primary-rgb, 15, 118, 110), 0.25)' 
+                      bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)', 
+                      border: '1px dashed rgba(var(--primary-rgb, 124, 111, 232), 0.25)' 
                     }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                         <Typography variant="caption" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main }}>
@@ -5170,8 +5170,8 @@ const Invoices = () => {
                       p: 1.8,
                       mb: 2,
                       borderRadius: 2,
-                      bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
-                      border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.2)'
+                      bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
+                      border: '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.2)'
                     }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.2 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
@@ -5307,8 +5307,8 @@ const Invoices = () => {
                     <Box sx={{
                       p: 1.2,
                       borderRadius: '9px',
-                      bgcolor: mode === 'dark' ? 'rgba(15, 118, 110, 0.15)' : 'rgba(15, 118, 110, 0.07)',
-                      border: '1px solid rgba(15, 118, 110, 0.25)',
+                      bgcolor: mode === 'dark' ? 'rgba(124, 111, 232, 0.15)' : 'rgba(124, 111, 232, 0.07)',
+                      border: '1px solid rgba(124, 111, 232, 0.25)',
                       display: 'flex',
                       flexDirection: 'column',
                       gap: 0.6
@@ -5358,7 +5358,7 @@ const Invoices = () => {
                         <Box sx={{
                           mt: 1,
                           pt: 1,
-                          borderTop: '1px dashed rgba(15, 118, 110, 0.25)',
+                          borderTop: '1px dashed rgba(124, 111, 232, 0.25)',
                           display: 'flex',
                           flexDirection: 'column',
                           gap: 1
@@ -6084,7 +6084,7 @@ const Invoices = () => {
       >
         <DialogTitle
           sx={{
-            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.dark || '#042F2E'} 0%, ${t.palette.primary.main} 100%)`,
+            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.dark || '#5B4BD1'} 0%, ${t.palette.primary.main} 100%)`,
             color: '#FFFFFF',
             px: 2.5,
             py: 2,
@@ -6121,9 +6121,9 @@ const Invoices = () => {
                 justifyContent: 'space-between',
                 p: 1.25,
                 borderRadius: 2,
-                bgcolor: mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(15, 118, 110, 0.035)',
+                bgcolor: mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(124, 111, 232, 0.035)',
                 border: '1px solid',
-                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)'
+                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)'
               }}
             >
               <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary', fontSize: '0.84rem' }}>
@@ -6137,7 +6137,7 @@ const Invoices = () => {
                     fontFamily: 'monospace',
                     fontWeight: 800,
                     fontSize: '0.74rem',
-                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
+                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)',
                     color: (t) => t.palette.mode === 'dark' ? t.palette.primary.light : t.palette.primary.main,
                     border: '1px solid',
                     borderColor: (t) => `${t.palette.primary.main}44`

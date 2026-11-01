@@ -87,18 +87,16 @@ export default function GlassCard({ children, sx = {}, hover = false, glowColor 
             default:
                 return {
                     borderRadius: `${radius}px`,
-                    background: isDark
-                        ? 'radial-gradient(ellipse at 50% 0%, rgba(20, 184, 166, 0.08) 0%, rgba(12, 26, 25, 0.96) 85%)'
-                        : 'rgba(255, 255, 255, 0.97)',
-                    border: isDark ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.14)',
+                    background: isDark ? '#1D1A2E' : '#FFFFFF',
+                    border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.14)',
                     boxShadow: isDark
                         ? 'inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 32px rgba(0, 0, 0, 0.5)'
-                        : 'inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 8px 24px -4px rgba(15, 118, 110, 0.07)',
-                    backdropFilter: 'blur(20px)',
+                        : 'inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 4px 16px -4px rgba(31, 27, 46, 0.06)',
+                    backdropFilter: 'none',
                     hoverShadow: isDark
-                        ? '0 18px 40px -4px rgba(0, 0, 0, 0.65), 0 0 28px rgba(20, 184, 166, 0.35)'
-                        : '0 16px 36px -4px rgba(15, 118, 110, 0.24), 0 0 22px rgba(15, 118, 110, 0.18)',
-                    hoverBorder: isDark ? '#2DD4BF' : '#0F766E'
+                        ? '0 18px 40px -4px rgba(0, 0, 0, 0.65), 0 0 28px rgba(155, 143, 245, 0.35)'
+                        : '0 12px 28px -6px rgba(124, 111, 232, 0.18)',
+                    hoverBorder: isDark ? '#2DD4BF' : '#7C6FE8'
                 };
         }
     };

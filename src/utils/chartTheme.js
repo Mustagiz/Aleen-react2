@@ -8,7 +8,7 @@
  * @returns {string[]} Array of hex/rgba color strings
  */
 export const getThemeChartPalette = (theme, count = 6) => {
-  const primary = theme?.palette?.primary?.main || '#0F766E';
+  const primary = theme?.palette?.primary?.main || '#7C6FE8';
   const secondary = theme?.palette?.secondary?.main || '#D97706';
   const info = theme?.palette?.info?.main || '#0284C7';
   const success = theme?.palette?.success?.main || '#10B981';

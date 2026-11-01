@@ -112,7 +112,7 @@ const Loyalty = () => {
             case 'Bronze': return '#B45309';
             case 'Silver': return '#64748B';
             case 'Gold': return '#D97706';
-            case 'Platinum': return '#0F766E';
+            case 'Platinum': return '#7C6FE8';
             default: return '#9E9E9E';
         }
     };
@@ -479,8 +479,8 @@ const Loyalty = () => {
                             Privilege Program Architecture
                         </Typography>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', p: 1.5, borderRadius: 2.5, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }}>
-                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main }}>
+                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', p: 1.5, borderRadius: 2.5, bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' }}>
+                                <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)', color: (t) => t.palette.primary.main }}>
                                     <LocalOffer sx={{ fontSize: 20 }} />
                                 </Box>
                                 <Box sx={{ flex: 1 }}>
@@ -569,14 +569,14 @@ const Loyalty = () => {
                 elevation={0}
                 sx={{
                     borderRadius: '20px',
-                    border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.14)',
+                    border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.14)',
                     overflow: 'hidden',
                     boxShadow: (t) => t.palette.mode === 'dark'
                         ? '0 10px 30px rgba(0, 0, 0, 0.4)'
-                        : '0 10px 30px -10px rgba(var(--primary-rgb, 15, 118, 110), 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
+                        : '0 10px 30px -10px rgba(var(--primary-rgb, 124, 111, 232), 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
                 }}
             >
-                <Box sx={{ px: 3, py: 2, bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(15, 118, 110, 0.03)', borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Box sx={{ px: 3, py: 2, bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(124, 111, 232, 0.03)', borderBottom: '1px solid', borderColor: 'divider' }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
                         Clientele Loyalty Leaderboard & Privilege Balances
                     </Typography>
@@ -584,7 +584,7 @@ const Loyalty = () => {
 
                 <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
                     <Table sx={{ minWidth: 680 }}>
-                        <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }}>
+                        <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' }}>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', width: 70 }} align="center">Rank</TableCell>
                                 <TableCell sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Client Details</TableCell>
@@ -611,7 +611,7 @@ const Loyalty = () => {
                                         const tier = customer.loyaltyTier || 'Bronze';
 
                                         return (
-                                            <TableRow key={customer.id} hover sx={{ '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.02)' } }}>
+                                            <TableRow key={customer.id} hover sx={{ '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.02)' } }}>
                                                 {/* Rank */}
                                                 <TableCell align="center">
                                                     <Chip
@@ -633,7 +633,7 @@ const Loyalty = () => {
                                                             sx={{ 
                                                                 bgcolor: getTierColor(tier), 
                                                                 background: tier === 'Platinum' 
-                                                                    ? 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)' 
+                                                                    ? 'linear-gradient(135deg, #7C6FE8 0%, #5B4BD1 100%)' 
                                                                     : tier === 'Gold' 
                                                                         ? 'linear-gradient(135deg, #F59E0B 0%, #B45309 100%)' 
                                                                         : tier === 'Silver' 
@@ -725,8 +725,8 @@ const Loyalty = () => {
                                                             gap: 0.75,
                                                             p: '3px 6px',
                                                             borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
-                                                            border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.12)'
+                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
+                                                            border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.12)'
                                                         }}
                                                     >
                                                         <Tooltip title="Redeem Available Points">
@@ -740,14 +740,14 @@ const Loyalty = () => {
                                                                         height: 30,
                                                                         color: (t) => t.palette.primary.main,
                                                                         bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
-                                                                        border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.2)',
+                                                                        border: '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.2)',
                                                                         boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
                                                                         transition: 'all 0.18s ease',
                                                                         '&:hover:not(:disabled)': {
                                                                             bgcolor: (t) => t.palette.primary.main,
                                                                             color: '#FFFFFF',
                                                                             transform: 'translateY(-1px)',
-                                                                            boxShadow: '0 4px 10px rgba(15, 118, 110, 0.3)'
+                                                                            boxShadow: '0 4px 10px rgba(124, 111, 232, 0.3)'
                                                                         }
                                                                     }}
                                                                 >
@@ -860,7 +860,7 @@ const Loyalty = () => {
                     display: 'flex', 
                     justifyContent: 'space-between', 
                     alignItems: 'center',
-                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
+                    bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
                     borderBottom: '1px solid',
                     borderColor: 'divider',
                     color: 'text.primary'
@@ -894,7 +894,7 @@ const Loyalty = () => {
                                 }}
                             />
                             {pointsToRedeem && parseInt(pointsToRedeem) > 0 && (
-                                <Box sx={{ mt: 2, p: 2, bgcolor: 'rgba(15, 118, 110, 0.06)', borderRadius: 2.5, border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.15)' }}>
+                                <Box sx={{ mt: 2, p: 2, bgcolor: 'rgba(124, 111, 232, 0.06)', borderRadius: 2.5, border: '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.15)' }}>
                                     <Typography variant="body2" sx={{ fontWeight: 750, color: (t) => t.palette.primary.main }}>
                                         Instant Invoice Discount: ₹{parseInt(pointsToRedeem || 0).toLocaleString()}
                                     </Typography>
@@ -1006,7 +1006,7 @@ const Loyalty = () => {
 
                             {/* Live Calculation Simulation Card for ₹1,000 Spend */}
                             {Number(settingsForm.spendPerPoint) > 0 && (
-                                <Box sx={{ p: 2, borderRadius: 2.5, bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(15, 118, 110, 0.15)' : 'rgba(15, 118, 110, 0.06)', border: '1px solid rgba(15, 118, 110, 0.2)' }}>
+                                <Box sx={{ p: 2, borderRadius: 2.5, bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(124, 111, 232, 0.15)' : 'rgba(124, 111, 232, 0.06)', border: '1px solid rgba(124, 111, 232, 0.2)' }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                                         <Calculate sx={{ fontSize: 18, color: 'primary.main' }} />
                                         <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'primary.main' }}>
@@ -1018,7 +1018,7 @@ const Loyalty = () => {
                                             { tier: 'Bronze', mult: Number(settingsForm.bronzeMultiplier) || 1, color: '#B45309' },
                                             { tier: 'Silver', mult: Number(settingsForm.silverMultiplier) || 1.25, color: '#64748B' },
                                             { tier: 'Gold', mult: Number(settingsForm.goldMultiplier) || 1.5, color: '#D97706' },
-                                            { tier: 'Platinum', mult: Number(settingsForm.platinumMultiplier) || 2, color: '#0F766E' }
+                                            { tier: 'Platinum', mult: Number(settingsForm.platinumMultiplier) || 2, color: '#7C6FE8' }
                                         ].map(({ tier, mult, color }) => {
                                             const base = 1000 / Number(settingsForm.spendPerPoint);
                                             const pts = Math.round(base * mult);

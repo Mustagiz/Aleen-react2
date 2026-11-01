@@ -552,7 +552,7 @@ export default function Settings() {
               color: '#FFFFFF',
               px: 3,
               py: 1,
-              boxShadow: '0 4px 14px rgba(var(--primary-rgb, 15, 118, 110), 0.3)',
+              boxShadow: '0 4px 14px rgba(var(--primary-rgb, 124, 111, 232), 0.3)',
               '&:hover': { bgcolor: (t) => t.palette.primary.dark }
             }}
           >
@@ -646,7 +646,7 @@ export default function Settings() {
                       objectFit: 'contain',
                       bgcolor: '#FFFFFF',
                       border: '2px solid rgba(217, 119, 6, 0.45)',
-                      boxShadow: '0 8px 24px rgba(var(--primary-rgb, 15, 118, 110), 0.2)',
+                      boxShadow: '0 8px 24px rgba(var(--primary-rgb, 124, 111, 232), 0.2)',
                       p: 0.5
                     }}
                   />
@@ -662,7 +662,7 @@ export default function Settings() {
                       justifyContent: 'center',
                       color: '#F59E0B',
                       border: '2px solid rgba(217, 119, 6, 0.45)',
-                      boxShadow: '0 8px 24px rgba(var(--primary-rgb, 15, 118, 110), 0.25)'
+                      boxShadow: '0 8px 24px rgba(var(--primary-rgb, 124, 111, 232), 0.25)'
                     }}
                   >
                     <Typography sx={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 900, fontSize: '2.5rem', color: '#F59E0B' }}>
@@ -768,7 +768,7 @@ export default function Settings() {
                 </Typography>
               </Box>
 
-              <Box sx={{ mt: 3, p: 1.5, borderRadius: 2, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)', border: (t) => `1px dashed ${t.palette.primary.main}` }}>
+              <Box sx={{ mt: 3, p: 1.5, borderRadius: 2, bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)', border: (t) => `1px dashed ${t.palette.primary.main}` }}>
                 <Typography variant="caption" sx={{ fontWeight: 700, color: (t) => t.palette.primary.main, display: 'block' }}>
                   ✓ Invoices Automatically Updated
                 </Typography>
@@ -1105,13 +1105,13 @@ export default function Settings() {
                 sx={{
                   p: 2,
                   borderRadius: 2,
-                  bgcolor: 'rgba(15, 118, 110, 0.03)',
-                  border: '1.5px solid rgba(var(--primary-rgb, 15, 118, 110), 0.2)'
+                  bgcolor: 'rgba(124, 111, 232, 0.03)',
+                  border: '1.5px solid rgba(var(--primary-rgb, 124, 111, 232), 0.2)'
                 }}
               >
                 {(formProfile.leftBoxMode === 'luxury-composite' || !formProfile.leftBoxMode) && (
                   <Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 0.8, mb: 1, borderBottom: '1px dashed rgba(var(--primary-rgb, 15, 118, 110), 0.2)' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 0.8, mb: 1, borderBottom: '1px dashed rgba(var(--primary-rgb, 124, 111, 232), 0.2)' }}>
                       <Typography variant="caption" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, textTransform: 'uppercase', fontSize: '0.7rem' }}>
                         ⚜️ Atelier Privileges & Quick Pay
                       </Typography>
@@ -1238,7 +1238,7 @@ export default function Settings() {
                             borderRadius: 2,
                             border: '2px solid',
                             borderColor: isSelected ? 'primary.main' : 'divider',
-                            bgcolor: isSelected ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)' : 'background.paper',
+                            bgcolor: isSelected ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)' : 'background.paper',
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
@@ -1398,7 +1398,7 @@ export default function Settings() {
                 </Typography>
 
                 {formProfile.showSignatureStamp && (
-                  <Box sx={{ p: 2.5, borderRadius: (t) => `${t.shape?.borderRadius || 8}px`, bgcolor: 'rgba(15, 118, 110, 0.03)', border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.15)' }}>
+                  <Box sx={{ p: 2.5, borderRadius: (t) => `${t.shape?.borderRadius || 8}px`, bgcolor: 'rgba(124, 111, 232, 0.03)', border: '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.15)' }}>
                     <Grid container spacing={2}>
                       <Grid item xs={12} sm={6}>
                         <TextField
@@ -1437,7 +1437,7 @@ export default function Settings() {
                               borderRadius: 2,
                               '&:hover': {
                                 borderColor: (t) => t.palette.primary.dark,
-                                bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)'
+                                bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)'
                               }
                             }}
                           >
@@ -1636,7 +1636,7 @@ export default function Settings() {
 
             <TableContainer sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
               <Table>
-                <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)' }}>
+                <TableHead sx={{ bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)' }}>
                   <TableRow>
                     <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem' }}>Staff Member</TableCell>
                     <TableCell sx={{ fontWeight: 800, fontSize: '0.78rem' }}>Login ID</TableCell>
@@ -1654,7 +1654,7 @@ export default function Settings() {
                       <TableRow key={staff.id} hover sx={{ opacity: isSuspended ? 0.6 : 1 }}>
                         <TableCell>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                            <Avatar sx={{ bgcolor: isSuspended ? '#94A3B8' : '#0F766E', width: 34, height: 34, fontSize: '0.8rem', fontWeight: 700 }}>
+                            <Avatar sx={{ bgcolor: isSuspended ? '#94A3B8' : '#7C6FE8', width: 34, height: 34, fontSize: '0.8rem', fontWeight: 700 }}>
                               {staff.name?.slice(0, 2).toUpperCase() || 'ST'}
                             </Avatar>
                             <Box>
@@ -1671,7 +1671,7 @@ export default function Settings() {
                           <Chip
                             label={staff.loginId}
                             size="small"
-                            sx={{ fontWeight: 800, fontFamily: 'monospace', bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main }}
+                            sx={{ fontWeight: 800, fontFamily: 'monospace', bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)', color: (t) => t.palette.primary.main }}
                           />
                         </TableCell>
                         <TableCell>
@@ -2507,7 +2507,7 @@ export default function Settings() {
             sx={{
               background: (t) =>
                 t.custom?.designSystem?.buttonStyle?.background ||
-                'linear-gradient(135deg, #0F766E 0%, #042F2C 100%)',
+                'linear-gradient(135deg, #7C6FE8 0%, #5B4BD1 100%)',
               color: '#FFFFFF',
               fontWeight: 800,
               borderRadius: 2,

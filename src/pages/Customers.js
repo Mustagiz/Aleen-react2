@@ -351,7 +351,7 @@ const Customers = () => {
                                 fontWeight: 700,
                                 textTransform: 'none',
                                 px: 2.5,
-                                '&:hover': { bordercolor: (t) => t.palette.primary.main, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }
+                                '&:hover': { bordercolor: (t) => t.palette.primary.main, bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' }
                             }}
                         >
                             Export Directory
@@ -367,9 +367,9 @@ const Customers = () => {
                                 fontWeight: 700,
                                 textTransform: 'none',
                                 px: 3,
-                                boxShadow: '0 4px 14px rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
+                                boxShadow: '0 4px 14px rgba(var(--primary-rgb, 124, 111, 232), 0.25)',
                                 '&:hover': {
-                                    background: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)'
+                                    background: 'linear-gradient(135deg, #5B4BD1 0%, #7C6FE8 100%)'
                                 }
                             }}
                         >
@@ -505,7 +505,7 @@ const Customers = () => {
                     background: (t) => t.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.95)' : '#FFFFFF',
                     boxShadow: (t) => t.palette.mode === 'dark'
                         ? '0 12px 36px rgba(0, 0, 0, 0.5), 0 0 24px rgba(20, 184, 166, 0.12)'
-                        : '0 12px 32px -4px rgba(var(--primary-rgb, 15, 118, 110), 0.08), 0 2px 6px rgba(0, 0, 0, 0.02)',
+                        : '0 12px 32px -4px rgba(var(--primary-rgb, 124, 111, 232), 0.08), 0 2px 6px rgba(0, 0, 0, 0.02)',
                     position: 'relative'
                 }}
             >
@@ -876,8 +876,8 @@ const Customers = () => {
                                                             gap: 0.65,
                                                             p: '3px 6px',
                                                             borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
-                                                            border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.12)'
+                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
+                                                            border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.12)'
                                                         }}
                                                     >
                                                         <Tooltip title="View 360° Profile & Sizing Specs">
@@ -889,14 +889,14 @@ const Customers = () => {
                                                                     height: 30,
                                                                     color: (t) => t.palette.primary.main,
                                                                     bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
-                                                                    border: '1px solid rgba(15, 118, 110, 0.16)',
+                                                                    border: '1px solid rgba(124, 111, 232, 0.16)',
                                                                     boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
                                                                     transition: 'all 0.18s ease',
                                                                     '&:hover': {
                                                                         bgcolor: (t) => t.palette.primary.main,
                                                                         color: '#FFFFFF',
                                                                         transform: 'translateY(-1px)',
-                                                                        boxShadow: '0 4px 10px rgba(15, 118, 110, 0.3)'
+                                                                        boxShadow: '0 4px 10px rgba(124, 111, 232, 0.3)'
                                                                     }
                                                                 }}
                                                             >

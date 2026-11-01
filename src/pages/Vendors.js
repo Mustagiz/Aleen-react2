@@ -187,14 +187,14 @@ const Vendors = () => {
                             boxSizing: 'border-box',
                             background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                             color: '#FFFFFF !important',
-                            boxShadow: '0 4px 14px rgba(15, 118, 110, 0.3)',
+                            boxShadow: '0 4px 14px rgba(124, 111, 232, 0.3)',
                             transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                             '& .MuiSvgIcon-root': {
                                 color: '#FFFFFF !important'
                             },
                             '&:hover': {
                                 background: (t) => t.palette.primary.dark,
-                                boxShadow: '0 6px 18px rgba(15, 118, 110, 0.45)',
+                                boxShadow: '0 6px 18px rgba(124, 111, 232, 0.45)',
                                 transform: 'translateY(-1px)'
                             }
                         }}
@@ -325,10 +325,10 @@ const Vendors = () => {
                 p: 0, 
                 overflow: 'hidden', 
                 borderRadius: '20px', 
-                border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.14)',
+                border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.14)',
                 boxShadow: (t) => t.palette.mode === 'dark' 
                     ? '0 10px 30px rgba(0, 0, 0, 0.4)' 
-                    : '0 10px 30px -10px rgba(var(--primary-rgb, 15, 118, 110), 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
+                    : '0 10px 30px -10px rgba(var(--primary-rgb, 124, 111, 232), 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
             }}>
                 <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
                     <Table sx={{ minWidth: 680 }} stickyHeader>
@@ -339,7 +339,7 @@ const Vendors = () => {
                             '& th': {
                                 backdropFilter: 'blur(10px)',
                                 bgcolor: theme.palette.mode === 'dark' ? 'rgba(16, 32, 32, 0.92)' : 'rgba(255, 255, 255, 0.92)',
-                                borderBottom: theme.palette.mode === 'dark' ? '1.5px solid rgba(255, 255, 255, 0.1)' : '1.5px solid rgba(var(--primary-rgb, 15, 118, 110), 0.15)'
+                                borderBottom: theme.palette.mode === 'dark' ? '1.5px solid rgba(255, 255, 255, 0.1)' : '1.5px solid rgba(var(--primary-rgb, 124, 111, 232), 0.15)'
                             }
                         }}>
                             <TableRow>
@@ -377,7 +377,7 @@ const Vendors = () => {
                                         <TableRow 
                                             key={vendor.id} 
                                             hover
-                                            sx={{ '&:hover': { bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.02)' } }}
+                                            sx={{ '&:hover': { bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.02)' } }}
                                         >
                                             {/* Vendor Name & Firm */}
                                             <TableCell sx={{ py: 2 }}>
@@ -391,7 +391,7 @@ const Vendors = () => {
                                                             width: 42,
                                                             height: 42,
                                                             fontSize: '0.95rem',
-                                                            boxShadow: '0 4px 14px rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
+                                                            boxShadow: '0 4px 14px rgba(var(--primary-rgb, 124, 111, 232), 0.25)',
                                                             border: '2px solid rgba(255, 255, 255, 0.9)'
                                                         }}
                                                     >
@@ -553,8 +553,8 @@ const Vendors = () => {
                                                         gap: 0.75,
                                                         p: '3px 6px',
                                                         borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                                                        bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
-                                                        border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.12)'
+                                                        bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
+                                                        border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.12)'
                                                     }}
                                                 >
                                                     <Tooltip title="Edit Vendor Details">
@@ -816,10 +816,10 @@ const Vendors = () => {
                             textTransform: 'none',
                             background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                             color: '#ffffff',
-                            boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
+                            boxShadow: '0 4px 14px rgba(124, 111, 232, 0.35)',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, #115E59 0%, #02201E 100%)',
-                                boxShadow: '0 6px 18px rgba(15, 118, 110, 0.45)'
+                                background: 'linear-gradient(135deg, #5B4BD1 0%, #14121F 100%)',
+                                boxShadow: '0 6px 18px rgba(124, 111, 232, 0.45)'
                             },
                             '&.Mui-disabled': {
                                 background: 'rgba(0, 0, 0, 0.12)',

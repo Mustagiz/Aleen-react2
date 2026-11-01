@@ -526,7 +526,7 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <Avatar sx={{ bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main }}>
+            <Avatar sx={{ bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)', color: (t) => t.palette.primary.main }}>
               <Person />
             </Avatar>
             <Box>
@@ -578,15 +578,15 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
                       cursor: 'pointer',
                       border: '1.5px solid',
                       borderColor: isSelected ? 'primary.main' : 'divider',
-                      bgcolor: isSelected ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)' : 'background.paper',
-                      boxShadow: isSelected ? '0 4px 14px rgba(var(--primary-rgb, 15, 118, 110), 0.15)' : 'none',
+                      bgcolor: isSelected ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)' : 'background.paper',
+                      boxShadow: isSelected ? '0 4px 14px rgba(var(--primary-rgb, 124, 111, 232), 0.15)' : 'none',
                       transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                       height: '100%',
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'space-between',
                       '&:hover': {
-                        borderColor: '#0F766E',
+                        borderColor: '#7C6FE8',
                         transform: 'translateY(-2px)'
                       }
                     }}
@@ -601,12 +601,12 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
                             height: 18,
                             fontSize: '0.64rem',
                             fontWeight: 800,
-                            bgcolor: isSelected ? '#0F766E' : 'action.hover',
+                            bgcolor: isSelected ? '#7C6FE8' : 'action.hover',
                             color: isSelected ? '#FFFFFF' : 'text.secondary'
                           }}
                         />
                       </Box>
-                      <Typography variant="body2" sx={{ fontWeight: 800, color: isSelected ? '#0F766E' : 'text.primary', mb: 0.4 }}>
+                      <Typography variant="body2" sx={{ fontWeight: 800, color: isSelected ? '#7C6FE8' : 'text.primary', mb: 0.4 }}>
                         {tmpl.name}
                       </Typography>
                       <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
@@ -665,8 +665,8 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
                       fontWeight: 700,
                       borderRadius: '16px',
                       color: (t) => t.palette.primary.main,
-                      borderColor: '#0F766E',
-                      '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)', borderColor: (t) => t.palette.primary.dark }
+                      borderColor: '#7C6FE8',
+                      '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)', borderColor: (t) => t.palette.primary.dark }
                     }}
                   >
                     Save as My Custom
@@ -727,7 +727,7 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
                     const link = buildPublicBillUrl(invRef, profile);
                     handleInsertVariable(`📥 *Download PDF Bill:* ${link}`);
                   }}
-                  sx={{ cursor: 'pointer', height: 22, fontSize: '0.7rem', fontWeight: 700, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)', color: (t) => t.palette.primary.main }}
+                  sx={{ cursor: 'pointer', height: 22, fontSize: '0.7rem', fontWeight: 700, bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)', color: (t) => t.palette.primary.main }}
                 />
                 <Chip
                   label="+ Boutique Phone"
@@ -891,12 +891,12 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
               borderRadius: '24px',
               fontWeight: 800,
               fontSize: '0.9rem',
-              borderColor: '#0F766E',
+              borderColor: '#7C6FE8',
               color: (t) => t.palette.primary.main,
               textTransform: 'none',
               '&:hover': {
                 borderColor: '#0D6861',
-                bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)'
+                bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)'
               }
             }}
           >

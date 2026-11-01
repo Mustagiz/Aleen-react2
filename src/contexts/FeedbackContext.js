@@ -125,7 +125,7 @@ export const FeedbackProvider = ({ children }) => {
                         boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
                         px: 2.5,
                         py: 1,
-                        bgcolor: toast.severity === 'success' ? '#0F766E' : undefined
+                        bgcolor: toast.severity === 'success' ? '#7C6FE8' : undefined
                     }}
                 >
                     {toast.message}
@@ -156,7 +156,7 @@ export const FeedbackProvider = ({ children }) => {
                                 width: 44,
                                 height: 44,
                                 bgcolor: confirmState.isDanger ? 'rgba(239, 68, 68, 0.12)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.12)',
-                                color: confirmState.isDanger ? '#DC2626' : '#0F766E'
+                                color: confirmState.isDanger ? '#DC2626' : '#7C6FE8'
                             }}
                         >
                             {confirmState.isDanger ? <Warning /> : <HelpOutline />}
@@ -199,11 +199,11 @@ export const FeedbackProvider = ({ children }) => {
                             borderRadius: 2.5,
                             px: 2.5,
                             textTransform: 'none',
-                            bgcolor: confirmState.isDanger ? '#DC2626' : '#0F766E',
+                            bgcolor: confirmState.isDanger ? '#DC2626' : '#7C6FE8',
                             color: '#FFFFFF',
-                            boxShadow: confirmState.isDanger ? '0 4px 14px rgba(220, 38, 38, 0.3)' : '0 4px 14px rgba(15, 118, 110, 0.3)',
+                            boxShadow: confirmState.isDanger ? '0 4px 14px rgba(220, 38, 38, 0.3)' : '0 4px 14px rgba(124, 111, 232, 0.3)',
                             '&:hover': {
-                                bgcolor: confirmState.isDanger ? '#B91C1C' : '#042F2E'
+                                bgcolor: confirmState.isDanger ? '#B91C1C' : '#5B4BD1'
                             }
                         }}
                     >

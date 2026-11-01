@@ -43,7 +43,7 @@ import { useData } from '../../contexts/DataContext';
 
 const getTierColor = (tier) => {
   switch (tier) {
-    case 'Platinum': return { bg: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)', text: '#F0FDFA', border: '#14B8A6' };
+    case 'Platinum': return { bg: 'linear-gradient(135deg, #7C6FE8 0%, #5B4BD1 100%)', text: '#F0FDFA', border: '#9B8FF5' };
     case 'Gold': return { bg: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)', text: '#FFFBEB', border: '#F59E0B' };
     case 'Silver': return { bg: 'linear-gradient(135deg, #64748B 0%, #475569 100%)', text: '#F8FAFC', border: '#94A3B8' };
     default: return { bg: 'linear-gradient(135deg, #B45309 0%, #78350F 100%)', text: '#FEF3C7', border: '#D97706' };
@@ -161,7 +161,7 @@ export default function Customer360Drawer({
           onClick={handleSaveMeasurements}
           disabled={saving}
           sx={{
-            background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+            background: 'linear-gradient(135deg, #7C6FE8 0%, #5B4BD1 100%)',
             color: '#FFFFFF',
             fontWeight: 700,
             fontSize: '0.8rem',
@@ -422,7 +422,7 @@ export default function Customer360Drawer({
                 py: 1,
                 borderRadius: 2,
                 fontWeight: 700,
-                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                background: 'linear-gradient(135deg, #7C6FE8 0%, #5B4BD1 100%)',
                 color: '#FFFFFF'
               }}
             >
@@ -461,7 +461,7 @@ export default function Customer360Drawer({
                       justifyContent: 'space-between',
                       transition: 'all 0.15s ease-in-out',
                       '&:hover': {
-                        borderColor: '#0F766E',
+                        borderColor: '#7C6FE8',
                         boxShadow: '0 4px 12px rgba(var(--primary-rgb, 15, 118, 110), 0.08)'
                       }
                     }}
@@ -552,7 +552,7 @@ export default function Customer360Drawer({
                 py: 1,
                 borderRadius: 2,
                 fontWeight: 700,
-                background: 'linear-gradient(135deg, #0F766E 0%, #042F2E 100%)',
+                background: 'linear-gradient(135deg, #7C6FE8 0%, #5B4BD1 100%)',
                 color: '#FFFFFF'
               }}
             >

@@ -508,75 +508,75 @@ export const DESIGN_SYSTEMS = [
   },
   {
     id: 'atelier',
-    name: 'Aleen Atelier Haute Couture',
-    company: 'Aleen Bespoke Studio',
-    badge: 'Velvet Forest & Gold',
-    tagline: 'Deep Royal Forest Velvet Emerald sidebar, Burnished Imperial Gold highlights, and Cormorant serif luxury.',
-    icon: '👑',
+    name: 'Aleen Light Lavender',
+    company: 'Aleen Studio',
+    badge: 'Light Lavender Studio',
+    tagline: 'Airy lavender canvas with white cards, hairline borders, pastel icon tiles, and crisp Outfit typography.',
+    icon: '💜',
     shape: {
-      borderRadius: 10,
-      buttonRadius: 9,
-      inputRadius: 9,
+      borderRadius: 14,
+      buttonRadius: 12,
+      inputRadius: 12,
       cardRadius: 14
     },
     typography: {
-      fontFamily: '"Plus Jakarta Sans", "Inter", -apple-system, sans-serif',
-      h1Font: '"Cormorant Garamond", Georgia, serif',
-      fontWeightBold: 800,
-      letterSpacing: '-0.015em'
+      fontFamily: '"Outfit", "Plus Jakarta Sans", "Inter", -apple-system, sans-serif',
+      h1Font: '"Outfit", "Plus Jakarta Sans", sans-serif',
+      fontWeightBold: 700,
+      letterSpacing: '-0.01em'
     },
     palette: {
       primary: {
-        main: '#0A4D46', // Velvet Atelier Emerald
-        light: '#14B8A6',
-        dark: '#042F2E',
+        main: '#7C6FE8', // Light Lavender
+        light: '#9B8FF5',
+        dark: '#5B4BD1',
         contrastText: '#FFFFFF'
       },
       secondary: {
-        main: '#C28D4B', // Burnished Imperial Gold
-        light: '#F59E0B',
-        dark: '#92400E',
+        main: '#2DD4BF', // Fresh Mint
+        light: '#5EEAD4',
+        dark: '#0D9488',
         contrastText: '#FFFFFF'
       },
       background: {
-        lightDefault: '#FBFBF9',
+        lightDefault: '#F9F9FC',
         lightPaper: '#FFFFFF',
-        darkDefault: '#081212',
-        darkPaper: '#0F1E1D'
+        darkDefault: '#14121F',
+        darkPaper: '#1D1A2E'
       }
     },
     sidebar: {
-      isDarkSidebar: true, // Atelier signature deep forest sidebar
-      lightBg: '#042F2E',  // Deep Forest Velvet Emerald
-      darkBg: '#031F1E',
-      textColor: '#A7F3D0',
-      textActiveColor: '#FFFFFF',
-      subheadColor: '#C28D4B', // Imperial Gold subheaders
-      activePillBg: 'rgba(20, 184, 166, 0.25)',
-      activePillText: '#FFFFFF',
-      borderColor: 'rgba(194, 141, 75, 0.2)'
+      isDarkSidebar: false,
+      lightBg: '#FFFFFF',
+      darkBg: '#1D1A2E',
+      textColor: '#5B5B66',
+      textActiveColor: '#7C6FE8',
+      subheadColor: '#9A9AA6',
+      activePillBg: '#F1EFFC',
+      activePillText: '#5B4BD1',
+      borderColor: '#EFEFF4'
     },
     topBar: {
-      style: 'frosted',
-      lightBg: 'rgba(255, 255, 255, 0.94)',
-      darkBg: 'rgba(15, 30, 29, 0.94)',
-      textColor: '#042F2E',
-      borderColor: 'rgba(10, 77, 70, 0.12)'
+      style: 'clean',
+      lightBg: '#FFFFFF',
+      darkBg: '#1D1A2E',
+      textColor: '#1F1B2E',
+      borderColor: '#EFEFF4'
     },
     cardStyle: {
-      backdropFilter: 'blur(16px)',
-      borderLight: '1px solid rgba(10, 77, 70, 0.1)',
+      backdropFilter: 'none',
+      borderLight: '1px solid #EFEFF4',
       borderDark: '1px solid rgba(255, 255, 255, 0.08)',
-      boxShadowLight: '0 1px 3px rgba(0,0,0,0.02), 0 10px 25px -5px rgba(0,0,0,0.04)',
+      boxShadowLight: '0 1px 2px rgba(31, 27, 46, 0.04), 0 4px 16px -4px rgba(31, 27, 46, 0.06)',
       boxShadowDark: '0 4px 20px rgba(0, 0, 0, 0.4)'
     },
     buttonStyle: {
       textTransform: 'none',
-      fontWeight: 700,
-      background: 'linear-gradient(135deg, #14B8A6 0%, #0A4D46 100%)',
-      boxShadow: '0 4px 14px rgba(10, 77, 70, 0.25)'
+      fontWeight: 600,
+      background: '#7C6FE8',
+      boxShadow: '0 1px 2px rgba(124, 111, 232, 0.3)'
     },
-    accentGlow: 'rgba(10, 77, 70, 0.25)'
+    accentGlow: 'rgba(124, 111, 232, 0.22)'
   }
 ];
 

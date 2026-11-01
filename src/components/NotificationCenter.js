@@ -240,8 +240,8 @@ const NotificationCenter = () => {
                         maxHeight: 480,
                         borderRadius: 3,
                         mt: 1.5,
-                        boxShadow: '0 16px 40px rgba(var(--primary-rgb, 15, 118, 110), 0.15), 0 4px 16px rgba(0,0,0,0.08)',
-                        border: '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.12)',
+                        boxShadow: '0 16px 40px rgba(var(--primary-rgb, 124, 111, 232), 0.15), 0 4px 16px rgba(0,0,0,0.08)',
+                        border: '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.12)',
                         overflow: 'hidden',
                         display: 'flex',
                         flexDirection: 'column'
@@ -299,7 +299,7 @@ const NotificationCenter = () => {
                                 px: 1,
                                 py: 0.35,
                                 borderRadius: '6px',
-                                '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)' },
+                                '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)' },
                                 '&.Mui-disabled': { color: 'text.disabled' }
                             }}
                         >
@@ -318,7 +318,7 @@ const NotificationCenter = () => {
                                 height: 24,
                                 fontSize: '0.72rem',
                                 fontWeight: activeTab === 'all' ? 800 : 600,
-                                bgcolor: activeTab === 'all' ? '#0F766E' : 'action.hover',
+                                bgcolor: activeTab === 'all' ? '#7C6FE8' : 'action.hover',
                                 color: activeTab === 'all' ? '#FFFFFF' : 'text.secondary',
                                 '&:hover': {
                                     bgcolor: activeTab === 'all' ? '#0D6860' : 'action.selected'
@@ -334,7 +334,7 @@ const NotificationCenter = () => {
                                 height: 24,
                                 fontSize: '0.72rem',
                                 fontWeight: activeTab === 'unread' ? 800 : 600,
-                                bgcolor: activeTab === 'unread' ? '#0F766E' : 'action.hover',
+                                bgcolor: activeTab === 'unread' ? '#7C6FE8' : 'action.hover',
                                 color: activeTab === 'unread' ? '#FFFFFF' : 'text.secondary',
                                 '&:hover': {
                                     bgcolor: activeTab === 'unread' ? '#0D6860' : 'action.selected'
@@ -372,10 +372,10 @@ const NotificationCenter = () => {
                                         py: 1.25,
                                         borderBottom: '1px solid',
                                         borderColor: 'divider',
-                                        bgcolor: notif.isRead ? 'transparent' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)',
+                                        bgcolor: notif.isRead ? 'transparent' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
                                         transition: 'background-color 0.15s ease',
                                         '&:hover': {
-                                            bgcolor: notif.isRead ? 'action.hover' : 'rgba(15, 118, 110, 0.09)'
+                                            bgcolor: notif.isRead ? 'action.hover' : 'rgba(124, 111, 232, 0.09)'
                                         }
                                     }}
                                 >
@@ -434,8 +434,8 @@ const NotificationCenter = () => {
                                             onClick={(e) => handleToggleSingleRead(notif.id, e)}
                                             sx={{
                                                 ml: 1,
-                                                color: notif.isRead ? 'text.disabled' : '#0F766E',
-                                                '&:hover': { color: (t) => t.palette.primary.main, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)' }
+                                                color: notif.isRead ? 'text.disabled' : '#7C6FE8',
+                                                '&:hover': { color: (t) => t.palette.primary.main, bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)' }
                                             }}
                                         >
                                             {notif.isRead ? (

@@ -55,7 +55,7 @@ class ErrorBoundary extends React.Component {
               borderRadius: 3.5,
               textAlign: 'center',
               bgcolor: 'rgba(16, 26, 26, 0.95)',
-              border: '1px solid rgba(15, 118, 110, 0.3)',
+              border: '1px solid rgba(124, 111, 232, 0.3)',
               color: '#FFFFFF'
             }}
           >

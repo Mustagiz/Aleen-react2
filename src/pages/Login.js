@@ -75,7 +75,7 @@ export default function Login() {
           justifyContent: 'space-between',
           p: { lg: 7, xl: 9 },
           position: 'relative',
-          background: 'radial-gradient(circle at 15% 20%, rgba(15, 118, 110, 0.45) 0%, rgba(4, 47, 46, 0.95) 75%), #042F2E',
+          background: 'radial-gradient(circle at 15% 20%, rgba(124, 111, 232, 0.45) 0%, rgba(91, 75, 209, 0.95) 75%), #1D1A2E',
           borderRight: '1px solid rgba(217, 119, 6, 0.2)',
           color: '#F8FAFC',
           overflow: 'hidden'
@@ -192,8 +192,8 @@ export default function Login() {
               sx={{
                 p: 2,
                 borderRadius: 2.5,
-                bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
-                border: '1px solid rgba(15, 118, 110, 0.4)',
+                bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.25)',
+                border: '1px solid rgba(124, 111, 232, 0.4)',
                 backdropFilter: 'blur(8px)'
               }}
             >
@@ -210,8 +210,8 @@ export default function Login() {
               sx={{
                 p: 2,
                 borderRadius: 2.5,
-                bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
-                border: '1px solid rgba(15, 118, 110, 0.4)',
+                bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.25)',
+                border: '1px solid rgba(124, 111, 232, 0.4)',
                 backdropFilter: 'blur(8px)'
               }}
             >
@@ -244,7 +244,7 @@ export default function Login() {
           alignItems: 'center',
           justifyContent: 'center',
           p: { xs: 3, sm: 6, md: 8 },
-          bgcolor: { xs: '#042F2E', lg: '#F8FAFC' },
+          bgcolor: { xs: '#5B4BD1', lg: '#F8FAFC' },
           position: 'relative'
         }}
       >
@@ -262,10 +262,10 @@ export default function Login() {
               borderRadius: 4,
               bgcolor: '#FFFFFF',
               border: '1px solid',
-              borderColor: { xs: 'rgba(15, 118, 110, 0.3)', lg: 'rgba(226, 232, 240, 0.9)' },
+              borderColor: { xs: 'rgba(124, 111, 232, 0.3)', lg: 'rgba(226, 232, 240, 0.9)' },
               boxShadow: {
                 xs: '0 20px 40px rgba(0, 0, 0, 0.4)',
-                lg: '0 20px 50px -10px rgba(4, 47, 46, 0.08)'
+                lg: '0 20px 50px -10px rgba(91, 75, 209, 0.08)'
               }
             }}
           >
@@ -282,7 +282,7 @@ export default function Login() {
                   justifyContent: 'center',
                   mx: 'auto',
                   mb: 2,
-                  boxShadow: '0 6px 16px rgba(var(--primary-rgb, 15, 118, 110), 0.25)',
+                  boxShadow: '0 6px 16px rgba(var(--primary-rgb, 124, 111, 232), 0.25)',
                   border: '1px solid rgba(217, 119, 6, 0.3)'
                 }}
               >
@@ -410,13 +410,13 @@ export default function Login() {
                   letterSpacing: '0.02em',
                   background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                   color: '#FFFFFF',
-                  boxShadow: '0 8px 20px rgba(15, 118, 110, 0.35)',
+                  boxShadow: '0 8px 20px rgba(124, 111, 232, 0.35)',
                   border: '1px solid rgba(217, 119, 6, 0.3)',
                   transition: 'all 0.2s ease-in-out',
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)',
+                    background: 'linear-gradient(135deg, #5B4BD1 0%, #7C6FE8 100%)',
                     transform: 'translateY(-1px)',
-                    boxShadow: '0 10px 24px rgba(15, 118, 110, 0.45)'
+                    boxShadow: '0 10px 24px rgba(124, 111, 232, 0.45)'
                   }
                 }}
               >
@@ -431,7 +431,7 @@ export default function Login() {
                 p: 2,
                 borderRadius: 2.5,
                 bgcolor: '#F0FDFA',
-                border: '1px dashed rgba(15, 118, 110, 0.35)',
+                border: '1px dashed rgba(124, 111, 232, 0.35)',
                 textAlign: 'center'
               }}
             >
@@ -454,7 +454,7 @@ export default function Login() {
                   py: 0.5,
                   px: 2,
                   '&:hover': {
-                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)',
+                    bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)',
                     bordercolor: (t) => t.palette.primary.main
                   }
                 }}

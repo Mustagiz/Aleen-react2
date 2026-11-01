@@ -236,12 +236,12 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
                 label={`${INVOICE_TEMPLATES.length} Luxury Templates`}
                 size="small"
                 sx={{
-                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
+                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)',
                   color: (t) => t.palette.primary.main,
                   fontWeight: 800,
                   fontSize: '0.72rem',
                   borderRadius: '6px',
-                  border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.2)'}`
+                  border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.2)'}`
                 }}
               />
             </Box>
@@ -364,11 +364,11 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
                     p: 4,
                     textAlign: 'center',
                     cursor: 'pointer',
-                    bgcolor: localSettings.customLetterheadImage ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' : 'background.paper',
+                    bgcolor: localSettings.customLetterheadImage ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' : 'background.paper',
                     transition: 'all 0.2s',
                     '&:hover': {
                       borderColor: (t) => t.palette.primary.main,
-                      bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)'
+                      bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)'
                     }
                   }}
                 >

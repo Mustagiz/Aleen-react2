@@ -1,18 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Roboto:wght@400;500;700;900&family=Open+Sans:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Roboto:wght@400;500;700;900&family=Open+Sans:wght@400;600;700;800&display=swap');
 
 :root {
   --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-display: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-serif: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  --font-serif: 'Outfit', 'Plus Jakarta Sans', sans-serif;
   --font-crest: 'Plus Jakarta Sans', sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
-  --emerald-primary: #0F766E;
-  --emerald-light: #14B8A6;
-  --emerald-dark: #042F2E;
-  --primary-rgb: 15, 118, 110;
-  --secondary-rgb: 217, 119, 6;
-  --gold-accent: #D97706;
-  --gold-champagne: #F59E0B;
+  --emerald-primary: #7C6FE8;
+  --emerald-light: #9B8FF5;
+  --emerald-dark: #5B4BD1;
+  --primary-rgb: 124, 111, 232;
+  --secondary-rgb: 45, 212, 191;
+  --gold-accent: #2DD4BF;
+  --gold-champagne: #5EEAD4;
   --radius-card: 14px;
   --radius-control: 9px;
   --radius-inner: 9px;
@@ -104,8 +104,8 @@ td.invoice-table-header-cell {
 }
 
 /* Filter Chips with active primary state */
-.MuiChip-root[style*="#0F766E"],
-.MuiChip-root[style*="#0f766e"] {
+.MuiChip-root[style*="#7C6FE8"],
+.MuiChip-root[style*="#7c6fe8"] {
   background-color: var(--emerald-primary) !important;
   border-color: var(--emerald-primary) !important;
 }
@@ -358,23 +358,23 @@ td.invoice-table-header-cell {
   border-radius: 12px !important;
 }
 
-/* 8. ATELIER LUXURY: 14px cards, 9px buttons, 9px inputs, gold & emerald accents */
+/* 8. ATELIER LIGHT LAVENDER: 14px cards, 12px buttons & inputs, hairline lavender borders */
 [data-design-system="atelier"] {
   --radius-card: 14px !important;
-  --radius-control: 9px !important;
-  --radius-inner: 9px !important;
+  --radius-control: 12px !important;
+  --radius-inner: 12px !important;
   --card-radius: 14px !important;
-  --button-radius: 9px !important;
+  --button-radius: 12px !important;
 }
 
 [data-design-system="atelier"] .MuiButton-root {
-  border-radius: 9px !important;
+  border-radius: 12px !important;
 }
 [data-design-system="atelier"] .MuiChip-root {
-  border-radius: 7px !important;
+  border-radius: 9px !important;
 }
 [data-design-system="atelier"] .MuiOutlinedInput-root {
-  border-radius: 9px !important;
+  border-radius: 12px !important;
 }
 [data-design-system="atelier"] .MuiPaper-root,
 [data-design-system="atelier"] .MuiCard-root,

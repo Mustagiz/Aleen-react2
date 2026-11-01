@@ -168,8 +168,8 @@ const Purchases = () => {
                 label: `Due in ${diffDays}d`,
                 status: 'upcoming',
                 color: (t) => t.palette.primary.main,
-                bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.12)',
-                borderColor: 'rgba(15, 118, 110, 0.3)',
+                bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.12)',
+                borderColor: 'rgba(124, 111, 232, 0.3)',
                 icon: <LocalShipping sx={{ fontSize: '0.85rem !important' }} />,
                 text: `Expected on ${new Date(po.expectedDeliveryDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}`
             };
@@ -419,7 +419,7 @@ const Purchases = () => {
     const generatePurchaseOrderPDF = (po) => {
         try {
             const doc = new jsPDF();
-            const primaryColor = [15, 118, 110]; // Atelier Emerald #0F766E
+            const primaryColor = [124, 111, 232]; // Atelier Emerald #7C6FE8
             const darkText = [30, 41, 59];
             const mutedText = [100, 116, 139];
 
@@ -434,7 +434,7 @@ const Purchases = () => {
                 : 'As Agreed';
 
             // Luxury Header Top Banner
-            doc.setFillColor(15, 118, 110);
+            doc.setFillColor(124, 111, 232);
             doc.rect(0, 0, 210, 32, 'F');
 
             // Brand Title & Subtitle
@@ -550,7 +550,7 @@ const Purchases = () => {
                 head: [['#', 'Item / Fabric Description', 'SKU / Variant', 'Qty', 'Unit Cost', 'Subtotal']],
                 body: tableBody,
                 headStyles: {
-                    fillColor: [15, 118, 110],
+                    fillColor: [124, 111, 232],
                     textColor: [255, 255, 255],
                     fontStyle: 'bold',
                     fontSize: 8.5
@@ -854,7 +854,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '&:hover': {
                                     border: (t) => `1.5px solid ${t.palette.primary.dark}`,
-                                    bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)',
+                                    bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)',
                                     transform: 'translateY(-1px)'
                                 }
                             }}
@@ -879,14 +879,14 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                 boxSizing: 'border-box',
                                 background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                                 color: '#FFFFFF !important',
-                                boxShadow: '0 4px 14px rgba(15, 118, 110, 0.3)',
+                                boxShadow: '0 4px 14px rgba(124, 111, 232, 0.3)',
                                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                                 '& .MuiSvgIcon-root': {
                                     color: '#FFFFFF !important'
                                 },
                                 '&:hover': {
                                     background: (t) => t.palette.primary.dark,
-                                    boxShadow: '0 6px 18px rgba(15, 118, 110, 0.45)',
+                                    boxShadow: '0 6px 18px rgba(124, 111, 232, 0.45)',
                                     transform: 'translateY(-1px)'
                                 }
                             }}
@@ -913,7 +913,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                         mr: 2
                     },
                     '& .Mui-selected': {
-                        color: '#0F766E !important'
+                        color: '#7C6FE8 !important'
                     },
                     '& .MuiTabs-indicator': {
                         backgroundcolor: (t) => t.palette.primary.main,
@@ -978,10 +978,10 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                             sx={{
                                 fontWeight: 700,
                                 fontSize: '0.78rem',
-                                bgcolor: pipelineFilter === 'All' ? '#0F766E' : 'transparent',
+                                bgcolor: pipelineFilter === 'All' ? '#7C6FE8' : 'transparent',
                                 color: pipelineFilter === 'All' ? '#ffffff' : 'text.primary',
-                                borderColor: pipelineFilter === 'All' ? '#0F766E' : 'divider',
-                                '&:hover': { bgcolor: pipelineFilter === 'All' ? '#0b5650' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)' }
+                                borderColor: pipelineFilter === 'All' ? '#7C6FE8' : 'divider',
+                                '&:hover': { bgcolor: pipelineFilter === 'All' ? '#0b5650' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)' }
                             }}
                         />
                         <Chip
@@ -1154,7 +1154,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                     <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
                         <TableContainer>
                             <Table>
-                                <TableHead sx={{ bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }}>
+                                <TableHead sx={{ bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' }}>
                                     <TableRow>
                                         <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
                                             <TableSortLabel 
@@ -1224,7 +1224,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                                     hover
                                                     sx={{ 
                                                         cursor: 'pointer',
-                                                        '&:hover': { bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.02)' } 
+                                                        '&:hover': { bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.02)' } 
                                                     }}
                                                 >
                                                     {/* PO Ref & Date */}
@@ -1362,8 +1362,8 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                                                     onClick={(e) => { e.stopPropagation(); handleOpenViewModal(po); }}
                                                                     sx={{ 
                                                                         color: (t) => t.palette.primary.main,
-                                                                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.12)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)',
-                                                                        '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.2)' }
+                                                                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.12)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)',
+                                                                        '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.2)' }
                                                                     }}
                                                                 >
                                                                     <Visibility fontSize="small" />
@@ -1463,8 +1463,8 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                                                     onClick={(e) => { e.stopPropagation(); handleOpen(po); }} 
                                                                     sx={{ 
                                                                         color: (t) => t.palette.primary.main,
-                                                                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)',
-                                                                        '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.2)' }
+                                                                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)',
+                                                                        '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.2)' }
                                                                     }}
                                                                 >
                                                                     <Edit fontSize="small" />
@@ -1823,10 +1823,10 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                             p: 2.5, 
                             borderRadius: 3, 
                             background: theme.palette.mode === 'dark' 
-                                ? 'linear-gradient(135deg, rgba(var(--primary-rgb, 15, 118, 110), 0.2) 0%, rgba(4, 47, 46, 0.3) 100%)' 
-                                : 'linear-gradient(135deg, rgba(15, 118, 110, 0.06) 0%, rgba(217, 119, 6, 0.06) 100%)',
+                                ? 'linear-gradient(135deg, rgba(var(--primary-rgb, 124, 111, 232), 0.2) 0%, rgba(4, 47, 46, 0.3) 100%)' 
+                                : 'linear-gradient(135deg, rgba(124, 111, 232, 0.06) 0%, rgba(217, 119, 6, 0.06) 100%)',
                             border: '1px solid',
-                            borderColor: theme.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.2)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.15)'
+                            borderColor: theme.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.2)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.15)'
                         }}
                     >
                         <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 800, letterSpacing: '0.08em', display: 'block', mb: 1.5 }}>
@@ -1898,10 +1898,10 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                             textTransform: 'none',
                             background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                             color: '#ffffff',
-                            boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
+                            boxShadow: '0 4px 14px rgba(124, 111, 232, 0.35)',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, #115E59 0%, #02201E 100%)',
-                                boxShadow: '0 6px 18px rgba(15, 118, 110, 0.45)'
+                                background: 'linear-gradient(135deg, #5B4BD1 0%, #14121F 100%)',
+                                boxShadow: '0 6px 18px rgba(124, 111, 232, 0.45)'
                             },
                             '&.Mui-disabled': {
                                 background: 'rgba(0, 0, 0, 0.12)',
@@ -2010,9 +2010,9 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                             textTransform: 'none',
                             borderRadius: 2,
                             px: 3,
-                            boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
+                            boxShadow: '0 4px 14px rgba(124, 111, 232, 0.35)',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, #115E59 0%, #02201E 100%)',
+                                background: 'linear-gradient(135deg, #5B4BD1 0%, #14121F 100%)',
                             }
                         }}
                     >
@@ -2280,9 +2280,9 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                                     sx={{ 
                                                         height: 7, 
                                                         borderRadius: 4, 
-                                                        bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.1)',
+                                                        bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)',
                                                         '& .MuiLinearProgress-bar': {
-                                                            background: 'linear-gradient(90deg, #0F766E 0%, #059669 100%)'
+                                                            background: 'linear-gradient(90deg, #7C6FE8 0%, #5B4BD1 100%)'
                                                         }
                                                     }} 
                                                 />
@@ -2316,7 +2316,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                 </Typography>
                                 <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2.5, mb: 3 }}>
                                     <Table size="small">
-                                        <TableHead sx={{ bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }}>
+                                        <TableHead sx={{ bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' }}>
                                             <TableRow>
                                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase' }}>#</TableCell>
                                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase' }}>Fabric / Product</TableCell>
@@ -2393,7 +2393,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                 )}
 
                                 {po.notes && (
-                                    <Box sx={{ mt: 2, p: 2, borderRadius: 2, bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)', border: '1px dashed rgba(var(--primary-rgb, 15, 118, 110), 0.2)' }}>
+                                    <Box sx={{ mt: 2, p: 2, borderRadius: 2, bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)', border: '1px dashed rgba(var(--primary-rgb, 124, 111, 232), 0.2)' }}>
                                         <Typography variant="caption" sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, display: 'block', mb: 0.5 }}>
                                             Special Instructions & Order Notes:
                                         </Typography>
@@ -2786,9 +2786,9 @@ const SmartRestockView = ({ getLowStockItems, vendors, handleOpen, setVendorId, 
                             textTransform: 'none',
                             background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
                             color: '#ffffff',
-                            boxShadow: '0 4px 14px rgba(15, 118, 110, 0.35)',
+                            boxShadow: '0 4px 14px rgba(124, 111, 232, 0.35)',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, #115E59 0%, #02201E 100%)',
+                                background: 'linear-gradient(135deg, #5B4BD1 0%, #14121F 100%)',
                             }
                         }}
                     >
@@ -2888,14 +2888,14 @@ const SmartRestockView = ({ getLowStockItems, vendors, handleOpen, setVendorId, 
                 p: 0, 
                 overflow: 'hidden', 
                 borderRadius: '20px', 
-                border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(var(--primary-rgb, 15, 118, 110), 0.14)',
+                border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.14)',
                 boxShadow: (t) => t.palette.mode === 'dark' 
                     ? '0 10px 30px rgba(0, 0, 0, 0.4)' 
-                    : '0 10px 30px -10px rgba(var(--primary-rgb, 15, 118, 110), 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
+                    : '0 10px 30px -10px rgba(var(--primary-rgb, 124, 111, 232), 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
             }}>
                 <TableContainer>
                     <Table size="small">
-                        <TableHead sx={{ bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.04)' }}>
+                        <TableHead sx={{ bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' }}>
                             <TableRow>
                                 <TableCell padding="checkbox" sx={{ pl: 2 }}>
                                     <Checkbox
@@ -2943,7 +2943,7 @@ const SmartRestockView = ({ getLowStockItems, vendors, handleOpen, setVendorId, 
                                             key={uniqueId} 
                                             hover 
                                             selected={isSelected}
-                                            sx={{ '&:hover': { bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.02)' } }}
+                                            sx={{ '&:hover': { bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.02)' } }}
                                         >
                                             <TableCell padding="checkbox" sx={{ pl: 2 }}>
                                                 <Checkbox
@@ -2982,7 +2982,7 @@ const SmartRestockView = ({ getLowStockItems, vendors, handleOpen, setVendorId, 
                                                         height: 22, 
                                                         fontSize: '0.72rem', 
                                                         fontWeight: 600,
-                                                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(var(--primary-rgb, 15, 118, 110), 0.2)' : 'rgba(var(--primary-rgb, 15, 118, 110), 0.08)',
+                                                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.2)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)',
                                                         color: (t) => t.palette.primary.main
                                                     }}
                                                 />
@@ -3043,7 +3043,7 @@ const SmartRestockView = ({ getLowStockItems, vendors, handleOpen, setVendorId, 
                                                         color: (t) => t.palette.primary.main,
                                                         '&:hover': {
                                                             borderColor: '#0b5650',
-                                                            bgcolor: 'rgba(var(--primary-rgb, 15, 118, 110), 0.05)'
+                                                            bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)'
                                                         }
                                                     }}
                                                 >

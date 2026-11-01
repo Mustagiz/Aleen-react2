@@ -97,7 +97,7 @@ export default function NeedleThreadTracker({
                   bgcolor: isCurrent
                     ? '#D97706'
                     : isPassed
-                      ? (isDark ? '#2DD4BF' : '#0F766E')
+                      ? (isDark ? '#2DD4BF' : '#7C6FE8')
                       : (isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(15, 23, 42, 0.15)'),
                   border: isCurrent
                     ? '2.5px solid #FFFFFF'
@@ -130,7 +130,7 @@ export default function NeedleThreadTracker({
           sx={{
             fontSize: '0.68rem',
             fontWeight: 800,
-            color: isDark ? '#FBBF24' : '#0F766E',
+            color: isDark ? '#FBBF24' : '#7C6FE8',
             letterSpacing: '0.01em',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
