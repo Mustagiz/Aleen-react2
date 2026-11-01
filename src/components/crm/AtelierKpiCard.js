@@ -19,7 +19,6 @@ export default function AtelierKpiCard({
   const isDark = theme.palette.mode === 'dark';
   const primaryColor = theme.palette.primary.main;
   const secondaryColor = theme.palette.secondary?.main || '#2DD4BF';
-  const cardRadius = theme.custom?.designSystem?.shape?.cardRadius ?? (theme.shape?.borderRadius || 14);
 
   // Safely extract trend label and positive state
   const trendLabel = (typeof trend === 'object' && trend !== null)
@@ -30,10 +29,11 @@ export default function AtelierKpiCard({
     ? Boolean(trend.isPositive)
     : Boolean(trendPositive);
 
+  // Horizon-style circular pastel icon tile
   const getIconBg = () => {
-    if (redAccent) return isDark ? 'rgba(239, 68, 68, 0.16)' : 'rgba(220, 38, 38, 0.07)';
-    if (goldAccent) return isDark ? `${secondaryColor}26` : 'rgba(45, 212, 191, 0.1)';
-    if (sapphireAccent) return isDark ? 'rgba(59, 130, 246, 0.16)' : 'rgba(37, 99, 235, 0.07)';
+    if (redAccent) return isDark ? 'rgba(239, 68, 68, 0.16)' : 'rgba(220, 38, 38, 0.08)';
+    if (goldAccent) return isDark ? `${secondaryColor}26` : 'rgba(45, 212, 191, 0.12)';
+    if (sapphireAccent) return isDark ? 'rgba(59, 130, 246, 0.16)' : 'rgba(37, 99, 235, 0.08)';
     return isDark ? `${primaryColor}26` : '#F1EFFC';
   };
 
@@ -44,17 +44,9 @@ export default function AtelierKpiCard({
     return isDark ? '#9B8FF5' : '#5B4BD1';
   };
 
-  const statusColor = isTrendPositive
+  const trendColor = isTrendPositive
     ? (isDark ? '#34D399' : '#059669')
     : (isDark ? '#F87171' : '#DC2626');
-
-  const statusBg = isTrendPositive
-    ? (isDark ? 'rgba(16, 185, 129, 0.14)' : '#ECFDF5')
-    : (isDark ? 'rgba(239, 68, 68, 0.14)' : '#FEF2F2');
-
-  const statusBorder = isTrendPositive
-    ? (isDark ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(16, 185, 129, 0.25)')
-    : (isDark ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(239, 68, 68, 0.25)');
 
   return (
     <Box
@@ -72,152 +64,129 @@ export default function AtelierKpiCard({
           height: '100%',
           position: 'relative',
           overflow: 'hidden',
-          borderRadius: `${cardRadius}px`,
+          borderRadius: '20px',
           cursor: onClick ? 'pointer' : 'default',
-          transition: 'box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.28s ease',
+          transition: 'box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
           background: isDark ? '#1D1A2E' : '#FFFFFF',
-          border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #EFEFF4',
+          border: '1px solid transparent',
           boxShadow: isDark
             ? '0 4px 20px rgba(0, 0, 0, 0.4)'
-            : '0 1px 2px rgba(31, 27, 46, 0.04), 0 4px 16px -4px rgba(31, 27, 46, 0.06)',
+            : '14px 17px 40px 4px rgba(112, 114, 176, 0.10)',
           '&:hover': {
             boxShadow: isDark
               ? '0 12px 32px rgba(0, 0, 0, 0.55)'
-              : '0 12px 28px -6px rgba(124, 111, 232, 0.16), 0 1px 2px rgba(31, 27, 46, 0.05)',
-            borderColor: isDark ? 'rgba(155, 143, 245, 0.35)' : '#7C6FE8'
+              : '14px 17px 40px 4px rgba(112, 114, 176, 0.16)'
           }
         }}
       >
         <CardContent sx={{
-          p: { xs: '12px 12px !important', sm: '12px 14px !important', md: '14px 16px !important' },
+          p: { xs: '14px 14px !important', sm: '15px 20px !important' },
           display: 'flex',
-          flexDirection: 'column',
+          alignItems: 'center',
+          gap: { xs: 1.25, sm: 1.5 },
           height: '100%',
           boxSizing: 'border-box',
           position: 'relative',
-          zIndex: 1
+          zIndex: 1,
+          '&:last-child': { pb: { xs: '14px !important', sm: '15px !important' } }
         }}>
-          {/* Header: Icon Tile Left + Label + Optional Action */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: { xs: 1, md: 1.25 } }}>
-            {icon && (
-              <Box
-                sx={{
-                  width: { xs: 30, sm: 32, md: 34 },
-                  height: { xs: 30, sm: 32, md: 34 },
-                  borderRadius: '10px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  background: getIconBg(),
-                  color: getIconColor(),
-                  transition: 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                  '& svg': {
-                    fontSize: { xs: '0.95rem', sm: '1rem', md: '1.1rem' }
-                  }
-                }}
-              >
-                {icon}
-              </Box>
-            )}
+          {/* Horizon-style circular pastel icon tile */}
+          {icon && (
+            <Box
+              sx={{
+                width: { xs: 40, sm: 48, md: 52 },
+                height: { xs: 40, sm: 48, md: 52 },
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                background: getIconBg(),
+                color: getIconColor(),
+                transition: 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                '& svg': {
+                  fontSize: { xs: '1.15rem', sm: '1.35rem', md: '1.5rem' }
+                }
+              }}
+            >
+              {icon}
+            </Box>
+          )}
+
+          {/* Stat column: label above value, growth line below (Horizon MiniStatistics) */}
+          <Box sx={{ flex: 1, minWidth: 0 }}>
             <Typography
-              variant="subtitle2"
               noWrap
               sx={{
                 color: isDark ? 'rgba(203, 213, 225, 0.9)' : '#5B5B66',
                 fontWeight: 600,
-                fontSize: { xs: '0.68rem', sm: '0.72rem', md: '0.74rem' },
+                fontSize: { xs: '0.7rem', sm: '0.74rem', md: '0.76rem' },
+                lineHeight: 1.2,
                 letterSpacing: '0.01em',
-                flex: 1,
-                minWidth: 0,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                lineHeight: 1.3
-              }}
-            >
-              {title}
-            </Typography>
-            {headerAction}
-          </Box>
-
-          {/* Numeric Value */}
-          <Typography
-            variant="h3"
-            noWrap
-            sx={{
-              fontWeight: 700,
-              color: 'text.primary',
-              letterSpacing: '-0.02em',
-              fontSize: { xs: '1.25rem', sm: '1.35rem', md: '1.45rem' },
-              lineHeight: 1.15,
-              fontVariantNumeric: 'tabular-nums',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              mb: { xs: 0.9, md: 1 }
-            }}
-          >
-            {value}
-          </Typography>
-
-          {/* Footer: Subtitle & Status Pill */}
-          <Box
-            sx={{
-              mt: 'auto',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 0.75,
-              minHeight: 20
-            }}
-          >
-            <Typography
-              variant="caption"
-              noWrap
-              sx={{
-                color: isDark ? 'rgba(148, 163, 184, 0.85)' : '#9A9AA6',
-                fontWeight: 500,
-                fontSize: { xs: '0.66rem', sm: '0.7rem' },
-                flex: 1,
-                minWidth: 0,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
               }}
             >
-              {subtitle || ''}
+              {title}
             </Typography>
-
-            {trendLabel && (
-              <Box
-                sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 0.4,
-                  px: 0.8,
-                  py: '1.5px',
-                  borderRadius: '999px',
-                  bgcolor: statusBg,
-                  border: statusBorder,
-                  flexShrink: 0,
-                  maxWidth: '55%'
-                }}
-              >
-                <Box sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: statusColor, flexShrink: 0 }} />
-                <Typography
-                  sx={{
-                    fontSize: '0.62rem',
-                    fontWeight: 700,
-                    color: statusColor,
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    lineHeight: 1.4
-                  }}
-                >
-                  {trendLabel}
-                </Typography>
+            <Typography
+              noWrap
+              sx={{
+                fontWeight: 700,
+                color: 'text.primary',
+                letterSpacing: '-0.02em',
+                fontSize: { xs: '1.25rem', sm: '1.4rem', md: '1.5rem' },
+                lineHeight: 1.2,
+                fontVariantNumeric: 'tabular-nums',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                mt: { xs: 0.35, md: 0.5 },
+                mb: { xs: 0.35, md: 0.5 }
+              }}
+            >
+              {value}
+            </Typography>
+            {(trendLabel || subtitle) && (
+              <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5, minWidth: 0 }}>
+                {trendLabel && (
+                  <Typography
+                    noWrap
+                    sx={{
+                      fontSize: { xs: '0.64rem', sm: '0.68rem' },
+                      fontWeight: 700,
+                      color: trendColor,
+                      flexShrink: 0
+                    }}
+                  >
+                    {trendLabel}
+                  </Typography>
+                )}
+                {subtitle && (
+                  <Typography
+                    noWrap
+                    sx={{
+                      fontSize: { xs: '0.64rem', sm: '0.68rem' },
+                      fontWeight: 400,
+                      color: isDark ? 'rgba(148, 163, 184, 0.85)' : '#9A9AA6',
+                      flex: 1,
+                      minWidth: 0,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}
+                  >
+                    {subtitle}
+                  </Typography>
+                )}
               </Box>
             )}
           </Box>
+
+          {/* Optional right-aligned action (Horizon endContent slot) */}
+          {headerAction && (
+            <Box sx={{ flexShrink: 0, alignSelf: 'flex-start' }}>
+              {headerAction}
+            </Box>
+          )}
         </CardContent>
       </Card>
     </Box>
