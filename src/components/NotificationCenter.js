@@ -35,7 +35,7 @@ import { useNavigate } from 'react-router-dom';
 const READ_STORAGE_KEY = 'aleen_read_notifications';
 const CLEARED_STORAGE_KEY = 'aleen_cleared_notifications';
 
-const NotificationCenter = () => {
+const NotificationCenter = ({ plain = false }) => {
     const theme = useTheme();
     const { activeSystemConfig } = useThemeContext() || {};
     const topBarConfig = theme.custom?.topBar || {
@@ -191,7 +191,18 @@ const NotificationCenter = () => {
                 <IconButton
                     color="inherit"
                     onClick={handleClick}
-                    sx={{
+                    sx={ plain ? {
+                        width: 32,
+                        height: 32,
+                        borderRadius: '50%',
+                        border: 'none',
+                        color: unreadCount > 0 ? theme.palette.primary.main : 'text.secondary',
+                        bgcolor: 'transparent',
+                        '&:hover': {
+                            bgcolor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#F1EFFC',
+                            color: theme.palette.primary.main
+                        }
+                    } : {
                         width: 36,
                         height: 36,
                         borderRadius: activeSystemConfig?.id === 'material' ? '50% !important' : `${activeSystemConfig?.shape?.buttonRadius || 6}px`,
