@@ -348,21 +348,21 @@ const Dashboard = () => {
   const greetingBtnSx = {
     textTransform: 'none',
     fontWeight: 600,
-    fontSize: '0.82rem',
+    fontSize: '0.78rem',
     borderRadius: `${buttonRadius}px`,
-    minHeight: { xs: 40, sm: 38 },
-    px: 2.2,
+    minHeight: { xs: 40, sm: 34 },
+    px: 1.8,
     transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
     '&:hover': { transform: 'translateY(-1px)' },
     '&:active': { transform: 'scale(0.98)' }
   };
 
   return (
-    <Box sx={{ maxWidth: 1600, mx: 'auto' }}>
+    <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
       {/* ============================================================== */}
       {/* 1. GREETING HEADER                                             */}
       {/* ============================================================== */}
-      <Box sx={{ mb: 3.5, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: { xs: 'flex-start', md: 'center' }, justifyContent: 'space-between', gap: 2.5 }}>
+      <Box sx={{ mb: 2.5, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: { xs: 'flex-start', md: 'center' }, justifyContent: 'space-between', gap: 2 }}>
         <Box>
           <Typography
             variant="h4"
@@ -371,12 +371,12 @@ const Dashboard = () => {
               fontWeight: 800,
               letterSpacing: '-0.02em',
               lineHeight: 1.2,
-              fontSize: { xs: '1.5rem', sm: '1.8rem', md: '2rem' }
+              fontSize: { xs: '1.35rem', sm: '1.55rem', md: '1.65rem' }
             }}
           >
             {greeting}, {user?.name || user?.email?.split('@')[0] || 'Store Stylist'}
           </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.6, fontSize: '0.9rem' }}>
+          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.4, fontSize: '0.82rem' }}>
             Here's what's happening at Aleen today.
           </Typography>
         </Box>
@@ -397,14 +397,14 @@ const Dashboard = () => {
               display: { xs: 'none', lg: 'flex' },
               alignItems: 'center',
               alignSelf: 'center',
-              px: 1.8,
-              py: 0.6,
+              px: 1.4,
+              py: 0.4,
               mr: 0.5,
               borderRadius: '999px',
               border: '1px solid #EFEFF4',
               bgcolor: isDark ? 'rgba(255, 255, 255, 0.06)' : '#FFFFFF',
               color: 'text.secondary',
-              fontSize: '0.78rem',
+              fontSize: '0.72rem',
               fontWeight: 600,
               whiteSpace: 'nowrap'
             }}
@@ -465,7 +465,7 @@ const Dashboard = () => {
       {/* ============================================================== */}
       {/* 2. TIMEFRAME SELECTOR FILTER BAR                               */}
       {/* ============================================================== */}
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
         <Typography sx={{ fontWeight: 600, color: 'text.secondary', fontSize: '0.85rem' }}>
           Financial overview · {rangeLabel}
         </Typography>
@@ -507,7 +507,7 @@ const Dashboard = () => {
       {/* ============================================================== */}
       {/* 3. KPI METRICS GRID: Responsive 2x2 Grid on Mobile             */}
       {/* ============================================================== */}
-      <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} sx={{ mb: { xs: 2.5, sm: 3.5 } }}>
+      <Grid container spacing={{ xs: 1.5, sm: 2, md: 2 }} sx={{ mb: { xs: 2.5, sm: 2.5 } }}>
         {/* Sales Revenue */}
         <Grid item xs={6} sm={6} lg={3}>
           <AtelierKpiCard
@@ -611,13 +611,13 @@ const Dashboard = () => {
       {/* ============================================================== */}
       {/* 4. WORKSHOP PULSE & FITTINGS DUE TODAY                         */}
       {/* ============================================================== */}
-      <GlassCard sx={{ p: 2.5, mb: 3.5 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, flexWrap: 'wrap', gap: 1 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.4 }}>
+      <GlassCard sx={{ p: 2, mb: 2.5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5, flexWrap: 'wrap', gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
             <Box
               sx={{
-                width: 38,
-                height: 38,
+                width: 34,
+                height: 34,
                 borderRadius: '12px',
                 display: 'flex',
                 alignItems: 'center',
@@ -627,7 +627,7 @@ const Dashboard = () => {
                 flexShrink: 0
               }}
             >
-              <Straighten sx={{ fontSize: 20 }} />
+              <Straighten sx={{ fontSize: 18 }} />
             </Box>
             <Box>
               <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.2 }}>
@@ -660,7 +660,7 @@ const Dashboard = () => {
 
         <Grid container spacing={2}>
           <Grid item xs={12} sm={4}>
-            <Box sx={{ p: 2, borderRadius: '12px', bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : '#F9F9FC', border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'}` }}>
+            <Box sx={{ p: 1.5, borderRadius: '12px', bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : '#F9F9FC', border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'}` }}>
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
                 Active garments on board
               </Typography>
@@ -676,7 +676,7 @@ const Dashboard = () => {
           <Grid item xs={12} sm={4}>
             <Box
               sx={{
-                p: 2,
+                p: 1.5,
                 borderRadius: '12px',
                 bgcolor: urgentFittingsToday.length > 0 ? 'rgba(217, 119, 6, 0.08)' : (isDark ? 'rgba(255, 255, 255, 0.04)' : '#F9F9FC'),
                 border: '1px solid',
@@ -696,7 +696,7 @@ const Dashboard = () => {
           </Grid>
 
           <Grid item xs={12} sm={4}>
-            <Box sx={{ p: 2, borderRadius: '12px', bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : '#F9F9FC', border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'}` }}>
+            <Box sx={{ p: 1.5, borderRadius: '12px', bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : '#F9F9FC', border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'}` }}>
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
                 Register cash status
               </Typography>
@@ -714,11 +714,11 @@ const Dashboard = () => {
       {/* ============================================================== */}
       {/* 5. CHARTS ROW: REVENUE TRENDS & STOCK HEALTH                   */}
       {/* ============================================================== */}
-      <Grid container spacing={3} sx={{ mb: 3.5 }}>
+      <Grid container spacing={2} sx={{ mb: 2.5 }}>
         {/* Left: Revenue Overview */}
         <Grid item xs={12} md={7} lg={8}>
-          <GlassCard sx={{ p: 3, height: '100%' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 1.5 }}>
+          <GlassCard sx={{ p: 2.25, height: '100%' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1.5 }}>
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>Revenue overview</Typography>
                 <Typography variant="caption" color="text.secondary">Gross sales vs operating cash expenses</Typography>
@@ -734,7 +734,7 @@ const Dashboard = () => {
                 </Box>
               </Box>
             </Box>
-            <Box sx={{ height: 320 }}>
+            <Box sx={{ height: 260 }}>
               <Line data={salesChartData} options={commonChartOptions} />
             </Box>
           </GlassCard>
@@ -742,9 +742,9 @@ const Dashboard = () => {
 
         {/* Right: Garment Stock Distribution */}
         <Grid item xs={12} md={5} lg={4}>
-          <GlassCard sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <GlassCard sx={{ p: 2.25, height: '100%', display: 'flex', flexDirection: 'column' }}>
             <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>Inventory health</Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ mb: 3 }}>Distribution by inventory tier</Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ mb: 2 }}>Distribution by inventory tier</Typography>
 
             <Box sx={{ flexGrow: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Doughnut
@@ -763,7 +763,7 @@ const Dashboard = () => {
               </Box>
             </Box>
 
-            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
+            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
               {stockData.labels.map((label, i) => (
                 <Box key={label} sx={{ display: 'flex', alignItems: 'center', gap: 0.7 }}>
                   <Circle sx={{ fontSize: 9, color: stockData.datasets[0].backgroundColor[i] }} />
@@ -780,11 +780,11 @@ const Dashboard = () => {
       {/* ============================================================== */}
       {/* 6. BOTTOM ROW: TOP PRODUCTS & LATEST ORDERS                    */}
       {/* ============================================================== */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Grid container spacing={2} sx={{ mb: 3 }}>
         {/* Left: Top Products Bar Chart */}
         <Grid item xs={12} md={7} lg={7}>
-          <GlassCard sx={{ p: 3, height: '100%' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3, alignItems: 'center' }}>
+          <GlassCard sx={{ p: 2.25, height: '100%' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2, alignItems: 'center' }}>
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>Top products</Typography>
                 <Typography variant="caption" color="text.secondary">Best-selling pieces by units sold</Typography>
@@ -798,7 +798,7 @@ const Dashboard = () => {
                 Full Analytics
               </Button>
             </Box>
-            <Box sx={{ height: 280 }}>
+            <Box sx={{ height: 230 }}>
               <Bar data={topProductsChartData} options={{ ...commonChartOptions, indexAxis: 'y' }} />
             </Box>
           </GlassCard>
@@ -807,8 +807,8 @@ const Dashboard = () => {
         {/* Right: Latest Orders Table */}
         <Grid item xs={12} md={5} lg={5}>
           <GlassCard sx={{ p: 0, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>Latest orders</Typography>
+            <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '1.05rem' }}>Latest orders</Typography>
               <Button
                 size="small"
                 onClick={() => navigate('/invoices')}
@@ -826,8 +826,8 @@ const Dashboard = () => {
               <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
                 <Box
                   sx={{
-                    px: 2.5,
-                    py: 1.25,
+                    px: 2,
+                    py: 1,
                     display: 'grid',
                     gridTemplateColumns: { xs: '44px 1fr auto', sm: '44px 1.1fr 1.3fr 44px 88px 74px' },
                     gap: 1,
@@ -859,8 +859,8 @@ const Dashboard = () => {
                   <Box
                     key={inv.id}
                     sx={{
-                      px: 2.5,
-                      py: 1.4,
+                      px: 2,
+                      py: 1.05,
                       display: 'grid',
                       gridTemplateColumns: { xs: '44px 1fr auto', sm: '44px 1.1fr 1.3fr 44px 88px 74px' },
                       gap: 1,
