@@ -43,7 +43,7 @@ import GlassCard from '../components/GlassCard';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import CashDrawerShiftModal from '../components/crm/CashDrawerShiftModal';
 import { useThemeContext } from '../contexts/ThemeContext';
-import { getThemeChartPalette } from '../utils/chartTheme';
+import { getThemeChartPalette, getChartMotion, getDoughnutMotion } from '../utils/chartTheme';
 
 ChartJS.register(
   CategoryScale,
@@ -317,6 +317,7 @@ const Dashboard = () => {
   const commonChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    ...getChartMotion(),
     plugins: {
       legend: { display: false },
       tooltip: {
@@ -752,6 +753,7 @@ const Dashboard = () => {
                   responsive: true,
                   maintainAspectRatio: false,
                   cutout: '72%',
+                  ...getDoughnutMotion(),
                   plugins: { legend: { display: false } }
                 }}
               />

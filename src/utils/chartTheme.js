@@ -45,6 +45,63 @@ export const getThemeChartPalette = (theme, count = 6) => {
 };
 
 /**
+ * Reduced-motion aware flag: animation durations collapse to 0 when the
+ * user's system requests reduced motion (accessibility).
+ */
+const prefersReducedMotion = () => {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+  try {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  } catch (e) {
+    return false;
+  }
+};
+
+/**
+ * Smooth, restrained entrance motion for cartesian charts (Line / Bar).
+ * Bars cascade in from left-to-right; lines ease up from the baseline.
+ * Hover transitions are shortened for a snappy but fluid feel.
+ */
+export const getChartMotion = () => {
+  const reduced = prefersReducedMotion();
+  return {
+    animation: {
+      duration: reduced ? 0 : 900,
+      easing: 'easeOutQuart',
+      delay: (ctx) => {
+        if (reduced || ctx.type !== 'data') return 0;
+        return ctx.chart?.config?.type === 'bar' ? ctx.dataIndex * 45 : 0;
+      }
+    },
+    transitions: {
+      active: {
+        animation: { duration: reduced ? 0 : 260, easing: 'easeOutQuad' }
+      }
+    }
+  };
+};
+
+/**
+ * Soft sweep-in for radial charts (Doughnut / Pie): rotate + scale entrance.
+ */
+export const getDoughnutMotion = () => {
+  const reduced = prefersReducedMotion();
+  return {
+    animation: {
+      duration: reduced ? 0 : 1100,
+      easing: 'easeOutQuart',
+      animateRotate: true,
+      animateScale: true
+    },
+    transitions: {
+      active: {
+        animation: { duration: reduced ? 0 : 260, easing: 'easeOutQuad' }
+      }
+    }
+  };
+};
+
+/**
  * Returns common chart options adapted to the active theme & dark/light mode
  * @param {import('@mui/material').Theme} theme 
  * @param {object} customConfig 
@@ -65,6 +122,7 @@ export const getThemeChartOptions = (theme, {
     responsive: true,
     maintainAspectRatio: false,
     indexAxis,
+    ...getChartMotion(),
     plugins: {
       legend: {
         display: showLegend,

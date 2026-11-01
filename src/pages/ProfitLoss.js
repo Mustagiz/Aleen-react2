@@ -22,7 +22,7 @@ import autoTable from 'jspdf-autotable';
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import FinanceNavTabs from '../components/crm/FinanceNavTabs';
-import { getThemeChartOptions } from '../utils/chartTheme';
+import { getThemeChartOptions, getDoughnutMotion } from '../utils/chartTheme';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, ChartTooltip, Legend);
 
@@ -426,6 +426,7 @@ const ProfitLoss = () => {
                                 options={{ 
                                     responsive: true, 
                                     maintainAspectRatio: false,
+                                    ...getDoughnutMotion(),
                                     plugins: { 
                                         legend: { 
                                             position: 'bottom',

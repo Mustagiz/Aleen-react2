@@ -17,7 +17,7 @@ import {
   Paper,
   useTheme
 } from '@mui/material';
-import { getThemeChartPalette, getThemeChartOptions } from '../utils/chartTheme';
+import { getThemeChartPalette, getThemeChartOptions, getDoughnutMotion } from '../utils/chartTheme';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -372,6 +372,7 @@ const SalesReports = () => {
                 options={{
                   responsive: true,
                   maintainAspectRatio: false,
+                  ...getDoughnutMotion(),
                   plugins: {
                     legend: {
                       position: 'bottom',
