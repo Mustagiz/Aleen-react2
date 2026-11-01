@@ -1,6 +1,5 @@
 import React from 'react';
-import { Card, CardContent, Box, Typography, Chip, useTheme } from '@mui/material';
-import { TrendingUp, TrendingDown } from '@mui/icons-material';
+import { Card, CardContent, Box, Typography, useTheme } from '@mui/material';
 import { motion } from 'framer-motion';
 
 export default function AtelierKpiCard({
@@ -44,6 +43,18 @@ export default function AtelierKpiCard({
     return isDark ? '#9B8FF5' : '#5B4BD1';
   };
 
+  const statusColor = isTrendPositive
+    ? (isDark ? '#34D399' : '#059669')
+    : (isDark ? '#F87171' : '#DC2626');
+
+  const statusBg = isTrendPositive
+    ? (isDark ? 'rgba(16, 185, 129, 0.14)' : '#ECFDF5')
+    : (isDark ? 'rgba(239, 68, 68, 0.14)' : '#FEF2F2');
+
+  const statusBorder = isTrendPositive
+    ? (isDark ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(16, 185, 129, 0.25)')
+    : (isDark ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(239, 68, 68, 0.25)');
+
   return (
     <Box
       component={motion.div}
@@ -83,33 +94,15 @@ export default function AtelierKpiCard({
           height: '100%',
           boxSizing: 'border-box',
           position: 'relative',
-          zIndex: 1,
-          gap: 1
+          zIndex: 1
         }}>
-          {/* Header: Label + Icon Tile */}
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.25 }}>
-            <Typography
-              variant="subtitle2"
-              noWrap
-              sx={{
-                color: isDark ? 'rgba(203, 213, 225, 0.9)' : '#5B5B66',
-                fontWeight: 600,
-                fontSize: { xs: '0.72rem', sm: '0.78rem', md: '0.8rem' },
-                letterSpacing: '0.01em',
-                flex: 1,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                lineHeight: 1.35
-              }}
-            >
-              {title}
-            </Typography>
-
+          {/* Header: Icon Tile Left + Label */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: { xs: 1.5, md: 2 } }}>
             {icon && (
               <Box
                 sx={{
-                  width: { xs: 32, sm: 36, md: 40 },
-                  height: { xs: 32, sm: 36, md: 40 },
+                  width: { xs: 34, sm: 38, md: 40 },
+                  height: { xs: 34, sm: 38, md: 40 },
                   borderRadius: '12px',
                   display: 'flex',
                   alignItems: 'center',
@@ -119,89 +112,111 @@ export default function AtelierKpiCard({
                   color: getIconColor(),
                   transition: 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
                   '& svg': {
-                    fontSize: { xs: '1.05rem', sm: '1.15rem', md: '1.25rem' }
+                    fontSize: { xs: '1.05rem', sm: '1.15rem', md: '1.3rem' }
                   }
                 }}
               >
                 {icon}
               </Box>
             )}
+            <Typography
+              variant="subtitle2"
+              noWrap
+              sx={{
+                color: isDark ? 'rgba(203, 213, 225, 0.9)' : '#5B5B66',
+                fontWeight: 600,
+                fontSize: { xs: '0.74rem', sm: '0.78rem', md: '0.82rem' },
+                letterSpacing: '0.01em',
+                flex: 1,
+                minWidth: 0,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                lineHeight: 1.3
+              }}
+            >
+              {title}
+            </Typography>
           </Box>
 
-          {/* Primary Metric Value */}
+          {/* Giant Numeric Value */}
           <Typography
             variant="h3"
             noWrap
             sx={{
-              fontFamily: 'inherit',
               fontWeight: 800,
               color: 'text.primary',
               letterSpacing: '-0.02em',
-              fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' },
-              lineHeight: 1.2,
+              fontSize: { xs: '1.55rem', sm: '1.75rem', md: '2rem' },
+              lineHeight: 1.15,
               fontVariantNumeric: 'tabular-nums',
               overflow: 'hidden',
-              textOverflow: 'ellipsis'
+              textOverflow: 'ellipsis',
+              mb: { xs: 1.25, md: 1.5 }
             }}
           >
             {value}
           </Typography>
 
-          {/* Footer: Subtitle & Micro-Trend Badge */}
-          <Box sx={{ mt: 'auto', pt: 0.5 }}>
-            {subtitle ? (
-              <Typography
-                variant="caption"
-                noWrap
+          {/* Footer: Hairline Divider + Subtitle & Status Pill */}
+          <Box
+            sx={{
+              mt: 'auto',
+              pt: 1.1,
+              borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #EFEFF4',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 1,
+              minHeight: 22
+            }}
+          >
+            <Typography
+              variant="caption"
+              noWrap
+              sx={{
+                color: isDark ? 'rgba(148, 163, 184, 0.85)' : '#9A9AA6',
+                fontWeight: 500,
+                fontSize: { xs: '0.7rem', sm: '0.74rem' },
+                flex: 1,
+                minWidth: 0,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}
+            >
+              {subtitle || ''}
+            </Typography>
+
+            {trendLabel && (
+              <Box
                 sx={{
-                  color: isDark ? 'rgba(148, 163, 184, 0.85)' : '#9A9AA6',
-                  fontWeight: 500,
-                  fontSize: { xs: '0.7rem', sm: '0.74rem' },
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  display: 'block',
-                  mb: 0.75
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  px: 1,
+                  py: '2px',
+                  borderRadius: '999px',
+                  bgcolor: statusBg,
+                  border: statusBorder,
+                  flexShrink: 0,
+                  maxWidth: '55%'
                 }}
               >
-                {subtitle}
-              </Typography>
-            ) : (
-              <Box sx={{ height: '1.1rem', mb: 0.75 }} />
-            )}
-
-            <Box sx={{ minHeight: 22, display: 'flex', alignItems: 'center' }}>
-              {trendLabel ? (
-                <Chip
-                  size="small"
-                  icon={isTrendPositive ? <TrendingUp style={{ fontSize: '0.85rem' }} /> : <TrendingDown style={{ fontSize: '0.85rem' }} />}
-                  label={trendLabel}
+                <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: statusColor, flexShrink: 0 }} />
+                <Typography
                   sx={{
-                    height: 22,
                     fontSize: '0.68rem',
                     fontWeight: 700,
-                    borderRadius: '999px',
-                    backgroundColor: isTrendPositive
-                      ? isDark ? 'rgba(16, 185, 129, 0.18)' : '#ECFDF5'
-                      : isDark ? 'rgba(239, 68, 68, 0.18)' : '#FEF2F2',
-                    color: isTrendPositive
-                      ? isDark ? '#34D399' : '#059669'
-                      : isDark ? '#F87171' : '#DC2626',
-                    border: isTrendPositive
-                      ? isDark ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(16, 185, 129, 0.25)'
-                      : isDark ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(239, 68, 68, 0.25)',
-                    '& .MuiChip-icon': {
-                      color: 'inherit',
-                      marginLeft: '4px',
-                      marginRight: '-2px'
-                    },
-                    '& .MuiChip-label': {
-                      paddingLeft: '6px',
-                      paddingRight: '8px'
-                    }
+                    color: statusColor,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    lineHeight: 1.4
                   }}
-                />
-              ) : null}
-            </Box>
+                >
+                  {trendLabel}
+                </Typography>
+              </Box>
+            )}
           </Box>
         </CardContent>
       </Card>
