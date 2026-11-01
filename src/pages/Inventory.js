@@ -1039,7 +1039,7 @@ const Inventory = () => {
                           ? (t.palette.mode === 'dark' ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(239, 68, 68, 0.28)')
                           : isLowStock
                             ? (t.palette.mode === 'dark' ? '1px solid rgba(217, 119, 6, 0.4)' : '1px solid rgba(217, 119, 6, 0.28)')
-                            : (t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.18)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.12)'),
+                            : (t.palette.mode === 'dark' ? '1px solid rgba(155, 143, 245, 0.18)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.12)'),
                         boxShadow: (t) => t.palette.mode === 'dark'
                           ? 'inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 8px 24px rgba(0, 0, 0, 0.4)'
                           : 'inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 4px 20px -2px rgba(var(--primary-rgb, 124, 111, 232), 0.05), 0 1px 3px rgba(0, 0, 0, 0.02)',
@@ -1087,8 +1087,8 @@ const Inventory = () => {
                                   px: 0.8,
                                   py: 0.2,
                                   borderRadius: '6px',
-                                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)',
-                                  border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.25)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.15)'}`
+                                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.12)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)',
+                                  border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.25)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.15)'}`
                                 }}
                               >
                                 #{formatSkuWithHyphen(item.productId || 'NO-SKU')}
@@ -1120,9 +1120,9 @@ const Inventory = () => {
                               fontWeight: 700,
                               fontSize: '0.68rem',
                               borderRadius: '8px',
-                              borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.3)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.22)',
+                              borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.3)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.22)',
                               color: (t) => t.palette.primary.main,
-                              bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.06)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
+                              bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.06)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
                               flexShrink: 0
                             }}
                           />
@@ -1171,10 +1171,10 @@ const Inventory = () => {
                           gap: 0,
                           textAlign: 'center',
                           mb: 2,
-                          bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.04)' : 'rgba(124, 111, 232, 0.03)',
+                          bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.04)' : 'rgba(124, 111, 232, 0.03)',
                           py: 1.25,
                           borderRadius: '12px',
-                          border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.12)'}`
+                          border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.12)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.12)'}`
                         }}>
                           <Box sx={{ px: 0.5, overflow: 'hidden' }}>
                             <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.65rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
@@ -1184,7 +1184,7 @@ const Inventory = () => {
                               ₹{price.toLocaleString('en-IN')}
                             </Typography>
                           </Box>
-                          <Box sx={{ px: 0.5, overflow: 'hidden', borderLeft: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.12)'}`, borderRight: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.12)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.12)'}` }}>
+                          <Box sx={{ px: 0.5, overflow: 'hidden', borderLeft: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.12)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.12)'}`, borderRight: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.12)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.12)'}` }}>
                             <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.65rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                               {user?.role === 'admin' ? 'Margin' : 'Category'}
                             </Typography>
@@ -1613,8 +1613,8 @@ const Inventory = () => {
                               gap: 0.75,
                               p: '3px 6px',
                               borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                              bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
-                              border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.12)'
+                              bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.08)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
+                              border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(155, 143, 245, 0.2)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.12)'
                             }}
                           >
                             <Tooltip title="Print Barcode Tag">

@@ -1826,7 +1826,7 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                                 ? 'linear-gradient(135deg, rgba(var(--primary-rgb, 124, 111, 232), 0.2) 0%, rgba(4, 47, 46, 0.3) 100%)' 
                                 : 'linear-gradient(135deg, rgba(124, 111, 232, 0.06) 0%, rgba(217, 119, 6, 0.06) 100%)',
                             border: '1px solid',
-                            borderColor: theme.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.2)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.15)'
+                            borderColor: theme.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.2)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.15)'
                         }}
                     >
                         <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 800, letterSpacing: '0.08em', display: 'block', mb: 1.5 }}>

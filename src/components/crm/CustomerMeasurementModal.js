@@ -176,9 +176,9 @@ export default function CustomerMeasurementModal({
           borderRadius: 3.5,
           overflow: 'hidden',
           backgroundColor: isDark ? '#0F1E1D' : '#FFFFFF',
-          border: isDark ? '1px solid rgba(20, 184, 166, 0.22)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.14)',
+          border: isDark ? '1px solid rgba(155, 143, 245, 0.22)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.14)',
           boxShadow: isDark
-            ? '0 24px 60px rgba(0, 0, 0, 0.75), 0 0 35px rgba(20, 184, 166, 0.15)'
+            ? '0 24px 60px rgba(0, 0, 0, 0.75), 0 0 35px rgba(155, 143, 245, 0.15)'
             : '0 24px 60px -8px rgba(10, 77, 70, 0.22), 0 4px 16px rgba(0, 0, 0, 0.06)'
         }
       }}
@@ -192,7 +192,7 @@ export default function CustomerMeasurementModal({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          borderBottom: isDark ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(194, 141, 75, 0.3)'
+          borderBottom: isDark ? '1px solid rgba(155, 143, 245, 0.2)' : '1px solid rgba(194, 141, 75, 0.3)'
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -260,9 +260,9 @@ export default function CustomerMeasurementModal({
             gap: 1.5,
             p: 1.75,
             borderRadius: 2.5,
-            bgcolor: isDark ? 'rgba(20, 184, 166, 0.05)' : 'rgba(124, 111, 232, 0.035)',
+            bgcolor: isDark ? 'rgba(155, 143, 245, 0.05)' : 'rgba(124, 111, 232, 0.035)',
             border: '1px solid',
-            borderColor: isDark ? 'rgba(20, 184, 166, 0.14)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)'
+            borderColor: isDark ? 'rgba(155, 143, 245, 0.14)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)'
           }}
         >
           {/* Fit Selector */}
@@ -425,11 +425,11 @@ export default function CustomerMeasurementModal({
             px: 3.5,
             py: 1,
             boxShadow: isDark
-              ? '0 4px 16px rgba(20, 184, 166, 0.35)'
+              ? '0 4px 16px rgba(155, 143, 245, 0.35)'
               : '0 4px 16px rgba(10, 77, 70, 0.3)',
             '&:hover': {
               boxShadow: isDark
-                ? '0 6px 20px rgba(20, 184, 166, 0.5)'
+                ? '0 6px 20px rgba(155, 143, 245, 0.5)'
                 : '0 6px 20px rgba(10, 77, 70, 0.45)'
             }
           }}

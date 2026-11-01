@@ -504,7 +504,7 @@ const Customers = () => {
                     overflow: 'hidden',
                     background: (t) => t.palette.mode === 'dark' ? 'rgba(17, 24, 39, 0.95)' : '#FFFFFF',
                     boxShadow: (t) => t.palette.mode === 'dark'
-                        ? '0 12px 36px rgba(0, 0, 0, 0.5), 0 0 24px rgba(20, 184, 166, 0.12)'
+                        ? '0 12px 36px rgba(0, 0, 0, 0.5), 0 0 24px rgba(155, 143, 245, 0.12)'
                         : '0 12px 32px -4px rgba(var(--primary-rgb, 124, 111, 232), 0.08), 0 2px 6px rgba(0, 0, 0, 0.02)',
                     position: 'relative'
                 }}
@@ -876,8 +876,8 @@ const Customers = () => {
                                                             gap: 0.65,
                                                             p: '3px 6px',
                                                             borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
-                                                            border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.12)'
+                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.08)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
+                                                            border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(155, 143, 245, 0.2)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.12)'
                                                         }}
                                                     >
                                                         <Tooltip title="View 360° Profile & Sizing Specs">

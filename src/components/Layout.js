@@ -783,7 +783,7 @@ export default function Layout() {
                     ? (isDark ? 'rgba(255, 255, 255, 0.14) !important' : '#E8EAED !important')
                     : (designSystem === 'microsoft'
                       ? '#FFFFFF !important'
-                      : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.28) !important' : (isDark ? 'rgba(20, 184, 166, 0.08)' : '#F0FDFA'))),
+                      : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.28) !important' : (isDark ? 'rgba(155, 143, 245, 0.08)' : '#F0FDFA'))),
                   boxShadow: designSystem === 'microsoft' ? '0 3.2px 7.2px 0 rgba(0,0,0,0.13), 0 0.6px 1.8px 0 rgba(0,0,0,0.11)' : 'none'
                 }
               }}
@@ -942,7 +942,7 @@ export default function Layout() {
                   borderRadius: designSystem === 'material' ? '50% !important' : (designSystem === 'microsoft' ? '4px' : `${activeSystemConfig?.shape?.buttonRadius || 6}px`),
                   border: designSystem === 'material' ? 'none' : (topBarConfig.isColored ? '1px solid rgba(255, 255, 255, 0.35)' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)')),
                   color: density === 'compact' ? (topBarConfig.isColored ? '#FFFFFF' : (isDark ? '#2DD4BF' : theme.palette.primary.main)) : (topBarConfig.isColored ? '#FFFFFF' : 'text.secondary'),
-                  bgcolor: density === 'compact' ? (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.25)' : (isDark ? 'rgba(20, 184, 166, 0.14)' : `${theme.palette.primary.main}14`)) : (designSystem === 'material' ? (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)') : 'transparent'),
+                  bgcolor: density === 'compact' ? (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.25)' : (isDark ? 'rgba(155, 143, 245, 0.14)' : `${theme.palette.primary.main}14`)) : (designSystem === 'material' ? (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)') : 'transparent'),
                   display: { xs: 'none', sm: 'inline-flex' },
                   '&:hover': {
                     bgcolor: designSystem === 'material' ? (isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)') : (topBarConfig.isColored ? 'rgba(255, 255, 255, 0.2)' : (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)'))

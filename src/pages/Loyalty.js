@@ -725,8 +725,8 @@ const Loyalty = () => {
                                                             gap: 0.75,
                                                             p: '3px 6px',
                                                             borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(20, 184, 166, 0.08)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
-                                                            border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(20, 184, 166, 0.2)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.12)'
+                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.08)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
+                                                            border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(155, 143, 245, 0.2)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.12)'
                                                         }}
                                                     >
                                                         <Tooltip title="Redeem Available Points">
