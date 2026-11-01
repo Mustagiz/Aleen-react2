@@ -21,6 +21,7 @@ import {
     Tooltip, 
     Avatar, 
     TablePagination, 
+    TableSortLabel, 
     MenuItem, 
     Select, 
     FormControl, 
@@ -322,6 +323,42 @@ const Customers = () => {
         });
     }, [customers, searchTerm, segmentFilter, customerStatsMap]);
 
+    // Table sorting via header arrows
+    const [sortField, setSortField] = useState('name');
+    const [sortDir, setSortDir] = useState('asc');
+
+    const handleSort = (field) => {
+        if (sortField === field) {
+            setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortField(field);
+            setSortDir('asc');
+        }
+    };
+
+    const sortedCustomers = useMemo(() => {
+        return [...filteredCustomers].sort((a, b) => {
+            const statsA = customerStatsMap[a.id] || {};
+            const statsB = customerStatsMap[b.id] || {};
+            let valA, valB;
+            switch (sortField) {
+                case 'spend': valA = statsA.totalSpent || 0; valB = statsB.totalSpent || 0; break;
+                case 'points': valA = a.loyaltyPoints || 0; valB = b.loyaltyPoints || 0; break;
+                case 'due': valA = a.totalDue || 0; valB = b.totalDue || 0; break;
+                case 'visit':
+                    valA = statsA.lastVisit && statsA.lastVisit !== 'Never' ? new Date(statsA.lastVisit).getTime() : 0;
+                    valB = statsB.lastVisit && statsB.lastVisit !== 'Never' ? new Date(statsB.lastVisit).getTime() : 0;
+                    break;
+                default:
+                    valA = (a.name || '').toLowerCase();
+                    valB = (b.name || '').toLowerCase();
+            }
+            if (valA < valB) return sortDir === 'asc' ? -1 : 1;
+            if (valA > valB) return sortDir === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }, [filteredCustomers, sortField, sortDir, customerStatsMap]);
+
     // KPI Metrics
     const totalCustomers = customers.length;
     const repeatCount = customers.filter(c => (customerStatsMap[c.id]?.visitCount || 0) > 1).length;
@@ -523,11 +560,31 @@ const Customers = () => {
                     <Table sx={{ minWidth: 700, '& .MuiTableCell-root': { verticalAlign: 'middle' } }}>
                         <TableHead>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4 }}>Guest & Contact Details</TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4 }} align="right">Lifetime Spend</TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4 }} align="center">Loyalty Points</TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4 }} align="right">Balance Due</TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4 }} align="center">Last Visit</TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4 }}>
+                                    <TableSortLabel active={sortField === 'name'} direction={sortField === 'name' ? sortDir : 'asc'} onClick={() => handleSort('name')}>
+                                        Guest & Contact Details
+                                    </TableSortLabel>
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4 }} align="right">
+                                    <TableSortLabel active={sortField === 'spend'} direction={sortField === 'spend' ? sortDir : 'asc'} onClick={() => handleSort('spend')}>
+                                        Lifetime Spend
+                                    </TableSortLabel>
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4 }} align="center">
+                                    <TableSortLabel active={sortField === 'points'} direction={sortField === 'points' ? sortDir : 'asc'} onClick={() => handleSort('points')}>
+                                        Loyalty Points
+                                    </TableSortLabel>
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4 }} align="right">
+                                    <TableSortLabel active={sortField === 'due'} direction={sortField === 'due' ? sortDir : 'asc'} onClick={() => handleSort('due')}>
+                                        Balance Due
+                                    </TableSortLabel>
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4 }} align="center">
+                                    <TableSortLabel active={sortField === 'visit'} direction={sortField === 'visit' ? sortDir : 'asc'} onClick={() => handleSort('visit')}>
+                                        Last Visit
+                                    </TableSortLabel>
+                                </TableCell>
                                 <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4, pr: 2.5 }} align="right">Actions</TableCell>
                             </TableRow>
                         </TableHead>
@@ -542,7 +599,7 @@ const Customers = () => {
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                filteredCustomers
+                                sortedCustomers
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .map(cust => {
                                         const customerStat = calculateCustomerStats(cust.id);
@@ -669,7 +726,7 @@ const Customers = () => {
                                                                             }
                                                                         }}
                                                                     >
-                                                                        <Phone sx={{ fontSize: 11, color: palette.accent }} />
+                                                                        <Phone sx={{ fontSize: 11, color: 'text.secondary', opacity: 0.7 }} />
                                                                         <Typography
                                                                             variant="caption"
                                                                             sx={{
@@ -691,8 +748,9 @@ const Customers = () => {
                                                                             px: 0.75,
                                                                             py: 0.15,
                                                                             borderRadius: '8px',
-                                                                            bgcolor: 'rgba(0,0,0,0.03)',
-                                                                            border: '1px dashed rgba(0,0,0,0.1)'
+                                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
+                                                                            border: '1px dashed',
+                                                                            borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)'
                                                                         }}
                                                                     >
                                                                         <Phone sx={{ fontSize: 10, color: 'text.disabled' }} />
@@ -713,13 +771,16 @@ const Customers = () => {
                                                                             }}
                                                                             sx={{
                                                                                 p: 0.35,
-                                                                                color: '#25D366',
-                                                                                bgcolor: 'rgba(37, 211, 102, 0.08)',
-                                                                                border: '1px solid rgba(37, 211, 102, 0.25)',
+                                                                                color: 'text.secondary',
+                                                                                bgcolor: 'transparent',
+                                                                                border: '1px solid',
+                                                                                borderColor: 'divider',
                                                                                 transition: 'all 0.15s ease',
                                                                                 '&:hover': {
-                                                                                    bgcolor: 'rgba(37, 211, 102, 0.2)',
-                                                                                    transform: 'scale(1.1)'
+                                                                                    color: '#128C7E',
+                                                                                    bgcolor: 'rgba(37, 211, 102, 0.12)',
+                                                                                    borderColor: 'rgba(37, 211, 102, 0.35)',
+                                                                                    transform: 'scale(1.08)'
                                                                                 }
                                                                             }}
                                                                         >

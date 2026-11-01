@@ -14,6 +14,8 @@ import {
     Tabs,
     Tab,
     Chip,
+    TextField,
+    MenuItem,
     useTheme
 } from '@mui/material';
 import {
@@ -40,6 +42,9 @@ const AdvancedReports = () => {
     const { invoices, inventory } = useData();
     const [activeTab, setActiveTab] = useState(0);
     const [dateRange, setDateRange] = useState('month');
+    const [fromDate, setFromDate] = useState('');
+    const [toDate, setToDate] = useState('');
+    const [methodFilter, setMethodFilter] = useState('All');
 
     const getDateRange = () => {
         const now = new Date();
@@ -61,10 +66,15 @@ const AdvancedReports = () => {
         }
     };
 
-    const { start, end, label } = getDateRange();
+    const baseRange = getDateRange();
+    const start = fromDate ? new Date(`${fromDate}T00:00:00`) : baseRange.start;
+    const end = toDate ? new Date(`${toDate}T23:59:59`) : baseRange.end;
+    const { label } = baseRange;
     const filteredInvoices = invoices.filter(inv => {
         const invDate = new Date(inv.date);
-        return invDate >= start && invDate <= end;
+        if (invDate < start || invDate > end) return false;
+        if (methodFilter !== 'All' && (inv.paymentMethod || 'Cash') !== methodFilter) return false;
+        return true;
     });
 
     // 1. PROFIT MARGIN BY CATEGORY
@@ -478,6 +488,123 @@ const AdvancedReports = () => {
 
             {/* Seamless Finance & Audit Navigation Tab Switcher */}
             <FinanceNavTabs activeTab="/advanced-reports" />
+
+            {/* Intelligence Filter Bar */}
+            <Paper
+                elevation={0}
+                sx={{
+                    p: 2,
+                    mb: 3,
+                    borderRadius: (t) => `${Math.max(12, t.shape?.borderRadius || 14)}px`,
+                    border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : '#EFEFF4'}`,
+                    bgcolor: 'background.paper',
+                    boxShadow: (t) => t.palette.mode === 'dark' ? 'none' : '0 2px 10px rgba(17, 25, 40, 0.04)'
+                }}
+            >
+                <Grid container spacing={2} alignItems="center">
+                    <Grid item xs={12} sm={6} md={3}>
+                        <TextField
+                            fullWidth
+                            size="small"
+                            type="date"
+                            label="From Date"
+                            value={fromDate}
+                            onChange={(e) => setFromDate(e.target.value)}
+                            InputLabelProps={{ shrink: true }}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    height: 40,
+                                    borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                                    bgcolor: 'background.paper',
+                                    fontSize: '0.84rem',
+                                    '& fieldset': { borderColor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.25)' },
+                                    '&:hover fieldset': { bordercolor: (t) => t.palette.primary.main },
+                                    '&.Mui-focused fieldset': { bordercolor: (t) => t.palette.primary.main, borderWidth: 1.5 }
+                                }
+                            }}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={3}>
+                        <TextField
+                            fullWidth
+                            size="small"
+                            type="date"
+                            label="To Date"
+                            value={toDate}
+                            onChange={(e) => setToDate(e.target.value)}
+                            InputLabelProps={{ shrink: true }}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    height: 40,
+                                    borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                                    bgcolor: 'background.paper',
+                                    fontSize: '0.84rem',
+                                    '& fieldset': { borderColor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.25)' },
+                                    '&:hover fieldset': { bordercolor: (t) => t.palette.primary.main },
+                                    '&.Mui-focused fieldset': { bordercolor: (t) => t.palette.primary.main, borderWidth: 1.5 }
+                                }
+                            }}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={3}>
+                        <TextField
+                            select
+                            fullWidth
+                            size="small"
+                            label="Payment Method"
+                            value={methodFilter}
+                            onChange={(e) => setMethodFilter(e.target.value)}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    height: 40,
+                                    borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                                    bgcolor: 'background.paper',
+                                    fontSize: '0.84rem',
+                                    '& fieldset': { borderColor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.25)' },
+                                    '&:hover fieldset': { bordercolor: (t) => t.palette.primary.main },
+                                    '&.Mui-focused fieldset': { bordercolor: (t) => t.palette.primary.main, borderWidth: 1.5 }
+                                }
+                            }}
+                        >
+                            <MenuItem value="All">All Methods</MenuItem>
+                            {['Cash', 'UPI', 'Card', 'Credit', 'Net Banking'].map(m => (
+                                <MenuItem key={m} value={m}>{m}</MenuItem>
+                            ))}
+                        </TextField>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={3} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        {(fromDate || toDate || methodFilter !== 'All') && (
+                            <Button
+                                size="small"
+                                onClick={() => {
+                                    setFromDate('');
+                                    setToDate('');
+                                    setMethodFilter('All');
+                                }}
+                                sx={{
+                                    height: 40,
+                                    minHeight: 40,
+                                    px: 2,
+                                    borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                                    border: (t) => `1.5px solid ${t.palette.primary.main}4D`,
+                                    color: (t) => t.palette.primary.main,
+                                    bgcolor: 'background.paper',
+                                    textTransform: 'none',
+                                    fontSize: '0.82rem',
+                                    fontWeight: 700,
+                                    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                                    '&:hover': {
+                                        border: (t) => `1.5px solid ${t.palette.primary.main}`,
+                                        bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)'
+                                    }
+                                }}
+                            >
+                                Clear Filters
+                            </Button>
+                        )}
+                    </Grid>
+                </Grid>
+            </Paper>
 
             {/* 4 Atelier Intelligence KPIs: Responsive 2x2 Grid on Mobile, 4 Columns on Desktop */}
             <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} sx={{ mb: { xs: 2.5, sm: 3.5 } }}>

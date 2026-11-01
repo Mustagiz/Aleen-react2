@@ -47,7 +47,9 @@ const PaymentSummary = () => {
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
     const [cashDrawerModalOpen, setCashDrawerModalOpen] = useState(false);
-    const [dateRange, setDateRange] = useState('today');
+    const [dateRange] = useState('today');
+    const [fromDate, setFromDate] = useState('');
+    const [toDate, setToDate] = useState('');
 
     // Search and Table Filter State
     const [searchQuery, setSearchQuery] = useState('');
@@ -78,7 +80,16 @@ const PaymentSummary = () => {
         }
     };
 
-    const { start, end, label } = getDateRange();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const { start, end, label } = useMemo(() => {
+        const baseRange = getDateRange();
+        return {
+            start: fromDate ? new Date(`${fromDate}T00:00:00`) : baseRange.start,
+            end: toDate ? new Date(`${toDate}T23:59:59`) : baseRange.end,
+            label: baseRange.label
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dateRange, fromDate, toDate]);
 
     // Filter invoices by date range
     const filteredInvoices = useMemo(() => {
@@ -429,63 +440,6 @@ const PaymentSummary = () => {
             {/* Finance & Audit Suite Sub-Nav Tabs */}
             <FinanceNavTabs />
 
-            {/* Date Range Selector Bar */}
-            <GlassCard sx={{ p: 1.5, mb: 3.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <CalendarToday sx={{ fontSize: '1.1rem', color: (t) => t.palette.primary.main }} />
-                    <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
-                        Reconciliation Period:
-                    </Typography>
-                </Box>
-                <Box sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    bgcolor: theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.25)' : 'background.paper',
-                    p: '3px',
-                    height: 40,
-                    boxSizing: 'border-box',
-                    borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                    border: (t) => `1.5px solid ${t.palette.primary.main}33`,
-                    boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
-                }}>
-                    {[
-                        { key: 'today', label: 'Today' },
-                        { key: 'yesterday', label: 'Yesterday' },
-                        { key: 'week', label: 'This Week' },
-                        { key: 'month', label: 'This Month' }
-                    ].map((item) => {
-                        const isSelected = dateRange === item.key;
-                        return (
-                            <Button
-                                key={item.key}
-                                onClick={() => {
-                                    setDateRange(item.key);
-                                    setPage(0);
-                                }}
-                                sx={{
-                                    height: 32,
-                                    minHeight: 32,
-                                    px: 2,
-                                    borderRadius: (t) => `${Math.max(4, (t.shape?.borderRadius || 8) - 2)}px`,
-                                    textTransform: 'none',
-                                    fontWeight: 700,
-                                    fontSize: '0.82rem',
-                                    color: isSelected ? '#FFFFFF !important' : 'text.secondary',
-                                    bgcolor: isSelected ? 'primary.main !important' : 'transparent',
-                                    boxShadow: isSelected ? (t) => `0 2px 8px ${t.palette.primary.main}4D` : 'none',
-                                    transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-                                    '&:hover': {
-                                        bgcolor: isSelected ? (t) => `${t.palette.primary.dark} !important` : (t) => `${t.palette.primary.main}14`
-                                    }
-                                }}
-                            >
-                                {item.label}
-                            </Button>
-                        );
-                    })}
-                </Box>
-            </GlassCard>
-
             {/* Atelier KPI Cards: Responsive Grid on Mobile, 3 Columns on Tablet/Desktop */}
             <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} sx={{ mb: { xs: 2.5, sm: 3.5 } }}>
                 <Grid item xs={6} sm={4}>
@@ -589,7 +543,7 @@ const PaymentSummary = () => {
             {/* Transaction Filter Toolbar */}
             <GlassCard sx={{ p: 2, mb: 3 }}>
                 <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={4.5}>
                         <TextField
                             fullWidth
                             size="small"
@@ -626,7 +580,57 @@ const PaymentSummary = () => {
                             }}
                         />
                     </Grid>
-                    <Grid item xs={12} sm={6} md={3.5}>
+                    <Grid item xs={6} sm={3} md={2}>
+                        <TextField
+                            fullWidth
+                            size="small"
+                            type="date"
+                            label="From"
+                            value={fromDate}
+                            onChange={(e) => {
+                                setFromDate(e.target.value);
+                                setPage(0);
+                            }}
+                            InputLabelProps={{ shrink: true }}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    height: 40,
+                                    borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                                    bgcolor: 'background.paper',
+                                    fontSize: '0.84rem',
+                                    '& fieldset': { borderColor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.25)' },
+                                    '&:hover fieldset': { bordercolor: (t) => t.palette.primary.main },
+                                    '&.Mui-focused fieldset': { bordercolor: (t) => t.palette.primary.main, borderWidth: 1.5 }
+                                }
+                            }}
+                        />
+                    </Grid>
+                    <Grid item xs={6} sm={3} md={2}>
+                        <TextField
+                            fullWidth
+                            size="small"
+                            type="date"
+                            label="To"
+                            value={toDate}
+                            onChange={(e) => {
+                                setToDate(e.target.value);
+                                setPage(0);
+                            }}
+                            InputLabelProps={{ shrink: true }}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    height: 40,
+                                    borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+                                    bgcolor: 'background.paper',
+                                    fontSize: '0.84rem',
+                                    '& fieldset': { borderColor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.25)' },
+                                    '&:hover fieldset': { bordercolor: (t) => t.palette.primary.main },
+                                    '&.Mui-focused fieldset': { bordercolor: (t) => t.palette.primary.main, borderWidth: 1.5 }
+                                }
+                            }}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={2}>
                         <TextField
                             select
                             fullWidth
@@ -657,13 +661,15 @@ const PaymentSummary = () => {
                             ))}
                         </TextField>
                     </Grid>
-                    <Grid item xs={12} sm={6} md={2.5} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                        {(searchQuery || methodFilter !== 'All') && (
+                    <Grid item xs={12} sm={6} md={1.5} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                        {(searchQuery || methodFilter !== 'All' || fromDate || toDate) && (
                             <Button 
                                 size="small" 
                                 onClick={() => {
                                     setSearchQuery('');
                                     setMethodFilter('All');
+                                    setFromDate('');
+                                    setToDate('');
                                     setPage(0);
                                 }}
                                 sx={{

@@ -3,7 +3,7 @@ import {
     Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, 
     Table, TableBody, TableCell, TableHead, TableRow, IconButton, Typography, 
     TableContainer, Grid, Chip, TablePagination, useTheme, useMediaQuery, Avatar, Tooltip, 
-    InputAdornment, MenuItem, Rating
+    InputAdornment, MenuItem, Rating, TableSortLabel
 } from '@mui/material';
 import { 
     Add, Edit, Delete, Store, LocalShipping, AttachMoney, Search, 
@@ -137,6 +137,35 @@ const Vendors = () => {
             return matchesSearch && matchesCategory && matchesBalance;
         });
     }, [vendors, searchQuery, categoryFilter, balanceFilter]);
+
+    // Table sorting via header arrows
+    const [sortField, setSortField] = useState('name');
+    const [sortDir, setSortDir] = useState('asc');
+
+    const handleSort = (field) => {
+        if (sortField === field) {
+            setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortField(field);
+            setSortDir('asc');
+        }
+    };
+
+    const sortedVendors = useMemo(() => {
+        return [...filteredVendors].sort((a, b) => {
+            let valA, valB;
+            switch (sortField) {
+                case 'balance': valA = a.balance || 0; valB = b.balance || 0; break;
+                case 'orders': valA = a.performance?.totalOrders || 0; valB = b.performance?.totalOrders || 0; break;
+                default:
+                    valA = (a.name || '').toLowerCase();
+                    valB = (b.name || '').toLowerCase();
+            }
+            if (valA < valB) return sortDir === 'asc' ? -1 : 1;
+            if (valA > valB) return sortDir === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }, [filteredVendors, sortField, sortDir]);
 
     // Summary KPI calculations
     const totalVendors = vendors.length;
@@ -343,31 +372,37 @@ const Vendors = () => {
                             }
                         }}>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
-                                    Vendor / Supplier
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
+                                    <TableSortLabel active={sortField === 'name'} direction={sortField === 'name' ? sortDir : 'asc'} onClick={() => handleSort('name')}>
+                                        Vendor / Supplier
+                                    </TableSortLabel>
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
                                     Contact & Communication
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
                                     Specialization & Rating
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
-                                    Order History
+                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
+                                    <TableSortLabel active={sortField === 'orders'} direction={sortField === 'orders' ? sortDir : 'asc'} onClick={() => handleSort('orders')}>
+                                        Order History
+                                    </TableSortLabel>
                                 </TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
-                                    Balance Due
+                                <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
+                                    <TableSortLabel active={sortField === 'balance'} direction={sortField === 'balance' ? sortDir : 'asc'} onClick={() => handleSort('balance')}>
+                                        Balance Due
+                                    </TableSortLabel>
                                 </TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
+                                <TableCell align="right" sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.secondary', py: 1.75 }}>
                                     Actions
                                 </TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {filteredVendors.length > 0 ? (
+                            {sortedVendors.length > 0 ? (
                                 (rowsPerPage > 0
-                                    ? filteredVendors.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                    : filteredVendors
+                                    ? sortedVendors.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                    : sortedVendors
                                 ).map((vendor) => {
                                     const balance = vendor.balance || 0;
                                     const rawPhone = (vendor.phone || '').replace(/[^0-9]/g, '');

@@ -23,6 +23,7 @@ import {
     IconButton,
     Tooltip,
     TablePagination,
+    TableSortLabel,
     Divider,
     InputAdornment,
     Switch,
@@ -327,8 +328,32 @@ const Loyalty = () => {
     };
 
     // Sorted loyalty patrons
+    const [sortField, setSortField] = useState('points');
+    const [sortDir, setSortDir] = useState('desc');
+
+    const handleSort = (field) => {
+        if (sortField === field) {
+            setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortField(field);
+            setSortDir(field === 'points' || field === 'spend' ? 'desc' : 'asc');
+        }
+    };
+
     const sortedMembers = [...customers]
-        .sort((a, b) => (b.loyaltyPoints || 0) - (a.loyaltyPoints || 0));
+        .sort((a, b) => {
+            let valA, valB;
+            switch (sortField) {
+                case 'points': valA = a.loyaltyPoints || 0; valB = b.loyaltyPoints || 0; break;
+                case 'spend': valA = a.totalSpent || 0; valB = b.totalSpent || 0; break;
+                default:
+                    valA = (a.name || '').toLowerCase();
+                    valB = (b.name || '').toLowerCase();
+            }
+            if (valA < valB) return sortDir === 'asc' ? -1 : 1;
+            if (valA > valB) return sortDir === 'asc' ? 1 : -1;
+            return 0;
+        });
 
     // Sanitized initials helper for boutique patrons
     const getInitials = (name) => {
@@ -586,13 +611,25 @@ const Loyalty = () => {
                     <Table sx={{ minWidth: 680 }}>
                         <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' }}>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', width: 70 }} align="center">Rank</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Client Details</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="center">Membership Tier</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="right">Available Points</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="right">Lifetime Spend</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Next Tier Target</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: (t) => t.palette.primary.main, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="right">Privilege Actions</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', width: 70 }} align="center">Rank</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                                    <TableSortLabel active={sortField === 'name'} direction={sortField === 'name' ? sortDir : 'asc'} onClick={() => handleSort('name')}>
+                                        Client Details
+                                    </TableSortLabel>
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="center">Membership Tier</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="right">
+                                    <TableSortLabel active={sortField === 'points'} direction={sortField === 'points' ? sortDir : 'asc'} onClick={() => handleSort('points')}>
+                                        Available Points
+                                    </TableSortLabel>
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="right">
+                                    <TableSortLabel active={sortField === 'spend'} direction={sortField === 'spend' ? sortDir : 'asc'} onClick={() => handleSort('spend')}>
+                                        Lifetime Spend
+                                    </TableSortLabel>
+                                </TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Next Tier Target</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="right">Privilege Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>

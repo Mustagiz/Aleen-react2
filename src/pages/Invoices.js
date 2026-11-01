@@ -2271,48 +2271,29 @@ const Invoices = () => {
             )}
           </Box>
 
-          {/* Quick Date Presets */}
+          {/* Quick Date Presets Dropdown */}
           <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 0.75, flex: '1 1 auto', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
-            <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.72rem', color: 'text.secondary', letterSpacing: '0.02em', mr: 0.25 }}>
-              Filter Dates:
-            </Typography>
-            {[
-              { id: 'all', label: 'All Dates' },
-              { id: 'today', label: 'Today' },
-              { id: 'yesterday', label: 'Yesterday' },
-              { id: 'this_week', label: 'Last 7 Days' },
-              { id: 'this_month', label: 'This Month' },
-              { id: 'last_30_days', label: 'Last 30 Days' }
-            ].map(p => {
-              const isSelected = datePreset === p.id && (!dateFrom || p.id !== 'all');
-              const isAllSelected = datePreset === 'all' && !dateFrom && !dateTo && p.id === 'all';
-              const active = isSelected || isAllSelected;
-              return (
-                <Chip
-                  key={p.id}
-                  label={p.label}
-                  size="small"
-                  clickable
-                  onClick={() => handleDatePreset(p.id)}
-                  sx={{
-                    fontWeight: 700,
-                    fontSize: '0.72rem',
-                    height: 30,
-                    px: 0.25,
-                    borderRadius: '999px',
-                    bgcolor: active ? 'primary.main' : (isDark ? 'rgba(255, 255, 255, 0.04)' : 'transparent'),
-                    color: active ? '#FFFFFF' : 'text.secondary',
-                    border: '1px solid',
-                    borderColor: active ? 'primary.main' : 'divider',
-                    transition: 'background-color 0.15s ease, border-color 0.15s ease',
-                    '&:hover': {
-                      bgcolor: active ? 'primary.dark' : (isDark ? 'rgba(155, 143, 245, 0.18)' : 'rgba(124, 111, 232, 0.08)'),
-                      color: active ? '#FFFFFF' : 'primary.main'
-                    }
-                  }}
-                />
-              );
-            })}
+            <TextField
+              select
+              size="small"
+              label="Filter Dates"
+              value={datePreset}
+              onChange={(e) => handleDatePreset(e.target.value)}
+              sx={{
+                width: { xs: '100%', sm: 185 },
+                '& .MuiInputBase-root': { height: 40, borderRadius: '10px', fontSize: '0.8rem', fontWeight: 600 },
+                '& .MuiInputLabel-root': { fontSize: '0.78rem' }
+              }}
+            >
+              <MenuItem value="all">All Dates</MenuItem>
+              <MenuItem value="today">Today</MenuItem>
+              <MenuItem value="yesterday">Yesterday</MenuItem>
+              <MenuItem value="this_week">Last 7 Days</MenuItem>
+              <MenuItem value="this_month">This Month</MenuItem>
+              <MenuItem value="last_month">Last Month</MenuItem>
+              <MenuItem value="last_30_days">Last 30 Days</MenuItem>
+              <MenuItem value="custom">Custom Range</MenuItem>
+            </TextField>
           </Box>
         </Box>
 
@@ -2359,63 +2340,6 @@ const Invoices = () => {
               }}
               sx={{ width: '100%', '& .MuiInputBase-root': { height: 38, borderRadius: '10px', fontSize: '0.82rem' } }}
             />
-          </Box>
-
-          {/* Payment Method Filter */}
-          <Box sx={{ flex: { xs: '1 1 100%', sm: '0 1 195px' } }}>
-            <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: 'text.secondary', letterSpacing: '0.02em', mb: 0.5 }}>
-              Payment Method
-            </Typography>
-            <TextField
-              select
-              size="small"
-              value={paymentFilter}
-              onChange={(e) => setPaymentFilter(e.target.value)}
-              sx={{ width: '100%', '& .MuiInputBase-root': { height: 38, borderRadius: '10px', fontSize: '0.82rem' } }}
-            >
-              <MenuItem value="All">All Payment Methods</MenuItem>
-              <MenuItem value="Cash">Cash</MenuItem>
-              <MenuItem value="Card">Card</MenuItem>
-              <MenuItem value="UPI">UPI</MenuItem>
-              <MenuItem value="Net Banking">Net Banking</MenuItem>
-              <MenuItem value="Credit">Credit / Due</MenuItem>
-            </TextField>
-          </Box>
-
-          {/* Sort Column */}
-          <Box sx={{ flex: { xs: '1 1 100%', sm: '0 1 130px' } }}>
-            <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: 'text.secondary', letterSpacing: '0.02em', mb: 0.5 }}>
-              Sort By
-            </Typography>
-            <TextField
-              select
-              size="small"
-              value={orderBy}
-              onChange={(e) => setOrderBy(e.target.value)}
-              sx={{ width: '100%', '& .MuiInputBase-root': { height: 38, borderRadius: '10px', fontSize: '0.82rem' } }}
-            >
-              <MenuItem value="date">Date</MenuItem>
-              <MenuItem value="total">Amount</MenuItem>
-              <MenuItem value="customer">Customer</MenuItem>
-              <MenuItem value="paymentMethod">Payment</MenuItem>
-            </TextField>
-          </Box>
-
-          {/* Sort Direction */}
-          <Box sx={{ flex: { xs: '1 1 100%', sm: '0 1 145px' } }}>
-            <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: 'text.secondary', letterSpacing: '0.02em', mb: 0.5 }}>
-              Order
-            </Typography>
-            <TextField
-              select
-              size="small"
-              value={order}
-              onChange={(e) => setOrder(e.target.value)}
-              sx={{ width: '100%', '& .MuiInputBase-root': { height: 38, borderRadius: '10px', fontSize: '0.82rem' } }}
-            >
-              <MenuItem value="desc">Newest First</MenuItem>
-              <MenuItem value="asc">Oldest First</MenuItem>
-            </TextField>
           </Box>
 
           {/* Reset Filters CTA */}
@@ -2980,32 +2904,32 @@ const Invoices = () => {
               <Table>
                 <TableHead>
                   <TableRow sx={{ bgcolor: isDark ? 'rgba(124, 111, 232, 0.06)' : 'rgba(124, 111, 232, 0.045)' }}>
-                    <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    <TableCell sx={{ color: 'text.secondary', fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       <TableSortLabel active={orderBy === 'id'} direction={orderBy === 'id' ? order : 'asc'} onClick={() => handleRequestSort('id')}>
                         Invoice Details
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    <TableCell sx={{ color: 'text.secondary', fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       <TableSortLabel active={orderBy === 'date'} direction={orderBy === 'date' ? order : 'asc'} onClick={() => handleRequestSort('date')}>
                         Date
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em', display: { xs: 'none', sm: 'table-cell' } }}>
+                    <TableCell sx={{ color: 'text.secondary', fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em', display: { xs: 'none', sm: 'table-cell' } }}>
                       <TableSortLabel active={orderBy === 'customer'} direction={orderBy === 'customer' ? order : 'asc'} onClick={() => handleRequestSort('customer')}>
                         Customer
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em', display: { xs: 'none', md: 'table-cell' } }}>
+                    <TableCell sx={{ color: 'text.secondary', fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em', display: { xs: 'none', md: 'table-cell' } }}>
                       <TableSortLabel active={orderBy === 'paymentMethod'} direction={orderBy === 'paymentMethod' ? order : 'asc'} onClick={() => handleRequestSort('paymentMethod')}>
                         Payment
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    <TableCell sx={{ color: 'text.secondary', fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       <TableSortLabel active={orderBy === 'total'} direction={orderBy === 'total' ? order : 'asc'} onClick={() => handleRequestSort('total')}>
                         Amount
                       </TableSortLabel>
                     </TableCell>
-                    <TableCell align="right" sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.06em', pr: 2.5 }}>Actions</TableCell>
+                    <TableCell align="right" sx={{ color: 'text.secondary', fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em', pr: 2.5 }}>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
