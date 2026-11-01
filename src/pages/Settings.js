@@ -665,7 +665,7 @@ export default function Settings() {
                       boxShadow: '0 8px 24px rgba(var(--primary-rgb, 124, 111, 232), 0.25)'
                     }}
                   >
-                    <Typography sx={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 900, fontSize: '2.5rem', color: '#F59E0B' }}>
+                    <Typography sx={{ fontFamily: '"DM Sans", sans-serif', fontWeight: 900, fontSize: '2.5rem', color: '#F59E0B' }}>
                       {(formProfile.businessName || 'A').charAt(0).toUpperCase()}
                     </Typography>
                   </Box>

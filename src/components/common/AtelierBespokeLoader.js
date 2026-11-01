@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
  * 
  * Signature loading state for Aleen.
  * Features an animated needle & thread monogram ring,
- * soft lavender caustics, and crisp Outfit typography.
+ * soft lavender caustics, and crisp DM Sans typography.
  */
 export default function AtelierBespokeLoader({
   message = 'Preparing Atelier Console...',
@@ -134,7 +134,7 @@ export default function AtelierBespokeLoader({
             color: '#FFFFFF',
             fontSize: compact ? '0.75rem' : '0.95rem',
             fontWeight: 800,
-            fontFamily: '"Outfit", "Plus Jakarta Sans", sans-serif'
+            fontFamily: '"DM Sans", sans-serif'
           }}
         >
           ⚜
@@ -145,7 +145,7 @@ export default function AtelierBespokeLoader({
       <Box sx={{ textAlign: 'center', zIndex: 1, maxWidth: 320 }}>
         <Typography
           sx={{
-            fontFamily: '"Outfit", "Plus Jakarta Sans", sans-serif',
+            fontFamily: '"DM Sans", sans-serif',
             fontWeight: 700,
             fontSize: compact ? '0.95rem' : '1.18rem',
             letterSpacing: '0.04em',

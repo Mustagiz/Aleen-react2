@@ -148,7 +148,7 @@ export default function WaxSealStamp({
         {/* Bottom Vintage Verification Text */}
         <Typography
           sx={{
-            fontFamily: '"Plus Jakarta Sans", sans-serif',
+            fontFamily: '"DM Sans", sans-serif',
             fontWeight: 800,
             fontSize: `${Math.max(6.5, size * 0.068)}px`,
             letterSpacing: '0.15em',
@@ -245,7 +245,7 @@ export default function WaxSealStamp({
       {subtitle && (
         <Typography
           sx={{
-            fontFamily: '"Plus Jakarta Sans", sans-serif',
+            fontFamily: '"DM Sans", sans-serif',
             fontWeight: 700,
             fontSize: `${size * 0.1}px`,
             letterSpacing: '0.08em',

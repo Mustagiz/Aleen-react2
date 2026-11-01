@@ -2614,7 +2614,7 @@ const Invoices = () => {
                     <Typography
                       variant="subtitle1"
                       sx={{
-                        fontFamily: '"Plus Jakarta Sans", sans-serif',
+                        fontFamily: '"DM Sans", sans-serif',
                         fontWeight: 900,
                         color: 'text.primary',
                         fontSize: '1.05rem',
@@ -3158,7 +3158,7 @@ const Invoices = () => {
                               fontWeight: 900,
                               fontSize: '0.96rem',
                               color: (t) => t.palette.primary.main,
-                              fontFamily: '"Plus Jakarta Sans", sans-serif',
+                              fontFamily: '"DM Sans", sans-serif',
                               fontVariantNumeric: 'tabular-nums'
                             }}
                           >

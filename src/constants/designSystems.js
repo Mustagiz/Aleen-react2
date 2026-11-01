@@ -160,7 +160,7 @@ export const DESIGN_SYSTEMS = [
       cardRadius: 14
     },
     typography: {
-      fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Plus Jakarta Sans", sans-serif',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "DM Sans", sans-serif',
       h1Font: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
       fontWeightBold: 700,
       letterSpacing: '-0.022em'
@@ -232,8 +232,8 @@ export const DESIGN_SYSTEMS = [
       cardRadius: 12
     },
     typography: {
-      fontFamily: '"Plus Jakarta Sans", "Inter", -apple-system, sans-serif',
-      h1Font: '"Plus Jakarta Sans", sans-serif',
+      fontFamily: '"DM Sans", "Inter", -apple-system, sans-serif',
+      h1Font: '"DM Sans", sans-serif',
       fontWeightBold: 700,
       letterSpacing: '-0.015em'
     },
@@ -448,7 +448,7 @@ export const DESIGN_SYSTEMS = [
       cardRadius: 16
     },
     typography: {
-      fontFamily: '"Roboto", "Plus Jakarta Sans", -apple-system, sans-serif',
+      fontFamily: '"Roboto", "DM Sans", -apple-system, sans-serif',
       h1Font: '"Roboto", sans-serif',
       fontWeightBold: 700,
       letterSpacing: '0em'
@@ -511,7 +511,7 @@ export const DESIGN_SYSTEMS = [
     name: 'Aleen Light Lavender',
     company: 'Aleen Studio',
     badge: 'Light Lavender Studio',
-    tagline: 'Airy lavender canvas with white cards, hairline borders, pastel icon tiles, and crisp Outfit typography.',
+    tagline: 'Airy lavender canvas with white cards, hairline borders, pastel icon tiles, and crisp DM Sans typography.',
     icon: '💜',
     shape: {
       borderRadius: 14,
@@ -520,8 +520,8 @@ export const DESIGN_SYSTEMS = [
       cardRadius: 14
     },
     typography: {
-      fontFamily: '"Outfit", "Plus Jakarta Sans", "Inter", -apple-system, sans-serif',
-      h1Font: '"Outfit", "Plus Jakarta Sans", sans-serif',
+      fontFamily: '"DM Sans", "Inter", -apple-system, sans-serif',
+      h1Font: '"DM Sans", sans-serif',
       fontWeightBold: 700,
       letterSpacing: '-0.01em'
     },

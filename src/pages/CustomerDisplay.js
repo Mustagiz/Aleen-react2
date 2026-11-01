@@ -2632,7 +2632,7 @@ export default function CustomerDisplay() {
                                         color: '#0F172A',
                                         fontSize: { xs: '0.94rem', sm: '1.04rem' },
                                         lineHeight: 1.25,
-                                        fontFamily: '"Plus Jakarta Sans", sans-serif'
+                                        fontFamily: '"DM Sans", sans-serif'
                                       }}
                                     >
                                       {item.name}
@@ -2887,7 +2887,7 @@ export default function CustomerDisplay() {
                             fontSize: { xs: '1.9rem', md: '2.3rem' },
                             lineHeight: 1.1,
                             mt: 0.4,
-                            fontFamily: '"Plus Jakarta Sans", sans-serif',
+                            fontFamily: '"DM Sans", sans-serif',
                             fontVariantNumeric: 'tabular-nums'
                           }}
                         >

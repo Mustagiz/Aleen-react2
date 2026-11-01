@@ -1098,7 +1098,7 @@ const Inventory = () => {
                               variant="subtitle1"
                               noWrap
                               sx={{
-                                fontFamily: '"Plus Jakarta Sans", sans-serif',
+                                fontFamily: '"DM Sans", sans-serif',
                                 fontWeight: 800,
                                 mt: 0.25,
                                 fontSize: { xs: '0.95rem', sm: '1.02rem' },
@@ -1180,7 +1180,7 @@ const Inventory = () => {
                             <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.65rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                               Price
                             </Typography>
-                            <Typography variant="body2" noWrap sx={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 800, fontVariantNumeric: 'tabular-nums', mt: 0.25, fontSize: '0.88rem' }}>
+                            <Typography variant="body2" noWrap sx={{ fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontVariantNumeric: 'tabular-nums', mt: 0.25, fontSize: '0.88rem' }}>
                               ₹{price.toLocaleString('en-IN')}
                             </Typography>
                           </Box>
@@ -1188,7 +1188,7 @@ const Inventory = () => {
                             <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.65rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                               {user?.role === 'admin' ? 'Margin' : 'Category'}
                             </Typography>
-                            <Typography variant="body2" noWrap sx={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 800, color: user?.role === 'admin' ? (profitVal > 0 ? '#059669' : '#DC2626') : 'text.primary', fontVariantNumeric: 'tabular-nums', mt: 0.25, fontSize: '0.88rem' }}>
+                            <Typography variant="body2" noWrap sx={{ fontFamily: '"DM Sans", sans-serif', fontWeight: 800, color: user?.role === 'admin' ? (profitVal > 0 ? '#059669' : '#DC2626') : 'text.primary', fontVariantNumeric: 'tabular-nums', mt: 0.25, fontSize: '0.88rem' }}>
                               {user?.role === 'admin' ? `${profitMarginVal}%` : (item.category || 'Apparel')}
                             </Typography>
                           </Box>
@@ -1196,7 +1196,7 @@ const Inventory = () => {
                             <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.65rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                               Stock
                             </Typography>
-                            <Typography variant="body2" noWrap sx={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 800, fontVariantNumeric: 'tabular-nums', mt: 0.25, fontSize: '0.88rem' }}>
+                            <Typography variant="body2" noWrap sx={{ fontFamily: '"DM Sans", sans-serif', fontWeight: 800, fontVariantNumeric: 'tabular-nums', mt: 0.25, fontSize: '0.88rem' }}>
                               {qty} <Typography component="span" variant="caption" sx={{ fontSize: '0.68rem', fontWeight: 600, color: 'text.secondary' }}>pcs</Typography>
                             </Typography>
                           </Box>

@@ -129,7 +129,7 @@ export const getThemeChartOptions = (theme, {
         position: legendPosition,
         labels: {
           color: theme?.palette?.text?.primary || '#0F172A',
-          font: { family: theme?.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 12 },
+          font: { family: theme?.typography?.fontFamily || "'DM Sans', sans-serif", size: 12 },
           boxWidth: 12,
           boxHeight: 12,
           usePointStyle: true,
@@ -144,8 +144,8 @@ export const getThemeChartOptions = (theme, {
         borderWidth: 1,
         padding: 12,
         cornerRadius: 8,
-        titleFont: { family: theme?.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 13, weight: '700' },
-        bodyFont: { family: theme?.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 12 }
+        titleFont: { family: theme?.typography?.fontFamily || "'DM Sans', sans-serif", size: 13, weight: '700' },
+        bodyFont: { family: theme?.typography?.fontFamily || "'DM Sans', sans-serif", size: 12 }
       }
     },
     scales: {
@@ -153,7 +153,7 @@ export const getThemeChartOptions = (theme, {
         grid: { display: indexAxis === 'y', color: gridColor, borderDash: [4, 4] },
         ticks: {
           color: textColor,
-          font: { family: theme?.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 11 }
+          font: { family: theme?.typography?.fontFamily || "'DM Sans', sans-serif", size: 11 }
         }
       },
       y: {
@@ -161,7 +161,7 @@ export const getThemeChartOptions = (theme, {
         grid: { display: indexAxis === 'x', color: gridColor, borderDash: [4, 4] },
         ticks: {
           color: textColor,
-          font: { family: theme?.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 11 },
+          font: { family: theme?.typography?.fontFamily || "'DM Sans', sans-serif", size: 11 },
           callback: (value) => (currency && typeof value === 'number' && indexAxis === 'x' ? `${currency}${value.toLocaleString('en-IN')}` : value)
         }
       }

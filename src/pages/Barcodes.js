@@ -183,7 +183,7 @@ const BarcodeItem = ({ value, businessName, product, settings }) => {
                 color: '#000000',
                 mx: 'auto',
                 boxSizing: 'border-box',
-                fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontFamily: '"DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                 position: 'relative',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
                 '@media print': {
@@ -2036,7 +2036,7 @@ export default function BarcodeGenerator() {
                                                         fontWeight: 800,
                                                         color: '#B45309',
                                                         fontSize: '0.85rem',
-                                                        fontFamily: '"Plus Jakarta Sans", sans-serif'
+                                                        fontFamily: '"DM Sans", sans-serif'
                                                     }}>
                                                         ₹{(item.price || 0).toLocaleString('en-IN')}
                                                     </Typography>

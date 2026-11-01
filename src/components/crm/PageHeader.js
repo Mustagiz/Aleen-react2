@@ -40,7 +40,7 @@ export default function PageHeader({
         };
       case 'stripe':
         return {
-          fontFamily: 'Plus Jakarta Sans, sans-serif',
+          fontFamily: 'DM Sans, sans-serif',
           letterSpacing: '-0.02em'
         };
       case 'salesforce':
@@ -52,7 +52,7 @@ export default function PageHeader({
       case 'atelier':
       default:
         return {
-          fontFamily: '"Outfit", "Plus Jakarta Sans", sans-serif'
+          fontFamily: '"DM Sans", sans-serif'
         };
     }
   };

@@ -349,8 +349,8 @@ const Dashboard = () => {
         borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)',
         borderWidth: 1,
         padding: 12,
-        titleFont: { family: theme.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 13, weight: '700' },
-        bodyFont: { family: theme.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 12 },
+        titleFont: { family: theme.typography?.fontFamily || "'DM Sans', sans-serif", size: 13, weight: '700' },
+        bodyFont: { family: theme.typography?.fontFamily || "'DM Sans', sans-serif", size: 12 },
         cornerRadius: 8,
         displayColors: false,
       }
@@ -358,11 +358,11 @@ const Dashboard = () => {
     scales: {
       x: {
         grid: { display: false },
-        ticks: { font: { family: theme.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 11 }, color: theme.palette.text.secondary || '#94A3B8' }
+        ticks: { font: { family: theme.typography?.fontFamily || "'DM Sans', sans-serif", size: 11 }, color: theme.palette.text.secondary || '#94A3B8' }
       },
       y: {
         grid: { borderDash: [4, 4], color: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0, 0, 0, 0.06)', drawBorder: false },
-        ticks: { font: { family: theme.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 11 }, color: theme.palette.text.secondary || '#94A3B8' }
+        ticks: { font: { family: theme.typography?.fontFamily || "'DM Sans', sans-serif", size: 11 }, color: theme.palette.text.secondary || '#94A3B8' }
       }
     }
   };

@@ -1095,7 +1095,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
         <Typography
           variant="caption"
           sx={{
-            fontFamily: '"Plus Jakarta Sans", sans-serif',
+            fontFamily: '"DM Sans", sans-serif',
             fontSize: '0.64rem',
             fontWeight: 700,
             letterSpacing: '0.12em',

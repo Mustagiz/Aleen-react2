@@ -366,7 +366,7 @@ export default function CustomerMeasurementModal({
                   },
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 2,
-                    fontFamily: '"Plus Jakarta Sans", monospace',
+                    fontFamily: '"DM Sans", monospace',
                     fontWeight: 700,
                     backgroundColor: isDark ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.015)'
                   }

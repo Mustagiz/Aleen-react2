@@ -394,7 +394,7 @@ const SalesReports = () => {
                       position: 'bottom',
                       labels: {
                         color: theme.palette.text.primary,
-                        font: { family: theme.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 12 },
+                        font: { family: theme.typography?.fontFamily || "'DM Sans', sans-serif", size: 12 },
                         boxWidth: 12,
                         boxHeight: 12,
                         usePointStyle: true,
@@ -407,8 +407,8 @@ const SalesReports = () => {
                       borderWidth: 1,
                       padding: 12,
                       cornerRadius: 8,
-                      titleFont: { family: theme.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 13, weight: '700' },
-                      bodyFont: { family: theme.typography?.fontFamily || "'Plus Jakarta Sans', sans-serif", size: 12 }
+                      titleFont: { family: theme.typography?.fontFamily || "'DM Sans', sans-serif", size: 13, weight: '700' },
+                      bodyFont: { family: theme.typography?.fontFamily || "'DM Sans', sans-serif", size: 12 }
                     }
                   }
                 }}
