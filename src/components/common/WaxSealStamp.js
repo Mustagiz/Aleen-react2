@@ -18,34 +18,34 @@ export default function WaxSealStamp({
 }) {
   const watermarkColors = {
     crimson: {
-      ink: '#991B1B',
-      border: '#B91C1C',
-      innerRing: '#DC2626'
+      ink: '#4A130F',
+      border: '#93261F',
+      innerRing: '#C2554A'
     },
     gold: {
-      ink: '#92400E',
-      border: '#B45309',
-      innerRing: '#D97706'
+      ink: '#3D2C10',
+      border: '#8A6A27',
+      innerRing: '#C9A227'
     },
     emerald: {
-      ink: '#064E3B',
-      border: '#0F766E',
-      innerRing: '#14B8A6'
+      ink: '#08281F',
+      border: '#155D46',
+      innerRing: '#2E8B6A'
     },
     sapphire: {
-      ink: '#1E3A8A',
-      border: '#1D4ED8',
-      innerRing: '#3B82F6'
+      ink: '#06263C',
+      border: '#0F5C8B',
+      innerRing: '#4FB4E8'
     },
     plum: {
-      ink: '#701A75',
-      border: '#86198F',
-      innerRing: '#A21CAF'
+      ink: '#3F2340',
+      border: '#8A4A76',
+      innerRing: '#C97BA6'
     },
     slate: {
-      ink: '#1E293B',
-      border: '#334155',
-      innerRing: '#475569'
+      ink: '#232220',
+      border: '#4B4A47',
+      innerRing: '#7A766F'
     }
   };
 
@@ -166,24 +166,24 @@ export default function WaxSealStamp({
   // Original solid wax seal stamp
   const colorMap = {
     crimson: {
-      bg: 'radial-gradient(circle at 35% 35%, #EF4444 0%, #B91C1C 65%, #7F1D1D 100%)',
-      border: '#DC2626',
-      shadow: '0 8px 20px -2px rgba(185, 28, 28, 0.45), inset 0 2px 4px rgba(255, 255, 255, 0.35)',
-      ring: 'rgba(254, 202, 202, 0.6)',
+      bg: 'radial-gradient(circle at 35% 35%, #C2554A 0%, #93261F 65%, #4A130F 100%)',
+      border: '#93261F',
+      shadow: '0 8px 20px -2px rgba(147, 38, 31, 0.45), inset 0 2px 4px rgba(255, 255, 255, 0.35)',
+      ring: 'rgba(245, 215, 210, 0.6)',
       textColor: '#FFFFFF'
     },
     gold: {
-      bg: 'radial-gradient(circle at 35% 35%, #FBBF24 0%, #D97706 65%, #92400E 100%)',
-      border: '#B45309',
-      shadow: '0 8px 20px -2px rgba(217, 119, 6, 0.45), inset 0 2px 4px rgba(255, 255, 255, 0.45)',
-      ring: 'rgba(254, 243, 199, 0.7)',
+      bg: 'radial-gradient(circle at 35% 35%, #C9A227 0%, #8A6A27 65%, #3D2C10 100%)',
+      border: '#8A6A27',
+      shadow: '0 8px 20px -2px rgba(138, 106, 39, 0.45), inset 0 2px 4px rgba(255, 255, 255, 0.45)',
+      ring: 'rgba(250, 245, 233, 0.7)',
       textColor: '#FFFFFF'
     },
     emerald: {
-      bg: 'radial-gradient(circle at 35% 35%, #14B8A6 0%, #0F766E 65%, #042F2E 100%)',
-      border: '#0F766E',
-      shadow: '0 8px 20px -2px rgba(15, 118, 110, 0.45), inset 0 2px 4px rgba(255, 255, 255, 0.35)',
-      ring: 'rgba(204, 251, 241, 0.65)',
+      bg: 'radial-gradient(circle at 35% 35%, #2E8B6A 0%, #155D46 65%, #08281F 100%)',
+      border: '#155D46',
+      shadow: '0 8px 20px -2px rgba(21, 93, 70, 0.45), inset 0 2px 4px rgba(255, 255, 255, 0.35)',
+      ring: 'rgba(200, 230, 215, 0.65)',
       textColor: '#FFFFFF'
     }
   };

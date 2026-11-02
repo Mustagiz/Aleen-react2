@@ -3,89 +3,89 @@ export const INVOICE_TEMPLATES = [
     id: 'atelier-emerald',
     name: 'Atelier Royal Emerald',
     tagline: 'Signature Luxury Couture',
-    primaryColor: '#0F766E',
-    secondaryColor: '#D97706',
-    darkColor: '#042F2E',
-    headerBg: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)',
+    primaryColor: '#155D46',
+    secondaryColor: '#B08D57',
+    darkColor: '#08281F',
+    headerBg: 'linear-gradient(135deg, #08281F 0%, #155D46 100%)',
     badge: 'Signature',
-    description: 'Deep emerald banner with champagne gold accents, atelier monogram crest, and refined styling.'
+    description: 'Deep forest emerald banner with antique brass accents, atelier monogram crest, and refined styling.'
   },
   {
     id: 'champagne-gold',
     name: 'Classic Champagne Gold',
     tagline: 'Regal Boutique Heritage',
-    primaryColor: '#D97706',
-    secondaryColor: '#B45309',
-    darkColor: '#78350F',
-    headerBg: 'linear-gradient(135deg, #78350F 0%, #D97706 100%)',
+    primaryColor: '#8A6A27',
+    secondaryColor: '#C9A227',
+    darkColor: '#3D2C10',
+    headerBg: 'linear-gradient(135deg, #3D2C10 0%, #8A6A27 100%)',
     badge: 'Regal',
-    description: 'Warm gold double-line borders, boutique crest, and classical luxury typography.'
+    description: 'Champagne bronze double-line borders, boutique crest, and classical luxury typography.'
   },
   {
     id: 'royal-sapphire',
     name: 'Royal Velvet Sapphire',
     tagline: 'Aristocratic Prestige & Seal',
-    primaryColor: '#1E3A8A',
-    secondaryColor: '#38BDF8',
-    darkColor: '#0F172A',
-    headerBg: 'linear-gradient(135deg, #0F172A 0%, #1E3A8A 50%, #2563EB 100%)',
+    primaryColor: '#0F5C8B',
+    secondaryColor: '#4FB4E8',
+    darkColor: '#06263C',
+    headerBg: 'linear-gradient(135deg, #06263C 0%, #0F5C8B 60%, #1976B8 100%)',
     badge: 'Prestige',
-    description: 'Midnight navy with platinum sapphire accents, aristocratic seal header, and sharp dual-tone financial columns.'
+    description: 'Deep azure with frost-blue highlights, aristocratic seal header, and crisp dual-tone financial columns.'
   },
   {
     id: 'rose-plum',
     name: 'Rose Gold & Dusty Plum',
     tagline: 'Haute Bridal Trousseau',
-    primaryColor: '#701A75',
-    secondaryColor: '#F472B6',
-    darkColor: '#4A044E',
-    headerBg: 'linear-gradient(135deg, #4A044E 0%, #701A75 60%, #9D174D 100%)',
+    primaryColor: '#8A4A76',
+    secondaryColor: '#C97BA6',
+    darkColor: '#3F2340',
+    headerBg: 'linear-gradient(135deg, #3F2340 0%, #8A4A76 60%, #A85C82 100%)',
     badge: 'Bridal',
-    description: 'Imperial velvet plum with warm rose gold hairline dividers, designed for luxury bridal suites & couture bespoke orders.'
+    description: 'Dusty plum with warm rose gold hairline dividers, designed for luxury bridal suites & couture bespoke orders.'
   },
   {
     id: 'heritage-crimson',
     name: 'Kashmiri Heritage Crimson',
     tagline: 'Pashmina & Royal Tilla',
-    primaryColor: '#9F1239',
-    secondaryColor: '#D97706',
-    darkColor: '#4C0519',
-    headerBg: 'linear-gradient(135deg, #4C0519 0%, #881337 50%, #9F1239 100%)',
+    primaryColor: '#93261F',
+    secondaryColor: '#C08A3E',
+    darkColor: '#4A130F',
+    headerBg: 'linear-gradient(135deg, #4A130F 0%, #7C1B18 55%, #93261F 100%)',
     badge: 'Heritage',
-    description: 'Deep Kashmiri ruby crimson with antique brass gold highlights, ornamental frame, and artisanal lineage typography.'
+    description: 'Kashmiri vermillion red with brass gold highlights, ornamental frame, and artisanal lineage typography.'
   },
   {
     id: 'executive-slate',
     name: 'Executive Monolith Slate',
     tagline: 'Architectural Minimalist Luxury',
-    primaryColor: '#1E293B',
-    secondaryColor: '#059669',
-    darkColor: '#0F172A',
-    headerBg: 'linear-gradient(135deg, #0F172A 0%, #1E293B 70%, #334155 100%)',
+    primaryColor: '#4B4A47',
+    secondaryColor: '#C05621',
+    darkColor: '#232220',
+    headerBg: 'linear-gradient(135deg, #232220 0%, #4B4A47 70%, #6E6B65 100%)',
     badge: 'Executive',
-    description: 'High-precision titanium graphite layout with razor-crisp grid dividers, clean mint accents, and modern high-end data tables.'
+    description: 'Warm titanium graphite layout with razor-crisp grid dividers, burnt amber accents, and modern high-end data tables.'
   },
   {
     id: 'minimal-haute',
     name: 'Modern Minimalist Haute',
     tagline: 'High-Fashion Monochromatic',
-    primaryColor: '#18181B',
-    secondaryColor: '#52525B',
-    darkColor: '#09090B',
-    headerBg: 'linear-gradient(135deg, #09090B 0%, #27272A 100%)',
+    primaryColor: '#221C3A',
+    secondaryColor: '#7C6FE8',
+    darkColor: '#100C1F',
+    headerBg: 'linear-gradient(135deg, #100C1F 0%, #3A3163 100%)',
     badge: 'Modern',
-    description: 'Crisp Swiss typographic editorial grid, razor-sharp dividers, and obsidian accents.'
+    description: 'Crisp Swiss typographic editorial grid, razor-sharp dividers, and ink-violet accents.'
   },
   {
     id: 'boutique-slip',
     name: 'Compact POS Boutique Slip',
     tagline: '80mm Thermal & Counter Bill',
-    primaryColor: '#334155',
-    secondaryColor: '#0F766E',
-    darkColor: '#1E293B',
-    headerBg: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+    primaryColor: '#5B4636',
+    secondaryColor: '#8B6F52',
+    darkColor: '#2E2119',
+    headerBg: 'linear-gradient(135deg, #2E2119 0%, #5B4636 100%)',
     badge: 'POS Slip',
-    description: 'Compact receipt format with dashed rules, optimized for rapid counter bills & thermal slips.'
+    description: 'Compact receipt format in warm mocha with dashed rules, optimized for rapid counter bills & thermal slips.'
   }
 ];
 

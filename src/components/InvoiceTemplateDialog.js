@@ -259,11 +259,11 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
                         height: '100%',
                         position: 'relative',
                         border: '2px solid',
-                        borderColor: isSelected ? tmpl.primaryColor : 'divider',
-                        boxShadow: isSelected ? `0 6px 20px ${tmpl.primaryColor}30` : '0 2px 8px rgba(0,0,0,0.04)',
+                        borderColor: (t) => (isSelected ? (t.palette.mode === 'dark' ? tmpl.secondaryColor : tmpl.primaryColor) : 'divider'),
+                        boxShadow: (t) => (isSelected ? `0 6px 20px ${t.palette.mode === 'dark' ? tmpl.secondaryColor : tmpl.primaryColor}40` : '0 2px 8px rgba(0,0,0,0.04)'),
                         transition: 'all 0.2s ease',
                         '&:hover': {
-                          borderColor: tmpl.primaryColor,
+                          borderColor: (t) => (t.palette.mode === 'dark' ? tmpl.secondaryColor : tmpl.primaryColor),
                           transform: 'translateY(-3px)'
                         }
                       }}
@@ -300,7 +300,7 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
                       </Box>
 
                       <CardContent sx={{ p: 2 }}>
-                        <Typography variant="caption" sx={{ fontWeight: 700, color: tmpl.primaryColor, display: 'block', mb: 0.5 }}>
+                        <Typography variant="caption" sx={{ fontWeight: 700, color: (t) => (t.palette.mode === 'dark' ? tmpl.secondaryColor : tmpl.primaryColor), display: 'block', mb: 0.5 }}>
                           {tmpl.tagline}
                         </Typography>
                         <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.78rem', mb: 2, minHeight: 36 }}>

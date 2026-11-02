@@ -1310,16 +1310,16 @@ export default function Settings() {
                             borderRadius: (t) => `${t.custom?.designSystem?.shape?.cardRadius || 12}px`,
                             overflow: 'hidden',
                             border: '2px solid',
-                            borderColor: isSelected ? tmpl.primaryColor : 'divider',
-                            boxShadow: isSelected ? `0 6px 18px ${tmpl.primaryColor}33` : '0 2px 8px rgba(0,0,0,0.04)',
+                            borderColor: (t) => (isSelected ? (t.palette.mode === 'dark' ? tmpl.secondaryColor : tmpl.primaryColor) : 'divider'),
+                            boxShadow: (t) => (isSelected ? `0 6px 18px ${t.palette.mode === 'dark' ? tmpl.secondaryColor : tmpl.primaryColor}40` : '0 2px 8px rgba(0,0,0,0.04)'),
                             transition: 'all 0.2s ease',
                             bgcolor: 'background.paper',
-                            '&:hover': { borderColor: tmpl.primaryColor, transform: 'translateY(-3px)' }
+                            '&:hover': { borderColor: (t) => (t.palette.mode === 'dark' ? tmpl.secondaryColor : tmpl.primaryColor), transform: 'translateY(-3px)' }
                           }}
                         >
                           {/* Miniature invoice mockup */}
                           <Box sx={{ p: 1.25, bgcolor: (t) => (t.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : '#F8FAFC') }}>
-                            <Box sx={{ borderRadius: 1.5, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.08)', bgcolor: '#FFFFFF', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
+                            <Box sx={{ borderRadius: 1, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.08)', bgcolor: '#FFFFFF', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
                               {/* Header banner */}
                               <Box sx={{ px: 1.25, py: 1, background: tmpl.headerBg, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, minWidth: 0 }}>
@@ -1338,12 +1338,12 @@ export default function Settings() {
                               {/* Meta skeleton */}
                               <Box sx={{ px: 1.25, py: 1, display: 'flex', justifyContent: 'space-between', gap: 1 }}>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.4, flex: 1 }}>
-                                  <Box sx={{ height: 4, width: '55%', borderRadius: 999, bgcolor: '#E2E8F0' }} />
-                                  <Box sx={{ height: 4, width: '78%', borderRadius: 999, bgcolor: '#E2E8F0' }} />
+                                  <Box sx={{ height: 4, width: '55%', borderRadius: 0.25, bgcolor: '#E2E8F0' }} />
+                                  <Box sx={{ height: 4, width: '78%', borderRadius: 0.25, bgcolor: '#E2E8F0' }} />
                                 </Box>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.4, alignItems: 'flex-end', flex: 1 }}>
-                                  <Box sx={{ height: 4, width: '45%', borderRadius: 999, bgcolor: '#E2E8F0' }} />
-                                  <Box sx={{ height: 4, width: '60%', borderRadius: 999, bgcolor: '#E2E8F0' }} />
+                                  <Box sx={{ height: 4, width: '45%', borderRadius: 0.25, bgcolor: '#E2E8F0' }} />
+                                  <Box sx={{ height: 4, width: '60%', borderRadius: 0.25, bgcolor: '#E2E8F0' }} />
                                 </Box>
                               </Box>
 
@@ -1358,8 +1358,8 @@ export default function Settings() {
                               <Box sx={{ px: 1.25, py: 0.75, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                                 {[0, 1, 2].map(i => (
                                   <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Box sx={{ height: 4, flex: 1, borderRadius: 999, bgcolor: '#F1F5F9' }} />
-                                    <Box sx={{ height: 4, width: 18, borderRadius: 999, bgcolor: '#E2E8F0' }} />
+                                    <Box sx={{ height: 4, flex: 1, borderRadius: 0.25, bgcolor: '#F1F5F9' }} />
+                                    <Box sx={{ height: 4, width: 18, borderRadius: 0.25, bgcolor: '#E2E8F0' }} />
                                   </Box>
                                 ))}
                               </Box>
@@ -1378,19 +1378,19 @@ export default function Settings() {
                               <Typography sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.78rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                 {tmpl.name}
                               </Typography>
-                              <Typography sx={{ fontSize: '0.62rem', fontWeight: 600, color: tmpl.primaryColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              <Typography sx={{ fontSize: '0.62rem', fontWeight: 600, color: (t) => (t.palette.mode === 'dark' ? tmpl.secondaryColor : tmpl.primaryColor), whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                 {tmpl.tagline}
                               </Typography>
                             </Box>
                             {isSelected ? (
                               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
-                                <CheckCircle sx={{ fontSize: 16, color: tmpl.primaryColor }} />
-                                <Typography sx={{ fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: tmpl.primaryColor }}>
+                                <CheckCircle sx={{ fontSize: 16, color: (t) => (t.palette.mode === 'dark' ? tmpl.secondaryColor : tmpl.primaryColor) }} />
+                                <Typography sx={{ fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: (t) => (t.palette.mode === 'dark' ? tmpl.secondaryColor : tmpl.primaryColor) }}>
                                   Active
                                 </Typography>
                               </Box>
                             ) : (
-                              <Box sx={{ flexShrink: 0, fontSize: '0.58rem', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'text.disabled', px: 1, py: 0.25, borderRadius: '999px', border: '1px solid', borderColor: 'divider' }}>
+                              <Box sx={{ flexShrink: 0, fontSize: '0.58rem', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'text.disabled', px: 1, py: 0.25, borderRadius: 0.75, border: '1px solid', borderColor: 'divider' }}>
                                 {tmpl.badge}
                               </Box>
                             )}

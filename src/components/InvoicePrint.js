@@ -32,108 +32,108 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
     switch (activeTemplate) {
       case 'champagne-gold':
         return {
-          primaryColor: '#D97706',
-          darkColor: '#78350F',
-          accentColor: '#B45309',
-          tableHeadBg: '#D97706',
+          primaryColor: '#8A6A27',
+          darkColor: '#3D2C10',
+          accentColor: '#C9A227',
+          tableHeadBg: '#8A6A27',
           tableHeadText: '#FFFFFF',
-          totalBoxBg: '#FFFBEB',
-          totalBoxBorder: '#F59E0B',
-          watermarkColor: 'rgba(217, 119, 6, 0.04)',
-          borderStyle: 'double 3px #D97706',
-          headerBg: 'linear-gradient(135deg, #78350F 0%, #D97706 100%)'
+          totalBoxBg: '#FAF5E9',
+          totalBoxBorder: '#DCC48B',
+          watermarkColor: 'rgba(138, 106, 39, 0.04)',
+          borderStyle: 'double 3px #8A6A27',
+          headerBg: 'linear-gradient(135deg, #3D2C10 0%, #8A6A27 100%)'
         };
       case 'royal-sapphire':
         return {
-          primaryColor: '#1E3A8A',
-          darkColor: '#0F172A',
-          accentColor: '#0284C7',
-          tableHeadBg: '#1E3A8A',
+          primaryColor: '#0F5C8B',
+          darkColor: '#06263C',
+          accentColor: '#4FB4E8',
+          tableHeadBg: '#0F5C8B',
           tableHeadText: '#FFFFFF',
-          totalBoxBg: '#F0F9FF',
-          totalBoxBorder: '#0284C7',
-          watermarkColor: 'rgba(30, 58, 138, 0.035)',
-          borderStyle: '1px solid rgba(30, 58, 138, 0.3)',
-          headerBg: 'linear-gradient(135deg, #0F172A 0%, #1E3A8A 50%, #2563EB 100%)'
+          totalBoxBg: '#EDF6FB',
+          totalBoxBorder: '#A5CFE4',
+          watermarkColor: 'rgba(15, 92, 139, 0.035)',
+          borderStyle: '1px solid rgba(15, 92, 139, 0.28)',
+          headerBg: 'linear-gradient(135deg, #06263C 0%, #0F5C8B 60%, #1976B8 100%)'
         };
       case 'rose-plum':
         return {
-          primaryColor: '#701A75',
-          darkColor: '#4A044E',
-          accentColor: '#DB2777',
-          tableHeadBg: '#701A75',
+          primaryColor: '#8A4A76',
+          darkColor: '#3F2340',
+          accentColor: '#C97BA6',
+          tableHeadBg: '#8A4A76',
           tableHeadText: '#FFFFFF',
-          totalBoxBg: '#FDF2F8',
-          totalBoxBorder: '#DB2777',
-          watermarkColor: 'rgba(112, 26, 117, 0.035)',
-          borderStyle: '1px solid rgba(112, 26, 117, 0.25)',
-          headerBg: 'linear-gradient(135deg, #4A044E 0%, #701A75 60%, #9D174D 100%)'
+          totalBoxBg: '#F9F1F7',
+          totalBoxBorder: '#DCC0D4',
+          watermarkColor: 'rgba(138, 74, 118, 0.035)',
+          borderStyle: '1px solid rgba(138, 74, 118, 0.25)',
+          headerBg: 'linear-gradient(135deg, #3F2340 0%, #8A4A76 60%, #A85C82 100%)'
         };
       case 'heritage-crimson':
         return {
-          primaryColor: '#9F1239',
-          darkColor: '#4C0519',
-          accentColor: '#D97706',
-          tableHeadBg: '#9F1239',
+          primaryColor: '#93261F',
+          darkColor: '#4A130F',
+          accentColor: '#C08A3E',
+          tableHeadBg: '#93261F',
           tableHeadText: '#FFFFFF',
-          totalBoxBg: '#FFF1F2',
-          totalBoxBorder: '#BE123C',
-          watermarkColor: 'rgba(159, 18, 57, 0.035)',
-          borderStyle: 'double 3px #9F1239',
-          headerBg: 'linear-gradient(135deg, #4C0519 0%, #881337 50%, #9F1239 100%)'
+          totalBoxBg: '#FCF2F0',
+          totalBoxBorder: '#E3B3AA',
+          watermarkColor: 'rgba(147, 38, 31, 0.035)',
+          borderStyle: 'double 3px #93261F',
+          headerBg: 'linear-gradient(135deg, #4A130F 0%, #7C1B18 55%, #93261F 100%)'
         };
       case 'executive-slate':
         return {
-          primaryColor: '#1E293B',
-          darkColor: '#0F172A',
-          accentColor: '#059669',
-          tableHeadBg: '#1E293B',
+          primaryColor: '#4B4A47',
+          darkColor: '#232220',
+          accentColor: '#C05621',
+          tableHeadBg: '#4B4A47',
           tableHeadText: '#FFFFFF',
-          totalBoxBg: '#F8FAFC',
-          totalBoxBorder: '#059669',
-          watermarkColor: 'rgba(30, 41, 59, 0.035)',
-          borderStyle: '1px solid #334155',
-          headerBg: 'linear-gradient(135deg, #0F172A 0%, #1E293B 70%, #334155 100%)'
+          totalBoxBg: '#F6F5F3',
+          totalBoxBorder: '#D5D1C8',
+          watermarkColor: 'rgba(75, 74, 71, 0.035)',
+          borderStyle: '1px solid #6B6862',
+          headerBg: 'linear-gradient(135deg, #232220 0%, #4B4A47 70%, #6E6B65 100%)'
         };
       case 'minimal-haute':
         return {
-          primaryColor: '#18181B',
-          darkColor: '#09090B',
-          accentColor: '#52525B',
-          tableHeadBg: '#18181B',
+          primaryColor: '#221C3A',
+          darkColor: '#100C1F',
+          accentColor: '#7C6FE8',
+          tableHeadBg: '#221C3A',
           tableHeadText: '#FFFFFF',
-          totalBoxBg: '#F4F4F5',
-          totalBoxBorder: '#27272A',
-          watermarkColor: 'rgba(24, 24, 27, 0.03)',
-          borderStyle: '1px solid #18181B',
-          headerBg: 'linear-gradient(135deg, #09090B 0%, #27272A 100%)'
+          totalBoxBg: '#F3F2FA',
+          totalBoxBorder: '#C9C3F0',
+          watermarkColor: 'rgba(34, 28, 58, 0.03)',
+          borderStyle: '1px solid #3A3163',
+          headerBg: 'linear-gradient(135deg, #100C1F 0%, #3A3163 100%)'
         };
       case 'boutique-slip':
         return {
-          primaryColor: '#334155',
-          darkColor: '#1E293B',
-          accentColor: '#0F766E',
-          tableHeadBg: '#1E293B',
+          primaryColor: '#5B4636',
+          darkColor: '#2E2119',
+          accentColor: '#8B6F52',
+          tableHeadBg: '#2E2119',
           tableHeadText: '#FFFFFF',
-          totalBoxBg: '#F8FAFC',
-          totalBoxBorder: '#CBD5E1',
-          watermarkColor: 'rgba(51, 65, 85, 0.02)',
-          borderStyle: '1px dashed #64748B',
-          headerBg: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)'
+          totalBoxBg: '#F8F4F0',
+          totalBoxBorder: '#D9CDC2',
+          watermarkColor: 'rgba(91, 70, 54, 0.02)',
+          borderStyle: '1px dashed #8B6F52',
+          headerBg: 'linear-gradient(135deg, #2E2119 0%, #5B4636 100%)'
         };
       case 'atelier-emerald':
       default:
         return {
-          primaryColor: '#0F766E',
-          darkColor: '#042F2E',
-          accentColor: '#D97706',
-          tableHeadBg: '#0F766E',
+          primaryColor: '#155D46',
+          darkColor: '#08281F',
+          accentColor: '#B08D57',
+          tableHeadBg: '#155D46',
           tableHeadText: '#FFFFFF',
-          totalBoxBg: '#F0FDF4',
-          totalBoxBorder: '#0F766E',
-          watermarkColor: 'rgba(15, 118, 110, 0.035)',
-          borderStyle: '1px solid rgba(15, 118, 110, 0.3)',
-          headerBg: 'linear-gradient(135deg, #042F2E 0%, #0F766E 100%)'
+          totalBoxBg: '#EFF6F1',
+          totalBoxBorder: '#B4D3C2',
+          watermarkColor: 'rgba(21, 93, 70, 0.035)',
+          borderStyle: '1px solid rgba(21, 93, 70, 0.28)',
+          headerBg: 'linear-gradient(135deg, #08281F 0%, #155D46 100%)'
         };
     }
   };
@@ -202,7 +202,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
         mx: 'auto',
         position: 'relative',
         boxShadow: { xs: 'none', sm: '0 4px 20px rgba(0,0,0,0.06)' },
-        borderRadius: { xs: 2, sm: 2 },
+        borderRadius: { xs: 1, sm: 1.5 },
         fontFamily: isSlip ? 'monospace, sans-serif' : '"DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         WebkitPrintColorAdjust: 'exact',
         printColorAdjust: 'exact',
@@ -268,7 +268,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
               sx={{
                 width: 48,
                 height: 48,
-                borderRadius: 1.5,
+                borderRadius: 1,
                 objectFit: 'contain',
                 mx: 'auto',
                 mb: 1,
@@ -288,7 +288,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
           <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary' }}>
             Ph: {profile.phone} | GST: {profile.gstin}
           </Typography>
-          <Box sx={{ mt: 1.5, display: 'inline-block', px: 2, py: 0.5, bgcolor: '#f1f5f9', borderRadius: 1, fontWeight: 800, fontSize: '0.8rem' }}>
+          <Box sx={{ mt: 1.5, display: 'inline-block', px: 2, py: 0.5, bgcolor: '#f1f5f9', borderRadius: 0.5, fontWeight: 800, fontSize: '0.8rem' }}>
             RETAIL SLIP #{invoice.invoiceNumber || invoice.id}
           </Box>
         </Box>
@@ -305,7 +305,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
             background: theme.headerBg,
             color: '#FFFFFF',
             p: { xs: 2, sm: 3 },
-            borderRadius: 2,
+            borderRadius: 1.5,
             mb: { xs: 2, sm: 3 },
             position: 'relative',
             zIndex: 1,
@@ -330,7 +330,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                 sx={{
                   width: { xs: 50, sm: 64 },
                   height: { xs: 50, sm: 64 },
-                  borderRadius: 2,
+                  borderRadius: 1,
                   objectFit: 'contain',
                   bgcolor: '#FFFFFF',
                   p: 0.5,
@@ -341,8 +341,8 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
             )}
             <Box sx={{ minWidth: 0, flex: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Box sx={{ width: 18, height: 2, borderRadius: '999px', bgcolor: '#FDE68A', flexShrink: 0 }} />
-                <Typography variant="caption" sx={{ letterSpacing: { xs: 1, sm: 2 }, color: '#FDE68A', fontWeight: 800, textTransform: 'uppercase', fontSize: { xs: '0.65rem', sm: '0.72rem' } }}>
+                <Box sx={{ width: 3, height: 15, borderRadius: 0.25, bgcolor: theme.accentColor, flexShrink: 0, WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }} />
+                <Typography variant="caption" sx={{ letterSpacing: { xs: 1, sm: 2 }, color: 'rgba(255,255,255,0.92)', fontWeight: 800, textTransform: 'uppercase', fontSize: { xs: '0.65rem', sm: '0.72rem' } }}>
                   {profile.tagline || activeSettings.tagline || 'Haute Couture & Bespoke Craft'}
                 </Typography>
               </Box>
@@ -385,8 +385,9 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
               >
                 TAX INVOICE
               </Typography>
-              <Box sx={{ display: 'inline-block', bgcolor: 'rgba(255,255,255,0.16)', px: 1.25, py: 0.3, borderRadius: '999px', mt: 0.5, border: '1px solid rgba(255,255,255,0.25)' }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#FDE68A', letterSpacing: 0.5, fontSize: { xs: '0.78rem', sm: '0.875rem' }, fontFamily: 'monospace' }}>
+              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, bgcolor: 'rgba(255,255,255,0.14)', pl: 1, pr: 1.25, py: 0.35, borderRadius: 0.75, mt: 0.6, border: '1px solid rgba(255,255,255,0.28)', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>
+                <Box sx={{ width: 2, height: 13, borderRadius: 0.25, bgcolor: theme.accentColor, flexShrink: 0 }} />
+                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#FFFFFF', letterSpacing: 0.5, fontSize: { xs: '0.78rem', sm: '0.875rem' }, fontFamily: 'monospace' }}>
                   #{invoice.invoiceNumber || invoice.id}
                 </Typography>
               </Box>
@@ -403,7 +404,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
         sx={{
           mb: 3,
           p: { xs: 1.5, sm: 2 },
-          borderRadius: 2,
+          borderRadius: 1.5,
           border: '1px solid',
           borderColor: 'divider',
           borderLeft: `4px solid ${theme.primaryColor}`,
@@ -456,6 +457,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
               sx={{
                 mt: 0.5,
                 height: 20,
+                borderRadius: 0.75,
                 fontWeight: 800,
                 fontSize: '0.65rem',
                 bgcolor: invoice.paymentStatus === 'paid' ? 'success.light' : 'warning.light',
@@ -604,7 +606,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                     <Chip
                       size="small"
                       label={item.category || 'Atelier Wear'}
-                      sx={{ fontSize: '0.7rem', height: 22, fontWeight: 600, bgcolor: 'action.hover' }}
+                      sx={{ fontSize: '0.7rem', height: 22, borderRadius: 0.75, fontWeight: 600, bgcolor: 'action.hover' }}
                     />
                   </TableCell>
                 )}
@@ -642,9 +644,9 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
             <Box
               sx={{
                 p: 1.8,
-                borderRadius: 2.5,
-                bgcolor: 'rgba(15, 118, 110, 0.025)',
-                border: `1.5px solid ${theme.primaryColor || '#0A4D46'}25`,
+                borderRadius: 1.5,
+                bgcolor: theme.totalBoxBg,
+                border: `1.5px solid ${theme.primaryColor || '#155D46'}25`,
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
@@ -654,7 +656,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
             >
               {leftBoxMode === 'luxury-composite' && (
                 <Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1, pb: 0.6, borderBottom: `1px dashed ${theme.primaryColor || '#0A4D46'}30` }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1, pb: 0.6, borderBottom: `1px dashed ${theme.primaryColor || '#155D46'}30` }}>
                     <Typography variant="caption" sx={{ fontWeight: 800, color: theme.primaryColor, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: '0.68rem', display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <span>⚜️</span> Atelier Privileges & Quick Pay
                     </Typography>
@@ -662,7 +664,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                       sx={{
                         px: 0.9,
                         py: 0.15,
-                        borderRadius: 1,
+                        borderRadius: 0.5,
                         bgcolor: 'rgba(194, 141, 75, 0.12)',
                         border: '1px solid rgba(194, 141, 75, 0.35)',
                         color: '#B45309',
@@ -677,7 +679,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                   </Box>
 
                   {/* Both Barcodes / QR Codes on TOP, MORE BIG */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'flex-start', py: 0.75, mb: 1, bgcolor: 'rgba(255,255,255,0.7)', borderRadius: 2, border: '1px solid rgba(0,0,0,0.05)' }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'flex-start', py: 0.75, mb: 1, bgcolor: 'rgba(255,255,255,0.7)', borderRadius: 1, border: '1px solid rgba(0,0,0,0.05)' }}>
                     {/* UPI QR Code */}
                     {qrImageUrl && (
                       <Box sx={{ textAlign: 'center' }}>
@@ -689,7 +691,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                             width: 82,
                             height: 82,
                             display: 'block',
-                            borderRadius: 1.5,
+                            borderRadius: 0.75,
                             border: '1.5px solid rgba(0,0,0,0.12)',
                             p: 0.35,
                             bgcolor: '#FFFFFF',
@@ -713,7 +715,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                           height: 82,
                           objectFit: 'contain',
                           display: 'block',
-                          borderRadius: 1.5,
+                          borderRadius: 0.75,
                           border: '1.5px solid rgba(225, 48, 108, 0.35)',
                           p: 0.3,
                           bgcolor: '#FFFFFF',
@@ -727,7 +729,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                   </Box>
 
                   {/* All Text Lines Arranged UNDER the QR Codes */}
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.4, px: 0.5, pt: 0.5, borderTop: `1px dashed ${theme.primaryColor || '#0A4D46'}20` }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.4, px: 0.5, pt: 0.5, borderTop: `1px dashed ${theme.primaryColor || '#155D46'}20` }}>
                     <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', lineHeight: 1.3 }}>
                       <b style={{ color: '#D97706' }}>🎁 Loyalty Club:</b> +{invoice.loyaltyPointsEarned !== undefined ? Number(invoice.loyaltyPointsEarned) : Math.max(0, Math.floor(Number(invoice.total || 0) / 100))} reward pts accrued
                     </Typography>
@@ -761,7 +763,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                           width: 80,
                           height: 80,
                           display: 'block',
-                          borderRadius: 1.5,
+                          borderRadius: 0.75,
                           border: '1.5px solid rgba(0,0,0,0.1)',
                           p: 0.4,
                           bgcolor: '#FFFFFF',
@@ -855,7 +857,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
                           height: 64,
                           objectFit: 'contain',
                           display: 'block',
-                          borderRadius: 1.2,
+                          borderRadius: 0.75,
                           border: '1.5px solid rgba(225, 48, 108, 0.3)',
                           p: 0.25,
                           bgcolor: '#FFFFFF',
@@ -901,7 +903,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
               )}
             </Box>
           ) : invoice.notes ? (
-            <Box sx={{ p: 1.5, bgcolor: 'action.hover', borderRadius: 1.5 }}>
+            <Box sx={{ p: 1.5, bgcolor: 'action.hover', borderRadius: 1 }}>
               <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                 <b>Note:</b> {invoice.notes}
               </Typography>
@@ -920,7 +922,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
             }}
             sx={{
               p: 2,
-              borderRadius: 2,
+              borderRadius: 1.5,
               border: '1px solid',
               borderColor: theme.totalBoxBorder,
               bgcolor: theme.totalBoxBg,
@@ -962,7 +964,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
 
             <Divider sx={{ my: 1, borderColor: theme.totalBoxBorder }} />
 
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 1.75, py: 1.1, borderRadius: 1.5, background: theme.primaryColor, color: '#FFFFFF', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 1.75, py: 1.1, borderRadius: 1, background: theme.primaryColor, color: '#FFFFFF', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>
               <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#FFFFFF', letterSpacing: 1.2, textTransform: 'uppercase', fontSize: '0.78rem' }}>
                 Net Total
               </Typography>
@@ -989,7 +991,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
               </>
             )}
           </Box>
-          <Box sx={{ mt: 1, py: 0.6, px: 1.25, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 1.5, border: '1px dashed #CBD5E1' }}>
+          <Box sx={{ mt: 1, py: 0.6, px: 1.25, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 1, border: '1px dashed #CBD5E1' }}>
             <Typography variant="caption" sx={{ fontSize: '0.72rem', color: 'text.secondary', display: 'block' }}>
               <b>Amount in Words:</b> {numberToWordsRupees(invoice.total || 0)}
             </Typography>
