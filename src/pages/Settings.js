@@ -72,6 +72,78 @@ import { PREDEFINED_LOGOS } from '../constants/predefinedLogos';
 import instagramQrImg from '../assets/instagram_qr.jpg';
 import CrmColorSettings from '../components/settings/CrmColorSettings';
 import CustomerDisplaySettings from '../components/settings/CustomerDisplaySettings';
+import InvoicePrint from '../components/InvoicePrint';
+
+const SAMPLE_INVOICE = {
+  id: 'INV-PREVIEW-01',
+  invoiceNumber: 'INV-PREVIEW-01',
+  date: new Date().toISOString(),
+  customer: 'Sultana Begum',
+  phone: '+91 98450 11223',
+  items: [
+    { name: 'Pure Raw Silk Bridal Lehenga with Hand Zari', category: 'Bridal Couture', quantity: 1, price: 28500 },
+    { name: 'Organza Embroidered Dupatta with Scallop Hem', category: 'Accessories', quantity: 1, price: 4200 }
+  ],
+  subtotal: 32700,
+  discount: 1635,
+  discountPercentage: 5,
+  gst: 18,
+  tax: 5591.70,
+  total: 36656.70,
+  paymentStatus: 'paid',
+  status: 'paid',
+  paidAmount: 36656.70,
+  balanceDue: 0,
+  isSample: true,
+  paymentMethod: 'UPI / Split Payment',
+  notes: 'Client fitting scheduled for this week. Roll pressing included.'
+};
+
+// Scales the full invoice rendering to fit its container so the preview
+// stays compact and professional without horizontal scrolling.
+function InvoicePreview({ invoice, template, settings, profile }) {
+  const outerRef = useRef(null);
+  const innerRef = useRef(null);
+  const [scale, setScale] = useState(1);
+  const [height, setHeight] = useState(0);
+  const DESIGN_WIDTH = 800;
+
+  useEffect(() => {
+    const update = () => {
+      const outer = outerRef.current;
+      const inner = innerRef.current;
+      if (!outer || !inner) return;
+      const s = Math.min(1, outer.clientWidth / DESIGN_WIDTH);
+      setScale(s);
+      setHeight(inner.offsetHeight * s);
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    if (outerRef.current) ro.observe(outerRef.current);
+    if (innerRef.current) ro.observe(innerRef.current);
+    window.addEventListener('resize', update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', update);
+    };
+  }, []);
+
+  return (
+    <Box ref={outerRef} sx={{ width: '100%', overflow: 'hidden', height: height || 'auto' }}>
+      <Box
+        ref={innerRef}
+        sx={{
+          width: DESIGN_WIDTH,
+          transform: `scale(${scale})`,
+          transformOrigin: 'top left',
+          transition: 'transform 0.2s ease'
+        }}
+      >
+        <InvoicePrint invoice={invoice} template={template} settings={settings} profile={profile} />
+      </Box>
+    </Box>
+  );
+}
 
 export default function Settings() {
   const theme = useTheme();
@@ -1234,27 +1306,43 @@ export default function Settings() {
                         <Box
                           onClick={() => setFormProfile({ ...formProfile, defaultTemplate: tmpl.id })}
                           sx={{
-                            p: 1.5,
-                            borderRadius: 2,
-                            border: '2px solid',
-                            borderColor: isSelected ? 'primary.main' : 'divider',
-                            bgcolor: isSelected ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)' : 'background.paper',
                             cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            transition: 'all 0.2s ease'
+                            borderRadius: (t) => `${t.custom?.designSystem?.shape?.cardRadius || 12}px`,
+                            overflow: 'hidden',
+                            border: '2px solid',
+                            borderColor: isSelected ? tmpl.primaryColor : 'divider',
+                            boxShadow: isSelected ? `0 6px 18px ${tmpl.primaryColor}33` : '0 2px 8px rgba(0,0,0,0.04)',
+                            transition: 'all 0.2s ease',
+                            bgcolor: 'background.paper',
+                            '&:hover': { borderColor: tmpl.primaryColor, transform: 'translateY(-3px)' }
                           }}
                         >
-                          <Box>
-                            <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                          <Box sx={{ p: 1.5, background: tmpl.headerBg, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+                            <Typography sx={{ fontWeight: 800, color: '#FFFFFF', fontSize: '0.78rem', letterSpacing: '0.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                               {tmpl.name}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.68rem' }}>
+                            {isSelected ? (
+                              <CheckCircle sx={{ color: '#FDE68A', fontSize: 18, flexShrink: 0 }} />
+                            ) : (
+                              <Box sx={{ fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.92)', bgcolor: 'rgba(255,255,255,0.18)', px: 1, py: 0.25, borderRadius: '999px', flexShrink: 0 }}>
+                                {tmpl.badge}
+                              </Box>
+                            )}
+                          </Box>
+
+                          <Box sx={{ p: 1.5 }}>
+                            <Typography sx={{ fontWeight: 700, color: tmpl.primaryColor, fontSize: '0.7rem', display: 'block', mb: 0.25 }}>
                               {tmpl.tagline}
                             </Typography>
+                            <Box sx={{ display: 'flex', gap: 0.75, alignItems: 'center', mt: 0.75 }}>
+                              <Box sx={{ width: 16, height: 16, borderRadius: '50%', bgcolor: tmpl.primaryColor, border: '1px solid rgba(0,0,0,0.12)' }} />
+                              <Box sx={{ width: 16, height: 16, borderRadius: '50%', bgcolor: tmpl.secondaryColor, border: '1px solid rgba(0,0,0,0.12)' }} />
+                              <Box sx={{ width: 16, height: 16, borderRadius: '50%', bgcolor: tmpl.darkColor, border: '1px solid rgba(0,0,0,0.12)' }} />
+                              <Typography sx={{ ml: 'auto', fontWeight: 800, fontSize: '0.62rem', letterSpacing: '0.06em', textTransform: 'uppercase', color: isSelected ? 'primary.main' : 'text.disabled' }}>
+                                {isSelected ? 'Active' : 'Select'}
+                              </Typography>
+                            </Box>
                           </Box>
-                          <Chip label={tmpl.badge} size="small" sx={{ fontWeight: 700, fontSize: '0.65rem' }} />
                         </Box>
                       </Grid>
                     );
@@ -1555,38 +1643,44 @@ export default function Settings() {
                 bgcolor: 'background.paper'
               }}
             >
-              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', mb: 1 }}>
-                Live Invoice Footer Preview
-              </Typography>
-              <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#F8FAFC', border: '1px solid #E2E8F0', mb: 2 }}>
-                <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary', display: 'block', mb: 0.5 }}>
-                  Terms & Conditions:
-                </Typography>
-                <Typography variant="caption" sx={{ color: 'text.secondary', whiteSpace: 'pre-line', display: 'block', fontSize: '0.68rem', lineHeight: 1.4 }}>
-                  {formProfile.termsText}
-                </Typography>
-                <Typography variant="body2" sx={{ mt: 1.5, fontWeight: 700, color: (t) => t.palette.primary.main, fontSize: '0.75rem' }}>
-                  {formProfile.customFooterNote}
-                </Typography>
-                {formProfile.showSignatureStamp && (
-                  <Box sx={{ mt: 2, pt: 1, borderTop: '1px solid #CBD5E1', textAlign: 'right' }}>
-                    {formProfile.signatureImage && (
-                      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 0.5 }}>
-                        <img
-                          src={formProfile.signatureImage}
-                          alt="Signature Preview"
-                          style={{ maxHeight: 68, maxWidth: 200, objectFit: 'contain' }}
-                        />
-                      </Box>
-                    )}
-                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block' }}>
-                      {formProfile.signatureLabel}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
-                      {formProfile.businessName}
-                    </Typography>
-                  </Box>
-                )}
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, flexWrap: 'wrap', mb: 2 }}>
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                    Live Invoice Template Preview
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                    Real-time rendering of the selected print template.
+                  </Typography>
+                </Box>
+                <Chip
+                  label={(INVOICE_TEMPLATES.find(t => t.id === (formProfile.defaultTemplate || 'atelier-emerald')) || INVOICE_TEMPLATES[0]).name}
+                  size="small"
+                  sx={{ fontWeight: 700, fontSize: '0.68rem', color: 'text.primary' }}
+                />
+              </Box>
+
+              <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'grey.100', border: '1px solid', borderColor: 'divider' }}>
+                <InvoicePreview
+                  invoice={SAMPLE_INVOICE}
+                  template={formProfile.defaultTemplate || 'atelier-emerald'}
+                  profile={formProfile}
+                  settings={{
+                    template: formProfile.defaultTemplate || 'atelier-emerald',
+                    useCustomLetterhead: formProfile.useCustomLetterhead,
+                    customLetterheadImage: formProfile.customLetterheadImage,
+                    showWatermark: formProfile.showWatermark,
+                    watermarkText: formProfile.watermarkText,
+                    tagline: formProfile.tagline,
+                    showBankDetails: formProfile.showBankDetails,
+                    leftBoxMode: formProfile.leftBoxMode,
+                    bankDetails: formProfile.bankDetails,
+                    showSignatureStamp: formProfile.showSignatureStamp,
+                    signatureLabel: formProfile.signatureLabel,
+                    signatureImage: formProfile.signatureImage,
+                    termsText: formProfile.termsText,
+                    customFooterNote: formProfile.customFooterNote
+                  }}
+                />
               </Box>
             </Paper>
           </Grid>
