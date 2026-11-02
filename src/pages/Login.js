@@ -77,24 +77,78 @@ export default function Login() {
     </Typography>
   );
 
-  const illustrationCard = (
-    <Box
-      sx={{
-        width: '100%',
-        maxWidth: { xs: 210, md: 340 },
-        mx: 'auto',
-        borderRadius: '28px',
-        overflow: 'hidden',
-        bgcolor: isDark ? '#F6F3FC' : 'transparent',
-        boxShadow: isDark ? '0 24px 60px rgba(0, 0, 0, 0.5)' : 'none'
-      }}
-    >
+  const sparkle = (color, size = 26) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} style={{ display: 'block' }}>
+      <path d="M12 1 L14.4 9.6 L23 12 L14.4 14.4 L12 23 L9.6 14.4 L1 12 L9.6 9.6 Z" />
+    </svg>
+  );
+
+  const squiggle = (color, w = 46, h = 16) => (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" style={{ display: 'block' }}>
+      <path d={`M2 ${h / 2} q4 -${h / 2 - 2} 8 0 t8 0 t8 0 t8 0 t8 0`} />
+    </svg>
+  );
+
+  const zigzag = (color, w = 34, h = 12) => (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
+      <path d={`M1 ${h - 1} L${w / 4} 2 L${w / 2} ${h - 1} L${(3 * w) / 4} 2 L${w - 1} ${h - 1}`} />
+    </svg>
+  );
+
+  const arc = (color, w = 26, h = 16) => (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" style={{ display: 'block' }}>
+      <path d={`M2 ${h - 2} Q${w / 2} 0 ${w - 2} ${h - 2}`} />
+    </svg>
+  );
+
+  const heart = (color, size = 24) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} style={{ display: 'block' }}>
+      <path d="M12 21 C7 16.5 3 13 3 9 A4.5 4.5 0 0 1 12 6.5 A4.5 4.5 0 0 1 21 9 C21 13 17 16.5 12 21 Z" />
+    </svg>
+  );
+
+  const dots = (color, size = 30) => (
+    <svg width={size} height={size / 2.2} viewBox={`0 0 ${size} ${size / 2.2}`} fill={color} style={{ display: 'block' }}>
+      <circle cx={size / 6} cy={size / 4} r="2.5" />
+      <circle cx={size / 2} cy={size / 5} r="2" />
+      <circle cx={(5 * size) / 6} cy={size / 4} r="3" />
+    </svg>
+  );
+
+  const plus = (color, size = 14) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.4" strokeLinecap="round" style={{ display: 'block' }}>
+      <path d="M12 3 V21 M3 12 H21" />
+    </svg>
+  );
+
+  const illustration = (
+    <Box sx={{ position: 'relative', width: '100%', maxWidth: { xs: 250, md: 380 }, mx: 'auto' }}>
+      {/* hand-drawn doodles around the figure */}
+      <Box sx={{ position: 'absolute', top: -16, left: -20, transform: 'rotate(-14deg)' }}>{sparkle(gold, 30)}</Box>
+      <Box sx={{ position: 'absolute', top: '7%', right: -22, transform: 'rotate(12deg)' }}>{sparkle(secondary, 20)}</Box>
+      <Box sx={{ position: 'absolute', top: '40%', left: -30, transform: 'rotate(-5deg)' }}>{squiggle(primary, 46, 16)}</Box>
+      <Box sx={{ position: 'absolute', top: '56%', right: -16 }}>{heart(primaryLight, 22)}</Box>
+      <Box sx={{ position: 'absolute', bottom: '16%', left: -22, transform: 'rotate(9deg)' }}>{zigzag(secondary, 34, 12)}</Box>
+      <Box sx={{ position: 'absolute', bottom: '8%', right: -20, transform: 'rotate(-8deg)' }}>{arc(primary, 26, 16)}</Box>
+      <Box sx={{ position: 'absolute', bottom: -14, left: '12%' }}>{dots(gold, 34)}</Box>
+      <Box sx={{ position: 'absolute', top: '-2%', right: '16%' }}>{plus(secondary, 13)}</Box>
+
       <Box
-        component="img"
-        src={loginIllustration}
-        alt="Fashion illustration of a woman in a lavender gown"
-        sx={{ display: 'block', width: '100%', height: 'auto' }}
-      />
+        sx={{
+          width: '100%',
+          borderRadius: '28px',
+          overflow: 'hidden',
+          bgcolor: isDark ? '#F6F3FC' : 'transparent',
+          boxShadow: isDark ? '0 24px 60px rgba(0, 0, 0, 0.5)' : 'none'
+        }}
+      >
+        <Box
+          component="img"
+          src={loginIllustration}
+          alt="Fashion illustration of a woman in a lavender gown"
+          sx={{ display: 'block', width: '100%', height: 'auto' }}
+        />
+      </Box>
     </Box>
   );
 
@@ -148,6 +202,12 @@ export default function Login() {
         }}
       />
 
+      {/* canvas doodles */}
+      <Box sx={{ position: 'absolute', top: '13%', left: { xs: '6%', md: '4%' }, transform: 'rotate(-10deg)', pointerEvents: 'none' }}>{sparkle(gold, 22)}</Box>
+      <Box sx={{ position: 'absolute', top: '24%', right: { xs: '7%', md: '3%' }, transform: 'rotate(6deg)', pointerEvents: 'none' }}>{squiggle(secondary, 52, 18)}</Box>
+      <Box sx={{ position: 'absolute', bottom: '24%', right: { xs: '5%', md: '2%' }, transform: 'rotate(-8deg)', pointerEvents: 'none' }}>{heart(primaryLight, 18)}</Box>
+      <Box sx={{ position: 'absolute', bottom: '12%', left: { xs: '8%', md: '3%' }, pointerEvents: 'none' }}>{dots(primary, 30)}</Box>
+
       {/* LEFT brand + illustration panel (tablet/desktop) */}
       <Box
         sx={{
@@ -161,7 +221,7 @@ export default function Login() {
         }}
       >
         <Box sx={{ mb: 5 }}>{wordmark('1.35rem')}</Box>
-        {illustrationCard}
+        {illustration}
         <Typography
           sx={{
             textAlign: 'center',
@@ -214,7 +274,7 @@ export default function Login() {
               <Checkroom sx={{ fontSize: 22 }} />
             </Box>
             {wordmark('1.05rem')}
-            <Box sx={{ mt: 3 }}>{illustrationCard}</Box>
+            <Box sx={{ mt: 3 }}>{illustration}</Box>
           </Box>
 
           {/* desktop brand mark above form */}
