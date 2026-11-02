@@ -22,7 +22,6 @@ import {
   Tooltip,
   useTheme,
   useMediaQuery,
-  Divider,
   TablePagination,
   TableSortLabel,
   Switch,
@@ -633,30 +632,21 @@ const Inventory = () => {
 
       {/* Filter and Command Toolbar */}
       <GlassCard sx={{ p: { xs: 2, sm: 2.5 }, mb: 3, border: '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.15)' }}>
-        {/* Tier 1: Search & Controls Layout */}
+        {/* Single-Line Filter Bar: Search + View + Collection + Sort + Stock Chips */}
         <Box sx={{
           display: 'flex',
-          flexDirection: { xs: 'column', lg: 'row' },
-          alignItems: { xs: 'stretch', lg: 'center' },
-          gap: 1.5,
-          mb: 2
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          gap: { xs: 1.25, sm: 1.5 }
         }}>
-          {/* Search Bar & Instant View Mode Switcher */}
-          <Box sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1.25,
-            flex: { lg: 2 },
-            minWidth: { lg: 320 },
-            width: { xs: '100%', lg: 'auto' }
-          }}>
-            <TextField
-              fullWidth
-              size="small"
-              placeholder="Search garments by name, SKU, or supplier..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              InputProps={{
+          {/* Search Bar */}
+          <TextField
+            fullWidth
+            size="small"
+            placeholder="Search garments by name, SKU, or supplier..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
                     <Search sx={{ color: (t) => t.palette.primary.main, fontSize: 20 }} />
@@ -671,7 +661,7 @@ const Inventory = () => {
                 ) : null
               }}
               sx={{
-                flex: 1,
+                flex: { xs: '1 1 100%', sm: '1 1 200px' },
                 minWidth: 0,
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2.5,
@@ -717,17 +707,7 @@ const Inventory = () => {
                 <ViewList sx={{ fontSize: 18 }} />
               </ToggleButton>
             </ToggleButtonGroup>
-          </Box>
 
-          {/* Controls Cluster */}
-          <Box sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1.25,
-            flexWrap: { xs: 'wrap', sm: 'nowrap' },
-            flex: { lg: 3 },
-            width: { xs: '100%', lg: 'auto' }
-          }}>
             {/* Collection Filter */}
             <TextField
               select
@@ -736,8 +716,8 @@ const Inventory = () => {
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
               sx={{
-                flex: { xs: '1 1 calc(50% - 6px)', sm: 1.5 },
-                minWidth: { xs: 'auto', sm: 160 },
+                flex: { xs: '1 1 calc(50% - 0.75rem)', sm: '0 1 140px' },
+                minWidth: { xs: 'auto', sm: 140 },
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2.5,
                   bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#FFFFFF'
@@ -760,7 +740,7 @@ const Inventory = () => {
               value={orderBy}
               onChange={(e) => setOrderBy(e.target.value)}
               sx={{
-                flex: { xs: '1 1 calc(50% - 6px)', sm: 1.2 },
+                flex: { xs: '1 1 calc(50% - 0.75rem)', sm: '0 1 130px' },
                 minWidth: { xs: 'auto', sm: 130 },
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2.5,
@@ -820,23 +800,10 @@ const Inventory = () => {
                 Reset
               </Button>
             </Box>
-          </Box>
-        </Box>
 
-        <Divider sx={{ my: 1.5 }} />
-
-        {/* Tier 2: Swipeable Touch Stock Filter Chips */}
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          overflowX: 'auto',
-          WebkitOverflowScrolling: 'touch',
-          py: 0.5,
-          scrollbarWidth: 'none',
-          '&::-webkit-scrollbar': { display: 'none' }
-        }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mr: 0.5, flexShrink: 0 }}>
+          {/* Stock Filter Chips */}
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1, flexBasis: '100%' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mr: 0.5, flexShrink: 0 }}>
             <FilterList sx={{ fontSize: 18, color: (t) => t.palette.primary.main }} />
             <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'text.secondary', fontSize: '0.7rem' }}>
               Stock Filter:
@@ -956,6 +923,7 @@ const Inventory = () => {
               '&:hover': { bgcolor: stockFilter === 'surplus' ? '#4F46E5' : 'rgba(99, 102, 241, 0.16)' }
             }}
           />
+          </Box>
         </Box>
 
         {/* Tier 3: Live Valuation & Result Count Bar */}

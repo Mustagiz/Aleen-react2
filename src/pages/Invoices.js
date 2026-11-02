@@ -2240,8 +2240,8 @@ const Invoices = () => {
 
       {/* Date Range Selection & Filter Studio */}
       <GlassCard sx={{ p: 2.5, mb: 3, border: '1px solid', borderColor: isFiltered ? 'primary.light' : 'divider' }}>
-        {/* Row 1: Search Capsule + Quick Date Range Presets */}
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: { xs: 1.25, sm: 1.5, md: 2 } }}>
+        {/* Single-Line Filter Bar: Search + Date Presets + From/To + Reset */}
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: { xs: 1.25, sm: 1.5, md: 2 } }}>
           <Box sx={{
             display: 'flex',
             alignItems: 'center',
@@ -2272,42 +2272,29 @@ const Invoices = () => {
           </Box>
 
           {/* Quick Date Presets Dropdown */}
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 0.75, flex: '1 1 auto', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
-            <TextField
-              select
-              size="small"
-              label="Filter Dates"
-              value={datePreset}
-              onChange={(e) => handleDatePreset(e.target.value)}
-              sx={{
-                width: { xs: '100%', sm: 185 },
-                '& .MuiInputBase-root': { height: 40, borderRadius: '10px', fontSize: '0.8rem', fontWeight: 600 },
-                '& .MuiInputLabel-root': { fontSize: '0.78rem' }
-              }}
-            >
-              <MenuItem value="all">All Dates</MenuItem>
-              <MenuItem value="today">Today</MenuItem>
-              <MenuItem value="yesterday">Yesterday</MenuItem>
-              <MenuItem value="this_week">Last 7 Days</MenuItem>
-              <MenuItem value="this_month">This Month</MenuItem>
-              <MenuItem value="last_month">Last Month</MenuItem>
-              <MenuItem value="last_30_days">Last 30 Days</MenuItem>
-              <MenuItem value="custom">Custom Range</MenuItem>
-            </TextField>
-          </Box>
-        </Box>
+          <TextField
+            select
+            size="small"
+            label="Filter Dates"
+            value={datePreset}
+            onChange={(e) => handleDatePreset(e.target.value)}
+            sx={{
+              width: { xs: '100%', sm: 185 },
+              flexShrink: 0,
+              '& .MuiInputBase-root': { height: 40, borderRadius: '10px', fontSize: '0.8rem', fontWeight: 600 },
+              '& .MuiInputLabel-root': { fontSize: '0.78rem' }
+            }}
+          >
+            <MenuItem value="all">All Dates</MenuItem>
+            <MenuItem value="today">Today</MenuItem>
+            <MenuItem value="yesterday">Yesterday</MenuItem>
+            <MenuItem value="this_week">Last 7 Days</MenuItem>
+            <MenuItem value="this_month">This Month</MenuItem>
+            <MenuItem value="last_month">Last Month</MenuItem>
+            <MenuItem value="last_30_days">Last 30 Days</MenuItem>
+            <MenuItem value="custom">Custom Range</MenuItem>
+          </TextField>
 
-        {/* Row 2: Selected Dates (From - To), Payment Method, Sorting & Actions */}
-        <Box sx={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'flex-end',
-          gap: 1.5,
-          pt: 2,
-          mt: 2,
-          borderTop: '1px solid',
-          borderColor: 'divider'
-        }}>
           {/* From Date Picker */}
           <Box sx={{ flex: { xs: '1 1 calc(50% - 0.75rem)', sm: '0 1 165px' } }}>
             <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: 'text.secondary', letterSpacing: '0.02em', mb: 0.5 }}>
