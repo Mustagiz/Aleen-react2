@@ -56,6 +56,7 @@ import {
   Security,
   ColorLens,
   CloudUpload,
+  CropFree,
   Draw,
   AutoAwesome,
   QrCode2,
@@ -72,6 +73,7 @@ import { PREDEFINED_LOGOS } from '../constants/predefinedLogos';
 import instagramQrImg from '../assets/instagram_qr.jpg';
 import CrmColorSettings from '../components/settings/CrmColorSettings';
 import CustomerDisplaySettings from '../components/settings/CustomerDisplaySettings';
+import LogoCropDialog from '../components/settings/LogoCropDialog';
 import InvoicePrint from '../components/InvoicePrint';
 import TemplateThumb from '../components/invoice/TemplateThumb';
 
@@ -250,8 +252,10 @@ export default function Settings() {
   const signatureInputRef = useRef(null);
   const letterheadInputRef = useRef(null);
   const [logoModalOpen, setLogoModalOpen] = useState(false);
+  const [cropSource, setCropSource] = useState(null);
 
-  // Upload handler for custom store logo
+  // Upload handler for custom store logo — the picked file goes to the
+  // crop/zoom editor before it can become the brand crest.
   const handleLogoUpload = (e) => {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
@@ -261,13 +265,24 @@ export default function Settings() {
     }
     const reader = new FileReader();
     reader.onload = (event) => {
-      setFormProfile(prev => ({
-        ...prev,
-        logoUrl: event.target.result
-      }));
-      showToast('Store logo loaded! Click "Save Brand Details" to confirm.', 'success');
+      setCropSource(event.target.result);
     };
     reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const handleApplyLogoCrop = (croppedDataUri) => {
+    setFormProfile(prev => ({
+      ...prev,
+      logoUrl: croppedDataUri
+    }));
+    setCropSource(null);
+    showToast('Logo cropped to crest! Click "Save Brand Details" to confirm.', 'success');
+  };
+
+  const openLogoCropper = () => {
+    if (formProfile.logoUrl) setCropSource(formProfile.logoUrl);
+    else logoInputRef.current?.click();
   };
 
   const handleSelectPredefinedLogo = (logoUri, logoName) => {
@@ -745,10 +760,10 @@ export default function Settings() {
                 )}
 
                 {/* Edit overlay icon button */}
-                <Tooltip title="Upload or change logo">
+                <Tooltip title={formProfile.logoUrl ? 'Crop & zoom the logo' : 'Upload a logo'}>
                   <IconButton
                     size="small"
-                    onClick={() => logoInputRef.current?.click()}
+                    onClick={openLogoCropper}
                     sx={{
                       position: 'absolute',
                       bottom: -6,
@@ -759,7 +774,7 @@ export default function Settings() {
                       '&:hover': { bgcolor: (t) => t.palette.primary.dark }
                     }}
                   >
-                    <Edit sx={{ fontSize: 15 }} />
+                    {formProfile.logoUrl ? <CropFree sx={{ fontSize: 15 }} /> : <Edit sx={{ fontSize: 15 }} />}
                   </IconButton>
                 </Tooltip>
               </Box>
@@ -803,6 +818,26 @@ export default function Settings() {
                 >
                   Choose Predefined
                 </Button>
+                {formProfile.logoUrl && (
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    startIcon={<CropFree sx={{ fontSize: '15px !important' }} />}
+                    onClick={openLogoCropper}
+                    sx={{
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      borderRadius: '20px',
+                      py: 0.4,
+                      px: 1.25,
+                      textTransform: 'none',
+                      bordercolor: '#D97706',
+                      color: '#D97706'
+                    }}
+                  >
+                    Crop &amp; Zoom
+                  </Button>
+                )}
                 {formProfile.logoUrl && (
                   <Button
                     size="small"
@@ -2619,6 +2654,13 @@ export default function Settings() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <LogoCropDialog
+        open={Boolean(cropSource)}
+        image={cropSource}
+        onClose={() => setCropSource(null)}
+        onApply={handleApplyLogoCrop}
+      />
     </Box>
   );
 }
