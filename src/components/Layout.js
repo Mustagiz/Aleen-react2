@@ -293,53 +293,72 @@ export default function Layout() {
             {/* Custom Logo or Monogram */}
             {profile?.logoUrl ? (
               <Box
-                component="img"
-                src={profile.logoUrl}
-                alt={profile.businessName || 'Logo'}
-                sx={{
-                  width: 42,
-                  height: 42,
-                  borderRadius: 'var(--radius-control, 12px)',
-                  objectFit: 'contain',
-                  bgcolor: sidebarConfig.isDark ? 'rgba(255, 255, 255, 0.04)' : '#FFFFFF',
-                  border: `1px solid ${sidebarConfig.borderColor}`,
-                  p: '3px',
-                  flexShrink: 0,
-                  cursor: 'pointer',
-                  transition: 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-                  '&:hover': { transform: 'translateY(-1px)' }
-                }}
                 onClick={() => {
                   navigate('/');
                   if (isMobile) setMobileOpen(false);
                 }}
-              />
+                sx={{
+                  position: 'relative',
+                  flexShrink: 0,
+                  cursor: 'pointer',
+                  p: '1.5px',
+                  borderRadius: 'calc(var(--radius-control, 12px) + 2px)',
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary?.main || theme.palette.primary.main} 100%)`,
+                  transition: 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+                  '&:hover': { transform: 'translateY(-1px)' }
+                }}
+              >
+                <Box
+                  component="img"
+                  src={profile.logoUrl}
+                  alt={profile.businessName || 'Logo'}
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    display: 'block',
+                    borderRadius: 'var(--radius-control, 12px)',
+                    objectFit: 'contain',
+                    bgcolor: sidebarConfig.isDark ? theme.palette.background.paper : '#FFFFFF',
+                    p: '3px'
+                  }}
+                />
+              </Box>
             ) : (
-              <Box sx={{
-                width: 42,
-                height: 42,
-                borderRadius: 'var(--radius-control, 12px)',
-                background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.dark} 100%)`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                cursor: 'pointer',
-                transition: 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-                '&:hover': { transform: 'translateY(-1px)' }
-              }} onClick={() => {
-                navigate('/');
-                if (isMobile) setMobileOpen(false);
-              }}>
-                <Typography sx={{ 
-                  fontFamily: 'inherit', 
-                  fontWeight: 800, 
-                  color: '#FFFFFF', 
-                  fontSize: '1.2rem',
-                  lineHeight: 1
+              <Box
+                onClick={() => {
+                  navigate('/');
+                  if (isMobile) setMobileOpen(false);
+                }}
+                sx={{
+                  position: 'relative',
+                  flexShrink: 0,
+                  cursor: 'pointer',
+                  p: '1.5px',
+                  borderRadius: 'calc(var(--radius-control, 12px) + 2px)',
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary?.main || theme.palette.primary.main} 100%)`,
+                  transition: 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+                  '&:hover': { transform: 'translateY(-1px)' }
+                }}
+              >
+                <Box sx={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 'var(--radius-control, 12px)',
+                  background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.dark} 100%)`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}>
-                  {(profile?.businessName || 'A').charAt(0).toUpperCase()}
-                </Typography>
+                  <Typography sx={{
+                    fontFamily: 'inherit',
+                    fontWeight: 800,
+                    color: '#FFFFFF',
+                    fontSize: '1.2rem',
+                    lineHeight: 1
+                  }}>
+                    {(profile?.businessName || 'A').charAt(0).toUpperCase()}
+                  </Typography>
+                </Box>
               </Box>
             )}
 
@@ -349,29 +368,37 @@ export default function Layout() {
                   fontFamily: 'inherit',
                   fontWeight: 800,
                   color: sidebarConfig.isDark ? '#FFFFFF' : 'text.primary',
-                  fontSize: '1.02rem',
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1.25,
+                  fontSize: '1.05rem',
+                  letterSpacing: '-0.01em',
+                  lineHeight: 1.2,
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis'
                 }}>
                   {profile?.businessName || 'Aleen Clothing'}
                 </Typography>
-                <Typography sx={{ 
-                  fontSize: '0.64rem', 
-                  fontWeight: 700, 
-                  color: sidebarConfig.isDark ? theme.palette.secondary.light : theme.palette.secondary.main,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
-                  lineHeight: 1.3,
-                  mt: 0.25,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
-                }}>
-                  {getSystemSubtitle()}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mt: 0.5, minWidth: 0 }}>
+                  <Box sx={{
+                    width: 14,
+                    height: 2,
+                    borderRadius: '999px',
+                    bgcolor: sidebarConfig.isDark ? theme.palette.secondary.light : theme.palette.secondary.main,
+                    flexShrink: 0
+                  }} />
+                  <Typography sx={{
+                    fontSize: '0.64rem',
+                    fontWeight: 700,
+                    color: sidebarConfig.isDark ? theme.palette.secondary.light : theme.palette.secondary.main,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    lineHeight: 1.2,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}>
+                    {getSystemSubtitle()}
+                  </Typography>
+                </Box>
               </Box>
             )}
           </Box>
