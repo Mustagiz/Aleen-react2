@@ -13,6 +13,7 @@ import {
 import { INVOICE_TEMPLATES } from '../../constants/invoiceTemplates';
 import { numberToWordsRupees } from '../../models/documentModel';
 import { formatSkuWithHyphen } from '../../utils/helpers';
+import { ScriptWordmark, TrackedTagline } from '../brand/BrandLockup';
 import WaxSealStamp from '../common/WaxSealStamp';
 import instagramQrImg from '../../assets/instagram_qr.jpg';
 
@@ -370,13 +371,9 @@ export const InvoiceHeader = ({ ctx }) => {
   if (headerFormat === 'receipt') {
     return (
       <Box sx={{ ...shell, textAlign: 'center', pb: 2, mb: 2, borderBottom: '1px dashed #64748B' }}>
-        <LogoTile profile={profile} sx={{ width: 48, height: 48, borderRadius: 1, mx: 'auto', mb: 1 }} />
-        <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: 1 }}>
-          {profile.businessName?.toUpperCase() || 'ALEEN CLOTHING'}
-        </Typography>
-        <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
-          {profile.tagline || activeSettings.tagline || 'Boutique & Bespoke Atelier'}
-        </Typography>
+        <LogoTile profile={profile} sx={{ width: 48, height: 48, borderRadius: 1, mx: 'auto', mb: 0.5 }} />
+        <ScriptWordmark name={businessName} fontSize={{ xs: '1.6rem', sm: '1.85rem' }} align="center" sx={{ mb: 0.25 }} />
+        <TrackedTagline text={tagline} align="center" rules fontSize="0.54rem" ruleWidth={22} sx={{ mb: 0.5 }} />
         <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary' }}>
           {profile.address}
         </Typography>
@@ -412,26 +409,24 @@ export const InvoiceHeader = ({ ctx }) => {
           )}
           <Box sx={{ width: 34, height: 1, bgcolor: theme.accentColor, ...EXACT }} />
         </Box>
-        <Typography
-          variant="h4"
-          sx={{
-            fontFamily: SERIF_STACK,
-            fontWeight: 700,
-            letterSpacing: { xs: 2, sm: 5 },
-            color: theme.darkColor,
-            textTransform: 'uppercase',
-            fontSize: { xs: '1.25rem', sm: '1.7rem' },
-            lineHeight: 1.2
-          }}
-        >
-          {businessName}
-        </Typography>
-        <Typography
-          variant="caption"
-          sx={{ display: 'block', mt: 0.5, letterSpacing: 2.5, textTransform: 'uppercase', color: theme.primaryColor, fontWeight: 700, fontSize: '0.68rem' }}
-        >
-          {tagline}
-        </Typography>
+        <ScriptWordmark
+          name={businessName}
+          color={theme.darkColor}
+          fontSize={{ xs: '2.35rem', sm: '3rem' }}
+          lineHeight={1.05}
+          align="center"
+          sx={{ mt: -0.5 }}
+        />
+        <TrackedTagline
+          text={tagline}
+          color={theme.primaryColor}
+          align="center"
+          rules
+          ruleColor={theme.accentColor}
+          ruleWidth={44}
+          fontSize="0.62rem"
+          sx={{ mt: 0.5 }}
+        />
         <Box sx={{ height: 5, mx: { xs: 2, sm: 6 }, my: 1.25, borderTop: `1px solid ${theme.primaryColor}`, borderBottom: `1px solid ${theme.primaryColor}`, ...EXACT }} />
         <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary', fontSize: '0.74rem' }}>
           {profile.address}
@@ -500,12 +495,8 @@ export const InvoiceHeader = ({ ctx }) => {
             sx={{ width: 52, height: 52, borderRadius: 0.75, bgcolor: '#FFFFFF', p: 0.5, flexShrink: 0, boxShadow: '0 3px 10px rgba(0,0,0,0.18)' }}
           />
           <Box sx={{ minWidth: 0 }}>
-            <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: 0.4, color: '#FFFFFF', fontSize: { xs: '1.1rem', sm: '1.35rem' }, lineHeight: 1.2 }}>
-              {businessName}
-            </Typography>
-            <Typography variant="caption" sx={{ display: 'block', mt: 0.25, color: 'rgba(255,255,255,0.9)', letterSpacing: 1.2, textTransform: 'uppercase', fontWeight: 700, fontSize: '0.64rem' }}>
-              {tagline}
-            </Typography>
+            <ScriptWordmark name={businessName} color="#FFFFFF" fontSize={{ xs: '1.85rem', sm: '2.3rem' }} sx={{ mb: 0.1 }} />
+            <TrackedTagline text={tagline} color="rgba(255,255,255,0.9)" fontSize="0.58rem" />
             <Typography variant="caption" sx={{ display: 'block', mt: 0.6, color: 'rgba(255,255,255,0.82)', fontSize: '0.72rem', lineHeight: 1.35 }}>
               {profile.address}
             </Typography>
@@ -533,14 +524,10 @@ export const InvoiceHeader = ({ ctx }) => {
   if (headerFormat === 'masthead') {
     return (
       <Box sx={{ ...shell, mb: { xs: 2, sm: 3 } }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1.5, pb: 0.75, borderBottom: `1px solid ${theme.primaryColor}` }}>
-          <Typography variant="caption" sx={{ fontWeight: 700, letterSpacing: { xs: 2, sm: 4 }, textTransform: 'uppercase', color: theme.darkColor, fontSize: { xs: '0.72rem', sm: '0.8rem' } }}>
-            {businessName}
-          </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1.5, pb: 0.5, borderBottom: `1px solid ${theme.primaryColor}` }}>
+          <ScriptWordmark name={businessName} color={theme.darkColor} fontSize={{ xs: '1.7rem', sm: '2.05rem' }} lineHeight={1.15} />
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="caption" sx={{ fontWeight: 700, letterSpacing: 1.8, textTransform: 'uppercase', color: theme.primaryColor, fontSize: '0.62rem', textAlign: 'right' }}>
-              {tagline}
-            </Typography>
+            <TrackedTagline text={tagline} color={theme.primaryColor} fontSize="0.58rem" align="right" />
             <LogoTile profile={profile} sx={{ width: 34, height: 34, borderRadius: 0.5 }} />
           </Box>
         </Box>
@@ -591,19 +578,24 @@ export const InvoiceHeader = ({ ctx }) => {
             <Box sx={{ width: 16, height: 16, transform: 'rotate(45deg)', bgcolor: theme.accentColor, ...EXACT }} />
           )}
         </Box>
-        <Typography
-          variant="h4"
-          sx={{ fontFamily: SERIF_STACK, fontWeight: 700, letterSpacing: { xs: 1.5, sm: 4 }, textTransform: 'uppercase', color: theme.darkColor, fontSize: { xs: '1.2rem', sm: '1.6rem' }, lineHeight: 1.2 }}
-        >
-          {businessName}
-        </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mt: 0.75 }}>
-          <Box sx={{ flex: '0 1 90px', height: 1, bgcolor: theme.primaryColor, opacity: 0.55 }} />
-          <Typography variant="caption" sx={{ fontWeight: 800, letterSpacing: 2, textTransform: 'uppercase', color: theme.primaryColor, fontSize: '0.64rem', px: 0.5 }}>
-            {tagline}
-          </Typography>
-          <Box sx={{ flex: '0 1 90px', height: 1, bgcolor: theme.primaryColor, opacity: 0.55 }} />
-        </Box>
+        <ScriptWordmark
+          name={businessName}
+          color={theme.darkColor}
+          fontSize={{ xs: '2.2rem', sm: '2.85rem' }}
+          lineHeight={1.05}
+          align="center"
+          sx={{ mt: -0.5 }}
+        />
+        <TrackedTagline
+          text={tagline}
+          color={theme.primaryColor}
+          align="center"
+          rules
+          ruleColor={theme.primaryColor}
+          ruleWidth={90}
+          fontSize="0.6rem"
+          sx={{ mt: 0.75 }}
+        />
         <Typography variant="caption" sx={{ display: 'block', mt: 1, color: 'text.secondary', fontSize: '0.74rem' }}>
           {profile.address}
         </Typography>
@@ -653,11 +645,10 @@ export const InvoiceHeader = ({ ctx }) => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, minWidth: 0 }}>
             <LogoTile profile={profile} sx={{ width: 30, height: 30, bgcolor: '#FFFFFF', p: 0.25, borderRadius: 0 }} />
             <Box sx={{ minWidth: 0 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 800, letterSpacing: 1.2, textTransform: 'uppercase', color: '#FFFFFF', fontSize: '0.92rem', lineHeight: 1.2 }}>
-                {businessName}
-              </Typography>
+              <ScriptWordmark name={businessName} color="#FFFFFF" fontSize={{ xs: '1.5rem', sm: '1.8rem' }} lineHeight={1.1} />
+              <TrackedTagline text={tagline} color="rgba(255,255,255,0.62)" fontSize="0.52rem" tracking="0.3em" />
               <Typography variant="caption" sx={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '0.62rem', letterSpacing: 0.6 }}>
-                {profile.address} — {tagline}
+                {profile.address}
               </Typography>
             </Box>
           </Box>
@@ -694,13 +685,9 @@ export const InvoiceHeader = ({ ctx }) => {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <LogoTile profile={profile} sx={{ width: 22, height: 22, borderRadius: 0.5, flexShrink: 0 }} />
               <Box sx={{ width: 9, height: 9, bgcolor: theme.accentColor, flexShrink: 0, ...EXACT }} />
-              <Typography variant="subtitle1" sx={{ fontWeight: 700, letterSpacing: { xs: 3, sm: 5 }, textTransform: 'uppercase', color: theme.darkColor, fontSize: { xs: '0.82rem', sm: '0.92rem' } }}>
-                {businessName}
-              </Typography>
+              <ScriptWordmark name={businessName} color={theme.darkColor} fontSize={{ xs: '1.9rem', sm: '2.4rem' }} lineHeight={1.1} />
             </Box>
-            <Typography variant="caption" sx={{ display: 'block', mt: 0.6, letterSpacing: 1.8, textTransform: 'uppercase', color: 'text.secondary', fontSize: '0.62rem' }}>
-              {tagline}
-            </Typography>
+            <TrackedTagline text={tagline} color="text.secondary" fontSize="0.58rem" tracking="0.42em" sx={{ mt: 0.35 }} />
             <Typography variant="caption" sx={{ display: 'block', mt: 0.35, color: 'text.secondary', fontSize: '0.66rem', lineHeight: 1.4 }}>
               {profile.address}
             </Typography>
@@ -761,15 +748,11 @@ export const InvoiceHeader = ({ ctx }) => {
           }}
         />
         <Box sx={{ minWidth: 0, flex: 1 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box sx={{ width: 3, height: 15, borderRadius: 0.25, bgcolor: theme.accentColor, flexShrink: 0, ...EXACT }} />
-            <Typography variant="caption" sx={{ letterSpacing: { xs: 1, sm: 2 }, color: 'rgba(255,255,255,0.92)', fontWeight: 800, textTransform: 'uppercase', fontSize: { xs: '0.65rem', sm: '0.72rem' } }}>
-              {tagline}
-            </Typography>
+          <ScriptWordmark name={businessName} color="#FFFFFF" fontSize={{ xs: '1.9rem', sm: '2.5rem' }} lineHeight={1.1} />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.35 }}>
+            <Box sx={{ width: 3, height: 11, borderRadius: 0.25, bgcolor: theme.accentColor, flexShrink: 0, ...EXACT }} />
+            <TrackedTagline text={tagline} color="rgba(255,255,255,0.92)" fontSize="0.56rem" tracking="0.3em" />
           </Box>
-          <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: -0.5, mt: 0.5, color: '#FFFFFF', fontSize: { xs: '1.35rem', sm: '1.75rem' }, lineHeight: 1.15 }}>
-            {businessName}
-          </Typography>
           <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)', mt: 0.5, fontSize: { xs: '0.74rem', sm: '0.82rem' }, wordBreak: 'break-word' }}>
             {profile.address}
           </Typography>

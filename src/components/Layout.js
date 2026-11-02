@@ -58,6 +58,7 @@ import NotificationCenter from './NotificationCenter';
 import GlobalSearch from './GlobalSearch';
 import NetworkStatus from './NetworkStatus';
 import AtelierFooter from './crm/AtelierFooter';
+import { ScriptWordmark } from './brand/BrandLockup';
 import CashDrawerShiftModal from './crm/CashDrawerShiftModal';
 
 const SIDEBAR_EXPANDED_WIDTH = 265;
@@ -364,20 +365,14 @@ export default function Layout() {
 
             {!showCollapsed && (
               <Box sx={{ overflow: 'hidden', minWidth: 0 }}>
-                <Typography sx={{
-                  fontFamily: 'inherit',
-                  fontWeight: 800,
-                  color: sidebarConfig.isDark ? '#FFFFFF' : 'text.primary',
-                  fontSize: '1.05rem',
-                  letterSpacing: '-0.01em',
-                  lineHeight: 1.2,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
-                }}>
-                  {profile?.businessName || 'Aleen Clothing'}
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mt: 0.5, minWidth: 0 }}>
+                <ScriptWordmark
+                  name={profile?.businessName || 'Aleen Clothing'}
+                  metallic
+                  fontSize="1.72rem"
+                  lineHeight={1.15}
+                  sx={{ mt: '-2px' }}
+                />
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mt: 0.25, minWidth: 0 }}>
                   <Box sx={{
                     width: 14,
                     height: 2,
@@ -386,12 +381,12 @@ export default function Layout() {
                     flexShrink: 0
                   }} />
                   <Typography sx={{
-                    fontSize: '0.64rem',
+                    fontSize: '0.56rem',
                     fontWeight: 700,
                     color: sidebarConfig.isDark ? theme.palette.secondary.light : theme.palette.secondary.main,
                     textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                    lineHeight: 1.2,
+                    letterSpacing: '0.3em',
+                    lineHeight: 1.3,
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis'
@@ -785,9 +780,7 @@ export default function Layout() {
         }}
       >
         <Box sx={{ px: 2, py: 1.25, borderBottom: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.06)' : '#F1EFFC'}` }}>
-          <Typography sx={{ fontSize: '0.82rem', fontWeight: 800, color: 'text.primary', letterSpacing: '-0.01em' }}>
-            {profile?.businessName || 'Aleen Clothing'}
-          </Typography>
+          <ScriptWordmark name={profile?.businessName || 'Aleen Clothing'} metallic fontSize="1.4rem" lineHeight={1.2} />
           <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: 'text.secondary' }}>
             {user?.name || user?.email || 'Boutique Owner'}
           </Typography>

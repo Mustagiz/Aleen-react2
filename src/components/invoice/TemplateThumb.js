@@ -10,6 +10,7 @@ import { Box, Typography } from '@mui/material';
 const SERIF = 'Georgia, "Times New Roman", serif';
 const MONO = 'monospace, sans-serif';
 const SANS = '"DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+const SCRIPT = '"Great Vibes", "Snell Roundhand", "Apple Chancery", cursive';
 
 const Bar = ({ w = '100%', h = 3, c = '#E2E8F0', r = 0.25, style }) => (
   <Box sx={{ height: h, width: w, borderRadius: r, bgcolor: c, flexShrink: 0 }} style={style} />
@@ -30,6 +31,26 @@ const Micro = ({ children, color, family = SANS, size = '0.42rem', weight = 800,
       lineHeight: 1.35,
       whiteSpace: 'nowrap',
       overflow: 'hidden'
+    }}
+  >
+    {children}
+  </Typography>
+);
+
+// The house wordmark is calligraphy everywhere, including the miniature previews.
+const Script = ({ children, color, size = '0.86rem', align, sx = {} }) => (
+  <Typography
+    component="span"
+    sx={{
+      display: 'block',
+      fontFamily: SCRIPT,
+      fontSize: size,
+      lineHeight: 1.2,
+      color,
+      textAlign: align,
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      ...sx
     }}
   >
     {children}
@@ -95,7 +116,7 @@ const ThumbBanner = ({ c }) => (
         <Box sx={{ width: 13, height: 13, borderRadius: 0.5, bgcolor: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Typography sx={{ fontSize: '0.42rem', fontWeight: 800, color: '#FFFFFF', lineHeight: 1 }}>A</Typography>
         </Box>
-        <Micro color="#FFFFFF" size="0.5rem">ALEEN CLOTHING</Micro>
+        <Script color="#FFFFFF" size="0.82rem">Aleen Clothing</Script>
       </Box>
       <Micro color="rgba(255,255,255,0.8)" size="0.4rem">TAX INVOICE</Micro>
     </Box>
@@ -175,10 +196,8 @@ const ThumbCrest = ({ c }) => (
       <Box sx={{ width: 16, height: 16, mx: 'auto', borderRadius: '50%', bgcolor: c.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 0 1px #FFFFFF inset, 0 0 0 2px ${c.primary}` }}>
         <Typography sx={{ fontSize: '0.46rem', fontWeight: 800, color: c.dark, lineHeight: 1, fontFamily: SERIF }}>A</Typography>
       </Box>
-      <Typography sx={{ mt: 0.4, fontFamily: SERIF, fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.2em', color: c.dark, textTransform: 'uppercase' }}>
-        Aleen Clothing
-      </Typography>
-      <Box sx={{ mt: 0.5, borderBottom: `3px double ${c.primary}` }} />
+      <Script color={c.dark} size="1.05rem" sx={{ mt: 0.15 }}>Aleen Clothing</Script>
+      <Box sx={{ mt: 0.25, borderBottom: `3px double ${c.primary}` }} />
       <Box sx={{ mt: 0.5, display: 'flex', justifyContent: 'space-between' }}>
         <Micro color={c.primary} family={SERIF} size="0.34rem">Regal Boutique</Micro>
         <Micro color={c.dark} family={SERIF} size="0.4rem">Tax Invoice</Micro>
@@ -252,7 +271,7 @@ const ThumbRail = ({ c }) => (
           <Box sx={{ width: 3, height: 9, bgcolor: c.accent }} />
           <Micro color="rgba(255,255,255,0.7)" size="0.3rem">Prestige</Micro>
         </Box>
-        <Micro color="#FFFFFF" size="0.5rem">ALEEN CLOTHING</Micro>
+        <Script color="#FFFFFF" size="0.82rem">Aleen Clothing</Script>
         <Box sx={{ display: 'flex', gap: 0.35 }}>
           <Bar w="40%" h={2.5} c="rgba(255,255,255,0.3)" />
           <Bar w="30%" h={2.5} c="rgba(255,255,255,0.3)" />
@@ -348,7 +367,7 @@ const ThumbMasthead = ({ c }) => (
     }}
   >
     <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', pb: 0.4, borderBottom: `1px solid ${c.primary}` }}>
-      <Micro color={c.dark} family={SERIF} size="0.46rem" spacing="0.24em">Aleen</Micro>
+      <Script color={c.dark} size="0.95rem">Aleen</Script>
       <Micro color={c.primary} size="0.3rem" spacing="0.2em">Bridal Trousseau</Micro>
     </Box>
     <Box sx={{ mt: 0.7, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 1 }}>
@@ -435,12 +454,10 @@ const ThumbFramed = ({ c }) => (
 
     <Box sx={{ textAlign: 'center' }}>
       <Box sx={{ width: 10, height: 10, mx: 'auto', bgcolor: c.accent, transform: 'rotate(45deg)', mb: 0.5 }} />
-      <Typography sx={{ fontFamily: SERIF, fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.18em', color: c.dark, textTransform: 'uppercase' }}>
-        Aleen Clothing
-      </Typography>
+      <Script color={c.dark} size="1.15rem" align="center">Aleen Clothing</Script>
       <Box sx={{ mt: 0.4, display: 'flex', alignItems: 'center', gap: 0.5 }}>
         <Box sx={{ flex: 1, height: 1, bgcolor: c.accent }} />
-        <Box sx={{ width: 5, height: 5, bgcolor: c.accent, transform: 'rotate(45deg)' }} />
+        <Micro color={c.primary} size="0.3rem" spacing="0.2em">Atelier</Micro>
         <Box sx={{ flex: 1, height: 1, bgcolor: c.accent }} />
       </Box>
       <Box sx={{ mt: 0.5, mx: 'auto', display: 'inline-block', px: 0.8, py: 0.3, border: `1px solid ${c.accent}`, bgcolor: `${c.accent}1A` }}>
@@ -522,7 +539,7 @@ const ThumbDataStrip = ({ c }) => (
         ))}
       </Box>
       <Box sx={{ mt: 0.4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Micro color="#FFFFFF" size="0.48rem">ALEEN CLOTHING</Micro>
+        <Script color="#FFFFFF" size="0.9rem">Aleen Clothing</Script>
         <Micro color={c.accent} size="0.34rem">TAX INVOICE</Micro>
       </Box>
     </Box>
@@ -598,7 +615,7 @@ const ThumbWordmark = ({ c }) => (
     <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.55 }}>
         <Box sx={{ width: 9, height: 9, bgcolor: c.accent }} />
-        <Micro color={c.dark} size="0.44rem" spacing="0.3em">Aleen</Micro>
+        <Script color={c.dark} size="1rem" sx={{ mt: '-3px' }}>Aleen</Script>
       </Box>
       <Typography sx={{ fontSize: '1.15rem', fontWeight: 300, color: `${c.primary}55`, lineHeight: 1, letterSpacing: '-0.02em' }}>
         0042
@@ -666,7 +683,7 @@ const ThumbReceipt = ({ c }) => (
   <Box sx={{ ...paperBase, bgcolor: '#FFFFFF', p: 1, borderRadius: 0.5 }}>
     <Box sx={{ mx: 'auto', width: '72%', fontFamily: MONO, position: 'relative', flex: 1, display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ textAlign: 'center' }}>
-        <Micro color={c.dark} family={MONO} size="0.5rem" weight={800} spacing="0.14em" align="center">ALEEN</Micro>
+        <Script color={c.dark} size="0.95rem" align="center">Aleen</Script>
         <Micro color="#64748B" family={MONO} size="0.28rem" spacing="0.06em" align="center">Boutique &amp; Bespoke Atelier</Micro>
         <Box sx={{ mt: 0.35, mx: 'auto', display: 'inline-block', px: 0.5, py: 0.2, bgcolor: '#F1F5F9', borderRadius: 0.25 }}>
           <Micro color={c.dark} family={MONO} size="0.32rem" spacing="0.04em">RETAIL SLIP #AL-0042</Micro>
