@@ -73,6 +73,7 @@ import instagramQrImg from '../assets/instagram_qr.jpg';
 import CrmColorSettings from '../components/settings/CrmColorSettings';
 import CustomerDisplaySettings from '../components/settings/CustomerDisplaySettings';
 import InvoicePrint from '../components/InvoicePrint';
+import TemplateThumb from '../components/invoice/TemplateThumb';
 
 const SAMPLE_INVOICE = {
   id: 'INV-PREVIEW-01',
@@ -1317,59 +1318,9 @@ export default function Settings() {
                             '&:hover': { borderColor: (t) => (t.palette.mode === 'dark' ? tmpl.secondaryColor : tmpl.primaryColor), transform: 'translateY(-3px)' }
                           }}
                         >
-                          {/* Miniature invoice mockup */}
+                          {/* Miniature invoice mockup — one per document format */}
                           <Box sx={{ p: 1.25, bgcolor: (t) => (t.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : '#F8FAFC') }}>
-                            <Box sx={{ borderRadius: 1, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.08)', bgcolor: '#FFFFFF', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
-                              {/* Header banner */}
-                              <Box sx={{ px: 1.25, py: 1, background: tmpl.headerBg, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, minWidth: 0 }}>
-                                  <Box sx={{ width: 16, height: 16, borderRadius: '4px', bgcolor: 'rgba(255,255,255,0.22)', border: '1px solid rgba(255,255,255,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                    <Typography sx={{ fontSize: '0.5rem', fontWeight: 800, color: '#FFFFFF', lineHeight: 1 }}>A</Typography>
-                                  </Box>
-                                  <Typography sx={{ fontSize: '0.6rem', fontWeight: 800, color: '#FFFFFF', letterSpacing: '0.06em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                    ALEEN CLOTHING
-                                  </Typography>
-                                </Box>
-                                <Typography sx={{ fontSize: '0.5rem', fontWeight: 800, color: 'rgba(255,255,255,0.85)', letterSpacing: '0.1em', flexShrink: 0 }}>
-                                  TAX INVOICE
-                                </Typography>
-                              </Box>
-
-                              {/* Meta skeleton */}
-                              <Box sx={{ px: 1.25, py: 1, display: 'flex', justifyContent: 'space-between', gap: 1 }}>
-                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.4, flex: 1 }}>
-                                  <Box sx={{ height: 4, width: '55%', borderRadius: 0.25, bgcolor: '#E2E8F0' }} />
-                                  <Box sx={{ height: 4, width: '78%', borderRadius: 0.25, bgcolor: '#E2E8F0' }} />
-                                </Box>
-                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.4, alignItems: 'flex-end', flex: 1 }}>
-                                  <Box sx={{ height: 4, width: '45%', borderRadius: 0.25, bgcolor: '#E2E8F0' }} />
-                                  <Box sx={{ height: 4, width: '60%', borderRadius: 0.25, bgcolor: '#E2E8F0' }} />
-                                </Box>
-                              </Box>
-
-                              {/* Table header strip */}
-                              <Box sx={{ mx: 1.25, px: 1, py: 0.4, borderRadius: '4px', background: tmpl.primaryColor, display: 'flex', justifyContent: 'space-between' }}>
-                                {['ITEM', 'QTY', 'AMT'].map(h => (
-                                  <Typography key={h} sx={{ fontSize: '0.48rem', fontWeight: 800, color: '#FFFFFF', letterSpacing: '0.08em' }}>{h}</Typography>
-                                ))}
-                              </Box>
-
-                              {/* Line-item skeleton rows */}
-                              <Box sx={{ px: 1.25, py: 0.75, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                                {[0, 1, 2].map(i => (
-                                  <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Box sx={{ height: 4, flex: 1, borderRadius: 0.25, bgcolor: '#F1F5F9' }} />
-                                    <Box sx={{ height: 4, width: 18, borderRadius: 0.25, bgcolor: '#E2E8F0' }} />
-                                  </Box>
-                                ))}
-                              </Box>
-
-                              {/* Totals bar */}
-                              <Box sx={{ mx: 1.25, mb: 1.25, px: 1, py: 0.5, borderRadius: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: `${tmpl.primaryColor}14`, border: `1px solid ${tmpl.primaryColor}33` }}>
-                                <Typography sx={{ fontSize: '0.52rem', fontWeight: 800, color: tmpl.darkColor, letterSpacing: '0.06em' }}>TOTAL</Typography>
-                                <Typography sx={{ fontSize: '0.62rem', fontWeight: 800, color: tmpl.primaryColor }}>₹36,657</Typography>
-                              </Box>
-                            </Box>
+                            <TemplateThumb tmpl={tmpl} />
                           </Box>
 
                           {/* Card footer: name + tagline + state */}

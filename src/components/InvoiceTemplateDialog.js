@@ -35,6 +35,7 @@ import {
   Visibility
 } from './icons';
 import { INVOICE_TEMPLATES, DEFAULT_INVOICE_SETTINGS } from '../constants/invoiceTemplates';
+import TemplateThumb from './invoice/TemplateThumb';
 import { useData } from '../contexts/DataContext';
 import InvoicePrint from './InvoicePrint';
 
@@ -268,22 +269,28 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
                         }
                       }}
                     >
-                      {/* Top Header Mockup */}
+                      {/* Miniature of the exact document format this template prints */}
+                      <Box sx={{ p: 1.5, bgcolor: (t) => (t.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : '#F1F5F9') }}>
+                        <TemplateThumb tmpl={tmpl} />
+                      </Box>
+
                       <Box
                         sx={{
-                          p: 2,
-                          background: tmpl.headerBg,
-                          color: '#ffffff',
+                          px: 2,
+                          py: 1,
                           display: 'flex',
                           alignItems: 'center',
-                          justifyContent: 'space-between'
+                          justifyContent: 'space-between',
+                          gap: 1,
+                          borderBottom: '1px solid',
+                          borderColor: 'divider'
                         }}
                       >
-                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#ffffff', fontSize: '0.85rem' }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: (t) => (t.palette.mode === 'dark' ? tmpl.secondaryColor : tmpl.primaryColor), fontSize: '0.82rem' }}>
                           {tmpl.name}
                         </Typography>
                         {isSelected ? (
-                          <CheckCircle sx={{ color: '#FDE68A', fontSize: 20 }} />
+                          <CheckCircle sx={{ color: (t) => (t.palette.mode === 'dark' ? tmpl.secondaryColor : tmpl.primaryColor), fontSize: 20 }} />
                         ) : (
                           <Chip
                             label={tmpl.badge}
@@ -292,8 +299,8 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
                               height: 20,
                               fontSize: '0.65rem',
                               fontWeight: 800,
-                              bgcolor: 'rgba(255,255,255,0.2)',
-                              color: '#ffffff'
+                              bgcolor: `${tmpl.primaryColor}14`,
+                              color: (t) => (t.palette.mode === 'dark' ? tmpl.secondaryColor : tmpl.primaryColor)
                             }}
                           />
                         )}

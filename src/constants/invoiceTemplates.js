@@ -8,7 +8,16 @@ export const INVOICE_TEMPLATES = [
     darkColor: '#08281F',
     headerBg: 'linear-gradient(135deg, #08281F 0%, #155D46 100%)',
     badge: 'Signature',
-    description: 'Deep forest emerald banner with antique brass accents, atelier monogram crest, and refined styling.'
+    description: 'Full colour header banner, split ledger with atelier privileges panel and a filled net-total band.',
+    format: {
+      header: 'banner',
+      sheet: 'soft',
+      meta: 'card',
+      items: 'banded-table',
+      summary: 'split-privileges',
+      footer: 'signature-right',
+      tear: 'client-copy'
+    }
   },
   {
     id: 'champagne-gold',
@@ -19,7 +28,16 @@ export const INVOICE_TEMPLATES = [
     darkColor: '#3D2C10',
     headerBg: 'linear-gradient(135deg, #3D2C10 0%, #8A6A27 100%)',
     badge: 'Regal',
-    description: 'Champagne bronze double-line borders, boutique crest, and classical luxury typography.'
+    description: 'Centred crest letterhead inside a double-rule certificate frame, ledger table and stacked settlement footer.',
+    format: {
+      header: 'crest',
+      sheet: 'double-rule',
+      meta: 'inline-centered',
+      items: 'ledger-table',
+      summary: 'stacked-ledger',
+      footer: 'centered-seal',
+      tear: 'original-client'
+    }
   },
   {
     id: 'royal-sapphire',
@@ -30,7 +48,16 @@ export const INVOICE_TEMPLATES = [
     darkColor: '#06263C',
     headerBg: 'linear-gradient(135deg, #06263C 0%, #0F5C8B 60%, #1976B8 100%)',
     badge: 'Prestige',
-    description: 'Deep azure with frost-blue highlights, aristocratic seal header, and crisp dual-tone financial columns.'
+    description: 'Filled identity rail beside a document title block, ruled tinted ledger and a headed summary rail.',
+    format: {
+      header: 'rail',
+      sheet: 'spine',
+      meta: 'split-grid',
+      items: 'ruled-table',
+      summary: 'dark-rail',
+      footer: 'corner-seal',
+      tear: 'client-copy'
+    }
   },
   {
     id: 'rose-plum',
@@ -41,7 +68,16 @@ export const INVOICE_TEMPLATES = [
     darkColor: '#3F2340',
     headerBg: 'linear-gradient(135deg, #3F2340 0%, #8A4A76 60%, #A85C82 100%)',
     badge: 'Bridal',
-    description: 'Dusty plum with warm rose gold hairline dividers, designed for luxury bridal suites & couture bespoke orders.'
+    description: 'Editorial masthead with hairline rules, dotted-leader garment list and a soft blush totals card.',
+    format: {
+      header: 'masthead',
+      sheet: 'hairline',
+      meta: 'ledger-columns',
+      items: 'editorial-list',
+      summary: 'blush-card',
+      footer: 'monogram-centered',
+      tear: 'trousseau-copy'
+    }
   },
   {
     id: 'heritage-crimson',
@@ -52,7 +88,16 @@ export const INVOICE_TEMPLATES = [
     darkColor: '#4A130F',
     headerBg: 'linear-gradient(135deg, #4A130F 0%, #7C1B18 55%, #93261F 100%)',
     badge: 'Heritage',
-    description: 'Kashmiri vermillion red with brass gold highlights, ornamental frame, and artisanal lineage typography.'
+    description: 'Ornamental framed sheet with corner ticks, provenance ledger rows and a brass-ruled artisan note.',
+    format: {
+      header: 'framed-crest',
+      sheet: 'ornament',
+      meta: 'inline-centered',
+      items: 'provenance-table',
+      summary: 'framed-ledger',
+      footer: 'framed-seal',
+      tear: 'heritage-ornament'
+    }
   },
   {
     id: 'executive-slate',
@@ -63,7 +108,16 @@ export const INVOICE_TEMPLATES = [
     darkColor: '#232220',
     headerBg: 'linear-gradient(135deg, #232220 0%, #4B4A47 70%, #6E6B65 100%)',
     badge: 'Executive',
-    description: 'Warm titanium graphite layout with razor-crisp grid dividers, burnt amber accents, and modern high-end data tables.'
+    description: 'Compact data-strip header, fully bordered dense grid with tabular figures and KPI total tiles.',
+    format: {
+      header: 'data-strip',
+      sheet: 'flat',
+      meta: 'split-grid',
+      items: 'grid-table',
+      summary: 'kpi-tiles',
+      footer: 'terms-split',
+      tear: 'official-record'
+    }
   },
   {
     id: 'minimal-haute',
@@ -74,7 +128,16 @@ export const INVOICE_TEMPLATES = [
     darkColor: '#100C1F',
     headerBg: 'linear-gradient(135deg, #100C1F 0%, #3A3163 100%)',
     badge: 'Modern',
-    description: 'Crisp Swiss typographic editorial grid, razor-sharp dividers, and ink-violet accents.'
+    description: 'Swiss editorial sheet: oversized document number, airy hairline rows and a single-line total.',
+    format: {
+      header: 'wordmark',
+      sheet: 'airy',
+      meta: 'ledger-columns',
+      items: 'airy-list',
+      summary: 'hairline-stack',
+      footer: 'minimal-hairline',
+      tear: 'hairline'
+    }
   },
   {
     id: 'boutique-slip',
@@ -85,7 +148,16 @@ export const INVOICE_TEMPLATES = [
     darkColor: '#2E2119',
     headerBg: 'linear-gradient(135deg, #2E2119 0%, #5B4636 100%)',
     badge: 'POS Slip',
-    description: 'Compact receipt format in warm mocha with dashed rules, optimized for rapid counter bills & thermal slips.'
+    description: 'Compact monospace counter slip with dashed separators and a tear-off footer.',
+    format: {
+      header: 'receipt',
+      sheet: 'dashed',
+      meta: 'slip-lines',
+      items: 'mono-slip',
+      summary: 'slip-stack',
+      footer: 'slip-thanks',
+      tear: 'counter-slip'
+    }
   }
 ];
 
