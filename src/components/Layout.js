@@ -289,22 +289,25 @@ export default function Layout() {
           borderBottom: sidebarConfig.borderColor,
           minHeight: 64
         }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, overflow: 'hidden' }}>
-            {/* Emerald & Gold Crest Monogram or Custom Logo */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, overflow: 'hidden', minWidth: 0 }}>
+            {/* Custom Logo or Monogram */}
             {profile?.logoUrl ? (
               <Box
                 component="img"
                 src={profile.logoUrl}
                 alt={profile.businessName || 'Logo'}
                 sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: '12px',
+                  width: 42,
+                  height: 42,
+                  borderRadius: 'var(--radius-control, 12px)',
                   objectFit: 'contain',
-                  border: '1.5px solid rgba(217, 119, 6, 0.4)',
-                  boxShadow: `0 4px 12px ${theme.palette.primary.main}40`,
+                  bgcolor: sidebarConfig.isDark ? 'rgba(255, 255, 255, 0.04)' : '#FFFFFF',
+                  border: `1px solid ${sidebarConfig.borderColor}`,
+                  p: '3px',
                   flexShrink: 0,
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  transition: 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+                  '&:hover': { transform: 'translateY(-1px)' }
                 }}
                 onClick={() => {
                   navigate('/');
@@ -313,17 +316,17 @@ export default function Layout() {
               />
             ) : (
               <Box sx={{
-                width: 40,
-                height: 40,
-                borderRadius: '12px',
+                width: 42,
+                height: 42,
+                borderRadius: 'var(--radius-control, 12px)',
                 background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.dark} 100%)`,
-                border: '1.5px solid rgba(217, 119, 6, 0.4)',
-                boxShadow: `0 4px 12px ${theme.palette.primary.main}40`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                cursor: 'pointer'
+                cursor: 'pointer',
+                transition: 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+                '&:hover': { transform: 'translateY(-1px)' }
               }} onClick={() => {
                 navigate('/');
                 if (isMobile) setMobileOpen(false);
@@ -341,14 +344,14 @@ export default function Layout() {
             )}
 
             {!showCollapsed && (
-              <Box sx={{ overflow: 'hidden' }}>
+              <Box sx={{ overflow: 'hidden', minWidth: 0 }}>
                 <Typography sx={{
                   fontFamily: 'inherit',
                   fontWeight: 800,
                   color: sidebarConfig.isDark ? '#FFFFFF' : 'text.primary',
-                  fontSize: '1.05rem',
-                  letterSpacing: '-0.025em',
-                  lineHeight: 1.2,
+                  fontSize: '1.02rem',
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1.25,
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis'
@@ -356,11 +359,13 @@ export default function Layout() {
                   {profile?.businessName || 'Aleen Clothing'}
                 </Typography>
                 <Typography sx={{ 
-                  fontSize: '0.68rem', 
+                  fontSize: '0.64rem', 
                   fontWeight: 700, 
-                  color: sidebarConfig.isDark ? '#F59E0B' : theme.palette.secondary.main,
+                  color: sidebarConfig.isDark ? theme.palette.secondary.light : theme.palette.secondary.main,
                   textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
+                  letterSpacing: '0.06em',
+                  lineHeight: 1.3,
+                  mt: 0.25,
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis'
@@ -718,13 +723,13 @@ export default function Layout() {
             fontWeight: 800,
             ml: 0.25,
             cursor: 'pointer',
-            border: isDark ? '1px solid transparent' : '2px solid rgba(124, 111, 232, 0.4)',
+            border: isDark ? '1px solid transparent' : `2px solid ${theme.palette.primary.main}66`,
             objectFit: 'contain',
             p: profile?.logoUrl ? 0.25 : 0,
-            boxShadow: '0 2px 8px rgba(124, 111, 232, 0.35)',
+            boxShadow: `0 2px 8px ${theme.palette.primary.main}59`,
             transition: 'box-shadow 0.2s ease, transform 0.2s ease',
             '&:hover': {
-              boxShadow: '0 0 0 4px rgba(124, 111, 232, 0.18), 0 2px 8px rgba(124, 111, 232, 0.35)',
+              boxShadow: `0 0 0 4px ${theme.palette.primary.main}2E, 0 2px 8px ${theme.palette.primary.main}59`,
               transform: 'translateY(-1px)'
             }
           }}
