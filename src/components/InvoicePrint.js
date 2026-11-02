@@ -203,7 +203,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
         position: 'relative',
         boxShadow: { xs: 'none', sm: '0 4px 20px rgba(0,0,0,0.06)' },
         borderRadius: { xs: 2, sm: 2 },
-        fontFamily: isSlip ? 'monospace, sans-serif' : '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        fontFamily: isSlip ? 'monospace, sans-serif' : '"DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         WebkitPrintColorAdjust: 'exact',
         printColorAdjust: 'exact',
         colorAdjust: 'exact',
@@ -341,8 +341,9 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
             )}
             <Box sx={{ minWidth: 0, flex: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography variant="caption" sx={{ letterSpacing: { xs: 1, sm: 2 }, color: '#FDE68A', fontWeight: 800, textTransform: 'uppercase', fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>
-                  ✂️ {profile.tagline || activeSettings.tagline || 'Haute Couture & Bespoke Craft'}
+                <Box sx={{ width: 18, height: 2, borderRadius: '999px', bgcolor: '#FDE68A', flexShrink: 0 }} />
+                <Typography variant="caption" sx={{ letterSpacing: { xs: 1, sm: 2 }, color: '#FDE68A', fontWeight: 800, textTransform: 'uppercase', fontSize: { xs: '0.65rem', sm: '0.72rem' } }}>
+                  {profile.tagline || activeSettings.tagline || 'Haute Couture & Bespoke Craft'}
                 </Typography>
               </Box>
               <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: -0.5, mt: 0.5, color: '#FFFFFF', fontSize: { xs: '1.35rem', sm: '1.75rem' }, lineHeight: 1.15 }}>
@@ -384,8 +385,8 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
               >
                 TAX INVOICE
               </Typography>
-              <Box sx={{ display: 'inline-block', bgcolor: 'rgba(255,255,255,0.18)', px: 1.2, py: 0.25, borderRadius: 1, mt: 0.5 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#FDE68A', letterSpacing: 0.5, fontSize: { xs: '0.78rem', sm: '0.875rem' } }}>
+              <Box sx={{ display: 'inline-block', bgcolor: 'rgba(255,255,255,0.16)', px: 1.25, py: 0.3, borderRadius: '999px', mt: 0.5, border: '1px solid rgba(255,255,255,0.25)' }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#FDE68A', letterSpacing: 0.5, fontSize: { xs: '0.78rem', sm: '0.875rem' }, fontFamily: 'monospace' }}>
                   #{invoice.invoiceNumber || invoice.id}
                 </Typography>
               </Box>
@@ -405,6 +406,7 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
           borderRadius: 2,
           border: '1px solid',
           borderColor: 'divider',
+          borderLeft: `4px solid ${theme.primaryColor}`,
           bgcolor: isSlip ? 'transparent' : 'rgba(0,0,0,0.01)',
           position: 'relative',
           zIndex: 1,
@@ -960,11 +962,11 @@ const InvoicePrint = forwardRef(({ invoice, template, settings, profile: profile
 
             <Divider sx={{ my: 1, borderColor: theme.totalBoxBorder }} />
 
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography variant="h6" sx={{ fontWeight: 900, color: theme.darkColor, fontSize: '0.98rem' }}>
-                NET TOTAL:
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 1.75, py: 1.1, borderRadius: 1.5, background: theme.primaryColor, color: '#FFFFFF', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#FFFFFF', letterSpacing: 1.2, textTransform: 'uppercase', fontSize: '0.78rem' }}>
+                Net Total
               </Typography>
-              <Typography variant="h5" style={{ color: theme.primaryColor }} sx={{ fontWeight: 900, color: theme.primaryColor, fontSize: '1.25rem', fontVariantNumeric: 'tabular-nums' }}>
+              <Typography variant="h6" sx={{ fontWeight: 900, color: '#FFFFFF', fontSize: '1.15rem', fontVariantNumeric: 'tabular-nums', lineHeight: 1.1 }}>
                 ₹{Number(invoice.total || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </Typography>
             </Box>
