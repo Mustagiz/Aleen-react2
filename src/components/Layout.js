@@ -583,7 +583,7 @@ export default function Layout() {
   const renderHorizonTopBar = () => (
     <>
       {/* Left: Collapse Toggle + Breadcrumb + Page Title */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.75 }, minWidth: 0 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.75 }, minWidth: 0, flex: 1 }}>
         <IconButton
           onClick={isMobile ? () => setMobileOpen(true) : toggleSidebarCollapse}
           size="small"
@@ -610,7 +610,8 @@ export default function Layout() {
             fontWeight: 800,
             color: 'text.primary',
             letterSpacing: '-0.015em',
-            maxWidth: { xs: 150, xxs: 110 }
+            flex: 1,
+            minWidth: 0
           }}
         >
           {getBreadcrumbTitle()}

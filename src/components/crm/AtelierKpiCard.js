@@ -116,15 +116,16 @@ export default function AtelierKpiCard({
           {/* Stat column: label above value, growth line below (Horizon MiniStatistics) */}
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Typography
-              noWrap
               sx={{
                 color: isDark ? 'rgba(203, 213, 225, 0.9)' : '#5B5B66',
                 fontWeight: 600,
                 fontSize: { xs: '0.66rem', sm: '0.7rem', md: '0.72rem' },
-                lineHeight: 1.2,
+                lineHeight: 1.25,
                 letterSpacing: '0.01em',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis'
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden'
               }}
             >
               {title}
@@ -163,15 +164,16 @@ export default function AtelierKpiCard({
                 )}
                 {subtitle && (
                   <Typography
-                    noWrap
                     sx={{
                       fontSize: { xs: '0.6rem', sm: '0.63rem' },
                       fontWeight: 400,
                       color: isDark ? 'rgba(148, 163, 184, 0.85)' : '#9A9AA6',
                       flex: 1,
                       minWidth: 0,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis'
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden'
                     }}
                   >
                     {subtitle}
