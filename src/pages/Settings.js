@@ -1317,31 +1317,83 @@ export default function Settings() {
                             '&:hover': { borderColor: tmpl.primaryColor, transform: 'translateY(-3px)' }
                           }}
                         >
-                          <Box sx={{ p: 1.5, background: tmpl.headerBg, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
-                            <Typography sx={{ fontWeight: 800, color: '#FFFFFF', fontSize: '0.78rem', letterSpacing: '0.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                              {tmpl.name}
-                            </Typography>
+                          {/* Miniature invoice mockup */}
+                          <Box sx={{ p: 1.25, bgcolor: (t) => (t.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : '#F8FAFC') }}>
+                            <Box sx={{ borderRadius: 1.5, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.08)', bgcolor: '#FFFFFF', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
+                              {/* Header banner */}
+                              <Box sx={{ px: 1.25, py: 1, background: tmpl.headerBg, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, minWidth: 0 }}>
+                                  <Box sx={{ width: 16, height: 16, borderRadius: '4px', bgcolor: 'rgba(255,255,255,0.22)', border: '1px solid rgba(255,255,255,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                    <Typography sx={{ fontSize: '0.5rem', fontWeight: 800, color: '#FFFFFF', lineHeight: 1 }}>A</Typography>
+                                  </Box>
+                                  <Typography sx={{ fontSize: '0.6rem', fontWeight: 800, color: '#FFFFFF', letterSpacing: '0.06em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                    ALEEN CLOTHING
+                                  </Typography>
+                                </Box>
+                                <Typography sx={{ fontSize: '0.5rem', fontWeight: 800, color: 'rgba(255,255,255,0.85)', letterSpacing: '0.1em', flexShrink: 0 }}>
+                                  TAX INVOICE
+                                </Typography>
+                              </Box>
+
+                              {/* Meta skeleton */}
+                              <Box sx={{ px: 1.25, py: 1, display: 'flex', justifyContent: 'space-between', gap: 1 }}>
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.4, flex: 1 }}>
+                                  <Box sx={{ height: 4, width: '55%', borderRadius: 999, bgcolor: '#E2E8F0' }} />
+                                  <Box sx={{ height: 4, width: '78%', borderRadius: 999, bgcolor: '#E2E8F0' }} />
+                                </Box>
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.4, alignItems: 'flex-end', flex: 1 }}>
+                                  <Box sx={{ height: 4, width: '45%', borderRadius: 999, bgcolor: '#E2E8F0' }} />
+                                  <Box sx={{ height: 4, width: '60%', borderRadius: 999, bgcolor: '#E2E8F0' }} />
+                                </Box>
+                              </Box>
+
+                              {/* Table header strip */}
+                              <Box sx={{ mx: 1.25, px: 1, py: 0.4, borderRadius: '4px', background: tmpl.primaryColor, display: 'flex', justifyContent: 'space-between' }}>
+                                {['ITEM', 'QTY', 'AMT'].map(h => (
+                                  <Typography key={h} sx={{ fontSize: '0.48rem', fontWeight: 800, color: '#FFFFFF', letterSpacing: '0.08em' }}>{h}</Typography>
+                                ))}
+                              </Box>
+
+                              {/* Line-item skeleton rows */}
+                              <Box sx={{ px: 1.25, py: 0.75, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                                {[0, 1, 2].map(i => (
+                                  <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Box sx={{ height: 4, flex: 1, borderRadius: 999, bgcolor: '#F1F5F9' }} />
+                                    <Box sx={{ height: 4, width: 18, borderRadius: 999, bgcolor: '#E2E8F0' }} />
+                                  </Box>
+                                ))}
+                              </Box>
+
+                              {/* Totals bar */}
+                              <Box sx={{ mx: 1.25, mb: 1.25, px: 1, py: 0.5, borderRadius: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: `${tmpl.primaryColor}14`, border: `1px solid ${tmpl.primaryColor}33` }}>
+                                <Typography sx={{ fontSize: '0.52rem', fontWeight: 800, color: tmpl.darkColor, letterSpacing: '0.06em' }}>TOTAL</Typography>
+                                <Typography sx={{ fontSize: '0.62rem', fontWeight: 800, color: tmpl.primaryColor }}>₹36,657</Typography>
+                              </Box>
+                            </Box>
+                          </Box>
+
+                          {/* Card footer: name + tagline + state */}
+                          <Box sx={{ px: 1.5, py: 1.25, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, borderTop: '1px solid', borderColor: 'divider' }}>
+                            <Box sx={{ minWidth: 0 }}>
+                              <Typography sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.78rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {tmpl.name}
+                              </Typography>
+                              <Typography sx={{ fontSize: '0.62rem', fontWeight: 600, color: tmpl.primaryColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {tmpl.tagline}
+                              </Typography>
+                            </Box>
                             {isSelected ? (
-                              <CheckCircle sx={{ color: '#FDE68A', fontSize: 18, flexShrink: 0 }} />
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
+                                <CheckCircle sx={{ fontSize: 16, color: tmpl.primaryColor }} />
+                                <Typography sx={{ fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: tmpl.primaryColor }}>
+                                  Active
+                                </Typography>
+                              </Box>
                             ) : (
-                              <Box sx={{ fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.92)', bgcolor: 'rgba(255,255,255,0.18)', px: 1, py: 0.25, borderRadius: '999px', flexShrink: 0 }}>
+                              <Box sx={{ flexShrink: 0, fontSize: '0.58rem', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'text.disabled', px: 1, py: 0.25, borderRadius: '999px', border: '1px solid', borderColor: 'divider' }}>
                                 {tmpl.badge}
                               </Box>
                             )}
-                          </Box>
-
-                          <Box sx={{ p: 1.5 }}>
-                            <Typography sx={{ fontWeight: 700, color: tmpl.primaryColor, fontSize: '0.7rem', display: 'block', mb: 0.25 }}>
-                              {tmpl.tagline}
-                            </Typography>
-                            <Box sx={{ display: 'flex', gap: 0.75, alignItems: 'center', mt: 0.75 }}>
-                              <Box sx={{ width: 16, height: 16, borderRadius: '50%', bgcolor: tmpl.primaryColor, border: '1px solid rgba(0,0,0,0.12)' }} />
-                              <Box sx={{ width: 16, height: 16, borderRadius: '50%', bgcolor: tmpl.secondaryColor, border: '1px solid rgba(0,0,0,0.12)' }} />
-                              <Box sx={{ width: 16, height: 16, borderRadius: '50%', bgcolor: tmpl.darkColor, border: '1px solid rgba(0,0,0,0.12)' }} />
-                              <Typography sx={{ ml: 'auto', fontWeight: 800, fontSize: '0.62rem', letterSpacing: '0.06em', textTransform: 'uppercase', color: isSelected ? 'primary.main' : 'text.disabled' }}>
-                                {isSelected ? 'Active' : 'Select'}
-                              </Typography>
-                            </Box>
                           </Box>
                         </Box>
                       </Grid>
