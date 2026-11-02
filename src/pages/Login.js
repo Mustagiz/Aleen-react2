@@ -19,6 +19,7 @@ import {
 } from '../components/icons';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
+import loginIllustration from '../assets/aleen-login-illustration.png';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -35,11 +36,8 @@ export default function Login() {
   const primary = theme.palette.primary.main;
   const primaryLight = theme.palette.primary.light;
   const secondary = theme.palette.secondary.main;
-  const secondaryLight = theme.palette.secondary.light;
   const gold = theme.palette.warning.main;
-  const ink = isDark ? '#EDE9FB' : '#2B2440';
   const canvas = isDark ? theme.palette.background.default : '#FAF8FE';
-  const dressFill = isDark ? primary : primaryLight;
   const fieldBg = isDark ? 'rgba(255, 255, 255, 0.04)' : '#FFFFFF';
   const fieldBorder = isDark ? 'rgba(255, 255, 255, 0.12)' : '#E6E1F6';
 
@@ -79,41 +77,24 @@ export default function Login() {
     </Typography>
   );
 
-  const dressIllustration = (
-    <Box sx={{ width: '100%', maxWidth: 330, mx: 'auto', position: 'relative' }}>
-      <svg viewBox="0 0 320 300" width="100%" height="auto" role="img" aria-label="Evening dress on a hanger">
-        {/* flat geometric backdrop */}
-        <circle cx="160" cy="150" r="122" fill="none" stroke={secondary} strokeOpacity="0.28" strokeWidth="14" />
-        <circle cx="268" cy="62" r="34" fill={primaryLight} opacity="0.5" />
-        <circle cx="286" cy="228" r="7" fill={gold} />
-        <circle cx="38" cy="236" r="7" fill={secondary} />
-        <circle cx="46" cy="72" r="5" fill={gold} opacity="0.85" />
-
-        {/* hanger */}
-        <circle cx="160" cy="32" r="9" fill="none" stroke={ink} strokeWidth="4" />
-        <line x1="160" y1="41" x2="160" y2="58" stroke={ink} strokeWidth="4" strokeLinecap="round" />
-        <line x1="160" y1="58" x2="84" y2="120" stroke={ink} strokeWidth="5" strokeLinecap="round" />
-        <line x1="160" y1="58" x2="236" y2="120" stroke={ink} strokeWidth="5" strokeLinecap="round" />
-        <line x1="84" y1="120" x2="236" y2="120" stroke={ink} strokeWidth="5" strokeLinecap="round" />
-
-        {/* dress straps */}
-        <line x1="122" y1="120" x2="126" y2="146" stroke={ink} strokeWidth="4" strokeLinecap="round" />
-        <line x1="198" y1="120" x2="194" y2="146" stroke={ink} strokeWidth="4" strokeLinecap="round" />
-
-        {/* bodice */}
-        <path d="M126 146 Q160 156 194 146 L182 198 Q160 208 138 198 Z" fill={dressFill} stroke={ink} strokeWidth="4" strokeLinejoin="round" />
-
-        {/* skirt */}
-        <path d="M138 198 Q118 240 104 268 Q160 282 216 268 Q202 240 182 198 Z" fill={dressFill} stroke={ink} strokeWidth="4" strokeLinejoin="round" />
-
-        {/* waist sash + bow */}
-        <path d="M132 202 L188 202 L190 212 L130 212 Z" fill={secondaryLight} stroke={ink} strokeWidth="3" strokeLinejoin="round" />
-        <path d="M160 205 l-9 -7 l9 4 l9 -4 Z" fill={secondaryLight} stroke={ink} strokeWidth="3" strokeLinejoin="round" />
-
-        {/* sparkles */}
-        <path d="M258 150 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3 Z" fill={gold} />
-        <path d="M66 172 l2.5 6.5 l6.5 2.5 l-6.5 2.5 l-2.5 6.5 l-2.5 -6.5 l-6.5 -2.5 l6.5 -2.5 Z" fill={secondary} />
-      </svg>
+  const illustrationCard = (
+    <Box
+      sx={{
+        width: '100%',
+        maxWidth: { xs: 210, md: 340 },
+        mx: 'auto',
+        borderRadius: '28px',
+        overflow: 'hidden',
+        bgcolor: isDark ? '#F6F3FC' : 'transparent',
+        boxShadow: isDark ? '0 24px 60px rgba(0, 0, 0, 0.5)' : 'none'
+      }}
+    >
+      <Box
+        component="img"
+        src={loginIllustration}
+        alt="Fashion illustration of a woman in a lavender gown"
+        sx={{ display: 'block', width: '100%', height: 'auto' }}
+      />
     </Box>
   );
 
@@ -180,7 +161,7 @@ export default function Login() {
         }}
       >
         <Box sx={{ mb: 5 }}>{wordmark('1.35rem')}</Box>
-        {dressIllustration}
+        {illustrationCard}
         <Typography
           sx={{
             textAlign: 'center',
@@ -233,7 +214,7 @@ export default function Login() {
               <Checkroom sx={{ fontSize: 22 }} />
             </Box>
             {wordmark('1.05rem')}
-            <Box sx={{ mt: 3, maxWidth: 210, mx: 'auto' }}>{dressIllustration}</Box>
+            <Box sx={{ mt: 3 }}>{illustrationCard}</Box>
           </Box>
 
           {/* desktop brand mark above form */}
