@@ -11,7 +11,7 @@ const MIN_FIT = 0.55; // never shrink the bill below ~8pt equivalent
 const SETTLE_TIMEOUT = 1200;
 
 // A4 @page margins below must stay in sync with the `pageMargin` written into the frame.
-const A4_MARGIN = { top: 14, bottom: 14, left: 16, right: 16 };
+const A4_MARGIN = { top: 12, bottom: 12, left: 14, right: 14 };
 const A4_BOX = {
   width: Math.round((A4.width - A4_MARGIN.left - A4_MARGIN.right) * MM),
   height: Math.round((A4.height - A4_MARGIN.top - A4_MARGIN.bottom) * MM)
@@ -65,7 +65,7 @@ export const printInvoiceElement = (element, format = false) => {
   const is80mm = format === '80mm' || format === true;
   const isThermal = is58mm || is80mm;
   const pageSize = is58mm ? '58mm auto' : (is80mm ? '80mm auto' : 'A4 portrait');
-  const pageMargin = is58mm ? '2mm 2mm' : (is80mm ? '3mm 2mm' : '14mm 16mm 14mm 16mm');
+  const pageMargin = is58mm ? '2mm 2mm' : (is80mm ? '3mm 2mm' : '12mm 14mm 12mm 14mm');
   const maxContentWidth = is58mm ? '54mm' : (is80mm ? '76mm' : '100%');
   // Lay the frame out at the real printable width so responsive breakpoints,
   // table wrapping and the one-page measurement all match the paper.
@@ -148,7 +148,7 @@ export const printInvoiceElement = (element, format = false) => {
             width: 100% !important;
             max-width: ${maxContentWidth} !important;
             margin: 0 auto !important;
-            padding: ${isThermal ? '2mm 2mm' : '6mm 6mm 10mm 6mm'} !important;
+            padding: ${isThermal ? '2mm 2mm' : '0'} !important;
             box-shadow: none !important;
             border-radius: 0 !important;
             background: #ffffff !important;
