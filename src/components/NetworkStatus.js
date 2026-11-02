@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Snackbar, Alert, Slide } from '@mui/material';
-import { WifiOff, Wifi } from '@mui/icons-material';
+import { WifiOff, Wifi } from './icons';
 
 const NetworkStatus = () => {
     const [isOnline, setIsOnline] = useState(navigator.onLine);

@@ -52,7 +52,7 @@ import {
   CalendarMonth,
   GridView,
   ViewList
-} from '@mui/icons-material';
+} from '../components/icons';
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import GlassCard from '../components/GlassCard';

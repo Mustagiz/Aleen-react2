@@ -37,7 +37,7 @@ import {
   ShoppingBag,
   Close,
   OpenInNew
-} from '@mui/icons-material';
+} from '../icons';
 import SlideOverDrawer from './SlideOverDrawer';
 import { useData } from '../../contexts/DataContext';
 

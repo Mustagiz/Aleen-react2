@@ -42,7 +42,7 @@ import {
   AccountBalanceWallet,
   WorkspacePremium,
   ContentCopy
-} from '@mui/icons-material';
+} from '../components/icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '../firebase';
 import { doc, onSnapshot, collection, getDocs } from 'firebase/firestore';

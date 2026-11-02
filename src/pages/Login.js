@@ -23,7 +23,7 @@ import {
   Straighten,
   PointOfSale,
   ArrowForward
-} from '@mui/icons-material';
+} from '../components/icons';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 

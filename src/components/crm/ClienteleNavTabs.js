@@ -4,7 +4,7 @@ import {
     People, 
     Stars, 
     Campaign 
-} from '@mui/icons-material';
+} from '../icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const CLIENTELE_TABS = [

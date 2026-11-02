@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography, Button, Paper } from '@mui/material';
-import { Refresh, WarningAmber } from '@mui/icons-material';
+import { Refresh, WarningAmber } from './icons';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {

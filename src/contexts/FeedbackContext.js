@@ -11,7 +11,7 @@ import {
     Box,
     Avatar
 } from '@mui/material';
-import { Warning, HelpOutline } from '@mui/icons-material';
+import { Warning, HelpOutline } from '../components/icons';
 
 const FeedbackContext = createContext(null);
 

@@ -28,7 +28,7 @@ import {
   Phone,
   Tune,
   AutoAwesome
-} from '@mui/icons-material';
+} from '../icons';
 import { useData } from '../../contexts/DataContext';
 
 /**

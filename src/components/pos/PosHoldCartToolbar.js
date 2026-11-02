@@ -23,7 +23,7 @@ import {
   CurrencyRupee,
   AccessTime,
   Close
-} from '@mui/icons-material';
+} from '../icons';
 import { getHeldCarts, saveHeldCartSlot, releaseHeldCartSlot } from '../../engine/billingEngine';
 
 /**

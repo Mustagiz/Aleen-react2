@@ -54,7 +54,7 @@ import {
   FilterList,
   GridView,
   ViewList
-} from '@mui/icons-material';
+} from '../components/icons';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';

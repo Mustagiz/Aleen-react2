@@ -31,7 +31,7 @@ import {
     Search,
     Close,
     PointOfSale
-} from '@mui/icons-material';
+} from '../components/icons';
 import { useData } from '../contexts/DataContext';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';

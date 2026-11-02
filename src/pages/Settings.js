@@ -62,7 +62,7 @@ import {
   Palette,
   Tv,
   Language
-} from '@mui/icons-material';
+} from '../components/icons';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useFeedback } from '../contexts/FeedbackContext';

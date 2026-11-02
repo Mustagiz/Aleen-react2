@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, MenuItem, Select, useTheme } from '@mui/material';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import { CalendarMonth as CalendarMonthIcon } from '../icons';
 
 // Shared quick-range presets used by in-card chart filters
 export const CHART_RANGE_OPTIONS = [

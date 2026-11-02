@@ -40,7 +40,7 @@ import {
   AttachMoney,
   FilterList,
   Clear
-} from '@mui/icons-material';
+} from '../components/icons';
 import { formatCurrencyForPDF, generateReportPDF } from '../utils/helpers';
 import PageHeader from '../components/crm/PageHeader';
 import FinanceNavTabs from '../components/crm/FinanceNavTabs';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography, Divider, Chip, Link, useTheme } from '@mui/material';
-import { Diamond, ShieldOutlined, CloudDone, Keyboard, Speed } from '@mui/icons-material';
+import { Diamond, ShieldOutlined, CloudDone, Keyboard, Speed } from '../icons';
 import { useData } from '../../contexts/DataContext';
 
 export default function AtelierFooter() {

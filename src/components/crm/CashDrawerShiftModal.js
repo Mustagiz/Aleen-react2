@@ -43,7 +43,7 @@ import {
   ReceiptLong,
   InfoOutlined,
   Send
-} from '@mui/icons-material';
+} from '../icons';
 import { collection, addDoc, getDocs, query, orderBy, limit, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useData } from '../../contexts/DataContext';

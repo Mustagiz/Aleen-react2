@@ -31,7 +31,7 @@ import {
   Star,
   Devices,
   Architecture
-} from '@mui/icons-material';
+} from '../icons';
 import { motion } from 'framer-motion';
 import { useThemeContext } from '../../contexts/ThemeContext';
 import { useFeedback } from '../../contexts/FeedbackContext';

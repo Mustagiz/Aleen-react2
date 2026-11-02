@@ -33,7 +33,7 @@ import {
   DescriptionOutlined,
   ImageOutlined,
   Visibility
-} from '@mui/icons-material';
+} from './icons';
 import { INVOICE_TEMPLATES, DEFAULT_INVOICE_SETTINGS } from '../constants/invoiceTemplates';
 import { useData } from '../contexts/DataContext';
 import InvoicePrint from './InvoicePrint';

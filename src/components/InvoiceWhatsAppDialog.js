@@ -39,7 +39,7 @@ import {
   CurrencyRupee,
   DoneAll,
   PictureAsPdf
-} from '@mui/icons-material';
+} from './icons';
 import { dispatchMessage, normalizePhoneNumber, buildPublicBillUrl } from '../services/messageDispatcher';
 
 export const INVOICE_WHATSAPP_TEMPLATES = [

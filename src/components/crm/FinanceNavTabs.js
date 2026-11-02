@@ -7,7 +7,7 @@ import {
     Insights, 
     BarChart, 
     FactCheck 
-} from '@mui/icons-material';
+} from '../icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const FINANCE_TABS = [

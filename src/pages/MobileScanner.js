@@ -17,7 +17,7 @@ import {
     VolumeOff,
     Sensors,
     PhotoCamera
-} from '@mui/icons-material';
+} from '../components/icons';
 import { useSearchParams } from 'react-router-dom';
 import { Html5Qrcode } from 'html5-qrcode';
 import { db } from '../firebase';

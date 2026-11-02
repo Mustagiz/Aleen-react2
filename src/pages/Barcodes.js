@@ -56,7 +56,7 @@ import {
     PriceChange,
     CurrencyRupee,
     Percent
-} from '@mui/icons-material';
+} from '../components/icons';
 import { useData } from '../contexts/DataContext';
 import { useFeedback } from '../contexts/FeedbackContext';
 import PageHeader from '../components/crm/PageHeader';

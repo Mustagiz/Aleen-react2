@@ -29,7 +29,7 @@ import {
   CheckCircle,
   Close,
   AccountBalanceWallet
-} from '@mui/icons-material';
+} from '../components/icons';
 import { doc, getDoc, collection, getDocs, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useData } from '../contexts/DataContext';

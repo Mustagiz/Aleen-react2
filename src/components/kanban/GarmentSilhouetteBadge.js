@@ -5,7 +5,7 @@ import {
   DryCleaning,
   AccessibilityNew,
   Face3
-} from '@mui/icons-material';
+} from '../icons';
 
 const SILHOUETTES = {
   suit: { label: 'Bespoke Suit', icon: DryCleaning, color: '#0284C7' },

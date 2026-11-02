@@ -33,7 +33,7 @@ import {
   Sms,
   Link as LinkIcon,
   OpenInNew
-} from '@mui/icons-material';
+} from './icons';
 import { INVOICE_WHATSAPP_TEMPLATES, generateInvoiceWhatsAppText } from './InvoiceWhatsAppDialog';
 import { buildPublicBillUrl } from '../services/messageDispatcher';
 import ThermalReceipt from './ThermalReceipt';

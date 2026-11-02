@@ -28,7 +28,7 @@ import {
     CheckCircleOutline,
     RadioButtonUnchecked,
     DeleteOutline
-} from '@mui/icons-material';
+} from './icons';
 import { useData } from '../contexts/DataContext';
 import { useNavigate } from 'react-router-dom';
 

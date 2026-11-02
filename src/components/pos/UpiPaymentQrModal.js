@@ -25,7 +25,7 @@ import {
   DoneAll,
   Edit,
   Check
-} from '@mui/icons-material';
+} from '../icons';
 import { generateUpiPaymentUrl } from '../../engine/billingEngine';
 import { getStoredInvoiceSettings } from '../../constants/invoiceTemplates';
 

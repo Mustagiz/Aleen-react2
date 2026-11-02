@@ -53,7 +53,7 @@ import {
     Tune,
     Calculate,
     CheckCircle
-} from '@mui/icons-material';
+} from '../components/icons';
 import { useData } from '../contexts/DataContext';
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';

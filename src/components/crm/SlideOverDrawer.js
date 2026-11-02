@@ -1,6 +1,6 @@
 import React from 'react';
 import { Drawer, Box, Typography, IconButton, Divider, useTheme } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import { Close } from '../icons';
 
 export default function SlideOverDrawer({
   open,

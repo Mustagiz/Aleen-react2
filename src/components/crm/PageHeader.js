@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography, Breadcrumbs, Link, Chip } from '@mui/material';
-import { NavigateNext } from '@mui/icons-material';
+import { NavigateNext } from '../icons';
 import { useNavigate } from 'react-router-dom';
 import { useThemeContext } from '../../contexts/ThemeContext';
 

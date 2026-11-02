@@ -8,7 +8,7 @@ import {
 import { 
     Edit, Delete, Add, Search, ReceiptLong, AccountBalanceWallet, 
     Download, Upload, Close, ArrowUpward, ArrowDownward, TrendingUp
-} from '@mui/icons-material';
+} from '../components/icons';
 import { useData } from '../contexts/DataContext';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 import GlassCard from '../components/GlassCard';

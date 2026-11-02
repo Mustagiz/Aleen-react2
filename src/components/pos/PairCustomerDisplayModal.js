@@ -22,7 +22,7 @@ import {
   Wifi,
   Sensors,
   OpenInNew
-} from '@mui/icons-material';
+} from '../icons';
 import { db } from '../../firebase';
 import { doc, setDoc } from 'firebase/firestore';
 

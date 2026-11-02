@@ -25,7 +25,7 @@ import {
     People,
     ShoppingCart,
     AttachMoney
-} from '@mui/icons-material';
+} from '../components/icons';
 import { useData } from '../contexts/DataContext';
 import { Line } from 'react-chartjs-2';
 import jsPDF from 'jspdf';

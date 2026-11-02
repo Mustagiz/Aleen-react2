@@ -31,7 +31,7 @@ import {
   KeyboardReturn,
   ArrowDownward,
   ArrowUpward
-} from '@mui/icons-material';
+} from './icons';
 import { useNavigate } from 'react-router-dom';
 import { useData } from '../contexts/DataContext';
 

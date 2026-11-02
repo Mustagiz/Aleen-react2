@@ -46,7 +46,7 @@ import {
   CloudUpload,
   DeleteOutline,
   VideoLibrary
-} from '@mui/icons-material';
+} from '../icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '../../firebase';
 import { doc, setDoc, onSnapshot, collection, getDocs, deleteDoc } from 'firebase/firestore';

@@ -23,7 +23,7 @@ import {
   Straighten,
   ExpandMore,
   Check
-} from '@mui/icons-material';
+} from '../components/icons';
 import {
   Chart as ChartJS,
   CategoryScale,

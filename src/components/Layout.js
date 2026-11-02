@@ -50,7 +50,7 @@ import {
   QrCodeScanner,
   Close,
   Palette
-} from '@mui/icons-material';
+} from './icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
 import { useThemeContext } from '../contexts/ThemeContext';

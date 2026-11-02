@@ -58,7 +58,7 @@ import {
     CameraAlt,
     InfoOutlined,
     OpenInNew
-} from '@mui/icons-material';
+} from '../components/icons';
 import { Html5Qrcode } from 'html5-qrcode';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase';

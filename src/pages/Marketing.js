@@ -80,7 +80,7 @@ import {
     QrCode,
     ReceiptLong,
     VpnKey
-} from '@mui/icons-material';
+} from '../components/icons';
 import { useData } from '../contexts/DataContext';
 import { storage } from '../firebase';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';

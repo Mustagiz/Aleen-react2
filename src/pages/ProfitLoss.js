@@ -9,7 +9,7 @@ import {
     TrendingUp, TrendingDown, Download, 
     ShoppingCart, Search, Close, 
     BarChart as BarChartIcon, MonetizationOn
-} from '@mui/icons-material';
+} from '../components/icons';
 import { 
     Chart as ChartJS, CategoryScale, LinearScale, BarElement, 
     LineElement, PointElement, ArcElement, Title, Tooltip as ChartTooltip, Legend 
