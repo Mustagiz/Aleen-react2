@@ -22,7 +22,6 @@ import {
     NotificationsNone,
     Warning,
     ErrorOutline,
-    Info,
     ChevronRight,
     DoneAll,
     CheckCircleOutline,
@@ -31,9 +30,59 @@ import {
 } from './icons';
 import { useData } from '../contexts/DataContext';
 import { useNavigate } from 'react-router-dom';
+import { db } from '../firebase';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 
-const READ_STORAGE_KEY = 'aleen_read_notifications';
-const CLEARED_STORAGE_KEY = 'aleen_cleared_notifications';
+const STATE_STORAGE_KEY = 'aleen_notification_state';
+const EMPTY_STATE = { read: {}, cleared: {} };
+
+const loadStoredState = () => {
+    try {
+        const raw = localStorage.getItem(STATE_STORAGE_KEY);
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            return { read: parsed.read || {}, cleared: parsed.cleared || {} };
+        }
+    } catch (e) {}
+    return EMPTY_STATE;
+};
+
+const normalizeKey = (value) => String(value || '').trim().replace(/\s+/g, ' ').toLowerCase();
+
+const formatNotificationTime = (iso) => {
+    const ts = Date.parse(iso || '');
+    if (!ts) return '';
+    const date = new Date(ts);
+    const now = new Date();
+    const minutes = Math.floor((now.getTime() - ts) / 60000);
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes} min ago`;
+    const time = date.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
+    if (date.toDateString() === now.toDateString()) return `Today · ${time}`;
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+    if (date.toDateString() === yesterday.toDateString()) return `Yesterday · ${time}`;
+    return `${date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} · ${time}`;
+};
+
+// Best evidence for when an alert became true: the movement log that left the
+// item at this quantity, otherwise when the stock row was created.
+const getGroupAlertTime = (group, movementTimes) => {
+    let best = 0;
+    group.items.forEach((item) => {
+        const entry = movementTimes.get(String(item?.id));
+        let exact = 0;
+        let atOrBelow = 0;
+        if (entry) {
+            entry.byQty.forEach((ts, qty) => {
+                if (qty === group.qty) exact = Math.max(exact, ts);
+                else if (qty < group.qty) atOrBelow = Math.max(atOrBelow, ts);
+            });
+        }
+        best = Math.max(best, exact || atOrBelow || (Date.parse(item?.dateAdded || '') || 0));
+    });
+    return best ? new Date(best).toISOString() : '';
+};
 
 const NotificationCenter = ({ plain = false }) => {
     const theme = useTheme();
@@ -43,71 +92,109 @@ const NotificationCenter = ({ plain = false }) => {
         textColor: theme.palette.mode === 'dark' ? '#F8FAFC' : '#0F172A'
     };
     const isDark = theme.palette.mode === 'dark';
-    const { inventory = [] } = useData();
+    const { inventory = [], inventoryLogs = [] } = useData();
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
     const [activeTab, setActiveTab] = useState('all'); // 'all' | 'unread'
 
-    // Read notification IDs from localStorage
-    const [readIds, setReadIds] = useState(() => {
-        try {
-            const saved = localStorage.getItem(READ_STORAGE_KEY);
-            return saved ? JSON.parse(saved) : [];
-        } catch (e) {
-            return [];
-        }
-    });
+    // Read/cleared state is shared through Firestore so refreshing, reopening or
+    // using another till keeps the same unread count. localStorage is the fast
+    // first paint before the snapshot lands.
+    const [notifState, setNotifState] = useState(loadStoredState);
 
-    // Cleared notification IDs from localStorage
-    const [clearedIds, setClearedIds] = useState(() => {
-        try {
-            const saved = localStorage.getItem(CLEARED_STORAGE_KEY);
-            return saved ? JSON.parse(saved) : [];
-        } catch (e) {
-            return [];
-        }
-    });
+    useEffect(() => {
+        const unsub = onSnapshot(
+            doc(db, 'settings', 'notificationState'),
+            (snap) => {
+                if (!snap.exists()) return;
+                const data = snap.data() || {};
+                setNotifState((prev) => ({
+                    read: { ...prev.read, ...(data.read || {}) },
+                    cleared: { ...prev.cleared, ...(data.cleared || {}) }
+                }));
+            },
+            (err) => console.warn('Notification state sync warning:', err)
+        );
+        return () => unsub();
+    }, []);
+
+    // Latest stock movement per product and resulting quantity
+    const movementTimes = useMemo(() => {
+        const byProduct = new Map();
+        (inventoryLogs || []).forEach((log) => {
+            const productId = String(log?.productId || '');
+            const ts = Date.parse(log?.timestamp || '');
+            const qty = Number(log?.newQuantity);
+            if (!productId || !ts || !Number.isFinite(qty)) return;
+            let entry = byProduct.get(productId);
+            if (!entry) {
+                entry = { byQty: new Map() };
+                byProduct.set(productId, entry);
+            }
+            entry.byQty.set(qty, Math.max(entry.byQty.get(qty) || 0, ts));
+        });
+        return byProduct;
+    }, [inventoryLogs]);
+
+    // Inventory rows that share a name and quantity are one alert, so a bulk
+    // import of 74 identical SKUs reads as "×74" instead of 74 duplicate rows.
+    const alertGroups = useMemo(() => {
+        const groups = new Map();
+        (inventory || []).forEach((item) => {
+            const qty = Number(item?.quantity) || 0;
+            const min = Number(item?.minStockLevel) || 2;
+            if (qty > min) return;
+            const type = qty <= 0 ? 'error' : 'warning';
+            const name = String(item?.name || 'Unnamed item').trim().replace(/\s+/g, ' ');
+            const id = `${type}:${normalizeKey(name)}:${qty}`;
+            let group = groups.get(id);
+            if (!group) {
+                group = { id, type, name, qty, items: [], skus: [] };
+                groups.set(id, group);
+            }
+            group.items.push(item);
+            const rawSku = String(item?.productId || item?.sku || '').trim().replace(/^#/, '');
+            const sku = rawSku ? `#${rawSku.toUpperCase()}` : '';
+            if (sku && !group.skus.includes(sku)) group.skus.push(sku);
+        });
+        return groups;
+    }, [inventory]);
 
     // Generate notification list from inventory & atelier alerts
     const allNotifications = useMemo(() => {
-        const list = [];
-
-        // Low stock and out-of-stock items
-        inventory.forEach((item) => {
-            const qty = Number(item.quantity) || 0;
-            const notifId = `low-stock-${item.id || item.sku || item.name}`;
-
-            if (clearedIds.includes(notifId)) return;
-
-            if (qty === 0) {
-                list.push({
-                    id: notifId,
-                    type: 'error',
-                    title: 'Out of Stock',
-                    message: `${item.name} is completely depleted. Reorder needed.`,
+        return Array.from(alertGroups.values())
+            .filter((group) => !notifState.cleared[group.id])
+            .map((group) => {
+                const count = group.items.length;
+                const isOut = group.qty <= 0;
+                const skuLabel = count === 1 && group.skus[0] ? ` · ${group.skus[0]}` : '';
+                const pieces = `piece${group.qty > 1 ? 's' : ''}`;
+                const message = isOut
+                    ? (count > 1
+                        ? `${group.name} · ${count} SKUs are fully depleted in the atelier. Reorder now.`
+                        : `${group.name}${skuLabel} is completely depleted. Reorder needed.`)
+                    : (count > 1
+                        ? `${group.name} · ${count} SKUs have only ${group.qty} ${pieces} left in the atelier.`
+                        : `${group.name}${skuLabel} has only ${group.qty} ${pieces} remaining in the atelier.`);
+                const timeIso = getGroupAlertTime(group, movementTimes);
+                return {
+                    id: group.id,
+                    type: group.type,
+                    title: isOut ? 'Out of Stock' : 'Low Stock Alert',
+                    message,
                     category: 'Inventory',
-                    time: 'Urgent',
-                    isRead: readIds.includes(notifId),
+                    count,
+                    timeIso,
+                    timeLabel: formatNotificationTime(timeIso),
+                    isRead: Boolean(notifState.read[group.id]),
                     action: () => navigate('/inventory'),
-                    icon: <ErrorOutline sx={{ color: '#EF4444' }} />
-                });
-            } else if (qty <= 2) {
-                list.push({
-                    id: notifId,
-                    type: 'warning',
-                    title: 'Low Stock Alert',
-                    message: `${item.name} has only ${qty} piece${qty > 1 ? 's' : ''} remaining in atelier.`,
-                    category: 'Inventory',
-                    time: 'Stock alert',
-                    isRead: readIds.includes(notifId),
-                    action: () => navigate('/inventory'),
-                    icon: <Warning sx={{ color: '#F59E0B' }} />
-                });
-            }
-        });
-
-        return list;
-    }, [inventory, readIds, clearedIds, navigate]);
+                    icon: isOut
+                        ? <ErrorOutline sx={{ color: '#EF4444' }} />
+                        : <Warning sx={{ color: '#F59E0B' }} />
+                };
+            })
+            .sort((a, b) => (Date.parse(b.timeIso) || 0) - (Date.parse(a.timeIso) || 0));
+    }, [alertGroups, notifState, movementTimes, navigate]);
 
     // Unread count
     const unreadCount = useMemo(() => {
@@ -125,59 +212,49 @@ const NotificationCenter = ({ plain = false }) => {
     const handleClick = (event) => setAnchorEl(event.currentTarget);
     const handleClose = () => setAnchorEl(null);
 
+    const persistState = (next) => {
+        setNotifState(next);
+        try {
+            localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(next));
+        } catch (err) {}
+        setDoc(doc(db, 'settings', 'notificationState'), next, { merge: true })
+            .catch((err) => console.warn('Failed to sync notification state:', err));
+    };
+
     // Mark all currently available notifications as read
     const handleMarkAllAsRead = (e) => {
         if (e) e.stopPropagation();
-        const currentIds = allNotifications.map(n => n.id);
-        const updated = Array.from(new Set([...readIds, ...currentIds]));
-        setReadIds(updated);
-        try {
-            localStorage.setItem(READ_STORAGE_KEY, JSON.stringify(updated));
-        } catch (err) {
-            console.error('Failed to save read notifications', err);
-        }
+        const stamp = new Date().toISOString();
+        const read = { ...notifState.read };
+        allNotifications.forEach((n) => { read[n.id] = stamp; });
+        persistState({ ...notifState, read });
     };
 
     // Toggle single notification read status
     const handleToggleSingleRead = (id, e) => {
         if (e) e.stopPropagation();
-        let updated;
-        if (readIds.includes(id)) {
-            updated = readIds.filter(x => x !== id);
-        } else {
-            updated = [...readIds, id];
-        }
-        setReadIds(updated);
-        try {
-            localStorage.setItem(READ_STORAGE_KEY, JSON.stringify(updated));
-        } catch (err) {
-            console.error('Failed to update read notification', err);
-        }
+        const read = { ...notifState.read };
+        if (read[id]) delete read[id];
+        else read[id] = new Date().toISOString();
+        persistState({ ...notifState, read });
     };
 
     // Clear all alerts
     const handleClearAll = (e) => {
         if (e) e.stopPropagation();
-        const currentIds = allNotifications.map(n => n.id);
-        const updated = Array.from(new Set([...clearedIds, ...currentIds]));
-        setClearedIds(updated);
-        try {
-            localStorage.setItem(CLEARED_STORAGE_KEY, JSON.stringify(updated));
-        } catch (err) {
-            console.error('Failed to clear notifications', err);
-        }
+        const stamp = new Date().toISOString();
+        const cleared = { ...notifState.cleared };
+        allNotifications.forEach((n) => { cleared[n.id] = stamp; });
+        persistState({ ...notifState, cleared });
     };
 
     // Handle item click: mark read and execute action
     const handleItemClick = (notif) => {
         if (!notif.isRead) {
-            const updated = Array.from(new Set([...readIds, notif.id]));
-            setReadIds(updated);
-            try {
-                localStorage.setItem(READ_STORAGE_KEY, JSON.stringify(updated));
-            } catch (err) {
-                console.error(err);
-            }
+            persistState({
+                ...notifState,
+                read: { ...notifState.read, [notif.id]: new Date().toISOString() }
+            });
         }
         if (notif.action) notif.action();
         handleClose();
@@ -443,22 +520,57 @@ const NotificationCenter = ({ plain = false }) => {
                                                         }}
                                                     />
                                                 )}
+                                                {notif.count > 1 && (
+                                                    <Box
+                                                        component="span"
+                                                        sx={{
+                                                            px: 0.6,
+                                                            borderRadius: '6px',
+                                                            fontSize: '0.62rem',
+                                                            fontWeight: 800,
+                                                            lineHeight: 1.5,
+                                                            letterSpacing: 0,
+                                                            color: isDark ? theme.palette.primary.light : '#5B4BD1',
+                                                            bgcolor: isDark ? 'rgba(124, 111, 232, 0.18)' : 'rgba(124, 111, 232, 0.1)'
+                                                        }}
+                                                    >
+                                                        ×{notif.count}
+                                                    </Box>
+                                                )}
                                             </Box>
                                         }
+                                        secondaryTypographyProps={{ component: 'div' }}
                                         secondary={
-                                            <Typography
-                                                variant="caption"
-                                                sx={{
-                                                    color: 'text.secondary',
-                                                    display: '-webkit-box',
-                                                    WebkitLineClamp: 2,
-                                                    WebkitBoxOrient: 'vertical',
-                                                    overflow: 'hidden',
-                                                    lineHeight: 1.4
-                                                }}
-                                            >
-                                                {notif.message}
-                                            </Typography>
+                                            <>
+                                                <Typography
+                                                    variant="caption"
+                                                    sx={{
+                                                        color: 'text.secondary',
+                                                        display: '-webkit-box',
+                                                        WebkitLineClamp: 2,
+                                                        WebkitBoxOrient: 'vertical',
+                                                        overflow: 'hidden',
+                                                        lineHeight: 1.4
+                                                    }}
+                                                >
+                                                    {notif.message}
+                                                </Typography>
+                                                {notif.timeLabel && (
+                                                    <Typography
+                                                        variant="caption"
+                                                        sx={{
+                                                            display: 'block',
+                                                            mt: 0.35,
+                                                            fontSize: '0.66rem',
+                                                            fontWeight: 600,
+                                                            color: 'text.disabled',
+                                                            letterSpacing: '0.01em'
+                                                        }}
+                                                    >
+                                                        {notif.timeLabel}
+                                                    </Typography>
+                                                )}
+                                            </>
                                         }
                                     />
 
