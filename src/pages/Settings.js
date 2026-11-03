@@ -60,6 +60,8 @@ import {
   Draw,
   AutoAwesome,
   QrCode2,
+  ZoomIn,
+  ZoomOut,
   Palette,
   Tv,
   Language
@@ -103,12 +105,17 @@ const SAMPLE_INVOICE = {
 };
 
 // Scales the full invoice rendering to fit its container so the preview
-// stays compact and professional without horizontal scrolling.
+// stays compact and professional without horizontal scrolling. "Fit" reads
+// 100%; zooming past it grows the page and the frame scrolls instead.
+const ZOOM_STEPS = [0.5, 0.65, 0.8, 1, 1.25, 1.5, 2, 2.5, 3];
+const FIT_ZOOM_INDEX = 3;
+
 function InvoicePreview({ invoice, template, settings, profile }) {
   const outerRef = useRef(null);
   const innerRef = useRef(null);
-  const [scale, setScale] = useState(1);
-  const [height, setHeight] = useState(0);
+  const [fitScale, setFitScale] = useState(1);
+  const [contentHeight, setContentHeight] = useState(0);
+  const [zoomIndex, setZoomIndex] = useState(FIT_ZOOM_INDEX);
   const DESIGN_WIDTH = 800;
 
   useEffect(() => {
@@ -116,9 +123,8 @@ function InvoicePreview({ invoice, template, settings, profile }) {
       const outer = outerRef.current;
       const inner = innerRef.current;
       if (!outer || !inner) return;
-      const s = Math.min(1, outer.clientWidth / DESIGN_WIDTH);
-      setScale(s);
-      setHeight(inner.offsetHeight * s);
+      setFitScale(Math.min(1, outer.clientWidth / DESIGN_WIDTH));
+      setContentHeight(inner.offsetHeight);
     };
     update();
     const ro = new ResizeObserver(update);
@@ -131,18 +137,68 @@ function InvoicePreview({ invoice, template, settings, profile }) {
     };
   }, []);
 
+  const zoom = ZOOM_STEPS[zoomIndex];
+  const scale = fitScale * zoom;
+  const paperNote = template === 'boutique-slip' ? 'Prints on 80mm thermal' : 'Prints on A4';
+
   return (
-    <Box ref={outerRef} sx={{ width: '100%', overflow: 'hidden', height: height || 'auto' }}>
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5, mb: 1 }}>
+        <Typography variant="caption" color="text.secondary" sx={{ mr: 'auto', fontWeight: 700 }}>
+          {paperNote} · {Math.round(zoom * 100)}%
+        </Typography>
+        <IconButton
+          size="small"
+          title="Zoom out"
+          disabled={zoomIndex === 0}
+          onClick={() => setZoomIndex((i) => Math.max(0, i - 1))}
+          sx={{ border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}
+        >
+          <ZoomOut sx={{ fontSize: 17 }} />
+        </IconButton>
+        <IconButton
+          size="small"
+          title="Zoom in"
+          disabled={zoomIndex === ZOOM_STEPS.length - 1}
+          onClick={() => setZoomIndex((i) => Math.min(ZOOM_STEPS.length - 1, i + 1))}
+          sx={{ border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}
+        >
+          <ZoomIn sx={{ fontSize: 17 }} />
+        </IconButton>
+        <Button
+          size="small"
+          variant="outlined"
+          disabled={zoomIndex === FIT_ZOOM_INDEX}
+          onClick={() => setZoomIndex(FIT_ZOOM_INDEX)}
+          sx={{ fontSize: '0.68rem', fontWeight: 700, textTransform: 'none', borderRadius: '16px', py: 0.2, px: 1 }}
+        >
+          Fit
+        </Button>
+      </Box>
+
       <Box
-        ref={innerRef}
+        ref={outerRef}
         sx={{
-          width: DESIGN_WIDTH,
-          transform: `scale(${scale})`,
-          transformOrigin: 'top left',
-          transition: 'transform 0.2s ease'
+          overflow: 'auto',
+          maxHeight: 680,
+          borderRadius: 1.5,
+          border: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.default'
         }}
       >
-        <InvoicePrint invoice={invoice} template={template} settings={settings} profile={profile} />
+        <Box sx={{ width: DESIGN_WIDTH * scale, height: contentHeight * scale, overflow: 'hidden' }}>
+          <Box
+            ref={innerRef}
+            sx={{
+              width: DESIGN_WIDTH,
+              transform: `scale(${scale})`,
+              transformOrigin: 'top left'
+            }}
+          >
+            <InvoicePrint invoice={invoice} template={template} settings={settings} profile={profile} />
+          </Box>
+        </Box>
       </Box>
     </Box>
   );

@@ -217,6 +217,7 @@ const MAPPING = {
     WifiOff: ['wifi-off'],
     WorkspacePremium: ['medal'],
     ZoomIn: ['zoom-in'],
+    ZoomOut: ['zoom-out'],
 };
 
 function collectUsedNames() {

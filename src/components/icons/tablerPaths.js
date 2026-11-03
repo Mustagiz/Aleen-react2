@@ -855,6 +855,11 @@ const T = {
         { el: "path", d: "M10 7l0 6" },
         { el: "path", d: "M21 21l-6 -6" }
     ],
+    "zoom-out": [
+        { el: "path", d: "M3 10a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" },
+        { el: "path", d: "M7 10l6 0" },
+        { el: "path", d: "M21 21l-6 -6" }
+    ],
 };
 
 export default T;
