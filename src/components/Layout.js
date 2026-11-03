@@ -59,6 +59,8 @@ import AtelierFooter from './crm/AtelierFooter';
 import { ScriptWordmark } from './brand/BrandLockup';
 import {
   getHeaderFont,
+  getFontWeight,
+  getFontStyle,
   DEFAULT_NAME_FONT,
   DEFAULT_NAME_SIZE,
   DEFAULT_TAGLINE_FONT,
@@ -132,6 +134,10 @@ export default function Layout() {
   const brandTaglineFont = getHeaderFont(profile?.headerTaglineFont || DEFAULT_TAGLINE_FONT);
   const brandNameSize = Number(profile?.headerNameSize) || DEFAULT_NAME_SIZE;
   const brandTaglineSize = Number(profile?.headerTaglineSize) || DEFAULT_TAGLINE_SIZE;
+  const brandNameWeight = getFontWeight(brandNameFont, !!profile?.headerNameBold);
+  const brandNameStyle = getFontStyle(brandNameFont, !!profile?.headerNameItalic);
+  const brandTaglineWeight = getFontWeight(brandTaglineFont, !!profile?.headerTaglineBold);
+  const brandTaglineStyle = getFontStyle(brandTaglineFont, !!profile?.headerTaglineItalic);
   const taglineIsScript = brandTaglineFont.kind === 'script';
   const brandInitial = (profile?.businessName || 'A').trim().charAt(0).toUpperCase();
 
@@ -325,7 +331,8 @@ export default function Layout() {
             {showCollapsed ? (
               <Typography sx={{
                 fontFamily: brandNameFont.stack,
-                fontWeight: brandNameFont.weight,
+                fontWeight: brandNameWeight,
+                fontStyle: brandNameStyle,
                 fontSize: `${Math.min(brandNameSize, 30)}px`,
                 lineHeight: 1,
                 ...(brandNameColor
@@ -350,7 +357,8 @@ export default function Layout() {
                   sx={{
                     mt: '-2px',
                     fontFamily: brandNameFont.stack,
-                    fontWeight: brandNameFont.weight,
+                    fontWeight: brandNameWeight,
+                    fontStyle: brandNameStyle,
                     letterSpacing: brandNameFont.kind === 'script' ? '0.015em' : '0.02em',
                     textOverflow: 'ellipsis'
                   }}
@@ -366,7 +374,8 @@ export default function Layout() {
                   <Typography sx={{
                     fontFamily: brandTaglineFont.stack,
                     fontSize: `${brandTaglineSize}px`,
-                    fontWeight: taglineIsScript ? 400 : 700,
+                    fontWeight: brandTaglineWeight,
+                    fontStyle: brandTaglineStyle,
                     color: brandTaglineColor,
                     textTransform: taglineIsScript ? 'none' : 'uppercase',
                     letterSpacing: taglineIsScript ? '0.04em' : '0.3em',
@@ -772,7 +781,8 @@ export default function Layout() {
             lineHeight={1.2}
             sx={{
               fontFamily: brandNameFont.stack,
-              fontWeight: brandNameFont.weight,
+              fontWeight: brandNameWeight,
+              fontStyle: brandNameStyle,
               letterSpacing: brandNameFont.kind === 'script' ? '0.015em' : '0.02em',
               textOverflow: 'ellipsis'
             }}

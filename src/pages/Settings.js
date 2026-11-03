@@ -34,7 +34,9 @@ import {
   useMediaQuery,
   useTheme,
   Slider,
-  ListSubheader
+  ListSubheader,
+  ToggleButton,
+  ToggleButtonGroup
 } from '@mui/material';
 import {
   Store,
@@ -79,7 +81,10 @@ import {
   DEFAULT_NAME_SIZE,
   DEFAULT_TAGLINE_FONT,
   DEFAULT_TAGLINE_SIZE,
-  getHeaderFont
+  getHeaderFont,
+  getFontWeight,
+  getFontStyle,
+  fontSupportsBold
 } from '../components/brand/headerFonts';
 import { useFeedback } from '../contexts/FeedbackContext';
 import PageHeader from '../components/crm/PageHeader';
@@ -269,6 +274,10 @@ export default function Settings() {
     headerNameSize: profile.headerNameSize || DEFAULT_NAME_SIZE,
     headerTaglineFont: profile.headerTaglineFont || DEFAULT_TAGLINE_FONT,
     headerTaglineSize: profile.headerTaglineSize || DEFAULT_TAGLINE_SIZE,
+    headerNameBold: profile.headerNameBold ?? false,
+    headerNameItalic: profile.headerNameItalic ?? false,
+    headerTaglineBold: profile.headerTaglineBold ?? false,
+    headerTaglineItalic: profile.headerTaglineItalic ?? false,
     logoUrl: profile.logoUrl || '',
     ownerName: profile.ownerName || 'Admin',
     email: profile.email || 'admin@aleen.com',
@@ -318,6 +327,10 @@ export default function Settings() {
         headerNameSize: profile.headerNameSize || prev.headerNameSize || DEFAULT_NAME_SIZE,
         headerTaglineFont: profile.headerTaglineFont || prev.headerTaglineFont || DEFAULT_TAGLINE_FONT,
         headerTaglineSize: profile.headerTaglineSize || prev.headerTaglineSize || DEFAULT_TAGLINE_SIZE,
+        headerNameBold: profile.headerNameBold ?? prev.headerNameBold ?? false,
+        headerNameItalic: profile.headerNameItalic ?? prev.headerNameItalic ?? false,
+        headerTaglineBold: profile.headerTaglineBold ?? prev.headerTaglineBold ?? false,
+        headerTaglineItalic: profile.headerTaglineItalic ?? prev.headerTaglineItalic ?? false,
         instagramQrUrl: profile.instagramQrUrl || prev.instagramQrUrl || '',
         bankDetails: {
           ...prev.bankDetails,
@@ -752,14 +765,63 @@ export default function Settings() {
   const headerNameFontMeta = getHeaderFont(formProfile.headerNameFont);
   const headerTaglineFontMeta = getHeaderFont(formProfile.headerTaglineFont);
   const headerTaglineIsScript = headerTaglineFontMeta.kind === 'script';
+  const headerNameWeight = getFontWeight(headerNameFontMeta, formProfile.headerNameBold);
+  const headerNameStyle = getFontStyle(headerNameFontMeta, formProfile.headerNameItalic);
+  const headerTaglineWeight = getFontWeight(headerTaglineFontMeta, formProfile.headerTaglineBold);
+  const headerTaglineStyle = getFontStyle(headerTaglineFontMeta, formProfile.headerTaglineItalic);
 
   const resetHeaderTypography = () => setFormProfile((prev) => ({
     ...prev,
     headerNameFont: DEFAULT_NAME_FONT,
     headerNameSize: DEFAULT_NAME_SIZE,
     headerTaglineFont: DEFAULT_TAGLINE_FONT,
-    headerTaglineSize: DEFAULT_TAGLINE_SIZE
+    headerTaglineSize: DEFAULT_TAGLINE_SIZE,
+    headerNameBold: false,
+    headerNameItalic: false,
+    headerTaglineBold: false,
+    headerTaglineItalic: false
   }));
+
+  const renderHeaderStyleToggles = (prefix, font, label) => {
+    const boldAvailable = fontSupportsBold(font);
+    const italicAvailable = font.italic;
+    return (
+      <ToggleButtonGroup
+        size="small"
+        value={[
+          formProfile[`${prefix}Bold`] ? 'bold' : null,
+          formProfile[`${prefix}Italic`] ? 'italic' : null
+        ].filter(Boolean)}
+        onChange={(e, next) => setFormProfile((prev) => ({
+          ...prev,
+          [`${prefix}Bold`]: next.includes('bold'),
+          [`${prefix}Italic`]: next.includes('italic')
+        }))}
+        aria-label={`${label} style`}
+        sx={{
+          flexShrink: 0,
+          '& .MuiToggleButton-root': { px: 1.1, py: 0.72, minWidth: 36, borderColor: 'divider' }
+        }}
+      >
+        <ToggleButton
+          value="bold"
+          aria-label={`${label} bold`}
+          disabled={!boldAvailable}
+          title={boldAvailable ? 'Bold' : 'No bold cut in this typeface'}
+        >
+          <Box component="span" sx={{ fontWeight: 800, fontSize: '0.8rem', lineHeight: 1 }}>B</Box>
+        </ToggleButton>
+        <ToggleButton
+          value="italic"
+          aria-label={`${label} italic`}
+          disabled={!italicAvailable}
+          title={italicAvailable ? 'Italic' : 'No italic cut in this typeface'}
+        >
+          <Box component="span" sx={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontWeight: 700, fontSize: '0.82rem', lineHeight: 1 }}>I</Box>
+        </ToggleButton>
+      </ToggleButtonGroup>
+    );
+  };
 
   const renderHeaderFontSelect = (valueKey, ariaLabel) => {
     const selectedFont = getHeaderFont(formProfile[valueKey]);
@@ -771,7 +833,16 @@ export default function Settings() {
           id={`${valueKey}-select`}
           value={formProfile[valueKey]}
           label={ariaLabel}
-          onChange={(e) => setFormProfile((prev) => ({ ...prev, [valueKey]: e.target.value }))}
+          onChange={(e) => {
+            const nextFont = getHeaderFont(e.target.value);
+            const prefix = valueKey.replace('Font', '');
+            setFormProfile((prev) => ({
+              ...prev,
+              [valueKey]: nextFont.id,
+              [`${prefix}Bold`]: prev[`${prefix}Bold`] && fontSupportsBold(nextFont),
+              [`${prefix}Italic`]: prev[`${prefix}Italic`] && !!nextFont.italic
+            }));
+          }}
           renderValue={() => (
             <Box
               component="span"
@@ -789,7 +860,7 @@ export default function Settings() {
               {selectedFont.label}
             </Box>
           )}
-          MenuProps={{ PaperProps: { sx: { maxHeight: 380 } } }}
+          MenuProps={{ PaperProps: { sx: { maxHeight: 420 } } }}
         >
           {FONT_GROUPS.flatMap((group) => [
             <ListSubheader
@@ -1255,7 +1326,8 @@ export default function Settings() {
                     <Box sx={{ p: 1.75, mb: 2, borderRadius: 1.5, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
                       <Typography sx={{
                         fontFamily: headerNameFontMeta.stack,
-                        fontWeight: headerNameFontMeta.weight,
+                        fontWeight: headerNameWeight,
+                        fontStyle: headerNameStyle,
                         fontSize: `${formProfile.headerNameSize}px`,
                         lineHeight: 1.15,
                         letterSpacing: headerNameFontMeta.kind === 'script' ? '0.015em' : '0.02em',
@@ -1284,7 +1356,8 @@ export default function Settings() {
                         <Typography sx={{
                           fontFamily: headerTaglineFontMeta.stack,
                           fontSize: `${formProfile.headerTaglineSize}px`,
-                          fontWeight: headerTaglineIsScript ? 400 : 700,
+                          fontWeight: headerTaglineWeight,
+                          fontStyle: headerTaglineStyle,
                           letterSpacing: headerTaglineIsScript ? '0.04em' : '0.3em',
                           textTransform: headerTaglineIsScript ? 'none' : 'uppercase',
                           whiteSpace: 'nowrap',
@@ -1299,18 +1372,31 @@ export default function Settings() {
 
                     <Grid container spacing={2} sx={{ mb: 0.5 }}>
                       <Grid item xs={12} sm={7}>
-                        {renderHeaderFontSelect('headerNameFont', 'Name Typeface')}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+                          <Box sx={{ flex: 1, minWidth: 0 }}>
+                            {renderHeaderFontSelect('headerNameFont', 'Name Typeface')}
+                          </Box>
+                          {renderHeaderStyleToggles('headerName', headerNameFontMeta, 'Name')}
+                        </Box>
                       </Grid>
                       <Grid item xs={12} sm={5}>
                         {renderHeaderSizeSlider('headerNameSize', NAME_SIZE_RANGE, 'Name Size')}
                       </Grid>
                       <Grid item xs={12} sm={7}>
-                        {renderHeaderFontSelect('headerTaglineFont', 'Tagline Typeface')}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+                          <Box sx={{ flex: 1, minWidth: 0 }}>
+                            {renderHeaderFontSelect('headerTaglineFont', 'Tagline Typeface')}
+                          </Box>
+                          {renderHeaderStyleToggles('headerTagline', headerTaglineFontMeta, 'Tagline')}
+                        </Box>
                       </Grid>
                       <Grid item xs={12} sm={5}>
                         {renderHeaderSizeSlider('headerTaglineSize', TAGLINE_SIZE_RANGE, 'Tagline Size')}
                       </Grid>
                     </Grid>
+                    <Typography variant="caption" color="text.disabled" sx={{ display: 'block', fontSize: '0.66rem', mt: 0.5, mb: 0.5 }}>
+                      B and I are unavailable for typefaces that do not ship a bold or italic cut.
+                    </Typography>
 
                     <Divider sx={{ my: 1.75 }} />
 

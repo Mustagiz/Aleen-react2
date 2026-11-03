@@ -1,22 +1,91 @@
-// Curated header typography for the CRM brand block. Every family here is
-// loaded in public/index.html, so a saved choice renders immediately.
+// Curated header typography for the CRM brand block. Every family listed here
+// is requested in public/index.html, so a saved choice renders immediately.
+// `weights` reflects the weights actually loaded; `italic` means the family
+// ships an italic cut. Anything unsupported is disabled in Settings rather than
+// faked by the browser.
+const script = (id, label, weights = [400], italic = false) => ({
+  id,
+  label,
+  kind: 'script',
+  stack: `"${label}", "Great Vibes", cursive`,
+  weights,
+  italic
+});
+
+const serif = (id, label, weights = [400], italic = false) => ({
+  id,
+  label,
+  kind: 'serif',
+  stack: `"${label}", Georgia, serif`,
+  weights,
+  italic
+});
+
+const sans = (id, label, weights = [400], italic = false) => ({
+  id,
+  label,
+  kind: 'sans',
+  stack: `"${label}", "DM Sans", sans-serif`,
+  weights,
+  italic
+});
+
 export const HEADER_FONTS = [
-  { id: 'great-vibes', label: 'Great Vibes', kind: 'script', weight: 400, stack: '"Great Vibes", "Snell Roundhand", "Apple Chancery", cursive' },
-  { id: 'parisienne', label: 'Parisienne', kind: 'script', weight: 400, stack: '"Parisienne", cursive' },
-  { id: 'allura', label: 'Allura', kind: 'script', weight: 400, stack: '"Allura", cursive' },
-  { id: 'italianno', label: 'Italianno', kind: 'script', weight: 400, stack: '"Italianno", cursive' },
-  { id: 'alex-brush', label: 'Alex Brush', kind: 'script', weight: 400, stack: '"Alex Brush", cursive' },
-  { id: 'pinyon-script', label: 'Pinyon Script', kind: 'script', weight: 400, stack: '"Pinyon Script", cursive' },
-  { id: 'sacramento', label: 'Sacramento', kind: 'script', weight: 400, stack: '"Sacramento", cursive' },
-  { id: 'playfair', label: 'Playfair Display', kind: 'serif', weight: 600, stack: '"Playfair Display", Georgia, serif' },
-  { id: 'cormorant', label: 'Cormorant Garamond', kind: 'serif', weight: 600, stack: '"Cormorant Garamond", Georgia, serif' },
-  { id: 'libre-baskerville', label: 'Libre Baskerville', kind: 'serif', weight: 400, stack: '"Libre Baskerville", Georgia, serif' },
-  { id: 'marcellus', label: 'Marcellus', kind: 'serif', weight: 400, stack: '"Marcellus", Georgia, serif' },
-  { id: 'cinzel', label: 'Cinzel', kind: 'serif', weight: 600, stack: '"Cinzel", Georgia, serif' },
-  { id: 'dm-sans', label: 'DM Sans', kind: 'sans', weight: 700, stack: '"DM Sans", "Inter", sans-serif' },
-  { id: 'jost', label: 'Jost', kind: 'sans', weight: 600, stack: '"Jost", "DM Sans", sans-serif' },
-  { id: 'montserrat', label: 'Montserrat', kind: 'sans', weight: 700, stack: '"Montserrat", "DM Sans", sans-serif' },
-  { id: 'manrope', label: 'Manrope', kind: 'sans', weight: 700, stack: '"Manrope", "DM Sans", sans-serif' }
+  // Signature scripts
+  script('great-vibes', 'Great Vibes'),
+  script('parisienne', 'Parisienne'),
+  script('allura', 'Allura'),
+  script('italianno', 'Italianno'),
+  script('alex-brush', 'Alex Brush'),
+  script('pinyon-script', 'Pinyon Script'),
+  script('sacramento', 'Sacramento'),
+  script('dancing-script', 'Dancing Script', [400, 700]),
+  script('lobster-two', 'Lobster Two', [400, 700], true),
+  script('pacifico', 'Pacifico'),
+  script('caveat', 'Caveat', [400, 700]),
+  script('kaushan-script', 'Kaushan Script'),
+  script('courgette', 'Courgette'),
+  script('yellowtail', 'Yellowtail'),
+  script('tangerine', 'Tangerine', [400, 700]),
+  script('marck-script', 'Marck Script'),
+  script('mrs-saint-delafield', 'Mrs Saint Delafield'),
+  script('petit-formal-script', 'Petit Formal Script'),
+
+  // Serif & display
+  serif('playfair', 'Playfair Display', [400, 600, 700], true),
+  serif('cormorant', 'Cormorant Garamond', [400, 500, 600, 700], true),
+  serif('libre-baskerville', 'Libre Baskerville', [400, 700], true),
+  serif('marcellus', 'Marcellus'),
+  serif('cinzel', 'Cinzel', [400, 600, 700]),
+  serif('eb-garamond', 'EB Garamond', [400, 600, 700], true),
+  serif('lora', 'Lora', [400, 600, 700], true),
+  serif('merriweather', 'Merriweather', [400, 700], true),
+  serif('crimson-text', 'Crimson Text', [400, 600, 700], true),
+  serif('bodoni-moda', 'Bodoni Moda', [400, 600, 700], true),
+  serif('dm-serif-display', 'DM Serif Display', [400], true),
+  serif('dm-serif-text', 'DM Serif Text', [400], true),
+  serif('rozha-one', 'Rozha One'),
+  serif('prata', 'Prata'),
+  serif('cardo', 'Cardo', [400, 700], true),
+  serif('spectral', 'Spectral', [400, 600, 700], true),
+  serif('gilda-display', 'Gilda Display'),
+  serif('forum', 'Forum'),
+
+  // Modern sans
+  sans('dm-sans', 'DM Sans', [400, 700], true),
+  sans('jost', 'Jost', [400, 600, 700], true),
+  sans('montserrat', 'Montserrat', [400, 600, 700], true),
+  sans('manrope', 'Manrope', [400, 600, 700]),
+  sans('inter', 'Inter', [400, 600, 700]),
+  sans('raleway', 'Raleway', [400, 600, 700], true),
+  sans('poppins', 'Poppins', [400, 600, 700], true),
+  sans('nunito-sans', 'Nunito Sans', [400, 600, 700], true),
+  sans('work-sans', 'Work Sans', [400, 600, 700], true),
+  sans('outfit', 'Outfit', [400, 600, 700]),
+  sans('sora', 'Sora', [400, 600, 700]),
+  sans('barlow', 'Barlow', [400, 600, 700], true),
+  sans('karla', 'Karla', [400, 600, 700], true),
+  sans('rubik', 'Rubik', [400, 600, 700], true)
 ];
 
 export const FONT_GROUPS = [
@@ -34,3 +103,13 @@ export const NAME_SIZE_RANGE = { min: 18, max: 38, step: 0.5 };
 export const TAGLINE_SIZE_RANGE = { min: 7, max: 15, step: 0.5 };
 
 export const getHeaderFont = (id) => HEADER_FONTS.find((font) => font.id === id) || HEADER_FONTS[0];
+
+export const fontSupportsBold = (font) => font.weights.some((weight) => weight >= 600);
+
+export const getFontWeight = (font, bold) => {
+  if (!bold) return 400;
+  const boldWeight = [700, 600].find((weight) => font.weights.includes(weight));
+  return boldWeight || 400;
+};
+
+export const getFontStyle = (font, italic) => (italic && font.italic ? 'italic' : 'normal');
