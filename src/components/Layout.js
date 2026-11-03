@@ -15,8 +15,6 @@ import {
   Divider, 
   ListSubheader, 
   Tooltip,
-  Paper,
-  Button,
   Fab,
   Menu as MuiMenu,
   MenuItem
@@ -59,6 +57,13 @@ import GlobalSearch from './GlobalSearch';
 import NetworkStatus from './NetworkStatus';
 import AtelierFooter from './crm/AtelierFooter';
 import { ScriptWordmark } from './brand/BrandLockup';
+import {
+  getHeaderFont,
+  DEFAULT_NAME_FONT,
+  DEFAULT_NAME_SIZE,
+  DEFAULT_TAGLINE_FONT,
+  DEFAULT_TAGLINE_SIZE
+} from './brand/headerFonts';
 import CashDrawerShiftModal from './crm/CashDrawerShiftModal';
 
 const SIDEBAR_EXPANDED_WIDTH = 265;
@@ -122,6 +127,13 @@ export default function Layout() {
   const brandNameColor = profile?.headerNameColor || '';
   const brandTaglineColor = profile?.headerTaglineColor
     || (sidebarConfig.isDark ? theme.palette.secondary.light : theme.palette.secondary.main);
+
+  const brandNameFont = getHeaderFont(profile?.headerNameFont || DEFAULT_NAME_FONT);
+  const brandTaglineFont = getHeaderFont(profile?.headerTaglineFont || DEFAULT_TAGLINE_FONT);
+  const brandNameSize = Number(profile?.headerNameSize) || DEFAULT_NAME_SIZE;
+  const brandTaglineSize = Number(profile?.headerTaglineSize) || DEFAULT_TAGLINE_SIZE;
+  const taglineIsScript = brandTaglineFont.kind === 'script';
+  const brandInitial = (profile?.businessName || 'A').trim().charAt(0).toUpperCase();
 
   const topBarConfig = theme.custom?.topBar || {
     bg: isDark ? 'rgba(15, 30, 29, 0.88)' : 'rgba(255, 255, 255, 0.92)',
@@ -287,97 +299,61 @@ export default function Layout() {
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
 
 
-        {/* Brand Header with Luxury Monogram & Mobile Close Button */}
+        {/* Brand Header — wordmark only; logo artwork stays on printed stationery */}
         <Box sx={{
-          p: showCollapsed ? 2 : 2,
+          p: showCollapsed ? 1.5 : 2,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: showCollapsed ? 'center' : 'space-between',
+          justifyContent: 'space-between',
           borderBottom: sidebarConfig.borderColor,
           minHeight: 64
         }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, overflow: 'hidden', minWidth: 0 }}>
-            {/* Custom Logo or Monogram */}
-            {profile?.logoUrl ? (
-              <Box
-                onClick={() => {
-                  navigate('/');
-                  if (isMobile) setMobileOpen(false);
-                }}
-                sx={{
-                  position: 'relative',
-                  flexShrink: 0,
-                  cursor: 'pointer',
-                  p: '1.5px',
-                  borderRadius: 'calc(var(--radius-control, 12px) + 2px)',
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary?.main || theme.palette.primary.main} 100%)`,
-                  transition: 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-                  '&:hover': { transform: 'translateY(-1px)' }
-                }}
-              >
-                <Box
-                  component="img"
-                  src={profile.logoUrl}
-                  alt={profile.businessName || 'Logo'}
-                  sx={{
-                    width: 40,
-                    height: 40,
-                    display: 'block',
-                    borderRadius: 'var(--radius-control, 12px)',
-                    objectFit: 'contain',
-                    bgcolor: sidebarConfig.isDark ? theme.palette.background.paper : '#FFFFFF',
-                    p: '3px'
-                  }}
-                />
-              </Box>
+          <Box
+            onClick={() => {
+              navigate('/');
+              if (isMobile) setMobileOpen(false);
+            }}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              flex: 1,
+              minWidth: 0,
+              cursor: 'pointer',
+              ...(showCollapsed ? { justifyContent: 'center' } : {})
+            }}
+          >
+            {showCollapsed ? (
+              <Typography sx={{
+                fontFamily: brandNameFont.stack,
+                fontWeight: brandNameFont.weight,
+                fontSize: `${Math.min(brandNameSize, 30)}px`,
+                lineHeight: 1,
+                ...(brandNameColor
+                  ? { color: brandNameColor }
+                  : {
+                      background: 'linear-gradient(96deg, #A85E3F 0%, #D89A72 24%, #F5DCC6 44%, #C97F5C 66%, #E9B694 84%, #B76E4F 100%)',
+                      WebkitBackgroundClip: 'text',
+                      backgroundClip: 'text',
+                      color: 'transparent'
+                    })
+              }}>
+                {brandInitial}
+              </Typography>
             ) : (
-              <Box
-                onClick={() => {
-                  navigate('/');
-                  if (isMobile) setMobileOpen(false);
-                }}
-                sx={{
-                  position: 'relative',
-                  flexShrink: 0,
-                  cursor: 'pointer',
-                  p: '1.5px',
-                  borderRadius: 'calc(var(--radius-control, 12px) + 2px)',
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary?.main || theme.palette.primary.main} 100%)`,
-                  transition: 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-                  '&:hover': { transform: 'translateY(-1px)' }
-                }}
-              >
-                <Box sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 'var(--radius-control, 12px)',
-                  background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.dark} 100%)`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  <Typography sx={{
-                    fontFamily: 'inherit',
-                    fontWeight: 800,
-                    color: '#FFFFFF',
-                    fontSize: '1.2rem',
-                    lineHeight: 1
-                  }}>
-                    {(profile?.businessName || 'A').charAt(0).toUpperCase()}
-                  </Typography>
-                </Box>
-              </Box>
-            )}
-
-            {!showCollapsed && (
-              <Box sx={{ overflow: 'hidden', minWidth: 0 }}>
+              <Box sx={{ overflow: 'hidden', minWidth: 0, width: '100%' }}>
                 <ScriptWordmark
                   name={profile?.businessName || 'Aleen Clothing'}
                   metallic={!brandNameColor}
                   color={brandNameColor}
-                  fontSize="1.72rem"
+                  fontSize={`${brandNameSize}px`}
                   lineHeight={1.15}
-                  sx={{ mt: '-2px' }}
+                  sx={{
+                    mt: '-2px',
+                    fontFamily: brandNameFont.stack,
+                    fontWeight: brandNameFont.weight,
+                    letterSpacing: brandNameFont.kind === 'script' ? '0.015em' : '0.02em',
+                    textOverflow: 'ellipsis'
+                  }}
                 />
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mt: 0.25, minWidth: 0 }}>
                   <Box sx={{
@@ -388,12 +364,13 @@ export default function Layout() {
                     flexShrink: 0
                   }} />
                   <Typography sx={{
-                    fontSize: '0.56rem',
-                    fontWeight: 700,
+                    fontFamily: brandTaglineFont.stack,
+                    fontSize: `${brandTaglineSize}px`,
+                    fontWeight: taglineIsScript ? 400 : 700,
                     color: brandTaglineColor,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.3em',
-                    lineHeight: 1.3,
+                    textTransform: taglineIsScript ? 'none' : 'uppercase',
+                    letterSpacing: taglineIsScript ? '0.04em' : '0.3em',
+                    lineHeight: 1.35,
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis'
@@ -791,8 +768,14 @@ export default function Layout() {
             name={profile?.businessName || 'Aleen Clothing'}
             metallic={!brandNameColor}
             color={brandNameColor}
-            fontSize="1.4rem"
+            fontSize={`${Math.round(brandNameSize * 0.82)}px`}
             lineHeight={1.2}
+            sx={{
+              fontFamily: brandNameFont.stack,
+              fontWeight: brandNameFont.weight,
+              letterSpacing: brandNameFont.kind === 'script' ? '0.015em' : '0.02em',
+              textOverflow: 'ellipsis'
+            }}
           />
           <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: 'text.secondary' }}>
             {user?.name || user?.email || 'Boutique Owner'}

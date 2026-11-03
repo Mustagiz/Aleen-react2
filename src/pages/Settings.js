@@ -32,7 +32,9 @@ import {
   Tabs,
   Tab,
   useMediaQuery,
-  useTheme
+  useTheme,
+  Slider,
+  ListSubheader
 } from '@mui/material';
 import {
   Store,
@@ -68,7 +70,17 @@ import {
 } from '../components/icons';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
-import { SCRIPT_STACK } from '../components/brand/BrandLockup';
+import {
+  HEADER_FONTS,
+  FONT_GROUPS,
+  NAME_SIZE_RANGE,
+  TAGLINE_SIZE_RANGE,
+  DEFAULT_NAME_FONT,
+  DEFAULT_NAME_SIZE,
+  DEFAULT_TAGLINE_FONT,
+  DEFAULT_TAGLINE_SIZE,
+  getHeaderFont
+} from '../components/brand/headerFonts';
 import { useFeedback } from '../contexts/FeedbackContext';
 import PageHeader from '../components/crm/PageHeader';
 import { INVOICE_TEMPLATES, DEFAULT_INVOICE_SETTINGS, getStoredInvoiceSettings } from '../constants/invoiceTemplates';
@@ -253,6 +265,10 @@ export default function Settings() {
     tagline: profile.tagline || 'Bespoke Measurement & Craft Studio',
     headerNameColor: profile.headerNameColor || '',
     headerTaglineColor: profile.headerTaglineColor || '',
+    headerNameFont: profile.headerNameFont || DEFAULT_NAME_FONT,
+    headerNameSize: profile.headerNameSize || DEFAULT_NAME_SIZE,
+    headerTaglineFont: profile.headerTaglineFont || DEFAULT_TAGLINE_FONT,
+    headerTaglineSize: profile.headerTaglineSize || DEFAULT_TAGLINE_SIZE,
     logoUrl: profile.logoUrl || '',
     ownerName: profile.ownerName || 'Admin',
     email: profile.email || 'admin@aleen.com',
@@ -298,6 +314,10 @@ export default function Settings() {
         logoUrl: profile.logoUrl || prev.logoUrl || '',
         headerNameColor: profile.headerNameColor ?? prev.headerNameColor ?? '',
         headerTaglineColor: profile.headerTaglineColor ?? prev.headerTaglineColor ?? '',
+        headerNameFont: profile.headerNameFont || prev.headerNameFont || DEFAULT_NAME_FONT,
+        headerNameSize: profile.headerNameSize || prev.headerNameSize || DEFAULT_NAME_SIZE,
+        headerTaglineFont: profile.headerTaglineFont || prev.headerTaglineFont || DEFAULT_TAGLINE_FONT,
+        headerTaglineSize: profile.headerTaglineSize || prev.headerTaglineSize || DEFAULT_TAGLINE_SIZE,
         instagramQrUrl: profile.instagramQrUrl || prev.instagramQrUrl || '',
         bankDetails: {
           ...prev.bankDetails,
@@ -728,6 +748,105 @@ export default function Settings() {
     );
   }
 
+  // Sidebar header typography
+  const headerNameFontMeta = getHeaderFont(formProfile.headerNameFont);
+  const headerTaglineFontMeta = getHeaderFont(formProfile.headerTaglineFont);
+  const headerTaglineIsScript = headerTaglineFontMeta.kind === 'script';
+
+  const resetHeaderTypography = () => setFormProfile((prev) => ({
+    ...prev,
+    headerNameFont: DEFAULT_NAME_FONT,
+    headerNameSize: DEFAULT_NAME_SIZE,
+    headerTaglineFont: DEFAULT_TAGLINE_FONT,
+    headerTaglineSize: DEFAULT_TAGLINE_SIZE
+  }));
+
+  const renderHeaderFontSelect = (valueKey, ariaLabel) => {
+    const selectedFont = getHeaderFont(formProfile[valueKey]);
+    return (
+      <FormControl fullWidth size="small">
+        <InputLabel id={`${valueKey}-label`}>{ariaLabel}</InputLabel>
+        <Select
+          labelId={`${valueKey}-label`}
+          id={`${valueKey}-select`}
+          value={formProfile[valueKey]}
+          label={ariaLabel}
+          onChange={(e) => setFormProfile((prev) => ({ ...prev, [valueKey]: e.target.value }))}
+          renderValue={() => (
+            <Box
+              component="span"
+              sx={{
+                display: 'block',
+                fontFamily: selectedFont.stack,
+                fontSize: selectedFont.kind === 'script' ? '1.25rem' : '0.92rem',
+                fontWeight: selectedFont.kind === 'script' ? 400 : 600,
+                lineHeight: 1.2,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              {selectedFont.label}
+            </Box>
+          )}
+          MenuProps={{ PaperProps: { sx: { maxHeight: 380 } } }}
+        >
+          {FONT_GROUPS.flatMap((group) => [
+            <ListSubheader
+              key={group.kind}
+              sx={{
+                fontSize: '0.63rem',
+                fontWeight: 800,
+                textTransform: 'uppercase',
+                letterSpacing: 0.8,
+                lineHeight: '30px',
+                bgcolor: 'background.paper'
+              }}
+            >
+              {group.label}
+            </ListSubheader>,
+            ...HEADER_FONTS.filter((font) => font.kind === group.kind).map((font) => (
+              <MenuItem
+                key={font.id}
+                value={font.id}
+                sx={{
+                  fontFamily: font.stack,
+                  fontSize: font.kind === 'script' ? '1.2rem' : '0.9rem',
+                  fontWeight: font.kind === 'script' ? 400 : 500,
+                  py: 0.6
+                }}
+              >
+                {font.label}
+              </MenuItem>
+            ))
+          ])}
+        </Select>
+      </FormControl>
+    );
+  };
+
+  const renderHeaderSizeSlider = (valueKey, range, ariaLabel) => (
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+          {ariaLabel}
+        </Typography>
+        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary', fontVariantNumeric: 'tabular-nums' }}>
+          {Number(formProfile[valueKey]).toFixed(1)} px
+        </Typography>
+      </Box>
+      <Slider
+        size="small"
+        value={Number(formProfile[valueKey])}
+        min={range.min}
+        max={range.max}
+        step={range.step}
+        onChange={(e, value) => setFormProfile((prev) => ({ ...prev, [valueKey]: value }))}
+        sx={{ py: 1 }}
+      />
+    </Box>
+  );
+
   return (
     <Box sx={{ maxWidth: 1400, mx: 'auto', p: { xs: 1.5, sm: 2.5, md: 3 } }}>
       {/* Page Header */}
@@ -1115,22 +1234,34 @@ export default function Settings() {
 
                 <Grid item xs={12}>
                   <Box sx={{ p: 2, borderRadius: 2, border: '1px dashed', borderColor: 'divider', bgcolor: 'grey.50' }}>
-                    <Typography variant="caption" sx={{ fontWeight: 800, letterSpacing: 0.8, textTransform: 'uppercase', color: 'text.secondary' }}>
-                      Sidebar Header Colours
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.4, mb: 1.5, fontSize: '0.7rem' }}>
-                      The boutique name and tagline at the top of the navigation panel. Reset either swatch to return to the rose-gold house style.
-                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1.5, flexWrap: 'wrap' }}>
+                      <Box sx={{ minWidth: 0, flex: '1 1 260px' }}>
+                        <Typography variant="caption" sx={{ fontWeight: 800, letterSpacing: 0.8, textTransform: 'uppercase', color: 'text.secondary' }}>
+                          Sidebar Header Style
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.4, mb: 1.5, fontSize: '0.7rem' }}>
+                          Typeface, size and colour for the boutique name and tagline at the top of navigation. The logo tile is no longer shown there — your logo still appears on printed invoices.
+                        </Typography>
+                      </Box>
+                      <Button
+                        size="small"
+                        onClick={resetHeaderTypography}
+                        sx={{ ml: 'auto', flexShrink: 0, minWidth: 0, px: 1, fontSize: '0.68rem', fontWeight: 700, textTransform: 'none' }}
+                      >
+                        Reset typography
+                      </Button>
+                    </Box>
 
-                    <Box sx={{ p: 1.75, mb: 1.75, borderRadius: 1.5, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider' }}>
+                    <Box sx={{ p: 1.75, mb: 2, borderRadius: 1.5, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
                       <Typography sx={{
-                        fontFamily: SCRIPT_STACK,
-                        fontWeight: 400,
-                        fontSize: '1.6rem',
+                        fontFamily: headerNameFontMeta.stack,
+                        fontWeight: headerNameFontMeta.weight,
+                        fontSize: `${formProfile.headerNameSize}px`,
                         lineHeight: 1.15,
-                        letterSpacing: '0.015em',
+                        letterSpacing: headerNameFontMeta.kind === 'script' ? '0.015em' : '0.02em',
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                         ...(formProfile.headerNameColor
                           ? { color: formProfile.headerNameColor }
                           : {
@@ -1151,10 +1282,11 @@ export default function Settings() {
                           bgcolor: formProfile.headerTaglineColor || theme.palette.secondary?.main || theme.palette.primary.main
                         }} />
                         <Typography sx={{
-                          fontSize: '0.56rem',
-                          fontWeight: 700,
-                          letterSpacing: '0.3em',
-                          textTransform: 'uppercase',
+                          fontFamily: headerTaglineFontMeta.stack,
+                          fontSize: `${formProfile.headerTaglineSize}px`,
+                          fontWeight: headerTaglineIsScript ? 400 : 700,
+                          letterSpacing: headerTaglineIsScript ? '0.04em' : '0.3em',
+                          textTransform: headerTaglineIsScript ? 'none' : 'uppercase',
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
@@ -1164,6 +1296,27 @@ export default function Settings() {
                         </Typography>
                       </Box>
                     </Box>
+
+                    <Grid container spacing={2} sx={{ mb: 0.5 }}>
+                      <Grid item xs={12} sm={7}>
+                        {renderHeaderFontSelect('headerNameFont', 'Name Typeface')}
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        {renderHeaderSizeSlider('headerNameSize', NAME_SIZE_RANGE, 'Name Size')}
+                      </Grid>
+                      <Grid item xs={12} sm={7}>
+                        {renderHeaderFontSelect('headerTaglineFont', 'Tagline Typeface')}
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        {renderHeaderSizeSlider('headerTaglineSize', TAGLINE_SIZE_RANGE, 'Tagline Size')}
+                      </Grid>
+                    </Grid>
+
+                    <Divider sx={{ my: 1.75 }} />
+
+                    <Typography variant="caption" sx={{ display: 'block', fontWeight: 800, letterSpacing: 0.6, textTransform: 'uppercase', color: 'text.secondary', mb: 1 }}>
+                      Header Colours
+                    </Typography>
 
                     <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
                       {[
