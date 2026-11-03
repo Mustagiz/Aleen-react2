@@ -68,6 +68,7 @@ import {
 } from '../components/icons';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
+import { SCRIPT_STACK } from '../components/brand/BrandLockup';
 import { useFeedback } from '../contexts/FeedbackContext';
 import PageHeader from '../components/crm/PageHeader';
 import { INVOICE_TEMPLATES, DEFAULT_INVOICE_SETTINGS, getStoredInvoiceSettings } from '../constants/invoiceTemplates';
@@ -250,6 +251,8 @@ export default function Settings() {
   const [formProfile, setFormProfile] = useState({
     businessName: profile.businessName || 'Aleen Clothing',
     tagline: profile.tagline || 'Bespoke Measurement & Craft Studio',
+    headerNameColor: profile.headerNameColor || '',
+    headerTaglineColor: profile.headerTaglineColor || '',
     logoUrl: profile.logoUrl || '',
     ownerName: profile.ownerName || 'Admin',
     email: profile.email || 'admin@aleen.com',
@@ -293,6 +296,8 @@ export default function Settings() {
         ...prev,
         ...profile,
         logoUrl: profile.logoUrl || prev.logoUrl || '',
+        headerNameColor: profile.headerNameColor ?? prev.headerNameColor ?? '',
+        headerTaglineColor: profile.headerTaglineColor ?? prev.headerTaglineColor ?? '',
         instagramQrUrl: profile.instagramQrUrl || prev.instagramQrUrl || '',
         bankDetails: {
           ...prev.bankDetails,
@@ -964,10 +969,10 @@ export default function Settings() {
                 style={{ display: 'none' }}
               />
 
-              <Typography variant="h5" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-0.02em', mb: 0.5 }}>
+              <Typography variant="h5" sx={{ fontWeight: 900, color: formProfile.headerNameColor || 'text.primary', letterSpacing: '-0.02em', mb: 0.5 }}>
                 {formProfile.businessName || 'Aleen Clothing'}
               </Typography>
-              <Typography variant="caption" sx={{ display: 'block', color: '#D97706', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, mb: 2 }}>
+              <Typography variant="caption" sx={{ display: 'block', color: formProfile.headerTaglineColor || '#D97706', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, mb: 2 }}>
                 ✂️ {formProfile.tagline || 'Bespoke Measurement & Craft Studio'}
               </Typography>
 
@@ -1106,6 +1111,126 @@ export default function Settings() {
                     value={formProfile.tagline}
                     onChange={(e) => setFormProfile({ ...formProfile, tagline: e.target.value })}
                   />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Box sx={{ p: 2, borderRadius: 2, border: '1px dashed', borderColor: 'divider', bgcolor: 'grey.50' }}>
+                    <Typography variant="caption" sx={{ fontWeight: 800, letterSpacing: 0.8, textTransform: 'uppercase', color: 'text.secondary' }}>
+                      Sidebar Header Colours
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.4, mb: 1.5, fontSize: '0.7rem' }}>
+                      The boutique name and tagline at the top of the navigation panel. Reset either swatch to return to the rose-gold house style.
+                    </Typography>
+
+                    <Box sx={{ p: 1.75, mb: 1.75, borderRadius: 1.5, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider' }}>
+                      <Typography sx={{
+                        fontFamily: SCRIPT_STACK,
+                        fontWeight: 400,
+                        fontSize: '1.6rem',
+                        lineHeight: 1.15,
+                        letterSpacing: '0.015em',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        ...(formProfile.headerNameColor
+                          ? { color: formProfile.headerNameColor }
+                          : {
+                              background: 'linear-gradient(96deg, #A85E3F 0%, #D89A72 24%, #F5DCC6 44%, #C97F5C 66%, #E9B694 84%, #B76E4F 100%)',
+                              WebkitBackgroundClip: 'text',
+                              backgroundClip: 'text',
+                              color: 'transparent'
+                            })
+                      }}>
+                        {formProfile.businessName || 'Aleen Clothing'}
+                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mt: 0.25, minWidth: 0 }}>
+                        <Box sx={{
+                          width: 14,
+                          height: 2,
+                          borderRadius: '999px',
+                          flexShrink: 0,
+                          bgcolor: formProfile.headerTaglineColor || theme.palette.secondary?.main || theme.palette.primary.main
+                        }} />
+                        <Typography sx={{
+                          fontSize: '0.56rem',
+                          fontWeight: 700,
+                          letterSpacing: '0.3em',
+                          textTransform: 'uppercase',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          color: formProfile.headerTaglineColor || theme.palette.secondary?.main || theme.palette.primary.main
+                        }}>
+                          {formProfile.tagline || 'Bespoke Measurement & Craft Studio'}
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+                      {[
+                        {
+                          key: 'headerNameColor',
+                          label: 'Header Name Colour',
+                          hint: 'Rose gold metallic',
+                          fallback: '#C97F5C',
+                          value: formProfile.headerNameColor
+                        },
+                        {
+                          key: 'headerTaglineColor',
+                          label: 'Tagline Colour',
+                          hint: 'Theme accent',
+                          fallback: theme.palette.secondary?.main || theme.palette.primary.main,
+                          value: formProfile.headerTaglineColor
+                        }
+                      ].map((field) => (
+                        <Box key={field.key} sx={{ minWidth: 200 }}>
+                          <Typography variant="caption" sx={{ display: 'block', fontWeight: 800, color: 'text.primary', mb: 0.75 }}>
+                            {field.label}
+                          </Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Box sx={{
+                              position: 'relative',
+                              width: 38,
+                              height: 38,
+                              flexShrink: 0,
+                              borderRadius: '10px',
+                              overflow: 'hidden',
+                              border: '1px solid',
+                              borderColor: 'divider',
+                              cursor: 'pointer',
+                              boxShadow: 'inset 0 0 0 2px #FFFFFF',
+                              ...(field.value
+                                ? { bgcolor: field.value }
+                                : { background: 'linear-gradient(135deg, #A85E3F, #F5DCC6 55%, #B76E4F)' })
+                            }}>
+                              <input
+                                type="color"
+                                value={field.value || field.fallback}
+                                onChange={(e) => setFormProfile((prev) => ({ ...prev, [field.key]: e.target.value }))}
+                                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer', border: 'none', padding: 0 }}
+                              />
+                            </Box>
+                            <Box sx={{ minWidth: 0 }}>
+                              <Typography variant="caption" sx={{ display: 'block', fontWeight: 700, fontSize: '0.72rem', color: field.value ? 'text.primary' : 'text.secondary' }}>
+                                {field.value ? field.value.toUpperCase() : 'Default'}
+                              </Typography>
+                              <Typography variant="caption" sx={{ display: 'block', fontSize: '0.66rem', color: 'text.disabled' }}>
+                                {field.hint}
+                              </Typography>
+                            </Box>
+                            {field.value && (
+                              <Button
+                                size="small"
+                                onClick={() => setFormProfile((prev) => ({ ...prev, [field.key]: '' }))}
+                                sx={{ ml: 'auto', minWidth: 0, px: 1, fontSize: '0.68rem', textTransform: 'none' }}
+                              >
+                                Reset
+                              </Button>
+                            )}
+                          </Box>
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField

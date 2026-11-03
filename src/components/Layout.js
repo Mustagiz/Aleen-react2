@@ -117,6 +117,12 @@ export default function Layout() {
     borderColor: isDark ? 'transparent' : 'rgba(0, 0, 0, 0.08)'
   };
 
+  // Brand lockup colours are configurable in Settings → Atelier Brand Identity.
+  // With no override the wordmark keeps the rose-gold metallic house style.
+  const brandNameColor = profile?.headerNameColor || '';
+  const brandTaglineColor = profile?.headerTaglineColor
+    || (sidebarConfig.isDark ? theme.palette.secondary.light : theme.palette.secondary.main);
+
   const topBarConfig = theme.custom?.topBar || {
     bg: isDark ? 'rgba(15, 30, 29, 0.88)' : 'rgba(255, 255, 255, 0.92)',
     textColor: isDark ? '#F8FAFC' : '#0F172A',
@@ -367,7 +373,8 @@ export default function Layout() {
               <Box sx={{ overflow: 'hidden', minWidth: 0 }}>
                 <ScriptWordmark
                   name={profile?.businessName || 'Aleen Clothing'}
-                  metallic
+                  metallic={!brandNameColor}
+                  color={brandNameColor}
                   fontSize="1.72rem"
                   lineHeight={1.15}
                   sx={{ mt: '-2px' }}
@@ -377,13 +384,13 @@ export default function Layout() {
                     width: 14,
                     height: 2,
                     borderRadius: '999px',
-                    bgcolor: sidebarConfig.isDark ? theme.palette.secondary.light : theme.palette.secondary.main,
+                    bgcolor: brandTaglineColor,
                     flexShrink: 0
                   }} />
                   <Typography sx={{
                     fontSize: '0.56rem',
                     fontWeight: 700,
-                    color: sidebarConfig.isDark ? theme.palette.secondary.light : theme.palette.secondary.main,
+                    color: brandTaglineColor,
                     textTransform: 'uppercase',
                     letterSpacing: '0.3em',
                     lineHeight: 1.3,
@@ -780,7 +787,13 @@ export default function Layout() {
         }}
       >
         <Box sx={{ px: 2, py: 1.25, borderBottom: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.06)' : '#F1EFFC'}` }}>
-          <ScriptWordmark name={profile?.businessName || 'Aleen Clothing'} metallic fontSize="1.4rem" lineHeight={1.2} />
+          <ScriptWordmark
+            name={profile?.businessName || 'Aleen Clothing'}
+            metallic={!brandNameColor}
+            color={brandNameColor}
+            fontSize="1.4rem"
+            lineHeight={1.2}
+          />
           <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: 'text.secondary' }}>
             {user?.name || user?.email || 'Boutique Owner'}
           </Typography>
