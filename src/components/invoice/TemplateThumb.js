@@ -113,9 +113,6 @@ const ThumbBanner = ({ c }) => (
   <Box sx={{ ...paperBase, borderRadius: 1, bgcolor: '#FFFFFF', boxShadow: '0 1px 0 rgba(0,0,0,0.04) inset' }}>
     <Box sx={{ background: c.headerBg, px: 1.1, py: 0.85, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 0.75 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6, minWidth: 0 }}>
-        <Box sx={{ width: 13, height: 13, borderRadius: 0.5, bgcolor: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Typography sx={{ fontSize: '0.42rem', fontWeight: 800, color: '#FFFFFF', lineHeight: 1 }}>A</Typography>
-        </Box>
         <Script color="#FFFFFF" size="0.82rem">Aleen Clothing</Script>
       </Box>
       <Micro color="rgba(255,255,255,0.8)" size="0.4rem">TAX INVOICE</Micro>
@@ -193,10 +190,12 @@ const ThumbCrest = ({ c }) => (
     }}
   >
     <Box sx={{ textAlign: 'center' }}>
-      <Box sx={{ width: 16, height: 16, mx: 'auto', borderRadius: '50%', bgcolor: c.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 0 1px #FFFFFF inset, 0 0 0 2px ${c.primary}` }}>
-        <Typography sx={{ fontSize: '0.46rem', fontWeight: 800, color: c.dark, lineHeight: 1, fontFamily: SERIF }}>A</Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, mb: 0.35 }}>
+        <Box sx={{ width: 14, height: 1, bgcolor: c.accent }} />
+        <Box sx={{ width: 5, height: 5, bgcolor: c.accent, transform: 'rotate(45deg)' }} />
+        <Box sx={{ width: 14, height: 1, bgcolor: c.accent }} />
       </Box>
-      <Script color={c.dark} size="1.05rem" sx={{ mt: 0.15 }}>Aleen Clothing</Script>
+      <Script color={c.dark} size="1.05rem">Aleen Clothing</Script>
       <Box sx={{ mt: 0.25, borderBottom: `3px double ${c.primary}` }} />
       <Box sx={{ mt: 0.5, display: 'flex', justifyContent: 'space-between' }}>
         <Micro color={c.primary} family={SERIF} size="0.34rem">Regal Boutique</Micro>

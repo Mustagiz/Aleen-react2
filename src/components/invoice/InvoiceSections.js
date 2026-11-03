@@ -350,16 +350,6 @@ const ITEM_LAYOUTS = {
  * Letterhead / header block — 8 distinct document identities
  * ------------------------------------------------------------------ */
 
-const LogoTile = ({ profile, sx }) =>
-  profile.logoUrl ? (
-    <Box
-      component="img"
-      src={profile.logoUrl}
-      alt={profile.businessName || 'Store Logo'}
-      sx={{ display: 'block', objectFit: 'contain', ...sx }}
-    />
-  ) : null;
-
 export const InvoiceHeader = ({ ctx }) => {
   const { invoice, profile, activeSettings, theme, headerFormat } = ctx;
   const tagline = profile.tagline || activeSettings.tagline || 'Haute Couture & Bespoke Craft';
@@ -371,7 +361,6 @@ export const InvoiceHeader = ({ ctx }) => {
   if (headerFormat === 'receipt') {
     return (
       <Box sx={{ ...shell, textAlign: 'center', pb: 2, mb: 2, borderBottom: '1px dashed #64748B' }}>
-        <LogoTile profile={profile} sx={{ width: 48, height: 48, borderRadius: 1, mx: 'auto', mb: 0.5 }} />
         <ScriptWordmark name={businessName} fontSize={{ xs: '1.6rem', sm: '1.85rem' }} align="center" sx={{ mb: 0.25 }} />
         <TrackedTagline text={tagline} align="center" rules fontSize="0.54rem" ruleWidth={22} sx={{ mb: 0.5 }} />
         <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary' }}>
@@ -392,21 +381,7 @@ export const InvoiceHeader = ({ ctx }) => {
       <Box sx={{ ...shell, mb: { xs: 2, sm: 3 }, textAlign: 'center', px: { xs: 0.5, sm: 1.5 } }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.25, mb: 1 }}>
           <Box sx={{ width: 34, height: 1, bgcolor: theme.accentColor, ...EXACT }} />
-          {profile.logoUrl ? (
-            <LogoTile
-              profile={profile}
-              sx={{
-                width: 52,
-                height: 52,
-                borderRadius: 0.5,
-                p: 0.5,
-                border: `1px solid ${theme.primaryColor}`,
-                bgcolor: '#FFFFFF'
-              }}
-            />
-          ) : (
-            <Box sx={{ width: 10, height: 10, transform: 'rotate(45deg)', bgcolor: theme.accentColor, ...EXACT }} />
-          )}
+          <Box sx={{ width: 10, height: 10, transform: 'rotate(45deg)', bgcolor: theme.accentColor, ...EXACT }} />
           <Box sx={{ width: 34, height: 1, bgcolor: theme.accentColor, ...EXACT }} />
         </Box>
         <ScriptWordmark
@@ -490,10 +465,6 @@ export const InvoiceHeader = ({ ctx }) => {
             ...EXACT
           }}
         >
-          <LogoTile
-            profile={profile}
-            sx={{ width: 52, height: 52, borderRadius: 0.75, bgcolor: '#FFFFFF', p: 0.5, flexShrink: 0, boxShadow: '0 3px 10px rgba(0,0,0,0.18)' }}
-          />
           <Box sx={{ minWidth: 0 }}>
             <ScriptWordmark name={businessName} color="#FFFFFF" fontSize={{ xs: '1.85rem', sm: '2.3rem' }} sx={{ mb: 0.1 }} />
             <TrackedTagline text={tagline} color="rgba(255,255,255,0.9)" fontSize="0.58rem" />
@@ -526,10 +497,7 @@ export const InvoiceHeader = ({ ctx }) => {
       <Box sx={{ ...shell, mb: { xs: 2, sm: 3 } }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1.5, pb: 0.5, borderBottom: `1px solid ${theme.primaryColor}` }}>
           <ScriptWordmark name={businessName} color={theme.darkColor} fontSize={{ xs: '1.7rem', sm: '2.05rem' }} lineHeight={1.15} />
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <TrackedTagline text={tagline} color={theme.primaryColor} fontSize="0.58rem" align="right" />
-            <LogoTile profile={profile} sx={{ width: 34, height: 34, borderRadius: 0.5 }} />
-          </Box>
+          <TrackedTagline text={tagline} color={theme.primaryColor} fontSize="0.58rem" align="right" />
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', mt: 1.75 }}>
           <Box sx={{ minWidth: 0 }}>
@@ -571,13 +539,7 @@ export const InvoiceHeader = ({ ctx }) => {
   if (headerFormat === 'framed-crest') {
     return (
       <Box sx={{ ...shell, mb: { xs: 2, sm: 3 }, textAlign: 'center', px: { xs: 0.5, sm: 2 } }}>
-        <Box sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 58, height: 58, transform: 'none', border: `1px solid ${theme.accentColor}`, borderRadius: 0.5, p: 0.5, mb: 1, ...EXACT }}>
-          {profile.logoUrl ? (
-            <LogoTile profile={profile} sx={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-          ) : (
-            <Box sx={{ width: 16, height: 16, transform: 'rotate(45deg)', bgcolor: theme.accentColor, ...EXACT }} />
-          )}
-        </Box>
+        <Box sx={{ width: 16, height: 16, mx: 'auto', transform: 'rotate(45deg)', bgcolor: theme.accentColor, mb: 1, ...EXACT }} />
         <ScriptWordmark
           name={businessName}
           color={theme.darkColor}
@@ -642,15 +604,12 @@ export const InvoiceHeader = ({ ctx }) => {
             ...EXACT
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, minWidth: 0 }}>
-            <LogoTile profile={profile} sx={{ width: 30, height: 30, bgcolor: '#FFFFFF', p: 0.25, borderRadius: 0 }} />
-            <Box sx={{ minWidth: 0 }}>
-              <ScriptWordmark name={businessName} color="#FFFFFF" fontSize={{ xs: '1.5rem', sm: '1.8rem' }} lineHeight={1.1} />
-              <TrackedTagline text={tagline} color="rgba(255,255,255,0.62)" fontSize="0.52rem" tracking="0.3em" />
-              <Typography variant="caption" sx={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '0.62rem', letterSpacing: 0.6 }}>
-                {profile.address}
-              </Typography>
-            </Box>
+          <Box sx={{ minWidth: 0 }}>
+            <ScriptWordmark name={businessName} color="#FFFFFF" fontSize={{ xs: '1.5rem', sm: '1.8rem' }} lineHeight={1.1} />
+            <TrackedTagline text={tagline} color="rgba(255,255,255,0.62)" fontSize="0.52rem" tracking="0.3em" />
+            <Typography variant="caption" sx={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '0.62rem', letterSpacing: 0.6 }}>
+              {profile.address}
+            </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'stretch', gap: 0, flexWrap: 'wrap' }}>
             {fields.map((field, idx) => (
@@ -683,7 +642,6 @@ export const InvoiceHeader = ({ ctx }) => {
         <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 2 }}>
           <Box sx={{ minWidth: 0 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <LogoTile profile={profile} sx={{ width: 22, height: 22, borderRadius: 0.5, flexShrink: 0 }} />
               <Box sx={{ width: 9, height: 9, bgcolor: theme.accentColor, flexShrink: 0, ...EXACT }} />
               <ScriptWordmark name={businessName} color={theme.darkColor} fontSize={{ xs: '1.9rem', sm: '2.4rem' }} lineHeight={1.1} />
             </Box>
@@ -735,18 +693,6 @@ export const InvoiceHeader = ({ ctx }) => {
       }}
     >
       <Box sx={{ display: 'flex', alignItems: { xs: 'flex-start', sm: 'center' }, gap: { xs: 1.5, sm: 2.5 }, flex: 1, pr: { xs: 0, sm: 2 }, width: { xs: '100%', sm: 'auto' } }}>
-        <LogoTile
-          profile={profile}
-          sx={{
-            width: { xs: 50, sm: 64 },
-            height: { xs: 50, sm: 64 },
-            borderRadius: 1,
-            bgcolor: '#FFFFFF',
-            p: 0.5,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-            flexShrink: 0
-          }}
-        />
         <Box sx={{ minWidth: 0, flex: 1 }}>
           <ScriptWordmark name={businessName} color="#FFFFFF" fontSize={{ xs: '1.9rem', sm: '2.5rem' }} lineHeight={1.1} />
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.35 }}>
