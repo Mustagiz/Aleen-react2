@@ -225,6 +225,7 @@ export default function Settings() {
     showSignatureStamp: profile.showSignatureStamp ?? true,
     signatureLabel: profile.signatureLabel || 'Authorized Atelier Signatory',
     signatureImage: profile.signatureImage || '',
+    instagramQrUrl: profile.instagramQrUrl || '',
     termsText: profile.termsText || DEFAULT_INVOICE_SETTINGS.termsText,
     customFooterNote: profile.customFooterNote || DEFAULT_INVOICE_SETTINGS.customFooterNote
   });
@@ -236,6 +237,7 @@ export default function Settings() {
         ...prev,
         ...profile,
         logoUrl: profile.logoUrl || prev.logoUrl || '',
+        instagramQrUrl: profile.instagramQrUrl || prev.instagramQrUrl || '',
         bankDetails: {
           ...prev.bankDetails,
           ...(profile.bankDetails || {})
@@ -251,6 +253,7 @@ export default function Settings() {
   const logoInputRef = useRef(null);
   const signatureInputRef = useRef(null);
   const letterheadInputRef = useRef(null);
+  const instagramQrInputRef = useRef(null);
   const [logoModalOpen, setLogoModalOpen] = useState(false);
   const [cropSource, setCropSource] = useState(null);
 
@@ -298,6 +301,49 @@ export default function Settings() {
     setFormProfile(prev => ({ ...prev, logoUrl: '' }));
     if (logoInputRef.current) logoInputRef.current.value = '';
     showToast('Logo removed. Monogram crest will be displayed.', 'info');
+  };
+
+  // Instagram QR — kept on the brand profile so every bill template prints it.
+  // The image is re-encoded to 512px so the base64 stays inside the profile doc.
+  const handleInstagramQrUpload = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (file.size > 6 * 1024 * 1024) {
+      showToast('Instagram QR image should be under 6MB.', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const loader = new Image();
+      loader.onload = () => {
+        // Contain-fit onto a white 512px square: the whole code stays visible
+        // and the base64 stays small enough for the profile document.
+        const ratio = Math.min(512 / loader.naturalWidth, 512 / loader.naturalHeight, 1);
+        const w = Math.round(loader.naturalWidth * ratio);
+        const h = Math.round(loader.naturalHeight * ratio);
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, 512, 512);
+        ctx.drawImage(loader, Math.round((512 - w) / 2), Math.round((512 - h) / 2), w, h);
+        setFormProfile(prev => ({
+          ...prev,
+          instagramQrUrl: canvas.toDataURL('image/png')
+        }));
+        showToast('Instagram QR loaded! Click "Save Brand Details" to confirm.', 'success');
+      };
+      loader.onerror = () => showToast('That file could not be read as an image.', 'error');
+      loader.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveInstagramQr = () => {
+    setFormProfile(prev => ({ ...prev, instagramQrUrl: '' }));
+    if (instagramQrInputRef.current) instagramQrInputRef.current.value = '';
+    showToast('Instagram QR removed. Default code will be printed.', 'info');
   };
 
   // Upload handler for custom signature (converted to base64 Data URL)
@@ -379,6 +425,7 @@ export default function Settings() {
         showSignatureStamp: formProfile.showSignatureStamp,
         signatureLabel: formProfile.signatureLabel,
         signatureImage: formProfile.signatureImage,
+        instagramQrUrl: formProfile.instagramQrUrl,
         termsText: formProfile.termsText,
         customFooterNote: formProfile.customFooterNote
       };
@@ -852,6 +899,15 @@ export default function Settings() {
                 )}
               </Box>
 
+              {/* Hidden File Input for Instagram QR */}
+              <input
+                type="file"
+                ref={instagramQrInputRef}
+                onChange={handleInstagramQrUpload}
+                accept="image/*"
+                style={{ display: 'none' }}
+              />
+
               <Typography variant="h5" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-0.02em', mb: 0.5 }}>
                 {formProfile.businessName || 'Aleen Clothing'}
               </Typography>
@@ -874,6 +930,73 @@ export default function Settings() {
                 <Typography variant="caption" sx={{ color: 'text.secondary', display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Payment fontSize="small" sx={{ color: (t) => t.palette.primary.main }} /> GSTIN: <b>{formProfile.gstin}</b>
                 </Typography>
+              </Box>
+
+              <Divider sx={{ my: 2 }} />
+
+              <Box sx={{ textAlign: 'left' }}>
+                <Typography variant="caption" sx={{ display: 'block', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, color: '#E1306C', mb: 1.25 }}>
+                  📸 Instagram QR
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+                  <Box
+                    component="img"
+                    src={formProfile.instagramQrUrl || instagramQrImg}
+                    alt="Instagram QR preview"
+                    sx={{
+                      width: 66,
+                      height: 66,
+                      objectFit: 'contain',
+                      display: 'block',
+                      flexShrink: 0,
+                      borderRadius: 1.5,
+                      border: '1.5px solid rgba(225, 48, 108, 0.35)',
+                      bgcolor: '#FFFFFF',
+                      p: 0.4,
+                      boxShadow: '0 3px 8px rgba(225, 48, 108, 0.1)'
+                    }}
+                  />
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75, minWidth: 0 }}>
+                    <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap' }}>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        startIcon={<CloudUpload sx={{ fontSize: '15px !important' }} />}
+                        onClick={() => instagramQrInputRef.current?.click()}
+                        sx={{
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          borderRadius: '20px',
+                          py: 0.4,
+                          px: 1.25,
+                          textTransform: 'none',
+                          borderColor: '#E1306C',
+                          color: '#E1306C',
+                          '&:hover': { bgcolor: 'rgba(225, 48, 108, 0.06)' }
+                        }}
+                      >
+                        Upload QR
+                      </Button>
+                      {formProfile.instagramQrUrl && (
+                        <Button
+                          size="small"
+                          variant="text"
+                          color="error"
+                          startIcon={<Delete sx={{ fontSize: '14px !important' }} />}
+                          onClick={handleRemoveInstagramQr}
+                          sx={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'none', py: 0.3 }}
+                        >
+                          Remove
+                        </Button>
+                      )}
+                    </Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.66rem', lineHeight: 1.35 }}>
+                      {formProfile.instagramQrUrl
+                        ? 'Saved — this code replaces the bundled one on every bill.'
+                        : 'Bundled code in use. Upload the QR saved from your Instagram profile to replace it on every bill.'}
+                    </Typography>
+                  </Box>
+                </Box>
               </Box>
 
               <Box sx={{ mt: 3, p: 1.5, borderRadius: 2, bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)', border: (t) => `1px dashed ${t.palette.primary.main}` }}>
@@ -1231,7 +1354,7 @@ export default function Settings() {
                         <Typography variant="caption" sx={{ display: 'block', fontSize: '0.55rem', fontWeight: 800, color: (t) => t.palette.primary.main }}>Scan to Pay</Typography>
                       </Box>
                       <Box sx={{ textAlign: 'center' }}>
-                        <Box component="img" src={instagramQrImg} alt="Instagram QR" sx={{ width: 48, height: 48, objectFit: 'contain', display: 'block', mx: 'auto' }} />
+                        <Box component="img" src={formProfile.instagramQrUrl || instagramQrImg} alt="Instagram QR" sx={{ width: 48, height: 48, objectFit: 'contain', display: 'block', mx: 'auto' }} />
                         <Typography variant="caption" sx={{ display: 'block', fontSize: '0.55rem', fontWeight: 800, color: '#E1306C' }}>Instagram</Typography>
                       </Box>
                     </Box>

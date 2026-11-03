@@ -1339,7 +1339,8 @@ const PANEL_STYLES = (theme) => ({
 });
 
 const PanelLuxuryComposite = ({ ctx }) => {
-  const { invoice, theme, storeVpa, qrImageUrl } = ctx;
+  const { invoice, theme, storeVpa, qrImageUrl, profile, activeSettings } = ctx;
+  const instagramQr = profile?.instagramQrUrl || activeSettings?.instagramQrUrl || instagramQrImg;
   return (
     <Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1, pb: 0.6, borderBottom: `1px dashed ${theme.primaryColor || '#155D46'}30` }}>
@@ -1394,7 +1395,7 @@ const PanelLuxuryComposite = ({ ctx }) => {
         <Box sx={{ textAlign: 'center' }}>
           <Box
             component="img"
-            src={instagramQrImg}
+            src={instagramQr}
             alt="Instagram QR"
             sx={{
               width: 82,
@@ -1527,7 +1528,8 @@ const PanelGarmentCare = ({ ctx }) => {
 };
 
 const PanelConcierge = ({ ctx }) => {
-  const { theme, profile, storeVpa } = ctx;
+  const { theme, profile, activeSettings, storeVpa } = ctx;
+  const instagramQr = profile?.instagramQrUrl || activeSettings?.instagramQrUrl || instagramQrImg;
   return (
     <Box>
       <Typography variant="caption" sx={{ fontWeight: 800, color: theme.primaryColor, textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', mb: 1 }}>
@@ -1548,7 +1550,7 @@ const PanelConcierge = ({ ctx }) => {
         <Box sx={{ textAlign: 'center', minWidth: 64 }}>
           <Box
             component="img"
-            src={instagramQrImg}
+            src={instagramQr}
             alt="Instagram QR"
             sx={{
               width: 64,
