@@ -14,6 +14,7 @@ import GlassCard from '../components/GlassCard';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
 import PageHeader from '../components/crm/PageHeader';
 import AtelierKpiCard from '../components/crm/AtelierKpiCard';
+import MandateDiscoveryFlow from '../components/discovery/MandateDiscoveryFlow';
 
 const VENDOR_CATEGORIES = [
     'Fabric Mills (Silk, Cotton, Velvet)',
@@ -44,6 +45,9 @@ const Vendors = () => {
     });
     const [deleteId, setDeleteId] = useState(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+    // View mode: 'discovery' (Mandate AI Intake Flow) | 'directory' (Supplier Register)
+    const [viewMode, setViewMode] = useState('discovery');
 
     // Filters and Search State
     const [searchQuery, setSearchQuery] = useState('');
@@ -188,6 +192,54 @@ const Vendors = () => {
 
     return (
         <Box>
+            {/* Mode Switcher: Mandate AI Discovery vs Boutique Supplier Register */}
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+                <Box sx={{ display: 'inline-flex', p: 0.5, bgcolor: '#FFFFFF', border: '1px solid #E1E4EA', borderRadius: '9999px', boxShadow: '0 2px 8px rgba(8, 15, 28, 0.04)' }}>
+                    <Box
+                        onClick={() => setViewMode('discovery')}
+                        sx={{
+                            px: 2.25,
+                            py: 0.65,
+                            borderRadius: '9999px',
+                            fontSize: '0.78rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            bgcolor: viewMode === 'discovery' ? '#080F1C' : 'transparent',
+                            color: viewMode === 'discovery' ? '#FFFFFF' : '#66707B',
+                            transition: 'all 0.2s ease',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.75
+                        }}
+                    >
+                        <span>🛡️</span> Mandate Discovery & Risk Flow
+                    </Box>
+                    <Box
+                        onClick={() => setViewMode('directory')}
+                        sx={{
+                            px: 2.25,
+                            py: 0.65,
+                            borderRadius: '9999px',
+                            fontSize: '0.78rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            bgcolor: viewMode === 'directory' ? '#080F1C' : 'transparent',
+                            color: viewMode === 'directory' ? '#FFFFFF' : '#66707B',
+                            transition: 'all 0.2s ease',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.75
+                        }}
+                    >
+                        <span>📋</span> Boutique Supplier Directory ({vendors.length})
+                    </Box>
+                </Box>
+            </Box>
+
+            {viewMode === 'discovery' ? (
+                <MandateDiscoveryFlow onNavigateVendor={() => setViewMode('directory')} />
+            ) : (
+                <>
             {/* Atelier Luxury Header with Breadcrumbs & Action */}
             <PageHeader
                 title="Fabric & Vendors Directory"
@@ -877,6 +929,8 @@ const Vendors = () => {
                 title="Delete Vendor Record"
                 content="Are you sure you want to delete this vendor? This will remove their record and contact details."
             />
+                </>
+            )}
         </Box>
     );
 };

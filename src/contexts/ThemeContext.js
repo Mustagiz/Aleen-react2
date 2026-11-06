@@ -20,6 +20,7 @@ export const ThemeProvider = ({ children }) => {
 
     const [designSystem, setDesignSystem] = useState(() => {
         const savedSystem = localStorage.getItem('crmDesignSystem');
+        if (!savedSystem || savedSystem === 'atelier') return 'mandate';
         return savedSystem || DEFAULT_DESIGN_SYSTEM;
     });
 
@@ -72,8 +73,20 @@ export const ThemeProvider = ({ children }) => {
         };
     }, [colorTheme, activeSystemConfig]);
 
-    // Computed sidebar styles — one unified Horizon look across every design system
+    // Computed sidebar styles — supports Mandate Discovery and existing styles
     const computedSidebar = useMemo(() => {
+        if (activeSystemConfig?.id === 'mandate') {
+            return {
+                bg: mode === 'light' ? '#FAFCFA' : '#080F1C',
+                isDark: mode === 'dark',
+                textColor: mode === 'dark' ? '#CBD5E1' : '#66707B',
+                textActiveColor: '#080F1C',
+                subheadColor: mode === 'dark' ? '#94A3B8' : '#969DA7',
+                activePillBg: mode === 'light' ? '#080F1C' : 'rgba(255, 255, 255, 0.14)',
+                activePillText: '#FFFFFF',
+                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(225, 228, 234, 0.8)'
+            };
+        }
         return {
             bg: mode === 'light' ? '#FFFFFF' : '#1D1A2E',
             isDark: mode === 'dark',
@@ -84,7 +97,7 @@ export const ThemeProvider = ({ children }) => {
             activePillText: mode === 'light' ? '#5B4BD1' : '#9B8FF5',
             borderColor: mode === 'dark' ? 'transparent' : '#EFEFF4'
         };
-    }, [mode]);
+    }, [mode, activeSystemConfig]);
 
     // Computed top navigation bar styles
     const computedTopBar = useMemo(() => {
@@ -156,6 +169,22 @@ export const ThemeProvider = ({ children }) => {
             root.style.setProperty('--card-shadow', mode === 'light' ? activeSystemConfig.cardStyle.boxShadowLight : activeSystemConfig.cardStyle.boxShadowDark);
             root.style.setProperty('--font-sans', activeSystemConfig.typography.fontFamily);
             root.style.setProperty('--font-serif', activeSystemConfig.typography.h1Font);
+
+            // Mandate Design System Specific Tokens
+            root.style.setProperty('--stage', '#D7DBDF');
+            root.style.setProperty('--app-shell', mode === 'light' ? '#ECEEF2' : '#080F1C');
+            root.style.setProperty('--surface', mode === 'light' ? '#FAFCFA' : '#111827');
+            root.style.setProperty('--surface-soft', mode === 'light' ? '#F2F3F6' : '#172033');
+            root.style.setProperty('--surface-inset', mode === 'light' ? '#E9EBF0' : '#1D273B');
+            root.style.setProperty('--ink', '#080F1C');
+            root.style.setProperty('--ink-hover', '#1D2531');
+            root.style.setProperty('--outline', mode === 'light' ? '#E1E4EA' : 'rgba(255, 255, 255, 0.1)');
+            root.style.setProperty('--violet', '#6F4CED');
+            root.style.setProperty('--violet-soft', '#EFEBFF');
+            root.style.setProperty('--risk-low', '#2A875B');
+            root.style.setProperty('--risk-mid', '#CE8F0B');
+            root.style.setProperty('--risk-high', '#D46521');
+            root.style.setProperty('--risk-critical', '#C33A4D');
         }
     }, [activeSystemConfig, activePalette, computedSidebar, computedTopBar, mode, colorTheme]);
 

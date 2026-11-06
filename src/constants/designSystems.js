@@ -1,7 +1,83 @@
 // Full Ecosystem Design Systems for Aleen CRM
-// Complete visual paradigms for Apple HIG, Microsoft Fluent, Zoho CRM, Linear, Salesforce, Stripe, Google Material 3, and Atelier Luxury.
+// Complete visual paradigms for Mandate Discovery & Risk, Apple HIG, Microsoft Fluent, Zoho CRM, Linear, Salesforce, Stripe, Google Material 3, and Atelier Luxury.
 
 export const DESIGN_SYSTEMS = [
+  {
+    id: 'mandate',
+    name: 'Mandate Discovery & Risk',
+    company: 'Mandate AI',
+    badge: 'Cool Stage & Floating Navy Capsule',
+    tagline: 'Uniform cool-gray stage (#D7DBDF) with a floating rounded app shell (#ECEEF2), centered dark navy capsule pill navigation, crisp white cards, and violet agent accents.',
+    icon: '🛡️',
+    shape: {
+      borderRadius: 18,
+      buttonRadius: 9999,
+      inputRadius: 9,
+      cardRadius: 18,
+      shellRadius: 22
+    },
+    typography: {
+      fontFamily: '"Inter", "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      h1Font: '"Inter", sans-serif',
+      fontWeightBold: 600,
+      letterSpacing: '-0.02em'
+    },
+    palette: {
+      primary: {
+        main: '#080F1C', // Deep Navy Ink
+        light: '#1D2531',
+        dark: '#040810',
+        contrastText: '#FFFFFF'
+      },
+      secondary: {
+        main: '#6F4CED', // Violet Agent Accent
+        light: '#8E72F3',
+        dark: '#5432D3',
+        contrastText: '#FFFFFF'
+      },
+      background: {
+        stage: '#D7DBDF',
+        lightDefault: '#ECEEF2',
+        lightPaper: '#FAFCFA',
+        darkDefault: '#080F1C',
+        darkPaper: '#111827'
+      }
+    },
+    sidebar: {
+      isDarkSidebar: false,
+      lightBg: '#FAFCFA',
+      darkBg: '#080F1C',
+      textColor: '#66707B',
+      textActiveColor: '#080F1C',
+      subheadColor: '#969DA7',
+      activePillBg: '#080F1C',
+      activePillText: '#FFFFFF',
+      borderColor: 'rgba(225, 228, 234, 0.75)'
+    },
+    topBar: {
+      style: 'capsule',
+      lightBg: '#080F1C',
+      darkBg: '#080F1C',
+      textColor: '#FFFFFF',
+      borderColor: 'rgba(255, 255, 255, 0.12)'
+    },
+    cardStyle: {
+      backdropFilter: 'none',
+      borderLight: '1px solid rgba(225, 228, 234, 0.75)',
+      borderDark: '1px solid rgba(255, 255, 255, 0.08)',
+      boxShadowLight: '0 4px 20px -2px rgba(8, 15, 28, 0.05)',
+      boxShadowDark: '0 12px 32px rgba(0, 0, 0, 0.5)'
+    },
+    buttonStyle: {
+      textTransform: 'none',
+      fontWeight: 600,
+      background: '#080F1C',
+      color: '#FFFFFF',
+      borderRadius: '9999px',
+      boxShadow: '0 2px 8px rgba(8, 15, 28, 0.2)'
+    },
+    accentGlow: 'rgba(111, 76, 237, 0.25)'
+  },
   {
     id: 'zoho',
     name: 'Zoho CRM Enterprise',
@@ -580,4 +656,4 @@ export const DESIGN_SYSTEMS = [
   }
 ];
 
-export const DEFAULT_DESIGN_SYSTEM = 'atelier';
+export const DEFAULT_DESIGN_SYSTEM = 'mandate';

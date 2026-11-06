@@ -431,3 +431,102 @@ td.invoice-table-header-cell {
     print-color-adjust: exact !important;
   }
 }
+
+/* ==========================================================================
+   MANDATE DISCOVERY & RISK DESIGN SYSTEM SPECIFICATION
+   ========================================================================== */
+
+:root {
+  --stage: #D7DBDF;
+  --app-shell: #ECEEF2;
+  --surface: #FAFCFA;
+  --surface-soft: #F2F3F6;
+  --surface-inset: #E9EBF0;
+  --ink: #080F1C;
+  --ink-hover: #1D2531;
+  --text: #161922;
+  --text-secondary: #66707B;
+  --text-tertiary: #969DA7;
+  --outline: #E1E4EA;
+  --white: #FFFFFF;
+  --violet: #6F4CED;
+  --violet-soft: #EFEBFF;
+  --risk-low: #2A875B;
+  --risk-mid: #CE8F0B;
+  --risk-high: #D46521;
+  --risk-critical: #C33A4D;
+  --radius-sm: 9px;
+  --radius-card: 18px;
+  --radius-shell: 22px;
+  --shadow-shell: 0 16px 40px rgba(8, 15, 28, 0.08);
+
+  /* Easing & Timing */
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ease-in-out: cubic-bezier(.65, 0, .35, 1);
+  --ease-emphasized: cubic-bezier(.16, 1, .3, 1);
+  --dur-hover: 160ms;
+  --dur-control: 220ms;
+  --dur-step: 340ms;
+  --dur-number: 520ms;
+  --dur-scene: 600ms;
+}
+
+[data-design-system="mandate"] body {
+  background-color: var(--stage);
+  color: var(--text);
+  font-family: 'Inter', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+[data-design-system="mandate"] .app-surface {
+  background-color: var(--app-shell);
+  border: 2px solid #FFFFFF;
+  border-radius: var(--radius-shell);
+  overflow: hidden;
+  box-shadow: var(--shadow-shell);
+}
+
+[data-design-system="mandate"] .primary-button {
+  border: none;
+  border-radius: 9999px;
+  background-color: var(--ink);
+  color: #FFFFFF;
+  min-height: 36px;
+  padding: 0 18px;
+  font-weight: 600;
+  transition: all var(--dur-hover) var(--ease-out);
+}
+
+[data-design-system="mandate"] .primary-button:hover {
+  background-color: var(--ink-hover);
+  transform: translateY(-1px);
+}
+
+[data-design-system="mandate"] .card {
+  background-color: var(--surface);
+  border: 1px solid rgba(225, 228, 234, 0.75);
+  border-radius: var(--radius-card);
+}
+
+.risk-track {
+  background: linear-gradient(90deg, var(--risk-low) 0 27%, var(--risk-mid) 27% 50%, var(--risk-high) 50% 73%, var(--risk-critical) 73% 100%);
+  border-radius: 9999px;
+  height: 6px;
+  position: relative;
+}
+
+.step-enter {
+  animation: step-in var(--dur-step) var(--ease-out) both;
+}
+
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translate3d(14px, 0, 0);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    filter: blur(0);
+  }
+}

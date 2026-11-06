@@ -23,6 +23,7 @@ const InventoryReports = lazy(() => import('./pages/InventoryReports'));
 const ProfitLoss = lazy(() => import('./pages/ProfitLoss'));
 const Expenses = lazy(() => import('./pages/Expenses'));
 const Vendors = lazy(() => import('./pages/Vendors'));
+const Discovery = lazy(() => import('./pages/Discovery'));
 const Purchases = lazy(() => import('./pages/Purchases'));
 const Barcodes = lazy(() => import('./pages/Barcodes'));
 const Marketing = lazy(() => import('./pages/Marketing'));
@@ -90,6 +91,7 @@ const AnimatedRoutes = () => {
           <Route path="profit-loss" element={<PageWrapper><ProfitLoss /></PageWrapper>} />
           <Route path="expenses" element={<PageWrapper><Expenses /></PageWrapper>} />
           <Route path="vendors" element={<PageWrapper><Vendors /></PageWrapper>} />
+          <Route path="discovery" element={<PageWrapper><Discovery /></PageWrapper>} />
           <Route path="purchases" element={<PageWrapper><Purchases /></PageWrapper>} />
           <Route path="barcodes" element={<PageWrapper><Barcodes /></PageWrapper>} />
           <Route path="devices" element={<PageWrapper><Devices /></PageWrapper>} />
