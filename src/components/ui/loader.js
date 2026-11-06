@@ -1,2 +1,1 @@
-export * from './loader.jsx';
-export { default } from './loader.jsx';
+export { LoaderOne, LoaderOneDemo, default } from './loader.jsx';
