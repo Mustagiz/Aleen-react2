@@ -656,4 +656,4 @@ export const DESIGN_SYSTEMS = [
   }
 ];
 
-export const DEFAULT_DESIGN_SYSTEM = 'atelier';
+export const DEFAULT_DESIGN_SYSTEM = 'mandate';

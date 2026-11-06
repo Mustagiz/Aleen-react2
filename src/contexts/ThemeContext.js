@@ -20,7 +20,6 @@ export const ThemeProvider = ({ children }) => {
 
     const [designSystem, setDesignSystem] = useState(() => {
         const savedSystem = localStorage.getItem('crmDesignSystem');
-        if (savedSystem === 'mandate') return DEFAULT_DESIGN_SYSTEM;
         return savedSystem || DEFAULT_DESIGN_SYSTEM;
     });
 

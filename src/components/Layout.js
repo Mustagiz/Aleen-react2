@@ -47,7 +47,8 @@ import {
   FactCheck,
   QrCodeScanner,
   Close,
-  Palette
+  Palette,
+  ExpandMore
 } from './icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
@@ -81,6 +82,9 @@ export default function Layout() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isDark = mode === 'dark';
   const isAtelier = designSystem === 'atelier';
+  const isMandate = designSystem === 'mandate';
+  const [reportsAnchor, setReportsAnchor] = useState(null);
+  const [settingsAnchor, setSettingsAnchor] = useState(null);
 
   // Live header clock (date + time)
   const [clockNow, setClockNow] = useState(new Date());
@@ -813,6 +817,582 @@ export default function Layout() {
       </MuiMenu>
     </>
   );
+
+  // Floating Top Capsule Bar with Real Aleen Pages + Overflow Dropdowns
+  const renderMandateTopBar = () => {
+    const reportRoutes = [
+      { label: 'Daily Cash Ledger', path: '/payment-summary' },
+      { label: 'Profit & Loss', path: '/profit-loss' },
+      { label: 'Expenses Register', path: '/expenses' },
+      { label: 'Sales Reports', path: '/sales-reports' },
+      { label: 'Stock Audit', path: '/inventory-reports' },
+      { label: 'Advanced Analytics', path: '/advanced-reports' }
+    ];
+    const isReportsActive = reportRoutes.some((r) => location.pathname === r.path);
+
+    const settingsRoutes = [
+      { label: 'Boutique Settings', path: '/settings' },
+      { label: 'Barcode Studio', path: '/barcodes' },
+      { label: 'Device Manager', path: '/devices' },
+      { label: 'VIP Loyalty', path: '/loyalty' },
+      { label: 'Marketing Hub', path: '/marketing' },
+      { label: 'Purchase Orders', path: '/purchases' }
+    ];
+    const isSettingsActive = settingsRoutes.some((r) => location.pathname === r.path);
+
+    const mainPillItems = [
+      { label: 'Dashboard', path: '/' },
+      { label: 'Invoices', path: '/invoices' },
+      { label: 'Customers', path: '/customers' },
+      { label: 'Inventory', path: '/inventory' },
+      { label: 'Tailoring', path: '/tailoring' },
+      { label: 'Vendors', path: '/vendors', matchPaths: ['/vendors', '/discovery'] }
+    ];
+
+    return (
+      <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
+        {/* Left: Boutique Brand Name & Tagline */}
+        <Box
+          onClick={() => navigate('/')}
+          sx={{ display: 'flex', alignItems: 'center', gap: 1.25, cursor: 'pointer', flexShrink: 0 }}
+        >
+          {isMobile && (
+            <IconButton
+              onClick={(e) => {
+                e.stopPropagation();
+                setMobileOpen(true);
+              }}
+              size="small"
+              sx={{ color: '#080F1C', mr: 0.5 }}
+            >
+              <Menu fontSize="small" />
+            </IconButton>
+          )}
+          <Box
+            sx={{
+              width: 32,
+              height: 32,
+              borderRadius: '50%',
+              bgcolor: '#080F1C',
+              color: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 800,
+              fontSize: '0.88rem',
+              boxShadow: '0 2px 8px rgba(8, 15, 28, 0.2)'
+            }}
+          >
+            {brandInitial}
+          </Box>
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Typography
+              sx={{
+                fontFamily: brandNameFont.stack,
+                fontWeight: brandNameWeight || 700,
+                fontStyle: brandNameStyle,
+                fontSize: `${Math.min(Math.max(brandNameSize * 0.9, 17), 22)}px`,
+                color: brandNameColor || '#080F1C',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.2
+              }}
+            >
+              {profile?.businessName || 'Aleen'}
+            </Typography>
+            <Typography
+              sx={{
+                fontFamily: brandTaglineFont.stack,
+                fontSize: '0.65rem',
+                fontWeight: 600,
+                color: '#66707B',
+                textTransform: taglineIsScript ? 'none' : 'uppercase',
+                letterSpacing: taglineIsScript ? '0.04em' : '0.14em',
+                lineHeight: 1
+              }}
+            >
+              {profile?.tagline || 'Haute Couture Atelier'}
+            </Typography>
+          </Box>
+        </Box>
+
+        {/* Center: Floating Dark Navy Capsule Navigation */}
+        <Box
+          sx={{
+            display: { xs: 'none', md: 'flex' },
+            alignItems: 'center',
+            bgcolor: '#080F1C',
+            borderRadius: '9999px',
+            p: '3px 4px',
+            gap: 0.35,
+            boxShadow: '0 4px 16px rgba(8, 15, 28, 0.25)'
+          }}
+        >
+          {mainPillItems.map((item) => {
+            const isActive = item.matchPaths
+              ? item.matchPaths.some((p) => location.pathname === p || location.pathname.startsWith(p))
+              : location.pathname === item.path;
+
+            return (
+              <Box
+                key={item.label}
+                onClick={() => navigate(item.path)}
+                sx={{
+                  px: 1.5,
+                  py: 0.5,
+                  borderRadius: '9999px',
+                  bgcolor: isActive ? '#FFFFFF' : 'transparent',
+                  color: isActive ? '#080F1C' : 'rgba(255, 255, 255, 0.75)',
+                  fontSize: '0.78rem',
+                  fontWeight: isActive ? 700 : 500,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+                  '&:hover': {
+                    color: isActive ? '#080F1C' : '#FFFFFF',
+                    bgcolor: isActive ? '#FFFFFF' : 'rgba(255, 255, 255, 0.08)'
+                  }
+                }}
+              >
+                <span>{item.label}</span>
+              </Box>
+            );
+          })}
+
+          {/* Reports ▾ Dropdown Pill */}
+          <Box
+            onClick={(e) => setReportsAnchor(e.currentTarget)}
+            sx={{
+              px: 1.5,
+              py: 0.5,
+              borderRadius: '9999px',
+              bgcolor: isReportsActive ? '#FFFFFF' : 'transparent',
+              color: isReportsActive ? '#080F1C' : 'rgba(255, 255, 255, 0.75)',
+              fontSize: '0.78rem',
+              fontWeight: isReportsActive ? 700 : 500,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.3,
+              transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+              '&:hover': {
+                color: isReportsActive ? '#080F1C' : '#FFFFFF',
+                bgcolor: isReportsActive ? '#FFFFFF' : 'rgba(255, 255, 255, 0.08)'
+              }
+            }}
+          >
+            <span>Reports</span>
+            <ExpandMore sx={{ fontSize: 15, opacity: 0.7 }} />
+          </Box>
+
+          {/* Settings ▾ Dropdown Pill */}
+          <Box
+            onClick={(e) => setSettingsAnchor(e.currentTarget)}
+            sx={{
+              px: 1.5,
+              py: 0.5,
+              borderRadius: '9999px',
+              bgcolor: isSettingsActive ? '#FFFFFF' : 'transparent',
+              color: isSettingsActive ? '#080F1C' : 'rgba(255, 255, 255, 0.75)',
+              fontSize: '0.78rem',
+              fontWeight: isSettingsActive ? 700 : 500,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.3,
+              transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+              '&:hover': {
+                color: isSettingsActive ? '#080F1C' : '#FFFFFF',
+                bgcolor: isSettingsActive ? '#FFFFFF' : 'rgba(255, 255, 255, 0.08)'
+              }
+            }}
+          >
+            <span>Settings</span>
+            <ExpandMore sx={{ fontSize: 15, opacity: 0.7 }} />
+          </Box>
+        </Box>
+
+        {/* Reports Dropdown Menu */}
+        <MuiMenu
+          anchorEl={reportsAnchor}
+          open={Boolean(reportsAnchor)}
+          onClose={() => setReportsAnchor(null)}
+          PaperProps={{
+            sx: {
+              mt: 1.25,
+              borderRadius: '16px',
+              bgcolor: '#080F1C',
+              color: '#FFFFFF',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              boxShadow: '0 16px 40px rgba(8, 15, 28, 0.4)',
+              py: 0.75,
+              px: 0.5,
+              minWidth: 210
+            }
+          }}
+        >
+          <Typography
+            sx={{
+              px: 1.75,
+              py: 0.6,
+              fontSize: '0.66rem',
+              fontWeight: 750,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: '#969DA7'
+            }}
+          >
+            Finance & Audit
+          </Typography>
+          {reportRoutes.map((r) => {
+            const isSelected = location.pathname === r.path;
+            return (
+              <MenuItem
+                key={r.path}
+                onClick={() => {
+                  setReportsAnchor(null);
+                  navigate(r.path);
+                }}
+                sx={{
+                  borderRadius: '10px',
+                  px: 1.75,
+                  py: 0.75,
+                  fontSize: '0.8rem',
+                  fontWeight: isSelected ? 700 : 500,
+                  color: isSelected ? '#FFFFFF' : 'rgba(255, 255, 255, 0.85)',
+                  bgcolor: isSelected ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+                  '&:hover': {
+                    bgcolor: 'rgba(255, 255, 255, 0.14)',
+                    color: '#FFFFFF'
+                  }
+                }}
+              >
+                {r.label}
+              </MenuItem>
+            );
+          })}
+        </MuiMenu>
+
+        {/* Settings Dropdown Menu */}
+        <MuiMenu
+          anchorEl={settingsAnchor}
+          open={Boolean(settingsAnchor)}
+          onClose={() => setSettingsAnchor(null)}
+          PaperProps={{
+            sx: {
+              mt: 1.25,
+              borderRadius: '16px',
+              bgcolor: '#080F1C',
+              color: '#FFFFFF',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              boxShadow: '0 16px 40px rgba(8, 15, 28, 0.4)',
+              py: 0.75,
+              px: 0.5,
+              minWidth: 210
+            }
+          }}
+        >
+          <Typography
+            sx={{
+              px: 1.75,
+              py: 0.6,
+              fontSize: '0.66rem',
+              fontWeight: 750,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: '#969DA7'
+            }}
+          >
+            Atelier Operations
+          </Typography>
+          {settingsRoutes.map((s) => {
+            const isSelected = location.pathname === s.path;
+            return (
+              <MenuItem
+                key={s.path}
+                onClick={() => {
+                  setSettingsAnchor(null);
+                  navigate(s.path);
+                }}
+                sx={{
+                  borderRadius: '10px',
+                  px: 1.75,
+                  py: 0.75,
+                  fontSize: '0.8rem',
+                  fontWeight: isSelected ? 700 : 500,
+                  color: isSelected ? '#FFFFFF' : 'rgba(255, 255, 255, 0.85)',
+                  bgcolor: isSelected ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+                  '&:hover': {
+                    bgcolor: 'rgba(255, 255, 255, 0.14)',
+                    color: '#FFFFFF'
+                  }
+                }}
+              >
+                {s.label}
+              </MenuItem>
+            );
+          })}
+        </MuiMenu>
+
+        {/* Right Utility: Live Clock + Command Search + Shift + Notifications + Avatar */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+          <Box
+            sx={{
+              display: { xs: 'none', lg: 'flex' },
+              alignItems: 'center',
+              px: 1.5,
+              py: 0.5,
+              borderRadius: '9999px',
+              bgcolor: '#FFFFFF',
+              border: '1px solid #E1E4EA',
+              color: '#66707B',
+              fontSize: '0.72rem',
+              fontWeight: 650,
+              letterSpacing: '0.01em'
+            }}
+          >
+            {clockNow.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+          </Box>
+
+          <Box
+            onClick={() => setSearchOpen(true)}
+            sx={{
+              display: { xs: 'none', sm: 'flex' },
+              alignItems: 'center',
+              gap: 1.25,
+              px: 1.5,
+              py: 0.55,
+              borderRadius: '9999px',
+              bgcolor: '#FFFFFF',
+              border: '1px solid #E1E4EA',
+              color: '#66707B',
+              fontSize: '0.76rem',
+              fontWeight: 500,
+              cursor: 'pointer',
+              boxShadow: '0 1px 3px rgba(8, 15, 28, 0.04)',
+              transition: 'all 0.18s ease',
+              '&:hover': {
+                borderColor: '#080F1C',
+                color: '#080F1C'
+              }
+            }}
+          >
+            <Search sx={{ fontSize: 14 }} />
+            <span>Ask Aleen</span>
+            <Box
+              sx={{
+                fontSize: '0.64rem',
+                fontWeight: 750,
+                color: '#969DA7',
+                bgcolor: '#F4F5F7',
+                px: 0.7,
+                py: 0.1,
+                borderRadius: '4px'
+              }}
+            >
+              ⌘K
+            </Box>
+          </Box>
+
+          {/* Quick Cash Register Modal */}
+          <Tooltip title="Cash Register & Shift">
+            <IconButton
+              size="small"
+              onClick={() => setCashDrawerOpen(true)}
+              sx={{
+                width: 34,
+                height: 34,
+                bgcolor: '#FFFFFF',
+                border: '1px solid #E1E4EA',
+                color: '#080F1C',
+                '&:hover': { bgcolor: '#F4F5F7' }
+              }}
+            >
+              <AccountBalanceWallet sx={{ fontSize: 16 }} />
+            </IconButton>
+          </Tooltip>
+
+          {/* Notification Center */}
+          <NotificationCenter />
+
+          {/* User Profile Avatar with dropdown */}
+          <Avatar
+            onClick={(e) => setProfileMenuAnchor(e.currentTarget)}
+            sx={{
+              width: 34,
+              height: 34,
+              bgcolor: '#080F1C',
+              color: '#FFFFFF',
+              fontSize: '0.76rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              border: '2px solid #FFFFFF',
+              boxShadow: '0 2px 8px rgba(8, 15, 28, 0.15)',
+              transition: 'transform 0.18s ease',
+              '&:hover': { transform: 'scale(1.05)' }
+            }}
+          >
+            {(user?.name || user?.email || 'AD').substring(0, 2).toUpperCase()}
+          </Avatar>
+        </Box>
+      </Box>
+    );
+  };
+
+  // If Mandate Design System is active, render the floating rounded app shell on cool-gray stage
+  if (isMandate) {
+    return (
+      <Box
+        sx={{
+          minHeight: '100vh',
+          height: '100vh',
+          bgcolor: '#D7DBDF', // Quiet cool-gray stage background
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          p: { xs: 0, md: 2 },
+          overflow: 'hidden'
+        }}
+      >
+        <Box
+          className="app-surface"
+          sx={{
+            width: '100%',
+            maxWidth: '1540px',
+            height: { xs: '100vh', md: 'calc(100vh - 32px)' },
+            bgcolor: '#ECEEF2', // Lavender-tinted main application shell
+            borderRadius: { xs: 0, md: '22px' },
+            border: { xs: 'none', md: '2px solid #FFFFFF' },
+            boxShadow: { xs: 'none', md: '0 16px 48px rgba(8, 15, 28, 0.08)' },
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            position: 'relative'
+          }}
+        >
+          {/* Top Mandate Navigation Header */}
+          <Box
+            component="header"
+            sx={{
+              px: { xs: 2, md: 3 },
+              py: 1.5,
+              display: 'flex',
+              alignItems: 'center',
+              bgcolor: 'transparent',
+              flexShrink: 0,
+              borderBottom: '1px solid rgba(225, 228, 234, 0.65)'
+            }}
+          >
+            {renderMandateTopBar()}
+          </Box>
+
+          {/* Main App Workspace */}
+          <Box
+            component="main"
+            sx={{
+              flex: 1,
+              overflowY: 'auto',
+              WebkitOverflowScrolling: 'touch',
+              scrollBehavior: 'smooth',
+              p: { xs: 2, md: 3 },
+              display: 'flex',
+              flexDirection: 'column',
+              bgcolor: '#ECEEF2'
+            }}
+          >
+            <Box sx={{ flex: 1, position: 'relative' }}>
+              <Outlet />
+            </Box>
+          </Box>
+        </Box>
+
+        {/* Mobile Drawer */}
+        {isMobile && (
+          <Drawer
+            anchor="left"
+            open={mobileOpen}
+            onClose={() => setMobileOpen(false)}
+            ModalProps={{ keepMounted: true }}
+            PaperProps={{
+              sx: {
+                width: 280,
+                bgcolor: sidebarConfig.bg,
+                borderRight: `1px solid ${sidebarConfig.borderColor}`,
+                boxShadow: '0 20px 45px rgba(0, 0, 0, 0.35)'
+              }
+            }}
+          >
+            {renderSidebarContent()}
+          </Drawer>
+        )}
+
+        {/* Profile dropdown menu */}
+        <MuiMenu
+          anchorEl={profileMenuAnchor}
+          open={Boolean(profileMenuAnchor)}
+          onClose={() => setProfileMenuAnchor(null)}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          PaperProps={{
+            sx: {
+              mt: 1.25,
+              minWidth: 220,
+              borderRadius: '14px',
+              bgcolor: isDark ? '#1D1A2E' : '#FFFFFF',
+              backgroundImage: 'none',
+              border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'}`,
+              boxShadow: isDark ? '0 16px 40px rgba(0, 0, 0, 0.5)' : '0 16px 40px rgba(112, 114, 176, 0.2)'
+            }
+          }}
+        >
+          <Box sx={{ px: 2, py: 1.25, borderBottom: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.06)' : '#F1EFFC'}` }}>
+            <ScriptWordmark
+              name={profile?.businessName || 'Aleen Clothing'}
+              metallic={!brandNameColor}
+              color={brandNameColor}
+              fontSize={`${Math.round(brandNameSize * 0.82)}px`}
+              lineHeight={1.2}
+              sx={{
+                fontFamily: brandNameFont.stack,
+                fontWeight: brandNameWeight,
+                fontStyle: brandNameStyle,
+                letterSpacing: brandNameFont.kind === 'script' ? '0.015em' : '0.02em',
+                textOverflow: 'ellipsis'
+              }}
+            />
+            <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: 'text.secondary' }}>
+              {user?.name || user?.email || 'Boutique Owner'}
+            </Typography>
+          </Box>
+          <MenuItem
+            onClick={() => { setProfileMenuAnchor(null); navigate('/settings'); }}
+            sx={{ fontSize: '0.8rem', fontWeight: 600, gap: 1.25, py: 1.1, color: 'text.primary' }}
+          >
+            <Settings fontSize="small" sx={{ color: 'text.secondary' }} /> Boutique Settings
+          </MenuItem>
+          <MenuItem
+            onClick={() => { setProfileMenuAnchor(null); navigate('/settings?tab=colors'); }}
+            sx={{ fontSize: '0.8rem', fontWeight: 600, gap: 1.25, py: 1.1, color: 'text.primary' }}
+          >
+            <Palette fontSize="small" sx={{ color: theme.palette.primary.main }} /> Color Themes
+          </MenuItem>
+          <Divider sx={{ my: 0.5, borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4' }} />
+          <MenuItem
+            onClick={() => { setProfileMenuAnchor(null); handleLogout(); }}
+            sx={{ fontSize: '0.8rem', fontWeight: 700, gap: 1.25, py: 1.1, color: isDark ? '#FCA5A5' : '#DC2626' }}
+          >
+            <Logout fontSize="small" sx={{ color: 'inherit' }} /> Logout
+          </MenuItem>
+        </MuiMenu>
+
+        {/* Global Dialogs & Alerts */}
+        <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
+        <CashDrawerShiftModal open={cashDrawerOpen} onClose={() => setCashDrawerOpen(false)} />
+        <NetworkStatus />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', bgcolor: 'background.default' }}>
