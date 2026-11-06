@@ -526,23 +526,31 @@ const Inventory = () => {
   const marginPct = (sellingPrice > 0 && costPrice > 0) ? (((profit / sellingPrice) * 100).toFixed(1)) : '0.0';
 
   return (
-    <Box>
+    <Box sx={{ maxWidth: 1440, mx: 'auto', p: { xs: 1.5, sm: 2, md: 3 } }}>
       <PageHeader
         title="Inventory & Garments"
         subtitle="Track stock levels, size variants, costs, profit margins, and manage your luxury apparel catalog"
         breadcrumbs={[{ label: 'Aleen Clothing', path: '/' }, { label: 'Inventory' }]}
         actions={
-          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', width: { xs: '100%', md: 'auto' } }}>
+          <Box sx={{ display: 'flex', gap: 1.25, flexWrap: 'wrap', width: { xs: '100%', md: 'auto' }, alignItems: 'center' }}>
             <Button
               variant="outlined"
               component="label"
               startIcon={<Upload />}
               sx={{
                 flex: { xs: 1, sm: 1, md: 'none' },
-                borderRadius: 2,
+                borderRadius: '9999px',
                 fontWeight: 700,
-                fontSize: { xs: '0.75rem', sm: '0.82rem' },
-                whiteSpace: 'nowrap'
+                fontSize: '0.82rem',
+                textTransform: 'none',
+                color: '#080F1C',
+                borderColor: '#E1E4EA',
+                bgcolor: '#FFFFFF',
+                boxShadow: 'none',
+                height: 38,
+                px: 2,
+                whiteSpace: 'nowrap',
+                '&:hover': { bgcolor: '#F8FAFC', borderColor: '#CBD1DC' }
               }}
             >
               Import CSV
@@ -554,32 +562,43 @@ const Inventory = () => {
               onClick={downloadInventory}
               sx={{
                 flex: { xs: 1, sm: 1, md: 'none' },
-                borderRadius: 2,
+                borderRadius: '9999px',
                 fontWeight: 700,
-                fontSize: { xs: '0.75rem', sm: '0.82rem' },
-                whiteSpace: 'nowrap'
+                fontSize: '0.82rem',
+                textTransform: 'none',
+                color: '#080F1C',
+                borderColor: '#E1E4EA',
+                bgcolor: '#FFFFFF',
+                boxShadow: 'none',
+                height: 38,
+                px: 2,
+                whiteSpace: 'nowrap',
+                '&:hover': { bgcolor: '#F8FAFC', borderColor: '#CBD1DC' }
               }}
             >
               Export CSV
             </Button>
             <Button
               variant="contained"
-              color="primary"
               startIcon={<Add />}
               onClick={() => handleOpen()}
               disabled={user?.role !== 'admin'}
               sx={{
                 flex: { xs: '100%', sm: 1.2, md: 'none' },
-                borderRadius: 2,
-                fontWeight: 800,
-                fontSize: { xs: '0.8rem', sm: '0.85rem' },
-                background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
-                color: '#ffffff',
-                boxShadow: '0 4px 14px rgba(15,118,110,0.3)',
-                whiteSpace: 'nowrap'
+                borderRadius: '9999px',
+                fontWeight: 700,
+                fontSize: '0.82rem',
+                textTransform: 'none',
+                bgcolor: '#080F1C',
+                color: '#FFFFFF',
+                boxShadow: 'none',
+                height: 38,
+                px: 2.5,
+                whiteSpace: 'nowrap',
+                '&:hover': { bgcolor: '#1A2333', boxShadow: 'none' }
               }}
             >
-              Add Garment
+              + Add Garment
             </Button>
           </Box>
         }
@@ -631,7 +650,7 @@ const Inventory = () => {
       </Grid>
 
       {/* Filter and Command Toolbar */}
-      <GlassCard sx={{ p: { xs: 2, sm: 2.5 }, mb: 3, border: '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.15)' }}>
+      <GlassCard sx={{ p: { xs: 2, sm: 2.5 }, mb: 3, border: '1px solid #E1E4EA', bgcolor: '#FFFFFF', borderRadius: '16px', boxShadow: 'none' }}>
         {/* Single-Line Filter Bar: Search + View + Collection + Sort + Stock Chips */}
         <Box sx={{
           display: 'flex',
@@ -649,7 +668,7 @@ const Inventory = () => {
             InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Search sx={{ color: (t) => t.palette.primary.main, fontSize: 20 }} />
+                    <Search sx={{ color: '#667085', fontSize: 20 }} />
                   </InputAdornment>
                 ),
                 endAdornment: search ? (
@@ -664,8 +683,13 @@ const Inventory = () => {
                 flex: { xs: '1 1 100%', sm: '1 1 200px' },
                 minWidth: 0,
                 '& .MuiOutlinedInput-root': {
-                  borderRadius: 2.5,
-                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#FFFFFF'
+                  borderRadius: '9999px',
+                  bgcolor: '#FAFCFA',
+                  fontSize: '0.85rem',
+                  height: 38,
+                  '& fieldset': { borderColor: '#E1E4EA' },
+                  '&:hover fieldset': { borderColor: '#CBD1DC' },
+                  '&.Mui-focused fieldset': { borderColor: '#080F1C', borderWidth: '1.5px' }
                 }
               }}
             />
@@ -677,11 +701,12 @@ const Inventory = () => {
               exclusive
               onChange={(e, next) => next && setViewMode(next)}
               sx={{
-                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : '#FFFFFF',
-                border: '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.2)',
-                borderRadius: 2,
+                bgcolor: '#FAFCFA',
+                border: '1px solid #E1E4EA',
+                borderRadius: '9999px',
                 height: 38,
-                flexShrink: 0
+                flexShrink: 0,
+                p: '2px'
               }}
             >
               <ToggleButton
@@ -689,8 +714,9 @@ const Inventory = () => {
                 title="Card Grid View"
                 sx={{
                   px: { xs: 1.1, sm: 1.5 },
+                  borderRadius: '9999px !important',
                   border: 'none',
-                  '&.Mui-selected': { bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.15)', color: (t) => t.palette.primary.main }
+                  '&.Mui-selected': { bgcolor: '#080F1C', color: '#FFFFFF' }
                 }}
               >
                 <GridView sx={{ fontSize: 18 }} />
@@ -700,8 +726,9 @@ const Inventory = () => {
                 title="Table View"
                 sx={{
                   px: { xs: 1.1, sm: 1.5 },
+                  borderRadius: '9999px !important',
                   border: 'none',
-                  '&.Mui-selected': { bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.15)', color: (t) => t.palette.primary.main }
+                  '&.Mui-selected': { bgcolor: '#080F1C', color: '#FFFFFF' }
                 }}
               >
                 <ViewList sx={{ fontSize: 18 }} />
@@ -719,8 +746,11 @@ const Inventory = () => {
                 flex: { xs: '1 1 calc(50% - 0.75rem)', sm: '0 1 140px' },
                 minWidth: { xs: 'auto', sm: 140 },
                 '& .MuiOutlinedInput-root': {
-                  borderRadius: 2.5,
-                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#FFFFFF'
+                  borderRadius: '9999px',
+                  bgcolor: '#FAFCFA',
+                  height: 38,
+                  fontSize: '0.82rem',
+                  '& fieldset': { borderColor: '#E1E4EA' }
                 }
               }}
             >
@@ -743,8 +773,11 @@ const Inventory = () => {
                 flex: { xs: '1 1 calc(50% - 0.75rem)', sm: '0 1 130px' },
                 minWidth: { xs: 'auto', sm: 130 },
                 '& .MuiOutlinedInput-root': {
-                  borderRadius: 2.5,
-                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#FFFFFF'
+                  borderRadius: '9999px',
+                  bgcolor: '#FAFCFA',
+                  height: 38,
+                  fontSize: '0.82rem',
+                  '& fieldset': { borderColor: '#E1E4EA' }
                 }
               }}
             >
@@ -764,10 +797,10 @@ const Inventory = () => {
                   sx={{
                     width: 38,
                     height: 38,
-                    borderRadius: 2,
-                    border: '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.25)',
-                    color: (t) => t.palette.primary.main,
-                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)',
+                    borderRadius: '9999px',
+                    border: '1px solid #E1E4EA',
+                    color: '#080F1C',
+                    bgcolor: '#FFFFFF',
                     flexShrink: 0
                   }}
                 >
@@ -784,17 +817,18 @@ const Inventory = () => {
                 disabled={!isFiltered}
                 startIcon={<RestartAlt fontSize="small" />}
                 sx={{
-                  borderRadius: 2,
+                  borderRadius: '9999px',
                   height: 38,
-                  px: 1.5,
+                  px: 2,
                   fontWeight: 700,
-                  fontSize: '0.75rem',
+                  fontSize: '0.78rem',
+                  textTransform: 'none',
                   whiteSpace: 'nowrap',
                   flex: { xs: 1, sm: 'none' },
-                  ...(isFiltered ? {
-                    background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
-                    color: '#ffffff'
-                  } : {})
+                  bgcolor: isFiltered ? '#080F1C' : '#FFFFFF',
+                  color: isFiltered ? '#FFFFFF' : '#667085',
+                  borderColor: '#E1E4EA',
+                  boxShadow: 'none'
                 }}
               >
                 Reset
@@ -802,10 +836,10 @@ const Inventory = () => {
             </Box>
 
           {/* Stock Filter Chips */}
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1, flexBasis: '100%' }}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1, flexBasis: '100%', pt: 0.5 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mr: 0.5, flexShrink: 0 }}>
-            <FilterList sx={{ fontSize: 18, color: (t) => t.palette.primary.main }} />
-            <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'text.secondary', fontSize: '0.7rem' }}>
+            <FilterList sx={{ fontSize: 16, color: '#667085' }} />
+            <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#667085', fontSize: '0.7rem' }}>
               Stock Filter:
             </Typography>
           </Box>
@@ -815,112 +849,106 @@ const Inventory = () => {
             label={`All (${totalItems})`}
             onClick={() => setStockFilter('all')}
             size="small"
-            variant={stockFilter === 'all' ? 'filled' : 'outlined'}
             sx={{
               fontWeight: 700,
-              fontSize: '0.75rem',
-              borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
+              fontSize: '0.74rem',
+              borderRadius: '9999px',
               cursor: 'pointer',
               flexShrink: 0,
-              bgcolor: stockFilter === 'all' ? 'primary.main' : 'transparent',
-              color: stockFilter === 'all' ? '#FFFFFF' : 'text.primary',
-              borderColor: 'primary.main',
-              '&:hover': { bgcolor: stockFilter === 'all' ? 'primary.dark' : (t) => `${t.palette.primary.main}12` }
+              bgcolor: stockFilter === 'all' ? '#080F1C' : '#FFFFFF',
+              color: stockFilter === 'all' ? '#FFFFFF' : '#344054',
+              border: stockFilter === 'all' ? '1px solid #080F1C' : '1px solid #E1E4EA',
+              '&:hover': { bgcolor: stockFilter === 'all' ? '#1A2333' : '#F8FAFC' }
             }}
           />
 
           {/* Urgent Restock */}
           <Chip
-            label={`⚠️ Urgent Restock (${lowOrOutCount})`}
+            label={`Urgent Restock (${lowOrOutCount})`}
             onClick={() => setStockFilter('low_or_out')}
             size="small"
-            variant={stockFilter === 'low_or_out' ? 'filled' : 'outlined'}
             sx={{
-              fontWeight: 800,
-              fontSize: '0.75rem',
-              borderRadius: 2,
+              fontWeight: 700,
+              fontSize: '0.74rem',
+              borderRadius: '9999px',
               cursor: 'pointer',
               flexShrink: 0,
-              bgcolor: stockFilter === 'low_or_out' ? '#D97706' : 'rgba(217, 119, 6, 0.08)',
+              bgcolor: stockFilter === 'low_or_out' ? '#B45309' : '#FEF8EB',
               color: stockFilter === 'low_or_out' ? '#FFFFFF' : '#B45309',
-              borderColor: 'rgba(217, 119, 6, 0.4)',
-              '&:hover': { bgcolor: stockFilter === 'low_or_out' ? '#B45309' : 'rgba(217, 119, 6, 0.16)' }
+              border: '1px solid #FEEFC7',
+              '&:hover': { bgcolor: stockFilter === 'low_or_out' ? '#92400E' : '#FEEFC7' }
             }}
           />
 
           {/* Out of Stock */}
           <Chip
-            label={`🔴 Out of Stock (${outOfStockCount})`}
+            label={`Out of Stock (${outOfStockCount})`}
             onClick={() => setStockFilter('out')}
             size="small"
-            variant={stockFilter === 'out' ? 'filled' : 'outlined'}
             sx={{
-              fontWeight: 800,
-              fontSize: '0.75rem',
-              borderRadius: 2,
+              fontWeight: 700,
+              fontSize: '0.74rem',
+              borderRadius: '9999px',
               cursor: 'pointer',
               flexShrink: 0,
-              bgcolor: stockFilter === 'out' ? '#DC2626' : 'rgba(239, 68, 68, 0.08)',
+              bgcolor: stockFilter === 'out' ? '#DC2626' : '#FEF3F2',
               color: stockFilter === 'out' ? '#FFFFFF' : '#DC2626',
-              borderColor: 'rgba(239, 68, 68, 0.35)',
-              '&:hover': { bgcolor: stockFilter === 'out' ? '#B91C1C' : 'rgba(239, 68, 68, 0.16)' }
+              border: '1px solid #FECDCA',
+              '&:hover': { bgcolor: stockFilter === 'out' ? '#B91C1C' : '#FEE4E2' }
             }}
           />
 
           {/* Low Stock */}
           <Chip
-            label={`🟡 Low Stock (${lowStockCount})`}
+            label={`Low Stock (${lowStockCount})`}
             onClick={() => setStockFilter('low')}
             size="small"
-            variant={stockFilter === 'low' ? 'filled' : 'outlined'}
             sx={{
               fontWeight: 700,
-              fontSize: '0.75rem',
-              borderRadius: 2,
+              fontSize: '0.74rem',
+              borderRadius: '9999px',
               cursor: 'pointer',
               flexShrink: 0,
-              bgcolor: stockFilter === 'low' ? '#F59E0B' : 'rgba(245, 158, 11, 0.08)',
-              color: stockFilter === 'low' ? '#FFFFFF' : '#D97706',
-              borderColor: 'rgba(245, 158, 11, 0.35)',
-              '&:hover': { bgcolor: stockFilter === 'low' ? '#D97706' : 'rgba(245, 158, 11, 0.16)' }
+              bgcolor: stockFilter === 'low' ? '#D97706' : '#FEF8EB',
+              color: stockFilter === 'low' ? '#FFFFFF' : '#B45309',
+              border: '1px solid #FEEFC7',
+              '&:hover': { bgcolor: stockFilter === 'low' ? '#B45309' : '#FEEFC7' }
             }}
           />
 
           {/* In Stock */}
           <Chip
-            label={`🟢 In Stock (${inStockCount})`}
+            label={`In Stock (${inStockCount})`}
             onClick={() => setStockFilter('in')}
             size="small"
-            variant={stockFilter === 'in' ? 'filled' : 'outlined'}
             sx={{
               fontWeight: 700,
-              fontSize: '0.75rem',
-              borderRadius: 2,
+              fontSize: '0.74rem',
+              borderRadius: '9999px',
               cursor: 'pointer',
               flexShrink: 0,
-              bgcolor: stockFilter === 'in' ? '#059669' : 'rgba(16, 185, 129, 0.08)',
-              color: stockFilter === 'in' ? '#FFFFFF' : '#059669',
-              borderColor: 'rgba(16, 185, 129, 0.35)',
-              '&:hover': { bgcolor: stockFilter === 'in' ? '#047857' : 'rgba(16, 185, 129, 0.16)' }
+              bgcolor: stockFilter === 'in' ? '#059669' : '#ECFDF3',
+              color: stockFilter === 'in' ? '#FFFFFF' : '#027A48',
+              border: '1px solid #D1FADF',
+              '&:hover': { bgcolor: stockFilter === 'in' ? '#047857' : '#D1FADF' }
             }}
           />
 
           {/* Surplus */}
           <Chip
-            label={`📦 Surplus 10+ (${surplusCount})`}
+            label={`Surplus 10+ (${surplusCount})`}
             onClick={() => setStockFilter('surplus')}
             size="small"
-            variant={stockFilter === 'surplus' ? 'filled' : 'outlined'}
             sx={{
               fontWeight: 700,
-              fontSize: '0.75rem',
-              borderRadius: 2,
+              fontSize: '0.74rem',
+              borderRadius: '9999px',
               cursor: 'pointer',
               flexShrink: 0,
-              bgcolor: stockFilter === 'surplus' ? '#6366F1' : 'rgba(99, 102, 241, 0.08)',
+              bgcolor: stockFilter === 'surplus' ? '#4F46E5' : '#F8F9FC',
               color: stockFilter === 'surplus' ? '#FFFFFF' : '#4F46E5',
-              borderColor: 'rgba(99, 102, 241, 0.35)',
-              '&:hover': { bgcolor: stockFilter === 'surplus' ? '#4F46E5' : 'rgba(99, 102, 241, 0.16)' }
+              border: '1px solid #E0E2EC',
+              '&:hover': { bgcolor: stockFilter === 'surplus' ? '#4338CA' : '#EDEFF7' }
             }}
           />
           </Box>
@@ -1296,12 +1324,12 @@ const Inventory = () => {
           )}
         </Box>
       ) : (
-        <GlassCard sx={{ p: 0, overflow: 'hidden' }}>
+        <Paper elevation={0} sx={{ p: 0, overflow: 'hidden', borderRadius: '16px', border: '1px solid #E1E4EA', bgcolor: '#FFFFFF', boxShadow: 'none' }}>
           <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
             <Table sx={{ minWidth: user?.role === 'admin' ? 1160 : 1030 }}>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: 800, width: 120, whiteSpace: 'nowrap' }}>
+              <TableHead sx={{ bgcolor: '#FAFCFA' }}>
+                <TableRow sx={{ borderBottom: '1px solid #E1E4EA' }}>
+                  <TableCell sx={{ fontWeight: 800, width: 120, whiteSpace: 'nowrap', color: '#667085' }}>
                     <TableSortLabel
                       active={orderBy === 'productId'}
                       direction={orderBy === 'productId' ? order : 'asc'}
@@ -1311,7 +1339,7 @@ const Inventory = () => {
                       Product SKU
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sx={{ fontWeight: 800, minWidth: 200 }}>
+                  <TableCell sx={{ fontWeight: 800, minWidth: 200, color: '#667085' }}>
                     <TableSortLabel
                       active={orderBy === 'name'}
                       direction={orderBy === 'name' ? order : 'asc'}
@@ -1321,7 +1349,7 @@ const Inventory = () => {
                       Garment Details
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sx={{ fontWeight: 800, width: 130, whiteSpace: 'nowrap' }}>
+                  <TableCell sx={{ fontWeight: 800, width: 130, whiteSpace: 'nowrap', color: '#667085' }}>
                     <TableSortLabel
                       active={orderBy === 'category'}
                       direction={orderBy === 'category' ? order : 'asc'}
@@ -1331,10 +1359,10 @@ const Inventory = () => {
                       Collection
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sx={{ fontWeight: 800, width: 130, whiteSpace: 'nowrap', textTransform: 'uppercase', fontSize: '0.72rem', letterSpacing: '0.04em' }}>
+                  <TableCell sx={{ fontWeight: 800, width: 130, whiteSpace: 'nowrap', textTransform: 'uppercase', fontSize: '0.72rem', letterSpacing: '0.04em', color: '#667085' }}>
                     Size & Color
                   </TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 800, width: 150, whiteSpace: 'nowrap' }}>
+                  <TableCell align="right" sx={{ fontWeight: 800, width: 150, whiteSpace: 'nowrap', color: '#667085' }}>
                     <TableSortLabel
                       active={orderBy === 'price'}
                       direction={orderBy === 'price' ? order : 'asc'}
@@ -1345,11 +1373,11 @@ const Inventory = () => {
                     </TableSortLabel>
                   </TableCell>
                   {user?.role === 'admin' && (
-                    <TableCell align="right" sx={{ fontWeight: 800, width: 130, whiteSpace: 'nowrap', textTransform: 'uppercase', fontSize: '0.72rem', letterSpacing: '0.04em' }}>
+                    <TableCell align="right" sx={{ fontWeight: 800, width: 130, whiteSpace: 'nowrap', textTransform: 'uppercase', fontSize: '0.72rem', letterSpacing: '0.04em', color: '#667085' }}>
                       Margin
                     </TableCell>
                   )}
-                  <TableCell align="center" sx={{ fontWeight: 800, width: 180, whiteSpace: 'nowrap' }}>
+                  <TableCell align="center" sx={{ fontWeight: 800, width: 180, whiteSpace: 'nowrap', color: '#667085' }}>
                     <TableSortLabel
                       active={orderBy === 'quantity'}
                       direction={orderBy === 'quantity' ? order : 'asc'}
@@ -1359,7 +1387,7 @@ const Inventory = () => {
                       Stock Status
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 800, width: 120, whiteSpace: 'nowrap', textTransform: 'uppercase', fontSize: '0.72rem', letterSpacing: '0.04em' }}>
+                  <TableCell align="right" sx={{ fontWeight: 800, width: 120, whiteSpace: 'nowrap', textTransform: 'uppercase', fontSize: '0.72rem', letterSpacing: '0.04em', color: '#667085' }}>
                     Actions
                   </TableCell>
                 </TableRow>
@@ -1580,9 +1608,9 @@ const Inventory = () => {
                               alignItems: 'center',
                               gap: 0.75,
                               p: '3px 6px',
-                              borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                              bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.08)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
-                              border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(155, 143, 245, 0.2)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.12)'
+                              borderRadius: '9999px',
+                              bgcolor: '#F4F5F7',
+                              border: '1px solid #E1E4EA'
                             }}
                           >
                             <Tooltip title="Print Barcode Tag">
@@ -1720,7 +1748,7 @@ const Inventory = () => {
               }
             }}
           />
-        </GlassCard>
+        </Paper>
       )}
 
       {/* LUXURY ATELIER ADD / EDIT GARMENT DIALOG */}

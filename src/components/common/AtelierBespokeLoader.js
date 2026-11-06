@@ -1,13 +1,14 @@
 import React from 'react';
-import { Box, Typography, useTheme } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { motion } from 'framer-motion';
+import { LoaderOne } from '../ui/loader';
 
 /**
  * AtelierBespokeLoader
  * 
  * Signature loading state for Aleen.
- * Features an animated needle & thread monogram ring,
- * soft lavender caustics, and crisp DM Sans typography.
+ * Integrates LoaderOne with the Mandate quiet cool-gray stage aesthetic:
+ * Deep Navy (#080F1C) + Violet (#6F4CED) orbital motion with DM Sans typography.
  */
 export default function AtelierBespokeLoader({
   message = 'Preparing Atelier Console...',
@@ -15,14 +16,11 @@ export default function AtelierBespokeLoader({
   compact = false,
   fullScreen = false
 }) {
-  const theme = useTheme();
-  const isDark = theme.palette.mode === 'dark';
-
   return (
     <Box
       sx={{
         width: '100%',
-        minHeight: fullScreen ? '100vh' : (compact ? 160 : '50vh'),
+        minHeight: fullScreen ? '100vh' : (compact ? 160 : '45vh'),
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -32,125 +30,19 @@ export default function AtelierBespokeLoader({
         position: 'relative'
       }}
     >
-      {/* Radiant Caustic Glow Behind Loader */}
-      <Box
-        sx={{
-          position: 'absolute',
-          width: compact ? 120 : 220,
-          height: compact ? 120 : 220,
-          borderRadius: '50%',
-          background: isDark
-            ? 'radial-gradient(circle, rgba(155, 143, 245, 0.18) 0%, rgba(45, 212, 191, 0.08) 50%, transparent 70%)'
-            : 'radial-gradient(circle, rgba(var(--primary-rgb, 124, 111, 232), 0.12) 0%, rgba(45, 212, 191, 0.08) 50%, transparent 70%)',
-          filter: 'blur(30px)',
-          pointerEvents: 'none',
-          animation: 'atelierPulse 3s ease-in-out infinite'
-        }}
-      />
-
-      {/* Animated Haute Couture Monogram Ring */}
-      <Box
-        component={motion.div}
-        animate={{ rotate: 360 }}
-        transition={{ repeat: Infinity, duration: 8, ease: 'linear' }}
-        sx={{
-          width: compact ? 52 : 76,
-          height: compact ? 52 : 76,
-          position: 'relative',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
-      >
-        <svg
-          width={compact ? 52 : 76}
-          height={compact ? 52 : 76}
-          viewBox="0 0 100 100"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          {/* Subtle Outer Track */}
-          <circle
-            cx="50"
-            cy="50"
-            r="42"
-            stroke={isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(124, 111, 232, 0.12)'}
-            strokeWidth="3"
-            strokeDasharray="4 4"
-          />
-
-          {/* Golden Thread Arc */}
-          <circle
-            cx="50"
-            cy="50"
-            r="42"
-            stroke="url(#goldGradient)"
-            strokeWidth="3.5"
-            strokeLinecap="round"
-            strokeDasharray="75 180"
-          />
-
-          {/* Emerald Accent Arc */}
-          <circle
-            cx="50"
-            cy="50"
-            r="34"
-            stroke="url(#emeraldGradient)"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeDasharray="45 150"
-          />
-
-          <defs>
-            <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#5B4BD1" />
-              <stop offset="35%" stopColor="#7C6FE8" />
-              <stop offset="70%" stopColor="#9B8FF5" />
-              <stop offset="100%" stopColor="#C7D2FE" />
-            </linearGradient>
-            <linearGradient id="emeraldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#5B4BD1" />
-              <stop offset="50%" stopColor="#9B8FF5" />
-              <stop offset="100%" stopColor="#2DD4BF" />
-            </linearGradient>
-          </defs>
-        </svg>
-
-        {/* Central Bespoke Needle & Diamond Monogram */}
-        <Box
-          sx={{
-            position: 'absolute',
-            width: compact ? 26 : 38,
-            height: compact ? 26 : 38,
-            borderRadius: '50%',
-            background: isDark
-              ? 'linear-gradient(135deg, #1D1A2E 0%, #14121F 100%)'
-              : 'linear-gradient(135deg, #7C6FE8 0%, #5B4BD1 100%)',
-            border: isDark ? '1.5px solid #2DD4BF' : '1.5px solid #0D9488',
-            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.25)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#FFFFFF',
-            fontSize: compact ? '0.75rem' : '0.95rem',
-            fontWeight: 800,
-            fontFamily: '"DM Sans", sans-serif'
-          }}
-        >
-          ⚜
-        </Box>
-      </Box>
+      {/* Central LoaderOne Animation */}
+      <LoaderOne size={compact ? 44 : 64} color="#080F1C" accentColor="#6F4CED" />
 
       {/* Typography & Shimmer Progress */}
-      <Box sx={{ textAlign: 'center', zIndex: 1, maxWidth: 320 }}>
+      <Box sx={{ textAlign: 'center', zIndex: 1, maxWidth: 360 }}>
         <Typography
           sx={{
-            fontFamily: '"DM Sans", sans-serif',
+            fontFamily: '"DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
             fontWeight: 700,
-            fontSize: compact ? '0.95rem' : '1.18rem',
-            letterSpacing: '0.04em',
-            color: isDark ? '#F8FAFC' : '#0F172A',
-            lineHeight: 1.2
+            fontSize: compact ? '0.88rem' : '1.05rem',
+            letterSpacing: '-0.01em',
+            color: '#080F1C',
+            lineHeight: 1.25
           }}
         >
           {message}
@@ -162,12 +54,11 @@ export default function AtelierBespokeLoader({
             sx={{
               display: 'block',
               mt: 0.5,
-              fontWeight: 700,
-              letterSpacing: '0.12em',
+              fontWeight: 650,
+              letterSpacing: '0.08em',
               textTransform: 'uppercase',
               fontSize: '0.68rem',
-              color: isDark ? '#2DD4BF' : '#7C6FE8',
-              opacity: 0.9
+              color: '#66707B'
             }}
           >
             {subtitle}
@@ -177,10 +68,10 @@ export default function AtelierBespokeLoader({
         {/* Shimmering Linear Progress Bar */}
         <Box
           sx={{
-            width: compact ? 100 : 160,
+            width: compact ? 90 : 140,
             height: 3,
             borderRadius: 9999,
-            bgcolor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(124, 111, 232, 0.12)',
+            bgcolor: '#E1E4EA',
             overflow: 'hidden',
             mx: 'auto',
             mt: compact ? 1 : 1.75,
@@ -190,11 +81,11 @@ export default function AtelierBespokeLoader({
           <Box
             component={motion.div}
             animate={{ x: ['-100%', '100%'] }}
-            transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut' }}
+            transition={{ repeat: Infinity, duration: 1.4, ease: 'easeInOut' }}
             sx={{
               width: '60%',
               height: '100%',
-              background: 'linear-gradient(90deg, transparent 0%, #9B8FF5 35%, #2DD4BF 70%, transparent 100%)',
+              background: 'linear-gradient(90deg, transparent 0%, #080F1C 50%, #6F4CED 85%, transparent 100%)',
               borderRadius: 9999
             }}
           />

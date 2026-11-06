@@ -447,7 +447,7 @@ export default function TailoringKanban() {
   );
 
   return (
-    <Box>
+    <Box sx={{ maxWidth: 1440, mx: 'auto', p: { xs: 1.5, sm: 2, md: 3 } }}>
       <PageHeader
         title="Tailoring"
         subtitle={`${activeOrders} active jobs · ${dueTodayOrders.length} due today · ${urgentOrders} urgent`}
@@ -459,23 +459,23 @@ export default function TailoringKanban() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               InputProps={{
-                startAdornment: <Search sx={{ mr: 1, color: (t) => t.palette.primary.main, fontSize: 18 }} />
+                startAdornment: <Search sx={{ mr: 1, color: '#667085', fontSize: 18 }} />
               }}
               sx={{
                 width: 240,
                 '& .MuiOutlinedInput-root': {
-                  height: 42,
-                  borderRadius: '12px',
-                  bgcolor: 'background.paper',
+                  height: 38,
+                  borderRadius: '9999px',
+                  bgcolor: '#FAFCFA',
                   fontSize: '0.84rem',
                   '& fieldset': {
-                    borderColor: 'rgba(0, 0, 0, 0.12)'
+                    borderColor: '#E1E4EA'
                   },
                   '&:hover fieldset': {
-                    borderColor: (t) => t.palette.primary.main
+                    borderColor: '#CBD1DC'
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: (t) => t.palette.primary.main,
+                    borderColor: '#080F1C',
                     borderWidth: 1.5
                   }
                 }
@@ -483,30 +483,23 @@ export default function TailoringKanban() {
             />
             <Button
               variant="outlined"
-              startIcon={<Group sx={{ fontSize: 19, color: (t) => t.palette.primary.main }} />}
+              startIcon={<Group sx={{ fontSize: 18, color: '#080F1C' }} />}
               onClick={() => setTailorDialogOpen(true)}
               sx={{
-                height: 42,
-                minHeight: 42,
+                height: 38,
                 px: 2.5,
-                borderRadius: '12px',
-                border: `1px solid ${'#EFEFF4'}`,
-                color: 'text.secondary',
-                bgcolor: 'background.paper',
-                fontWeight: 600,
-                fontSize: '0.84rem',
+                borderRadius: '9999px',
+                border: '1px solid #E1E4EA',
+                color: '#080F1C',
+                bgcolor: '#FFFFFF',
+                fontWeight: 700,
+                fontSize: '0.82rem',
                 textTransform: 'none',
                 whiteSpace: 'nowrap',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxSizing: 'border-box',
-                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                boxShadow: 'none',
                 '&:hover': {
-                  borderColor: (t) => t.palette.primary.main,
-                  color: (t) => t.palette.primary.main,
-                  bgcolor: 'background.paper',
-                  transform: 'translateY(-1px)'
+                  borderColor: '#CBD1DC',
+                  bgcolor: '#F8FAFC'
                 }
               }}
             >
@@ -514,36 +507,26 @@ export default function TailoringKanban() {
             </Button>
             <Button
               variant="contained"
-              startIcon={<Add sx={{ fontSize: 19, color: '#FFFFFF !important' }} />}
+              startIcon={<Add sx={{ fontSize: 18, color: '#FFFFFF !important' }} />}
               onClick={() => setDialogOpen(true)}
               sx={{
-                height: 42,
-                minHeight: 42,
-                px: 3,
-                borderRadius: '12px',
-                fontWeight: 600,
-                fontSize: '0.84rem',
+                height: 38,
+                px: 2.5,
+                borderRadius: '9999px',
+                fontWeight: 700,
+                fontSize: '0.82rem',
                 textTransform: 'none',
                 whiteSpace: 'nowrap',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxSizing: 'border-box',
-                background: (t) => t.custom?.designSystem?.buttonStyle?.background || t.palette.primary.main,
+                bgcolor: '#080F1C',
                 color: '#FFFFFF !important',
-                boxShadow: '0 1px 2px rgba(124, 111, 232, 0.3)',
-                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                '& .MuiSvgIcon-root': {
-                  color: '#FFFFFF !important'
-                },
+                boxShadow: 'none',
                 '&:hover': {
-                  background: (t) => t.palette.primary.dark,
-                  boxShadow: '0 4px 12px rgba(124, 111, 232, 0.35)',
-                  transform: 'translateY(-1px)'
+                  bgcolor: '#1A2333',
+                  boxShadow: 'none'
                 }
               }}
             >
-              New Job
+              + New Job
             </Button>
           </Box>
         }
@@ -818,9 +801,9 @@ export default function TailoringKanban() {
               <Box
                 key={col.id}
                 sx={{
-                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#F9F9FC',
-                  border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'}`,
-                  borderRadius: '14px',
+                  bgcolor: '#FAFCFA',
+                  border: '1px solid #E1E4EA',
+                  borderRadius: '16px',
                   p: 1.5,
                   display: 'flex',
                   flexDirection: 'column',
@@ -836,12 +819,12 @@ export default function TailoringKanban() {
                     justifyContent: 'space-between',
                     pb: 1.25,
                     mb: 1.25,
-                    borderBottom: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'}`
+                    borderBottom: '1px solid #E1E4EA'
                   }}
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.9 }}>
                     <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: col.color, flexShrink: 0 }} />
-                    <Typography variant="caption" sx={{ fontWeight: 700, fontSize: '0.78rem', color: 'text.primary' }}>
+                    <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.8rem', color: '#080F1C' }}>
                       {col.label}
                     </Typography>
                   </Box>
@@ -850,15 +833,15 @@ export default function TailoringKanban() {
                       minWidth: 24,
                       height: 22,
                       px: 0.9,
-                      borderRadius: '999px',
+                      borderRadius: '9999px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '0.7rem',
+                      fontSize: '0.72rem',
                       fontWeight: 700,
-                      bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#FFFFFF',
-                      color: 'text.secondary',
-                      border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : '#EFEFF4'}`,
+                      bgcolor: '#FFFFFF',
+                      color: '#667085',
+                      border: '1px solid #E1E4EA',
                       fontVariantNumeric: 'tabular-nums'
                     }}
                   >
@@ -878,8 +861,8 @@ export default function TailoringKanban() {
                   }}
                 >
                   {colOrders.length === 0 ? (
-                    <Box sx={{ p: 3, textAlign: 'center', border: '1px dashed', borderColor: 'divider', borderRadius: '10px' }}>
-                      <Typography variant="caption" color="text.secondary">
+                    <Box sx={{ p: 3, textAlign: 'center', border: '1px dashed #E1E4EA', borderRadius: '12px' }}>
+                      <Typography variant="caption" sx={{ color: '#667085', fontWeight: 600 }}>
                         No jobs in this phase
                       </Typography>
                     </Box>
@@ -889,21 +872,13 @@ export default function TailoringKanban() {
                         key={order.id}
                         sx={{
                           p: 1.75,
-                          borderRadius: '12px',
-                          border: (t) => order.urgent
-                            ? (t.palette.mode === 'dark' ? '1px solid rgba(217, 119, 6, 0.4)' : '1px solid rgba(217, 119, 6, 0.35)')
-                            : (t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #EFEFF4'),
-                          boxShadow: (t) => t.palette.mode === 'dark'
-                            ? 'inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 4px 16px rgba(0, 0, 0, 0.35)'
-                            : 'inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 1px 3px rgba(0, 0, 0, 0.03)',
-                          transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                          borderRadius: '16px',
+                          border: order.urgent ? '1.5px solid #F04438' : '1px solid #E1E4EA',
+                          bgcolor: '#FFFFFF',
+                          boxShadow: 'none',
+                          transition: 'border-color 0.15s ease',
                           '&:hover': {
-                            borderColor: (t) => order.urgent
-                              ? '#D97706'
-                              : (t.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.35)' : 'rgba(124, 111, 232, 0.35)'),
-                            boxShadow: (t) => t.palette.mode === 'dark'
-                              ? '0 6px 20px rgba(0, 0, 0, 0.45)'
-                              : '0 4px 14px rgba(var(--primary-rgb, 124, 111, 232), 0.08)'
+                            borderColor: '#080F1C'
                           }
                         }}
                       >
@@ -915,12 +890,13 @@ export default function TailoringKanban() {
                               sx={{
                                 fontFamily: '"JetBrains Mono", monospace',
                                 fontWeight: 700,
-                                color: (t) => t.palette.mode === 'dark' ? '#9B8FF5' : '#5B4BD1',
+                                color: '#080F1C',
                                 fontSize: '0.72rem',
-                                px: 0.75,
-                                py: 0.2,
-                                borderRadius: '6px',
-                                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.12)' : '#F1EFFC',
+                                px: 1,
+                                py: 0.25,
+                                borderRadius: '9999px',
+                                bgcolor: '#F4F5F7',
+                                border: '1px solid #E1E4EA',
                                 whiteSpace: 'nowrap',
                                 flexShrink: 0
                               }}
@@ -936,11 +912,11 @@ export default function TailoringKanban() {
                               sx={{
                                 height: 20,
                                 fontSize: '0.62rem',
-                                fontWeight: 900,
-                                bgcolor: 'rgba(239, 68, 68, 0.12)',
-                                color: '#EF4444',
-                                border: '1px solid rgba(239, 68, 68, 0.35)',
-                                borderRadius: '999px',
+                                fontWeight: 800,
+                                bgcolor: '#FEF3F2',
+                                color: '#D92D20',
+                                border: '1px solid #FECDCA',
+                                borderRadius: '9999px',
                                 letterSpacing: '0.05em',
                                 flexShrink: 0
                               }}
@@ -955,10 +931,10 @@ export default function TailoringKanban() {
                             sx={{
                               flex: 1,
                               minWidth: 0,
-                              fontWeight: 800,
-                              fontSize: '0.92rem',
+                              fontWeight: 700,
+                              fontSize: '0.9rem',
                               lineHeight: 1.3,
-                              letterSpacing: '-0.01em',
+                              color: '#080F1C',
                               minHeight: 38,
                               display: '-webkit-box',
                               WebkitLineClamp: 2,
@@ -970,14 +946,15 @@ export default function TailoringKanban() {
                           </Typography>
                           <Avatar
                             sx={{
-                              width: 34,
-                              height: 34,
+                              width: 32,
+                              height: 32,
                               borderRadius: '50%',
                               flexShrink: 0,
-                              bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.16)' : '#F1EFFC',
-                              color: (t) => t.palette.mode === 'dark' ? '#9B8FF5' : '#5B4BD1',
-                              fontSize: '0.85rem',
-                              fontWeight: 800
+                              bgcolor: '#F4F5F7',
+                              color: '#080F1C',
+                              fontSize: '0.8rem',
+                              fontWeight: 700,
+                              border: '1px solid #E1E4EA'
                             }}
                           >
                             {(order.customerName || 'C').charAt(0).toUpperCase()}
@@ -986,7 +963,7 @@ export default function TailoringKanban() {
 
                         {/* Customer Name & Stage Status Pill */}
                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: 1 }}>
-                          <Typography variant="caption" color="text.secondary" noWrap sx={{ fontWeight: 600, fontSize: '0.73rem', flex: 1, minWidth: 0 }}>
+                          <Typography variant="caption" sx={{ color: '#667085', fontWeight: 600, fontSize: '0.73rem', flex: 1, minWidth: 0 }} noWrap>
                             {order.customerName}
                           </Typography>
                           <Box
@@ -996,14 +973,14 @@ export default function TailoringKanban() {
                               gap: 0.5,
                               px: 1,
                               py: 0.2,
-                              borderRadius: '999px',
-                              bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : '#F9F9FC',
-                              border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : '#EFEFF4'}`,
+                              borderRadius: '9999px',
+                              bgcolor: '#FAFCFA',
+                              border: '1px solid #E1E4EA',
                               flexShrink: 0
                             }}
                           >
                             <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: col.color, flexShrink: 0 }} />
-                            <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 700, color: 'text.secondary', whiteSpace: 'nowrap' }}>
+                            <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 700, color: '#475467', whiteSpace: 'nowrap' }}>
                               {col.label}
                             </Typography>
                           </Box>
@@ -1014,16 +991,16 @@ export default function TailoringKanban() {
                           <Box
                             sx={{
                               p: 1,
-                              borderRadius: '8px',
-                              bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#F9F9FC',
-                              border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : '#EFEFF4'}`,
+                              borderRadius: '10px',
+                              bgcolor: '#FAFCFA',
+                              border: '1px solid #E1E4EA',
                               mb: 1.25,
                               minHeight: 44,
                               display: 'flex',
                               alignItems: 'center'
                             }}
                           >
-                            <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.secondary', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                            <Typography variant="caption" sx={{ fontSize: '0.68rem', color: '#667085', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                               {order.specs}
                             </Typography>
                           </Box>
@@ -1033,30 +1010,30 @@ export default function TailoringKanban() {
 
                         {/* Tailor & Meta */}
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.8 }}>
-                          <Typography variant="caption" sx={{ fontSize: '0.7rem', color: 'text.secondary', fontWeight: 600 }}>
+                          <Typography variant="caption" sx={{ fontSize: '0.7rem', color: '#667085', fontWeight: 600 }}>
                             {order.tailor || 'Master Tailor'}
                           </Typography>
-                          <Typography variant="caption" sx={{ fontWeight: 800, color: '#D97706', fontSize: '0.8rem', fontVariantNumeric: 'tabular-nums' }}>
+                          <Typography variant="caption" sx={{ fontWeight: 800, color: '#080F1C', fontSize: '0.8rem', fontVariantNumeric: 'tabular-nums' }}>
                             ₹{order.price}
                           </Typography>
                         </Box>
 
                         {order.artisanWage > 0 && (
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1, px: 1, py: 0.4, bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.06)' : '#F9F9FC', borderRadius: '6px' }}>
-                            <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.secondary' }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1, px: 1, py: 0.4, bgcolor: '#FAFCFA', borderRadius: '8px', border: '1px solid #E1E4EA' }}>
+                            <Typography variant="caption" sx={{ fontSize: '0.65rem', color: '#667085' }}>
                               Labor: ₹{order.artisanWage}
                             </Typography>
-                            <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 700, color: (t) => t.palette.mode === 'dark' ? '#9B8FF5' : '#5B4BD1' }}>
+                            <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 700, color: '#080F1C' }}>
                               Margin: ₹{Math.max(0, (order.price || 0) - (order.artisanWage || 0))}
                             </Typography>
                           </Box>
                         )}
 
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                          <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 700, color: 'text.secondary', fontSize: '0.7rem' }}>
-                            <AccessTime sx={{ fontSize: 13, color: (t) => t.palette.primary.main }} /> Due: {order.targetDate}
+                          <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 600, color: '#667085', fontSize: '0.7rem' }}>
+                            <AccessTime sx={{ fontSize: 13, color: '#667085' }} /> Due: {order.targetDate}
                           </Typography>
-                          <Typography variant="caption" sx={{ fontSize: '0.7rem', color: order.advance >= order.price ? 'success.main' : 'warning.main', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
+                          <Typography variant="caption" sx={{ fontSize: '0.7rem', color: order.advance >= order.price ? '#027A48' : '#B45309', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
                             {order.advance >= order.price ? 'Fully Paid' : `Bal: ₹${(order.price || 0) - (order.advance || 0)}`}
                           </Typography>
                         </Box>
@@ -1067,17 +1044,20 @@ export default function TailoringKanban() {
                             fullWidth
                             size="small"
                             variant="outlined"
-                            startIcon={<WhatsApp sx={{ fontSize: 15, color: '#25D366' }} />}
+                            startIcon={<WhatsApp sx={{ fontSize: 15 }} />}
                             onClick={() => sendWhatsAppUpdate(order, 'trial')}
                             sx={{
                               mb: 1.2,
-                              py: 0.4,
-                              borderRadius: '8px',
-                              fontSize: '0.72rem',
-                              fontWeight: 800,
-                              color: (t) => t.palette.primary.main,
-                              borderColor: 'rgba(124, 111, 232, 0.4)',
-                              '&:hover': { bordercolor: (t) => t.palette.primary.main, bgcolor: 'rgba(124, 111, 232, 0.06)' }
+                              py: 0.6,
+                              borderRadius: '9999px',
+                              fontSize: '0.75rem',
+                              fontWeight: 700,
+                              color: '#080F1C',
+                              borderColor: '#080F1C',
+                              bgcolor: '#FFFFFF',
+                              textTransform: 'none',
+                              boxShadow: 'none',
+                              '&:hover': { borderColor: '#080F1C', bgcolor: '#F8FAFC' }
                             }}
                           >
                             Notify Trial Fitting
@@ -1091,16 +1071,19 @@ export default function TailoringKanban() {
                               fullWidth
                               size="small"
                               variant="outlined"
-                              startIcon={<WhatsApp sx={{ fontSize: 15, color: '#25D366' }} />}
+                              startIcon={<WhatsApp sx={{ fontSize: 15 }} />}
                               onClick={() => sendWhatsAppUpdate(order, 'ready')}
                               sx={{
-                                py: 0.35,
-                                borderRadius: '8px',
-                                fontSize: '0.72rem',
-                                fontWeight: 800,
-                                color: '#15803D',
-                                borderColor: 'rgba(34, 197, 94, 0.5)',
-                                '&:hover': { borderColor: '#16A34A', bgcolor: 'rgba(34, 197, 94, 0.08)' }
+                                py: 0.6,
+                                borderRadius: '9999px',
+                                fontSize: '0.75rem',
+                                fontWeight: 700,
+                                color: '#080F1C',
+                                borderColor: '#080F1C',
+                                bgcolor: '#FFFFFF',
+                                textTransform: 'none',
+                                boxShadow: 'none',
+                                '&:hover': { borderColor: '#080F1C', bgcolor: '#F8FAFC' }
                               }}
                             >
                               Notify Pickup Ready
@@ -1112,13 +1095,15 @@ export default function TailoringKanban() {
                               startIcon={<CheckCircleOutline sx={{ fontSize: 16 }} />}
                               onClick={() => markAsDelivered(order.id)}
                               sx={{
-                                py: 0.4,
-                                borderRadius: '8px',
-                                fontSize: '0.72rem',
-                                fontWeight: 800,
-                                background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                                color: '#ffffff',
-                                boxShadow: '0 2px 8px rgba(5, 150, 105, 0.25)'
+                                py: 0.6,
+                                borderRadius: '9999px',
+                                fontSize: '0.75rem',
+                                fontWeight: 700,
+                                bgcolor: '#080F1C',
+                                color: '#FFFFFF',
+                                textTransform: 'none',
+                                boxShadow: 'none',
+                                '&:hover': { bgcolor: '#1A2333', boxShadow: 'none' }
                               }}
                             >
                               Mark Delivered
@@ -1127,7 +1112,7 @@ export default function TailoringKanban() {
                         )}
 
                         {/* Card Controls */}
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 1, borderTop: '1px solid', borderColor: 'divider' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 1, borderTop: '1px solid #E1E4EA' }}>
                           <IconButton
                             size="small"
                             disabled={colIndex === 0}

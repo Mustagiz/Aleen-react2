@@ -965,12 +965,11 @@ const Marketing = () => {
                 elevation={0}
                 sx={{
                     mb: 3,
-                    borderRadius: '14px',
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    bgcolor: 'background.paper',
+                    borderRadius: '16px',
+                    border: '1px solid #E1E4EA',
+                    bgcolor: '#FFFFFF',
                     overflow: 'hidden',
-                    boxShadow: horizonShadow
+                    boxShadow: 'none'
                 }}
             >
                 <Tabs
@@ -982,7 +981,7 @@ const Marketing = () => {
                         px: 2,
                         minHeight: 52,
                         '& .MuiTabs-indicator': {
-                            bgcolor: (t) => t.palette.primary.main,
+                            bgcolor: '#080F1C',
                             height: 3,
                             borderRadius: '3px 3px 0 0'
                         },
@@ -991,10 +990,10 @@ const Marketing = () => {
                             fontWeight: 700,
                             fontSize: '0.88rem',
                             minHeight: 52,
-                            color: 'text.secondary',
+                            color: '#667085',
                             gap: 1,
                             '&.Mui-selected': {
-                                color: (t) => t.palette.primary.main,
+                                color: '#080F1C',
                                 fontWeight: 800
                             }
                         }
@@ -1036,84 +1035,58 @@ const Marketing = () => {
                             elevation={0}
                             sx={{
                                 p: 2.5,
-                                borderRadius: '14px',
-                                border: '1px solid',
-                                borderColor: 'divider',
+                                borderRadius: '16px',
+                                border: '1px solid #E1E4EA',
                                 mb: 2.5,
-                                bgcolor: 'background.paper',
-                                boxShadow: horizonShadow
+                                bgcolor: '#FFFFFF',
+                                boxShadow: 'none'
                             }}
                         >
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', letterSpacing: '0.02em', textTransform: 'uppercase', fontSize: '0.78rem' }}>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#080F1C', letterSpacing: '0.02em', textTransform: 'uppercase', fontSize: '0.78rem' }}>
                                     Smart Audience Segmentation
                                 </Typography>
-                                <Typography variant="caption" color="text.secondary">
+                                <Typography variant="caption" sx={{ color: '#667085', fontWeight: 600 }}>
                                     {filteredPatrons.length} patrons match current filter
                                 </Typography>
                             </Box>
 
                             {/* Segment Filter Chips */}
                             <Stack direction="row" spacing={1} sx={{ overflowX: 'auto', pb: 1, '::-webkit-scrollbar': { height: 4 } }}>
-                                <Chip
-                                    label={`All Patrons (${segmentCounts.all})`}
-                                    clickable
-                                    color={selectedSegment === 'all' ? 'primary' : 'default'}
-                                    variant={selectedSegment === 'all' ? 'filled' : 'outlined'}
-                                    onClick={() => setSelectedSegment('all')}
-                                    sx={{ height: 26, fontWeight: 700, fontSize: '0.72rem', borderRadius: '8px' }}
-                                />
-                                <Chip
-                                    label={`Dormant 30d+ (${segmentCounts.dormant30})`}
-                                    clickable
-                                    color={selectedSegment === 'dormant30' ? 'warning' : 'default'}
-                                    variant={selectedSegment === 'dormant30' ? 'filled' : 'outlined'}
-                                    onClick={() => setSelectedSegment('dormant30')}
-                                    sx={{ height: 26, fontWeight: 700, fontSize: '0.72rem', borderRadius: '8px' }}
-                                />
-                                <Chip
-                                    label={`Deep Dormant 60d+ (${segmentCounts.dormant60})`}
-                                    clickable
-                                    color={selectedSegment === 'dormant60' ? 'error' : 'default'}
-                                    variant={selectedSegment === 'dormant60' ? 'filled' : 'outlined'}
-                                    onClick={() => setSelectedSegment('dormant60')}
-                                    sx={{ height: 26, fontWeight: 700, fontSize: '0.72rem', borderRadius: '8px' }}
-                                />
-                                <Chip
-                                    label={`VIP & High Spenders (${segmentCounts.vip})`}
-                                    clickable
-                                    color={selectedSegment === 'vip' ? 'secondary' : 'default'}
-                                    variant={selectedSegment === 'vip' ? 'filled' : 'outlined'}
-                                    onClick={() => setSelectedSegment('vip')}
-                                    sx={{ height: 26, fontWeight: 700, fontSize: '0.72rem', borderRadius: '8px' }}
-                                />
-                                <Chip
-                                    label={`Recent Shoppers (${segmentCounts.recent})`}
-                                    clickable
-                                    color={selectedSegment === 'recent' ? 'success' : 'default'}
-                                    variant={selectedSegment === 'recent' ? 'filled' : 'outlined'}
-                                    onClick={() => setSelectedSegment('recent')}
-                                    sx={{ height: 26, fontWeight: 700, fontSize: '0.72rem', borderRadius: '8px' }}
-                                />
-                                <Chip
-                                    label={`Celebrants (${segmentCounts.celebrants})`}
-                                    clickable
-                                    color={selectedSegment === 'celebrants' ? 'warning' : 'default'}
-                                    variant={selectedSegment === 'celebrants' ? 'filled' : 'outlined'}
-                                    onClick={() => setSelectedSegment('celebrants')}
-                                    sx={{ height: 26, fontWeight: 700, fontSize: '0.72rem', borderRadius: '8px' }}
-                                />
-                                <Chip
-                                    label={`Loyalty Points (${segmentCounts.loyalty})`}
-                                    clickable
-                                    color={selectedSegment === 'loyalty' ? 'info' : 'default'}
-                                    variant={selectedSegment === 'loyalty' ? 'filled' : 'outlined'}
-                                    onClick={() => setSelectedSegment('loyalty')}
-                                    sx={{ height: 26, fontWeight: 700, fontSize: '0.72rem', borderRadius: '8px' }}
-                                />
+                                {[
+                                    { id: 'all', label: `All Patrons (${segmentCounts.all})` },
+                                    { id: 'dormant30', label: `Dormant 30d+ (${segmentCounts.dormant30})` },
+                                    { id: 'dormant60', label: `Deep Dormant 60d+ (${segmentCounts.dormant60})` },
+                                    { id: 'vip', label: `VIP & High Spenders (${segmentCounts.vip})` },
+                                    { id: 'recent', label: `Recent Shoppers (${segmentCounts.recent})` },
+                                    { id: 'celebrants', label: `Celebrants (${segmentCounts.celebrants})` },
+                                    { id: 'loyalty', label: `Loyalty Points (${segmentCounts.loyalty})` }
+                                ].map((seg) => {
+                                    const active = selectedSegment === seg.id;
+                                    return (
+                                        <Chip
+                                            key={seg.id}
+                                            label={seg.label}
+                                            clickable
+                                            onClick={() => setSelectedSegment(seg.id)}
+                                            sx={{
+                                                height: 30,
+                                                fontWeight: 700,
+                                                fontSize: '0.74rem',
+                                                borderRadius: '9999px',
+                                                bgcolor: active ? '#080F1C' : '#FFFFFF',
+                                                color: active ? '#FFFFFF' : '#344054',
+                                                border: active ? '1px solid #080F1C' : '1px solid #E1E4EA',
+                                                '&:hover': {
+                                                    bgcolor: active ? '#1A2333' : '#F8FAFC'
+                                                }
+                                            }}
+                                        />
+                                    );
+                                })}
                             </Stack>
 
-                            <Divider sx={{ my: 2 }} />
+                            <Divider sx={{ my: 2, borderColor: '#E1E4EA' }} />
 
                             {/* Search & Actions Bar */}
                             <Grid container spacing={1.5} alignItems="center">
@@ -1127,11 +1100,20 @@ const Marketing = () => {
                                         InputProps={{
                                             startAdornment: (
                                                 <InputAdornment position="start">
-                                                    <Search fontSize="small" sx={{ color: (t) => t.palette.primary.main }} />
+                                                    <Search fontSize="small" sx={{ color: '#667085' }} />
                                                 </InputAdornment>
                                             )
                                         }}
-                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2.5 } }}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                borderRadius: '9999px',
+                                                bgcolor: '#FAFCFA',
+                                                fontSize: '0.85rem',
+                                                '& fieldset': { borderColor: '#E1E4EA' },
+                                                '&:hover fieldset': { borderColor: '#CBD1DC' },
+                                                '&.Mui-focused fieldset': { borderColor: '#080F1C', borderWidth: '1.5px' }
+                                            }
+                                        }}
                                     />
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
@@ -1210,18 +1192,15 @@ const Marketing = () => {
                                                     onClick={() => setActiveCustomerForPreview(customer)}
                                                     sx={{
                                                         cursor: 'pointer',
-                                                        borderRadius: '14px',
-                                                        border: '1px solid',
-                                                        borderColor: isPreviewActive ? 'primary.main' : isSelected ? 'rgba(124, 111, 232, 0.5)' : 'divider',
-                                                        bgcolor: isPreviewActive ? lavenderTint : 'background.paper',
-                                                        boxShadow: isPreviewActive ? horizonShadow : 'none',
-                                                        transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                                                        borderRadius: '16px',
+                                                        border: isPreviewActive ? '1.5px solid #080F1C' : '1px solid #E1E4EA',
+                                                        bgcolor: '#FFFFFF',
+                                                        boxShadow: 'none',
+                                                        transition: 'all 0.15s ease',
                                                         position: 'relative',
                                                         overflow: 'hidden',
                                                         '&:hover': {
-                                                            borderColor: (t) => t.palette.primary.main,
-                                                            boxShadow: horizonShadow,
-                                                            transform: 'translateY(-2px)'
+                                                            borderColor: '#080F1C'
                                                         }
                                                     }}
                                                 >
@@ -1239,25 +1218,27 @@ const Marketing = () => {
                                                                             setSelectedCustomerIds(prev => prev.filter(id => id !== customer.id));
                                                                         }
                                                                     }}
-                                                                    sx={{ p: 0.25, color: (t) => t.palette.primary.main, '&.Mui-checked': { color: (t) => t.palette.primary.main } }}
+                                                                    sx={{ p: 0.25, color: '#080F1C', '&.Mui-checked': { color: '#080F1C' } }}
                                                                 />
                                                                 <Avatar
                                                                     sx={{
                                                                         width: 36,
                                                                         height: 36,
                                                                         fontSize: '0.85rem',
-                                                                        fontWeight: 800,
-                                                                        bgcolor: customer.tier === 'Platinum' ? '#5B4BD1' : customer.tier === 'Gold' ? '#D97706' : '#7C6FE8',
-                                                                        color: '#ffffff'
+                                                                        fontWeight: 700,
+                                                                        bgcolor: customer.tier === 'Platinum' ? '#080F1C' : customer.tier === 'Gold' ? '#FEF8EB' : '#F4F5F7',
+                                                                        color: customer.tier === 'Platinum' ? '#FFFFFF' : customer.tier === 'Gold' ? '#CE8F0B' : '#475467',
+                                                                        border: customer.tier === 'Platinum' ? '1px solid #080F1C' : '1px solid #E1E4EA',
+                                                                        boxShadow: 'none'
                                                                     }}
                                                                 >
                                                                     {customer.displayName[0]}
                                                                 </Avatar>
                                                                 <Box>
-                                                                    <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.2 }}>
+                                                                    <Typography variant="body2" sx={{ fontWeight: 700, color: '#080F1C', lineHeight: 1.2 }}>
                                                                         {customer.displayName}
                                                                     </Typography>
-                                                                    <Typography variant="caption" color="text.secondary">
+                                                                    <Typography variant="caption" sx={{ color: '#667085', fontWeight: 500 }}>
                                                                         {customer.phone}
                                                                     </Typography>
                                                                 </Box>
@@ -1269,9 +1250,10 @@ const Marketing = () => {
                                                                 sx={{
                                                                     height: 20,
                                                                     fontSize: '0.65rem',
-                                                                    fontWeight: 800,
-                                                                    bgcolor: customer.tier === 'Platinum' ? 'rgba(91, 75, 209, 0.1)' : customer.tier === 'Gold' ? 'rgba(217, 119, 6, 0.12)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)',
-                                                                    color: customer.tier === 'Platinum' ? '#5B4BD1' : customer.tier === 'Gold' ? '#B45309' : '#7C6FE8'
+                                                                    fontWeight: 700,
+                                                                    bgcolor: customer.tier === 'Platinum' ? '#080F1C' : customer.tier === 'Gold' ? '#FEF8EB' : '#F4F5F7',
+                                                                    color: customer.tier === 'Platinum' ? '#FFFFFF' : customer.tier === 'Gold' ? '#CE8F0B' : '#475467',
+                                                                    border: customer.tier === 'Platinum' ? '1px solid #080F1C' : '1px solid #E1E4EA'
                                                                 }}
                                                             />
                                                         </Box>
@@ -1283,35 +1265,34 @@ const Marketing = () => {
                                                                 gridTemplateColumns: 'repeat(3, 1fr)',
                                                                 gap: 1,
                                                                 p: 1.25,
-                                                                borderRadius: 2,
-                                                                bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(124, 111, 232, 0.045)',
-                                                                border: '1px solid',
-                                                                borderColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(124, 111, 232, 0.1)',
+                                                                borderRadius: '12px',
+                                                                bgcolor: '#FAFCFA',
+                                                                border: '1px solid #E1E4EA',
                                                                 mb: 1.5,
                                                                 textAlign: 'center'
                                                             }}
                                                         >
                                                             <Box>
-                                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.65rem' }}>
+                                                                <Typography variant="caption" sx={{ color: '#667085', display: 'block', fontSize: '0.65rem', fontWeight: 600 }}>
                                                                     Spend
                                                                 </Typography>
-                                                                <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                                                                <Typography variant="caption" sx={{ fontWeight: 700, color: '#080F1C' }}>
                                                                     ₹{(customer.totalSpent || 0).toLocaleString()}
                                                                 </Typography>
                                                             </Box>
                                                             <Box>
-                                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.65rem' }}>
+                                                                <Typography variant="caption" sx={{ color: '#667085', display: 'block', fontSize: '0.65rem', fontWeight: 600 }}>
                                                                     Last Visit
                                                                 </Typography>
-                                                                <Typography variant="caption" sx={{ fontWeight: 800, color: customer.daysDormant > 30 ? '#D97706' : 'text.primary' }}>
+                                                                <Typography variant="caption" sx={{ fontWeight: 700, color: customer.daysDormant > 30 ? '#B45309' : '#080F1C' }}>
                                                                     {customer.daysDormant === 999 ? 'Never' : `${customer.daysDormant}d ago`}
                                                                 </Typography>
                                                             </Box>
                                                             <Box>
-                                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.65rem' }}>
+                                                                <Typography variant="caption" sx={{ color: '#667085', display: 'block', fontSize: '0.65rem', fontWeight: 600 }}>
                                                                     Credits
                                                                 </Typography>
-                                                                <Typography variant="caption" sx={{ fontWeight: 800, color: '#059669' }}>
+                                                                <Typography variant="caption" sx={{ fontWeight: 700, color: '#059669' }}>
                                                                     {customer.loyaltyPoints || 0} pts
                                                                 </Typography>
                                                             </Box>
@@ -1323,9 +1304,9 @@ const Marketing = () => {
                                                                 <Typography
                                                                     variant="caption"
                                                                     sx={{
-                                                                        fontWeight: 800,
+                                                                        fontWeight: 700,
                                                                         fontSize: '0.72rem',
-                                                                        color: isPreviewActive ? 'primary.main' : 'text.secondary',
+                                                                        color: isPreviewActive ? '#080F1C' : '#667085',
                                                                         display: 'flex',
                                                                         alignItems: 'center',
                                                                         gap: 0.5
@@ -1345,14 +1326,16 @@ const Marketing = () => {
                                                                     dispatchWhatsApp(customer, msg, composerImage, composerTitle);
                                                                 }}
                                                                 sx={{
-                                                                    bgcolor: '#25D366',
-                                                                    '&:hover': { bgcolor: '#128C7E' },
-                                                                    borderRadius: 2,
-                                                                    fontWeight: 750,
+                                                                    bgcolor: '#080F1C',
+                                                                    color: '#FFFFFF',
+                                                                    '&:hover': { bgcolor: '#1A2333' },
+                                                                    borderRadius: '9999px',
+                                                                    fontWeight: 700,
                                                                     fontSize: '0.75rem',
                                                                     textTransform: 'none',
-                                                                    px: 1.5,
-                                                                    py: 0.5
+                                                                    boxShadow: 'none',
+                                                                    px: 2,
+                                                                    py: 0.6
                                                                 }}
                                                             >
                                                                 {customer.lastReminderSent ? 'Resend' : 'Broadcast'}
@@ -1855,26 +1838,25 @@ const Marketing = () => {
                         elevation={0}
                         sx={{
                             p: 3,
-                            borderRadius: '14px',
-                            border: '1px solid',
-                            borderColor: gatewayConfig.mode !== 'browser' ? 'rgba(124, 111, 232, 0.35)' : 'divider',
-                            bgcolor: lavenderTint,
+                            borderRadius: '16px',
+                            border: '1px solid #E1E4EA',
+                            bgcolor: '#FAFCFA',
                             mb: 3.5,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
                             flexWrap: 'wrap',
                             gap: 2,
-                            boxShadow: horizonShadow
+                            boxShadow: 'none'
                         }}
                     >
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Avatar sx={{ bgcolor: (t) => t.palette.primary.main, width: 48, height: 48 }}>
-                                <ElectricBolt sx={{ color: '#ffffff', fontSize: 28 }} />
+                            <Avatar sx={{ bgcolor: '#080F1C', width: 44, height: 44 }}>
+                                <ElectricBolt sx={{ color: '#ffffff', fontSize: 24 }} />
                             </Avatar>
                             <Box>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#080F1C' }}>
                                         WhatsApp Dispatch Gateway
                                     </Typography>
                                     <Chip
@@ -1882,10 +1864,11 @@ const Marketing = () => {
                                         label={gatewayConfig.mode === 'meta_cloud' ? 'Meta Cloud API (Headless)' : gatewayConfig.mode === 'webhook' ? 'Custom Webhook Gateway' : 'Click-to-Chat (wa.me)'}
                                         sx={{
                                             height: 22,
-                                            fontWeight: 800,
+                                            fontWeight: 700,
                                             fontSize: '0.72rem',
-                                            bgcolor: gatewayConfig.mode !== 'browser' ? 'primary.main' : 'action.hover',
-                                            color: gatewayConfig.mode !== 'browser' ? '#ffffff' : 'text.primary'
+                                            borderRadius: '9999px',
+                                            bgcolor: '#080F1C',
+                                            color: '#ffffff'
                                         }}
                                     />
                                 </Box>
@@ -1905,11 +1888,17 @@ const Marketing = () => {
                                 startIcon={<Settings />}
                                 onClick={() => setGatewayModalOpen(true)}
                                 sx={{
-                                    borderRadius: 2.5,
-                                    fontWeight: 750,
+                                    borderRadius: '9999px',
+                                    fontWeight: 700,
                                     textTransform: 'none',
-                                    color: (t) => t.palette.primary.main,
-                                    borderColor: 'rgba(124, 111, 232, 0.4)'
+                                    color: '#080F1C',
+                                    borderColor: '#E1E4EA',
+                                    bgcolor: '#FFFFFF',
+                                    boxShadow: 'none',
+                                    '&:hover': {
+                                        borderColor: '#CBD1DC',
+                                        bgcolor: '#F8FAFC'
+                                    }
                                 }}
                             >
                                 Gateway Config
@@ -1919,11 +1908,14 @@ const Marketing = () => {
                                 startIcon={<WhatsApp />}
                                 onClick={handleTestGatewayPing}
                                 sx={{
-                                    bgcolor: '#25D366',
-                                    '&:hover': { bgcolor: '#128C7E' },
-                                    borderRadius: 2.5,
-                                    fontWeight: 800,
-                                    textTransform: 'none'
+                                    bgcolor: '#080F1C',
+                                    color: '#FFFFFF',
+                                    '&:hover': { bgcolor: '#1A2333' },
+                                    borderRadius: '9999px',
+                                    fontWeight: 700,
+                                    textTransform: 'none',
+                                    boxShadow: 'none',
+                                    px: 2.5
                                 }}
                             >
                                 Test Ping
@@ -1954,22 +1946,21 @@ const Marketing = () => {
                                 elevation={0}
                                 sx={{
                                     p: 2.5,
-                                    borderRadius: '14px',
-                                    border: '1px solid',
-                                    borderColor: automationRules.birthdayAutoDrip ? 'rgba(217, 119, 6, 0.4)' : 'divider',
-                                    bgcolor: 'background.paper',
+                                    borderRadius: '16px',
+                                    border: '1px solid #E1E4EA',
+                                    bgcolor: '#FFFFFF',
                                     height: '100%',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     justifyContent: 'space-between',
-                                    boxShadow: horizonShadow
+                                    boxShadow: 'none'
                                 }}
                             >
                                 <Box>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <Cake sx={{ color: '#D97706' }} />
-                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#080F1C' }}>
                                                 Daily Birthday & Anniversary Greeter
                                             </Typography>
                                         </Box>
@@ -1984,11 +1975,11 @@ const Marketing = () => {
                                     </Typography>
                                 </Box>
 
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 1.5, borderTop: '1px solid', borderColor: 'divider' }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 1.5, borderTop: '1px solid #E1E4EA' }}>
                                     <Chip
                                         size="small"
                                         label={`${todayCelebrants.length} Celebrants Today`}
-                                        sx={{ bgcolor: 'rgba(217, 119, 6, 0.1)', color: '#B45309', fontWeight: 800, fontSize: '0.7rem' }}
+                                        sx={{ bgcolor: '#FEF8EB', color: '#B45309', fontWeight: 700, fontSize: '0.7rem', borderRadius: '9999px', border: '1px solid #FEEFC7' }}
                                     />
                                     <Button
                                         size="small"
@@ -2000,7 +1991,17 @@ const Marketing = () => {
                                                 dispatchWhatsApp(c, msg, '', 'Automated Birthday Drip');
                                             });
                                         }}
-                                        sx={{ textTransform: 'none', fontWeight: 750, fontSize: '0.72rem' }}
+                                        sx={{
+                                            textTransform: 'none',
+                                            fontWeight: 700,
+                                            fontSize: '0.75rem',
+                                            borderRadius: '9999px',
+                                            color: '#080F1C',
+                                            borderColor: '#E1E4EA',
+                                            bgcolor: '#FFFFFF',
+                                            boxShadow: 'none',
+                                            '&:hover': { bgcolor: '#F8FAFC', borderColor: '#CBD1DC' }
+                                        }}
                                     >
                                         Run Scan & Send Now
                                     </Button>
@@ -2014,29 +2015,28 @@ const Marketing = () => {
                                 elevation={0}
                                 sx={{
                                     p: 2.5,
-                                    borderRadius: '14px',
-                                    border: '1px solid',
-                                    borderColor: automationRules.dormancyWinback ? 'rgba(124, 111, 232, 0.4)' : 'divider',
-                                    bgcolor: 'background.paper',
+                                    borderRadius: '16px',
+                                    border: '1px solid #E1E4EA',
+                                    bgcolor: '#FFFFFF',
                                     height: '100%',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     justifyContent: 'space-between',
-                                    boxShadow: horizonShadow
+                                    boxShadow: 'none'
                                 }}
                             >
                                 <Box>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <Warning sx={{ color: (t) => t.palette.primary.main }} />
-                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                                            <Warning sx={{ color: '#080F1C' }} />
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#080F1C' }}>
                                                 Dormant Patron Winback (30d+ Inactivity)
                                             </Typography>
                                         </Box>
                                         <Switch
                                             checked={automationRules.dormancyWinback}
                                             onChange={() => handleToggleAutomation('dormancyWinback')}
-                                            color="primary"
+                                            color="default"
                                         />
                                     </Box>
                                     <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5, fontSize: '0.82rem' }}>
@@ -2044,11 +2044,11 @@ const Marketing = () => {
                                     </Typography>
                                 </Box>
 
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 1.5, borderTop: '1px solid', borderColor: 'divider' }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 1.5, borderTop: '1px solid #E1E4EA' }}>
                                     <Chip
                                         size="small"
                                         label={`${segmentCounts.dormant30} In Dormancy Queue`}
-                                        sx={{ bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)', color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: '0.7rem' }}
+                                        sx={{ bgcolor: '#F4F5F7', color: '#344054', fontWeight: 700, fontSize: '0.7rem', borderRadius: '9999px', border: '1px solid #E1E4EA' }}
                                     />
                                     <Button
                                         size="small"
@@ -2057,7 +2057,17 @@ const Marketing = () => {
                                             setSelectedSegment('dormant30');
                                             setActiveSubTab(0);
                                         }}
-                                        sx={{ textTransform: 'none', fontWeight: 750, fontSize: '0.72rem' }}
+                                        sx={{
+                                            textTransform: 'none',
+                                            fontWeight: 700,
+                                            fontSize: '0.75rem',
+                                            borderRadius: '9999px',
+                                            color: '#080F1C',
+                                            borderColor: '#E1E4EA',
+                                            bgcolor: '#FFFFFF',
+                                            boxShadow: 'none',
+                                            '&:hover': { bgcolor: '#F8FAFC', borderColor: '#CBD1DC' }
+                                        }}
                                     >
                                         View Dormant Queue
                                     </Button>
@@ -2071,29 +2081,28 @@ const Marketing = () => {
                                 elevation={0}
                                 sx={{
                                     p: 2.5,
-                                    borderRadius: '14px',
-                                    border: '1px solid',
-                                    borderColor: automationRules.invoiceReceiptAuto ? 'rgba(124, 111, 232, 0.4)' : 'divider',
-                                    bgcolor: 'background.paper',
+                                    borderRadius: '16px',
+                                    border: '1px solid #E1E4EA',
+                                    bgcolor: '#FFFFFF',
                                     height: '100%',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     justifyContent: 'space-between',
-                                    boxShadow: horizonShadow
+                                    boxShadow: 'none'
                                 }}
                             >
                                 <Box>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <ReceiptLong sx={{ color: (t) => t.palette.primary.main }} />
-                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                                            <ReceiptLong sx={{ color: '#080F1C' }} />
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#080F1C' }}>
                                                 E-Invoice & Digital Receipt Auto-Share
                                             </Typography>
                                         </Box>
                                         <Switch
                                             checked={automationRules.invoiceReceiptAuto}
                                             onChange={() => handleToggleAutomation('invoiceReceiptAuto')}
-                                            color="primary"
+                                            color="default"
                                         />
                                     </Box>
                                     <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5, fontSize: '0.82rem' }}>
@@ -2101,11 +2110,11 @@ const Marketing = () => {
                                     </Typography>
                                 </Box>
 
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 1.5, borderTop: '1px solid', borderColor: 'divider' }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 1.5, borderTop: '1px solid #E1E4EA' }}>
                                     <Chip
                                         size="small"
                                         label="Active in POS / Invoices"
-                                        sx={{ bgcolor: 'rgba(5, 150, 105, 0.1)', color: '#059669', fontWeight: 800, fontSize: '0.7rem' }}
+                                        sx={{ bgcolor: '#ECFDF3', color: '#027A48', fontWeight: 700, fontSize: '0.7rem', borderRadius: '9999px', border: '1px solid #D1FADF' }}
                                     />
                                     <Typography variant="caption" color="text.secondary">
                                         Auto-formatted breakdown
@@ -2120,29 +2129,28 @@ const Marketing = () => {
                                 elevation={0}
                                 sx={{
                                     p: 2.5,
-                                    borderRadius: '14px',
-                                    border: '1px solid',
-                                    borderColor: automationRules.tailoringReadyAlert ? 'rgba(124, 111, 232, 0.4)' : 'divider',
-                                    bgcolor: 'background.paper',
+                                    borderRadius: '16px',
+                                    border: '1px solid #E1E4EA',
+                                    bgcolor: '#FFFFFF',
                                     height: '100%',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     justifyContent: 'space-between',
-                                    boxShadow: horizonShadow
+                                    boxShadow: 'none'
                                 }}
                             >
                                 <Box>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <CheckCircle sx={{ color: (t) => t.palette.primary.main }} />
-                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                                            <CheckCircle sx={{ color: '#080F1C' }} />
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#080F1C' }}>
                                                 Tailoring Ready & Fitting Notification
                                             </Typography>
                                         </Box>
                                         <Switch
                                             checked={automationRules.tailoringReadyAlert}
                                             onChange={() => handleToggleAutomation('tailoringReadyAlert')}
-                                            color="primary"
+                                            color="default"
                                         />
                                     </Box>
                                     <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5, fontSize: '0.82rem' }}>
@@ -2150,11 +2158,11 @@ const Marketing = () => {
                                     </Typography>
                                 </Box>
 
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 1.5, borderTop: '1px solid', borderColor: 'divider' }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 1.5, borderTop: '1px solid #E1E4EA' }}>
                                     <Chip
                                         size="small"
                                         label="Connected to Tailoring Kanban"
-                                        sx={{ bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)', color: (t) => t.palette.primary.main, fontWeight: 800, fontSize: '0.7rem' }}
+                                        sx={{ bgcolor: '#F4F5F7', color: '#344054', fontWeight: 700, fontSize: '0.7rem', borderRadius: '9999px', border: '1px solid #E1E4EA' }}
                                     />
                                     <Typography variant="caption" color="text.secondary">
                                         Includes delivery target date

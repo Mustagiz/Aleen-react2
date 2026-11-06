@@ -378,7 +378,20 @@ const Loyalty = () => {
                         startIcon={<Settings />}
                         onClick={handleSettingsOpen}
                         size="small"
-                        sx={{ borderRadius: 2.5, fontWeight: 700, textTransform: 'none', px: 2.5 }}
+                        sx={{
+                            borderRadius: '9999px',
+                            fontWeight: 700,
+                            textTransform: 'none',
+                            px: 2.5,
+                            py: 0.9,
+                            bgcolor: '#080F1C',
+                            color: '#FFFFFF',
+                            boxShadow: 'none',
+                            '&:hover': {
+                                bgcolor: '#1A2333',
+                                boxShadow: 'none'
+                            }
+                        }}
                     >
                         Program Settings
                     </Button>
@@ -443,14 +456,14 @@ const Loyalty = () => {
                         elevation={0}
                         sx={{
                             p: 3,
-                            borderRadius: 3.5,
-                            border: '1px solid',
-                            borderColor: 'divider',
+                            borderRadius: '16px',
+                            border: '1px solid #E1E4EA',
+                            bgcolor: '#FFFFFF',
                             height: '100%',
-                            boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+                            boxShadow: 'none'
                         }}
                     >
-                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 2.5, color: 'text.primary' }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 2.5, color: '#080F1C' }}>
                             Membership Tier Hierarchy
                         </Typography>
                         {['Platinum', 'Gold', 'Silver', 'Bronze'].map((tier) => (
@@ -493,14 +506,14 @@ const Loyalty = () => {
                         elevation={0}
                         sx={{
                             p: 3,
-                            borderRadius: 3.5,
-                            border: '1px solid',
-                            borderColor: 'divider',
+                            borderRadius: '16px',
+                            border: '1px solid #E1E4EA',
+                            bgcolor: '#FFFFFF',
                             height: '100%',
-                            boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+                            boxShadow: 'none'
                         }}
                     >
-                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 2.5, color: 'text.primary' }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 2.5, color: '#080F1C' }}>
                             Privilege Program Architecture
                         </Typography>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -589,47 +602,45 @@ const Loyalty = () => {
             </Grid>
 
             {/* Top Loyalty Patrons Table */}
-            {/* Top Loyalty Patrons Table */}
             <Paper
                 elevation={0}
                 sx={{
-                    borderRadius: '20px',
-                    border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.14)',
+                    borderRadius: '16px',
+                    border: '1px solid #E1E4EA',
+                    bgcolor: '#FFFFFF',
                     overflow: 'hidden',
-                    boxShadow: (t) => t.palette.mode === 'dark'
-                        ? '0 10px 30px rgba(0, 0, 0, 0.4)'
-                        : '0 10px 30px -10px rgba(var(--primary-rgb, 124, 111, 232), 0.08), 0 1px 3px rgba(0, 0, 0, 0.03)'
+                    boxShadow: 'none'
                 }}
             >
-                <Box sx={{ px: 3, py: 2, bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(124, 111, 232, 0.03)', borderBottom: '1px solid', borderColor: 'divider' }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                <Box sx={{ px: 3, py: 2, bgcolor: '#FAFCFA', borderBottom: '1px solid #E1E4EA' }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#080F1C' }}>
                         Clientele Loyalty Leaderboard & Privilege Balances
                     </Typography>
                 </Box>
 
                 <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
                     <Table sx={{ minWidth: 680 }}>
-                        <TableHead sx={{ bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' }}>
-                            <TableRow>
-                                <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', width: 70 }} align="center">Rank</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                        <TableHead sx={{ bgcolor: '#FAFCFA' }}>
+                            <TableRow sx={{ borderBottom: '1px solid #E1E4EA' }}>
+                                <TableCell sx={{ fontWeight: 800, color: '#667085', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', width: 70 }} align="center">Rank</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: '#667085', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                                     <TableSortLabel active={sortField === 'name'} direction={sortField === 'name' ? sortDir : 'asc'} onClick={() => handleSort('name')}>
                                         Client Details
                                     </TableSortLabel>
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="center">Membership Tier</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="right">
+                                <TableCell sx={{ fontWeight: 800, color: '#667085', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="center">Membership Tier</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: '#667085', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="right">
                                     <TableSortLabel active={sortField === 'points'} direction={sortField === 'points' ? sortDir : 'asc'} onClick={() => handleSort('points')}>
                                         Available Points
                                     </TableSortLabel>
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="right">
+                                <TableCell sx={{ fontWeight: 800, color: '#667085', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="right">
                                     <TableSortLabel active={sortField === 'spend'} direction={sortField === 'spend' ? sortDir : 'asc'} onClick={() => handleSort('spend')}>
                                         Lifetime Spend
                                     </TableSortLabel>
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Next Tier Target</TableCell>
-                                <TableCell sx={{ fontWeight: 800, color: 'text.secondary', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="right">Privilege Actions</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: '#667085', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Next Tier Target</TableCell>
+                                <TableCell sx={{ fontWeight: 800, color: '#667085', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em' }} align="right">Privilege Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -648,15 +659,15 @@ const Loyalty = () => {
                                         const tier = customer.loyaltyTier || 'Bronze';
 
                                         return (
-                                            <TableRow key={customer.id} hover sx={{ '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.02)' } }}>
+                                            <TableRow key={customer.id} hover sx={{ '&:hover': { bgcolor: '#F8FAFC' }, borderBottom: '1px solid #E1E4EA' }}>
                                                 {/* Rank */}
                                                 <TableCell align="center">
                                                     <Chip
                                                         label={`#${globalRank}`}
                                                         size="small"
                                                         sx={{
-                                                            bgcolor: globalRank === 1 ? '#D97706' : globalRank === 2 ? '#64748B' : globalRank === 3 ? '#B45309' : 'rgba(0,0,0,0.06)',
-                                                            color: globalRank <= 3 ? '#FFFFFF' : 'text.primary',
+                                                            bgcolor: globalRank === 1 ? '#080F1C' : globalRank === 2 ? '#344054' : globalRank === 3 ? '#475467' : '#F4F5F7',
+                                                            color: globalRank <= 3 ? '#FFFFFF' : '#344054',
                                                             fontWeight: 800,
                                                             fontSize: '0.72rem'
                                                         }}
@@ -668,30 +679,23 @@ const Loyalty = () => {
                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                                                         <Avatar 
                                                             sx={{ 
-                                                                bgcolor: getTierColor(tier), 
-                                                                background: tier === 'Platinum' 
-                                                                    ? 'linear-gradient(135deg, #7C6FE8 0%, #5B4BD1 100%)' 
-                                                                    : tier === 'Gold' 
-                                                                        ? 'linear-gradient(135deg, #F59E0B 0%, #B45309 100%)' 
-                                                                        : tier === 'Silver' 
-                                                                            ? 'linear-gradient(135deg, #94A3B8 0%, #475569 100%)' 
-                                                                            : 'linear-gradient(135deg, #B45309 0%, #78350F 100%)',
-                                                                color: '#FFFFFF',
-                                                                width: 40, 
-                                                                height: 40, 
-                                                                fontSize: '0.88rem',
-                                                                fontWeight: 800,
-                                                                boxShadow: `0 4px 12px ${getTierColor(tier)}35`,
-                                                                border: '2px solid rgba(255, 255, 255, 0.85)'
+                                                                bgcolor: tier === 'Platinum' ? '#080F1C' : tier === 'Gold' ? '#FEF8EB' : '#F4F5F7',
+                                                                color: tier === 'Platinum' ? '#FFFFFF' : tier === 'Gold' ? '#CE8F0B' : '#475467',
+                                                                width: 38, 
+                                                                height: 38, 
+                                                                fontSize: '0.82rem',
+                                                                fontWeight: 700,
+                                                                border: tier === 'Platinum' ? '1px solid #080F1C' : '1px solid #E1E4EA',
+                                                                boxShadow: 'none'
                                                             }}
                                                         >
                                                             {getInitials(customer.name)}
                                                         </Avatar>
                                                         <Box>
-                                                            <Typography sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.9rem' }}>
+                                                            <Typography sx={{ fontWeight: 700, color: '#080F1C', fontSize: '0.9rem' }}>
                                                                 {customer.name}
                                                             </Typography>
-                                                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                                                            <Typography variant="caption" sx={{ color: '#667085', fontWeight: 500 }}>
                                                                 {customer.phone}
                                                             </Typography>
                                                         </Box>
@@ -761,9 +765,9 @@ const Loyalty = () => {
                                                             alignItems: 'center',
                                                             gap: 0.75,
                                                             p: '3px 6px',
-                                                            borderRadius: (t) => `${t.shape?.borderRadius || 8}px`,
-                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.08)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)',
-                                                            border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(155, 143, 245, 0.2)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.12)'
+                                                            borderRadius: '9999px',
+                                                            bgcolor: '#F4F5F7',
+                                                            border: '1px solid #E1E4EA'
                                                         }}
                                                     >
                                                         <Tooltip title="Redeem Available Points">
