@@ -82,7 +82,7 @@ export default function Layout() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isDark = mode === 'dark';
   const isAtelier = designSystem === 'atelier';
-  const isMandate = designSystem === 'mandate';
+  const isMandate = designSystem === 'mandate' || !designSystem || designSystem === 'atelier';
   const [reportsAnchor, setReportsAnchor] = useState(null);
   const [settingsAnchor, setSettingsAnchor] = useState(null);
 

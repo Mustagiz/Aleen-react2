@@ -20,7 +20,11 @@ export const ThemeProvider = ({ children }) => {
 
     const [designSystem, setDesignSystem] = useState(() => {
         const savedSystem = localStorage.getItem('crmDesignSystem');
-        return savedSystem || DEFAULT_DESIGN_SYSTEM;
+        if (!savedSystem || savedSystem === 'atelier') {
+            try { localStorage.setItem('crmDesignSystem', 'mandate'); } catch (e) {}
+            return 'mandate';
+        }
+        return savedSystem || 'mandate';
     });
 
     const [colorTheme, setColorTheme] = useState(() => {
