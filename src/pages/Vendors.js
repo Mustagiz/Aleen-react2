@@ -46,8 +46,8 @@ const Vendors = () => {
     const [deleteId, setDeleteId] = useState(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-    // View mode: 'discovery' (Mandate AI Intake Flow) | 'directory' (Supplier Register)
-    const [viewMode, setViewMode] = useState('discovery');
+    // View mode: 'directory' (Supplier Register) | 'discovery' (Mandate AI Intake Flow)
+    const [viewMode, setViewMode] = useState('directory');
 
     // Filters and Search State
     const [searchQuery, setSearchQuery] = useState('');

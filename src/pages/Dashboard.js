@@ -73,7 +73,7 @@ const Dashboard = () => {
   const cardRadius = activeSystemConfig?.shape?.cardRadius || 14;
 
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
 
   const [dateRange, setDateRange] = useState('7days');
   const [drawerModalOpen, setDrawerModalOpen] = useState(false);
@@ -489,10 +489,11 @@ const Dashboard = () => {
               fontWeight: 700,
               letterSpacing: '-0.01em',
               lineHeight: 1.25,
-              fontSize: { xs: '1.1rem', sm: '1.18rem', md: '1.28rem' }
+              fontSize: { xs: '1.1rem', sm: '1.18rem', md: '1.28rem' },
+              textTransform: 'capitalize'
             }}
           >
-            {greeting}, {user?.name || user?.email?.split('@')[0] || 'Store Stylist'}
+            {greeting}, {(user?.name || user?.email?.split('@')[0] || 'Store Stylist')}
           </Typography>
           <Typography variant="caption" sx={{ color: 'text.secondary', mt: 0.3, display: 'block', fontSize: '0.74rem' }}>
             Here's what's happening at Aleen today.
