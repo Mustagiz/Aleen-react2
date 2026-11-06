@@ -29,6 +29,10 @@ export const ThemeProvider = ({ children }) => {
 
     const [colorTheme, setColorTheme] = useState(() => {
         const savedTheme = localStorage.getItem('crmColorTheme');
+        if (!savedTheme || savedTheme === 'atelier-emerald') {
+            try { localStorage.setItem('crmColorTheme', 'match-system'); } catch (e) {}
+            return 'match-system';
+        }
         return savedTheme || 'match-system';
     });
 

@@ -83,20 +83,26 @@ export default function GlassCard({ children, sx = {}, hover = false, glowColor 
                     hoverShadow: '0 4px 14px rgba(1, 118, 211, 0.18)',
                     hoverBorder: '#0176D3'
                 };
+            case 'mandate':
+                return {
+                    borderRadius: `${radius || 18}px`,
+                    background: isDark ? '#111827' : '#FFFFFF',
+                    border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #E1E4EA',
+                    boxShadow: isDark ? '0 12px 32px rgba(0, 0, 0, 0.5)' : '0 4px 20px -2px rgba(8, 15, 28, 0.05)',
+                    backdropFilter: 'none',
+                    hoverShadow: '0 8px 24px -2px rgba(8, 15, 28, 0.12)',
+                    hoverBorder: '#080F1C'
+                };
             case 'atelier':
             default:
                 return {
-                    borderRadius: `${radius}px`,
-                    background: isDark ? '#1D1A2E' : '#FFFFFF',
-                    border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.14)',
-                    boxShadow: isDark
-                        ? 'inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 32px rgba(0, 0, 0, 0.5)'
-                        : 'inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 4px 16px -4px rgba(31, 27, 46, 0.06)',
+                    borderRadius: `${radius || 18}px`,
+                    background: isDark ? '#111827' : '#FFFFFF',
+                    border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #E1E4EA',
+                    boxShadow: isDark ? '0 12px 32px rgba(0, 0, 0, 0.5)' : '0 4px 20px -2px rgba(8, 15, 28, 0.05)',
                     backdropFilter: 'none',
-                    hoverShadow: isDark
-                        ? '0 18px 40px -4px rgba(0, 0, 0, 0.65), 0 0 28px rgba(155, 143, 245, 0.35)'
-                        : '0 12px 28px -6px rgba(124, 111, 232, 0.18)',
-                    hoverBorder: isDark ? '#2DD4BF' : '#7C6FE8'
+                    hoverShadow: '0 8px 24px -2px rgba(8, 15, 28, 0.12)',
+                    hoverBorder: '#080F1C'
                 };
         }
     };
