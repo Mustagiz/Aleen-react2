@@ -370,7 +370,7 @@ const Customers = () => {
     }).length;
 
     return (
-        <Box sx={{ maxWidth: 1400, mx: 'auto', p: { xs: 2, md: 3 } }}>
+        <Box sx={{ width: '100%', maxWidth: 1440, mx: 'auto', p: { xs: 1.5, sm: 2, md: 3 } }}>
             {/* Page Header */}
             <PageHeader
                 title="Clientele & Guest Directory"
@@ -379,34 +379,45 @@ const Customers = () => {
                     <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
                         <Button
                             variant="outlined"
-                            startIcon={<Download />}
+                            startIcon={<Download sx={{ fontSize: 18 }} />}
                             onClick={downloadCustomers}
                             sx={{
-                                borderColor: 'divider',
-                                color: 'text.primary',
-                                borderRadius: 2.5,
-                                fontWeight: 700,
+                                borderColor: '#E1E4EA',
+                                bgcolor: '#FFFFFF',
+                                color: '#080F1C',
+                                borderRadius: '9999px',
+                                fontWeight: 650,
+                                fontSize: '0.82rem',
                                 textTransform: 'none',
                                 px: 2.5,
-                                '&:hover': { bordercolor: (t) => t.palette.primary.main, bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)' }
+                                height: 38,
+                                boxShadow: '0 1px 3px rgba(8, 15, 28, 0.04)',
+                                transition: 'all 0.15s ease',
+                                '&:hover': {
+                                    borderColor: '#080F1C',
+                                    bgcolor: '#F4F5F7'
+                                }
                             }}
                         >
                             Export Directory
                         </Button>
                         <Button
                             variant="contained"
-                            startIcon={<Add />}
+                            startIcon={<Add sx={{ fontSize: 18 }} />}
                             onClick={() => handleOpen()}
                             sx={{
-                                background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`,
+                                bgcolor: '#080F1C',
                                 color: '#FFFFFF',
-                                borderRadius: 2.5,
-                                fontWeight: 700,
+                                borderRadius: '9999px',
+                                fontWeight: 650,
+                                fontSize: '0.82rem',
                                 textTransform: 'none',
                                 px: 3,
-                                boxShadow: '0 4px 14px rgba(var(--primary-rgb, 124, 111, 232), 0.25)',
+                                height: 38,
+                                boxShadow: '0 2px 8px rgba(8, 15, 28, 0.16)',
+                                transition: 'all 0.15s ease',
                                 '&:hover': {
-                                    background: 'linear-gradient(135deg, #5B4BD1 0%, #7C6FE8 100%)'
+                                    bgcolor: '#1D2531'
                                 }
                             }}
                         >
@@ -427,7 +438,6 @@ const Customers = () => {
                         value={totalCustomers.toLocaleString()}
                         subtitle="Total boutique guests on record"
                         icon={<People />}
-                        color="primary"
                     />
                 </Grid>
                 <Grid item xs={6} sm={6} md={3}>
@@ -436,11 +446,8 @@ const Customers = () => {
                         value={repeatCount.toLocaleString()}
                         subtitle="Guests with > 1 completed purchase"
                         icon={<TrendingUp />}
-                        color="success"
-                        delta={{
-                            text: `${loyaltyRatio}% Repeat Ratio`,
-                            isPositive: loyaltyRatio >= 25
-                        }}
+                        trend={`${loyaltyRatio}% Repeat Ratio`}
+                        trendPositive={loyaltyRatio >= 25}
                     />
                 </Grid>
                 <Grid item xs={6} sm={6} md={3}>
@@ -449,7 +456,6 @@ const Customers = () => {
                         value={activeThisMonth.toLocaleString()}
                         subtitle="Purchased within current calendar month"
                         icon={<ShoppingBag />}
-                        color="warning"
                     />
                 </Grid>
                 <Grid item xs={6} sm={6} md={3}>
@@ -458,7 +464,8 @@ const Customers = () => {
                         value={`₹${totalReceivables.toLocaleString('en-IN')}`}
                         subtitle="Total pending accounts receivable"
                         icon={<WarningAmber />}
-                        color={totalReceivables > 0 ? "error" : "success"}
+                        redAccent={totalReceivables > 0}
+                        sapphireAccent={totalReceivables === 0}
                     />
                 </Grid>
             </Grid>
@@ -467,14 +474,12 @@ const Customers = () => {
             <Paper
                 elevation={0}
                 sx={{
-                    p: 2.5,
-                    mb: 3.5,
-                    borderRadius: '14px',
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    boxShadow: (t) => t.palette.mode === 'dark'
-                        ? '0 4px 24px rgba(0, 0, 0, 0.35)'
-                        : '0 2px 12px rgba(112, 114, 176, 0.08)'
+                    p: 2,
+                    mb: 3,
+                    borderRadius: '16px',
+                    border: '1px solid #E1E4EA',
+                    bgcolor: '#FFFFFF',
+                    boxShadow: '0 1px 3px rgba(8, 15, 28, 0.04)'
                 }}
             >
                 <Grid container spacing={2} alignItems="center">
@@ -485,17 +490,27 @@ const Customers = () => {
                             placeholder="Search by client name, mobile (+91), or email..."
                             value={searchTerm}
                             onChange={(e) => { setSearchTerm(e.target.value); setPage(0); }}
-                            sx={{ '& .MuiInputBase-root': { height: 38, borderRadius: '999px', fontSize: '0.82rem' } }}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    height: 38,
+                                    borderRadius: '9999px',
+                                    fontSize: '0.82rem',
+                                    bgcolor: '#FAFCFA',
+                                    '& fieldset': { borderColor: '#E1E4EA' },
+                                    '&:hover fieldset': { borderColor: '#080F1C' },
+                                    '&.Mui-focused fieldset': { borderColor: '#080F1C', borderWidth: 1 }
+                                }
+                            }}
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <Search sx={{ color: (t) => t.palette.primary.main }} />
+                                        <Search sx={{ color: '#66707B', fontSize: 18 }} />
                                     </InputAdornment>
                                 ),
                                 endAdornment: searchTerm && (
                                     <InputAdornment position="end">
                                         <IconButton size="small" onClick={() => setSearchTerm('')}>
-                                            <Clear fontSize="small" />
+                                            <Clear fontSize="small" sx={{ color: '#969DA7' }} />
                                         </IconButton>
                                     </InputAdornment>
                                 )
@@ -510,32 +525,37 @@ const Customers = () => {
                                 { id: 'active', label: `Active (${activeThisMonth})` },
                                 { id: 'due', label: `Balance Due (${customers.filter(c => (c.totalDue || 0) > 0).length})` },
                                 { id: 'measurements', label: `With Specs (${customers.filter(c => !!c.measurements).length})` }
-                            ].map((pill) => (
-                                <Button
-                                    key={pill.id}
-                                    size="small"
-                                    onClick={() => { setSegmentFilter(pill.id); setPage(0); }}
-                                    sx={{
-                                        height: 30,
-                                        px: 2,
-                                        borderRadius: '999px',
-                                        textTransform: 'none',
-                                        fontWeight: 700,
-                                        fontSize: '0.8rem',
-                                        color: segmentFilter === pill.id ? '#FFFFFF' : 'text.secondary',
-                                        bgcolor: segmentFilter === pill.id ? 'primary.main' : 'transparent',
-                                        border: '1px solid',
-                                        borderColor: segmentFilter === pill.id ? 'primary.main' : 'divider',
-                                        transition: 'background-color 0.15s ease, border-color 0.15s ease',
-                                        '&:hover': {
-                                            bgcolor: segmentFilter === pill.id ? 'primary.dark' : (t) => t.palette.mode === 'dark' ? 'rgba(155, 143, 245, 0.18)' : 'rgba(124, 111, 232, 0.08)',
-                                            color: segmentFilter === pill.id ? '#FFFFFF' : 'primary.main'
-                                        }
-                                    }}
-                                >
-                                    {pill.label}
-                                </Button>
-                            ))}
+                            ].map((pill) => {
+                                const isActive = segmentFilter === pill.id;
+                                return (
+                                    <Button
+                                        key={pill.id}
+                                        size="small"
+                                        onClick={() => { setSegmentFilter(pill.id); setPage(0); }}
+                                        sx={{
+                                            height: 32,
+                                            px: 2,
+                                            borderRadius: '9999px',
+                                            textTransform: 'none',
+                                            fontWeight: isActive ? 700 : 550,
+                                            fontSize: '0.78rem',
+                                            color: isActive ? '#FFFFFF' : '#66707B',
+                                            bgcolor: isActive ? '#080F1C' : '#FAFCFA',
+                                            border: '1px solid',
+                                            borderColor: isActive ? '#080F1C' : '#E1E4EA',
+                                            boxShadow: isActive ? '0 2px 6px rgba(8, 15, 28, 0.12)' : 'none',
+                                            transition: 'all 0.15s ease',
+                                            '&:hover': {
+                                                bgcolor: isActive ? '#1D2531' : '#F4F5F7',
+                                                borderColor: isActive ? '#1D2531' : '#080F1C',
+                                                color: isActive ? '#FFFFFF' : '#080F1C'
+                                            }
+                                        }}
+                                    >
+                                        {pill.label}
+                                    </Button>
+                                );
+                            })}
                         </Box>
                     </Grid>
                 </Grid>
@@ -546,54 +566,53 @@ const Customers = () => {
                 elevation={0}
                 sx={{
                     overflow: 'hidden',
-                    borderRadius: '14px',
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    background: 'background.paper',
-                    boxShadow: (t) => t.palette.mode === 'dark'
-                        ? '0 4px 24px rgba(0, 0, 0, 0.35)'
-                        : '0 2px 12px rgba(112, 114, 176, 0.08)',
+                    borderRadius: '16px',
+                    border: '1px solid #E1E4EA',
+                    bgcolor: '#FFFFFF',
+                    boxShadow: '0 2px 8px rgba(8, 15, 28, 0.04)',
                     position: 'relative'
                 }}
             >
                 <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
                     <Table sx={{ minWidth: 700, '& .MuiTableCell-root': { verticalAlign: 'middle' } }}>
                         <TableHead>
-                            <TableRow>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4 }}>
+                            <TableRow sx={{ bgcolor: '#FAFCFA', borderBottom: '1px solid #E1E4EA' }}>
+                                <TableCell sx={{ fontWeight: 750, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#66707B', py: 1.5 }}>
                                     <TableSortLabel active={sortField === 'name'} direction={sortField === 'name' ? sortDir : 'asc'} onClick={() => handleSort('name')}>
                                         Guest & Contact Details
                                     </TableSortLabel>
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4 }} align="right">
+                                <TableCell sx={{ fontWeight: 750, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#66707B', py: 1.5 }} align="right">
                                     <TableSortLabel active={sortField === 'spend'} direction={sortField === 'spend' ? sortDir : 'asc'} onClick={() => handleSort('spend')}>
                                         Lifetime Spend
                                     </TableSortLabel>
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4 }} align="center">
+                                <TableCell sx={{ fontWeight: 750, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#66707B', py: 1.5 }} align="center">
                                     <TableSortLabel active={sortField === 'points'} direction={sortField === 'points' ? sortDir : 'asc'} onClick={() => handleSort('points')}>
                                         Loyalty Points
                                     </TableSortLabel>
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4 }} align="right">
+                                <TableCell sx={{ fontWeight: 750, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#66707B', py: 1.5 }} align="right">
                                     <TableSortLabel active={sortField === 'due'} direction={sortField === 'due' ? sortDir : 'asc'} onClick={() => handleSort('due')}>
                                         Balance Due
                                     </TableSortLabel>
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4 }} align="center">
+                                <TableCell sx={{ fontWeight: 750, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#66707B', py: 1.5 }} align="center">
                                     <TableSortLabel active={sortField === 'visit'} direction={sortField === 'visit' ? sortDir : 'asc'} onClick={() => handleSort('visit')}>
                                         Last Visit
                                     </TableSortLabel>
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 800, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'text.secondary', py: 1.4, pr: 2.5 }} align="right">Actions</TableCell>
+                                <TableCell sx={{ fontWeight: 750, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#66707B', py: 1.5, pr: 2.5 }} align="right">
+                                    Actions
+                                </TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {filteredCustomers.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} align="center" sx={{ py: 8, color: 'text.secondary' }}>
-                                        <People sx={{ fontSize: 48, color: 'text.disabled', mb: 1, opacity: 0.5 }} />
-                                        <Typography variant="body1" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                                    <TableCell colSpan={6} align="center" sx={{ py: 8, color: '#66707B' }}>
+                                        <People sx={{ fontSize: 44, color: '#969DA7', mb: 1, opacity: 0.5 }} />
+                                        <Typography variant="body1" sx={{ fontWeight: 650, color: '#66707B' }}>
                                             No guests match the selected search or filter criteria.
                                         </Typography>
                                     </TableCell>
@@ -606,7 +625,6 @@ const Customers = () => {
                                         const hasDue = (cust.totalDue || 0) > 0;
                                         const isVip = customerStat.totalSpent >= 50000;
                                         const isPremier = customerStat.totalSpent >= 10000 && !isVip;
-                                        const palette = getContactAvatarPalette(cust.name || cust.phone || cust.id, isVip);
                                         const rawPhone = (cust.phone || '').replace(/\D/g, '');
                                         const cleanPhone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
                                         const hasPhone = Boolean(cust.phone && cust.phone.trim() && cust.phone !== '+91' && rawPhone.length >= 7);
@@ -616,9 +634,10 @@ const Customers = () => {
                                                 key={cust.id} 
                                                 hover 
                                                 sx={{ 
-                                                    transition: 'all 0.18s ease',
+                                                    transition: 'background-color 0.15s ease',
+                                                    borderBottom: '1px solid #F0F2F5',
                                                     '&:hover': { 
-                                                        bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.025)' : 'rgba(0, 0, 0, 0.015)'
+                                                        bgcolor: '#F8FAFC'
                                                     }
                                                 }}
                                             >
@@ -628,21 +647,21 @@ const Customers = () => {
                                                         <Avatar
                                                             onClick={() => handleOpen360(cust)}
                                                             sx={{
-                                                                background: palette.gradient,
-                                                                border: `2px solid ${palette.border}`,
-                                                                color: '#FFFFFF',
-                                                                width: 44,
-                                                                height: 44,
-                                                                borderRadius: '13px',
-                                                                fontSize: '0.86rem',
-                                                                fontWeight: 900,
-                                                                letterSpacing: '0.04em',
+                                                                bgcolor: isVip ? '#080F1C' : '#F4F5F7',
+                                                                color: isVip ? '#FFFFFF' : '#080F1C',
+                                                                border: isVip ? '1px solid rgba(8, 15, 28, 0.25)' : '1px solid #E1E4EA',
+                                                                width: 38,
+                                                                height: 38,
+                                                                borderRadius: '50%',
+                                                                fontSize: '0.82rem',
+                                                                fontWeight: 800,
+                                                                letterSpacing: '0.02em',
                                                                 cursor: 'pointer',
-                                                                boxShadow: `0 4px 14px ${palette.glow}, inset 0 1px 1px rgba(255,255,255,0.4)`,
-                                                                transition: 'all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                                                                boxShadow: isVip ? '0 2px 6px rgba(8, 15, 28, 0.18)' : '0 1px 2px rgba(8, 15, 28, 0.04)',
+                                                                transition: 'all 0.18s ease',
                                                                 '&:hover': { 
-                                                                    transform: 'scale(1.08) translateY(-1px)',
-                                                                    boxShadow: `0 6px 18px ${palette.glow}`
+                                                                    transform: 'scale(1.06)',
+                                                                    borderColor: '#080F1C'
                                                                 }
                                                             }}
                                                         >
@@ -654,14 +673,14 @@ const Customers = () => {
                                                                 <Typography
                                                                     onClick={() => handleOpen360(cust)}
                                                                     sx={{
-                                                                        fontWeight: 800,
-                                                                        fontSize: '0.94rem',
-                                                                        color: 'text.primary',
+                                                                        fontWeight: 700,
+                                                                        fontSize: '0.92rem',
+                                                                        color: '#080F1C',
                                                                         textTransform: 'capitalize',
                                                                         cursor: 'pointer',
                                                                         letterSpacing: '-0.01em',
                                                                         transition: 'color 0.15s ease',
-                                                                        '&:hover': { color: palette.accent }
+                                                                        '&:hover': { color: '#6F4CED' }
                                                                     }}
                                                                 >
                                                                     {cust.name}
@@ -670,16 +689,17 @@ const Customers = () => {
                                                                     <Chip
                                                                         label="VIP"
                                                                         size="small"
-                                                                        icon={<Stars sx={{ fontSize: '11px !important', color: '#D97706' }} />}
+                                                                        icon={<Stars sx={{ fontSize: '11px !important', color: '#6F4CED' }} />}
                                                                         sx={{
                                                                             height: 20,
                                                                             fontSize: '0.62rem',
-                                                                            fontWeight: 900,
-                                                                            bgcolor: 'rgba(217, 119, 6, 0.14)',
-                                                                            color: '#B45309',
-                                                                            border: '1px solid rgba(217, 119, 6, 0.35)',
-                                                                            letterSpacing: '0.05em',
-                                                                            borderRadius: '999px'
+                                                                            fontWeight: 800,
+                                                                            bgcolor: '#F3F0FF',
+                                                                            color: '#6F4CED',
+                                                                            border: '1px solid rgba(111, 76, 237, 0.25)',
+                                                                            letterSpacing: '0.04em',
+                                                                            borderRadius: '9999px',
+                                                                            px: 0.5
                                                                         }}
                                                                     />
                                                                 )}
@@ -690,12 +710,12 @@ const Customers = () => {
                                                                         sx={{
                                                                             height: 20,
                                                                             fontSize: '0.58rem',
-                                                                            fontWeight: 800,
-                                                                            bgcolor: palette.chipBg,
-                                                                            color: palette.chipText,
-                                                                            border: `1px solid ${palette.border}`,
+                                                                            fontWeight: 750,
+                                                                            bgcolor: '#F4F5F7',
+                                                                            color: '#080F1C',
+                                                                            border: '1px solid #E1E4EA',
                                                                             letterSpacing: '0.04em',
-                                                                            borderRadius: '999px'
+                                                                            borderRadius: '9999px'
                                                                         }}
                                                                     />
                                                                 )}
@@ -713,26 +733,27 @@ const Customers = () => {
                                                                             alignItems: 'center',
                                                                             gap: 0.5,
                                                                             textDecoration: 'none',
-                                                                            px: 0.85,
+                                                                            px: 1,
                                                                             py: 0.2,
-                                                                            borderRadius: '8px',
-                                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)',
-                                                                            border: '1px solid',
-                                                                            borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
+                                                                            borderRadius: '6px',
+                                                                            bgcolor: '#FAFCFA',
+                                                                            border: '1px solid #E1E4EA',
+                                                                            color: '#66707B',
                                                                             transition: 'all 0.15s ease',
                                                                             '&:hover': {
-                                                                                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
-                                                                                borderColor: palette.accent
+                                                                                bgcolor: '#F4F5F7',
+                                                                                borderColor: '#080F1C',
+                                                                                color: '#080F1C'
                                                                             }
                                                                         }}
                                                                     >
-                                                                        <Phone sx={{ fontSize: 11, color: 'text.secondary', opacity: 0.7 }} />
+                                                                        <Phone sx={{ fontSize: 11, color: '#969DA7' }} />
                                                                         <Typography
                                                                             variant="caption"
                                                                             sx={{
                                                                                 fontWeight: 600,
                                                                                 fontSize: '0.74rem',
-                                                                                color: 'text.secondary',
+                                                                                color: 'inherit',
                                                                                 fontVariantNumeric: 'tabular-nums'
                                                                             }}
                                                                         >
@@ -747,14 +768,13 @@ const Customers = () => {
                                                                             gap: 0.4,
                                                                             px: 0.75,
                                                                             py: 0.15,
-                                                                            borderRadius: '8px',
-                                                                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
-                                                                            border: '1px dashed',
-                                                                            borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)'
+                                                                            borderRadius: '6px',
+                                                                            bgcolor: '#FAFCFA',
+                                                                            border: '1px dashed #E1E4EA'
                                                                         }}
                                                                     >
-                                                                        <Phone sx={{ fontSize: 10, color: 'text.disabled' }} />
-                                                                        <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.disabled', fontStyle: 'italic' }}>
+                                                                        <Phone sx={{ fontSize: 10, color: '#969DA7' }} />
+                                                                        <Typography variant="caption" sx={{ fontSize: '0.68rem', color: '#969DA7', fontStyle: 'italic' }}>
                                                                             No phone
                                                                         </Typography>
                                                                     </Box>
@@ -770,17 +790,17 @@ const Customers = () => {
                                                                                 window.open(`https://wa.me/${cleanPhone}`, '_blank');
                                                                             }}
                                                                             sx={{
-                                                                                p: 0.35,
-                                                                                color: 'text.secondary',
-                                                                                bgcolor: 'transparent',
-                                                                                border: '1px solid',
-                                                                                borderColor: 'divider',
+                                                                                width: 24,
+                                                                                height: 24,
+                                                                                p: 0,
+                                                                                color: '#66707B',
+                                                                                bgcolor: '#FAFCFA',
+                                                                                border: '1px solid #E1E4EA',
                                                                                 transition: 'all 0.15s ease',
                                                                                 '&:hover': {
-                                                                                    color: '#128C7E',
-                                                                                    bgcolor: 'rgba(37, 211, 102, 0.12)',
-                                                                                    borderColor: 'rgba(37, 211, 102, 0.35)',
-                                                                                    transform: 'scale(1.08)'
+                                                                                    color: '#2A875B',
+                                                                                    bgcolor: '#E7F2EA',
+                                                                                    borderColor: '#2A875B'
                                                                                 }
                                                                             }}
                                                                         >
@@ -791,17 +811,17 @@ const Customers = () => {
 
                                                                 {cust.measurements?.bust && (
                                                                     <Chip
-                                                                        icon={<Straighten sx={{ fontSize: '11px !important', color: palette.accent }} />}
+                                                                        icon={<Straighten sx={{ fontSize: '11px !important', color: '#66707B' }} />}
                                                                         label={`Bust: ${cust.measurements.bust}" • ${cust.measurements.preferredFit || 'Custom'}`}
                                                                         size="small"
                                                                         sx={{
                                                                             height: 20,
                                                                             fontSize: '0.67rem',
-                                                                            bgcolor: palette.chipBg,
-                                                                            color: palette.chipText,
-                                                                            fontWeight: 700,
-                                                                            border: `1px solid ${palette.border}`,
-                                                                            borderRadius: '999px'
+                                                                            bgcolor: '#FAFCFA',
+                                                                            color: '#66707B',
+                                                                            fontWeight: 600,
+                                                                            border: '1px solid #E1E4EA',
+                                                                            borderRadius: '9999px'
                                                                         }}
                                                                     />
                                                                 )}
@@ -815,9 +835,9 @@ const Customers = () => {
                                                     <Typography
                                                         variant="body2"
                                                         sx={{
-                                                            fontWeight: 900,
-                                                            fontSize: '0.95rem',
-                                                            color: (t) => t.palette.primary.main,
+                                                            fontWeight: 750,
+                                                            fontSize: '0.92rem',
+                                                            color: '#080F1C',
                                                             fontVariantNumeric: 'tabular-nums'
                                                         }}
                                                     >
@@ -826,8 +846,8 @@ const Customers = () => {
                                                     <Typography
                                                         variant="caption"
                                                         sx={{
-                                                            color: 'text.secondary',
-                                                            fontWeight: 600,
+                                                            color: '#969DA7',
+                                                            fontWeight: 500,
                                                             fontSize: '0.71rem',
                                                             display: 'flex',
                                                             alignItems: 'center',
@@ -844,18 +864,19 @@ const Customers = () => {
                                                 {/* Loyalty Points */}
                                                 <TableCell align="center" sx={{ py: 1.5 }}>
                                                     <Chip
-                                                        icon={<Stars sx={{ fontSize: '13px !important', color: (cust.loyaltyPoints || 0) > 0 ? '#D97706' : 'text.disabled' }} />}
+                                                        icon={<Stars sx={{ fontSize: '12px !important', color: (cust.loyaltyPoints || 0) > 0 ? '#CE8F0B' : '#969DA7' }} />}
                                                         label={`${(cust.loyaltyPoints || 0).toLocaleString()} pts`}
                                                         size="small"
                                                         sx={{
                                                             height: 24,
-                                                            px: 1.1,
-                                                            borderRadius: '999px',
-                                                            bgcolor: (cust.loyaltyPoints || 0) > 0 ? 'rgba(217, 119, 6, 0.12)' : (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
-                                                            color: (cust.loyaltyPoints || 0) > 0 ? '#B45309' : 'text.secondary',
-                                                            border: (cust.loyaltyPoints || 0) > 0 ? '1px solid rgba(217, 119, 6, 0.28)' : '1px solid rgba(0,0,0,0.06)',
-                                                            fontWeight: 800,
-                                                            fontSize: '0.73rem'
+                                                            px: 1,
+                                                            borderRadius: '9999px',
+                                                            bgcolor: (cust.loyaltyPoints || 0) > 0 ? '#FEF8EB' : '#FAFCFA',
+                                                            color: (cust.loyaltyPoints || 0) > 0 ? '#CE8F0B' : '#66707B',
+                                                            border: '1px solid',
+                                                            borderColor: (cust.loyaltyPoints || 0) > 0 ? 'rgba(206, 143, 11, 0.3)' : '#E1E4EA',
+                                                            fontWeight: 700,
+                                                            fontSize: '0.72rem'
                                                         }}
                                                     />
                                                 </TableCell>
@@ -867,45 +888,45 @@ const Customers = () => {
                                                             <Typography
                                                                 variant="body2"
                                                                 sx={{
-                                                                    fontWeight: 900,
-                                                                    color: '#DC2626',
-                                                                    fontSize: '0.94rem',
+                                                                    fontWeight: 750,
+                                                                    color: '#C33A4D',
+                                                                    fontSize: '0.92rem',
                                                                     fontVariantNumeric: 'tabular-nums'
                                                                 }}
                                                             >
                                                                 ₹{(cust.totalDue || 0).toLocaleString('en-IN')}
                                                             </Typography>
                                                             <Chip
-                                                                label="Pending • Settle"
+                                                                label="Due • Settle"
                                                                 size="small"
                                                                 onClick={() => handleOpenPaymentDialog(cust.id)}
                                                                 sx={{
                                                                     height: 20,
                                                                     fontSize: '0.62rem',
-                                                                    fontWeight: 800,
-                                                                    bgcolor: 'rgba(220, 38, 38, 0.1)',
-                                                                    color: '#DC2626',
-                                                                    border: '1px solid rgba(220, 38, 38, 0.3)',
-                                                                    borderRadius: '999px',
+                                                                    fontWeight: 750,
+                                                                    bgcolor: '#FEF2F2',
+                                                                    color: '#C33A4D',
+                                                                    border: '1px solid rgba(195, 58, 77, 0.3)',
+                                                                    borderRadius: '9999px',
                                                                     cursor: 'pointer',
                                                                     mt: 0.3,
-                                                                    '&:hover': { bgcolor: 'rgba(220, 38, 38, 0.2)' }
+                                                                    '&:hover': { bgcolor: '#FEE2E2' }
                                                                 }}
                                                             />
                                                         </Box>
                                                     ) : (
                                                         <Chip
-                                                            icon={<CheckCircle sx={{ fontSize: '12px !important', color: '#059669' }} />}
+                                                            icon={<CheckCircle sx={{ fontSize: '12px !important', color: '#2A875B' }} />}
                                                             label="Settled • ₹0"
                                                             size="small"
                                                             sx={{
                                                                 height: 24,
                                                                 fontSize: '0.72rem',
-                                                                fontWeight: 800,
-                                                                bgcolor: 'rgba(5, 150, 105, 0.08)',
-                                                                color: '#059669',
-                                                                border: '1px solid rgba(5, 150, 105, 0.22)',
-                                                                borderRadius: '999px'
+                                                                fontWeight: 700,
+                                                                bgcolor: '#E7F2EA',
+                                                                color: '#2A875B',
+                                                                border: '1px solid rgba(42, 135, 91, 0.25)',
+                                                                borderRadius: '9999px'
                                                             }}
                                                         />
                                                     )}
@@ -920,17 +941,17 @@ const Customers = () => {
                                                             sx={{
                                                                 height: 24,
                                                                 fontSize: '0.71rem',
-                                                                fontWeight: 600,
-                                                                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
-                                                                color: 'text.secondary',
-                                                                border: '1px solid rgba(0,0,0,0.06)',
-                                                                borderRadius: '999px'
+                                                                fontWeight: 550,
+                                                                bgcolor: '#FAFCFA',
+                                                                color: '#969DA7',
+                                                                border: '1px solid #E1E4EA',
+                                                                borderRadius: '9999px'
                                                             }}
                                                         />
                                                     ) : (
                                                         <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
-                                                            <CalendarMonth sx={{ fontSize: 13, color: (t) => t.palette.primary.main, opacity: 0.7 }} />
-                                                            <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.82rem', color: 'text.primary' }}>
+                                                            <CalendarMonth sx={{ fontSize: 13, color: '#66707B' }} />
+                                                            <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.8rem', color: '#161922' }}>
                                                                 {customerStat.lastVisit}
                                                             </Typography>
                                                         </Box>
@@ -939,13 +960,7 @@ const Customers = () => {
 
                                                 {/* Actions */}
                                                 <TableCell align="right" sx={{ py: 1.5, pr: 2 }}>
-                                                    <Box
-                                                        sx={{
-                                                            display: 'inline-flex',
-                                                            alignItems: 'center',
-                                                            gap: 0.5
-                                                        }}
-                                                    >
+                                                    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
                                                         <Tooltip title="View 360° Profile & Sizing Specs">
                                                             <IconButton
                                                                 size="small"
@@ -953,16 +968,15 @@ const Customers = () => {
                                                                 sx={{
                                                                     width: 30,
                                                                     height: 30,
-                                                                    color: (t) => t.palette.primary.main,
-                                                                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
-                                                                    border: '1px solid rgba(124, 111, 232, 0.16)',
-                                                                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                                                                    transition: 'all 0.18s ease',
+                                                                    color: '#66707B',
+                                                                    bgcolor: '#FFFFFF',
+                                                                    border: '1px solid #E1E4EA',
+                                                                    borderRadius: '8px',
+                                                                    transition: 'all 0.15s ease',
                                                                     '&:hover': {
-                                                                        bgcolor: (t) => t.palette.primary.main,
-                                                                        color: '#FFFFFF',
-                                                                        transform: 'translateY(-1px)',
-                                                                        boxShadow: '0 4px 10px rgba(124, 111, 232, 0.3)'
+                                                                        color: '#080F1C',
+                                                                        bgcolor: '#F4F5F7',
+                                                                        borderColor: '#080F1C'
                                                                     }
                                                                 }}
                                                             >
@@ -979,16 +993,15 @@ const Customers = () => {
                                                                 sx={{
                                                                     width: 30,
                                                                     height: 30,
-                                                                    color: '#D97706',
-                                                                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
-                                                                    border: '1px solid rgba(217, 119, 6, 0.2)',
-                                                                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                                                                    transition: 'all 0.18s ease',
+                                                                    color: '#66707B',
+                                                                    bgcolor: '#FFFFFF',
+                                                                    border: '1px solid #E1E4EA',
+                                                                    borderRadius: '8px',
+                                                                    transition: 'all 0.15s ease',
                                                                     '&:hover': {
-                                                                        bgcolor: '#D97706',
-                                                                        color: '#FFFFFF',
-                                                                        transform: 'translateY(-1px)',
-                                                                        boxShadow: '0 4px 10px rgba(217, 119, 6, 0.3)'
+                                                                        color: '#080F1C',
+                                                                        bgcolor: '#F4F5F7',
+                                                                        borderColor: '#080F1C'
                                                                     }
                                                                 }}
                                                             >
@@ -1003,15 +1016,14 @@ const Customers = () => {
                                                                     sx={{
                                                                         width: 30,
                                                                         height: 30,
-                                                                        color: '#059669',
-                                                                        bgcolor: 'rgba(5, 150, 105, 0.12)',
-                                                                        border: '1px solid rgba(5, 150, 105, 0.3)',
-                                                                        transition: 'all 0.18s ease',
+                                                                        color: '#2A875B',
+                                                                        bgcolor: '#E7F2EA',
+                                                                        border: '1px solid rgba(42, 135, 91, 0.3)',
+                                                                        borderRadius: '8px',
+                                                                        transition: 'all 0.15s ease',
                                                                         '&:hover': {
-                                                                            bgcolor: '#059669',
-                                                                            color: '#FFFFFF',
-                                                                            transform: 'translateY(-1px)',
-                                                                            boxShadow: '0 4px 10px rgba(5, 150, 105, 0.3)'
+                                                                            bgcolor: '#2A875B',
+                                                                            color: '#FFFFFF'
                                                                         }
                                                                     }}
                                                                 >
@@ -1026,15 +1038,15 @@ const Customers = () => {
                                                                 sx={{
                                                                     width: 30,
                                                                     height: 30,
-                                                                    color: '#059669',
-                                                                    bgcolor: 'rgba(37, 211, 102, 0.09)',
-                                                                    border: '1px solid rgba(37, 211, 102, 0.25)',
-                                                                    transition: 'all 0.18s ease',
+                                                                    color: '#66707B',
+                                                                    bgcolor: '#FFFFFF',
+                                                                    border: '1px solid #E1E4EA',
+                                                                    borderRadius: '8px',
+                                                                    transition: 'all 0.15s ease',
                                                                     '&:hover': {
-                                                                        bgcolor: '#059669',
-                                                                        color: '#FFFFFF',
-                                                                        transform: 'translateY(-1px)',
-                                                                        boxShadow: '0 4px 12px rgba(5, 150, 105, 0.35)'
+                                                                        color: '#2A875B',
+                                                                        bgcolor: '#E7F2EA',
+                                                                        borderColor: '#2A875B'
                                                                     }
                                                                 }}
                                                             >
@@ -1048,15 +1060,15 @@ const Customers = () => {
                                                                 sx={{
                                                                     width: 30,
                                                                     height: 30,
-                                                                    color: '#0284C7',
-                                                                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
-                                                                    border: '1px solid rgba(2, 132, 199, 0.2)',
-                                                                    transition: 'all 0.18s ease',
+                                                                    color: '#66707B',
+                                                                    bgcolor: '#FFFFFF',
+                                                                    border: '1px solid #E1E4EA',
+                                                                    borderRadius: '8px',
+                                                                    transition: 'all 0.15s ease',
                                                                     '&:hover': {
-                                                                        bgcolor: '#0284C7',
-                                                                        color: '#FFFFFF',
-                                                                        transform: 'translateY(-1px)',
-                                                                        boxShadow: '0 4px 10px rgba(2, 132, 199, 0.3)'
+                                                                        color: '#080F1C',
+                                                                        bgcolor: '#F4F5F7',
+                                                                        borderColor: '#080F1C'
                                                                     }
                                                                 }}
                                                             >
@@ -1081,15 +1093,15 @@ const Customers = () => {
                                                                 sx={{
                                                                     width: 30,
                                                                     height: 30,
-                                                                    color: '#DC2626',
-                                                                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
-                                                                    border: '1px solid rgba(220, 38, 38, 0.2)',
-                                                                    transition: 'all 0.18s ease',
+                                                                    color: '#66707B',
+                                                                    bgcolor: '#FFFFFF',
+                                                                    border: '1px solid #E1E4EA',
+                                                                    borderRadius: '8px',
+                                                                    transition: 'all 0.15s ease',
                                                                     '&:hover': {
-                                                                        bgcolor: '#DC2626',
-                                                                        color: '#FFFFFF',
-                                                                        transform: 'translateY(-1px)',
-                                                                        boxShadow: '0 4px 10px rgba(220, 38, 38, 0.3)'
+                                                                        color: '#C33A4D',
+                                                                        bgcolor: '#FEF2F2',
+                                                                        borderColor: '#C33A4D'
                                                                     }
                                                                 }}
                                                             >
@@ -1114,7 +1126,11 @@ const Customers = () => {
                     page={page}
                     onPageChange={(e, newPage) => setPage(newPage)}
                     onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0); }}
-                    sx={{ borderTop: '1px solid', borderColor: 'divider' }}
+                    sx={{
+                        borderTop: '1px solid #E1E4EA',
+                        color: '#66707B',
+                        '& .MuiTablePagination-select': { fontWeight: 600 }
+                    }}
                 />
             </Paper>
 
@@ -1127,40 +1143,39 @@ const Customers = () => {
                 fullScreen={isTablet}
                 PaperProps={{ 
                     sx: { 
-                        borderRadius: isTablet ? 0 : 3.5,
+                        borderRadius: isTablet ? 0 : '18px',
                         overflow: 'hidden',
-                        boxShadow: '0 24px 60px rgba(0,0,0,0.18)'
+                        border: '1px solid #E1E4EA',
+                        boxShadow: '0 24px 60px rgba(8, 15, 28, 0.18)'
                     } 
                 }}
             >
                 <DialogTitle sx={{ 
                     p: 0,
                     position: 'relative',
-                    bgcolor: 'background.paper',
-                    borderBottom: '1px solid',
-                    borderColor: 'divider'
+                    bgcolor: '#FFFFFF',
+                    borderBottom: '1px solid #E1E4EA'
                 }}>
                     <Box sx={{ p: 2.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                             <Box sx={{ 
-                                width: 44, 
-                                height: 44, 
-                                borderRadius: '12px', 
-                                bgcolor: (t) => `${t.palette.primary.main}14`,
+                                width: 42, 
+                                height: 42, 
+                                borderRadius: '10px', 
+                                bgcolor: '#F4F5F7',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                border: '1px solid',
-                                borderColor: (t) => `${t.palette.primary.main}26`
+                                border: '1px solid #E1E4EA'
                             }}>
-                                <PersonAdd sx={{ color: 'primary.main', fontSize: 24 }} />
+                                <PersonAdd sx={{ color: '#080F1C', fontSize: 22 }} />
                             </Box>
                             <Box>
-                                <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.2, letterSpacing: '-0.01em' }}>
+                                <Typography variant="h6" sx={{ fontWeight: 750, color: '#080F1C', lineHeight: 1.2, letterSpacing: '-0.01em', fontSize: '1.05rem' }}>
                                     {editCustomer ? 'Update Guest Profile' : 'Register New Atelier Guest'}
                                 </Typography>
-                                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25 }}>
-                                    <AutoAwesome sx={{ fontSize: 13, color: 'primary.main' }} />
+                                <Typography variant="caption" sx={{ color: '#66707B', fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25 }}>
+                                    <AutoAwesome sx={{ fontSize: 13, color: '#6F4CED' }} />
                                     VIP Clientele & Tailoring Bespoke Registry
                                 </Typography>
                             </Box>
@@ -1169,9 +1184,10 @@ const Customers = () => {
                             onClick={() => setOpen(false)} 
                             size="small" 
                             sx={{ 
-                                color: 'text.secondary',
-                                bgcolor: 'transparent',
-                                '&:hover': { bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)' }
+                                color: '#66707B',
+                                bgcolor: '#FAFCFA',
+                                border: '1px solid #E1E4EA',
+                                '&:hover': { bgcolor: '#F4F5F7', color: '#080F1C' }
                             }}
                         >
                             <Close fontSize="small" />
@@ -1179,11 +1195,11 @@ const Customers = () => {
                     </Box>
                 </DialogTitle>
 
-                <DialogContent sx={{ p: { xs: 2, sm: 3 }, bgcolor: (t) => t.palette.mode === 'dark' ? 'background.default' : '#FBFBFB' }}>
+                <DialogContent sx={{ p: { xs: 2, sm: 3 }, bgcolor: '#ECEEF2' }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
                         {/* Section 1: Guest Identity */}
-                        <Box sx={{ p: 2, bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#FFFFFF', borderRadius: 2.5, border: '1px solid', borderColor: 'divider', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-                            <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: (t) => t.palette.primary.main, mb: 1.5, display: 'block' }}>
+                        <Box sx={{ p: 2, bgcolor: '#FFFFFF', borderRadius: '14px', border: '1px solid #E1E4EA', boxShadow: '0 1px 3px rgba(8, 15, 28, 0.04)' }}>
+                            <Typography variant="caption" sx={{ fontWeight: 750, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#080F1C', mb: 1.5, display: 'block' }}>
                                 Primary Contact & Identity
                             </Typography>
                             <Grid container spacing={2}>
@@ -1200,11 +1216,11 @@ const Customers = () => {
                                         InputProps={{
                                             startAdornment: (
                                                 <InputAdornment position="start">
-                                                    <Person sx={{ fontSize: 18, color: 'text.secondary' }} />
+                                                    <Person sx={{ fontSize: 18, color: '#66707B' }} />
                                                 </InputAdornment>
                                             )
                                         }}
-                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
                                         placeholder="e.g. Ayesha Khan"
                                     />
                                 </Grid>
@@ -1218,11 +1234,11 @@ const Customers = () => {
                                         InputProps={{
                                             startAdornment: (
                                                 <InputAdornment position="start">
-                                                    <Phone sx={{ fontSize: 18, color: 'text.secondary' }} />
+                                                    <Phone sx={{ fontSize: 18, color: '#66707B' }} />
                                                 </InputAdornment>
                                             )
                                         }}
-                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
                                         placeholder="+91 9876543210"
                                     />
                                 </Grid>
@@ -1236,11 +1252,11 @@ const Customers = () => {
                                         InputProps={{
                                             startAdornment: (
                                                 <InputAdornment position="start">
-                                                    <Email sx={{ fontSize: 18, color: 'text.secondary' }} />
+                                                    <Email sx={{ fontSize: 18, color: '#66707B' }} />
                                                 </InputAdornment>
                                             )
                                         }}
-                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
                                         placeholder="client@luxury.com"
                                     />
                                 </Grid>
@@ -1248,8 +1264,8 @@ const Customers = () => {
                         </Box>
 
                         {/* Section 2: Residential & Bespoke Preferences */}
-                        <Box sx={{ p: 2, bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#FFFFFF', borderRadius: 2.5, border: '1px solid', borderColor: 'divider', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-                            <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: (t) => t.palette.primary.main, mb: 1.5, display: 'block' }}>
+                        <Box sx={{ p: 2, bgcolor: '#FFFFFF', borderRadius: '14px', border: '1px solid #E1E4EA', boxShadow: '0 1px 3px rgba(8, 15, 28, 0.04)' }}>
+                            <Typography variant="caption" sx={{ fontWeight: 750, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#080F1C', mb: 1.5, display: 'block' }}>
                                 Atelier Concierge & Styling Notes
                             </Typography>
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
@@ -1261,7 +1277,7 @@ const Customers = () => {
                                     rows={2}
                                     value={formData.address}
                                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
                                     placeholder="Villa / Suite, Street, City, Pincode"
                                 />
                                 <TextField
@@ -1273,7 +1289,7 @@ const Customers = () => {
                                     value={formData.notes}
                                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                                     placeholder="e.g. Prefers Pure Katan Silk, loves antique gold zardozi borders, measurements on file"
-                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
                                 />
                             </Box>
                         </Box>
@@ -1281,20 +1297,20 @@ const Customers = () => {
                         {/* VIP Hospitality Banner */}
                         <Box sx={{
                             p: 1.5,
-                            borderRadius: 2,
+                            borderRadius: '12px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
-                            bgcolor: 'rgba(217, 119, 6, 0.08)',
-                            border: '1px solid rgba(217, 119, 6, 0.25)'
+                            bgcolor: '#FEF8EB',
+                            border: '1px solid rgba(206, 143, 11, 0.25)'
                         }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <Stars sx={{ color: '#D97706', fontSize: 20 }} />
+                                <Stars sx={{ color: '#CE8F0B', fontSize: 20 }} />
                                 <Box>
-                                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#B45309', display: 'block' }}>
+                                    <Typography variant="caption" sx={{ fontWeight: 750, color: '#CE8F0B', display: 'block' }}>
                                         Automatic VIP Loyalty Enrollment
                                     </Typography>
-                                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem' }}>
+                                    <Typography variant="caption" sx={{ color: '#66707B', fontSize: '0.68rem' }}>
                                         Guest is immediately enrolled in Atelier Bronze Tier with points accrued on billing.
                                     </Typography>
                                 </Box>
@@ -1305,23 +1321,26 @@ const Customers = () => {
                                 sx={{ 
                                     height: 22, 
                                     fontSize: '0.65rem', 
-                                    fontWeight: 800, 
-                                    bgcolor: '#D97706', 
-                                    color: '#FFFFFF' 
+                                    fontWeight: 750, 
+                                    bgcolor: '#CE8F0B', 
+                                    color: '#FFFFFF',
+                                    borderRadius: '9999px'
                                 }} 
                             />
                         </Box>
                     </Box>
                 </DialogContent>
 
-                <DialogActions sx={{ p: 2.5, bgcolor: (t) => t.palette.mode === 'dark' ? 'background.default' : '#FFFFFF', borderTop: '1px solid', borderColor: 'divider', justifyContent: 'space-between' }}>
+                <DialogActions sx={{ p: 2.5, bgcolor: '#FFFFFF', borderTop: '1px solid #E1E4EA', justifyContent: 'space-between' }}>
                     <Button 
                         onClick={() => setOpen(false)} 
                         sx={{ 
-                            fontWeight: 700, 
-                            color: 'text.secondary',
+                            fontWeight: 650, 
+                            color: '#66707B',
                             textTransform: 'none',
-                            px: 2
+                            px: 2.5,
+                            borderRadius: '9999px',
+                            '&:hover': { bgcolor: '#F4F5F7', color: '#080F1C' }
                         }}
                     >
                         Cancel
@@ -1331,13 +1350,16 @@ const Customers = () => {
                         onClick={handleSave} 
                         sx={{ 
                             px: 3.5, 
-                            py: 1,
-                            borderRadius: 2.5, 
-                            fontWeight: 800,
+                            py: 0.9,
+                            borderRadius: '9999px', 
+                            fontWeight: 700,
                             textTransform: 'none',
                             color: '#FFFFFF',
-                            boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
-                            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.primary.main} 100%)`
+                            bgcolor: '#080F1C',
+                            boxShadow: '0 2px 8px rgba(8, 15, 28, 0.16)',
+                            '&:hover': {
+                                bgcolor: '#1D2531'
+                            }
                         }}
                     >
                         {editCustomer ? 'Update Guest Profile' : 'Save Guest Details'}
@@ -1352,80 +1374,121 @@ const Customers = () => {
                 maxWidth="xs" 
                 fullWidth 
                 fullScreen={isMobile}
-                PaperProps={{ sx: { borderRadius: isMobile ? 0 : 4 } }}
+                PaperProps={{ 
+                    sx: { 
+                        borderRadius: isMobile ? 0 : '18px',
+                        border: '1px solid #E1E4EA',
+                        boxShadow: '0 24px 60px rgba(8, 15, 28, 0.18)'
+                    } 
+                }}
             >
                 <DialogTitle sx={{ 
-                    fontWeight: 800, 
+                    fontWeight: 750, 
                     display: 'flex', 
                     alignItems: 'center', 
-                    gap: 1,
-                    bgcolor: 'rgba(5, 150, 105, 0.05)',
-                    borderBottom: '1px solid',
-                    borderColor: 'divider',
-                    color: 'text.primary'
+                    gap: 1.25,
+                    bgcolor: '#FFFFFF',
+                    borderBottom: '1px solid #E1E4EA',
+                    color: '#080F1C',
+                    fontSize: '1rem',
+                    p: 2.5
                 }}>
-                    <Payments sx={{ color: '#059669' }} /> Settle Balance Due
+                    <Box sx={{
+                        width: 34,
+                        height: 34,
+                        borderRadius: '50%',
+                        bgcolor: '#E7F2EA',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#2A875B'
+                    }}>
+                        <Payments sx={{ fontSize: 18 }} />
+                    </Box>
+                    Settle Balance Due
                 </DialogTitle>
-                <DialogContent sx={{ pt: 2.5 }}>
-                    <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
-                        Collect outstanding balance from <strong>{customers.find(c => c.id === selectedCustomerForPayment)?.name}</strong>
-                    </Typography>
-                    <TextField
-                        fullWidth 
-                        label="Amount Received (₹) *" 
-                        margin="normal" 
-                        type="number"
-                        value={paymentData.amount}
-                        onChange={(e) => setPaymentData({ ...paymentData, amount: e.target.value })}
-                        InputProps={{ startAdornment: <CurrencyRupee sx={{ fontSize: 16, mr: 0.5, color: (t) => t.palette.primary.main }} /> }}
-                    />
-                    <FormControl fullWidth margin="normal">
-                        <InputLabel>Payment Tender</InputLabel>
-                        <Select
-                            value={paymentData.method}
-                            label="Payment Tender"
-                            onChange={(e) => setPaymentData({ ...paymentData, method: e.target.value })}
-                        >
-                            <MenuItem value="Cash">Cash</MenuItem>
-                            <MenuItem value="UPI">UPI / QR Transfer</MenuItem>
-                            <MenuItem value="Bank Transfer">Bank NEFT / IMPS</MenuItem>
-                            <MenuItem value="Card">Card</MenuItem>
-                            <MenuItem value="Cheque">Cheque</MenuItem>
-                        </Select>
-                    </FormControl>
-                    {(paymentData.method === 'UPI' || paymentData.method === 'Bank Transfer') && (
+                <DialogContent sx={{ pt: 2.5, bgcolor: '#ECEEF2' }}>
+                    <Box sx={{ p: 2, bgcolor: '#FFFFFF', borderRadius: '14px', border: '1px solid #E1E4EA', my: 1, boxShadow: '0 1px 3px rgba(8, 15, 28, 0.04)' }}>
+                        <Typography variant="body2" sx={{ mb: 2, color: '#66707B', fontSize: '0.84rem' }}>
+                            Collect outstanding balance from <strong style={{ color: '#080F1C' }}>{customers.find(c => c.id === selectedCustomerForPayment)?.name}</strong>
+                        </Typography>
                         <TextField
                             fullWidth 
-                            label="Transaction / UTR Reference ID" 
-                            margin="normal"
-                            value={paymentData.transactionId}
-                            onChange={(e) => setPaymentData({ ...paymentData, transactionId: e.target.value })}
+                            size="small"
+                            label="Amount Received (₹) *" 
+                            margin="normal" 
+                            type="number"
+                            value={paymentData.amount}
+                            onChange={(e) => setPaymentData({ ...paymentData, amount: e.target.value })}
+                            InputProps={{ startAdornment: <CurrencyRupee sx={{ fontSize: 16, mr: 0.5, color: '#080F1C' }} /> }}
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
                         />
-                    )}
-                    <TextField
-                        fullWidth 
-                        label="Audit Note" 
-                        margin="normal" 
-                        multiline 
-                        rows={2}
-                        value={paymentData.note}
-                        onChange={(e) => setPaymentData({ ...paymentData, note: e.target.value })}
-                        placeholder="e.g. Received via GPay at fitting appointment"
-                    />
+                        <FormControl fullWidth size="small" margin="normal">
+                            <InputLabel>Payment Tender</InputLabel>
+                            <Select
+                                value={paymentData.method}
+                                label="Payment Tender"
+                                onChange={(e) => setPaymentData({ ...paymentData, method: e.target.value })}
+                                sx={{ borderRadius: '10px' }}
+                            >
+                                <MenuItem value="Cash">Cash</MenuItem>
+                                <MenuItem value="UPI">UPI / QR Transfer</MenuItem>
+                                <MenuItem value="Bank Transfer">Bank NEFT / IMPS</MenuItem>
+                                <MenuItem value="Card">Card</MenuItem>
+                                <MenuItem value="Cheque">Cheque</MenuItem>
+                            </Select>
+                        </FormControl>
+                        {(paymentData.method === 'UPI' || paymentData.method === 'Bank Transfer') && (
+                            <TextField
+                                fullWidth 
+                                size="small"
+                                label="Transaction / UTR Reference ID" 
+                                margin="normal"
+                                value={paymentData.transactionId}
+                                onChange={(e) => setPaymentData({ ...paymentData, transactionId: e.target.value })}
+                                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
+                            />
+                        )}
+                        <TextField
+                            fullWidth 
+                            size="small"
+                            label="Audit Note" 
+                            margin="normal" 
+                            multiline 
+                            rows={2}
+                            value={paymentData.note}
+                            onChange={(e) => setPaymentData({ ...paymentData, note: e.target.value })}
+                            placeholder="e.g. Received via GPay at fitting appointment"
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
+                        />
+                    </Box>
                 </DialogContent>
-                <DialogActions sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider' }}>
-                    <Button onClick={() => setPaymentDialogOpen(false)} sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                <DialogActions sx={{ p: 2.5, borderTop: '1px solid #E1E4EA', bgcolor: '#FFFFFF' }}>
+                    <Button 
+                        onClick={() => setPaymentDialogOpen(false)} 
+                        sx={{ 
+                            fontWeight: 650, 
+                            color: '#66707B',
+                            textTransform: 'none',
+                            borderRadius: '9999px',
+                            px: 2.5,
+                            '&:hover': { bgcolor: '#F4F5F7', color: '#080F1C' }
+                        }}
+                    >
                         Cancel
                     </Button>
                     <Button 
                         variant="contained" 
                         onClick={handleRecordPayment} 
                         sx={{ 
-                            px: 3.5, 
-                            borderRadius: 2.5, 
+                            px: 3, 
+                            borderRadius: '9999px', 
                             fontWeight: 700,
-                            bgcolor: '#059669',
-                            '&:hover': { bgcolor: '#047857' }
+                            textTransform: 'none',
+                            bgcolor: '#080F1C',
+                            color: '#FFFFFF',
+                            boxShadow: '0 2px 8px rgba(8, 15, 28, 0.16)',
+                            '&:hover': { bgcolor: '#1D2531' }
                         }}
                     >
                         Confirm Settlement
@@ -1465,101 +1528,140 @@ const Customers = () => {
                 maxWidth="sm"
                 fullWidth
                 PaperProps={{
-                    sx: { borderRadius: 3 }
+                    sx: { 
+                        borderRadius: '18px',
+                        border: '1px solid #E1E4EA',
+                        boxShadow: '0 24px 60px rgba(8, 15, 28, 0.18)',
+                        overflow: 'hidden'
+                    }
                 }}
             >
                 <DialogTitle sx={{ 
                     display: 'flex', 
                     alignItems: 'center', 
                     justifyContent: 'space-between',
-                    borderBottom: '1px solid',
-                    borderColor: 'divider',
-                    pb: 2
+                    bgcolor: '#FFFFFF',
+                    borderBottom: '1px solid #E1E4EA',
+                    p: 2.5
                 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
                         <Box sx={{
                             width: 38,
                             height: 38,
                             borderRadius: '50%',
-                            bgcolor: 'rgba(37, 211, 102, 0.12)',
+                            bgcolor: '#E7F2EA',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            color: '#25D366'
+                            color: '#2A875B'
                         }}>
-                            <WhatsApp />
+                            <WhatsApp sx={{ fontSize: 20 }} />
                         </Box>
                         <Box>
-                            <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 750, color: '#080F1C', fontSize: '0.98rem' }}>
                                 WhatsApp Client Dispatch
                             </Typography>
-                            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                            <Typography variant="caption" sx={{ color: '#66707B', fontWeight: 550, fontSize: '0.74rem' }}>
                                 {whatsAppCustomer?.name} • {whatsAppCustomer?.phone}
                             </Typography>
                         </Box>
                     </Box>
-                    <IconButton size="small" onClick={() => setWhatsAppModalOpen(false)}>
+                    <IconButton 
+                        size="small" 
+                        onClick={() => setWhatsAppModalOpen(false)}
+                        sx={{
+                            color: '#66707B',
+                            bgcolor: '#FAFCFA',
+                            border: '1px solid #E1E4EA',
+                            '&:hover': { bgcolor: '#F4F5F7', color: '#080F1C' }
+                        }}
+                    >
                         <Clear fontSize="small" />
                     </IconButton>
                 </DialogTitle>
 
-                <DialogContent sx={{ pt: 2.5 }}>
-                    <Typography variant="caption" sx={{ fontWeight: 800, textTransform: 'uppercase', color: 'text.secondary', letterSpacing: '0.04em', mb: 1, display: 'block' }}>
-                        Select Campaign / Message Template
-                    </Typography>
-                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2.5 }}>
-                        {[
-                            { id: 'loyalty', label: '🎁 Loyalty Rewards', desc: 'Points balance & tier' },
-                            { id: 'fitting', label: '📏 Fitting Ready', desc: 'Trial pickup alert' },
-                            { id: 'festive', label: '🌟 Festive VIP', desc: 'New collection preview' },
-                            { id: 'due', label: '📋 Balance Due', desc: 'Pending settlement' },
-                            { id: 'greeting', label: '💬 General Note', desc: 'Styling check-in' },
-                        ].map((tpl) => (
-                            <Chip
-                                key={tpl.id}
-                                label={tpl.label}
-                                clickable
-                                color={whatsAppTemplate === tpl.id ? 'primary' : 'default'}
-                                variant={whatsAppTemplate === tpl.id ? 'filled' : 'outlined'}
-                                onClick={() => {
-                                    setWhatsAppTemplate(tpl.id);
-                                    setWhatsAppCustomText(getWhatsAppTemplateText(whatsAppCustomer, tpl.id));
-                                }}
-                                sx={{
-                                    fontWeight: 700,
-                                    fontSize: '0.75rem',
-                                    borderRadius: 2
-                                }}
-                            />
-                        ))}
-                    </Box>
+                <DialogContent sx={{ p: 2.5, bgcolor: '#ECEEF2' }}>
+                    <Box sx={{ p: 2, bgcolor: '#FFFFFF', borderRadius: '14px', border: '1px solid #E1E4EA', my: 1, boxShadow: '0 1px 3px rgba(8, 15, 28, 0.04)' }}>
+                        <Typography variant="caption" sx={{ fontWeight: 750, textTransform: 'uppercase', color: '#080F1C', letterSpacing: '0.04em', mb: 1.25, display: 'block' }}>
+                            Select Campaign / Message Template
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2.5 }}>
+                            {[
+                                { id: 'loyalty', label: '🎁 Loyalty Rewards', desc: 'Points balance & tier' },
+                                { id: 'fitting', label: '📏 Fitting Ready', desc: 'Trial pickup alert' },
+                                { id: 'festive', label: '🌟 Festive VIP', desc: 'New collection preview' },
+                                { id: 'due', label: '📋 Balance Due', desc: 'Pending settlement' },
+                                { id: 'greeting', label: '💬 General Note', desc: 'Styling check-in' },
+                            ].map((tpl) => {
+                                const isSelected = whatsAppTemplate === tpl.id;
+                                return (
+                                    <Chip
+                                        key={tpl.id}
+                                        label={tpl.label}
+                                        clickable
+                                        onClick={() => {
+                                            setWhatsAppTemplate(tpl.id);
+                                            setWhatsAppCustomText(getWhatsAppTemplateText(whatsAppCustomer, tpl.id));
+                                        }}
+                                        sx={{
+                                            fontWeight: isSelected ? 700 : 550,
+                                            fontSize: '0.74rem',
+                                            borderRadius: '9999px',
+                                            height: 28,
+                                            bgcolor: isSelected ? '#080F1C' : '#FAFCFA',
+                                            color: isSelected ? '#FFFFFF' : '#66707B',
+                                            border: '1px solid',
+                                            borderColor: isSelected ? '#080F1C' : '#E1E4EA',
+                                            '&:hover': {
+                                                bgcolor: isSelected ? '#1D2531' : '#F4F5F7',
+                                                borderColor: isSelected ? '#1D2531' : '#080F1C'
+                                            }
+                                        }}
+                                    />
+                                );
+                            })}
+                        </Box>
 
-                    <TextField
-                        label="Message Preview (Editable)"
-                        fullWidth
-                        multiline
-                        rows={5}
-                        value={whatsAppCustomText}
-                        onChange={(e) => setWhatsAppCustomText(e.target.value)}
-                        helperText="Will open directly in WhatsApp Web or desktop/mobile app."
-                    />
+                        <TextField
+                            label="Message Preview (Editable)"
+                            fullWidth
+                            multiline
+                            rows={5}
+                            value={whatsAppCustomText}
+                            onChange={(e) => setWhatsAppCustomText(e.target.value)}
+                            helperText="Will open directly in WhatsApp Web or desktop/mobile app."
+                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
+                        />
+                    </Box>
                 </DialogContent>
 
-                <DialogActions sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider' }}>
-                    <Button onClick={() => setWhatsAppModalOpen(false)} sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                <DialogActions sx={{ p: 2.5, borderTop: '1px solid #E1E4EA', bgcolor: '#FFFFFF' }}>
+                    <Button 
+                        onClick={() => setWhatsAppModalOpen(false)} 
+                        sx={{ 
+                            fontWeight: 650, 
+                            color: '#66707B',
+                            textTransform: 'none',
+                            borderRadius: '9999px',
+                            px: 2.5,
+                            '&:hover': { bgcolor: '#F4F5F7', color: '#080F1C' }
+                        }}
+                    >
                         Cancel
                     </Button>
                     <Button
                         variant="contained"
                         onClick={handleSendWhatsApp}
-                        startIcon={<WhatsApp />}
+                        startIcon={<WhatsApp sx={{ fontSize: 17 }} />}
                         sx={{
                             px: 3,
-                            borderRadius: 2,
+                            borderRadius: '9999px',
                             fontWeight: 700,
-                            bgcolor: '#25D366',
-                            color: '#fff',
-                            '&:hover': { bgcolor: '#128C7E' }
+                            textTransform: 'none',
+                            bgcolor: '#2A875B',
+                            color: '#FFFFFF',
+                            boxShadow: '0 2px 8px rgba(42, 135, 91, 0.25)',
+                            '&:hover': { bgcolor: '#23734D' }
                         }}
                     >
                         Send via WhatsApp
