@@ -104,9 +104,9 @@ export default function PairCustomerDisplayModal({
       fullWidth
       PaperProps={{
         sx: {
-          width: { xs: '100%', sm: 860, md: 890 },
-          maxWidth: '94vw',
-          borderRadius: '18px',
+          width: { xs: '100%', sm: 880, md: 920 },
+          maxWidth: '96vw',
+          borderRadius: '20px',
           overflow: 'hidden',
           bgcolor: 'background.paper',
           color: 'text.primary',
@@ -172,7 +172,7 @@ export default function PairCustomerDisplayModal({
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: '340px 1fr' },
+            gridTemplateColumns: { xs: '1fr', md: '360px 1fr' },
             gap: 2.5,
             alignItems: 'stretch'
           }}
@@ -233,7 +233,8 @@ export default function PairCustomerDisplayModal({
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
                 gap: 1.25,
-                mt: 'auto'
+                mt: 'auto',
+                pt: 1.5
               }}
             >
               <Button
@@ -290,29 +291,41 @@ export default function PairCustomerDisplayModal({
             </Box>
           </Paper>
 
-          {/* Right Column: Connection details & Wi-Fi Setup */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 2 }}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {/* Right Column: Connection details & Wi-Fi Setup (Matching Outer Paper Card) */}
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2.5,
+              borderRadius: '16px',
+              bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#F9FAFC',
+              border: '1px solid',
+              borderColor: 'divider',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between'
+            }}
+          >
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               {/* Cloud Realtime Status Banner (Horizontally and Vertically Balanced) */}
               <Box
                 sx={{
                   px: 2,
-                  py: 1.5,
+                  py: 1.25,
                   borderRadius: '12px',
-                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(16, 185, 129, 0.08)',
+                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.12)' : '#ECFDF5',
                   border: '1px solid',
-                  borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(16, 185, 129, 0.25)',
+                  borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.3)' : '#A7F3D0',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   gap: 1.5
                 }}
               >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, minWidth: 0 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, minWidth: 0, flex: 1 }}>
                   <Box
                     sx={{
-                      width: 9,
-                      height: 9,
+                      width: 8,
+                      height: 8,
                       borderRadius: '50%',
                       bgcolor: '#10B981',
                       boxShadow: '0 0 8px #10B981',
@@ -324,8 +337,8 @@ export default function PairCustomerDisplayModal({
                       variant="subtitle2"
                       sx={{
                         fontWeight: 800,
-                        fontSize: '0.84rem',
-                        color: (t) => t.palette.mode === 'dark' ? '#34D399' : '#047857',
+                        fontSize: '0.82rem',
+                        color: (t) => t.palette.mode === 'dark' ? '#34D399' : '#065F46',
                         lineHeight: 1.2,
                         whiteSpace: 'nowrap'
                       }}
@@ -335,9 +348,9 @@ export default function PairCustomerDisplayModal({
                     <Typography
                       variant="caption"
                       sx={{
-                        color: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : '#065F46',
+                        color: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : '#047857',
                         display: 'block',
-                        fontSize: '0.72rem',
+                        fontSize: '0.7rem',
                         mt: 0.25,
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
@@ -354,26 +367,26 @@ export default function PairCustomerDisplayModal({
                   variant="outlined"
                   onClick={handleSendTestPing}
                   disabled={isPinging}
-                  startIcon={<Sensors sx={{ fontSize: 15 }} />}
+                  startIcon={<Sensors sx={{ fontSize: 14 }} />}
                   sx={{
                     color: (t) => t.palette.mode === 'dark' ? '#34D399' : '#047857',
-                    borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(52, 211, 153, 0.4)' : 'rgba(16, 185, 129, 0.35)',
-                    bgcolor: 'background.paper',
+                    borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(52, 211, 153, 0.4)' : '#6EE7B7',
+                    bgcolor: '#FFFFFF',
                     textTransform: 'none',
                     fontWeight: 700,
-                    fontSize: '0.74rem',
-                    height: 32,
+                    fontSize: '0.72rem',
+                    height: 30,
                     borderRadius: '9999px',
                     px: 1.5,
                     whiteSpace: 'nowrap',
                     flexShrink: 0,
                     '&:hover': {
                       borderColor: '#10B981',
-                      bgcolor: 'rgba(16, 185, 129, 0.12)'
+                      bgcolor: '#F0FDF4'
                     }
                   }}
                 >
-                  {isPinging ? 'Pinging...' : pingSuccess ? 'Ping Sent! ✓' : 'Send Test Pulse'}
+                  {isPinging ? 'Pinging…' : pingSuccess ? 'Ping Sent! ✓' : 'Send Test Pulse'}
                 </Button>
               </Box>
 
@@ -382,6 +395,7 @@ export default function PairCustomerDisplayModal({
                 <Box
                   sx={{
                     p: 2,
+                    mt: 1.5,
                     borderRadius: '12px',
                     bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(245, 158, 11, 0.08)',
                     border: '1px solid',
@@ -444,12 +458,13 @@ export default function PairCustomerDisplayModal({
               )}
 
               {/* How it works */}
-              <Paper
-                variant="outlined"
+              <Box
                 sx={{
                   p: 2,
-                  borderRadius: '14px',
-                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#F9FAFC',
+                  my: 1.5,
+                  borderRadius: '12px',
+                  bgcolor: '#FFFFFF',
+                  border: '1px solid',
                   borderColor: 'divider'
                 }}
               >
@@ -461,6 +476,7 @@ export default function PairCustomerDisplayModal({
                     fontWeight: 800,
                     textTransform: 'uppercase',
                     display: 'block',
+                    fontSize: '0.68rem',
                     mb: 1.5
                   }}
                 >
@@ -475,51 +491,51 @@ export default function PairCustomerDisplayModal({
                     <Box key={step.num} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
                       <Box
                         sx={{
-                          width: 22,
-                          height: 22,
+                          width: 20,
+                          height: 20,
                           borderRadius: '50%',
                           bgcolor: '#080F1C',
                           color: '#FFFFFF',
-                          fontSize: '0.72rem',
+                          fontSize: '0.7rem',
                           fontWeight: 800,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           flexShrink: 0,
-                          mt: 0.2
+                          mt: 0.1
                         }}
                       >
                         {step.num}
                       </Box>
                       <Box>
-                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary', display: 'block', lineHeight: 1.3 }}>
+                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary', display: 'block', lineHeight: 1.3, fontSize: '0.76rem' }}>
                           {step.title}
                         </Typography>
-                        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.78rem', lineHeight: 1.4 }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem', lineHeight: 1.4 }}>
                           {step.desc}
                         </Typography>
                       </Box>
                     </Box>
                   ))}
                 </Stack>
-              </Paper>
+              </Box>
             </Box>
 
-            {/* Target URL Preview (Matching 38px Height with Left Column Buttons) */}
+            {/* Target URL Preview (Matching 38px Height and Grid Baseline with Left Column Buttons) */}
             <Box
               sx={{
                 px: 1.75,
-                py: 0.5,
                 borderRadius: '10px',
-                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#F4F5F7',
+                bgcolor: '#FFFFFF',
                 border: '1px solid',
                 borderColor: 'divider',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 gap: 1,
-                minHeight: 38,
-                boxSizing: 'border-box'
+                height: 38,
+                boxSizing: 'border-box',
+                mt: 'auto'
               }}
             >
               <Box sx={{ minWidth: 0, flex: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -533,7 +549,7 @@ export default function PairCustomerDisplayModal({
                     fontFamily: 'monospace',
                     color: 'text.primary',
                     fontWeight: 600,
-                    fontSize: '0.76rem',
+                    fontSize: '0.74rem',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis'
                   }}
@@ -545,7 +561,7 @@ export default function PairCustomerDisplayModal({
                 {copied ? <Check sx={{ fontSize: 16 }} /> : <ContentCopy sx={{ fontSize: 16 }} />}
               </IconButton>
             </Box>
-          </Box>
+          </Paper>
         </Box>
       </DialogContent>
 
