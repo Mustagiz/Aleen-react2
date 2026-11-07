@@ -887,76 +887,181 @@ const Dashboard = () => {
                 <Typography variant="body2" color="text.secondary">No invoices issued yet.</Typography>
               </Box>
             ) : (
-              <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
-                <Box
-                  sx={{
-                    px: 2,
-                    py: 0.75,
-                    display: 'grid',
-                    gridTemplateColumns: { xs: '44px 1fr auto', sm: '44px 1.1fr 1.3fr 44px 88px 74px' },
-                    gap: 1,
-                    alignItems: 'center',
-                    borderBottom: '1px solid',
-                    borderColor: 'divider',
-                    bgcolor: isDark ? 'rgba(255, 255, 255, 0.03)' : '#F9F9FC'
-                  }}
-                >
-                  {['#', 'Date', 'Customer', 'Items', 'Total', 'Payment'].map((col, i) => (
-                    <Typography
-                      key={col}
-                      variant="caption"
-                      sx={{
-                        fontWeight: 700,
-                        color: 'text.secondary',
-                        fontSize: '0.68rem',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.06em',
-                        display: { xs: i === 0 || i === 2 || i === 4 ? 'block' : 'none', sm: 'block' }
-                      }}
-                    >
-                      {col}
-                    </Typography>
-                  ))}
-                </Box>
-
-                {recentInvoices.map((inv, index) => (
+              <Box sx={{ flexGrow: 1, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                <Box sx={{ minWidth: { xs: 340, sm: 480 } }}>
+                  {/* Table Header */}
                   <Box
-                    key={inv.id}
                     sx={{
-                      px: 2,
-                      py: 0.9,
+                      px: { xs: 1.5, sm: 2 },
+                      py: 1,
                       display: 'grid',
-                      gridTemplateColumns: { xs: '44px 1fr auto', sm: '44px 1.1fr 1.3fr 44px 88px 74px' },
-                      gap: 1,
+                      gridTemplateColumns: { xs: '110px 1.2fr 85px', sm: '115px 95px 1.2fr 44px 90px 70px' },
+                      gap: 1.5,
                       alignItems: 'center',
-                      borderBottom: index !== recentInvoices.length - 1 ? '1px solid' : 'none',
+                      borderBottom: '1px solid',
                       borderColor: 'divider',
-                      transition: 'background 0.2s',
-                      cursor: 'pointer',
-                      '&:hover': { bgcolor: 'action.hover' }
+                      bgcolor: isDark ? 'rgba(255, 255, 255, 0.03)' : '#F9F9FC'
                     }}
-                    onClick={() => navigate('/invoices')}
                   >
-                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', fontVariantNumeric: 'tabular-nums' }}>
-                      #{inv.invoiceNumber || inv.id}
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                      # Order
                     </Typography>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem', display: { xs: 'none', sm: 'block' } }} noWrap>
-                      {inv.date ? new Date(inv.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : 'Recent'} · {inv.date ? new Date(inv.date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '—'}
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.06em', display: { xs: 'none', sm: 'block' } }}>
+                      Date
                     </Typography>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.82rem' }} noWrap>
-                      {inv.customer || 'Walk-in Patron'}
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                      Customer
                     </Typography>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontVariantNumeric: 'tabular-nums', display: { xs: 'none', sm: 'block' } }}>
-                      {inv.items?.length || 1}
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'center', display: { xs: 'none', sm: 'block' } }}>
+                      Items
                     </Typography>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'primary.main', fontVariantNumeric: 'tabular-nums', fontSize: '0.82rem' }}>
-                      ₹{Number(inv.total || 0).toLocaleString('en-IN')}
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'right' }}>
+                      Total
                     </Typography>
-                    <Typography variant="caption" sx={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--emerald-primary)', display: { xs: 'none', sm: 'block' } }} noWrap>
-                      {inv.paymentMethod || 'Cash'}
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'right', display: { xs: 'none', sm: 'block' } }}>
+                      Payment
                     </Typography>
                   </Box>
-                ))}
+
+                  {/* Table Rows */}
+                  {recentInvoices.map((inv, index) => (
+                    <Box
+                      key={inv.id}
+                      sx={{
+                        px: { xs: 1.5, sm: 2 },
+                        py: 1.1,
+                        display: 'grid',
+                        gridTemplateColumns: { xs: '110px 1.2fr 85px', sm: '115px 95px 1.2fr 44px 90px 70px' },
+                        gap: 1.5,
+                        alignItems: 'center',
+                        borderBottom: index !== recentInvoices.length - 1 ? '1px solid' : 'none',
+                        borderColor: 'divider',
+                        transition: 'background 0.18s ease',
+                        cursor: 'pointer',
+                        '&:hover': { bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(8, 15, 28, 0.03)' }
+                      }}
+                      onClick={() => navigate('/invoices')}
+                    >
+                      {/* 1. Order ID & mobile timestamp */}
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            fontWeight: 800,
+                            color: 'text.primary',
+                            fontVariantNumeric: 'tabular-nums',
+                            letterSpacing: '-0.02em',
+                            fontSize: '0.76rem',
+                            display: 'block'
+                          }}
+                          noWrap
+                        >
+                          #{inv.invoiceNumber || inv.id}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: 'text.secondary',
+                            fontSize: '0.65rem',
+                            display: { xs: 'block', sm: 'none' }
+                          }}
+                          noWrap
+                        >
+                          {inv.date ? new Date(inv.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}
+                        </Typography>
+                      </Box>
+
+                      {/* 2. Date & Time (tablet / iPad / desktop) */}
+                      <Box sx={{ display: { xs: 'none', sm: 'block' }, minWidth: 0 }}>
+                        <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.primary', fontSize: '0.74rem', display: 'block' }} noWrap>
+                          {inv.date ? new Date(inv.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : 'Recent'}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.66rem', display: 'block' }} noWrap>
+                          {inv.date ? new Date(inv.date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '—'}
+                        </Typography>
+                      </Box>
+
+                      {/* 3. Customer Name */}
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: '0.82rem',
+                          color: 'text.primary',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}
+                        noWrap
+                      >
+                        {inv.customer || 'Walk-in Patron'}
+                      </Typography>
+
+                      {/* 4. Item Count */}
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: 'text.secondary',
+                          fontWeight: 600,
+                          textAlign: 'center',
+                          fontVariantNumeric: 'tabular-nums',
+                          fontSize: '0.76rem',
+                          display: { xs: 'none', sm: 'block' }
+                        }}
+                      >
+                        {inv.items?.length || 1}
+                      </Typography>
+
+                      {/* 5. Total Amount */}
+                      <Box sx={{ textAlign: 'right', minWidth: 0 }}>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{
+                            fontWeight: 800,
+                            color: 'text.primary',
+                            fontVariantNumeric: 'tabular-nums',
+                            fontSize: '0.82rem'
+                          }}
+                          noWrap
+                        >
+                          ₹{Number(inv.total || 0).toLocaleString('en-IN')}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            fontSize: '0.64rem',
+                            fontWeight: 700,
+                            color: 'success.main',
+                            display: { xs: 'block', sm: 'none' },
+                            textTransform: 'uppercase'
+                          }}
+                          noWrap
+                        >
+                          {inv.paymentMethod || 'Cash'}
+                        </Typography>
+                      </Box>
+
+                      {/* 6. Payment Method Badge */}
+                      <Box sx={{ textAlign: 'right', display: { xs: 'none', sm: 'block' } }}>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            fontSize: '0.72rem',
+                            fontWeight: 700,
+                            color: 'success.main',
+                            bgcolor: isDark ? 'rgba(16, 185, 129, 0.12)' : 'rgba(16, 185, 129, 0.08)',
+                            px: 1,
+                            py: 0.3,
+                            borderRadius: '6px',
+                            display: 'inline-block'
+                          }}
+                          noWrap
+                        >
+                          {inv.paymentMethod || 'Cash'}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
               </Box>
             )}
           </GlassCard>
