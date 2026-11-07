@@ -467,11 +467,11 @@ export default function CustomerDisplaySettings() {
         @keyframes cfdPulseGlow {
           0%, 100% {
             transform: scale(1);
-            filter: drop-shadow(0 0 6px rgba(197, 160, 89, 0.4));
+            filter: drop-shadow(0 0 6px rgba(8, 15, 28, 0.25));
           }
           50% {
             transform: scale(1.06);
-            filter: drop-shadow(0 0 24px rgba(217, 119, 6, 0.85));
+            filter: drop-shadow(0 0 24px rgba(111, 76, 237, 0.6));
           }
         }
         @keyframes cfdBounceFloat {
@@ -485,10 +485,10 @@ export default function CustomerDisplaySettings() {
         }
         @keyframes cfdNeonGlow {
           0%, 100% {
-            text-shadow: 0 0 8px rgba(197, 160, 89, 0.4), 0 0 16px rgba(197, 160, 89, 0.2);
+            text-shadow: 0 0 8px rgba(111, 76, 237, 0.3), 0 0 16px rgba(111, 76, 237, 0.15);
           }
           50% {
-            text-shadow: 0 0 20px rgba(217, 119, 6, 0.9), 0 0 35px rgba(245, 158, 11, 0.8);
+            text-shadow: 0 0 20px rgba(111, 76, 237, 0.7), 0 0 35px rgba(111, 76, 237, 0.5);
           }
         }
         @keyframes cfdMarqueeScroll {
@@ -519,9 +519,9 @@ export default function CustomerDisplaySettings() {
         sx={{
           p: { xs: 2.5, sm: 3 },
           mb: 3,
-          borderRadius: 3.5,
-          background: 'linear-gradient(135deg, rgba(197, 160, 89, 0.12) 0%, rgba(217, 119, 6, 0.05) 100%)',
-          border: '1.5px solid rgba(197, 160, 89, 0.35)',
+          borderRadius: '16px',
+          bgcolor: '#FFFFFF',
+          border: '1px solid #E1E4EA',
           display: 'flex',
           flexDirection: { xs: 'column', md: 'row' },
           justifyContent: 'space-between',
@@ -536,21 +536,21 @@ export default function CustomerDisplaySettings() {
                 width: 44,
                 height: 44,
                 borderRadius: '12px',
-                background: 'linear-gradient(135deg, #C5A059 0%, #937230 100%)',
+                bgcolor: '#080F1C',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#FFFFFF',
-                boxShadow: '0 4px 14px rgba(197, 160, 89, 0.4)'
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)'
               }}
             >
               <Tv />
             </Box>
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 900, color: '#0F172A', lineHeight: 1.2 }}>
+              <Typography variant="h6" sx={{ fontWeight: 900, color: '#161922', lineHeight: 1.2 }}>
                 Customer Display Terminal (CFD) Controls
               </Typography>
-              <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700 }}>
+              <Typography variant="caption" sx={{ color: '#66707B', fontWeight: 700 }}>
                 Haute Couture Light Theme • 0ms Instant Dual-Screen Sync • Interactive Animations
               </Typography>
             </Box>
@@ -565,12 +565,13 @@ export default function CustomerDisplaySettings() {
             disabled={pingSending}
             startIcon={<Speed />}
             sx={{
-              borderRadius: 2.5,
+              borderRadius: 9999,
               fontWeight: 800,
               textTransform: 'none',
-              borderColor: 'rgba(197, 160, 89, 0.5)',
-              color: '#937230',
-              '&:hover': { borderColor: '#937230', bgcolor: 'rgba(197, 160, 89, 0.08)' }
+              border: '1.5px solid #E1E4EA',
+              color: '#080F1C',
+              bgcolor: '#FFFFFF',
+              '&:hover': { borderColor: '#080F1C', bgcolor: 'rgba(8, 15, 28, 0.04)' }
             }}
           >
             {pingSending ? 'Pinging...' : 'Test Ping Screen'}
@@ -582,12 +583,13 @@ export default function CustomerDisplaySettings() {
             onClick={handleLaunchDisplay}
             startIcon={<Launch />}
             sx={{
-              borderRadius: 2.5,
+              borderRadius: 9999,
               fontWeight: 800,
               textTransform: 'none',
-              borderColor: 'primary.main',
-              color: 'primary.main',
-              '&:hover': { bgcolor: 'primary.lighter' }
+              border: '1.5px solid #E1E4EA',
+              color: '#080F1C',
+              bgcolor: '#FFFFFF',
+              '&:hover': { borderColor: '#080F1C', bgcolor: 'rgba(8, 15, 28, 0.04)' }
             }}
           >
             Launch Customer Screen ↗
@@ -600,13 +602,13 @@ export default function CustomerDisplaySettings() {
             disabled={saving}
             startIcon={<Save />}
             sx={{
-              borderRadius: 2.5,
+              borderRadius: 9999,
               fontWeight: 900,
               textTransform: 'none',
-              background: 'linear-gradient(135deg, #C5A059 0%, #937230 100%)',
+              bgcolor: '#080F1C',
               color: '#FFFFFF',
-              boxShadow: '0 4px 14px rgba(197, 160, 89, 0.35)',
-              '&:hover': { background: 'linear-gradient(135deg, #B38E44 0%, #826227 100%)' }
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+              '&:hover': { bgcolor: '#1D2531' }
             }}
           >
             {saving ? 'Saving...' : 'Save & Sync to Screen'}
@@ -622,8 +624,8 @@ export default function CustomerDisplaySettings() {
           <Paper
             elevation={0}
             sx={{
-              borderRadius: 3.5,
-              border: '1.5px solid rgba(197, 160, 89, 0.28)',
+              borderRadius: '16px',
+              border: '1px solid #E1E4EA',
               bgcolor: '#FFFFFF',
               mb: 3,
               overflow: 'hidden'
@@ -641,18 +643,18 @@ export default function CustomerDisplaySettings() {
               scrollButtons="auto"
               sx={{
                 px: 1,
-                bgcolor: '#FAF8F5',
-                borderBottom: '1px solid rgba(197, 160, 89, 0.2)',
+                bgcolor: '#FAFCFA',
+                borderBottom: '1px solid #E1E4EA',
                 '& .MuiTab-root': {
                   textTransform: 'none',
                   fontWeight: 800,
                   fontSize: '0.86rem',
                   py: 1.8,
-                  color: '#64748B',
-                  '&.Mui-selected': { color: '#937230' }
+                  color: '#66707B',
+                  '&.Mui-selected': { color: '#080F1C' }
                 },
                 '& .MuiTabs-indicator': {
-                  bgcolor: '#937230',
+                  bgcolor: '#080F1C',
                   height: 3,
                   borderRadius: '3px 3px 0 0'
                 }
@@ -670,10 +672,10 @@ export default function CustomerDisplaySettings() {
                 <Box>
                   <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
                     <Box>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#0F172A' }}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#161922' }}>
                         Haute Couture Idle Animations
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#64748B' }}>
+                      <Typography variant="body2" sx={{ color: '#66707B' }}>
                         Select which luxury animated experience patrons see during idle:
                       </Typography>
                     </Box>
@@ -683,8 +685,10 @@ export default function CustomerDisplaySettings() {
                       onClick={() => updateConfig('idleDisplayType', 'animation')}
                       size="small"
                       sx={{
-                        bgcolor: config.idleDisplayType === 'animation' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(0,0,0,0.06)',
-                        color: config.idleDisplayType === 'animation' ? '#059669' : '#64748B',
+                        borderRadius: 9999,
+                        bgcolor: config.idleDisplayType === 'animation' ? 'rgba(16, 185, 129, 0.15)' : '#FFFFFF',
+                        color: config.idleDisplayType === 'animation' ? '#059669' : '#66707B',
+                        border: config.idleDisplayType === 'animation' ? 'none' : '1.5px solid #E1E4EA',
                         fontWeight: 800
                       }}
                     />
@@ -704,29 +708,29 @@ export default function CustomerDisplaySettings() {
                             }}
                             sx={{
                               p: 2.2,
-                              borderRadius: 3,
+                              borderRadius: '16px',
                               border: '2px solid',
-                              borderColor: isSelected ? '#C5A059' : 'rgba(0,0,0,0.08)',
-                              bgcolor: isSelected ? 'rgba(197, 160, 89, 0.08)' : '#FAF8F5',
+                              borderColor: isSelected ? '#080F1C' : '#E1E4EA',
+                              bgcolor: isSelected ? 'rgba(8, 15, 28, 0.04)' : '#FAFCFA',
                               cursor: 'pointer',
                               transition: 'all 0.2s ease',
-                              boxShadow: isSelected ? '0 6px 18px rgba(197, 160, 89, 0.2)' : 'none',
+                              boxShadow: isSelected ? '0 2px 8px rgba(0, 0, 0, 0.06)' : 'none',
                               '&:hover': {
-                                borderColor: '#C5A059',
-                                bgcolor: 'rgba(197, 160, 89, 0.06)'
+                                borderColor: '#080F1C',
+                                bgcolor: 'rgba(8, 15, 28, 0.03)'
                               }
                             }}
                           >
                             <Stack direction="row" spacing={1.2} alignItems="center" sx={{ mb: 0.8 }}>
                               <Typography sx={{ fontSize: '1.4rem' }}>{anim.icon}</Typography>
                               <Box sx={{ flex: 1 }}>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 900, color: isSelected ? '#937230' : '#0F172A' }}>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 900, color: isSelected ? '#080F1C' : '#161922' }}>
                                   {anim.title}
                                 </Typography>
                               </Box>
-                              {isSelected && <CheckCircle sx={{ color: '#937230', fontSize: 20 }} />}
+                              {isSelected && <CheckCircle sx={{ color: '#080F1C', fontSize: 20 }} />}
                             </Stack>
-                            <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 1, lineHeight: 1.35 }}>
+                            <Typography variant="caption" sx={{ color: '#66707B', display: 'block', mb: 1, lineHeight: 1.35 }}>
                               {anim.desc}
                             </Typography>
                             <Chip
@@ -736,9 +740,10 @@ export default function CustomerDisplaySettings() {
                                 height: 22,
                                 fontSize: '0.68rem',
                                 fontWeight: 800,
-                                bgcolor: isSelected ? '#FFFFFF' : 'rgba(0,0,0,0.05)',
-                                color: isSelected ? '#937230' : '#475569',
-                                border: '1px solid rgba(197, 160, 89, 0.3)'
+                                borderRadius: 9999,
+                                bgcolor: isSelected ? '#FFFFFF' : 'rgba(0,0,0,0.04)',
+                                color: isSelected ? '#080F1C' : '#475569',
+                                border: '1px solid #E1E4EA'
                               }}
                             />
                           </Box>
@@ -754,10 +759,10 @@ export default function CustomerDisplaySettings() {
                 <Box>
                   <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
                     <Box>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#0F172A' }}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#161922' }}>
                         Haute Couture Runway Video & Framing
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#64748B' }}>
+                      <Typography variant="body2" sx={{ color: '#66707B' }}>
                         Play high-definition couture video or use the built-in virtual luxury runway:
                       </Typography>
                     </Box>
@@ -767,8 +772,10 @@ export default function CustomerDisplaySettings() {
                       onClick={() => updateConfig('idleDisplayType', 'video')}
                       size="small"
                       sx={{
-                        bgcolor: config.idleDisplayType === 'video' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(0,0,0,0.06)',
-                        color: config.idleDisplayType === 'video' ? '#059669' : '#64748B',
+                        borderRadius: 9999,
+                        bgcolor: config.idleDisplayType === 'video' ? 'rgba(16, 185, 129, 0.15)' : '#FFFFFF',
+                        color: config.idleDisplayType === 'video' ? '#059669' : '#66707B',
+                        border: config.idleDisplayType === 'video' ? 'none' : '1.5px solid #E1E4EA',
                         fontWeight: 800
                       }}
                     />
@@ -779,13 +786,13 @@ export default function CustomerDisplaySettings() {
                     elevation={0}
                     sx={{
                       p: 2.5,
-                      borderRadius: 3,
+                      borderRadius: '16px',
                       bgcolor: '#FFFFFF',
-                      border: '1.5px dashed rgba(197, 160, 89, 0.55)',
+                      border: '1.5px dashed #E1E4EA',
                       mb: 2.5,
                       textAlign: 'center',
                       transition: 'all 0.2s ease',
-                      '&:hover': { borderColor: '#C5A059', bgcolor: '#FAF8F5' }
+                      '&:hover': { borderColor: '#080F1C', bgcolor: '#FAFCFA' }
                     }}
                   >
                     <input
@@ -802,21 +809,21 @@ export default function CustomerDisplaySettings() {
                           width: 52,
                           height: 52,
                           borderRadius: '50%',
-                          bgcolor: 'rgba(197, 160, 89, 0.15)',
+                          bgcolor: 'rgba(8, 15, 28, 0.08)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: '#937230'
+                          color: '#080F1C'
                         }}
                       >
                         <CloudUpload sx={{ fontSize: 30 }} />
                       </Box>
 
                       <Box>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0F172A' }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#161922' }}>
                           Upload Fashion Video from Local Device
                         </Typography>
-                        <Typography variant="caption" sx={{ color: '#64748B', display: 'block' }}>
+                        <Typography variant="caption" sx={{ color: '#66707B', display: 'block' }}>
                           Select an MP4, WebM or MOV video file directly from your computer or tablet
                         </Typography>
                       </Box>
@@ -852,11 +859,11 @@ export default function CustomerDisplaySettings() {
                             sx={{
                               height: 8,
                               borderRadius: 4,
-                              bgcolor: 'rgba(197, 160, 89, 0.2)',
-                              '& .MuiLinearProgress-bar': { bgcolor: '#C5A059' }
+                              bgcolor: 'rgba(8, 15, 28, 0.1)',
+                              '& .MuiLinearProgress-bar': { bgcolor: '#080F1C' }
                             }}
                           />
-                          <Typography variant="caption" sx={{ color: '#937230', fontWeight: 800, display: 'block', mt: 0.5 }}>
+                          <Typography variant="caption" sx={{ color: '#080F1C', fontWeight: 800, display: 'block', mt: 0.5 }}>
                             Cloud syncing video: {uploadProgress}%
                           </Typography>
                         </Box>
@@ -868,12 +875,12 @@ export default function CustomerDisplaySettings() {
                         onClick={() => fileInputRef.current?.click()}
                         disabled={uploadingVideo}
                         sx={{
-                          color: '#937230',
-                          borderColor: '#C5A059',
+                          color: '#080F1C',
+                          border: '1.5px solid #E1E4EA',
                           fontWeight: 800,
-                          borderRadius: 2.5,
+                          borderRadius: 9999,
                           px: 3,
-                          '&:hover': { bgcolor: 'rgba(197, 160, 89, 0.1)', borderColor: '#937230' }
+                          '&:hover': { bgcolor: 'rgba(8, 15, 28, 0.04)', borderColor: '#080F1C' }
                         }}
                       >
                         {config.videoPreset === 'uploaded' ? 'Choose Another Video' : 'Choose Local Video File'}
@@ -934,16 +941,16 @@ export default function CustomerDisplaySettings() {
                     elevation={0}
                     sx={{
                       p: 2.5,
-                      borderRadius: 3,
-                      bgcolor: '#FAF8F5',
-                      border: '1.5px solid rgba(197, 160, 89, 0.3)',
+                      borderRadius: '16px',
+                      bgcolor: '#FAFCFA',
+                      border: '1px solid #E1E4EA',
                       mb: 2
                     }}
                   >
-                    <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#0F172A', mb: 0.5 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#161922', mb: 0.5 }}>
                       Video Framing & Screen Ratio:
                     </Typography>
-                    <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 2 }}>
+                    <Typography variant="caption" sx={{ color: '#66707B', display: 'block', mb: 2 }}>
                       Select how the video frames on the customer display terminal:
                     </Typography>
 
@@ -953,20 +960,20 @@ export default function CustomerDisplaySettings() {
                           onClick={() => updateConfig('videoFit', 'cover')}
                           sx={{
                             p: 2,
-                            borderRadius: 2.5,
+                            borderRadius: '16px',
                             border: '2px solid',
-                            borderColor: config.videoFit === 'cover' ? '#C5A059' : 'rgba(0,0,0,0.08)',
+                            borderColor: config.videoFit === 'cover' ? '#080F1C' : '#E1E4EA',
                             bgcolor: config.videoFit === 'cover' ? '#FFFFFF' : 'transparent',
                             cursor: 'pointer',
                             textAlign: 'center',
-                            boxShadow: config.videoFit === 'cover' ? '0 4px 12px rgba(197, 160, 89, 0.2)' : 'none'
+                            boxShadow: config.videoFit === 'cover' ? '0 2px 8px rgba(0, 0, 0, 0.06)' : 'none'
                           }}
                         >
-                          <CropFree sx={{ color: config.videoFit === 'cover' ? '#937230' : '#64748B', fontSize: 28 }} />
-                          <Typography variant="subtitle2" sx={{ fontWeight: 800, mt: 0.5, color: config.videoFit === 'cover' ? '#937230' : '#0F172A' }}>
+                          <CropFree sx={{ color: config.videoFit === 'cover' ? '#080F1C' : '#66707B', fontSize: 28 }} />
+                          <Typography variant="subtitle2" sx={{ fontWeight: 800, mt: 0.5, color: config.videoFit === 'cover' ? '#080F1C' : '#161922' }}>
                             Full Bleed Cover
                           </Typography>
-                          <Typography variant="caption" sx={{ color: '#64748B' }}>
+                          <Typography variant="caption" sx={{ color: '#66707B' }}>
                             Fills the entire screen edge-to-edge
                           </Typography>
                         </Box>
@@ -977,21 +984,21 @@ export default function CustomerDisplaySettings() {
                           onClick={() => updateConfig('videoFit', 'contain')}
                           sx={{
                             p: 2,
-                            borderRadius: 2.5,
+                            borderRadius: '16px',
                             border: '2px solid',
-                            borderColor: config.videoFit === 'contain' ? '#C5A059' : 'rgba(0,0,0,0.08)',
+                            borderColor: config.videoFit === 'contain' ? '#080F1C' : '#E1E4EA',
                             bgcolor: config.videoFit === 'contain' ? '#FFFFFF' : 'transparent',
                             cursor: 'pointer',
                             textAlign: 'center',
-                            boxShadow: config.videoFit === 'contain' ? '0 4px 12px rgba(197, 160, 89, 0.2)' : 'none'
+                            boxShadow: config.videoFit === 'contain' ? '0 2px 8px rgba(0, 0, 0, 0.06)' : 'none'
                           }}
                         >
-                          <FitScreen sx={{ color: config.videoFit === 'contain' ? '#937230' : '#64748B', fontSize: 28 }} />
-                          <Typography variant="subtitle2" sx={{ fontWeight: 800, mt: 0.5, color: config.videoFit === 'contain' ? '#937230' : '#0F172A' }}>
+                          <FitScreen sx={{ color: config.videoFit === 'contain' ? '#080F1C' : '#66707B', fontSize: 28 }} />
+                          <Typography variant="subtitle2" sx={{ fontWeight: 800, mt: 0.5, color: config.videoFit === 'contain' ? '#080F1C' : '#161922' }}>
                             Contain / Letterbox
                           </Typography>
-                          <Typography variant="caption" sx={{ color: '#64748B' }}>
-                            Fits whole video with gold borders
+                          <Typography variant="caption" sx={{ color: '#66707B' }}>
+                            Fits whole video with borders
                           </Typography>
                         </Box>
                       </Grid>
@@ -1001,20 +1008,20 @@ export default function CustomerDisplaySettings() {
                           onClick={() => updateConfig('videoFit', 'cinematic')}
                           sx={{
                             p: 2,
-                            borderRadius: 2.5,
+                            borderRadius: '16px',
                             border: '2px solid',
-                            borderColor: config.videoFit === 'cinematic' ? '#C5A059' : 'rgba(0,0,0,0.08)',
+                            borderColor: config.videoFit === 'cinematic' ? '#080F1C' : '#E1E4EA',
                             bgcolor: config.videoFit === 'cinematic' ? '#FFFFFF' : 'transparent',
                             cursor: 'pointer',
                             textAlign: 'center',
-                            boxShadow: config.videoFit === 'cinematic' ? '0 4px 12px rgba(197, 160, 89, 0.2)' : 'none'
+                            boxShadow: config.videoFit === 'cinematic' ? '0 2px 8px rgba(0, 0, 0, 0.06)' : 'none'
                           }}
                         >
-                          <AspectRatio sx={{ color: config.videoFit === 'cinematic' ? '#937230' : '#64748B', fontSize: 28 }} />
-                          <Typography variant="subtitle2" sx={{ fontWeight: 800, mt: 0.5, color: config.videoFit === 'cinematic' ? '#937230' : '#0F172A' }}>
+                          <AspectRatio sx={{ color: config.videoFit === 'cinematic' ? '#080F1C' : '#66707B', fontSize: 28 }} />
+                          <Typography variant="subtitle2" sx={{ fontWeight: 800, mt: 0.5, color: config.videoFit === 'cinematic' ? '#080F1C' : '#161922' }}>
                             Cinematic 21:9
                           </Typography>
-                          <Typography variant="caption" sx={{ color: '#64748B' }}>
+                          <Typography variant="caption" sx={{ color: '#66707B' }}>
                             Ultra-wide luxury cinema scope
                           </Typography>
                         </Box>
@@ -1029,10 +1036,10 @@ export default function CustomerDisplaySettings() {
                 <Box>
                   <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
                     <Box>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#0F172A' }}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#161922' }}>
                         Custom Animated Announcement & Marquee
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#64748B' }}>
+                      <Typography variant="body2" sx={{ color: '#66707B' }}>
                         Type your announcement and select an eye-catching text animation style:
                       </Typography>
                     </Box>
@@ -1042,8 +1049,10 @@ export default function CustomerDisplaySettings() {
                       onClick={() => updateConfig('idleDisplayType', 'text')}
                       size="small"
                       sx={{
-                        bgcolor: config.idleDisplayType === 'text' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(0,0,0,0.06)',
-                        color: config.idleDisplayType === 'text' ? '#059669' : '#64748B',
+                        borderRadius: 9999,
+                        bgcolor: config.idleDisplayType === 'text' ? 'rgba(16, 185, 129, 0.15)' : '#FFFFFF',
+                        color: config.idleDisplayType === 'text' ? '#059669' : '#66707B',
+                        border: config.idleDisplayType === 'text' ? 'none' : '1.5px solid #E1E4EA',
                         fontWeight: 800
                       }}
                     />
@@ -1067,7 +1076,7 @@ export default function CustomerDisplaySettings() {
                     sx={{ mb: 2.5 }}
                   />
 
-                  <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#0F172A', mb: 1 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#161922', mb: 1 }}>
                     Choose Text Animation Style:
                   </Typography>
 
@@ -1085,21 +1094,21 @@ export default function CustomerDisplaySettings() {
                             }}
                             sx={{
                               p: 2,
-                              borderRadius: 2.5,
+                              borderRadius: '16px',
                               border: '2px solid',
-                              borderColor: isSelected ? '#C5A059' : 'rgba(0,0,0,0.08)',
-                              bgcolor: isSelected ? 'rgba(197, 160, 89, 0.08)' : '#FAF8F5',
+                              borderColor: isSelected ? '#080F1C' : '#E1E4EA',
+                              bgcolor: isSelected ? 'rgba(8, 15, 28, 0.04)' : '#FAFCFA',
                               cursor: 'pointer',
-                              boxShadow: isSelected ? '0 4px 14px rgba(197, 160, 89, 0.2)' : 'none'
+                              boxShadow: isSelected ? '0 2px 8px rgba(0, 0, 0, 0.06)' : 'none'
                             }}
                           >
                             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
                               <Typography sx={{ fontSize: '1.2rem' }}>{tStyle.icon}</Typography>
-                              <Typography variant="subtitle2" sx={{ fontWeight: 900, color: isSelected ? '#937230' : '#0F172A' }}>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 900, color: isSelected ? '#080F1C' : '#161922' }}>
                                 {tStyle.title}
                               </Typography>
                             </Stack>
-                            <Typography variant="caption" sx={{ color: '#64748B' }}>
+                            <Typography variant="caption" sx={{ color: '#66707B' }}>
                               {tStyle.desc}
                             </Typography>
                           </Box>
@@ -1113,10 +1122,10 @@ export default function CustomerDisplaySettings() {
               {/* TAB 3: PATRON VIP NAME ANIMATIONS */}
               {activeSettingsTab === 3 && (
                 <Box>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#0F172A', mb: 0.5 }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#161922', mb: 0.5 }}>
                     Patron VIP Recognition & Name Animation Styles
                   </Typography>
-                  <Typography variant="body2" sx={{ color: '#64748B', mb: 2.5 }}>
+                  <Typography variant="body2" sx={{ color: '#66707B', mb: 2.5 }}>
                     Delight valued patrons (like Mrs. Ayesha Khan) with captivating animated name entrances:
                   </Typography>
 
@@ -1125,13 +1134,13 @@ export default function CustomerDisplaySettings() {
                     direction="row"
                     justifyContent="space-between"
                     alignItems="center"
-                    sx={{ p: 2, bgcolor: '#FAF8F5', borderRadius: 2.5, border: '1px solid rgba(197, 160, 89, 0.25)', mb: 2.5 }}
+                    sx={{ p: 2, bgcolor: '#FAFCFA', borderRadius: '16px', border: '1px solid #E1E4EA', mb: 2.5 }}
                   >
                     <Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#0F172A' }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#161922' }}>
                         Animate Patron Name & Golden Starburst
                       </Typography>
-                      <Typography variant="caption" sx={{ color: '#64748B' }}>
+                      <Typography variant="caption" sx={{ color: '#66707B' }}>
                         Enables dynamic animated text effects when customer name is chosen
                       </Typography>
                     </Box>
@@ -1154,7 +1163,7 @@ export default function CustomerDisplaySettings() {
                   />
 
                   {/* Selectable Name Animation Styles */}
-                  <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#0F172A', mb: 1.5 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#161922', mb: 1.5 }}>
                     Select Patron Name Animation Effect:
                   </Typography>
 
@@ -1167,21 +1176,21 @@ export default function CustomerDisplaySettings() {
                             onClick={() => updateConfig('customerAnimationStyle', cStyle.id)}
                             sx={{
                               p: 2,
-                              borderRadius: 2.5,
+                              borderRadius: '16px',
                               border: '2px solid',
-                              borderColor: isSelected ? '#C5A059' : 'rgba(0,0,0,0.08)',
-                              bgcolor: isSelected ? 'rgba(197, 160, 89, 0.08)' : '#FAF8F5',
+                              borderColor: isSelected ? '#080F1C' : '#E1E4EA',
+                              bgcolor: isSelected ? 'rgba(8, 15, 28, 0.04)' : '#FAFCFA',
                               cursor: 'pointer',
-                              boxShadow: isSelected ? '0 4px 14px rgba(197, 160, 89, 0.2)' : 'none'
+                              boxShadow: isSelected ? '0 2px 8px rgba(0, 0, 0, 0.06)' : 'none'
                             }}
                           >
                             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
                               <Typography sx={{ fontSize: '1.2rem' }}>{cStyle.icon}</Typography>
-                              <Typography variant="subtitle2" sx={{ fontWeight: 900, color: isSelected ? '#937230' : '#0F172A' }}>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 900, color: isSelected ? '#080F1C' : '#161922' }}>
                                 {cStyle.title}
                               </Typography>
                             </Stack>
-                            <Typography variant="caption" sx={{ color: '#64748B' }}>
+                            <Typography variant="caption" sx={{ color: '#66707B' }}>
                               {cStyle.desc}
                             </Typography>
                           </Box>
@@ -1201,25 +1210,25 @@ export default function CustomerDisplaySettings() {
             elevation={0}
             sx={{
               p: 2.5,
-              borderRadius: 3.5,
-              border: '1.5px solid rgba(197, 160, 89, 0.35)',
+              borderRadius: '16px',
+              border: '1px solid #E1E4EA',
               bgcolor: '#FFFFFF',
-              boxShadow: '0 10px 30px rgba(197, 160, 89, 0.12)',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
               position: 'sticky',
               top: 24
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
               <Stack direction="row" spacing={1} alignItems="center">
-                <Diamond sx={{ color: '#C5A059', fontSize: 20 }} />
-                <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#0F172A' }}>
+                <Diamond sx={{ color: '#080F1C', fontSize: 20 }} />
+                <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#161922' }}>
                   Live Terminal Simulator
                 </Typography>
               </Stack>
               <Chip
                 label={`Mode: ${config.idleDisplayType.toUpperCase()}`}
                 size="small"
-                sx={{ bgcolor: 'rgba(197, 160, 89, 0.15)', color: '#937230', fontWeight: 800, fontSize: '0.7rem' }}
+                sx={{ borderRadius: 9999, bgcolor: 'rgba(8, 15, 28, 0.08)', color: '#080F1C', fontWeight: 800, fontSize: '0.7rem' }}
               />
             </Stack>
 
@@ -1227,12 +1236,12 @@ export default function CustomerDisplaySettings() {
             <Box
               sx={{
                 width: '100%',
-                borderRadius: 3,
+                borderRadius: '16px',
                 overflow: 'hidden',
-                border: '1.5px solid rgba(197, 160, 89, 0.35)',
-                background: 'linear-gradient(135deg, #FDFBF7 0%, #F5F1E8 100%)',
-                color: '#1E293B',
-                boxShadow: '0 12px 35px rgba(180, 140, 75, 0.1)',
+                border: '1px solid #E1E4EA',
+                background: '#ECEEF2',
+                color: '#161922',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
                 minHeight: 440,
                 display: 'flex',
                 flexDirection: 'column'
@@ -1243,7 +1252,7 @@ export default function CustomerDisplaySettings() {
                 sx={{
                   px: 2,
                   py: 1.2,
-                  borderBottom: '1px solid rgba(197, 160, 89, 0.25)',
+                  borderBottom: '1px solid #E1E4EA',
                   bgcolor: 'rgba(255, 255, 255, 0.95)',
                   display: 'flex',
                   justifyContent: 'space-between',
@@ -1256,7 +1265,7 @@ export default function CustomerDisplaySettings() {
                       width: 26,
                       height: 26,
                       borderRadius: '6px',
-                      background: 'linear-gradient(135deg, #C5A059 0%, #937230 100%)',
+                      bgcolor: '#080F1C',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -1265,7 +1274,7 @@ export default function CustomerDisplaySettings() {
                   >
                     <Diamond sx={{ fontSize: 16 }} />
                   </Box>
-                  <Typography variant="caption" sx={{ fontWeight: 900, color: '#0F172A', fontSize: '0.78rem' }}>
+                  <Typography variant="caption" sx={{ fontWeight: 900, color: '#161922', fontSize: '0.78rem' }}>
                     ALEEN CLOTHING
                   </Typography>
                 </Stack>
@@ -1296,13 +1305,13 @@ export default function CustomerDisplaySettings() {
                       width: '100%',
                       mb: 2,
                       p: 1.8,
-                      borderRadius: 3,
+                      borderRadius: '16px',
                       bgcolor: '#FFFFFF',
-                      border: '1.5px solid rgba(197, 160, 89, 0.35)',
-                      boxShadow: '0 4px 14px rgba(197, 160, 89, 0.1)'
+                      border: '1px solid #E1E4EA',
+                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.06)'
                     }}
                   >
-                    <Typography variant="caption" sx={{ color: '#937230', fontWeight: 900, letterSpacing: '0.12em', display: 'block', mb: 0.5 }}>
+                    <Typography variant="caption" sx={{ color: '#080F1C', fontWeight: 900, letterSpacing: '0.12em', display: 'block', mb: 0.5 }}>
                       ✨ HONOURED ATELIER PATRON
                     </Typography>
 
@@ -1315,26 +1324,26 @@ export default function CustomerDisplaySettings() {
                         fontSize: '1.35rem',
                         lineHeight: 1.2,
                         ...(config.customerAnimationStyle === 'golden-shimmer' && {
-                          background: 'linear-gradient(90deg, #937230 0%, #D97706 25%, #FDE047 50%, #D97706 75%, #937230 100%)',
+                          background: 'linear-gradient(90deg, #080F1C 0%, #6F4CED 25%, #A78BFA 50%, #6F4CED 75%, #080F1C 100%)',
                           backgroundSize: '200% auto',
                           WebkitBackgroundClip: 'text',
                           WebkitTextFillColor: 'transparent',
                           animation: 'cfdShimmer 2.2s linear infinite'
                         }),
                         ...(config.customerAnimationStyle === 'bounce-float' && {
-                          color: '#0F172A',
+                          color: '#161922',
                           animation: 'cfdBounceFloat 1.8s ease-in-out infinite'
                         }),
                         ...(config.customerAnimationStyle === 'pulse-glow' && {
-                          color: '#937230',
+                          color: '#080F1C',
                           animation: 'cfdPulseGlow 2s ease-in-out infinite'
                         }),
                         ...(config.customerAnimationStyle === 'sparkle-pop' && {
-                          color: '#B45309',
+                          color: '#161922',
                           animation: 'cfdSparklePop 2.4s ease-in-out infinite'
                         }),
                         ...(config.customerAnimationStyle === 'neon-atelier' && {
-                          color: '#937230',
+                          color: '#6F4CED',
                           animation: 'cfdNeonGlow 2s ease-in-out infinite'
                         })
                       }}
@@ -1353,10 +1362,10 @@ export default function CustomerDisplaySettings() {
                         sx={{
                           width: '100%',
                           height: 200,
-                          borderRadius: 2.5,
+                          borderRadius: '16px',
                           overflow: 'hidden',
-                          border: '1.5px solid rgba(197, 160, 89, 0.4)',
-                          background: 'radial-gradient(circle at 50% 30%, #2A2215 0%, #0A0805 100%)',
+                          border: '1px solid #E1E4EA',
+                          background: 'radial-gradient(circle at 50% 30%, #1D2531 0%, #080F1C 100%)',
                           position: 'relative',
                           display: 'flex',
                           flexDirection: 'column',
@@ -1366,8 +1375,8 @@ export default function CustomerDisplaySettings() {
                         }}
                       >
                         {/* Animated Catwalk Lighting Pillars */}
-                        <Box sx={{ position: 'absolute', top: 0, left: '20%', width: 2, height: '100%', bgcolor: 'rgba(197, 160, 89, 0.5)', animation: 'cfdRunwayLight 2s infinite ease-in-out' }} />
-                        <Box sx={{ position: 'absolute', top: 0, right: '20%', width: 2, height: '100%', bgcolor: 'rgba(197, 160, 89, 0.5)', animation: 'cfdRunwayLight 2s infinite ease-in-out 1s' }} />
+                        <Box sx={{ position: 'absolute', top: 0, left: '20%', width: 2, height: '100%', bgcolor: 'rgba(111, 76, 237, 0.5)', animation: 'cfdRunwayLight 2s infinite ease-in-out' }} />
+                        <Box sx={{ position: 'absolute', top: 0, right: '20%', width: 2, height: '100%', bgcolor: 'rgba(111, 76, 237, 0.5)', animation: 'cfdRunwayLight 2s infinite ease-in-out 1s' }} />
 
                         {/* Walking Couture Silhouette */}
                         <motion.div
@@ -1377,7 +1386,7 @@ export default function CustomerDisplaySettings() {
                           <Typography sx={{ fontSize: 46 }}>💃</Typography>
                         </motion.div>
 
-                        <Typography variant="overline" sx={{ color: '#FCD34D', letterSpacing: '0.2em', fontWeight: 900, mt: 1 }}>
+                        <Typography variant="overline" sx={{ color: '#FFFFFF', letterSpacing: '0.2em', fontWeight: 900, mt: 1 }}>
                           HAUTE COUTURE CATWALK
                         </Typography>
                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
@@ -1390,9 +1399,9 @@ export default function CustomerDisplaySettings() {
                         sx={{
                           width: '100%',
                           height: config.videoFit === 'cinematic' ? 160 : 200,
-                          borderRadius: 2.5,
+                          borderRadius: '16px',
                           overflow: 'hidden',
-                          border: config.videoFit === 'contain' ? '3px solid #C5A059' : '1.5px solid rgba(197, 160, 89, 0.4)',
+                          border: config.videoFit === 'contain' ? '3px solid #080F1C' : '1px solid #E1E4EA',
                           bgcolor: '#000000',
                           position: 'relative'
                         }}
@@ -1417,7 +1426,7 @@ export default function CustomerDisplaySettings() {
                             bottom: 6,
                             left: 8,
                             bgcolor: 'rgba(0,0,0,0.75)',
-                            color: '#FCD34D',
+                            color: '#FFFFFF',
                             px: 1,
                             py: 0.3,
                             borderRadius: 1,
@@ -1438,13 +1447,13 @@ export default function CustomerDisplaySettings() {
                     sx={{
                       p: 2.5,
                       width: '100%',
-                      borderRadius: 3,
+                      borderRadius: '16px',
                       bgcolor: '#FFFFFF',
-                      border: '1.5px solid rgba(197, 160, 89, 0.35)',
-                      boxShadow: '0 8px 24px rgba(197, 160, 89, 0.1)'
+                      border: '1px solid #E1E4EA',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)'
                     }}
                   >
-                    <Box sx={{ width: 44, height: 44, mx: 'auto', mb: 1.5, borderRadius: '50%', background: 'linear-gradient(135deg, #C5A059 0%, #937230 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF' }}>
+                    <Box sx={{ width: 44, height: 44, mx: 'auto', mb: 1.5, borderRadius: '50%', bgcolor: '#080F1C', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF' }}>
                       <AutoAwesome fontSize="small" />
                     </Box>
 
@@ -1455,12 +1464,12 @@ export default function CustomerDisplaySettings() {
                         fontWeight: 900,
                         mb: 1,
                         lineHeight: 1.3,
-                        color: '#0F172A',
+                        color: '#161922',
                         ...(config.textAnimationStyle === 'pulse-glow' && {
                           animation: 'cfdPulseGlow 2s infinite ease-in-out'
                         }),
                         ...(config.textAnimationStyle === 'marquee-glide' && {
-                          color: '#937230'
+                          color: '#080F1C'
                         })
                       }}
                     >
@@ -1476,9 +1485,9 @@ export default function CustomerDisplaySettings() {
                           width: '100%',
                           py: 1,
                           my: 1,
-                          bgcolor: '#FAF8F5',
+                          bgcolor: '#FAFCFA',
                           borderRadius: 2,
-                          border: '1px solid rgba(197, 160, 89, 0.3)'
+                          border: '1px solid #E1E4EA'
                         }}
                       >
                         <Box
@@ -1487,19 +1496,19 @@ export default function CustomerDisplaySettings() {
                           transition={{ repeat: Infinity, duration: 10, ease: 'linear' }}
                           sx={{ display: 'inline-flex', gap: 2 }}
                         >
-                          <Typography variant="caption" sx={{ fontWeight: 800, color: '#937230' }}>
+                          <Typography variant="caption" sx={{ fontWeight: 800, color: '#080F1C' }}>
                             💎 {config.customSubtext || 'Handcrafted Silks • Bespoke Bridal Lehengas • Master Fitting'}
                           </Typography>
-                          <Typography variant="caption" sx={{ fontWeight: 800, color: '#0F172A' }}>
+                          <Typography variant="caption" sx={{ fontWeight: 800, color: '#161922' }}>
                             ✨ Pure Handloom Banarasi & Royal Chanderi
                           </Typography>
-                          <Typography variant="caption" sx={{ fontWeight: 800, color: '#937230' }}>
+                          <Typography variant="caption" sx={{ fontWeight: 800, color: '#080F1C' }}>
                             💎 {config.customSubtext || 'Handcrafted Silks • Bespoke Bridal Lehengas • Master Fitting'}
                           </Typography>
                         </Box>
                       </Box>
                     ) : (
-                      <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 1.5, lineHeight: 1.4 }}>
+                      <Typography variant="caption" sx={{ color: '#66707B', display: 'block', mb: 1.5, lineHeight: 1.4 }}>
                         {config.customSubtext || 'Bespoke Bridal Lehengas & Handcrafted Silks'}
                       </Typography>
                     )}
@@ -1507,7 +1516,7 @@ export default function CustomerDisplaySettings() {
                     <Chip
                       label={`Animation: ${config.textAnimationStyle || 'marquee-glide'}`}
                       size="small"
-                      sx={{ height: 22, fontSize: '0.68rem', fontWeight: 800, bgcolor: 'rgba(197, 160, 89, 0.15)', color: '#937230' }}
+                      sx={{ height: 22, fontSize: '0.68rem', fontWeight: 800, borderRadius: 9999, bgcolor: 'rgba(8, 15, 28, 0.08)', color: '#080F1C' }}
                     />
                   </Box>
                 )}
@@ -1518,10 +1527,10 @@ export default function CustomerDisplaySettings() {
                     sx={{
                       p: 2.5,
                       width: '100%',
-                      borderRadius: 3,
+                      borderRadius: '16px',
                       bgcolor: '#FFFFFF',
-                      border: '1.5px solid rgba(197, 160, 89, 0.35)',
-                      boxShadow: '0 8px 24px rgba(197, 160, 89, 0.1)'
+                      border: '1px solid #E1E4EA',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)'
                     }}
                   >
                     {/* SUB-TYPE: MANDALA (Concentric Rotating Rings) */}
@@ -1544,7 +1553,7 @@ export default function CustomerDisplaySettings() {
                               width: '100%',
                               height: '100%',
                               borderRadius: '50%',
-                              border: '2px dashed #C5A059',
+                              border: '2px dashed #080F1C',
                               animation: 'cfdRotateSlow 16s linear infinite'
                             }}
                           />
@@ -1554,7 +1563,7 @@ export default function CustomerDisplaySettings() {
                               width: '74%',
                               height: '74%',
                               borderRadius: '50%',
-                              border: '1.5px solid #937230',
+                              border: '1.5px solid #6F4CED',
                               animation: 'cfdRotateReverseSlow 10s linear infinite'
                             }}
                           />
@@ -1563,7 +1572,7 @@ export default function CustomerDisplaySettings() {
                               width: 44,
                               height: 44,
                               borderRadius: '50%',
-                              background: 'linear-gradient(135deg, #C5A059 0%, #937230 100%)',
+                              bgcolor: '#080F1C',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
@@ -1574,10 +1583,10 @@ export default function CustomerDisplaySettings() {
                             <Diamond sx={{ fontSize: 24 }} />
                           </Box>
                         </Box>
-                        <Typography variant="overline" sx={{ color: '#937230', fontWeight: 900, display: 'block', mt: 1.5 }}>
+                        <Typography variant="overline" sx={{ color: '#080F1C', fontWeight: 900, display: 'block', mt: 1.5 }}>
                           ROTATING GOLD MANDALA
                         </Typography>
-                        <Typography variant="caption" sx={{ color: '#64748B' }}>
+                        <Typography variant="caption" sx={{ color: '#66707B' }}>
                           Continuous dual concentric rotation in opposite directions
                         </Typography>
                       </Box>
@@ -1592,20 +1601,20 @@ export default function CustomerDisplaySettings() {
                             height: 90,
                             mx: 'auto',
                             borderRadius: '30% 70% 70% 30% / 30% 30% 70% 70%',
-                            background: 'linear-gradient(135deg, rgba(197, 160, 89, 0.4) 0%, rgba(217, 119, 6, 0.3) 100%)',
-                            border: '1.5px solid #C5A059',
+                            background: 'linear-gradient(135deg, rgba(8, 15, 28, 0.2) 0%, rgba(111, 76, 237, 0.2) 100%)',
+                            border: '1.5px solid #080F1C',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             animation: 'cfdWaveUndulate 3s infinite ease-in-out'
                           }}
                         >
-                          <Spa sx={{ fontSize: 44, color: '#937230' }} />
+                          <Spa sx={{ fontSize: 44, color: '#080F1C' }} />
                         </Box>
-                        <Typography variant="overline" sx={{ color: '#937230', fontWeight: 900, display: 'block', mt: 1.5 }}>
+                        <Typography variant="overline" sx={{ color: '#080F1C', fontWeight: 900, display: 'block', mt: 1.5 }}>
                           FLOWING MULBERRY SILK
                         </Typography>
-                        <Typography variant="caption" sx={{ color: '#64748B' }}>
+                        <Typography variant="caption" sx={{ color: '#66707B' }}>
                           Organic undulating silk waves with floating shimmer
                         </Typography>
                       </Box>
@@ -1620,20 +1629,20 @@ export default function CustomerDisplaySettings() {
                             height: 80,
                             mx: 'auto',
                             borderRadius: '50%',
-                            bgcolor: 'rgba(197, 160, 89, 0.15)',
-                            border: '2px solid #C5A059',
+                            bgcolor: 'rgba(8, 15, 28, 0.08)',
+                            border: '2px solid #080F1C',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             animation: 'cfdPulseGlow 2.5s infinite ease-in-out'
                           }}
                         >
-                          <Diamond sx={{ fontSize: 38, color: '#937230' }} />
+                          <Diamond sx={{ fontSize: 38, color: '#080F1C' }} />
                         </Box>
-                        <Typography variant="overline" sx={{ color: '#937230', fontWeight: 900, display: 'block', mt: 1.5 }}>
+                        <Typography variant="overline" sx={{ color: '#080F1C', fontWeight: 900, display: 'block', mt: 1.5 }}>
                           PARISIAN ATELIER AURA
                         </Typography>
-                        <Typography variant="caption" sx={{ color: '#64748B' }}>
+                        <Typography variant="caption" sx={{ color: '#66707B' }}>
                           Expanding atmospheric golden light rings
                         </Typography>
                       </Box>
@@ -1646,19 +1655,19 @@ export default function CustomerDisplaySettings() {
                           animate={{ y: [0, -6, 0] }}
                           transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
                         >
-                          <Box sx={{ width: 64, height: 64, mx: 'auto', mb: 1, borderRadius: 3, background: 'linear-gradient(135deg, #C5A059 0%, #937230 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF' }}>
+                          <Box sx={{ width: 64, height: 64, mx: 'auto', mb: 1, borderRadius: '16px', bgcolor: '#080F1C', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFF' }}>
                             <Diamond sx={{ fontSize: 32 }} />
                           </Box>
                         </motion.div>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#0F172A' }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#161922' }}>
                           Bridal Heritage & Silk Lehengas
                         </Typography>
-                        <Typography variant="caption" sx={{ color: '#937230', fontWeight: 800, display: 'block', mb: 1 }}>
+                        <Typography variant="caption" sx={{ color: '#080F1C', fontWeight: 800, display: 'block', mb: 1 }}>
                           HAUTE COUTURE EMBELLISHMENTS
                         </Typography>
                         {/* Animated Loading Bar */}
-                        <Box sx={{ width: '80%', height: 4, borderRadius: 2, bgcolor: 'rgba(197, 160, 89, 0.2)', mx: 'auto', overflow: 'hidden' }}>
-                          <Box component={motion.div} animate={{ x: ['-100%', '100%'] }} transition={{ repeat: Infinity, duration: 2.5, ease: 'linear' }} sx={{ width: '50%', height: '100%', bgcolor: '#937230' }} />
+                        <Box sx={{ width: '80%', height: 4, borderRadius: 2, bgcolor: 'rgba(8, 15, 28, 0.1)', mx: 'auto', overflow: 'hidden' }}>
+                          <Box component={motion.div} animate={{ x: ['-100%', '100%'] }} transition={{ repeat: Infinity, duration: 2.5, ease: 'linear' }} sx={{ width: '50%', height: '100%', bgcolor: '#080F1C' }} />
                         </Box>
                       </Box>
                     )}
@@ -1667,14 +1676,14 @@ export default function CustomerDisplaySettings() {
               </Box>
 
               {/* Screen Footer */}
-              <Box sx={{ px: 2, py: 1, borderTop: '1px solid rgba(197, 160, 89, 0.2)', bgcolor: 'rgba(255, 255, 255, 0.95)', textAlign: 'center' }}>
-                <Typography variant="caption" sx={{ fontSize: '0.68rem', color: '#64748B', fontWeight: 700 }}>
+              <Box sx={{ px: 2, py: 1, borderTop: '1px solid #E1E4EA', bgcolor: 'rgba(255, 255, 255, 0.95)', textAlign: 'center' }}>
+                <Typography variant="caption" sx={{ fontSize: '0.68rem', color: '#66707B', fontWeight: 700 }}>
                   Aleen Atelier Dual-Screen Synchronized Display
                 </Typography>
               </Box>
             </Box>
 
-            <Alert severity="success" sx={{ mt: 2, borderRadius: 2.5, fontSize: '0.78rem', fontWeight: 700 }}>
+            <Alert severity="success" sx={{ mt: 2, borderRadius: '16px', fontSize: '0.78rem', fontWeight: 700 }}>
               Live 0ms updates: Changing tabs or animation options immediately previews in this simulator and sends to any open customer screen!
             </Alert>
           </Paper>

@@ -621,7 +621,7 @@ export default function CustomerDisplay() {
         return {
           label: 'Gold VIP',
           color: '#D97706',
-          bg: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
+          bg: 'linear-gradient(135deg, #D97706 0%, #080F1C 100%)',
           border: '#F59E0B',
           icon: '⚜️',
           nextTier: 'Platinum (₹1,00,000)',
@@ -642,8 +642,8 @@ export default function CustomerDisplay() {
       default:
         return {
           label: 'Bronze Patron',
-          color: '#B45309',
-          bg: 'linear-gradient(135deg, #B45309 0%, #78350F 100%)',
+          color: '#080F1C',
+          bg: 'linear-gradient(135deg, #080F1C 0%, #1D2531 100%)',
           border: '#D97706',
           icon: '💎',
           nextTier: 'Silver (₹25,000)',
@@ -704,8 +704,8 @@ export default function CustomerDisplay() {
   }, [activeCustomerName]);
 
   // Luxury Light Theme Accent Palette
-  const themeAccent = '#C5A059'; // Royal Champagne Gold
-  const themeAccentDeep = '#937230'; // Deep Antique Gold
+  const themeAccent = '#080F1C'; // Mandate Ink
+  const themeAccentDeep = '#161922'; // Mandate Text
   const tierMeta = getTierMeta(customerTier);
   const storeVpa = crmProfile?.bankDetails?.upiId || crmProfile?.upiId || 'aleenclothing@hdfcbank';
 
@@ -763,7 +763,7 @@ export default function CustomerDisplay() {
 
     const animSx = isAnimated ? {
       ...(style === 'golden-shimmer' && {
-        background: 'linear-gradient(90deg, #937230 0%, #D97706 25%, #FDE047 50%, #D97706 75%, #937230 100%)',
+        background: 'linear-gradient(90deg, #080F1C 0%, #6F4CED 50%, #080F1C 100%)',
         backgroundSize: '200% auto',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
@@ -774,15 +774,15 @@ export default function CustomerDisplay() {
         animation: 'cfdBounceFloat 1.8s ease-in-out infinite'
       }),
       ...(style === 'pulse-glow' && {
-        color: '#937230',
+        color: '#080F1C',
         animation: 'cfdPulseGlow 2s ease-in-out infinite'
       }),
       ...(style === 'sparkle-pop' && {
-        color: '#B45309',
+        color: '#080F1C',
         animation: 'cfdSparklePop 2.4s ease-in-out infinite'
       }),
       ...(style === 'neon-atelier' && {
-        color: '#937230',
+        color: '#080F1C',
         animation: 'cfdNeonGlow 2s ease-in-out infinite'
       })
     } : {
@@ -810,9 +810,9 @@ export default function CustomerDisplay() {
         width: '100vw',
         height: '100dvh',
         maxHeight: '100dvh',
-        background: 'linear-gradient(135deg, #FDFBF7 0%, #F5F1E8 50%, #FAF8F5 100%)',
+        background: '#ECEEF2',
         color: '#1E293B',
-        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        fontFamily: '"DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -829,11 +829,11 @@ export default function CustomerDisplay() {
         @keyframes cfdPulseGlow {
           0%, 100% {
             transform: scale(1);
-            filter: drop-shadow(0 0 6px rgba(197, 160, 89, 0.4));
+            filter: drop-shadow(0 0 6px rgba(8, 15, 28, 0.25));
           }
           50% {
             transform: scale(1.06);
-            filter: drop-shadow(0 0 24px rgba(217, 119, 6, 0.85));
+            filter: drop-shadow(0 0 24px rgba(111, 76, 237, 0.6));
           }
         }
         @keyframes cfdBounceFloat {
@@ -847,10 +847,10 @@ export default function CustomerDisplay() {
         }
         @keyframes cfdNeonGlow {
           0%, 100% {
-            text-shadow: 0 0 8px rgba(197, 160, 89, 0.4), 0 0 16px rgba(197, 160, 89, 0.2);
+            text-shadow: 0 0 8px rgba(111, 76, 237, 0.3), 0 0 16px rgba(111, 76, 237, 0.15);
           }
           50% {
-            text-shadow: 0 0 20px rgba(217, 119, 6, 0.9), 0 0 35px rgba(245, 158, 11, 0.8);
+            text-shadow: 0 0 20px rgba(111, 76, 237, 0.7), 0 0 35px rgba(111, 76, 237, 0.5);
           }
         }
         @keyframes cfdMarqueeScroll {
@@ -889,7 +889,7 @@ export default function CustomerDisplay() {
             color: '#065F46',
             border: '1.5px solid #10B981',
             boxShadow: '0 12px 35px rgba(5, 150, 105, 0.2)',
-            borderRadius: 3.5,
+            borderRadius: '16px',
             fontWeight: 800
           }}
         >
@@ -909,10 +909,10 @@ export default function CustomerDisplay() {
           icon={<AutoAwesome sx={{ color: '#D97706' }} />}
           sx={{
             bgcolor: '#FFFFFF',
-            color: '#92400E',
+            color: '#080F1C',
             border: `1.5px solid ${themeAccent}`,
-            boxShadow: `0 14px 40px rgba(197, 160, 89, 0.25)`,
-            borderRadius: 3.5,
+            boxShadow: `0 14px 40px #E1E4EA`,
+            borderRadius: '16px',
             fontWeight: 800
           }}
         >
@@ -935,7 +935,7 @@ export default function CustomerDisplay() {
             color: '#065F46',
             border: '1.5px solid #10B981',
             boxShadow: '0 14px 40px rgba(0, 0, 0, 0.12)',
-            borderRadius: 3.5,
+            borderRadius: '16px',
             fontWeight: 800
           }}
         >
@@ -966,7 +966,7 @@ export default function CustomerDisplay() {
                 p: 3,
                 borderRadius: '50%',
                 background: `radial-gradient(circle, #F59E0B 0%, #D97706 100%)`,
-                boxShadow: `0 0 60px rgba(217, 119, 6, 0.5)`,
+                boxShadow: `0 0 60px rgba(111, 76, 237, 0.35)`,
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center'
@@ -974,7 +974,7 @@ export default function CustomerDisplay() {
             >
               <Favorite sx={{ fontSize: 64, color: '#FFFFFF' }} />
             </Box>
-            <Typography variant="h5" sx={{ fontWeight: 900, color: '#92400E', mt: 1.5, textShadow: '0 2px 10px rgba(255,255,255,0.8)' }}>
+            <Typography variant="h5" sx={{ fontWeight: 900, color: '#080F1C', mt: 1.5, textShadow: '0 2px 10px rgba(255,255,255,0.8)' }}>
               Stylist Cherished! ✨
             </Typography>
           </motion.div>
@@ -990,7 +990,7 @@ export default function CustomerDisplay() {
           width: 580,
           height: 580,
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(197, 160, 89, 0.18) 0%, rgba(255, 255, 255, 0) 70%)',
+          background: 'radial-gradient(circle, rgba(8, 15, 28, 0.03) 0%, rgba(255, 255, 255, 0) 70%)',
           pointerEvents: 'none',
           zIndex: 0
         }}
@@ -1003,7 +1003,7 @@ export default function CustomerDisplay() {
           width: 600,
           height: 600,
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(217, 119, 6, 0.12) 0%, rgba(255, 255, 255, 0) 70%)',
+          background: 'radial-gradient(circle, rgba(111, 76, 237, 0.03) 0%, rgba(255, 255, 255, 0) 70%)',
           pointerEvents: 'none',
           zIndex: 0
         }}
@@ -1019,10 +1019,10 @@ export default function CustomerDisplay() {
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: { xs: 0.8, sm: 2 },
-          borderBottom: '1px solid rgba(197, 160, 89, 0.25)',
+          borderBottom: '1px solid #E1E4EA',
           bgcolor: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(20px)',
-          boxShadow: '0 4px 20px rgba(180, 140, 75, 0.06)',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
           zIndex: 10,
           overflow: 'hidden'
         }}
@@ -1040,10 +1040,10 @@ export default function CustomerDisplay() {
                 borderRadius: { xs: '8px', sm: '12px' },
                 objectFit: 'contain',
                 flexShrink: 0,
-                border: '1.5px solid rgba(197, 160, 89, 0.35)',
+                border: '1px solid #E1E4EA',
                 bgcolor: '#FFFFFF',
                 p: 0.3,
-                boxShadow: '0 2px 8px rgba(197, 160, 89, 0.15)'
+                boxShadow: '0 2px 8px #E1E4EA'
               }}
             />
           ) : (
@@ -1052,11 +1052,11 @@ export default function CustomerDisplay() {
                 width: { xs: 34, sm: 42, md: 46 },
                 height: { xs: 34, sm: 42, md: 46 },
                 borderRadius: { xs: '8px', sm: '12px' },
-                background: `linear-gradient(135deg, ${themeAccent} 0%, #937230 100%)`,
+                bgcolor: '#080F1C',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 3px 12px rgba(197, 160, 89, 0.35)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
                 flexShrink: 0
               }}
             >
@@ -1114,17 +1114,18 @@ export default function CustomerDisplay() {
                   </Box>
                 }
                 sx={{
-                  bgcolor: 'rgba(197, 160, 89, 0.12)',
-                  color: '#937230 !important',
-                  border: '1px solid rgba(197, 160, 89, 0.4)',
+                  bgcolor: '#FAFCFA',
+                  color: '#080F1C !important',
+                  border: '1px solid #E1E4EA',
+                  borderRadius: 9999,
                   fontWeight: 800,
                   fontSize: { xs: '0.68rem', sm: '0.82rem' },
                   height: { xs: 26, sm: 32 },
                   maxWidth: { xs: 125, sm: 240, md: 'none' },
-                  boxShadow: '0 2px 6px rgba(197, 160, 89, 0.12)',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
                   '& .MuiChip-label': {
                     px: { xs: 0.6, sm: 1 },
-                    color: '#937230 !important',
+                    color: '#080F1C !important',
                     fontWeight: 800,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis'
@@ -1180,7 +1181,7 @@ export default function CustomerDisplay() {
             spacing={0.6}
             sx={{ color: '#475569', display: { xs: 'none', md: 'flex' } }}
           >
-            <AccessTime sx={{ fontSize: 16, color: '#937230' }} />
+            <AccessTime sx={{ fontSize: 16, color: '#080F1C' }} />
             <Typography variant="body2" sx={{ fontWeight: 700, letterSpacing: '0.04em', fontSize: '0.88rem', color: '#334155' }}>
               {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
             </Typography>
@@ -1199,7 +1200,7 @@ export default function CustomerDisplay() {
                 height: { xs: 28, sm: 34 },
                 p: { xs: 0.4, sm: 0.8 },
                 border: '1px solid rgba(0, 0, 0, 0.08)',
-                '&:hover': { bgcolor: 'rgba(197, 160, 89, 0.15)', color: '#937230' }
+                '&:hover': { bgcolor: '#E1E4EA', color: '#080F1C' }
               }}
             >
               {isFullscreen ? <FullscreenExit sx={{ fontSize: { xs: 16, sm: 20 } }} /> : <Fullscreen sx={{ fontSize: { xs: 16, sm: 20 } }} />}
@@ -1290,8 +1291,8 @@ export default function CustomerDisplay() {
                   textAlign: 'center',
                   borderRadius: '14px',
                   bgcolor: '#FFFFFF',
-                  border: '1.5px solid rgba(197, 160, 89, 0.35)',
-                  boxShadow: '0 25px 60px rgba(180, 140, 75, 0.15), 0 4px 20px rgba(0, 0, 0, 0.05)',
+                  border: '1px solid #E1E4EA',
+                  boxShadow: '0 25px 60px rgba(0, 0, 0, 0.06), 0 4px 20px rgba(0, 0, 0, 0.05)',
                   position: 'relative'
                 }}
               >
@@ -1364,14 +1365,14 @@ export default function CustomerDisplay() {
                       p: 2.5,
                       borderRadius: '12px',
                       bgcolor: '#FFFFFF',
-                      border: '1.5px solid rgba(197, 160, 89, 0.3)',
-                      boxShadow: '0 8px 25px rgba(180, 140, 75, 0.08)'
+                      border: '1.5px solid #E1E4EA',
+                      boxShadow: '0 8px 25px rgba(0, 0, 0, 0.04)'
                     }}
                   >
                     <Typography variant="overline" sx={{ color: '#64748B', letterSpacing: '0.12em', fontWeight: 800, display: 'block' }}>
                       Settled Tender ({paymentMethod})
                     </Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 900, color: '#937230', mt: 0.5, fontSize: { xs: '1.6rem', sm: '1.9rem' } }}>
+                    <Typography variant="h4" sx={{ fontWeight: 900, color: '#080F1C', mt: 0.5, fontSize: { xs: '1.6rem', sm: '1.9rem' } }}>
                       ₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                     </Typography>
                     <Typography variant="caption" sx={{ color: '#059669', fontWeight: 800, display: 'block', mt: 0.3 }}>
@@ -1408,8 +1409,8 @@ export default function CustomerDisplay() {
                     p: 2.8,
                     borderRadius: '12px',
                     bgcolor: '#FFFFFF',
-                    border: '1.5px solid rgba(197, 160, 89, 0.3)',
-                    boxShadow: '0 8px 25px rgba(180, 140, 75, 0.06)',
+                    border: '1.5px solid #E1E4EA',
+                    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.04)',
                     mb: 3,
                     textAlign: 'center'
                   }}
@@ -1438,7 +1439,7 @@ export default function CustomerDisplay() {
                   />
 
                   {/* Compliment Chips */}
-                  <Typography variant="caption" sx={{ color: '#937230', fontWeight: 800, display: 'block', mt: 1.5, mb: 1, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <Typography variant="caption" sx={{ color: '#080F1C', fontWeight: 800, display: 'block', mt: 1.5, mb: 1, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                     What did you love most today?
                   </Typography>
                   <Stack direction="row" spacing={1} justifyContent="center" flexWrap="wrap" sx={{ gap: 1 }}>
@@ -1452,15 +1453,16 @@ export default function CustomerDisplay() {
                           size="small"
                           sx={{
                             cursor: 'pointer',
-                            bgcolor: isSelected ? '#C5A059' : '#FFFFFF',
+                            borderRadius: 9999,
+                            bgcolor: isSelected ? '#080F1C' : '#FFFFFF',
                             color: isSelected ? '#FFFFFF' : '#334155',
                             fontWeight: isSelected ? 800 : 700,
-                            border: `1.5px solid ${isSelected ? '#937230' : 'rgba(197, 160, 89, 0.3)'}`,
-                            boxShadow: isSelected ? '0 4px 12px rgba(197, 160, 89, 0.3)' : '0 1px 4px rgba(0,0,0,0.04)',
+                            border: `1.5px solid ${isSelected ? '#080F1C' : '#E1E4EA'}`,
+                            boxShadow: isSelected ? '0 2px 8px rgba(8, 15, 28, 0.15)' : '0 1px 4px rgba(0,0,0,0.04)',
                             transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                             '&:hover': {
                               transform: 'scale(1.04)',
-                              bgcolor: isSelected ? '#B38E44' : 'rgba(197, 160, 89, 0.12)'
+                              bgcolor: isSelected ? '#1D2531' : '#FAFCFA'
                             }
                           }}
                         />
@@ -1476,7 +1478,7 @@ export default function CustomerDisplay() {
                       startIcon={<WhatsApp sx={{ color: '#FFFFFF' }} />}
                       onClick={handleRequestReceipt}
                       sx={{
-                        borderRadius: 2.5,
+                        borderRadius: 9999,
                         bgcolor: receiptRequested ? '#059669' : '#10B981',
                         color: '#FFFFFF',
                         boxShadow: '0 4px 14px rgba(16, 185, 129, 0.3)',
@@ -1496,7 +1498,7 @@ export default function CustomerDisplay() {
                       startIcon={<Favorite sx={{ color: '#EF4444' }} />}
                       onClick={triggerHeartBurst}
                       sx={{
-                        borderRadius: 2.5,
+                        borderRadius: 9999,
                         borderColor: 'rgba(239, 68, 68, 0.5)',
                         color: '#DC2626',
                         bgcolor: 'rgba(239, 68, 68, 0.05)',
@@ -1550,8 +1552,8 @@ export default function CustomerDisplay() {
                     p: { xs: 3, sm: 4, md: 5.5 },
                     borderRadius: '14px',
                     bgcolor: '#FFFFFF',
-                    border: '1.5px solid rgba(197, 160, 89, 0.35)',
-                    boxShadow: '0 25px 60px rgba(180, 140, 75, 0.12), 0 4px 16px rgba(0, 0, 0, 0.04)',
+                    border: '1px solid #E1E4EA',
+                    boxShadow: '0 25px 60px rgba(0, 0, 0, 0.05), 0 4px 16px rgba(0, 0, 0, 0.04)',
                     textAlign: 'center'
                   }}
                 >
@@ -1567,11 +1569,11 @@ export default function CustomerDisplay() {
                         mx: 'auto',
                         mb: 2.5,
                         borderRadius: '10px',
-                        background: 'linear-gradient(135deg, #C5A059 0%, #937230 100%)',
+                        background: '#080F1C',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        boxShadow: '0 8px 25px rgba(197, 160, 89, 0.45)'
+                        boxShadow: '0 8px 25px #E1E4EA'
                       }}
                     >
                       <Stars sx={{ fontSize: 46, color: '#FFFFFF' }} />
@@ -1579,12 +1581,12 @@ export default function CustomerDisplay() {
                   </motion.div>
 
                   <Chip
-                    icon={<CardMembership sx={{ fontSize: '1rem !important', color: '#937230 !important' }} />}
+                    icon={<CardMembership sx={{ fontSize: '1rem !important', color: '#080F1C !important' }} />}
                     label={`HONOURED ATELIER PATRON • ${customerTier.toUpperCase()} PRIVILEGE`}
                     sx={{
-                      bgcolor: 'rgba(197, 160, 89, 0.14)',
-                      color: '#937230',
-                      border: '1px solid rgba(197, 160, 89, 0.4)',
+                      bgcolor: 'rgba(8, 15, 28, 0.03)',
+                      color: '#080F1C',
+                      border: '1px solid #E1E4EA',
                       fontWeight: 900,
                       fontSize: '0.82rem',
                       letterSpacing: '0.06em',
@@ -1617,17 +1619,17 @@ export default function CustomerDisplay() {
                       <Box
                         sx={{
                           p: 2.5,
-                          borderRadius: 3.5,
-                          bgcolor: '#FAF8F5',
-                          border: '1px solid rgba(197, 160, 89, 0.3)',
+                          borderRadius: '16px',
+                          bgcolor: '#FAFCFA',
+                          border: '1px solid #E1E4EA',
                           height: '100%',
                           textAlign: 'left',
-                          boxShadow: '0 4px 12px rgba(197, 160, 89, 0.06)'
+                          boxShadow: '0 4px 12px rgba(8, 15, 28, 0.02)'
                         }}
                       >
                         <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-                          <Redeem sx={{ color: '#937230', fontSize: 20 }} />
-                          <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#937230' }}>
+                          <Redeem sx={{ color: '#080F1C', fontSize: 20 }} />
+                          <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#080F1C' }}>
                             Loyalty Balance
                           </Typography>
                         </Stack>
@@ -1644,8 +1646,8 @@ export default function CustomerDisplay() {
                       <Box
                         sx={{
                           p: 2.5,
-                          borderRadius: 3.5,
-                          bgcolor: '#FAF8F5',
+                          borderRadius: '16px',
+                          bgcolor: '#FAFCFA',
                           border: '1px solid rgba(16, 185, 129, 0.3)',
                           height: '100%',
                           textAlign: 'left',
@@ -1671,8 +1673,8 @@ export default function CustomerDisplay() {
                       <Box
                         sx={{
                           p: 2.5,
-                          borderRadius: 3.5,
-                          bgcolor: '#FAF8F5',
+                          borderRadius: '16px',
+                          bgcolor: '#FAFCFA',
                           border: '1px solid rgba(59, 130, 246, 0.3)',
                           height: '100%',
                           textAlign: 'left',
@@ -1700,15 +1702,15 @@ export default function CustomerDisplay() {
                     sx={{
                       p: 2,
                       borderRadius: 3,
-                      bgcolor: 'rgba(197, 160, 89, 0.12)',
-                      border: '1.5px dashed rgba(197, 160, 89, 0.5)',
+                      bgcolor: 'rgba(8, 15, 28, 0.02)',
+                      border: '1.5px dashed #E1E4EA',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: 1.5
                     }}
                   >
-                    <AutoAwesome sx={{ color: '#937230', fontSize: 20 }} />
+                    <AutoAwesome sx={{ color: '#080F1C', fontSize: 20 }} />
                     <Typography variant="body2" sx={{ color: '#0F172A', fontWeight: 700 }}>
                       Consultant currently ringing up items at the billing terminal...
                     </Typography>
@@ -1726,7 +1728,7 @@ export default function CustomerDisplay() {
                     overflow: 'hidden',
                     position: 'relative',
                     bgcolor: '#000000',
-                    border: cfdConfig.videoFit === 'contain' ? '4px solid #C5A059' : '1.5px solid rgba(197, 160, 89, 0.4)',
+                    border: cfdConfig.videoFit === 'contain' ? '4px solid #080F1C' : '1.5px solid #E1E4EA',
                     boxShadow: '0 25px 70px rgba(0,0,0,0.4)',
                     display: 'flex',
                     flexDirection: 'column'
@@ -1751,8 +1753,8 @@ export default function CustomerDisplay() {
                       }}
                     >
                       {/* Animated Runway Lighting Pillars */}
-                      <Box sx={{ position: 'absolute', top: 0, left: '18%', width: 3, height: '100%', bgcolor: 'rgba(197, 160, 89, 0.65)', animation: 'cfdRunwayLight 2s infinite ease-in-out' }} />
-                      <Box sx={{ position: 'absolute', top: 0, right: '18%', width: 3, height: '100%', bgcolor: 'rgba(197, 160, 89, 0.65)', animation: 'cfdRunwayLight 2s infinite ease-in-out 1s' }} />
+                      <Box sx={{ position: 'absolute', top: 0, left: '18%', width: 3, height: '100%', bgcolor: '#E1E4EA', animation: 'cfdRunwayLight 2s infinite ease-in-out' }} />
+                      <Box sx={{ position: 'absolute', top: 0, right: '18%', width: 3, height: '100%', bgcolor: '#E1E4EA', animation: 'cfdRunwayLight 2s infinite ease-in-out 1s' }} />
 
                       {/* Perspective Gold Runway Lines */}
                       <Box
@@ -1762,9 +1764,9 @@ export default function CustomerDisplay() {
                           left: '10%',
                           right: '10%',
                           height: '45%',
-                          background: 'linear-gradient(to top, rgba(197, 160, 89, 0.35) 0%, rgba(197, 160, 89, 0) 100%)',
-                          borderLeft: '3px solid rgba(197, 160, 89, 0.5)',
-                          borderRight: '3px solid rgba(197, 160, 89, 0.5)',
+                          background: 'linear-gradient(to top, #E1E4EA 0%, rgba(8, 15, 28, 0) 100%)',
+                          borderLeft: '3px solid #E1E4EA',
+                          borderRight: '3px solid #E1E4EA',
                           transform: 'perspective(250px) rotateX(45deg)',
                           pointerEvents: 'none'
                         }}
@@ -1845,7 +1847,7 @@ export default function CustomerDisplay() {
                           bottom: { xs: 16, sm: 24 },
                           right: { xs: 16, sm: 24 },
                           zIndex: 30,
-                          bgcolor: isVideoMuted ? 'rgba(15, 23, 42, 0.85)' : 'rgba(197, 160, 89, 0.95)',
+                          bgcolor: isVideoMuted ? 'rgba(15, 23, 42, 0.85)' : '#080F1C',
                           color: '#FFFFFF !important',
                           border: '1.5px solid rgba(255, 255, 255, 0.45)',
                           backdropFilter: 'blur(10px)',
@@ -1859,7 +1861,7 @@ export default function CustomerDisplay() {
                           textTransform: 'uppercase',
                           cursor: 'pointer',
                           '&:hover': {
-                            bgcolor: isVideoMuted ? 'rgba(15, 23, 42, 0.95)' : '#B38E44'
+                            bgcolor: isVideoMuted ? 'rgba(15, 23, 42, 0.95)' : '#1D2531'
                           }
                         }}
                       >
@@ -1879,8 +1881,8 @@ export default function CustomerDisplay() {
                     textAlign: 'center',
                     borderRadius: '14px',
                     bgcolor: '#FFFFFF',
-                    border: '1.5px solid rgba(197, 160, 89, 0.35)',
-                    boxShadow: '0 25px 60px rgba(180, 140, 75, 0.12), 0 4px 16px rgba(0, 0, 0, 0.04)',
+                    border: '1px solid #E1E4EA',
+                    boxShadow: '0 25px 60px rgba(0, 0, 0, 0.05), 0 4px 16px rgba(0, 0, 0, 0.04)',
                     overflow: 'hidden',
                     position: 'relative'
                   }}
@@ -1896,11 +1898,11 @@ export default function CustomerDisplay() {
                           mx: 'auto',
                           mb: 2.5,
                           borderRadius: '50%',
-                          background: 'linear-gradient(135deg, #C5A059 0%, #937230 100%)',
+                          background: '#080F1C',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          boxShadow: '0 8px 25px rgba(197, 160, 89, 0.45)',
+                          boxShadow: '0 8px 25px #E1E4EA',
                           animation: 'cfdPulseGlow 2.5s infinite ease-in-out'
                         }}
                       >
@@ -1909,7 +1911,7 @@ export default function CustomerDisplay() {
 
                       <Typography
                         variant="overline"
-                        sx={{ color: '#937230', letterSpacing: '0.24em', fontWeight: 900, fontSize: '0.85rem' }}
+                        sx={{ color: '#080F1C', letterSpacing: '0.24em', fontWeight: 900, fontSize: '0.85rem' }}
                       >
                         {storeName.toUpperCase()} • ATELIER BESPOKE
                       </Typography>
@@ -1924,11 +1926,11 @@ export default function CustomerDisplay() {
                           fontSize: { xs: '1.9rem', sm: '2.5rem', md: '3.1rem' },
                           lineHeight: 1.2,
                           ...(cfdConfig.textAnimationStyle === 'pulse-glow' && {
-                            color: '#937230',
+                            color: '#080F1C',
                             animation: 'cfdPulseGlow 2.2s infinite ease-in-out'
                           }),
                           ...(cfdConfig.textAnimationStyle === 'marquee-glide' && {
-                            background: 'linear-gradient(90deg, #937230 0%, #D97706 25%, #FDE047 50%, #D97706 75%, #937230 100%)',
+                            background: 'linear-gradient(90deg, #080F1C 0%, #6F4CED 50%, #080F1C 100%)',
                             backgroundSize: '200% auto',
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
@@ -1939,7 +1941,7 @@ export default function CustomerDisplay() {
                             animation: 'cfdBounceFloat 1.8s ease-in-out infinite'
                           }),
                           ...(cfdConfig.textAnimationStyle === 'typewriter-fade' && {
-                            color: '#B45309',
+                            color: '#080F1C',
                             animation: 'cfdSparklePop 2.4s ease-in-out infinite'
                           })
                         }}
@@ -1957,9 +1959,9 @@ export default function CustomerDisplay() {
                             py: 2,
                             my: 2.5,
                             borderRadius: '12px',
-                            bgcolor: '#FAF8F5',
-                            border: '1.5px solid rgba(197, 160, 89, 0.35)',
-                            boxShadow: '0 8px 25px rgba(197, 160, 89, 0.1)'
+                            bgcolor: '#FAFCFA',
+                            border: '1px solid #E1E4EA',
+                            boxShadow: '0 8px 25px rgba(8, 15, 28, 0.02)'
                           }}
                         >
                           <Box
@@ -1971,7 +1973,7 @@ export default function CustomerDisplay() {
                           >
                             {/* Track 1 */}
                             <Stack direction="row" spacing={3} sx={{ px: 2, flexShrink: 0, alignItems: 'center' }}>
-                              <Typography variant="h6" sx={{ fontWeight: 800, color: '#937230' }}>
+                              <Typography variant="h6" sx={{ fontWeight: 800, color: '#080F1C' }}>
                                 💎 {cfdConfig.customSubtext || 'Bespoke Bridal Lehengas • Pure Handloom Banarasi Silks • Master Couture Tailoring'}
                               </Typography>
                               <Typography variant="h6" sx={{ fontWeight: 800, color: '#0F172A' }}>
@@ -1983,7 +1985,7 @@ export default function CustomerDisplay() {
                             </Stack>
                             {/* Track 2 (Duplicate for Seamless Loop) */}
                             <Stack direction="row" spacing={3} sx={{ px: 2, flexShrink: 0, alignItems: 'center' }}>
-                              <Typography variant="h6" sx={{ fontWeight: 800, color: '#937230' }}>
+                              <Typography variant="h6" sx={{ fontWeight: 800, color: '#080F1C' }}>
                                 💎 {cfdConfig.customSubtext || 'Bespoke Bridal Lehengas • Pure Handloom Banarasi Silks • Master Couture Tailoring'}
                               </Typography>
                               <Typography variant="h6" sx={{ fontWeight: 800, color: '#0F172A' }}>
@@ -2004,19 +2006,19 @@ export default function CustomerDisplay() {
                       {/* Highlight Badges */}
                       <Stack direction="row" spacing={1.5} justifyContent="center" flexWrap="wrap" sx={{ mt: 1 }}>
                         <Chip
-                          icon={<Star sx={{ color: '#937230 !important' }} />}
+                          icon={<Star sx={{ color: '#080F1C !important' }} />}
                           label="Bespoke Bridal Lehengas"
-                          sx={{ bgcolor: '#FAF8F5', color: '#937230', border: '1px solid rgba(197, 160, 89, 0.3)', fontWeight: 800 }}
+                          sx={{ bgcolor: '#FAFCFA', color: '#080F1C', border: '1px solid #E1E4EA', fontWeight: 800 }}
                         />
                         <Chip
-                          icon={<Diamond sx={{ color: '#937230 !important' }} />}
+                          icon={<Diamond sx={{ color: '#080F1C !important' }} />}
                           label="Pure Handloom Silks"
-                          sx={{ bgcolor: '#FAF8F5', color: '#937230', border: '1px solid rgba(197, 160, 89, 0.3)', fontWeight: 800 }}
+                          sx={{ bgcolor: '#FAFCFA', color: '#080F1C', border: '1px solid #E1E4EA', fontWeight: 800 }}
                         />
                         <Chip
-                          icon={<Spa sx={{ color: '#937230 !important' }} />}
+                          icon={<Spa sx={{ color: '#080F1C !important' }} />}
                           label="Master Fitting Guaranteed"
-                          sx={{ bgcolor: '#FAF8F5', color: '#937230', border: '1px solid rgba(197, 160, 89, 0.3)', fontWeight: 800 }}
+                          sx={{ bgcolor: '#FAFCFA', color: '#080F1C', border: '1px solid #E1E4EA', fontWeight: 800 }}
                         />
                       </Stack>
                     </Box>
@@ -2033,7 +2035,7 @@ export default function CustomerDisplay() {
                                 position: 'absolute',
                                 inset: 0,
                                 borderRadius: '50%',
-                                border: '2.5px dashed #C5A059',
+                                border: '2.5px dashed #080F1C',
                                 animation: 'cfdRotateSlow 20s linear infinite'
                               }}
                             />
@@ -2044,7 +2046,7 @@ export default function CustomerDisplay() {
                                 position: 'absolute',
                                 inset: 26,
                                 borderRadius: '50%',
-                                border: '2px dotted #937230',
+                                border: '2px dotted #080F1C',
                                 animation: 'cfdRotateReverseSlow 14s linear infinite'
                               }}
                             />
@@ -2055,12 +2057,12 @@ export default function CustomerDisplay() {
                                 position: 'absolute',
                                 inset: 56,
                                 borderRadius: '50%',
-                                background: 'linear-gradient(135deg, #C5A059 0%, #937230 100%)',
+                                background: '#080F1C',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 color: '#FFF',
-                                boxShadow: '0 8px 30px rgba(197, 160, 89, 0.55)',
+                                boxShadow: '0 8px 30px #E1E4EA',
                                 animation: 'cfdPulseGlow 2.5s infinite ease-in-out'
                               }}
                             >
@@ -2068,7 +2070,7 @@ export default function CustomerDisplay() {
                             </Box>
                           </Box>
 
-                          <Typography variant="overline" sx={{ color: '#937230', letterSpacing: '0.24em', fontWeight: 900, display: 'block', mt: 2 }}>
+                          <Typography variant="overline" sx={{ color: '#080F1C', letterSpacing: '0.24em', fontWeight: 900, display: 'block', mt: 2 }}>
                             ROYAL ZARDOZI HERITAGE
                           </Typography>
                           <Typography variant="h3" sx={{ fontWeight: 900, color: '#0F172A', mt: 0.5, mb: 1, fontSize: { xs: '1.8rem', md: '2.6rem' } }}>
@@ -2090,8 +2092,8 @@ export default function CustomerDisplay() {
                                   width: { xs: 10, sm: 16 },
                                   height: 42 + (barIdx % 4) * 18,
                                   borderRadius: 3,
-                                  background: 'linear-gradient(180deg, #FDE047 0%, #D97706 50%, #937230 100%)',
-                                  boxShadow: '0 4px 15px rgba(217, 119, 6, 0.45)',
+                                  background: 'linear-gradient(180deg, #FDE047 0%, #D97706 50%, #080F1C 100%)',
+                                  boxShadow: '0 4px 15px rgba(111, 76, 237, 0.3)',
                                   animation: `cfdWaveUndulate 2s ease-in-out infinite ${barIdx * 0.22}s`
                                 }}
                               />
@@ -2111,7 +2113,7 @@ export default function CustomerDisplay() {
                             ))}
                           </Stack>
 
-                          <Typography variant="overline" sx={{ color: '#937230', letterSpacing: '0.24em', fontWeight: 900, display: 'block' }}>
+                          <Typography variant="overline" sx={{ color: '#080F1C', letterSpacing: '0.24em', fontWeight: 900, display: 'block' }}>
                             FLOWING PURE MULBERRY SILKS & GOLDEN STARDUST
                           </Typography>
                           <Typography variant="h3" sx={{ fontWeight: 900, color: '#0F172A', mt: 0.5, mb: 1, fontSize: { xs: '1.8rem', md: '2.6rem' } }}>
@@ -2131,7 +2133,7 @@ export default function CustomerDisplay() {
                                 position: 'absolute',
                                 inset: 0,
                                 borderRadius: '50%',
-                                border: '1.5px dashed rgba(197, 160, 89, 0.4)',
+                                border: '1.5px dashed #E1E4EA',
                                 animation: 'cfdPulseGlow 3.5s infinite ease-in-out 1.5s'
                               }}
                             />
@@ -2141,7 +2143,7 @@ export default function CustomerDisplay() {
                                 position: 'absolute',
                                 inset: 32,
                                 borderRadius: '50%',
-                                border: '2px solid rgba(197, 160, 89, 0.6)',
+                                border: '2px solid #E1E4EA',
                                 animation: 'cfdPulseGlow 3.5s infinite ease-in-out 0.75s'
                               }}
                             />
@@ -2151,20 +2153,20 @@ export default function CustomerDisplay() {
                                 position: 'absolute',
                                 inset: 68,
                                 borderRadius: '50%',
-                                background: 'linear-gradient(135deg, rgba(197, 160, 89, 0.3) 0%, rgba(147, 114, 48, 0.4) 100%)',
-                                border: '2px solid #C5A059',
+                                background: 'linear-gradient(135deg, #E1E4EA 0%, rgba(8, 15, 28, 0.2) 100%)',
+                                border: '2px solid #080F1C',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                boxShadow: '0 8px 30px rgba(197, 160, 89, 0.4)',
+                                boxShadow: '0 8px 30px #E1E4EA',
                                 animation: 'cfdPulseGlow 3.5s infinite ease-in-out'
                               }}
                             >
-                              <Diamond sx={{ fontSize: 40, color: '#937230' }} />
+                              <Diamond sx={{ fontSize: 40, color: '#080F1C' }} />
                             </Box>
                           </Box>
 
-                          <Typography variant="overline" sx={{ color: '#937230', letterSpacing: '0.28em', fontWeight: 900, fontSize: '0.85rem' }}>
+                          <Typography variant="overline" sx={{ color: '#080F1C', letterSpacing: '0.28em', fontWeight: 900, fontSize: '0.85rem' }}>
                             ALEEN COUTURE MANIFESTO
                           </Typography>
                           <Typography variant="h3" sx={{ fontWeight: 900, color: '#0F172A', mt: 0.5, mb: 1, fontSize: { xs: '1.8rem', md: '2.6rem' } }}>
@@ -2185,21 +2187,21 @@ export default function CustomerDisplay() {
                               mx: 'auto',
                               mb: 2.5,
                               borderRadius: '12px',
-                              background: 'linear-gradient(135deg, rgba(197, 160, 89, 0.3) 0%, rgba(197, 160, 89, 0.1) 100%)',
-                              border: '2px solid rgba(197, 160, 89, 0.6)',
+                              background: 'linear-gradient(135deg, #E1E4EA 0%, rgba(8, 15, 28, 0.02) 100%)',
+                              border: '2px solid #E1E4EA',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
                               animation: 'cfdPulseGlow 3s infinite ease-in-out',
-                              boxShadow: '0 8px 25px rgba(197, 160, 89, 0.3)'
+                              boxShadow: '0 8px 25px #E1E4EA'
                             }}
                           >
-                            <Diamond sx={{ fontSize: 46, color: '#937230' }} />
+                            <Diamond sx={{ fontSize: 46, color: '#080F1C' }} />
                           </Box>
 
                           <Typography
                             variant="overline"
-                            sx={{ color: '#937230', letterSpacing: '0.24em', fontWeight: 900, fontSize: '0.85rem' }}
+                            sx={{ color: '#080F1C', letterSpacing: '0.24em', fontWeight: 900, fontSize: '0.85rem' }}
                           >
                             WELCOME TO {storeName.toUpperCase()}
                           </Typography>
@@ -2222,18 +2224,18 @@ export default function CustomerDisplay() {
                             sx={{
                               p: 3,
                               borderRadius: '12px',
-                              bgcolor: '#FAF8F5',
-                              border: '1.5px solid rgba(197, 160, 89, 0.35)',
+                              bgcolor: '#FAFCFA',
+                              border: '1px solid #E1E4EA',
                               my: 3,
                               position: 'relative',
                               overflow: 'hidden',
-                              boxShadow: '0 8px 24px rgba(197, 160, 89, 0.08)'
+                              boxShadow: '0 8px 24px rgba(8, 15, 28, 0.02)'
                             }}
                           >
                             <Typography
                               variant="caption"
                               sx={{
-                                color: '#937230',
+                                color: '#080F1C',
                                 letterSpacing: '0.14em',
                                 fontWeight: 900,
                                 textTransform: 'uppercase',
@@ -2260,8 +2262,8 @@ export default function CustomerDisplay() {
                                   size="small"
                                   sx={{
                                     bgcolor: '#FFFFFF',
-                                    color: '#937230',
-                                    border: '1px solid rgba(197, 160, 89, 0.4)',
+                                    color: '#080F1C',
+                                    border: '1px solid #E1E4EA',
                                     fontWeight: 700,
                                     fontSize: '0.78rem',
                                     boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
@@ -2278,7 +2280,7 @@ export default function CustomerDisplay() {
                                 left: 0,
                                 right: 0,
                                 height: 3.5,
-                                background: 'linear-gradient(90deg, #937230, #FDE047, #937230)',
+                                background: 'linear-gradient(90deg, #080F1C, #FDE047, #080F1C)',
                                 backgroundSize: '200% auto',
                                 animation: 'cfdShimmer 2.5s linear infinite'
                               }}
@@ -2294,7 +2296,7 @@ export default function CustomerDisplay() {
                                     width: i === activeSlide ? 24 : 8,
                                     height: 8,
                                     borderRadius: '4px',
-                                    bgcolor: i === activeSlide ? '#937230' : 'rgba(197, 160, 89, 0.3)',
+                                    bgcolor: i === activeSlide ? '#080F1C' : '#E1E4EA',
                                     cursor: 'pointer',
                                     transition: 'all 0.3s ease'
                                   }}
@@ -2310,19 +2312,19 @@ export default function CustomerDisplay() {
                   {/* Store Credo Chips (Light Theme) */}
                   <Stack direction="row" spacing={1.5} justifyContent="center" flexWrap="wrap" sx={{ mt: 2 }}>
                     <Chip
-                      icon={<AutoAwesome sx={{ color: '#937230 !important' }} />}
+                      icon={<AutoAwesome sx={{ color: '#080F1C !important' }} />}
                       label="Zero-Contact UPI Checkout"
-                      sx={{ bgcolor: '#FAF8F5', color: '#334155', border: '1px solid rgba(197, 160, 89, 0.25)', fontWeight: 700 }}
+                      sx={{ bgcolor: '#FAFCFA', color: '#334155', border: '1px solid #E1E4EA', fontWeight: 700 }}
                     />
                     <Chip
                       icon={<ShoppingBag sx={{ color: '#0284C7 !important' }} />}
                       label="Itemized Live Bill Mirroring"
-                      sx={{ bgcolor: '#FAF8F5', color: '#334155', border: '1px solid rgba(197, 160, 89, 0.25)', fontWeight: 700 }}
+                      sx={{ bgcolor: '#FAFCFA', color: '#334155', border: '1px solid #E1E4EA', fontWeight: 700 }}
                     />
                     <Chip
                       icon={<VerifiedUser sx={{ color: '#059669 !important' }} />}
                       label="Certified Authentic Handloom"
-                      sx={{ bgcolor: '#FAF8F5', color: '#334155', border: '1px solid rgba(197, 160, 89, 0.25)', fontWeight: 700 }}
+                      sx={{ bgcolor: '#FAFCFA', color: '#334155', border: '1px solid #E1E4EA', fontWeight: 700 }}
                     />
                   </Stack>
                 </Paper>
@@ -2351,12 +2353,12 @@ export default function CustomerDisplay() {
                     p: { xs: 2.2, sm: 3 },
                     borderRadius: '14px',
                     bgcolor: '#FFFFFF',
-                    border: '1.5px solid rgba(197, 160, 89, 0.35)',
-                    boxShadow: '0 12px 35px rgba(180, 140, 75, 0.08), 0 2px 10px rgba(0, 0, 0, 0.03)'
+                    border: '1px solid #E1E4EA',
+                    boxShadow: '0 12px 35px rgba(0, 0, 0, 0.04), 0 2px 10px rgba(0, 0, 0, 0.03)'
                   }}
                 >
                   {/* Atelier Master Header */}
-                  <Box sx={{ pb: 2, mb: 2, borderBottom: '1px solid rgba(197, 160, 89, 0.2)' }}>
+                  <Box sx={{ pb: 2, mb: 2, borderBottom: '1px solid #E1E4EA' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.2 }}>
                       <Stack direction="row" spacing={1.2} alignItems="center">
                         <Box
@@ -2364,12 +2366,12 @@ export default function CustomerDisplay() {
                             width: 34,
                             height: 34,
                             borderRadius: '50%',
-                            bgcolor: 'rgba(197, 160, 89, 0.15)',
-                            border: '1.5px solid rgba(197, 160, 89, 0.4)',
+                            bgcolor: '#E1E4EA',
+                            border: '1.5px solid #E1E4EA',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            color: '#937230'
+                            color: '#080F1C'
                           }}
                         >
                           <Diamond sx={{ fontSize: 19 }} />
@@ -2378,7 +2380,7 @@ export default function CustomerDisplay() {
                           <Typography
                             variant="overline"
                             sx={{
-                              color: '#937230',
+                              color: '#080F1C',
                               letterSpacing: '0.18em',
                               fontWeight: 900,
                               fontSize: '0.74rem',
@@ -2411,12 +2413,12 @@ export default function CustomerDisplay() {
                           label={`${items.length} ${items.length === 1 ? 'ITEM' : 'ITEMS'}`}
                           size="small"
                           sx={{
-                            bgcolor: 'rgba(197, 160, 89, 0.15)',
-                            color: '#937230',
+                            bgcolor: '#E1E4EA',
+                            color: '#080F1C',
                             fontWeight: 900,
                             fontSize: '0.68rem',
                             height: 24,
-                            border: '1px solid rgba(197, 160, 89, 0.3)'
+                            border: '1px solid #E1E4EA'
                           }}
                         />
                       </Stack>
@@ -2428,10 +2430,10 @@ export default function CustomerDisplay() {
                         sx={{
                           mt: 1.5,
                           p: 1.8,
-                          borderRadius: '12px',
-                          background: 'linear-gradient(135deg, rgba(254, 243, 199, 0.6) 0%, rgba(240, 253, 250, 0.75) 100%)',
-                          border: '1.5px solid rgba(197, 160, 89, 0.45)',
-                          boxShadow: '0 4px 16px rgba(197, 160, 89, 0.12)',
+                          borderRadius: '16px',
+                          bgcolor: '#FAFCFA',
+                          border: '1px solid #E1E4EA',
+                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
@@ -2444,39 +2446,39 @@ export default function CustomerDisplay() {
                             sx={{
                               width: 44,
                               height: 44,
-                              bgcolor: '#7C6FE8',
+                              bgcolor: '#080F1C',
                               color: '#FFFFFF',
                               fontWeight: 900,
                               fontSize: '1.05rem',
-                              borderRadius: '10px',
-                              border: '2px solid #C5A059',
-                              boxShadow: '0 3px 10px rgba(124, 111, 232, 0.25)'
+                              borderRadius: '50%',
+                              border: '1.5px solid #E1E4EA',
+                              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
                             }}
                           >
                             {activeCustomerName.charAt(0).toUpperCase()}
                           </Avatar>
                           <Box>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, flexWrap: 'wrap' }}>
-                              <Typography variant="caption" sx={{ color: '#937230', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', fontSize: '0.64rem' }}>
+                              <Typography variant="caption" sx={{ color: '#66707B', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', fontSize: '0.64rem' }}>
                                 Patron Concierge • Honoured Guest
                               </Typography>
                             </Box>
                             <Stack direction="row" spacing={0.8} alignItems="center" sx={{ mt: 0.2 }}>
-                              <Typography sx={{ fontWeight: 900, color: '#0F172A', fontSize: '1.04rem', letterSpacing: '-0.01em' }}>
+                              <Typography sx={{ fontWeight: 900, color: '#161922', fontSize: '1.04rem', letterSpacing: '-0.01em' }}>
                                 {renderPatronName(activeCustomerName, { fontSize: 'inherit' })}
                               </Typography>
                               <Chip
-                                icon={<Stars sx={{ fontSize: '13px !important', color: '#937230 !important' }} />}
+                                icon={<Stars sx={{ fontSize: '13px !important', color: '#080F1C !important' }} />}
                                 label={`${customerTier} VIP`}
                                 size="small"
                                 sx={{
                                   height: 20,
                                   fontSize: '0.65rem',
                                   fontWeight: 900,
-                                  borderRadius: '6px',
-                                  bgcolor: 'rgba(197, 160, 89, 0.22)',
-                                  color: '#937230',
-                                  border: '1px solid rgba(197, 160, 89, 0.45)'
+                                  borderRadius: 9999,
+                                  bgcolor: '#FFFFFF',
+                                  color: '#080F1C',
+                                  border: '1px solid #E1E4EA'
                                 }}
                               />
                             </Stack>
@@ -2488,7 +2490,7 @@ export default function CustomerDisplay() {
                           </Box>
                         </Stack>
 
-                        <Box sx={{ bgcolor: '#FFFFFF', px: 1.8, py: 0.75, borderRadius: '8px', border: '1.5px solid rgba(197, 160, 89, 0.3)', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
+                        <Box sx={{ bgcolor: '#FFFFFF', px: 1.8, py: 0.75, borderRadius: '8px', border: '1.5px solid #E1E4EA', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
                           <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700, fontSize: '0.64rem', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                             Privilege Balance
                           </Typography>
@@ -2504,14 +2506,14 @@ export default function CustomerDisplay() {
                           px: 1.8,
                           py: 0.8,
                           borderRadius: '10px',
-                          bgcolor: '#FAF8F5',
-                          border: '1px dashed rgba(197, 160, 89, 0.35)',
+                          bgcolor: '#FAFCFA',
+                          border: '1px dashed #E1E4EA',
                           display: 'flex',
                           alignItems: 'center',
                           gap: 1
                         }}
                       >
-                        <AutoAwesome sx={{ color: '#C5A059', fontSize: 16 }} />
+                        <AutoAwesome sx={{ color: '#080F1C', fontSize: 16 }} />
                         <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700, fontSize: '0.74rem' }}>
                           Honoured Atelier Patron • Items reflect automatically as our master stylers curate your ensemble
                         </Typography>
@@ -2547,9 +2549,9 @@ export default function CustomerDisplay() {
                                   alignItems: 'center',
                                   justifyContent: 'space-between',
                                   borderRadius: '10px',
-                                  bgcolor: isJustScanned ? 'rgba(254, 243, 199, 0.4)' : '#FAF8F5',
-                                  border: isJustScanned ? '1.5px solid #D97706' : '1px solid rgba(197, 160, 89, 0.24)',
-                                  boxShadow: isJustScanned ? '0 4px 18px rgba(217, 119, 6, 0.15)' : '0 2px 8px rgba(0, 0, 0, 0.02)',
+                                  bgcolor: isJustScanned ? 'rgba(254, 243, 199, 0.4)' : '#FAFCFA',
+                                  border: isJustScanned ? '1.5px solid #D97706' : '1px solid rgba(8, 15, 28, 0.04)',
+                                  boxShadow: isJustScanned ? '0 4px 18px rgba(111, 76, 237, 0.1)' : '0 2px 8px rgba(0, 0, 0, 0.02)',
                                   transition: 'all 0.25s ease',
                                   position: 'relative',
                                   overflow: 'hidden'
@@ -2583,7 +2585,7 @@ export default function CustomerDisplay() {
                                       height: 44,
                                       borderRadius: '8px',
                                       bgcolor: '#FFFFFF',
-                                      border: '1px solid rgba(197, 160, 89, 0.3)',
+                                      border: '1px solid #E1E4EA',
                                       display: 'flex',
                                       alignItems: 'center',
                                       justifyContent: 'center',
@@ -2616,9 +2618,9 @@ export default function CustomerDisplay() {
                                           sx={{
                                             height: 19,
                                             fontSize: '0.62rem',
-                                            bgcolor: 'rgba(197, 160, 89, 0.12)',
-                                            color: '#937230',
-                                            border: '1px solid rgba(197, 160, 89, 0.25)',
+                                            bgcolor: 'rgba(8, 15, 28, 0.02)',
+                                            color: '#080F1C',
+                                            border: '1px solid #E1E4EA',
                                             fontWeight: 700
                                           }}
                                         />
@@ -2653,7 +2655,7 @@ export default function CustomerDisplay() {
                                       py: 0.25,
                                       borderRadius: '6px',
                                       bgcolor: '#FFFFFF',
-                                      border: '1px solid rgba(197, 160, 89, 0.3)',
+                                      border: '1px solid #E1E4EA',
                                       mb: 0.4
                                     }}
                                   >
@@ -2666,7 +2668,7 @@ export default function CustomerDisplay() {
                                     variant="subtitle1"
                                     sx={{
                                       fontWeight: 900,
-                                      color: '#937230',
+                                      color: '#080F1C',
                                       fontSize: { xs: '1.02rem', sm: '1.15rem' },
                                       fontVariantNumeric: 'tabular-nums',
                                       fontFamily: '"JetBrains Mono", monospace'
@@ -2732,15 +2734,15 @@ export default function CustomerDisplay() {
                       p: 3,
                       borderRadius: '14px',
                       bgcolor: '#FFFFFF',
-                      border: '1.5px solid rgba(197, 160, 89, 0.35)',
-                      boxShadow: '0 12px 35px rgba(180, 140, 75, 0.08), 0 2px 10px rgba(0, 0, 0, 0.03)'
+                      border: '1px solid #E1E4EA',
+                      boxShadow: '0 12px 35px rgba(0, 0, 0, 0.04), 0 2px 10px rgba(0, 0, 0, 0.03)'
                     }}
                   >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.8 }}>
                       <Box>
                         <Stack direction="row" spacing={0.8} alignItems="center">
-                          <AccountBalanceWallet sx={{ fontSize: 18, color: '#937230' }} />
-                          <Typography variant="overline" sx={{ color: '#937230', letterSpacing: '0.18em', fontWeight: 900, fontSize: '0.74rem', lineHeight: 1 }}>
+                          <AccountBalanceWallet sx={{ fontSize: 18, color: '#080F1C' }} />
+                          <Typography variant="overline" sx={{ color: '#080F1C', letterSpacing: '0.18em', fontWeight: 900, fontSize: '0.74rem', lineHeight: 1 }}>
                             ATELIER BILL SUMMARY
                           </Typography>
                         </Stack>
@@ -2860,30 +2862,31 @@ export default function CustomerDisplay() {
                       )}
                     </Stack>
 
-                    <Divider sx={{ borderColor: 'rgba(197, 160, 89, 0.25)', my: 2 }} />
+                    <Divider sx={{ borderColor: '#E1E4EA', my: 2 }} />
 
                     {/* Hero Net Payable Jewel Capsule */}
                     <Box
                       sx={{
                         p: 2.2,
-                        borderRadius: '12px',
-                        background: 'linear-gradient(135deg, #FFFDF8 0%, #FAF4E5 100%)',
-                        border: '2px solid rgba(197, 160, 89, 0.55)',
-                        boxShadow: '0 8px 25px rgba(180, 140, 75, 0.15)',
+                        borderRadius: '16px',
+                        bgcolor: '#080F1C',
+                        color: '#FFFFFF',
+                        border: '1px solid #1D2531',
+                        boxShadow: '0 4px 20px rgba(8, 15, 28, 0.15)',
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center'
                       }}
                     >
                       <Box>
-                        <Typography variant="caption" sx={{ color: '#937230', fontWeight: 900, letterSpacing: '0.12em', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          <Diamond sx={{ fontSize: 14 }} /> TOTAL NET PAYABLE
+                        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Diamond sx={{ fontSize: 14, color: '#6F4CED' }} /> TOTAL NET PAYABLE
                         </Typography>
                         <Typography
                           variant="h4"
                           sx={{
                             fontWeight: 900,
-                            color: '#8D6A28',
+                            color: '#FFFFFF',
                             fontSize: { xs: '1.9rem', md: '2.3rem' },
                             lineHeight: 1.1,
                             mt: 0.4,
@@ -2898,13 +2901,14 @@ export default function CustomerDisplay() {
                       <Chip
                         label={isSettled ? "SETTLED" : "DUE"}
                         sx={{
-                          bgcolor: isSettled ? '#059669' : '#D97706',
+                          bgcolor: isSettled ? '#059669' : '#6F4CED',
                           color: '#FFFFFF',
                           fontWeight: 900,
                           fontSize: '0.82rem',
                           height: 32,
                           px: 1.5,
-                          boxShadow: isSettled ? '0 4px 12px rgba(5, 150, 105, 0.3)' : '0 4px 12px rgba(217, 119, 6, 0.3)'
+                          borderRadius: 9999,
+                          boxShadow: isSettled ? '0 4px 12px rgba(5, 150, 105, 0.3)' : '0 4px 12px rgba(111, 76, 237, 0.3)'
                         }}
                       />
                     </Box>
@@ -2916,9 +2920,9 @@ export default function CustomerDisplay() {
                           mt: 2,
                           p: 1.8,
                           borderRadius: '10px',
-                          bgcolor: '#FAF8F5',
-                          border: '1.5px solid rgba(197, 160, 89, 0.4)',
-                          boxShadow: '0 4px 15px rgba(180, 140, 75, 0.08)'
+                          bgcolor: '#FAFCFA',
+                          border: '1.5px solid #E1E4EA',
+                          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.04)'
                         }}
                       >
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.2 }}>
@@ -2960,12 +2964,12 @@ export default function CustomerDisplay() {
                         </Box>
 
                         {/* Balance & Progress */}
-                        <Box sx={{ mt: 1, pt: 1, borderTop: '1px dashed rgba(197, 160, 89, 0.25)' }}>
+                        <Box sx={{ mt: 1, pt: 1, borderTop: '1px dashed #E1E4EA' }}>
                           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.6 }}>
                             <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700, fontSize: '0.68rem' }}>
                               Privilege Milestone • {tierMeta.nextTier}
                             </Typography>
-                            <Typography variant="caption" sx={{ color: '#937230', fontWeight: 800, fontSize: '0.68rem' }}>
+                            <Typography variant="caption" sx={{ color: '#080F1C', fontWeight: 800, fontSize: '0.68rem' }}>
                               {Math.round(tierMeta.progress)}%
                             </Typography>
                           </Box>
@@ -2975,10 +2979,10 @@ export default function CustomerDisplay() {
                             sx={{
                               height: 6,
                               borderRadius: '6px',
-                              bgcolor: 'rgba(197, 160, 89, 0.15)',
+                              bgcolor: '#E1E4EA',
                               '& .MuiLinearProgress-bar': {
                                 borderRadius: '6px',
-                                background: 'linear-gradient(90deg, #C5A059 0%, #7C6FE8 100%)'
+                                background: 'linear-gradient(90deg, #080F1C 0%, #7C6FE8 100%)'
                               }
                             }}
                           />
@@ -2990,8 +2994,8 @@ export default function CustomerDisplay() {
                           mt: 2,
                           p: 1.6,
                           borderRadius: '10px',
-                          bgcolor: 'rgba(197, 160, 89, 0.08)',
-                          border: '1.5px dashed rgba(197, 160, 89, 0.45)',
+                          bgcolor: 'rgba(8, 15, 28, 0.02)',
+                          border: '1.5px dashed #E1E4EA',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
@@ -3004,18 +3008,18 @@ export default function CustomerDisplay() {
                               width: 32,
                               height: 32,
                               borderRadius: '50%',
-                              bgcolor: 'rgba(197, 160, 89, 0.2)',
-                              border: '1.5px solid rgba(197, 160, 89, 0.4)',
+                              bgcolor: '#E1E4EA',
+                              border: '1.5px solid #E1E4EA',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              color: '#937230'
+                              color: '#080F1C'
                             }}
                           >
                             <WorkspacePremium sx={{ fontSize: 18 }} />
                           </Box>
                           <Box>
-                            <Typography sx={{ fontSize: '0.8rem', fontWeight: 900, color: '#937230', lineHeight: 1.2 }}>
+                            <Typography sx={{ fontSize: '0.8rem', fontWeight: 900, color: '#080F1C', lineHeight: 1.2 }}>
                               Join Aleen Privilege Club
                             </Typography>
                             <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.68rem' }}>
@@ -3046,13 +3050,13 @@ export default function CustomerDisplay() {
                       p: 2.8,
                       borderRadius: '14px',
                       bgcolor: '#FFFFFF',
-                      border: '1.5px solid rgba(197, 160, 89, 0.35)',
+                      border: '1px solid #E1E4EA',
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'center',
                       textAlign: 'center',
-                      boxShadow: '0 12px 35px rgba(180, 140, 75, 0.08), 0 2px 10px rgba(0, 0, 0, 0.03)',
+                      boxShadow: '0 12px 35px rgba(0, 0, 0, 0.04), 0 2px 10px rgba(0, 0, 0, 0.03)',
                       position: 'relative'
                     }}
                   >
@@ -3069,15 +3073,16 @@ export default function CustomerDisplay() {
                         {/* Store VPA Pill with Copy */}
                         {storeVpa && (
                           <Chip
-                            icon={<ContentCopy sx={{ fontSize: '13px !important', color: copiedUpi ? '#059669 !important' : '#937230 !important' }} />}
+                            icon={<ContentCopy sx={{ fontSize: '13px !important', color: copiedUpi ? '#059669 !important' : '#080F1C !important' }} />}
                             label={copiedUpi ? "UPI ID Copied!" : `UPI: ${storeVpa}`}
                             onClick={handleCopyUpi}
                             size="small"
                             sx={{
                               mb: 1.5,
-                              bgcolor: copiedUpi ? 'rgba(16, 185, 129, 0.12)' : 'rgba(197, 160, 89, 0.1)',
-                              color: copiedUpi ? '#059669' : '#937230',
-                              border: '1px solid rgba(197, 160, 89, 0.3)',
+                              borderRadius: 9999,
+                              bgcolor: copiedUpi ? 'rgba(16, 185, 129, 0.12)' : '#FAFCFA',
+                              color: copiedUpi ? '#059669' : '#080F1C',
+                              border: '1px solid #E1E4EA',
                               fontWeight: 800,
                               fontSize: '0.68rem',
                               cursor: 'pointer'
@@ -3090,10 +3095,10 @@ export default function CustomerDisplay() {
                           onClick={() => setQrZoomOpen(true)}
                           sx={{
                             p: 2,
-                            borderRadius: '12px',
+                            borderRadius: '16px',
                             bgcolor: '#FFFFFF',
-                            border: '2px solid rgba(197, 160, 89, 0.55)',
-                            boxShadow: '0 8px 30px rgba(180, 140, 75, 0.18)',
+                            border: '1.5px solid #E1E4EA',
+                            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.04)',
                             display: 'inline-flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -3102,8 +3107,8 @@ export default function CustomerDisplay() {
                             transition: 'all 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
                             '&:hover': {
                               transform: 'scale(1.04)',
-                              borderColor: '#937230',
-                              boxShadow: '0 12px 35px rgba(180, 140, 75, 0.28)'
+                              borderColor: '#080F1C',
+                              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.08)'
                             }
                           }}
                         >
@@ -3116,20 +3121,21 @@ export default function CustomerDisplay() {
                         </Box>
 
                         <Chip
-                          icon={<ZoomIn sx={{ fontSize: '1.05rem !important', color: '#937230 !important' }} />}
+                          icon={<ZoomIn sx={{ fontSize: '1.05rem !important', color: '#080F1C !important' }} />}
                           label="Tap to Expand Fullscreen QR"
                           onClick={() => setQrZoomOpen(true)}
                           size="small"
                           sx={{
                             mt: 1.5,
                             mb: 1.2,
-                            bgcolor: 'rgba(197, 160, 89, 0.12)',
-                            color: '#937230',
-                            border: '1px solid rgba(197, 160, 89, 0.35)',
+                            borderRadius: 9999,
+                            bgcolor: '#FAFCFA',
+                            color: '#080F1C',
+                            border: '1px solid #E1E4EA',
                             fontWeight: 800,
                             fontSize: '0.72rem',
                             cursor: 'pointer',
-                            '&:hover': { bgcolor: 'rgba(197, 160, 89, 0.22)' }
+                            '&:hover': { bgcolor: '#F2F3F6', borderColor: '#080F1C' }
                           }}
                         />
 
@@ -3162,7 +3168,7 @@ export default function CustomerDisplay() {
                             width: '100%',
                             pt: 1.5,
                             mt: 0.5,
-                            borderTop: '1px solid rgba(197, 160, 89, 0.2)'
+                            borderTop: '1px solid #E1E4EA'
                           }}
                         >
                           <Stack direction="row" spacing={0.8} justifyContent="center" alignItems="center">
@@ -3195,14 +3201,14 @@ export default function CustomerDisplay() {
                             mx: 'auto',
                             mb: 2,
                             borderRadius: '50%',
-                            bgcolor: 'rgba(197, 160, 89, 0.15)',
-                            border: '1.5px solid rgba(197, 160, 89, 0.35)',
+                            bgcolor: '#E1E4EA',
+                            border: '1px solid #E1E4EA',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center'
                           }}
                         >
-                          <Payments sx={{ color: '#937230', fontSize: 36 }} />
+                          <Payments sx={{ color: '#080F1C', fontSize: 36 }} />
                         </Box>
                         <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#0F172A' }}>
                           Tender Method: {paymentMethod}
@@ -3230,8 +3236,8 @@ export default function CustomerDisplay() {
           sx: {
             borderRadius: '14px',
             bgcolor: '#FFFFFF',
-            border: '2px solid rgba(197, 160, 89, 0.5)',
-            boxShadow: '0 25px 60px rgba(180, 140, 75, 0.25)',
+            border: '2px solid #E1E4EA',
+            boxShadow: '0 25px 60px rgba(0, 0, 0, 0.08)',
             p: 3,
             textAlign: 'center',
             color: '#0F172A'
@@ -3240,7 +3246,7 @@ export default function CustomerDisplay() {
       >
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
           <Stack direction="row" spacing={1} alignItems="center">
-            <QrCode2 sx={{ color: '#937230', fontSize: 24 }} />
+            <QrCode2 sx={{ color: '#080F1C', fontSize: 24 }} />
             <Typography variant="h6" sx={{ fontWeight: 900, fontSize: '1.15rem' }}>
               High-Definition UPI Scan
             </Typography>
@@ -3255,8 +3261,8 @@ export default function CustomerDisplay() {
             p: 2,
             borderRadius: '12px',
             bgcolor: '#FFFFFF',
-            border: '1.5px solid rgba(197, 160, 89, 0.35)',
-            boxShadow: '0 12px 35px rgba(197, 160, 89, 0.15)',
+            border: '1px solid #E1E4EA',
+            boxShadow: '0 12px 35px #E1E4EA',
             display: 'inline-block',
             mx: 'auto',
             mb: 2.5
@@ -3272,7 +3278,7 @@ export default function CustomerDisplay() {
           )}
         </Box>
 
-        <Typography variant="overline" sx={{ color: '#937230', letterSpacing: '0.18em', fontWeight: 900 }}>
+        <Typography variant="overline" sx={{ color: '#080F1C', letterSpacing: '0.18em', fontWeight: 900 }}>
           TOTAL AMOUNT DUE
         </Typography>
         <Typography variant="h3" sx={{ fontWeight: 900, color: '#0F172A', mb: 1, fontSize: '2.4rem' }}>
@@ -3289,16 +3295,16 @@ export default function CustomerDisplay() {
             variant="outlined"
             onClick={handleCopyUpi}
             sx={{
-              borderRadius: 2.5,
+              borderRadius: 9999,
               py: 1.2,
-              borderColor: 'rgba(197, 160, 89, 0.5)',
-              color: '#937230',
+              borderColor: '#E1E4EA',
+              color: '#080F1C',
               fontWeight: 800,
               textTransform: 'none',
               fontSize: '0.9rem',
               '&:hover': {
-                borderColor: '#937230',
-                bgcolor: 'rgba(197, 160, 89, 0.1)'
+                borderColor: '#080F1C',
+                bgcolor: 'rgba(8, 15, 28, 0.02)'
               }
             }}
           >
@@ -3310,16 +3316,16 @@ export default function CustomerDisplay() {
             variant="contained"
             onClick={() => setQrZoomOpen(false)}
             sx={{
-              borderRadius: 2.5,
+              borderRadius: 9999,
               py: 1.2,
-              background: 'linear-gradient(135deg, #C5A059 0%, #937230 100%)',
+              bgcolor: '#080F1C',
               color: '#FFFFFF',
               fontWeight: 900,
               textTransform: 'none',
               fontSize: '0.95rem',
-              boxShadow: '0 4px 14px rgba(197, 160, 89, 0.35)',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
               '&:hover': {
-                background: 'linear-gradient(135deg, #B38E44 0%, #826227 100%)'
+                bgcolor: '#1D2531'
               }
             }}
           >
@@ -3338,11 +3344,11 @@ export default function CustomerDisplay() {
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-          borderTop: '1px solid rgba(197, 160, 89, 0.25)',
+          borderTop: '1px solid #E1E4EA',
           bgcolor: 'rgba(255, 255, 255, 0.96)',
           backdropFilter: 'blur(20px)',
           zIndex: 10,
-          boxShadow: '0 -2px 10px rgba(180, 140, 75, 0.04)'
+          boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.02)'
         }}
       >
         <Typography
