@@ -51,4 +51,19 @@ describe('Login Page Professional Redesign', () => {
     // Verify enterprise security indicators
     expect(html).toContain('Sign In to Atelier');
   });
+
+  test('renders couture atelier doodles and excludes dense marketing text walls', () => {
+    const html = renderLoginStatic();
+
+    // Verify doodle artwork elements are present
+    expect(html).toContain('dress-form');
+    expect(html).toContain('tailor-shears');
+    expect(html).toContain('measuring-tape');
+    expect(html).toContain('thread-spool');
+
+    // Verify dense text walls and feature cards are absent
+    expect(html).not.toContain('Precision bespoke craft');
+    expect(html).not.toContain('Bespoke Tailoring &amp; Workshop Kanban');
+    expect(html).not.toContain('Bespoke Tailoring & Workshop Kanban');
+  });
 });
