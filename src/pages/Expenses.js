@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import { 
     Edit, Delete, Add, Search, ReceiptLong, AccountBalanceWallet, 
-    Download, Upload, Close, ArrowUpward, ArrowDownward, TrendingUp
+    Download, Upload, Close, TrendingUp
 } from '../components/icons';
 import { useData } from '../contexts/DataContext';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
@@ -22,6 +22,8 @@ const Expenses = () => {
     const [editItem, setEditItem] = useState(null);
     const [search, setSearch] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('All');
+    const [dateFrom, setDateFrom] = useState('');
+    const [dateTo, setDateTo] = useState('');
     const [newCategory, setNewCategory] = useState('');
     const [form, setForm] = useState({
         title: '', amount: '', category: 'General', date: new Date().toISOString().split('T')[0], note: ''
@@ -63,6 +65,20 @@ const Expenses = () => {
         setOrderBy(property);
     };
 
+    const normalizeDateStr = (dateVal) => {
+        if (!dateVal) return '';
+        if (typeof dateVal === 'string') {
+            const match = dateVal.match(/^(\d{4}-\d{2}-\d{2})/);
+            if (match) return match[1];
+        }
+        const d = new Date(dateVal);
+        if (isNaN(d.getTime())) return '';
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    };
+
     const filteredExpenses = useMemo(() => {
         return expenses.filter(exp => {
             const query = search.toLowerCase().trim();
@@ -71,9 +87,21 @@ const Expenses = () => {
                 (exp.note || '').toLowerCase().includes(query);
 
             const matchesCategory = categoryFilter === 'All' || exp.category === categoryFilter;
-            return matchesSearch && matchesCategory;
+
+            let matchesDate = true;
+            if (dateFrom || dateTo) {
+                const expDateStr = normalizeDateStr(exp.date);
+                if (!expDateStr) {
+                    matchesDate = false;
+                } else {
+                    if (dateFrom && expDateStr < dateFrom) matchesDate = false;
+                    if (dateTo && expDateStr > dateTo) matchesDate = false;
+                }
+            }
+
+            return matchesSearch && matchesCategory && matchesDate;
         });
-    }, [expenses, search, categoryFilter]);
+    }, [expenses, search, categoryFilter, dateFrom, dateTo]);
 
     const sortedExpenses = useMemo(() => {
         return [...filteredExpenses].sort((a, b) => {
@@ -397,7 +425,7 @@ const Expenses = () => {
             {/* Search and Filters Toolbar */}
             <GlassCard sx={{ p: 2, mb: 3 }}>
                 <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={12} md={5}>
+                    <Grid item xs={12} md={3.5}>
                         <TextField
                             fullWidth
                             size="small"
@@ -419,7 +447,7 @@ const Expenses = () => {
                             }}
                         />
                     </Grid>
-                    <Grid item xs={6} sm={4} md={3}>
+                    <Grid item xs={12} sm={4} md={2.5}>
                         <TextField
                             select
                             fullWidth
@@ -439,44 +467,75 @@ const Expenses = () => {
                             ))}
                         </TextField>
                     </Grid>
-                    <Grid item xs={6} sm={4} md={2.5}>
+                    <Grid item xs={6} sm={4} md={2.25}>
                         <TextField
-                            select
                             fullWidth
                             size="small"
-                            label="Sort By"
-                            value={orderBy}
-                            onChange={(e) => setOrderBy(e.target.value)}
-                        >
-                            <MenuItem value="date">Date</MenuItem>
-                            <MenuItem value="amount">Amount (₹)</MenuItem>
-                            <MenuItem value="category">Category</MenuItem>
-                            <MenuItem value="title">Expense Title</MenuItem>
-                        </TextField>
+                            label="From Date"
+                            type="date"
+                            value={dateFrom}
+                            onChange={(e) => {
+                                setDateFrom(e.target.value);
+                                setPage(0);
+                            }}
+                            InputLabelProps={{ shrink: true }}
+                            inputProps={{
+                                max: dateTo || undefined
+                            }}
+                        />
                     </Grid>
-                    <Grid item xs={12} sm={4} md={1.5} sx={{ display: 'flex', gap: 1, alignItems: 'center', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
-                        <Tooltip title={order === 'asc' ? 'Ascending Order' : 'Descending Order'}>
-                            <IconButton 
-                                size="small" 
-                                onClick={() => setOrder(order === 'asc' ? 'desc' : 'asc')}
-                                sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1.5, p: 0.8 }}
-                            >
-                                {order === 'asc' ? <ArrowUpward fontSize="small" /> : <ArrowDownward fontSize="small" />}
-                            </IconButton>
-                        </Tooltip>
-                        {(search || categoryFilter !== 'All') && (
+                    <Grid item xs={6} sm={4} md={2.25}>
+                        <TextField
+                            fullWidth
+                            size="small"
+                            label="To Date"
+                            type="date"
+                            value={dateTo}
+                            onChange={(e) => {
+                                setDateTo(e.target.value);
+                                setPage(0);
+                            }}
+                            InputLabelProps={{ shrink: true }}
+                            inputProps={{
+                                min: dateFrom || undefined
+                            }}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={1.5} sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
+                        {(search || categoryFilter !== 'All' || dateFrom || dateTo) ? (
                             <Button 
                                 size="small" 
                                 color="inherit" 
                                 onClick={() => {
                                     setSearch('');
                                     setCategoryFilter('All');
+                                    setDateFrom('');
+                                    setDateTo('');
                                     setPage(0);
                                 }}
-                                sx={{ textTransform: 'none', fontSize: '0.75rem', fontWeight: 600, minWidth: 'auto', px: 1 }}
+                                sx={{ 
+                                    textTransform: 'none', 
+                                    fontSize: '0.75rem', 
+                                    fontWeight: 600, 
+                                    minWidth: 'auto', 
+                                    px: 1.5, 
+                                    py: 0.7,
+                                    borderRadius: 1.5,
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    whiteSpace: 'nowrap',
+                                    '&:hover': {
+                                        bgcolor: 'action.hover',
+                                        borderColor: 'text.secondary'
+                                    }
+                                }}
                             >
                                 Reset
                             </Button>
+                        ) : (
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.75rem', whiteSpace: 'nowrap' }}>
+                                {sortedExpenses.length} {sortedExpenses.length === 1 ? 'entry' : 'entries'}
+                            </Typography>
                         )}
                     </Grid>
                 </Grid>
