@@ -142,25 +142,26 @@ export default function InvoiceTemplateDialog({ open, onClose, settings, onSaveS
       fullScreen={isTablet}
       PaperProps={{
         sx: {
-          borderRadius: isTablet ? 0 : 3,
+          borderRadius: isTablet ? 0 : '18px',
           overflow: 'hidden',
-          maxHeight: isTablet ? '100%' : '92vh'
+          maxHeight: isTablet ? '100%' : '92vh',
+          border: '1px solid',
+          borderColor: 'divider',
+          boxShadow: '0 24px 64px -8px rgba(8, 15, 28, 0.18), 0 8px 24px -4px rgba(8, 15, 28, 0.08)'
         }
       }}
     >
       {/* Luxury Header Banner */}
       <Box
         sx={{
-          background: (t) => t.palette.mode === 'dark'
-            ? `linear-gradient(135deg, ${t.palette.background.paper} 0%, ${t.palette.primary.dark} 100%)`
-            : `linear-gradient(135deg, ${t.palette.primary.dark} 0%, ${t.palette.primary.main} 100%)`,
+          background: (t) => t.palette.mode === 'dark' ? '#0F172A' : '#080F1C',
           color: '#ffffff',
           p: 2.5,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           position: 'relative',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.15)'
+          borderBottom: '1px solid rgba(255, 255, 255, 0.12)'
         }}
       >
         {/* Top Metallic Primary/Secondary Accent */}

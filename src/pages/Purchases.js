@@ -1540,9 +1540,11 @@ _Please acknowledge this Purchase Order and confirm dispatch tracking number. Th
                 fullScreen={isTablet}
                 PaperProps={{ 
                     sx: { 
-                        borderRadius: isTablet ? 0 : 3.5,
+                        borderRadius: isTablet ? 0 : '18px',
                         overflow: 'hidden',
-                        boxShadow: '0 20px 40px rgba(0,0,0,0.25)'
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        boxShadow: '0 24px 64px -8px rgba(8, 15, 28, 0.18)'
                     } 
                 }}
             >

@@ -104,12 +104,13 @@ export default function PairCustomerDisplayModal({
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: 4,
+          borderRadius: '18px',
           overflow: 'hidden',
-          bgcolor: '#0F172A',
-          color: '#F8FAFC',
-          border: '1px solid rgba(197, 160, 89, 0.35)',
-          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(197, 160, 89, 0.12)'
+          bgcolor: 'background.paper',
+          color: 'text.primary',
+          border: '1px solid',
+          borderColor: 'divider',
+          boxShadow: '0 24px 64px -8px rgba(8, 15, 28, 0.18), 0 8px 24px -4px rgba(8, 15, 28, 0.08)'
         }
       }}
     >

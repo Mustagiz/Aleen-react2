@@ -409,13 +409,13 @@ export const ThemeProvider = ({ children }) => {
                 MuiDialog: {
                     styleOverrides: {
                         paper: {
-                            borderRadius: 14,
+                            borderRadius: activeSystemConfig.shape.cardRadius || 18,
                             backgroundImage: 'none',
-                            backgroundColor: 'background.paper',
-                            border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'}`,
+                            backgroundColor: mode === 'dark' ? activePalette.background.paper : '#FFFFFF',
+                            border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(225, 228, 234, 0.85)'}`,
                             boxShadow: mode === 'dark'
-                                ? '0 24px 60px rgba(0, 0, 0, 0.55)'
-                                : '0 24px 60px rgba(112, 114, 176, 0.18), 0 2px 6px rgba(31, 27, 46, 0.06)',
+                                ? '0 28px 72px rgba(0, 0, 0, 0.65)'
+                                : '0 24px 64px -8px rgba(8, 15, 28, 0.16), 0 8px 24px -4px rgba(8, 15, 28, 0.08)',
                             overflow: 'hidden'
                         }
                     }
@@ -423,39 +423,42 @@ export const ThemeProvider = ({ children }) => {
                 MuiBackdrop: {
                     styleOverrides: {
                         root: {
-                            backgroundColor: mode === 'dark' ? 'rgba(0, 0, 0, 0.6)' : 'rgba(15, 23, 42, 0.35)',
-                            backdropFilter: 'blur(3px)',
-                            WebkitBackdropFilter: 'blur(3px)'
+                            backgroundColor: mode === 'dark' ? 'rgba(0, 0, 0, 0.72)' : 'rgba(8, 15, 28, 0.45)',
+                            backdropFilter: 'blur(6px)',
+                            WebkitBackdropFilter: 'blur(6px)'
                         }
                     }
                 },
                 MuiDialogTitle: {
                     styleOverrides: {
                         root: {
-                            fontWeight: 800,
-                            fontSize: '1.02rem',
+                            fontFamily: activeSystemConfig.typography.fontFamily,
+                            fontWeight: 700,
+                            fontSize: '1.08rem',
                             letterSpacing: '-0.01em',
                             lineHeight: 1.3,
-                            color: 'text.primary',
-                            padding: '20px 24px 12px'
+                            color: mode === 'dark' ? '#F9FAFB' : '#080F1C',
+                            backgroundColor: mode === 'dark' ? activePalette.background.paper : '#FFFFFF',
+                            borderBottom: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(225, 228, 234, 0.75)'}`,
+                            padding: '18px 24px'
                         }
                     }
                 },
                 MuiDialogContent: {
                     styleOverrides: {
                         root: {
-                            padding: '12px 24px 22px'
+                            padding: '20px 24px'
                         },
                         dividers: {
-                            borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'
+                            borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(225, 228, 234, 0.75)'
                         }
                     }
                 },
                 MuiDialogContentText: {
                     styleOverrides: {
                         root: {
-                            color: 'text.secondary',
-                            fontSize: '0.85rem',
+                            color: mode === 'dark' ? '#9CA3AF' : '#66707B',
+                            fontSize: '0.875rem',
                             lineHeight: 1.6
                         }
                     }
@@ -463,10 +466,10 @@ export const ThemeProvider = ({ children }) => {
                 MuiDialogActions: {
                     styleOverrides: {
                         root: {
-                            padding: '14px 24px',
-                            gap: 8,
-                            borderTop: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#EFEFF4'}`,
-                            backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.015)'
+                            padding: '16px 24px',
+                            gap: 10,
+                            borderTop: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(225, 228, 234, 0.75)'}`,
+                            backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(248, 249, 252, 0.75)'
                         }
                     }
                 },

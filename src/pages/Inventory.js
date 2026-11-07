@@ -1760,11 +1760,13 @@ const Inventory = () => {
         fullScreen={isSmallMobile}
         PaperProps={{
           sx: {
-            borderRadius: { xs: 0, sm: 3.5 },
+            borderRadius: { xs: 0, sm: '18px' },
             m: { xs: 0, sm: 2 },
             maxHeight: { xs: '100%', sm: 'calc(100% - 48px)' },
             overflow: 'hidden',
-            boxShadow: '0 24px 60px rgba(var(--primary-rgb, 124, 111, 232), 0.2), 0 8px 30px rgba(0,0,0,0.12)'
+            border: '1px solid',
+            borderColor: 'divider',
+            boxShadow: '0 24px 64px -8px rgba(8, 15, 28, 0.18), 0 8px 24px -4px rgba(8, 15, 28, 0.08)'
           }
         }}
       >

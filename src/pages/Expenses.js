@@ -666,7 +666,7 @@ const Expenses = () => {
                 maxWidth="sm" 
                 fullWidth 
                 fullScreen={isMobile}
-                PaperProps={{ sx: { borderRadius: isMobile ? 0 : 3.5, overflow: 'hidden' } }}
+                PaperProps={{ sx: { borderRadius: isMobile ? 0 : '18px', overflow: 'hidden', border: '1px solid', borderColor: 'divider', boxShadow: '0 24px 64px -8px rgba(8, 15, 28, 0.18)' } }}
             >
                 <DialogTitle 
                     sx={{ 

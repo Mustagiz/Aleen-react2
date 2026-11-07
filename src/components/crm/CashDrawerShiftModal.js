@@ -309,10 +309,12 @@ ${shiftNotes ? `\n📝 *Notes:* ${shiftNotes}` : ''}
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: 3.5,
+          borderRadius: '18px',
           overflow: 'hidden',
-          bgcolor: '#FFFFFF',
-          boxShadow: (t) => `0 24px 60px ${t.palette.primary.main}40`
+          bgcolor: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider',
+          boxShadow: '0 24px 64px -8px rgba(8, 15, 28, 0.18), 0 8px 24px -4px rgba(8, 15, 28, 0.08)'
         }
       }}
     >
@@ -320,7 +322,7 @@ ${shiftNotes ? `\n📝 *Notes:* ${shiftNotes}` : ''}
       <Box
         sx={{
           p: 2.5,
-          background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.dark || '#5B4BD1'} 0%, ${t.palette.primary.main} 100%)`,
+          background: (t) => t.palette.mode === 'dark' ? '#0F172A' : '#080F1C',
           color: '#FFFFFF',
           display: 'flex',
           alignItems: 'center',

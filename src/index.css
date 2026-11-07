@@ -507,6 +507,33 @@ td.invoice-table-header-cell {
   border-radius: var(--radius-card);
 }
 
+[data-design-system="mandate"] .MuiDialog-paper {
+  border-radius: 18px !important;
+  background-color: #FFFFFF !important;
+  border: 1px solid rgba(225, 228, 234, 0.85) !important;
+  box-shadow: 0 24px 64px -8px rgba(8, 15, 28, 0.16), 0 8px 24px -4px rgba(8, 15, 28, 0.08) !important;
+  overflow: hidden !important;
+}
+
+[data-design-system="mandate"] .MuiDialogTitle-root {
+  background-color: #FFFFFF !important;
+  border-bottom: 1px solid rgba(225, 228, 234, 0.75) !important;
+  color: #080F1C !important;
+  font-weight: 700 !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+[data-design-system="mandate"] .MuiDialogActions-root {
+  background-color: rgba(248, 249, 252, 0.75) !important;
+  border-top: 1px solid rgba(225, 228, 234, 0.75) !important;
+}
+
+[data-design-system="mandate"] .MuiBackdrop-root {
+  background-color: rgba(8, 15, 28, 0.45) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+}
+
 .risk-track {
   background: linear-gradient(90deg, var(--risk-low) 0 27%, var(--risk-mid) 27% 50%, var(--risk-high) 50% 73%, var(--risk-critical) 73% 100%);
   border-radius: 9999px;

@@ -733,9 +733,11 @@ const Vendors = () => {
                 fullScreen={isMobile}
                 PaperProps={{ 
                     sx: { 
-                        borderRadius: isMobile ? 0 : '16px',
+                        borderRadius: isMobile ? 0 : '18px',
                         overflow: 'hidden',
-                        boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        boxShadow: '0 24px 64px -8px rgba(8, 15, 28, 0.18)'
                     } 
                 }}
             >

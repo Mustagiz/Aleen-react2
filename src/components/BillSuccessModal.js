@@ -255,20 +255,20 @@ const BillSuccessModal = ({
         fullWidth
         PaperProps={{
           sx: {
-            borderRadius: { xs: 3, sm: 4 },
+            borderRadius: { xs: 0, sm: '18px' },
             overflow: 'hidden',
-            boxShadow: '0 24px 60px rgba(0, 0, 0, 0.28)',
+            boxShadow: '0 24px 64px -8px rgba(8, 15, 28, 0.18), 0 8px 24px -4px rgba(8, 15, 28, 0.08)',
             border: '1px solid',
             borderColor: 'divider',
             bgcolor: 'background.paper',
-            m: { xs: 1.5, sm: 3 }
+            m: { xs: 0, sm: 2 }
           }
         }}
       >
         {/* Atelier Header Banner */}
         <Box
           sx={{
-            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.dark || '#5B4BD1'} 0%, ${t.palette.primary.main} 100%)`,
+            background: (t) => t.palette.mode === 'dark' ? '#0F172A' : '#080F1C',
             color: '#FFFFFF',
             px: { xs: 2.5, sm: 3.5 },
             py: { xs: 2.5, sm: 3 },
@@ -295,12 +295,12 @@ const BillSuccessModal = ({
                 width: { xs: 46, sm: 54 },
                 height: { xs: 46, sm: 54 },
                 borderRadius: '50%',
-                bgcolor: 'rgba(255, 255, 255, 0.18)',
+                bgcolor: 'rgba(16, 185, 129, 0.2)',
                 backdropFilter: 'blur(8px)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                border: '1.5px solid rgba(255, 255, 255, 0.35)',
+                border: '1.5px solid rgba(16, 185, 129, 0.45)',
                 color: '#34D399',
                 flexShrink: 0
               }}
@@ -339,7 +339,7 @@ const BillSuccessModal = ({
             elevation={0}
             sx={{
               p: 2,
-              borderRadius: 3,
+              borderRadius: '12px',
               bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#F8FAFC',
               border: '1px solid',
               borderColor: 'divider',
@@ -355,8 +355,8 @@ const BillSuccessModal = ({
                 sx={{
                   width: 40,
                   height: 40,
-                  borderRadius: 2,
-                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.2)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)',
+                  borderRadius: '10px',
+                  bgcolor: (t) => `${t.palette.primary.main}14`,
                   color: (t) => t.palette.primary.main,
                   display: 'flex',
                   alignItems: 'center',
@@ -402,10 +402,10 @@ const BillSuccessModal = ({
             elevation={0}
             sx={{
               p: 2.25,
-              borderRadius: 3,
-              border: '1.5px solid',
-              borderColor: '#7C6FE8',
-              bgcolor: theme.palette.mode === 'dark' ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)' : '#F0FDFA',
+              borderRadius: '12px',
+              border: '1px solid',
+              borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(8, 15, 28, 0.12)',
+              bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#F9FBF9',
               display: 'flex',
               flexDirection: 'column',
               gap: 1.75
@@ -612,10 +612,10 @@ const BillSuccessModal = ({
                     fontWeight: 700,
                     fontSize: '0.74rem',
                     color: (t) => t.palette.primary.main,
-                    bgcolor: 'rgba(124, 111, 232, 0.06)',
+                    bgcolor: 'action.hover',
                     borderRadius: 1.5,
                     py: 0.6,
-                    '&:hover': { bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.12)' }
+                    '&:hover': { bgcolor: 'action.selected' }
                   }}
                 >
                   Copy Bill Link
@@ -700,8 +700,8 @@ const BillSuccessModal = ({
                   flexDirection: 'column',
                   gap: 0.3,
                   '&:hover': {
-                    borderColor: '#7C6FE8',
-                    bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.05)'
+                    borderColor: 'primary.main',
+                    bgcolor: 'action.hover'
                   }
                 }}
               >
@@ -713,7 +713,7 @@ const BillSuccessModal = ({
               <Button
                 variant="outlined"
                 size="small"
-                startIcon={<Print sx={{ color: '#7C6FE8', fontSize: 16 }} />}
+                startIcon={<Print sx={{ color: 'primary.main', fontSize: 16 }} />}
                 onClick={() => {
                   const el = document.getElementById('bill-success-thermal-58mm');
                   if (el) {
@@ -738,8 +738,8 @@ const BillSuccessModal = ({
                   flexDirection: 'column',
                   gap: 0.3,
                   '&:hover': {
-                    borderColor: '#7C6FE8',
-                    bgcolor: 'rgba(13, 148, 136, 0.05)'
+                    borderColor: 'primary.main',
+                    bgcolor: 'action.hover'
                   }
                 }}
               >

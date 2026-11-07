@@ -110,10 +110,12 @@ export default function UpiPaymentQrModal({
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: 3.5,
+          borderRadius: '18px',
           overflow: 'hidden',
-          boxShadow: '0 24px 60px rgba(0,0,0,0.3)',
-          border: '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.2)'
+          boxShadow: '0 24px 64px -8px rgba(8, 15, 28, 0.18), 0 8px 24px -4px rgba(8, 15, 28, 0.08)',
+          border: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
         }
       }}
     >

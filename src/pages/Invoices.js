@@ -3504,10 +3504,12 @@ const Invoices = () => {
         fullScreen={isTablet}
         PaperProps={{
           sx: {
-            borderRadius: isTablet ? 0 : '14px',
+            borderRadius: isTablet ? 0 : '18px',
             overflow: 'hidden',
             maxHeight: isTablet ? '100%' : '92vh',
-            boxShadow: (t) => `0 24px 60px ${t.palette.primary.main}33`
+            border: '1px solid',
+            borderColor: 'divider',
+            boxShadow: '0 24px 64px -8px rgba(8, 15, 28, 0.18), 0 8px 24px -4px rgba(8, 15, 28, 0.08)'
           }
         }}
       >
@@ -5466,7 +5468,7 @@ const Invoices = () => {
         maxWidth="md"
         fullWidth
         fullScreen={isMobile}
-        PaperProps={{ sx: { borderRadius: isMobile ? 0 : 3, overflow: 'hidden' } }}
+        PaperProps={{ sx: { borderRadius: isMobile ? 0 : '18px', overflow: 'hidden', border: '1px solid', borderColor: 'divider', boxShadow: '0 24px 64px -8px rgba(8, 15, 28, 0.18)' } }}
       >
         {isMobile && (
           <AppBar sx={{ position: 'relative', bgcolor: 'primary.main' }}>

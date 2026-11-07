@@ -460,9 +460,11 @@ const InvoiceWhatsAppDialog = ({ open, onClose, invoice, profile, onSharePDF }) 
       fullScreen={isMobile}
       PaperProps={{
         sx: {
-          borderRadius: isMobile ? 0 : 3.5,
+          borderRadius: isMobile ? 0 : '18px',
           overflow: 'hidden',
-          boxShadow: '0 24px 70px rgba(0,0,0,0.25)'
+          border: '1px solid',
+          borderColor: 'divider',
+          boxShadow: '0 24px 64px -8px rgba(8, 15, 28, 0.18), 0 8px 24px -4px rgba(8, 15, 28, 0.08)'
         }
       }}
     >

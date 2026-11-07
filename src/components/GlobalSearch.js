@@ -341,15 +341,17 @@ const GlobalSearch = ({ open, onClose }) => {
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: 3.5,
+          borderRadius: '18px',
           position: 'fixed',
           top: { xs: 20, sm: 60, md: 80 },
           m: { xs: '0 auto', sm: '0 auto' },
           width: { xs: 'calc(100% - 24px)', sm: '85vw', md: 680 },
           maxWidth: '100%',
           bgcolor: 'background.paper',
-          backgroundImage: 'linear-gradient(180deg, rgba(124, 111, 232, 0.03) 0%, rgba(0, 0, 0, 0) 100%)',
-          boxShadow: '0 25px 50px -12px rgba(4, 47, 46, 0.35), 0 0 0 1px rgba(var(--primary-rgb, 124, 111, 232), 0.2)',
+          backgroundImage: 'none',
+          boxShadow: '0 24px 64px -8px rgba(8, 15, 28, 0.22), 0 8px 24px -4px rgba(8, 15, 28, 0.08)',
+          border: '1px solid',
+          borderColor: 'divider',
           overflow: 'hidden'
         }
       }}
@@ -363,7 +365,7 @@ const GlobalSearch = ({ open, onClose }) => {
           gap: 1.5,
           borderBottom: '1px solid',
           borderColor: 'divider',
-          bgcolor: 'rgba(var(--primary-rgb, 124, 111, 232), 0.04)'
+          bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(8, 15, 28, 0.02)'
         }}>
           <Search sx={{ color: (t) => t.palette.primary.main, fontSize: 26 }} />
           <TextField
@@ -445,15 +447,15 @@ const GlobalSearch = ({ open, onClose }) => {
                   onClick={item.action}
                   selected={isSelected}
                   sx={{
-                    borderRadius: 2,
+                    borderRadius: '10px',
                     mb: 0.5,
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
-                    bgcolor: isSelected ? 'rgba(var(--primary-rgb, 124, 111, 232), 0.08)' : 'transparent',
+                    bgcolor: isSelected ? 'action.selected' : 'transparent',
                     border: '1px solid',
-                    borderColor: isSelected ? 'rgba(124, 111, 232, 0.3)' : 'transparent',
+                    borderColor: isSelected ? 'primary.main' : 'transparent',
                     '&:hover': {
-                      bgcolor: 'rgba(124, 111, 232, 0.06)'
+                      bgcolor: 'action.hover'
                     }
                   }}
                 >

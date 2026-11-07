@@ -173,13 +173,12 @@ export default function CustomerMeasurementModal({
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: 3.5,
+          borderRadius: '18px',
           overflow: 'hidden',
-          backgroundColor: isDark ? '#0F1E1D' : '#FFFFFF',
-          border: isDark ? '1px solid rgba(155, 143, 245, 0.22)' : '1px solid rgba(var(--primary-rgb, 124, 111, 232), 0.14)',
-          boxShadow: isDark
-            ? '0 24px 60px rgba(0, 0, 0, 0.75), 0 0 35px rgba(155, 143, 245, 0.15)'
-            : '0 24px 60px -8px rgba(10, 77, 70, 0.22), 0 4px 16px rgba(0, 0, 0, 0.06)'
+          backgroundColor: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider',
+          boxShadow: '0 24px 64px -8px rgba(8, 15, 28, 0.18), 0 8px 24px -4px rgba(8, 15, 28, 0.08)'
         }
       }}
     >
