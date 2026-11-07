@@ -104,6 +104,8 @@ export default function PairCustomerDisplayModal({
       fullWidth
       PaperProps={{
         sx: {
+          width: { xs: '100%', sm: 860, md: 890 },
+          maxWidth: '94vw',
           borderRadius: '18px',
           overflow: 'hidden',
           bgcolor: 'background.paper',
@@ -117,7 +119,8 @@ export default function PairCustomerDisplayModal({
       {/* Header */}
       <DialogTitle
         sx={{
-          p: { xs: 2.5, sm: 3 },
+          px: { xs: 2.5, sm: 3 },
+          py: 2,
           bgcolor: 'background.paper',
           color: 'text.primary',
           borderBottom: '1px solid',
@@ -130,10 +133,10 @@ export default function PairCustomerDisplayModal({
         <Stack direction="row" spacing={1.5} alignItems="center">
           <Box
             sx={{
-              width: 42,
-              height: 42,
+              width: 40,
+              height: 40,
               borderRadius: 2.5,
-              bgcolor: (t) => `${t.palette.primary.main}1F`,
+              bgcolor: (t) => `${t.palette.primary.main}14`,
               border: '1px solid',
               borderColor: (t) => `${t.palette.primary.main}26`,
               display: 'flex',
@@ -141,13 +144,13 @@ export default function PairCustomerDisplayModal({
               justifyContent: 'center'
             }}
           >
-            <PhoneIphone sx={{ color: 'primary.main', fontSize: 24 }} />
+            <PhoneIphone sx={{ color: 'primary.main', fontSize: 22 }} />
           </Box>
           <Box>
-            <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary', fontSize: { xs: '1rem', sm: '1.2rem' } }}>
+            <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary', fontSize: { xs: '1rem', sm: '1.15rem' }, lineHeight: 1.2 }}>
               Connect 2nd Screen / Customer Facing Display
             </Typography>
-            <Typography variant="caption" sx={{ color: 'text.secondary', letterSpacing: '0.08em', fontWeight: 600 }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', letterSpacing: '0.04em', fontWeight: 600 }}>
               Live Real-Time Cloud & Dual-Monitor Pairing (iPad, Tablet, Phone or 2nd Monitor)
             </Typography>
           </Box>
@@ -166,61 +169,77 @@ export default function PairCustomerDisplayModal({
       </DialogTitle>
 
       <DialogContent sx={{ p: { xs: 2.5, sm: 3 } }}>
-        <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems="stretch">
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '340px 1fr' },
+            gap: 2.5,
+            alignItems: 'stretch'
+          }}
+        >
           {/* Left Column: QR Code Card */}
           <Paper
             elevation={0}
             sx={{
-              flex: 1,
-              p: 3,
+              p: 2.5,
               borderRadius: '16px',
               bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#F9FAFC',
               border: '1px solid',
               borderColor: 'divider',
               display: 'flex',
               flexDirection: 'column',
+              justifyContent: 'space-between',
               alignItems: 'center',
-              justifyContent: 'center',
               textAlign: 'center'
             }}
           >
-            <Box
-              sx={{
-                p: 1.5,
-                bgcolor: '#FFFFFF',
-                borderRadius: '14px',
-                border: '1px solid',
-                borderColor: 'divider',
-                boxShadow: '0 8px 24px rgba(8, 15, 28, 0.08)',
-                mb: 2,
-                display: 'inline-block'
-              }}
-            >
+            <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Box
-                component="img"
-                src={qrCodeUrl}
-                alt="Scan to open customer display"
                 sx={{
-                  width: { xs: 200, sm: 220 },
-                  height: { xs: 200, sm: 220 },
-                  display: 'block'
+                  p: 1.25,
+                  bgcolor: '#FFFFFF',
+                  borderRadius: '14px',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  boxShadow: '0 6px 20px rgba(8, 15, 28, 0.06)',
+                  mb: 2,
+                  display: 'inline-block'
                 }}
-              />
+              >
+                <Box
+                  component="img"
+                  src={qrCodeUrl}
+                  alt="Scan to open customer display"
+                  sx={{
+                    width: 190,
+                    height: 190,
+                    display: 'block'
+                  }}
+                />
+              </Box>
+
+              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.96rem', mb: 0.5 }}>
+                Scan with iPad, Tablet or Phone
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.78rem', maxWidth: 280, mb: 2, lineHeight: 1.45 }}>
+                Point secondary device camera at this QR code. The browser will instantly load the synchronized customer screen.
+              </Typography>
             </Box>
 
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5 }}>
-              Scan with iPad, Tablet or Phone
-            </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.82rem', maxWidth: 280, mb: 2.5, lineHeight: 1.5 }}>
-              Point secondary device camera at this QR code. The browser will instantly load the synchronized customer screen.
-            </Typography>
-
-            <Stack direction="row" spacing={1.5} sx={{ width: '100%' }}>
+            {/* Bottom Action Buttons (Aligned Grid, Identical Heights, No Wrap) */}
+            <Box
+              sx={{
+                width: '100%',
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 1.25,
+                mt: 'auto'
+              }}
+            >
               <Button
-                fullWidth
                 variant="outlined"
                 size="small"
-                startIcon={copied ? <Check sx={{ color: 'success.main' }} /> : <ContentCopy />}
+                startIcon={copied ? <Check sx={{ color: 'success.main', fontSize: 16 }} /> : <ContentCopy sx={{ fontSize: 16 }} />}
                 onClick={handleCopyLink}
                 sx={{
                   color: copied ? 'success.main' : 'text.primary',
@@ -228,23 +247,24 @@ export default function PairCustomerDisplayModal({
                   bgcolor: copied ? 'rgba(16, 185, 129, 0.08)' : 'background.paper',
                   textTransform: 'none',
                   fontWeight: 700,
-                  fontSize: '0.8rem',
-                  py: 1,
+                  fontSize: '0.78rem',
+                  height: 38,
+                  whiteSpace: 'nowrap',
                   borderRadius: '9999px',
+                  px: 1,
                   '&:hover': {
                     borderColor: 'text.primary',
                     bgcolor: 'action.hover'
                   }
                 }}
               >
-                {copied ? 'Link Copied!' : 'Copy Display Link'}
+                {copied ? 'Copied!' : 'Copy Link'}
               </Button>
 
               <Button
-                fullWidth
                 variant="contained"
                 size="small"
-                startIcon={<OpenInNew />}
+                startIcon={<OpenInNew sx={{ fontSize: 16 }} />}
                 onClick={() => {
                   if (onLaunchSameWindow) onLaunchSameWindow();
                   else window.open(customerDisplayUrl, 'AleenCustomerDisplay', 'width=1120,height=760,menubar=no,toolbar=no');
@@ -254,9 +274,11 @@ export default function PairCustomerDisplayModal({
                   color: '#FFFFFF',
                   textTransform: 'none',
                   fontWeight: 700,
-                  fontSize: '0.8rem',
-                  py: 1,
+                  fontSize: '0.78rem',
+                  height: 38,
+                  whiteSpace: 'nowrap',
                   borderRadius: '9999px',
+                  px: 1,
                   boxShadow: '0 2px 8px rgba(8, 15, 28, 0.2)',
                   '&:hover': {
                     bgcolor: '#1D2531'
@@ -265,54 +287,74 @@ export default function PairCustomerDisplayModal({
               >
                 Launch on PC
               </Button>
-            </Stack>
+            </Box>
           </Paper>
 
           {/* Right Column: Connection details & Wi-Fi Setup */}
-          <Box sx={{ flex: 1.2, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <Box>
-              {/* Cloud Realtime Status */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {/* Cloud Realtime Status Banner (Horizontally and Vertically Balanced) */}
               <Box
                 sx={{
-                  p: 2,
+                  px: 2,
+                  py: 1.5,
                   borderRadius: '12px',
                   bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(16, 185, 129, 0.08)',
                   border: '1px solid',
                   borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(16, 185, 129, 0.25)',
-                  mb: 2,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   gap: 1.5
                 }}
               >
-                <Stack direction="row" spacing={1.5} alignItems="center">
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, minWidth: 0 }}>
                   <Box
                     sx={{
-                      width: 10,
-                      height: 10,
+                      width: 9,
+                      height: 9,
                       borderRadius: '50%',
                       bgcolor: '#10B981',
-                      boxShadow: '0 0 10px #10B981',
+                      boxShadow: '0 0 8px #10B981',
                       flexShrink: 0
                     }}
                   />
-                  <Box>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: (t) => t.palette.mode === 'dark' ? '#34D399' : '#047857' }}>
+                  <Box sx={{ minWidth: 0 }}>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        fontWeight: 800,
+                        fontSize: '0.84rem',
+                        color: (t) => t.palette.mode === 'dark' ? '#34D399' : '#047857',
+                        lineHeight: 1.2,
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
                       Cloud Firestore Live Stream Active
                     </Typography>
-                    <Typography variant="caption" sx={{ color: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : '#065F46', display: 'block' }}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : '#065F46',
+                        display: 'block',
+                        fontSize: '0.72rem',
+                        mt: 0.25,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}
+                    >
                       Zero Latency • Live Cart Mirroring • Dynamic UPI QR
                     </Typography>
                   </Box>
-                </Stack>
+                </Box>
 
                 <Button
                   size="small"
                   variant="outlined"
                   onClick={handleSendTestPing}
                   disabled={isPinging}
-                  startIcon={<Sensors sx={{ fontSize: 16 }} />}
+                  startIcon={<Sensors sx={{ fontSize: 15 }} />}
                   sx={{
                     color: (t) => t.palette.mode === 'dark' ? '#34D399' : '#047857',
                     borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(52, 211, 153, 0.4)' : 'rgba(16, 185, 129, 0.35)',
@@ -320,9 +362,11 @@ export default function PairCustomerDisplayModal({
                     textTransform: 'none',
                     fontWeight: 700,
                     fontSize: '0.74rem',
+                    height: 32,
                     borderRadius: '9999px',
-                    px: 1.8,
+                    px: 1.5,
                     whiteSpace: 'nowrap',
+                    flexShrink: 0,
                     '&:hover': {
                       borderColor: '#10B981',
                       bgcolor: 'rgba(16, 185, 129, 0.12)'
@@ -341,8 +385,7 @@ export default function PairCustomerDisplayModal({
                     borderRadius: '12px',
                     bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(245, 158, 11, 0.08)',
                     border: '1px solid',
-                    borderColor: 'rgba(245, 158, 11, 0.25)',
-                    mb: 2
+                    borderColor: 'rgba(245, 158, 11, 0.25)'
                   }}
                 >
                   <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.75 }}>
@@ -462,11 +505,11 @@ export default function PairCustomerDisplayModal({
               </Paper>
             </Box>
 
-            {/* Target URL Preview */}
+            {/* Target URL Preview (Matching 38px Height with Left Column Buttons) */}
             <Box
               sx={{
-                mt: 2,
-                p: 1.5,
+                px: 1.75,
+                py: 0.5,
                 borderRadius: '10px',
                 bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#F4F5F7',
                 border: '1px solid',
@@ -474,12 +517,14 @@ export default function PairCustomerDisplayModal({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                gap: 1
+                gap: 1,
+                minHeight: 38,
+                boxSizing: 'border-box'
               }}
             >
-              <Box sx={{ minWidth: 0, flex: 1 }}>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>
-                  Active Display URL:
+              <Box sx={{ minWidth: 0, flex: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.66rem', fontWeight: 800, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                  ACTIVE DISPLAY URL:
                 </Typography>
                 <Typography
                   variant="caption"
@@ -488,19 +533,20 @@ export default function PairCustomerDisplayModal({
                     fontFamily: 'monospace',
                     color: 'text.primary',
                     fontWeight: 600,
-                    fontSize: '0.78rem',
-                    display: 'block'
+                    fontSize: '0.76rem',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
                   }}
                 >
                   {customerDisplayUrl}
                 </Typography>
               </Box>
-              <IconButton size="small" onClick={handleCopyLink} sx={{ color: copied ? 'success.main' : 'text.secondary' }}>
-                {copied ? <Check fontSize="small" /> : <ContentCopy fontSize="small" />}
+              <IconButton size="small" onClick={handleCopyLink} sx={{ color: copied ? 'success.main' : 'text.secondary', p: 0.5 }}>
+                {copied ? <Check sx={{ fontSize: 16 }} /> : <ContentCopy sx={{ fontSize: 16 }} />}
               </IconButton>
             </Box>
           </Box>
-        </Stack>
+        </Box>
       </DialogContent>
 
       <DialogActions
