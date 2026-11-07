@@ -8,7 +8,7 @@ import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import DeleteConfirmDialog from '../components/DeleteConfirmDialog';
-import { generateInvoiceNumber, formatSkuWithHyphen } from '../utils/helpers';
+import { generateInvoiceNumber, formatSkuWithHyphen, getContactAvatarPalette } from '../utils/helpers';
 import InvoicePrint from '../components/InvoicePrint';
 import InvoiceTemplateDialog from '../components/InvoiceTemplateDialog';
 import { INVOICE_TEMPLATES, getStoredInvoiceSettings } from '../constants/invoiceTemplates';
@@ -3852,6 +3852,18 @@ const Invoices = () => {
                       return `${option.name || ''} (${option.phone || ''})`;
                     }}
                     value={matchedCustomer || customer}
+                    filterOptions={(options, { inputValue }) => {
+                      const term = (inputValue || '').toLowerCase().trim();
+                      if (!term) return options.slice(0, 50);
+                      const cleanDigits = term.replace(/[^0-9]/g, '');
+                      return options.filter(opt => {
+                        if (!opt) return false;
+                        const name = (opt.name || '').toLowerCase();
+                        const phone = (opt.phone || '').toLowerCase();
+                        const phoneDigits = (opt.phone || '').replace(/[^0-9]/g, '');
+                        return name.includes(term) || phone.includes(term) || (cleanDigits && phoneDigits.includes(cleanDigits));
+                      });
+                    }}
                     onChange={(event, newValue) => {
                       if (typeof newValue === 'object' && newValue !== null) {
                         setCustomer(toSentenceCase(newValue.name || ''));
@@ -3879,6 +3891,78 @@ const Invoices = () => {
                         }
                       }
                     }}
+                    PaperComponent={(paperProps) => (
+                      <Paper
+                        {...paperProps}
+                        elevation={12}
+                        sx={{
+                          mt: 1,
+                          borderRadius: '16px',
+                          border: '1px solid',
+                          borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(8, 15, 28, 0.1)',
+                          bgcolor: isDark ? '#0F172A' : '#FFFFFF',
+                          boxShadow: isDark
+                            ? '0 24px 50px -12px rgba(0, 0, 0, 0.8), 0 0 1px rgba(255, 255, 255, 0.18)'
+                            : '0 24px 50px -12px rgba(8, 15, 28, 0.22), 0 4px 14px rgba(8, 15, 28, 0.08)',
+                          overflow: 'hidden',
+                          '& .MuiAutocomplete-listbox': {
+                            p: 0.75,
+                            maxHeight: 320,
+                            '&::-webkit-scrollbar': {
+                              width: '6px'
+                            },
+                            '&::-webkit-scrollbar-thumb': {
+                              bgcolor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(8, 15, 28, 0.15)',
+                              borderRadius: '3px'
+                            }
+                          }
+                        }}
+                      >
+                        <Box sx={{
+                          px: 2,
+                          py: 1,
+                          borderBottom: '1px solid',
+                          borderColor: 'divider',
+                          bgcolor: isDark ? 'rgba(255, 255, 255, 0.03)' : '#F8FAFC',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between'
+                        }}>
+                          <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.68rem', letterSpacing: '0.06em', textTransform: 'uppercase', color: 'text.secondary' }}>
+                            Patron Directory
+                          </Typography>
+                          <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.secondary', fontWeight: 700 }}>
+                            {customers.length} registered
+                          </Typography>
+                        </Box>
+                        {paperProps.children}
+                        <Box sx={{
+                          px: 2,
+                          py: 0.8,
+                          borderTop: '1px solid',
+                          borderColor: 'divider',
+                          bgcolor: isDark ? 'rgba(255, 255, 255, 0.02)' : '#FBFBFE',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between'
+                        }}>
+                          <Typography variant="caption" sx={{ fontSize: '0.68rem', color: 'text.secondary' }}>
+                            💡 Type any new name or phone to record as walk-in
+                          </Typography>
+                        </Box>
+                      </Paper>
+                    )}
+                    noOptionsText={
+                      <Box sx={{ p: 2.5, textAlign: 'center' }}>
+                        <PersonOutline sx={{ color: 'text.secondary', fontSize: 26, mb: 0.5, opacity: 0.6 }} />
+                        <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '0.84rem' }}>
+                          No matching patron found
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem', display: 'block', mt: 0.3 }}>
+                          Press Enter or continue typing to bill as a new walk-in client
+                        </Typography>
+                      </Box>
+                    }
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -3888,26 +3972,203 @@ const Invoices = () => {
                         error={clientValidationErrors.customer}
                         placeholder="e.g. Saira banu or search phone"
                         helperText={clientValidationErrors.customer ? "Customer Name is mandatory before generating a bill" : "Type client name or select existing patron from records"}
+                        InputProps={{
+                          ...params.InputProps,
+                          startAdornment: (
+                            <>
+                              <InputAdornment position="start" sx={{ pl: 0.5, mr: 0.5 }}>
+                                <PersonOutline sx={{ color: 'text.secondary', fontSize: 19 }} />
+                              </InputAdornment>
+                              {params.InputProps.startAdornment}
+                            </>
+                          ),
+                          sx: {
+                            borderRadius: '11px',
+                            bgcolor: isDark ? 'rgba(255, 255, 255, 0.02)' : '#FFFFFF'
+                          }
+                        }}
                       />
                     )}
-                    renderOption={(props, option) => (
-                      <Box component="li" {...props} key={option.id} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', py: 0.8 }}>
-                        <Box>
-                          <Typography variant="body2" sx={{ fontWeight: 700 }}>{option.name}</Typography>
-                          <Typography variant="caption" sx={{ color: 'text.secondary', fontFamily: 'monospace' }}>{option.phone}</Typography>
-                        </Box>
-                        <Chip
-                          size="small"
-                          label={`${option.loyaltyTier || 'Bronze'} • ${option.loyaltyPoints || 0} pts`}
+                    renderOption={(props, option) => {
+                      const { key, ...otherProps } = props;
+                      if (typeof option === 'string') {
+                        return (
+                          <Box component="li" key={key || option} {...otherProps} sx={{ p: 1.5 }}>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>{option}</Typography>
+                          </Box>
+                        );
+                      }
+
+                      const initials = (option.name || 'P')
+                        .replace(/[^a-zA-Z\s]/g, '')
+                        .trim()
+                        .split(/\s+/)
+                        .filter(Boolean)
+                        .slice(0, 2)
+                        .map(n => n[0].toUpperCase())
+                        .join('') || (option.name ? option.name.slice(0, 2).toUpperCase() : 'P');
+
+                      const isVip = option.loyaltyTier === 'Gold' || option.loyaltyTier === 'Platinum';
+                      const palette = getContactAvatarPalette(option.name || option.phone, isVip);
+                      const tier = option.loyaltyTier || 'Bronze';
+                      const points = Number(option.loyaltyPoints) || 0;
+
+                      // Format phone nicely: +91 96379 66082
+                      const rawDigits = (option.phone || '').replace(/[^0-9]/g, '');
+                      let formattedPhone = option.phone || 'No phone';
+                      if (rawDigits.length === 12 && rawDigits.startsWith('91')) {
+                        formattedPhone = `+91 ${rawDigits.slice(2, 7)} ${rawDigits.slice(7)}`;
+                      } else if (rawDigits.length === 10) {
+                        formattedPhone = `+91 ${rawDigits.slice(0, 5)} ${rawDigits.slice(5)}`;
+                      }
+
+                      const formattedName = option.name
+                        ? option.name.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')
+                        : 'Walk-in Patron';
+
+                      const tierColors = {
+                        Platinum: {
+                          bg: isDark ? 'rgba(124, 58, 237, 0.2)' : '#F3E8FF',
+                          color: isDark ? '#C4B5FD' : '#6D28D9',
+                          border: isDark ? 'rgba(124, 58, 237, 0.4)' : '#DDD6FE'
+                        },
+                        Gold: {
+                          bg: isDark ? 'rgba(217, 119, 6, 0.2)' : '#FEF3C7',
+                          color: isDark ? '#FCD34D' : '#B45309',
+                          border: isDark ? 'rgba(217, 119, 6, 0.4)' : '#FDE68A'
+                        },
+                        Silver: {
+                          bg: isDark ? 'rgba(100, 116, 139, 0.2)' : '#F1F5F9',
+                          color: isDark ? '#CBD5E1' : '#475569',
+                          border: isDark ? 'rgba(100, 116, 139, 0.35)' : '#E2E8F0'
+                        },
+                        Bronze: {
+                          bg: isDark ? 'rgba(154, 52, 18, 0.18)' : '#FFEDD5',
+                          color: isDark ? '#FDBA74' : '#9A3412',
+                          border: isDark ? 'rgba(154, 52, 18, 0.28)' : '#FED7AA'
+                        }
+                      };
+                      const currentTierStyle = tierColors[tier] || tierColors.Bronze;
+
+                      return (
+                        <Box
+                          component="li"
+                          key={key || option.id}
+                          {...otherProps}
                           sx={{
-                            fontSize: '0.68rem',
-                            fontWeight: 700,
-                            bgcolor: option.loyaltyTier === 'Platinum' ? 'rgba(124, 58, 237, 0.1)' : option.loyaltyTier === 'Gold' ? 'rgba(217, 119, 6, 0.1)' : 'rgba(var(--primary-rgb, 124, 111, 232), 0.1)',
-                            color: option.loyaltyTier === 'Platinum' ? '#7C3AED' : option.loyaltyTier === 'Gold' ? '#D97706' : '#7C6FE8'
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            width: '100%',
+                            p: '8px 12px !important',
+                            my: 0.35,
+                            borderRadius: '11px',
+                            border: '1px solid transparent',
+                            transition: 'all 0.16s ease',
+                            cursor: 'pointer',
+                            '&:hover, &.Mui-focused, &[aria-selected="true"]': {
+                              bgcolor: isDark ? 'rgba(255, 255, 255, 0.06) !important' : 'rgba(8, 15, 28, 0.04) !important',
+                              borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(8, 15, 28, 0.1)',
+                              transform: 'translateX(3px)'
+                            }
                           }}
-                        />
-                      </Box>
-                    )}
+                        >
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 0 }}>
+                            <Avatar
+                              sx={{
+                                width: 36,
+                                height: 36,
+                                fontSize: '0.76rem',
+                                fontWeight: 800,
+                                background: palette?.gradient || 'linear-gradient(135deg, #080F1C 0%, #1E293B 100%)',
+                                color: '#FFFFFF',
+                                border: `1.5px solid ${palette?.border || 'rgba(8, 15, 28, 0.2)'}`,
+                                boxShadow: `0 2px 8px ${palette?.glow || 'rgba(0,0,0,0.1)'}`,
+                                flexShrink: 0
+                              }}
+                            >
+                              {initials}
+                            </Avatar>
+                            <Box sx={{ minWidth: 0 }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    fontWeight: 700,
+                                    color: 'text.primary',
+                                    fontSize: '0.86rem',
+                                    lineHeight: 1.25
+                                  }}
+                                  noWrap
+                                >
+                                  {formattedName}
+                                </Typography>
+                                {option.measurements && (
+                                  <Tooltip title="Bespoke atelier measurements on file">
+                                    <Box
+                                      sx={{
+                                        px: 0.65,
+                                        py: 0.1,
+                                        borderRadius: '4px',
+                                        bgcolor: 'rgba(16, 185, 129, 0.12)',
+                                        color: '#059669',
+                                        fontSize: '0.62rem',
+                                        fontWeight: 800,
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: 0.35,
+                                        flexShrink: 0
+                                      }}
+                                    >
+                                      <Straighten sx={{ fontSize: 11 }} />
+                                      Fitted
+                                    </Box>
+                                  </Tooltip>
+                                )}
+                              </Box>
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  color: 'text.secondary',
+                                  fontFamily: 'monospace',
+                                  fontSize: '0.73rem',
+                                  display: 'block',
+                                  letterSpacing: '0.02em',
+                                  mt: 0.15
+                                }}
+                                noWrap
+                              >
+                                {formattedPhone}
+                              </Typography>
+                            </Box>
+                          </Box>
+
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0, ml: 1.5 }}>
+                            <Box
+                              sx={{
+                                px: 1.1,
+                                py: 0.4,
+                                borderRadius: '9999px',
+                                fontSize: '0.68rem',
+                                fontWeight: 700,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 0.5,
+                                bgcolor: currentTierStyle.bg,
+                                color: currentTierStyle.color,
+                                border: '1px solid',
+                                borderColor: currentTierStyle.border
+                              }}
+                            >
+                              {isVip && <Stars sx={{ fontSize: 12, color: tier === 'Platinum' ? '#7C3AED' : '#D97706' }} />}
+                              <span>{tier}</span>
+                              <span style={{ opacity: 0.4 }}>•</span>
+                              <span style={{ fontWeight: 800 }}>{points} pts</span>
+                            </Box>
+                          </Box>
+                        </Box>
+                      );
+                    }}
                   />
                 </Box>
 
