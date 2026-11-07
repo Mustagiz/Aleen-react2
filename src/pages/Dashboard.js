@@ -38,6 +38,7 @@ import {
   Filler
 } from 'chart.js';
 import { Bar, Line, Doughnut } from 'react-chartjs-2';
+import { motion } from 'framer-motion';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -46,7 +47,7 @@ import AtelierKpiCard from '../components/crm/AtelierKpiCard';
 import ChartRangeSelect, { CHART_RANGE_OPTIONS } from '../components/crm/ChartRangeSelect';
 import CashDrawerShiftModal from '../components/crm/CashDrawerShiftModal';
 import { useThemeContext } from '../contexts/ThemeContext';
-import { getThemeChartPalette, getChartMotion, getDoughnutMotion } from '../utils/chartTheme';
+import { getThemeChartPalette, getChartMotion, getDoughnutMotion, getLineChartMotion, getBarChartMotion } from '../utils/chartTheme';
 
 ChartJS.register(
   CategoryScale,
@@ -122,6 +123,12 @@ const Dashboard = () => {
     d.setHours(23, 59, 59, 999);
     return d;
   }, []);
+
+  // Chart animation key: forces a fresh entrance animation on page load/reload and range change
+  const [chartKey, setChartKey] = useState(0);
+  useEffect(() => {
+    setChartKey(prev => prev + 1);
+  }, [dateRange]);
 
   // Filtered dataset according to timeframe
   const getFilteredData = () => {
@@ -242,7 +249,11 @@ const Dashboard = () => {
       label: 'Pieces Sold',
       data: top5ProductsData.map(p => p.quantity),
       backgroundColor: getThemeChartPalette(theme, top5ProductsData.length),
-      borderRadius: activeSystemConfig?.shape?.borderRadius || 6,
+      hoverBackgroundColor: '#6F4CED',
+      hoverBorderColor: '#080F1C',
+      hoverBorderWidth: 2,
+      borderRadius: 8,
+      borderSkipped: false,
       barThickness: 24,
     }]
   };
@@ -295,11 +306,17 @@ const Dashboard = () => {
         borderColor: theme.palette.primary.main,
         backgroundColor: `${theme.palette.primary.main}1F`,
         fill: true,
-        tension: 0.4,
+        tension: 0.38,
         pointBackgroundColor: theme.palette.primary.main,
-        pointBorderColor: isDark ? '#0F172A' : '#FFFFFF',
-        pointRadius: 4,
-        borderWidth: 2.5
+        pointBorderColor: isDark ? '#080F1C' : '#FFFFFF',
+        pointBorderWidth: 2,
+        pointRadius: 5,
+        pointHoverRadius: 9,
+        pointHoverBackgroundColor: '#FFFFFF',
+        pointHoverBorderColor: theme.palette.primary.main,
+        pointHoverBorderWidth: 3,
+        pointHitRadius: 20,
+        borderWidth: 2.8
       },
       {
         label: 'Store Operating Expenses',
@@ -307,11 +324,17 @@ const Dashboard = () => {
         borderColor: theme.palette.secondary?.main || '#D97706',
         backgroundColor: `${theme.palette.secondary?.main || '#D97706'}14`,
         fill: true,
-        tension: 0.4,
+        tension: 0.38,
         pointBackgroundColor: theme.palette.secondary?.main || '#D97706',
-        pointBorderColor: isDark ? '#0F172A' : '#FFFFFF',
-        pointRadius: 4,
-        borderWidth: 2
+        pointBorderColor: isDark ? '#080F1C' : '#FFFFFF',
+        pointBorderWidth: 2,
+        pointRadius: 5,
+        pointHoverRadius: 9,
+        pointHoverBackgroundColor: '#FFFFFF',
+        pointHoverBorderColor: theme.palette.secondary?.main || '#D97706',
+        pointHoverBorderWidth: 3,
+        pointHitRadius: 20,
+        borderWidth: 2.2
       }
     ]
   };
@@ -325,12 +348,22 @@ const Dashboard = () => {
         inventory.filter(i => (Number(i.quantity) || 0) >= 50).length
       ],
       backgroundColor: [
-        theme.palette.error.main,
-        theme.palette.primary.main,
-        theme.palette.success.main
+        '#C33A4D',
+        '#080F1C',
+        '#2A875B'
+      ],
+      hoverBackgroundColor: [
+        '#E11D48',
+        '#1D2531',
+        '#10B981'
       ],
       borderWidth: 2,
-      borderColor: isDark ? '#1E293B' : '#FFFFFF'
+      borderColor: isDark ? '#1E293B' : '#FFFFFF',
+      hoverBorderColor: isDark ? '#080F1C' : '#FFFFFF',
+      hoverBorderWidth: 3,
+      hoverOffset: 18,
+      borderRadius: 6,
+      spacing: 3
     }]
   };
 
@@ -341,7 +374,7 @@ const Dashboard = () => {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(15, 23, 42, 0.92)',
+        backgroundColor: isDark ? 'rgba(8, 15, 28, 0.96)' : 'rgba(8, 15, 28, 0.94)',
         borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)',
         borderWidth: 1,
         padding: 12,
@@ -360,6 +393,45 @@ const Dashboard = () => {
         grid: { borderDash: [4, 4], color: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0, 0, 0, 0.06)', drawBorder: false },
         ticks: { font: { family: theme.typography?.fontFamily || "'DM Sans', sans-serif", size: 11 }, color: theme.palette.text.secondary || '#94A3B8' }
       }
+    }
+  };
+
+  const lineChartOptions = {
+    ...commonChartOptions,
+    ...getLineChartMotion(),
+    interaction: {
+      mode: 'index',
+      intersect: false
+    },
+    hover: {
+      mode: 'nearest',
+      intersect: true
+    }
+  };
+
+  const doughnutChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '72%',
+    ...getDoughnutMotion(),
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        ...commonChartOptions.plugins.tooltip,
+        displayColors: true,
+        boxPadding: 4,
+        usePointStyle: true
+      }
+    }
+  };
+
+  const barChartOptions = {
+    ...commonChartOptions,
+    ...getBarChartMotion(),
+    indexAxis: 'y',
+    interaction: {
+      mode: 'nearest',
+      intersect: true
     }
   };
 
@@ -719,7 +791,7 @@ const Dashboard = () => {
               </Box>
             </Box>
             <Box sx={{ height: 230 }}>
-              <Line data={salesChartData} options={commonChartOptions} />
+              <Line key={`rev-${dateRange}-${chartKey}`} data={salesChartData} options={lineChartOptions} />
             </Box>
           </GlassCard>
         </Grid>
@@ -732,19 +804,20 @@ const Dashboard = () => {
 
             <Box sx={{ flexGrow: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Doughnut
+                key={`stock-${chartKey}`}
                 data={stockData}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  cutout: '72%',
-                  ...getDoughnutMotion(),
-                  plugins: { legend: { display: false } }
-                }}
+                options={doughnutChartOptions}
               />
-              <Box sx={{ position: 'absolute', textAlign: 'center' }}>
-                <Typography variant="h4" sx={{ fontWeight: 800, color: 'primary.main' }}>{totalItems}</Typography>
+              <motion.div
+                key={`stock-cnt-${chartKey}-${totalItems}`}
+                initial={{ scale: 0.82, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+                style={{ position: 'absolute', textAlign: 'center', pointerEvents: 'none' }}
+              >
+                <Typography variant="h4" sx={{ fontWeight: 800, color: 'primary.main', letterSpacing: '-0.02em' }}>{totalItems}</Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>Total Pieces</Typography>
-              </Box>
+              </motion.div>
             </Box>
 
             <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
@@ -790,7 +863,7 @@ const Dashboard = () => {
               </Box>
             </Box>
             <Box sx={{ height: 210 }}>
-              <Bar data={topProductsChartData} options={{ ...commonChartOptions, indexAxis: 'y' }} />
+              <Bar key={`top-${dateRange}-${chartKey}`} data={topProductsChartData} options={barChartOptions} />
             </Box>
           </GlassCard>
         </Grid>

@@ -110,6 +110,20 @@ const CELEBRATION_PARTICLES = [
   { icon: '💫', xOffset: 140, yOffset: 100, size: 28, duration: 2.3, delay: 0.3, rotation: -50, finalScale: 1 }
 ];
 
+const getVideoFilterCss = (filterName) => {
+  switch (filterName) {
+    case 'glamour':
+      return 'contrast(1.1) saturate(1.25) brightness(1.02)';
+    case 'gold':
+      return 'sepia(0.25) saturate(1.3) contrast(1.08) brightness(1.02)';
+    case 'noir':
+      return 'grayscale(1) contrast(1.22) brightness(0.96)';
+    case 'natural':
+    default:
+      return 'none';
+  }
+};
+
 export default function CustomerDisplay() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -156,6 +170,9 @@ export default function CustomerDisplay() {
       videoPreset: 'interactive-runway',
       videoUrl: 'canvas-runway',
       videoFit: 'cover',
+      videoAmbientGlow: true,
+      videoPlaybackSpeed: 1.0,
+      videoFilter: 'natural',
       customHeadline: 'Welcome to Aleen Clothing Atelier',
       customSubtext: 'Bespoke Bridal Lehengas • Pure Handloom Banarasi Silks • Master Couture Tailoring',
       textAnimationStyle: 'marquee-glide',
@@ -246,11 +263,12 @@ export default function CustomerDisplay() {
     });
   };
 
-  // Auto-play video with audio or seamless fallback on mode/url change
+  // Auto-play video with audio or seamless fallback on mode/url change & apply playback speed
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.muted = isVideoMuted;
       videoRef.current.volume = 1.0;
+      videoRef.current.playbackRate = Number(cfdConfig.videoPlaybackSpeed) || 1.0;
       const playPromise = videoRef.current.play();
       if (playPromise !== undefined) {
         playPromise.catch((err) => {
@@ -262,7 +280,7 @@ export default function CustomerDisplay() {
         });
       }
     }
-  }, [cfdConfig.videoUrl, cfdConfig.videoFit, cfdConfig.idleDisplayType, chunkedVideoUrl, isVideoMuted]);
+  }, [cfdConfig.videoUrl, cfdConfig.videoFit, cfdConfig.videoPlaybackSpeed, cfdConfig.videoFilter, cfdConfig.idleDisplayType, chunkedVideoUrl, isVideoMuted]);
 
   // Unlock video audio on first user touch / click
   useEffect(() => {
@@ -1736,7 +1754,7 @@ export default function CustomerDisplay() {
                 >
                   {/* If canvas-runway, or if video load failed, or foreign invalid blob: fallback gracefully to 60FPS Virtual Runway Catwalk Canvas */}
                   {(cfdConfig.videoUrl === 'canvas-runway' || videoLoadError || (cfdConfig.videoUrl === 'firestore-chunked' && !chunkedVideoUrl) || (cfdConfig.videoUrl?.startsWith('blob:') && !chunkedVideoUrl)) ? (
-                    /* 60FPS Interactive Virtual Runway Catwalk Canvas - Fullscreen Edge-to-Edge */
+                    /* 60FPS Interactive Virtual Runway Catwalk Canvas with Framing */
                     <Box
                       sx={{
                         position: 'absolute',
@@ -1744,57 +1762,148 @@ export default function CustomerDisplay() {
                         width: '100%',
                         height: '100%',
                         overflow: 'hidden',
-                        background: 'radial-gradient(circle at 50% 30%, #2A2215 0%, #0A0805 100%)',
+                        bgcolor: '#04070D',
                         display: 'flex',
-                        flexDirection: 'column',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        color: '#FFFFFF'
+                        justifyContent: 'center'
                       }}
                     >
-                      {/* Animated Runway Lighting Pillars */}
-                      <Box sx={{ position: 'absolute', top: 0, left: '18%', width: 3, height: '100%', bgcolor: '#E1E4EA', animation: 'cfdRunwayLight 2s infinite ease-in-out' }} />
-                      <Box sx={{ position: 'absolute', top: 0, right: '18%', width: 3, height: '100%', bgcolor: '#E1E4EA', animation: 'cfdRunwayLight 2s infinite ease-in-out 1s' }} />
+                      {/* Ambient Dynamic Glow for Canvas */}
+                      {cfdConfig.videoAmbientGlow !== false && cfdConfig.videoFit !== 'cover' && (
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            inset: 0,
+                            background: 'radial-gradient(circle at 50% 50%, rgba(111, 76, 237, 0.45) 0%, rgba(8, 15, 28, 0.85) 100%)',
+                            filter: 'blur(50px)',
+                            opacity: 0.8,
+                            transform: 'scale(1.2)',
+                            pointerEvents: 'none',
+                            zIndex: 1
+                          }}
+                        />
+                      )}
 
-                      {/* Perspective Gold Runway Lines */}
+                      {/* Foreground Framed Canvas Container */}
+                      <Box
+                        sx={{
+                          position: 'relative',
+                          zIndex: 2,
+                          ...(cfdConfig.videoFit === 'cinematic' ? {
+                            width: '100%',
+                            maxWidth: '100%',
+                            aspectRatio: '21 / 9',
+                            maxHeight: '100%',
+                            overflow: 'hidden',
+                            borderRadius: { xs: 1, md: 2 },
+                            boxShadow: '0 25px 80px rgba(0,0,0,0.9)',
+                            border: '1px solid rgba(255, 255, 255, 0.12)'
+                          } : cfdConfig.videoFit === 'portrait' ? {
+                            height: { xs: '96%', md: '94%' },
+                            maxHeight: '100%',
+                            aspectRatio: '9 / 16',
+                            maxWidth: '100%',
+                            overflow: 'hidden',
+                            borderRadius: { xs: 2, md: 3 },
+                            boxShadow: '0 30px 90px rgba(0,0,0,0.9)',
+                            border: '1.5px solid rgba(255, 255, 255, 0.15)'
+                          } : cfdConfig.videoFit === 'square' ? {
+                            height: { xs: '92%', md: '88%' },
+                            maxHeight: '90vw',
+                            aspectRatio: '1 / 1',
+                            maxWidth: '92%',
+                            overflow: 'hidden',
+                            borderRadius: { xs: 2, md: 3 },
+                            boxShadow: '0 30px 90px rgba(0,0,0,0.9)',
+                            border: '1.5px solid rgba(255, 255, 255, 0.15)'
+                          } : cfdConfig.videoFit === 'contain' ? {
+                            width: '92%',
+                            height: '92%',
+                            borderRadius: { xs: 2, md: 3 },
+                            overflow: 'hidden',
+                            boxShadow: '0 20px 60px rgba(0,0,0,0.8)',
+                            border: '1px solid rgba(255, 255, 255, 0.12)'
+                          } : {
+                            width: '100%',
+                            height: '100%'
+                          }),
+                          background: 'radial-gradient(circle at 50% 30%, #2A2215 0%, #0A0805 100%)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#FFFFFF'
+                        }}
+                      >
+                        {/* Animated Runway Lighting Pillars */}
+                        <Box sx={{ position: 'absolute', top: 0, left: '18%', width: 3, height: '100%', bgcolor: '#E1E4EA', animation: 'cfdRunwayLight 2s infinite ease-in-out' }} />
+                        <Box sx={{ position: 'absolute', top: 0, right: '18%', width: 3, height: '100%', bgcolor: '#E1E4EA', animation: 'cfdRunwayLight 2s infinite ease-in-out 1s' }} />
+
+                        {/* Perspective Gold Runway Lines */}
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            bottom: 0,
+                            left: '10%',
+                            right: '10%',
+                            height: '45%',
+                            background: 'linear-gradient(to top, #E1E4EA 0%, rgba(8, 15, 28, 0) 100%)',
+                            borderLeft: '3px solid #E1E4EA',
+                            borderRight: '3px solid #E1E4EA',
+                            transform: 'perspective(250px) rotateX(45deg)',
+                            pointerEvents: 'none'
+                          }}
+                        />
+
+                        {/* Floating Runway Stardust */}
+                        <Stack direction="row" spacing={{ xs: 3, sm: 5, md: 7 }} sx={{ position: 'absolute', top: '20%', pointerEvents: 'none' }}>
+                          {['✨', '⭐', '💎', '🌟', '✨'].map((star, sIdx) => (
+                            <motion.div
+                              key={sIdx}
+                              animate={{ y: [0, -14, 0], opacity: [0.4, 1, 0.4] }}
+                              transition={{ repeat: Infinity, duration: 2.2, delay: sIdx * 0.4, ease: 'easeInOut' }}
+                            >
+                              <Typography sx={{ fontSize: { xs: 26, sm: 34 } }}>{star}</Typography>
+                            </motion.div>
+                          ))}
+                        </Stack>
+
+                        {/* Walking Haute Couture Model Silhouette */}
+                        <motion.div
+                          animate={{ y: [0, -16, 0], scale: [1, 1.1, 1] }}
+                          transition={{ repeat: Infinity, duration: 2.2 / (Number(cfdConfig.videoPlaybackSpeed) || 1.0), ease: 'easeInOut' }}
+                        >
+                          <Typography sx={{ fontSize: { xs: 80, sm: 110, md: 140 } }}>💃</Typography>
+                        </motion.div>
+                      </Box>
+
+                      {/* Discreet Floating Video Status Pill */}
                       <Box
                         sx={{
                           position: 'absolute',
-                          bottom: 0,
-                          left: '10%',
-                          right: '10%',
-                          height: '45%',
-                          background: 'linear-gradient(to top, #E1E4EA 0%, rgba(8, 15, 28, 0) 100%)',
-                          borderLeft: '3px solid #E1E4EA',
-                          borderRight: '3px solid #E1E4EA',
-                          transform: 'perspective(250px) rotateX(45deg)',
-                          pointerEvents: 'none'
+                          top: { xs: 16, sm: 24 },
+                          left: { xs: 16, sm: 24 },
+                          zIndex: 30,
+                          bgcolor: 'rgba(8, 15, 28, 0.78)',
+                          backdropFilter: 'blur(10px)',
+                          color: '#FFFFFF',
+                          border: '1px solid rgba(255, 255, 255, 0.18)',
+                          borderRadius: 9999,
+                          px: 2,
+                          py: 0.6,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1.2
                         }}
-                      />
-
-                      {/* Floating Runway Stardust */}
-                      <Stack direction="row" spacing={{ xs: 3, sm: 5, md: 7 }} sx={{ position: 'absolute', top: '20%', pointerEvents: 'none' }}>
-                        {['✨', '⭐', '💎', '🌟', '✨'].map((star, sIdx) => (
-                          <motion.div
-                            key={sIdx}
-                            animate={{ y: [0, -14, 0], opacity: [0.4, 1, 0.4] }}
-                            transition={{ repeat: Infinity, duration: 2.2, delay: sIdx * 0.4, ease: 'easeInOut' }}
-                          >
-                            <Typography sx={{ fontSize: { xs: 26, sm: 34 } }}>{star}</Typography>
-                          </motion.div>
-                        ))}
-                      </Stack>
-
-                      {/* Walking Haute Couture Model Silhouette */}
-                      <motion.div
-                        animate={{ y: [0, -16, 0], scale: [1, 1.1, 1] }}
-                        transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
                       >
-                        <Typography sx={{ fontSize: { xs: 80, sm: 110, md: 140 } }}>💃</Typography>
-                      </motion.div>
+                        <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: '#10B981', boxShadow: '0 0 8px #10B981' }} />
+                        <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                          Catwalk Runway • {(cfdConfig.videoFit || 'cover').toUpperCase()} • {(cfdConfig.videoPlaybackSpeed || 1.0)}x
+                        </Typography>
+                      </Box>
                     </Box>
                   ) : (
-                    /* Real Video Player with Explicit Autoplay & Mobile Compliance - Fullscreen */
+                    /* Real Video Player with Explicit Autoplay & Enhanced Framing */
                     <Box
                       sx={{
                         position: 'absolute',
@@ -1802,40 +1911,134 @@ export default function CustomerDisplay() {
                         width: '100%',
                         height: '100%',
                         overflow: 'hidden',
-                        bgcolor: '#000000',
+                        bgcolor: '#04070D',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        ...(cfdConfig.videoFit === 'cinematic' ? {
-                          borderTop: { xs: '16px solid #000000', md: '35px solid #000000' },
-                          borderBottom: { xs: '16px solid #000000', md: '35px solid #000000' }
-                        } : {})
+                        justifyContent: 'center'
                       }}
                     >
-                      <video
-                        ref={videoRef}
-                        src={cfdConfig.videoUrl === 'firestore-chunked' ? chunkedVideoUrl : cfdConfig.videoUrl}
-                        autoPlay
-                        loop
-                        muted={isVideoMuted}
-                        playsInline
-                        webkit-playsinline="true"
-                        x5-playsinline="true"
-                        preload="auto"
-                        controls={false}
-                        onClick={handleToggleVideoSound}
-                        onError={() => {
-                          console.warn('Video playback error on this device, falling back to 60FPS Virtual Runway Catwalk Canvas');
-                          setVideoLoadError(true);
+                      {/* Ambient Dynamic Video Glow Background Layer */}
+                      {cfdConfig.videoAmbientGlow !== false && cfdConfig.videoFit !== 'cover' && (
+                        <video
+                          src={cfdConfig.videoUrl === 'firestore-chunked' ? chunkedVideoUrl : cfdConfig.videoUrl}
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          webkit-playsinline="true"
+                          x5-playsinline="true"
+                          preload="auto"
+                          controls={false}
+                          style={{
+                            position: 'absolute',
+                            inset: 0,
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            filter: `blur(45px) brightness(0.65) ${getVideoFilterCss(cfdConfig.videoFilter)}`,
+                            transform: 'scale(1.2)',
+                            opacity: 0.72,
+                            pointerEvents: 'none',
+                            zIndex: 1
+                          }}
+                        />
+                      )}
+
+                      {/* Foreground Framed Video Container */}
+                      <Box
+                        sx={{
+                          position: 'relative',
+                          zIndex: 2,
+                          ...(cfdConfig.videoFit === 'cinematic' ? {
+                            width: '100%',
+                            maxWidth: '100%',
+                            aspectRatio: '21 / 9',
+                            maxHeight: '100%',
+                            overflow: 'hidden',
+                            borderRadius: { xs: 1, md: 2 },
+                            boxShadow: '0 25px 80px rgba(0,0,0,0.9)',
+                            border: '1px solid rgba(255, 255, 255, 0.12)'
+                          } : cfdConfig.videoFit === 'portrait' ? {
+                            height: { xs: '96%', md: '94%' },
+                            maxHeight: '100%',
+                            aspectRatio: '9 / 16',
+                            maxWidth: '100%',
+                            overflow: 'hidden',
+                            borderRadius: { xs: 2, md: 3 },
+                            boxShadow: '0 30px 90px rgba(0,0,0,0.9)',
+                            border: '1.5px solid rgba(255, 255, 255, 0.15)'
+                          } : cfdConfig.videoFit === 'square' ? {
+                            height: { xs: '92%', md: '88%' },
+                            maxHeight: '90vw',
+                            aspectRatio: '1 / 1',
+                            maxWidth: '92%',
+                            overflow: 'hidden',
+                            borderRadius: { xs: 2, md: 3 },
+                            boxShadow: '0 30px 90px rgba(0,0,0,0.9)',
+                            border: '1.5px solid rgba(255, 255, 255, 0.15)'
+                          } : cfdConfig.videoFit === 'contain' ? {
+                            width: '100%',
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          } : {
+                            width: '100%',
+                            height: '100%'
+                          })
                         }}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: cfdConfig.videoFit === 'contain' ? 'contain' : 'cover',
-                          display: 'block',
-                          cursor: 'pointer'
+                      >
+                        <video
+                          ref={videoRef}
+                          src={cfdConfig.videoUrl === 'firestore-chunked' ? chunkedVideoUrl : cfdConfig.videoUrl}
+                          autoPlay
+                          loop
+                          muted={isVideoMuted}
+                          playsInline
+                          webkit-playsinline="true"
+                          x5-playsinline="true"
+                          preload="auto"
+                          controls={false}
+                          onClick={handleToggleVideoSound}
+                          onError={() => {
+                            console.warn('Video playback error on this device, falling back to 60FPS Virtual Runway Catwalk Canvas');
+                            setVideoLoadError(true);
+                          }}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: cfdConfig.videoFit === 'contain' ? 'contain' : 'cover',
+                            display: 'block',
+                            cursor: 'pointer',
+                            filter: getVideoFilterCss(cfdConfig.videoFilter)
+                          }}
+                        />
+                      </Box>
+
+                      {/* Discreet Floating Video Status Pill */}
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: { xs: 16, sm: 24 },
+                          left: { xs: 16, sm: 24 },
+                          zIndex: 30,
+                          bgcolor: 'rgba(8, 15, 28, 0.78)',
+                          backdropFilter: 'blur(10px)',
+                          color: '#FFFFFF',
+                          border: '1px solid rgba(255, 255, 255, 0.18)',
+                          borderRadius: 9999,
+                          px: 2,
+                          py: 0.6,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1.2
                         }}
-                      />
+                      >
+                        <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: '#10B981', boxShadow: '0 0 8px #10B981' }} />
+                        <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                          Atelier Runway • {(cfdConfig.videoFit || 'cover').toUpperCase()} • {(cfdConfig.videoPlaybackSpeed || 1.0)}x
+                        </Typography>
+                      </Box>
 
                       {/* Luxury Floating Sound Toggle Button */}
                       <Button
@@ -1847,13 +2050,13 @@ export default function CustomerDisplay() {
                           bottom: { xs: 16, sm: 24 },
                           right: { xs: 16, sm: 24 },
                           zIndex: 30,
-                          bgcolor: isVideoMuted ? 'rgba(15, 23, 42, 0.85)' : '#080F1C',
+                          bgcolor: isVideoMuted ? 'rgba(8, 15, 28, 0.85)' : '#080F1C',
                           color: '#FFFFFF !important',
                           border: '1.5px solid rgba(255, 255, 255, 0.45)',
                           backdropFilter: 'blur(10px)',
                           boxShadow: '0 8px 25px rgba(0,0,0,0.5)',
-                          borderRadius: 3,
-                          px: 2,
+                          borderRadius: 9999,
+                          px: 2.2,
                           py: 0.8,
                           fontWeight: 800,
                           fontSize: '0.78rem',
@@ -1861,7 +2064,7 @@ export default function CustomerDisplay() {
                           textTransform: 'uppercase',
                           cursor: 'pointer',
                           '&:hover': {
-                            bgcolor: isVideoMuted ? 'rgba(15, 23, 42, 0.95)' : '#1D2531'
+                            bgcolor: isVideoMuted ? 'rgba(8, 15, 28, 0.95)' : '#1D2531'
                           }
                         }}
                       >

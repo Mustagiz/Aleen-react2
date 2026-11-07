@@ -165,12 +165,29 @@ export const CUSTOMER_ANIMATION_STYLES = [
   }
 ];
 
+export const getVideoFilterCss = (filterName) => {
+  switch (filterName) {
+    case 'glamour':
+      return 'contrast(1.1) saturate(1.25) brightness(1.02)';
+    case 'gold':
+      return 'sepia(0.25) saturate(1.3) contrast(1.08) brightness(1.02)';
+    case 'noir':
+      return 'grayscale(1) contrast(1.2) brightness(0.96)';
+    case 'natural':
+    default:
+      return 'none';
+  }
+};
+
 export const DEFAULT_CFD_CONFIG = {
   idleDisplayType: 'animation', // 'animation' | 'video' | 'text'
   animationType: 'couture-showcase',
   videoPreset: 'interactive-runway',
   videoUrl: 'canvas-runway',
-  videoFit: 'cover', // 'cover' | 'contain' | 'cinematic'
+  videoFit: 'cover', // 'cover' | 'contain' | 'cinematic' | 'portrait' | 'square'
+  videoAmbientGlow: true,
+  videoPlaybackSpeed: 1.0,
+  videoFilter: 'natural',
   customHeadline: 'Welcome to Aleen Clothing Atelier',
   customSubtext: 'Bespoke Bridal Lehengas • Pure Handloom Banarasi Silks • Master Couture Tailoring',
   textAnimationStyle: 'marquee-glide',
@@ -360,16 +377,17 @@ export default function CustomerDisplaySettings() {
     }
   }, []);
 
-  // Guarantee video plays when element mounts or URL/fit changes
+  // Guarantee video plays when element mounts or URL/fit/speed changes
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.defaultMuted = true;
       videoRef.current.muted = true;
+      videoRef.current.playbackRate = Number(config.videoPlaybackSpeed) || 1.0;
       videoRef.current.play().catch(() => {});
     }
-  }, [config.videoUrl, config.videoFit, config.idleDisplayType, activeSettingsTab]);
+  }, [config.videoUrl, config.videoFit, config.videoPlaybackSpeed, config.videoFilter, config.idleDisplayType, activeSettingsTab]);
 
-  // Robust update helper: updates React state, localStorage, and broadcasts to CFD in 0ms!
+  // Robust update helper: updates React state, localStorage, broadcasts in 0ms, and auto-syncs to Firestore
   const updateConfig = (key, value) => {
     setConfig((prev) => {
       const updated = { ...prev, [key]: value };
@@ -380,6 +398,10 @@ export default function CustomerDisplaySettings() {
           bc.postMessage({ type: 'CONFIG_UPDATE', config: updated });
           bc.close();
         }
+        // Auto-sync to Firestore so customer displays on iPad / external screens receive instant update
+        setDoc(doc(db, 'settings', 'cfd_config'), { ...updated, updatedAt: new Date().toISOString() }, { merge: true }).catch((err) => {
+          console.warn('Auto-sync CFD error:', err);
+        });
       } catch (e) {}
       return updated;
     });
@@ -395,6 +417,10 @@ export default function CustomerDisplaySettings() {
           bc.postMessage({ type: 'CONFIG_UPDATE', config: updated });
           bc.close();
         }
+        // Auto-sync to Firestore
+        setDoc(doc(db, 'settings', 'cfd_config'), { ...updated, updatedAt: new Date().toISOString() }, { merge: true }).catch((err) => {
+          console.warn('Auto-sync CFD error:', err);
+        });
       } catch (e) {}
       return updated;
     });
@@ -936,7 +962,7 @@ export default function CustomerDisplaySettings() {
                     />
                   )}
 
-                  {/* Video Framing Control (Cover, Contain, Cinematic) */}
+                  {/* 1. Video Framing & Screen Ratio Control */}
                   <Paper
                     elevation={0}
                     sx={{
@@ -944,88 +970,239 @@ export default function CustomerDisplaySettings() {
                       borderRadius: '16px',
                       bgcolor: '#FAFCFA',
                       border: '1px solid #E1E4EA',
-                      mb: 2
+                      mb: 2.5
                     }}
                   >
-                    <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#161922', mb: 0.5 }}>
-                      Video Framing & Screen Ratio:
-                    </Typography>
+                    <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+                      <AspectRatio sx={{ color: '#080F1C', fontSize: 20 }} />
+                      <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#161922' }}>
+                        Video Framing & Screen Ratio:
+                      </Typography>
+                    </Stack>
                     <Typography variant="caption" sx={{ color: '#66707B', display: 'block', mb: 2 }}>
                       Select how the video frames on the customer display terminal:
                     </Typography>
 
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} sm={4}>
-                        <Box
-                          onClick={() => updateConfig('videoFit', 'cover')}
-                          sx={{
-                            p: 2,
-                            borderRadius: '16px',
-                            border: '2px solid',
-                            borderColor: config.videoFit === 'cover' ? '#080F1C' : '#E1E4EA',
-                            bgcolor: config.videoFit === 'cover' ? '#FFFFFF' : 'transparent',
-                            cursor: 'pointer',
-                            textAlign: 'center',
-                            boxShadow: config.videoFit === 'cover' ? '0 2px 8px rgba(0, 0, 0, 0.06)' : 'none'
-                          }}
-                        >
-                          <CropFree sx={{ color: config.videoFit === 'cover' ? '#080F1C' : '#66707B', fontSize: 28 }} />
-                          <Typography variant="subtitle2" sx={{ fontWeight: 800, mt: 0.5, color: config.videoFit === 'cover' ? '#080F1C' : '#161922' }}>
-                            Full Bleed Cover
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: '#66707B' }}>
-                            Fills the entire screen edge-to-edge
-                          </Typography>
-                        </Box>
-                      </Grid>
+                    <Grid container spacing={1.5}>
+                      {[
+                        {
+                          id: 'cover',
+                          label: 'Full Bleed Cover',
+                          desc: 'Fills the entire screen edge-to-edge',
+                          icon: <CropFree sx={{ fontSize: 24 }} />
+                        },
+                        {
+                          id: 'contain',
+                          label: 'Contain / Letterbox',
+                          desc: 'Full uncropped frame with borders',
+                          icon: <FitScreen sx={{ fontSize: 24 }} />
+                        },
+                        {
+                          id: 'cinematic',
+                          label: 'Cinematic 21:9',
+                          desc: 'Ultra-wide luxury cinema scope',
+                          icon: <AspectRatio sx={{ fontSize: 24 }} />
+                        },
+                        {
+                          id: 'portrait',
+                          label: 'Portrait 9:16',
+                          desc: 'Vertical kiosk / Instagram Reels style',
+                          icon: <Tv sx={{ fontSize: 24, transform: 'rotate(90deg)' }} />
+                        },
+                        {
+                          id: 'square',
+                          label: 'Square 1:1',
+                          desc: 'High-fashion editorial square format',
+                          icon: <Diamond sx={{ fontSize: 24 }} />
+                        }
+                      ].map((item) => {
+                        const active = (config.videoFit || 'cover') === item.id;
+                        return (
+                          <Grid item xs={12} sm={6} md={2.4} key={item.id}>
+                            <Box
+                              onClick={() => updateMultipleConfig({ videoFit: item.id, idleDisplayType: 'video' })}
+                              sx={{
+                                p: 1.75,
+                                height: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderRadius: '14px',
+                                border: '2px solid',
+                                borderColor: active ? '#080F1C' : '#E1E4EA',
+                                bgcolor: active ? '#FFFFFF' : '#FAFCFA',
+                                cursor: 'pointer',
+                                textAlign: 'center',
+                                boxShadow: active ? '0 2px 8px rgba(0, 0, 0, 0.08)' : 'none',
+                                transition: 'all 0.15s ease',
+                                '&:hover': {
+                                  borderColor: '#080F1C',
+                                  bgcolor: '#FFFFFF'
+                                }
+                              }}
+                            >
+                              <Box sx={{ color: active ? '#080F1C' : '#66707B', mb: 0.5 }}>
+                                {item.icon}
+                              </Box>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 800, fontSize: '0.82rem', color: active ? '#080F1C' : '#161922' }}>
+                                {item.label}
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: '#66707B', fontSize: '0.7rem', mt: 0.3, display: 'block' }}>
+                                {item.desc}
+                              </Typography>
+                            </Box>
+                          </Grid>
+                        );
+                      })}
+                    </Grid>
+                  </Paper>
 
-                      <Grid item xs={12} sm={4}>
-                        <Box
-                          onClick={() => updateConfig('videoFit', 'contain')}
-                          sx={{
-                            p: 2,
-                            borderRadius: '16px',
-                            border: '2px solid',
-                            borderColor: config.videoFit === 'contain' ? '#080F1C' : '#E1E4EA',
-                            bgcolor: config.videoFit === 'contain' ? '#FFFFFF' : 'transparent',
-                            cursor: 'pointer',
-                            textAlign: 'center',
-                            boxShadow: config.videoFit === 'contain' ? '0 2px 8px rgba(0, 0, 0, 0.06)' : 'none'
-                          }}
-                        >
-                          <FitScreen sx={{ color: config.videoFit === 'contain' ? '#080F1C' : '#66707B', fontSize: 28 }} />
-                          <Typography variant="subtitle2" sx={{ fontWeight: 800, mt: 0.5, color: config.videoFit === 'contain' ? '#080F1C' : '#161922' }}>
-                            Contain / Letterbox
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: '#66707B' }}>
-                            Fits whole video with borders
-                          </Typography>
-                        </Box>
-                      </Grid>
+                  {/* 2. Atmospheric Ambient Video Glow */}
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2.25,
+                      borderRadius: '16px',
+                      bgcolor: '#FAFCFA',
+                      border: '1px solid #E1E4EA',
+                      mb: 2.5,
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <Box sx={{ pr: 2 }}>
+                      <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+                        <AutoAwesome sx={{ color: '#080F1C', fontSize: 20 }} />
+                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#161922' }}>
+                          Atmospheric Ambient Video Glow
+                        </Typography>
+                      </Stack>
+                      <Typography variant="caption" sx={{ color: '#66707B', display: 'block' }}>
+                        Diffuses blurred real-time video colors onto screen edges (replaces solid black bars in letterbox/cinematic/portrait modes)
+                      </Typography>
+                    </Box>
+                    <Switch
+                      checked={config.videoAmbientGlow !== false}
+                      onChange={(e) => updateMultipleConfig({ videoAmbientGlow: e.target.checked, idleDisplayType: 'video' })}
+                      sx={{
+                        '& .MuiSwitch-switchBase.Mui-checked': { color: '#080F1C' },
+                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#080F1C' }
+                      }}
+                    />
+                  </Paper>
 
-                      <Grid item xs={12} sm={4}>
-                        <Box
-                          onClick={() => updateConfig('videoFit', 'cinematic')}
-                          sx={{
-                            p: 2,
-                            borderRadius: '16px',
-                            border: '2px solid',
-                            borderColor: config.videoFit === 'cinematic' ? '#080F1C' : '#E1E4EA',
-                            bgcolor: config.videoFit === 'cinematic' ? '#FFFFFF' : 'transparent',
-                            cursor: 'pointer',
-                            textAlign: 'center',
-                            boxShadow: config.videoFit === 'cinematic' ? '0 2px 8px rgba(0, 0, 0, 0.06)' : 'none'
-                          }}
-                        >
-                          <AspectRatio sx={{ color: config.videoFit === 'cinematic' ? '#080F1C' : '#66707B', fontSize: 28 }} />
-                          <Typography variant="subtitle2" sx={{ fontWeight: 800, mt: 0.5, color: config.videoFit === 'cinematic' ? '#080F1C' : '#161922' }}>
-                            Cinematic 21:9
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: '#66707B' }}>
-                            Ultra-wide luxury cinema scope
-                          </Typography>
-                        </Box>
-                      </Grid>
+                  {/* 3. Runway Playback Speed */}
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2.25,
+                      borderRadius: '16px',
+                      bgcolor: '#FAFCFA',
+                      border: '1px solid #E1E4EA',
+                      mb: 2.5
+                    }}
+                  >
+                    <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+                      <Speed sx={{ color: '#080F1C', fontSize: 20 }} />
+                      <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#161922' }}>
+                        Runway Playback Speed
+                      </Typography>
+                    </Stack>
+                    <Typography variant="caption" sx={{ color: '#66707B', display: 'block', mb: 1.5 }}>
+                      Control the pacing and elegance of the video loop on the customer terminal
+                    </Typography>
+                    <Stack direction="row" spacing={1.5}>
+                      {[
+                        { speed: 0.75, label: '0.75x Slow Motion', desc: 'Elegant runway glide' },
+                        { speed: 1.0, label: '1.0x Realtime', desc: 'Standard showroom speed' },
+                        { speed: 1.25, label: '1.25x Dynamic', desc: 'Brisk seasonal preview' }
+                      ].map((item) => {
+                        const active = (config.videoPlaybackSpeed || 1.0) === item.speed;
+                        return (
+                          <Button
+                            key={item.speed}
+                            variant={active ? 'contained' : 'outlined'}
+                            onClick={() => updateMultipleConfig({ videoPlaybackSpeed: item.speed, idleDisplayType: 'video' })}
+                            sx={{
+                              flex: 1,
+                              py: 1,
+                              borderRadius: 9999,
+                              textTransform: 'none',
+                              fontWeight: 800,
+                              fontSize: '0.78rem',
+                              bgcolor: active ? '#080F1C' : '#FFFFFF',
+                              color: active ? '#FFFFFF' : '#161922',
+                              border: active ? 'none' : '1.5px solid #E1E4EA',
+                              '&:hover': { bgcolor: active ? '#1D2531' : 'rgba(8, 15, 28, 0.04)' }
+                            }}
+                          >
+                            {item.label}
+                          </Button>
+                        );
+                      })}
+                    </Stack>
+                  </Paper>
+
+                  {/* 4. Haute Couture Color Grading & Filters */}
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2.25,
+                      borderRadius: '16px',
+                      bgcolor: '#FAFCFA',
+                      border: '1px solid #E1E4EA',
+                      mb: 2
+                    }}
+                  >
+                    <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+                      <Palette sx={{ color: '#080F1C', fontSize: 20 }} />
+                      <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#161922' }}>
+                        Haute Couture Color Grading & Filters
+                      </Typography>
+                    </Stack>
+                    <Typography variant="caption" sx={{ color: '#66707B', display: 'block', mb: 1.5 }}>
+                      Apply refined editorial color grading to the video stream in real-time
+                    </Typography>
+                    <Grid container spacing={1.5}>
+                      {[
+                        { id: 'natural', label: 'Natural Studio', tag: 'Standard original fidelity' },
+                        { id: 'glamour', label: 'Haute Glamour', tag: 'Enhanced contrast & satin vibrancy' },
+                        { id: 'gold', label: 'Atelier Gold', tag: 'Warm amber couture glow' },
+                        { id: 'noir', label: 'Vintage Noir', tag: 'Monochrome editorial high-contrast' }
+                      ].map((filter) => {
+                        const active = (config.videoFilter || 'natural') === filter.id;
+                        return (
+                          <Grid item xs={6} sm={3} key={filter.id}>
+                            <Box
+                              onClick={() => updateMultipleConfig({ videoFilter: filter.id, idleDisplayType: 'video' })}
+                              sx={{
+                                p: 1.5,
+                                borderRadius: '12px',
+                                border: '2px solid',
+                                borderColor: active ? '#080F1C' : '#E1E4EA',
+                                bgcolor: active ? '#FFFFFF' : '#FAFCFA',
+                                cursor: 'pointer',
+                                textAlign: 'center',
+                                boxShadow: active ? '0 2px 8px rgba(0,0,0,0.06)' : 'none',
+                                transition: 'all 0.15s ease',
+                                '&:hover': {
+                                  borderColor: '#080F1C',
+                                  bgcolor: '#FFFFFF'
+                                }
+                              }}
+                            >
+                              <Typography variant="subtitle2" sx={{ fontWeight: 800, fontSize: '0.82rem', color: active ? '#080F1C' : '#161922' }}>
+                                {filter.label}
+                              </Typography>
+                              <Typography variant="caption" sx={{ fontSize: '0.68rem', color: '#66707B', display: 'block', mt: 0.3 }}>
+                                {filter.tag}
+                              </Typography>
+                            </Box>
+                          </Grid>
+                        );
+                      })}
                     </Grid>
                   </Paper>
                 </Box>
@@ -1357,84 +1534,232 @@ export default function CustomerDisplaySettings() {
                 {config.idleDisplayType === 'video' && (
                   <Box sx={{ width: '100%' }}>
                     {config.videoUrl === 'canvas-runway' ? (
-                      /* Virtual Runway Catwalk Canvas Animation */
+                      /* Virtual Runway Catwalk Canvas Animation with selected framing */
                       <Box
                         sx={{
                           width: '100%',
-                          height: 200,
+                          height: 220,
                           borderRadius: '16px',
                           overflow: 'hidden',
-                          border: '1px solid #E1E4EA',
-                          background: 'radial-gradient(circle at 50% 30%, #1D2531 0%, #080F1C 100%)',
+                          bgcolor: '#04070D',
                           position: 'relative',
                           display: 'flex',
-                          flexDirection: 'column',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: '#FFFFFF'
+                          border: '1px solid #E1E4EA'
                         }}
                       >
-                        {/* Animated Catwalk Lighting Pillars */}
-                        <Box sx={{ position: 'absolute', top: 0, left: '20%', width: 2, height: '100%', bgcolor: 'rgba(111, 76, 237, 0.5)', animation: 'cfdRunwayLight 2s infinite ease-in-out' }} />
-                        <Box sx={{ position: 'absolute', top: 0, right: '20%', width: 2, height: '100%', bgcolor: 'rgba(111, 76, 237, 0.5)', animation: 'cfdRunwayLight 2s infinite ease-in-out 1s' }} />
+                        {/* Ambient Glow for Canvas */}
+                        {config.videoAmbientGlow !== false && config.videoFit !== 'cover' && (
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              inset: 0,
+                              background: 'radial-gradient(circle at 50% 50%, rgba(111, 76, 237, 0.4) 0%, rgba(8, 15, 28, 0.8) 100%)',
+                              filter: 'blur(24px)',
+                              opacity: 0.8,
+                              transform: 'scale(1.1)',
+                              pointerEvents: 'none',
+                              zIndex: 1
+                            }}
+                          />
+                        )}
 
-                        {/* Walking Couture Silhouette */}
-                        <motion.div
-                          animate={{ y: [0, -10, 0], scale: [1, 1.05, 1] }}
-                          transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
-                        >
-                          <Typography sx={{ fontSize: 46 }}>💃</Typography>
-                        </motion.div>
-
-                        <Typography variant="overline" sx={{ color: '#FFFFFF', letterSpacing: '0.2em', fontWeight: 900, mt: 1 }}>
-                          HAUTE COUTURE CATWALK
-                        </Typography>
-                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
-                          Framing: <strong>{config.videoFit.toUpperCase()}</strong>
-                        </Typography>
-                      </Box>
-                    ) : (
-                      /* Real Video Player with explicit framing & autoplay */
-                      <Box
-                        sx={{
-                          width: '100%',
-                          height: config.videoFit === 'cinematic' ? 160 : 200,
-                          borderRadius: '16px',
-                          overflow: 'hidden',
-                          border: config.videoFit === 'contain' ? '3px solid #080F1C' : '1px solid #E1E4EA',
-                          bgcolor: '#000000',
-                          position: 'relative'
-                        }}
-                      >
-                        <video
-                          ref={videoRef}
-                          src={config.videoUrl === 'firestore-chunked' ? (localPreviewBlobUrl || chunkedVideoUrl) : config.videoUrl}
-                          autoPlay
-                          loop
-                          muted
-                          playsInline
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: config.videoFit === 'contain' ? 'contain' : 'cover',
-                            display: 'block'
+                        <Box
+                          sx={{
+                            position: 'relative',
+                            zIndex: 2,
+                            ...(config.videoFit === 'cinematic' ? {
+                              width: '100%',
+                              aspectRatio: '21 / 9',
+                              maxHeight: '100%',
+                              borderRadius: '8px',
+                              overflow: 'hidden',
+                              boxShadow: '0 8px 30px rgba(0,0,0,0.85)',
+                              border: '1px solid rgba(255,255,255,0.2)'
+                            } : config.videoFit === 'portrait' ? {
+                              height: '92%',
+                              aspectRatio: '9 / 16',
+                              borderRadius: '12px',
+                              overflow: 'hidden',
+                              boxShadow: '0 8px 30px rgba(0,0,0,0.85)',
+                              border: '1px solid rgba(255,255,255,0.2)'
+                            } : config.videoFit === 'square' ? {
+                              height: '88%',
+                              aspectRatio: '1 / 1',
+                              borderRadius: '12px',
+                              overflow: 'hidden',
+                              boxShadow: '0 8px 30px rgba(0,0,0,0.85)',
+                              border: '1px solid rgba(255,255,255,0.2)'
+                            } : config.videoFit === 'contain' ? {
+                              width: '94%',
+                              height: '94%',
+                              borderRadius: '10px',
+                              overflow: 'hidden',
+                              boxShadow: '0 8px 25px rgba(0,0,0,0.7)',
+                              border: '1px solid rgba(255,255,255,0.15)'
+                            } : {
+                              width: '100%',
+                              height: '100%'
+                            }),
+                            background: 'radial-gradient(circle at 50% 30%, #1D2531 0%, #080F1C 100%)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: '#FFFFFF'
                           }}
-                        />
+                        >
+                          <Box sx={{ position: 'absolute', top: 0, left: '20%', width: 2, height: '100%', bgcolor: 'rgba(111, 76, 237, 0.5)', animation: 'cfdRunwayLight 2s infinite ease-in-out' }} />
+                          <Box sx={{ position: 'absolute', top: 0, right: '20%', width: 2, height: '100%', bgcolor: 'rgba(111, 76, 237, 0.5)', animation: 'cfdRunwayLight 2s infinite ease-in-out 1s' }} />
+
+                          <motion.div
+                            animate={{ y: [0, -8, 0], scale: [1, 1.05, 1] }}
+                            transition={{ repeat: Infinity, duration: 2.2 / (config.videoPlaybackSpeed || 1.0), ease: 'easeInOut' }}
+                          >
+                            <Typography sx={{ fontSize: config.videoFit === 'cinematic' ? 32 : 44 }}>💃</Typography>
+                          </motion.div>
+
+                          <Typography variant="overline" sx={{ color: '#FFFFFF', letterSpacing: '0.15em', fontWeight: 900, mt: 0.5, fontSize: '0.62rem' }}>
+                            HAUTE COUTURE CATWALK
+                          </Typography>
+                        </Box>
+
                         <Box
                           sx={{
                             position: 'absolute',
-                            bottom: 6,
+                            bottom: 8,
                             left: 8,
-                            bgcolor: 'rgba(0,0,0,0.75)',
+                            zIndex: 3,
+                            bgcolor: 'rgba(8, 15, 28, 0.85)',
+                            backdropFilter: 'blur(8px)',
                             color: '#FFFFFF',
-                            px: 1,
-                            py: 0.3,
-                            borderRadius: 1,
+                            px: 1.2,
+                            py: 0.35,
+                            borderRadius: 9999,
                             fontSize: '0.62rem',
-                            fontWeight: 800
+                            fontWeight: 800,
+                            letterSpacing: '0.04em',
+                            border: '1px solid rgba(255,255,255,0.2)'
                           }}
                         >
-                          Framing: {config.videoFit.toUpperCase()}
+                          {(config.videoFit || 'cover').toUpperCase()} • {(config.videoPlaybackSpeed || 1.0)}x
+                        </Box>
+                      </Box>
+                    ) : (
+                      /* Real Video Player with explicit framing & ambient blur glow */
+                      <Box
+                        sx={{
+                          width: '100%',
+                          height: 220,
+                          borderRadius: '16px',
+                          overflow: 'hidden',
+                          bgcolor: '#04070D',
+                          position: 'relative',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          border: '1px solid #E1E4EA'
+                        }}
+                      >
+                        {/* Ambient video blur backdrop */}
+                        {config.videoAmbientGlow !== false && config.videoFit !== 'cover' && (
+                          <video
+                            src={config.videoUrl === 'firestore-chunked' ? (localPreviewBlobUrl || chunkedVideoUrl) : config.videoUrl}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            style={{
+                              position: 'absolute',
+                              inset: 0,
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              filter: `blur(28px) brightness(0.65) ${getVideoFilterCss(config.videoFilter)}`,
+                              transform: 'scale(1.2)',
+                              opacity: 0.72,
+                              pointerEvents: 'none',
+                              zIndex: 1
+                            }}
+                          />
+                        )}
+
+                        {/* Foreground Framed Video */}
+                        <Box
+                          sx={{
+                            position: 'relative',
+                            zIndex: 2,
+                            ...(config.videoFit === 'cinematic' ? {
+                              width: '100%',
+                              aspectRatio: '21 / 9',
+                              maxHeight: '100%',
+                              borderRadius: '8px',
+                              overflow: 'hidden',
+                              boxShadow: '0 8px 30px rgba(0,0,0,0.85)',
+                              border: '1px solid rgba(255,255,255,0.2)'
+                            } : config.videoFit === 'portrait' ? {
+                              height: '92%',
+                              aspectRatio: '9 / 16',
+                              borderRadius: '12px',
+                              overflow: 'hidden',
+                              boxShadow: '0 8px 30px rgba(0,0,0,0.85)',
+                              border: '1px solid rgba(255,255,255,0.2)'
+                            } : config.videoFit === 'square' ? {
+                              height: '88%',
+                              aspectRatio: '1 / 1',
+                              borderRadius: '12px',
+                              overflow: 'hidden',
+                              boxShadow: '0 8px 30px rgba(0,0,0,0.85)',
+                              border: '1px solid rgba(255,255,255,0.2)'
+                            } : config.videoFit === 'contain' ? {
+                              width: '100%',
+                              height: '100%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            } : {
+                              width: '100%',
+                              height: '100%'
+                            })
+                          }}
+                        >
+                          <video
+                            ref={videoRef}
+                            src={config.videoUrl === 'firestore-chunked' ? (localPreviewBlobUrl || chunkedVideoUrl) : config.videoUrl}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: config.videoFit === 'contain' ? 'contain' : 'cover',
+                              display: 'block',
+                              filter: getVideoFilterCss(config.videoFilter)
+                            }}
+                          />
+                        </Box>
+
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            bottom: 8,
+                            left: 8,
+                            zIndex: 3,
+                            bgcolor: 'rgba(8, 15, 28, 0.82)',
+                            backdropFilter: 'blur(8px)',
+                            color: '#FFFFFF',
+                            px: 1.2,
+                            py: 0.35,
+                            borderRadius: 9999,
+                            fontSize: '0.62rem',
+                            fontWeight: 800,
+                            letterSpacing: '0.04em',
+                            border: '1px solid rgba(255,255,255,0.2)'
+                          }}
+                        >
+                          {(config.videoFit || 'cover').toUpperCase()} • {(config.videoPlaybackSpeed || 1.0)}x • {(config.videoFilter || 'natural').toUpperCase()}
                         </Box>
                       </Box>
                     )}

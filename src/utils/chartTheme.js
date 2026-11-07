@@ -58,44 +58,96 @@ const prefersReducedMotion = () => {
 };
 
 /**
- * Smooth, restrained entrance motion for cartesian charts (Line / Bar).
- * Bars cascade in from left-to-right; lines ease up from the baseline.
- * Hover transitions are shortened for a snappy but fluid feel.
+ * Smooth, high-impact entrance and hover motion for cartesian charts (Line / Bar).
+ * Lines ease up dynamically from baseline with smooth Bezier easing;
+ * Bars cascade in with staggered timing;
+ * Hover transitions are snappy and springy for interactive delight.
  */
 export const getChartMotion = () => {
   const reduced = prefersReducedMotion();
   return {
     animation: {
-      duration: reduced ? 0 : 900,
+      duration: reduced ? 0 : 1200,
       easing: 'easeOutQuart',
       delay: (ctx) => {
         if (reduced || ctx.type !== 'data') return 0;
-        return ctx.chart?.config?.type === 'bar' ? ctx.dataIndex * 45 : 0;
+        return ctx.chart?.config?.type === 'bar' ? ctx.dataIndex * 80 : ctx.dataIndex * 40;
       }
     },
     transitions: {
       active: {
-        animation: { duration: reduced ? 0 : 700, easing: 'easeOutQuart' }
+        animation: { duration: reduced ? 0 : 300, easing: 'easeOutCubic' }
       }
     }
   };
 };
 
 /**
- * Soft sweep-in for radial charts (Doughnut / Pie): rotate + scale entrance.
+ * Sweeping rotational & scale entrance for radial charts (Doughnut / Pie).
+ * Includes elastic outward hover pop on slices.
  */
 export const getDoughnutMotion = () => {
   const reduced = prefersReducedMotion();
   return {
     animation: {
-      duration: reduced ? 0 : 1100,
+      duration: reduced ? 0 : 1400,
       easing: 'easeOutQuart',
       animateRotate: true,
       animateScale: true
     },
     transitions: {
       active: {
-        animation: { duration: reduced ? 0 : 700, easing: 'easeOutQuart' }
+        animation: { duration: reduced ? 0 : 350, easing: 'easeOutQuart' }
+      }
+    }
+  };
+};
+
+/**
+ * Dedicated line chart animation with progressive baseline lift
+ */
+export const getLineChartMotion = () => {
+  const reduced = prefersReducedMotion();
+  return {
+    animation: {
+      duration: reduced ? 0 : 1300,
+      easing: 'easeOutQuart',
+      y: {
+        type: 'number',
+        easing: 'easeOutQuart',
+        duration: reduced ? 0 : 1300,
+        from: (ctx) => (ctx.type === 'data' && ctx.mode === 'default' && ctx.chart?.scales?.y ? ctx.chart.scales.y.getPixelForValue(0) : undefined),
+        delay: (ctx) => (reduced || ctx.type !== 'data' ? 0 : ctx.dataIndex * 50)
+      }
+    },
+    transitions: {
+      active: {
+        animation: { duration: reduced ? 0 : 250, easing: 'easeOutCubic' }
+      }
+    }
+  };
+};
+
+/**
+ * Dedicated horizontal bar chart cascade animation
+ */
+export const getBarChartMotion = () => {
+  const reduced = prefersReducedMotion();
+  return {
+    animation: {
+      duration: reduced ? 0 : 1200,
+      easing: 'easeOutQuart',
+      x: {
+        type: 'number',
+        easing: 'easeOutQuart',
+        duration: reduced ? 0 : 1200,
+        from: (ctx) => (ctx.type === 'data' && ctx.mode === 'default' && ctx.chart?.scales?.x ? ctx.chart.scales.x.getPixelForValue(0) : 0),
+        delay: (ctx) => (reduced || ctx.type !== 'data' ? 0 : ctx.dataIndex * 120)
+      }
+    },
+    transitions: {
+      active: {
+        animation: { duration: reduced ? 0 : 250, easing: 'easeOutCubic' }
       }
     }
   };
