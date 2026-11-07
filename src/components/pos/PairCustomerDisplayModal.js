@@ -100,12 +100,12 @@ export default function PairCustomerDisplayModal({
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="md"
-      fullWidth
+      maxWidth={false}
       PaperProps={{
         sx: {
-          width: { xs: '100%', sm: 880, md: 920 },
+          width: { xs: '100%', sm: 940, md: 980, lg: 1020 },
           maxWidth: '96vw',
+          maxHeight: '96vh',
           borderRadius: '20px',
           overflow: 'hidden',
           bgcolor: 'background.paper',
@@ -120,7 +120,7 @@ export default function PairCustomerDisplayModal({
       <DialogTitle
         sx={{
           px: { xs: 2.5, sm: 3 },
-          py: 2,
+          py: 1.75,
           bgcolor: 'background.paper',
           color: 'text.primary',
           borderBottom: '1px solid',
@@ -133,8 +133,8 @@ export default function PairCustomerDisplayModal({
         <Stack direction="row" spacing={1.5} alignItems="center">
           <Box
             sx={{
-              width: 40,
-              height: 40,
+              width: 38,
+              height: 38,
               borderRadius: 2.5,
               bgcolor: (t) => `${t.palette.primary.main}14`,
               border: '1px solid',
@@ -144,7 +144,7 @@ export default function PairCustomerDisplayModal({
               justifyContent: 'center'
             }}
           >
-            <PhoneIphone sx={{ color: 'primary.main', fontSize: 22 }} />
+            <PhoneIphone sx={{ color: 'primary.main', fontSize: 21 }} />
           </Box>
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary', fontSize: { xs: '1rem', sm: '1.15rem' }, lineHeight: 1.2 }}>
@@ -168,11 +168,11 @@ export default function PairCustomerDisplayModal({
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ p: { xs: 2.5, sm: 3 } }}>
+      <DialogContent sx={{ px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 2 }, overflowY: { xs: 'auto', md: 'hidden' } }}>
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: '360px 1fr' },
+            gridTemplateColumns: { xs: '1fr', md: '350px 1fr' },
             gap: 2.5,
             alignItems: 'stretch'
           }}
@@ -181,7 +181,7 @@ export default function PairCustomerDisplayModal({
           <Paper
             elevation={0}
             sx={{
-              p: 2.5,
+              p: 2,
               borderRadius: '16px',
               bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#F9FAFC',
               border: '1px solid',
@@ -196,13 +196,13 @@ export default function PairCustomerDisplayModal({
             <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Box
                 sx={{
-                  p: 1.25,
+                  p: 1.2,
                   bgcolor: '#FFFFFF',
                   borderRadius: '14px',
                   border: '1px solid',
                   borderColor: 'divider',
                   boxShadow: '0 6px 20px rgba(8, 15, 28, 0.06)',
-                  mb: 2,
+                  mb: 1.5,
                   display: 'inline-block'
                 }}
               >
@@ -211,17 +211,17 @@ export default function PairCustomerDisplayModal({
                   src={qrCodeUrl}
                   alt="Scan to open customer display"
                   sx={{
-                    width: 190,
-                    height: 190,
+                    width: 175,
+                    height: 175,
                     display: 'block'
                   }}
                 />
               </Box>
 
-              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.96rem', mb: 0.5 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.92rem', mb: 0.35 }}>
                 Scan with iPad, Tablet or Phone
               </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.78rem', maxWidth: 280, mb: 2, lineHeight: 1.45 }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.75rem', maxWidth: 280, mb: 1.5, lineHeight: 1.4 }}>
                 Point secondary device camera at this QR code. The browser will instantly load the synchronized customer screen.
               </Typography>
             </Box>
@@ -234,7 +234,7 @@ export default function PairCustomerDisplayModal({
                 gridTemplateColumns: '1fr 1fr',
                 gap: 1.25,
                 mt: 'auto',
-                pt: 1.5
+                pt: 1
               }}
             >
               <Button
@@ -249,7 +249,7 @@ export default function PairCustomerDisplayModal({
                   textTransform: 'none',
                   fontWeight: 700,
                   fontSize: '0.78rem',
-                  height: 38,
+                  height: 36,
                   whiteSpace: 'nowrap',
                   borderRadius: '9999px',
                   px: 1,
@@ -276,7 +276,7 @@ export default function PairCustomerDisplayModal({
                   textTransform: 'none',
                   fontWeight: 700,
                   fontSize: '0.78rem',
-                  height: 38,
+                  height: 36,
                   whiteSpace: 'nowrap',
                   borderRadius: '9999px',
                   px: 1,
@@ -295,7 +295,7 @@ export default function PairCustomerDisplayModal({
           <Paper
             elevation={0}
             sx={{
-              p: 2.5,
+              p: 2,
               borderRadius: '16px',
               bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#F9FAFC',
               border: '1px solid',
@@ -310,7 +310,7 @@ export default function PairCustomerDisplayModal({
               <Box
                 sx={{
                   px: 2,
-                  py: 1.25,
+                  py: 1.2,
                   borderRadius: '12px',
                   bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.12)' : '#ECFDF5',
                   border: '1px solid',
@@ -394,23 +394,22 @@ export default function PairCustomerDisplayModal({
               {isLocalhost && (
                 <Box
                   sx={{
-                    p: 2,
-                    mt: 1.5,
+                    p: 1.5,
+                    mt: 1,
                     borderRadius: '12px',
                     bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(245, 158, 11, 0.08)',
                     border: '1px solid',
                     borderColor: 'rgba(245, 158, 11, 0.25)'
                   }}
                 >
-                  <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.75 }}>
-                    <Wifi sx={{ color: '#D97706', fontSize: 18 }} />
-                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: (t) => t.palette.mode === 'dark' ? '#FBBF24' : '#B45309' }}>
+                  <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+                    <Wifi sx={{ color: '#D97706', fontSize: 17 }} />
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, fontSize: '0.8rem', color: (t) => t.palette.mode === 'dark' ? '#FBBF24' : '#B45309' }}>
                       Shop Wi-Fi Pairing Notice (Localhost Detected)
                     </Typography>
                   </Stack>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 1.5, lineHeight: 1.5 }}>
-                    Because your POS is running locally on this machine, your iPad cannot reach <code>localhost</code> directly.
-                    Enter your computer's local Wi-Fi IP address below (e.g. <code>192.168.1.15:3002</code>) to update the QR code:
+                  <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 1, lineHeight: 1.4, fontSize: '0.72rem' }}>
+                    Because your POS is running locally on this machine, enter your local Wi-Fi IP address below:
                   </Typography>
 
                   <TextField
@@ -433,8 +432,8 @@ export default function PairCustomerDisplayModal({
                             size="small"
                             label="QR Updated"
                             sx={{
-                              height: 20,
-                              fontSize: '0.65rem',
+                              height: 18,
+                              fontSize: '0.62rem',
                               bgcolor: 'rgba(16, 185, 129, 0.15)',
                               color: 'success.main',
                               fontWeight: 700
@@ -446,22 +445,19 @@ export default function PairCustomerDisplayModal({
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         bgcolor: 'background.paper',
-                        borderRadius: '9px',
-                        fontSize: '0.85rem'
+                        borderRadius: '8px',
+                        fontSize: '0.82rem'
                       }
                     }}
                   />
-                  <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.8, fontSize: '0.68rem' }}>
-                    Tip: On macOS, find your IP under <strong>System Settings → Wi-Fi → Details → IP Address</strong>.
-                  </Typography>
                 </Box>
               )}
 
               {/* How it works */}
               <Box
                 sx={{
-                  p: 2,
-                  my: 1.5,
+                  p: 1.75,
+                  my: 1.25,
                   borderRadius: '12px',
                   bgcolor: '#FFFFFF',
                   border: '1px solid',
@@ -476,27 +472,27 @@ export default function PairCustomerDisplayModal({
                     fontWeight: 800,
                     textTransform: 'uppercase',
                     display: 'block',
-                    fontSize: '0.68rem',
-                    mb: 1.5
+                    fontSize: '0.66rem',
+                    mb: 1.25
                   }}
                 >
                   HOW CUSTOMER SCREEN PAIRING WORKS
                 </Typography>
-                <Stack spacing={1.5}>
+                <Stack spacing={1.25}>
                   {[
                     { num: '1', title: 'Place Device on Counter', desc: 'Mount your iPad or tablet facing the patron at your checkout desk.' },
                     { num: '2', title: 'Scan Once', desc: 'Scan this QR code using the iPad camera. It launches the Aleen Customer Terminal.' },
                     { num: '3', title: 'Automatic Realtime Sync', desc: 'As you barcode-scan items or apply discounts, the display updates with 0ms delay.' }
                   ].map((step) => (
-                    <Box key={step.num} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+                    <Box key={step.num} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.25 }}>
                       <Box
                         sx={{
-                          width: 20,
-                          height: 20,
+                          width: 19,
+                          height: 19,
                           borderRadius: '50%',
                           bgcolor: '#080F1C',
                           color: '#FFFFFF',
-                          fontSize: '0.7rem',
+                          fontSize: '0.68rem',
                           fontWeight: 800,
                           display: 'flex',
                           alignItems: 'center',
@@ -508,10 +504,10 @@ export default function PairCustomerDisplayModal({
                         {step.num}
                       </Box>
                       <Box>
-                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary', display: 'block', lineHeight: 1.3, fontSize: '0.76rem' }}>
+                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary', display: 'block', lineHeight: 1.25, fontSize: '0.74rem' }}>
                           {step.title}
                         </Typography>
-                        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem', lineHeight: 1.4 }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.71rem', lineHeight: 1.35 }}>
                           {step.desc}
                         </Typography>
                       </Box>
@@ -521,7 +517,7 @@ export default function PairCustomerDisplayModal({
               </Box>
             </Box>
 
-            {/* Target URL Preview (Matching 38px Height and Grid Baseline with Left Column Buttons) */}
+            {/* Target URL Preview (Matching 36px Height and Grid Baseline with Left Column Buttons) */}
             <Box
               sx={{
                 px: 1.75,
@@ -533,7 +529,7 @@ export default function PairCustomerDisplayModal({
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 gap: 1,
-                height: 38,
+                height: 36,
                 boxSizing: 'border-box',
                 mt: 'auto'
               }}
@@ -568,7 +564,7 @@ export default function PairCustomerDisplayModal({
       <DialogActions
         sx={{
           px: 3,
-          py: 2,
+          py: 1.5,
           borderTop: '1px solid',
           borderColor: 'divider',
           bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#FFFFFF',
@@ -587,7 +583,7 @@ export default function PairCustomerDisplayModal({
             fontWeight: 700,
             textTransform: 'none',
             px: 3.5,
-            py: 0.8,
+            py: 0.7,
             borderRadius: '9999px',
             boxShadow: '0 2px 8px rgba(8, 15, 28, 0.2)',
             '&:hover': {
