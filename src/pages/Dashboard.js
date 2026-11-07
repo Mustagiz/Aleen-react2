@@ -126,6 +126,8 @@ const Dashboard = () => {
 
   // Chart animation key: forces a fresh entrance animation on page load/reload and range change
   const [chartKey, setChartKey] = useState(0);
+  const [hoveredStockSegment, setHoveredStockSegment] = useState(null);
+  const [activeRevenueSeries, setActiveRevenueSeries] = useState({ sales: true, expenses: true });
   useEffect(() => {
     setChartKey(prev => prev + 1);
   }, [dateRange]);
@@ -231,34 +233,68 @@ const Dashboard = () => {
   filteredInvoices.forEach(inv => {
     inv.items?.forEach(item => {
       const key = item.id || item.name;
-      productSales[key] = (productSales[key] || 0) + item.quantity;
+      productSales[key] = (productSales[key] || 0) + (Number(item.quantity) || 1);
     });
   });
 
-  const top5ProductsData = Object.entries(productSales)
+  let top5ProductsData = Object.entries(productSales)
     .map(([id, qty]) => {
-      const product = inventory.find(p => p.id === id);
-      return { name: product?.name || 'Garment Item', quantity: qty, price: product?.price || 0 };
+      const product = inventory.find(p => p.id === id || p.name === id);
+      return {
+        name: product?.name || id || 'Garment Item',
+        quantity: qty,
+        price: product?.price || 0,
+        revenue: qty * (product?.price || 0)
+      };
     })
-    .sort((a, b) => b.quantity - a.quantity)
-    .slice(0, 5);
+    .sort((a, b) => b.quantity - a.quantity);
+
+  // If fewer than 5 products sold in this period, supplement with top catalog pieces
+  if (top5ProductsData.length < 5 && inventory.length > 0) {
+    const existingNames = new Set(top5ProductsData.map(p => p.name));
+    const catalogFillers = inventory
+      .filter(p => !existingNames.has(p.name))
+      .slice(0, 5 - top5ProductsData.length)
+      .map(p => ({
+        name: p.name,
+        quantity: 0,
+        price: p.price || 0,
+        revenue: 0,
+        isCatalog: true
+      }));
+    top5ProductsData = [...top5ProductsData, ...catalogFillers];
+  }
+  top5ProductsData = top5ProductsData.slice(0, 5);
 
   const topProductsChartData = {
     labels: top5ProductsData.map(p => p.name),
     datasets: [{
       label: 'Pieces Sold',
       data: top5ProductsData.map(p => p.quantity),
-      backgroundColor: getThemeChartPalette(theme, top5ProductsData.length),
-      hoverBackgroundColor: '#6F4CED',
-      hoverBorderColor: '#080F1C',
+      backgroundColor: [
+        '#080F1C',
+        '#4F46E5',
+        '#059669',
+        '#D97706',
+        '#DC2626'
+      ].slice(0, top5ProductsData.length),
+      hoverBackgroundColor: [
+        '#1E293B',
+        '#6366F1',
+        '#10B981',
+        '#F59E0B',
+        '#EF4444'
+      ].slice(0, top5ProductsData.length),
+      hoverBorderColor: isDark ? '#FFFFFF' : '#080F1C',
       hoverBorderWidth: 2,
       borderRadius: 8,
       borderSkipped: false,
-      barThickness: 24,
+      barThickness: 22,
+      maxBarThickness: 28
     }]
   };
 
-  // Financial Trends Data (Daily/Monthly)
+  // Financial Trends Data (Daily/Monthly with full chronological timeline)
   const getTrendData = () => {
     const isAll = dateRange === 'all';
     const salesMap = {};
@@ -284,9 +320,30 @@ const Dashboard = () => {
       expMap[key] = (expMap[key] || 0) + (Number(exp.amount) || 0);
     });
 
-    const rawKeys = [...new Set([...Object.keys(salesMap), ...Object.keys(expMap)])];
-    const sortedKeys = rawKeys.sort((a, b) => new Date(a) - new Date(b));
-    const finalLabels = sortedKeys.length > 0 ? sortedKeys : ['Today'];
+    let finalLabels = [];
+    if (dateRange === '7days') {
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        finalLabels.push(d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }));
+      }
+    } else if (dateRange === '30days') {
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        finalLabels.push(d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }));
+      }
+    } else if (dateRange === 'thisMonth') {
+      const currentDay = today.getDate();
+      for (let day = 1; day <= currentDay; day++) {
+        const d = new Date(today.getFullYear(), today.getMonth(), day);
+        finalLabels.push(d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }));
+      }
+    } else {
+      const rawKeys = [...new Set([...Object.keys(salesMap), ...Object.keys(expMap)])];
+      finalLabels = rawKeys.sort((a, b) => new Date(a) - new Date(b));
+      if (finalLabels.length === 0) finalLabels = ['Today'];
+    }
 
     return {
       labels: finalLabels,
@@ -300,43 +357,61 @@ const Dashboard = () => {
   const salesChartData = {
     labels: trend.labels,
     datasets: [
-      {
+      activeRevenueSeries.sales && {
         label: 'Gross Sales (Revenue)',
         data: trend.sales,
-        borderColor: theme.palette.primary.main,
-        backgroundColor: `${theme.palette.primary.main}1F`,
+        borderColor: isDark ? '#818CF8' : '#080F1C',
+        backgroundColor: (context) => {
+          const chart = context.chart;
+          const { ctx, chartArea } = chart;
+          if (!chartArea) return isDark ? 'rgba(129, 140, 248, 0.2)' : 'rgba(8, 15, 28, 0.15)';
+          const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+          gradient.addColorStop(0, isDark ? 'rgba(129, 140, 248, 0.42)' : 'rgba(8, 15, 28, 0.22)');
+          gradient.addColorStop(0.7, isDark ? 'rgba(129, 140, 248, 0.08)' : 'rgba(8, 15, 28, 0.05)');
+          gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          return gradient;
+        },
         fill: true,
-        tension: 0.38,
-        pointBackgroundColor: theme.palette.primary.main,
-        pointBorderColor: isDark ? '#080F1C' : '#FFFFFF',
+        tension: 0.4,
+        pointBackgroundColor: isDark ? '#818CF8' : '#080F1C',
+        pointBorderColor: '#FFFFFF',
         pointBorderWidth: 2,
-        pointRadius: 5,
-        pointHoverRadius: 9,
+        pointRadius: 4,
+        pointHoverRadius: 8,
         pointHoverBackgroundColor: '#FFFFFF',
-        pointHoverBorderColor: theme.palette.primary.main,
-        pointHoverBorderWidth: 3,
-        pointHitRadius: 20,
+        pointHoverBorderColor: isDark ? '#818CF8' : '#080F1C',
+        pointHoverBorderWidth: 3.5,
+        pointHitRadius: 25,
         borderWidth: 2.8
       },
-      {
+      activeRevenueSeries.expenses && {
         label: 'Store Operating Expenses',
         data: trend.expenses,
-        borderColor: theme.palette.secondary?.main || '#D97706',
-        backgroundColor: `${theme.palette.secondary?.main || '#D97706'}14`,
+        borderColor: '#D97706',
+        backgroundColor: (context) => {
+          const chart = context.chart;
+          const { ctx, chartArea } = chart;
+          if (!chartArea) return 'rgba(217, 119, 6, 0.1)';
+          const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+          gradient.addColorStop(0, 'rgba(217, 119, 6, 0.35)');
+          gradient.addColorStop(0.7, 'rgba(217, 119, 6, 0.06)');
+          gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          return gradient;
+        },
         fill: true,
-        tension: 0.38,
-        pointBackgroundColor: theme.palette.secondary?.main || '#D97706',
-        pointBorderColor: isDark ? '#080F1C' : '#FFFFFF',
+        tension: 0.4,
+        pointBackgroundColor: '#D97706',
+        pointBorderColor: '#FFFFFF',
         pointBorderWidth: 2,
-        pointRadius: 5,
-        pointHoverRadius: 9,
+        pointRadius: 4,
+        pointHoverRadius: 8,
         pointHoverBackgroundColor: '#FFFFFF',
-        pointHoverBorderColor: theme.palette.secondary?.main || '#D97706',
-        pointHoverBorderWidth: 3,
-        pointHitRadius: 20,
+        pointHoverBorderColor: '#D97706',
+        pointHoverBorderWidth: 3.5,
+        pointHitRadius: 25,
         borderWidth: 2.2
       }
-    ]
+    ].filter(Boolean)
   };
 
   const stockData = {
@@ -354,14 +429,14 @@ const Dashboard = () => {
       ],
       hoverBackgroundColor: [
         '#E11D48',
-        '#1D2531',
+        '#1E293B',
         '#10B981'
       ],
       borderWidth: 2,
       borderColor: isDark ? '#1E293B' : '#FFFFFF',
       hoverBorderColor: isDark ? '#080F1C' : '#FFFFFF',
       hoverBorderWidth: 3,
-      hoverOffset: 18,
+      hoverOffset: 16,
       borderRadius: 6,
       spacing: 3
     }]
@@ -375,10 +450,10 @@ const Dashboard = () => {
       legend: { display: false },
       tooltip: {
         backgroundColor: isDark ? 'rgba(8, 15, 28, 0.96)' : 'rgba(8, 15, 28, 0.94)',
-        borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)',
+        borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.1)',
         borderWidth: 1,
         padding: 12,
-        titleFont: { family: theme.typography?.fontFamily || "'DM Sans', sans-serif", size: 13, weight: '700' },
+        titleFont: { family: theme.typography?.fontFamily || "'DM Sans', sans-serif", size: 12, weight: '700' },
         bodyFont: { family: theme.typography?.fontFamily || "'DM Sans', sans-serif", size: 12 },
         cornerRadius: 8,
         displayColors: false,
@@ -405,7 +480,42 @@ const Dashboard = () => {
     },
     hover: {
       mode: 'nearest',
-      intersect: true
+      intersect: false
+    },
+    plugins: {
+      ...commonChartOptions.plugins,
+      tooltip: {
+        ...commonChartOptions.plugins.tooltip,
+        displayColors: true,
+        boxPadding: 4,
+        usePointStyle: true,
+        callbacks: {
+          label: function(context) {
+            const val = context.parsed.y || 0;
+            return ` ${context.dataset.label}: ₹${val.toLocaleString('en-IN')}`;
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: {
+          maxTicksLimit: 7,
+          maxRotation: 0,
+          autoSkip: true,
+          font: { family: theme.typography?.fontFamily || "'DM Sans', sans-serif", size: 11 },
+          color: theme.palette.text.secondary || '#94A3B8'
+        }
+      },
+      y: {
+        grid: { borderDash: [4, 4], color: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0, 0, 0, 0.06)', drawBorder: false },
+        ticks: {
+          font: { family: theme.typography?.fontFamily || "'DM Sans', sans-serif", size: 11 },
+          color: theme.palette.text.secondary || '#94A3B8',
+          callback: (value) => `₹${value >= 1000 ? `${(value / 1000).toFixed(value % 1000 === 0 ? 0 : 1)}k` : value}`
+        }
+      }
     }
   };
 
@@ -414,13 +524,27 @@ const Dashboard = () => {
     maintainAspectRatio: false,
     cutout: '72%',
     ...getDoughnutMotion(),
+    onHover: (event, activeElements) => {
+      if (activeElements && activeElements.length > 0) {
+        setHoveredStockSegment(activeElements[0].index);
+      } else {
+        setHoveredStockSegment(null);
+      }
+    },
     plugins: {
       legend: { display: false },
       tooltip: {
         ...commonChartOptions.plugins.tooltip,
         displayColors: true,
         boxPadding: 4,
-        usePointStyle: true
+        usePointStyle: true,
+        callbacks: {
+          label: function(context) {
+            const val = context.parsed || 0;
+            const pct = totalItems > 0 ? Math.round((val / totalItems) * 100) : 0;
+            return ` ${context.label}: ${val} pieces (${pct}%)`;
+          }
+        }
       }
     }
   };
@@ -432,6 +556,42 @@ const Dashboard = () => {
     interaction: {
       mode: 'nearest',
       intersect: true
+    },
+    plugins: {
+      ...commonChartOptions.plugins,
+      tooltip: {
+        ...commonChartOptions.plugins.tooltip,
+        callbacks: {
+          label: function(context) {
+            const p = top5ProductsData[context.dataIndex];
+            const qty = context.parsed.x || 0;
+            if (p?.isCatalog) {
+              return ` In Stock Catalog (₹${(p.price || 0).toLocaleString('en-IN')})`;
+            }
+            return [
+              ` Units Sold: ${qty} pcs`,
+              p?.revenue ? ` Gross Revenue: ₹${p.revenue.toLocaleString('en-IN')}` : null
+            ].filter(Boolean);
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { borderDash: [4, 4], color: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0, 0, 0, 0.06)', drawBorder: false },
+        ticks: {
+          precision: 0,
+          font: { family: theme.typography?.fontFamily || "'DM Sans', sans-serif", size: 11 },
+          color: theme.palette.text.secondary || '#94A3B8'
+        }
+      },
+      y: {
+        grid: { display: false },
+        ticks: {
+          font: { family: theme.typography?.fontFamily || "'DM Sans', sans-serif", size: 11 },
+          color: theme.palette.text.secondary || '#94A3B8'
+        }
+      }
     }
   };
 
@@ -769,18 +929,71 @@ const Dashboard = () => {
           <GlassCard sx={{ p: 2.25, height: '100%' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1.5 }}>
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>Revenue overview</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>Revenue overview</Typography>
+                  <Box
+                    sx={{
+                      px: 1,
+                      py: 0.25,
+                      borderRadius: '9999px',
+                      bgcolor: isDark ? 'rgba(129, 140, 248, 0.12)' : 'rgba(8, 15, 28, 0.06)',
+                      border: '1px solid',
+                      borderColor: isDark ? 'rgba(129, 140, 248, 0.25)' : 'rgba(8, 15, 28, 0.1)',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      color: isDark ? '#818CF8' : '#080F1C'
+                    }}
+                  >
+                    ₹{totalRevenue.toLocaleString('en-IN')}
+                  </Box>
+                </Box>
                 <Typography variant="caption" color="text.secondary">Gross sales vs operating cash expenses</Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                    <Circle sx={{ fontSize: 10, color: 'primary.main' }} />
-                    <Typography variant="caption" sx={{ fontWeight: 600 }}>Gross Sales</Typography>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  {/* Interactive toggle for Gross Sales */}
+                  <Box
+                    onClick={() => setActiveRevenueSeries(prev => ({ ...prev, sales: !prev.sales }))}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.75,
+                      px: 1.2,
+                      py: 0.4,
+                      borderRadius: '9999px',
+                      cursor: 'pointer',
+                      border: '1px solid',
+                      borderColor: activeRevenueSeries.sales ? (isDark ? '#818CF8' : '#080F1C') : 'transparent',
+                      bgcolor: activeRevenueSeries.sales ? (isDark ? 'rgba(129, 140, 248, 0.1)' : 'rgba(8, 15, 28, 0.05)') : 'transparent',
+                      opacity: activeRevenueSeries.sales ? 1 : 0.45,
+                      transition: 'all 0.15s ease',
+                      '&:hover': { opacity: 1 }
+                    }}
+                  >
+                    <Circle sx={{ fontSize: 9, color: isDark ? '#818CF8' : '#080F1C' }} />
+                    <Typography variant="caption" sx={{ fontWeight: 700, fontSize: '0.74rem' }}>Gross Sales</Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                    <Circle sx={{ fontSize: 10, color: 'secondary.main' }} />
-                    <Typography variant="caption" sx={{ fontWeight: 600 }}>Expenses</Typography>
+                  {/* Interactive toggle for Expenses */}
+                  <Box
+                    onClick={() => setActiveRevenueSeries(prev => ({ ...prev, expenses: !prev.expenses }))}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.75,
+                      px: 1.2,
+                      py: 0.4,
+                      borderRadius: '9999px',
+                      cursor: 'pointer',
+                      border: '1px solid',
+                      borderColor: activeRevenueSeries.expenses ? '#D97706' : 'transparent',
+                      bgcolor: activeRevenueSeries.expenses ? 'rgba(217, 119, 6, 0.1)' : 'transparent',
+                      opacity: activeRevenueSeries.expenses ? 1 : 0.45,
+                      transition: 'all 0.15s ease',
+                      '&:hover': { opacity: 1 }
+                    }}
+                  >
+                    <Circle sx={{ fontSize: 9, color: '#D97706' }} />
+                    <Typography variant="caption" sx={{ fontWeight: 700, fontSize: '0.74rem' }}>Expenses</Typography>
                   </Box>
                 </Box>
                 <ChartRangeSelect
@@ -809,22 +1022,65 @@ const Dashboard = () => {
                 options={doughnutChartOptions}
               />
               <motion.div
-                key={`stock-cnt-${chartKey}-${totalItems}`}
-                initial={{ scale: 0.82, opacity: 0 }}
+                key={`stock-cnt-${chartKey}-${hoveredStockSegment !== null ? hoveredStockSegment : totalItems}`}
+                initial={{ scale: 0.85, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
-                style={{ position: 'absolute', textAlign: 'center', pointerEvents: 'none' }}
+                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                style={{ position: 'absolute', textAlign: 'center', pointerEvents: 'none', maxWidth: 140 }}
               >
-                <Typography variant="h4" sx={{ fontWeight: 800, color: 'primary.main', letterSpacing: '-0.02em' }}>{totalItems}</Typography>
-                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>Total Pieces</Typography>
+                {hoveredStockSegment !== null ? (
+                  <>
+                    <Typography
+                      variant="h4"
+                      sx={{
+                        fontWeight: 800,
+                        color: stockData.datasets[0].backgroundColor[hoveredStockSegment],
+                        letterSpacing: '-0.02em',
+                        lineHeight: 1.1
+                      }}
+                    >
+                      {stockData.datasets[0].data[hoveredStockSegment]}
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.primary', display: 'block', fontSize: '0.72rem', mt: 0.25 }}>
+                      {stockData.labels[hoveredStockSegment]}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.66rem' }}>
+                      {totalItems > 0 ? `${Math.round((stockData.datasets[0].data[hoveredStockSegment] / totalItems) * 100)}% of total` : ''}
+                    </Typography>
+                  </>
+                ) : (
+                  <>
+                    <Typography variant="h4" sx={{ fontWeight: 800, color: 'primary.main', letterSpacing: '-0.02em' }}>
+                      {totalItems}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                      Total Pieces
+                    </Typography>
+                  </>
+                )}
               </motion.div>
             </Box>
 
-            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
+            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center', gap: 1.5, flexWrap: 'wrap' }}>
               {stockData.labels.map((label, i) => (
-                <Box key={label} sx={{ display: 'flex', alignItems: 'center', gap: 0.7 }}>
+                <Box
+                  key={label}
+                  onMouseEnter={() => setHoveredStockSegment(i)}
+                  onMouseLeave={() => setHoveredStockSegment(null)}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.7,
+                    px: 1,
+                    py: 0.35,
+                    borderRadius: '9999px',
+                    cursor: 'pointer',
+                    bgcolor: hoveredStockSegment === i ? (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)') : 'transparent',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
                   <Circle sx={{ fontSize: 9, color: stockData.datasets[0].backgroundColor[i] }} />
-                  <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', fontSize: '0.72rem' }}>
+                  <Typography variant="caption" sx={{ fontWeight: hoveredStockSegment === i ? 800 : 600, color: 'text.secondary', fontSize: '0.72rem' }}>
                     {label}
                   </Typography>
                 </Box>
@@ -843,7 +1099,22 @@ const Dashboard = () => {
           <GlassCard sx={{ p: 2.25, height: '100%' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2, alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>Top products</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>Top products</Typography>
+                  <Box
+                    sx={{
+                      px: 1,
+                      py: 0.25,
+                      borderRadius: '9999px',
+                      bgcolor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(8, 15, 28, 0.06)',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      color: 'text.secondary'
+                    }}
+                  >
+                    {top5ProductsData.reduce((acc, p) => acc + (p.quantity || 0), 0)} Pieces Sold
+                  </Box>
+                </Box>
                 <Typography variant="caption" color="text.secondary">Best-selling pieces by units sold</Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
