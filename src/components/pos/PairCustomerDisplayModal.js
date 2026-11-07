@@ -165,7 +165,7 @@ export default function PairCustomerDisplayModal({
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ p: { xs: 2.5, sm: 3.5 } }}>
+      <DialogContent sx={{ p: { xs: 2.5, sm: 3 } }}>
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems="stretch">
           {/* Left Column: QR Code Card */}
           <Paper
@@ -173,9 +173,10 @@ export default function PairCustomerDisplayModal({
             sx={{
               flex: 1,
               p: 3,
-              borderRadius: 3.5,
-              bgcolor: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid rgba(197, 160, 89, 0.25)',
+              borderRadius: '16px',
+              bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#F9FAFC',
+              border: '1px solid',
+              borderColor: 'divider',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -187,9 +188,11 @@ export default function PairCustomerDisplayModal({
               sx={{
                 p: 1.5,
                 bgcolor: '#FFFFFF',
-                borderRadius: 3,
-                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(197, 160, 89, 0.3)',
-                mb: 2.5,
+                borderRadius: '14px',
+                border: '1px solid',
+                borderColor: 'divider',
+                boxShadow: '0 8px 24px rgba(8, 15, 28, 0.08)',
+                mb: 2,
                 display: 'inline-block'
               }}
             >
@@ -198,18 +201,18 @@ export default function PairCustomerDisplayModal({
                 src={qrCodeUrl}
                 alt="Scan to open customer display"
                 sx={{
-                  width: { xs: 210, sm: 240 },
-                  height: { xs: 210, sm: 240 },
+                  width: { xs: 200, sm: 220 },
+                  height: { xs: 200, sm: 220 },
                   display: 'block'
                 }}
               />
             </Box>
 
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#FFFFFF', mb: 0.5 }}>
-              Scan with iPad, Tablet or Phone Camera
+            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5 }}>
+              Scan with iPad, Tablet or Phone
             </Typography>
-            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)', maxWidth: 280, mb: 2 }}>
-              Point your iPad or mobile phone camera at this QR code. The browser will open the live, customer-facing terminal.
+            <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.82rem', maxWidth: 280, mb: 2.5, lineHeight: 1.5 }}>
+              Point secondary device camera at this QR code. The browser will instantly load the synchronized customer screen.
             </Typography>
 
             <Stack direction="row" spacing={1.5} sx={{ width: '100%' }}>
@@ -217,20 +220,20 @@ export default function PairCustomerDisplayModal({
                 fullWidth
                 variant="outlined"
                 size="small"
-                startIcon={copied ? <Check sx={{ color: '#34D399' }} /> : <ContentCopy />}
+                startIcon={copied ? <Check sx={{ color: 'success.main' }} /> : <ContentCopy />}
                 onClick={handleCopyLink}
                 sx={{
-                  color: copied ? '#34D399' : '#C5A059',
-                  borderColor: copied ? 'rgba(52, 211, 153, 0.4)' : 'rgba(197, 160, 89, 0.4)',
-                  bgcolor: copied ? 'rgba(52, 211, 153, 0.08)' : 'transparent',
+                  color: copied ? 'success.main' : 'text.primary',
+                  borderColor: copied ? 'success.main' : 'divider',
+                  bgcolor: copied ? 'rgba(16, 185, 129, 0.08)' : 'background.paper',
                   textTransform: 'none',
                   fontWeight: 700,
                   fontSize: '0.8rem',
                   py: 1,
-                  borderRadius: 2,
+                  borderRadius: '9999px',
                   '&:hover': {
-                    borderColor: '#C5A059',
-                    bgcolor: 'rgba(197, 160, 89, 0.1)'
+                    borderColor: 'text.primary',
+                    bgcolor: 'action.hover'
                   }
                 }}
               >
@@ -247,16 +250,16 @@ export default function PairCustomerDisplayModal({
                   else window.open(customerDisplayUrl, 'AleenCustomerDisplay', 'width=1120,height=760,menubar=no,toolbar=no');
                 }}
                 sx={{
-                  background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.main} 0%, ${t.palette.primary.dark} 100%)`,
+                  bgcolor: '#080F1C',
                   color: '#FFFFFF',
                   textTransform: 'none',
                   fontWeight: 700,
                   fontSize: '0.8rem',
                   py: 1,
-                  borderRadius: 2,
-                  boxShadow: (t) => `0 4px 14px ${t.palette.primary.main}55`,
+                  borderRadius: '9999px',
+                  boxShadow: '0 2px 8px rgba(8, 15, 28, 0.2)',
                   '&:hover': {
-                    filter: 'brightness(1.08)'
+                    bgcolor: '#1D2531'
                   }
                 }}
               >
@@ -272,13 +275,15 @@ export default function PairCustomerDisplayModal({
               <Box
                 sx={{
                   p: 2,
-                  borderRadius: 3,
-                  bgcolor: 'rgba(16, 185, 129, 0.08)',
-                  border: '1px solid rgba(16, 185, 129, 0.25)',
-                  mb: 2.5,
+                  borderRadius: '12px',
+                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(16, 185, 129, 0.08)',
+                  border: '1px solid',
+                  borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(16, 185, 129, 0.25)',
+                  mb: 2,
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'space-between'
+                  justifyContent: 'space-between',
+                  gap: 1.5
                 }}
               >
                 <Stack direction="row" spacing={1.5} alignItems="center">
@@ -288,14 +293,15 @@ export default function PairCustomerDisplayModal({
                       height: 10,
                       borderRadius: '50%',
                       bgcolor: '#10B981',
-                      boxShadow: '0 0 10px #10B981'
+                      boxShadow: '0 0 10px #10B981',
+                      flexShrink: 0
                     }}
                   />
                   <Box>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#34D399' }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: (t) => t.palette.mode === 'dark' ? '#34D399' : '#047857' }}>
                       Cloud Firestore Live Stream Active
                     </Typography>
-                    <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                    <Typography variant="caption" sx={{ color: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : '#065F46', display: 'block' }}>
                       Zero Latency • Live Cart Mirroring • Dynamic UPI QR
                     </Typography>
                   </Box>
@@ -308,13 +314,19 @@ export default function PairCustomerDisplayModal({
                   disabled={isPinging}
                   startIcon={<Sensors sx={{ fontSize: 16 }} />}
                   sx={{
-                    color: '#34D399',
-                    borderColor: 'rgba(16, 185, 129, 0.3)',
+                    color: (t) => t.palette.mode === 'dark' ? '#34D399' : '#047857',
+                    borderColor: (t) => t.palette.mode === 'dark' ? 'rgba(52, 211, 153, 0.4)' : 'rgba(16, 185, 129, 0.35)',
+                    bgcolor: 'background.paper',
                     textTransform: 'none',
                     fontWeight: 700,
-                    fontSize: '0.72rem',
-                    borderRadius: 1.8,
-                    '&:hover': { borderColor: '#10B981', bgcolor: 'rgba(16, 185, 129, 0.12)' }
+                    fontSize: '0.74rem',
+                    borderRadius: '9999px',
+                    px: 1.8,
+                    whiteSpace: 'nowrap',
+                    '&:hover': {
+                      borderColor: '#10B981',
+                      bgcolor: 'rgba(16, 185, 129, 0.12)'
+                    }
                   }}
                 >
                   {isPinging ? 'Pinging...' : pingSuccess ? 'Ping Sent! ✓' : 'Send Test Pulse'}
@@ -325,22 +337,23 @@ export default function PairCustomerDisplayModal({
               {isLocalhost && (
                 <Box
                   sx={{
-                    p: 2.2,
-                    borderRadius: 3,
-                    bgcolor: 'rgba(245, 158, 11, 0.08)',
-                    border: '1px solid rgba(245, 158, 11, 0.25)',
-                    mb: 2.5
+                    p: 2,
+                    borderRadius: '12px',
+                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(245, 158, 11, 0.08)',
+                    border: '1px solid',
+                    borderColor: 'rgba(245, 158, 11, 0.25)',
+                    mb: 2
                   }}
                 >
-                  <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-                    <Wifi sx={{ color: '#FBBF24', fontSize: 18 }} />
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#FBBF24' }}>
+                  <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.75 }}>
+                    <Wifi sx={{ color: '#D97706', fontSize: 18 }} />
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: (t) => t.palette.mode === 'dark' ? '#FBBF24' : '#B45309' }}>
                       Shop Wi-Fi Pairing Notice (Localhost Detected)
                     </Typography>
                   </Stack>
-                  <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.75)', display: 'block', mb: 1.5, lineHeight: 1.5 }}>
-                    Because your POS is running locally on this Mac/PC, your iPad or phone cannot reach <code>localhost</code> directly.
-                    Enter your computer's local Wi-Fi IP address below (e.g. <code>192.168.1.15:3002</code>) to immediately update the QR code for your iPad:
+                  <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 1.5, lineHeight: 1.5 }}>
+                    Because your POS is running locally on this machine, your iPad cannot reach <code>localhost</code> directly.
+                    Enter your computer's local Wi-Fi IP address below (e.g. <code>192.168.1.15:3002</code>) to update the QR code:
                   </Typography>
 
                   <TextField
@@ -352,7 +365,7 @@ export default function PairCustomerDisplayModal({
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 600 }}>
+                          <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
                             http://
                           </Typography>
                         </InputAdornment>
@@ -365,8 +378,8 @@ export default function PairCustomerDisplayModal({
                             sx={{
                               height: 20,
                               fontSize: '0.65rem',
-                              bgcolor: 'rgba(52, 211, 153, 0.15)',
-                              color: '#34D399',
+                              bgcolor: 'rgba(16, 185, 129, 0.15)',
+                              color: 'success.main',
                               fontWeight: 700
                             }}
                           />
@@ -375,57 +388,116 @@ export default function PairCustomerDisplayModal({
                     }}
                     sx={{
                       '& .MuiOutlinedInput-root': {
-                        bgcolor: 'rgba(0, 0, 0, 0.3)',
-                        color: '#FFFFFF',
-                        borderRadius: 2,
-                        fontSize: '0.85rem',
-                        '& fieldset': { borderColor: 'rgba(245, 158, 11, 0.35)' },
-                        '&:hover fieldset': { borderColor: '#FBBF24' },
-                        '&.Mui-focused fieldset': { borderColor: '#FBBF24' }
+                        bgcolor: 'background.paper',
+                        borderRadius: '9px',
+                        fontSize: '0.85rem'
                       }
                     }}
                   />
-                  <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.45)', display: 'block', mt: 0.8, fontSize: '0.68rem' }}>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.8, fontSize: '0.68rem' }}>
                     Tip: On macOS, find your IP under <strong>System Settings → Wi-Fi → Details → IP Address</strong>.
                   </Typography>
                 </Box>
               )}
 
               {/* How it works */}
-              <Box sx={{ p: 2, borderRadius: 3, bgcolor: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
-                <Typography variant="overline" sx={{ color: '#C5A059', letterSpacing: '0.12em', fontWeight: 700 }}>
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 2,
+                  borderRadius: '14px',
+                  bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#F9FAFC',
+                  borderColor: 'divider'
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'text.secondary',
+                    letterSpacing: '0.08em',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    display: 'block',
+                    mb: 1.5
+                  }}
+                >
                   HOW CUSTOMER SCREEN PAIRING WORKS
                 </Typography>
-                <Stack spacing={1.2} sx={{ mt: 1 }}>
-                  <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.75)', display: 'block' }}>
-                    <strong>1. Place Device on Counter:</strong> Mount your iPad or tablet facing the patron at your checkout desk.
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.75)', display: 'block' }}>
-                    <strong>2. Scan Once:</strong> Scan this QR code using the iPad camera. It launches the Aleen Customer Terminal.
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.75)', display: 'block' }}>
-                    <strong>3. Automatic Realtime Sync:</strong> As you barcode-scan items, select discounts, or switch to UPI, the iPad updates in real time with dynamic UPI QR and personalized patron greetings.
-                  </Typography>
+                <Stack spacing={1.5}>
+                  {[
+                    { num: '1', title: 'Place Device on Counter', desc: 'Mount your iPad or tablet facing the patron at your checkout desk.' },
+                    { num: '2', title: 'Scan Once', desc: 'Scan this QR code using the iPad camera. It launches the Aleen Customer Terminal.' },
+                    { num: '3', title: 'Automatic Realtime Sync', desc: 'As you barcode-scan items or apply discounts, the display updates with 0ms delay.' }
+                  ].map((step) => (
+                    <Box key={step.num} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+                      <Box
+                        sx={{
+                          width: 22,
+                          height: 22,
+                          borderRadius: '50%',
+                          bgcolor: '#080F1C',
+                          color: '#FFFFFF',
+                          fontSize: '0.72rem',
+                          fontWeight: 800,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                          mt: 0.2
+                        }}
+                      >
+                        {step.num}
+                      </Box>
+                      <Box>
+                        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary', display: 'block', lineHeight: 1.3 }}>
+                          {step.title}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.78rem', lineHeight: 1.4 }}>
+                          {step.desc}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ))}
                 </Stack>
-              </Box>
+              </Paper>
             </Box>
 
             {/* Target URL Preview */}
-            <Box sx={{ mt: 2, pt: 1.5, borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
-              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', display: 'block' }}>
-                Active Display URL:
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  fontFamily: 'monospace',
-                  color: '#C5A059',
-                  wordBreak: 'break-all',
-                  fontSize: '0.78rem'
-                }}
-              >
-                {customerDisplayUrl}
-              </Typography>
+            <Box
+              sx={{
+                mt: 2,
+                p: 1.5,
+                borderRadius: '10px',
+                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#F4F5F7',
+                border: '1px solid',
+                borderColor: 'divider',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 1
+              }}
+            >
+              <Box sx={{ minWidth: 0, flex: 1 }}>
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>
+                  Active Display URL:
+                </Typography>
+                <Typography
+                  variant="caption"
+                  noWrap
+                  sx={{
+                    fontFamily: 'monospace',
+                    color: 'text.primary',
+                    fontWeight: 600,
+                    fontSize: '0.78rem',
+                    display: 'block'
+                  }}
+                >
+                  {customerDisplayUrl}
+                </Typography>
+              </Box>
+              <IconButton size="small" onClick={handleCopyLink} sx={{ color: copied ? 'success.main' : 'text.secondary' }}>
+                {copied ? <Check fontSize="small" /> : <ContentCopy fontSize="small" />}
+              </IconButton>
             </Box>
           </Box>
         </Stack>
@@ -435,24 +507,30 @@ export default function PairCustomerDisplayModal({
         sx={{
           px: 3,
           py: 2,
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          bgcolor: 'rgba(15, 23, 42, 0.95)',
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : '#FFFFFF',
           justifyContent: 'space-between'
         }}
       >
-        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.45)' }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
           Powered by Aleen Haute Couture Dual-Screen Live Engine
         </Typography>
         <Button
           onClick={onClose}
           variant="contained"
           sx={{
-            background: (t) => t.custom?.designSystem?.buttonStyle?.background || `linear-gradient(135deg, ${t.palette.primary.main} 0%, ${t.palette.primary.dark} 100%)`,
+            bgcolor: '#080F1C',
             color: '#FFFFFF',
             fontWeight: 700,
             textTransform: 'none',
-            px: 3,
-            borderRadius: 2
+            px: 3.5,
+            py: 0.8,
+            borderRadius: '9999px',
+            boxShadow: '0 2px 8px rgba(8, 15, 28, 0.2)',
+            '&:hover': {
+              bgcolor: '#1D2531'
+            }
           }}
         >
           Done
