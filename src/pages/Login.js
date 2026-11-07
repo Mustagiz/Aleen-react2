@@ -9,16 +9,19 @@ import {
   IconButton,
   InputAdornment,
   CircularProgress,
-  useTheme
+  useTheme,
+  Stack
 } from '@mui/material';
 import {
-  Checkroom,
   Visibility,
   VisibilityOff,
-  ArrowForward
+  ArrowForward,
+  VpnKey,
+  Security
 } from '../components/icons';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
+import { ScriptWordmark, TrackedTagline } from '../components/brand/BrandLockup';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -59,127 +62,335 @@ export default function Login() {
         minHeight: '100vh',
         width: '100%',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        bgcolor: isDark ? '#080F1C' : '#D7DBDF', // Quiet cool-gray stage
-        p: { xs: 2, sm: 4 },
-        position: 'relative',
-        overflow: 'hidden'
+        bgcolor: isDark ? '#080F1C' : '#F4F5F7',
+        color: isDark ? '#F8FAFC' : '#080F1C'
       }}
     >
-      {/* Subtle stage ambient glow */}
+      {/* =========================================================================
+          LEFT WING: Haute Couture Editorial Showcase (Desktop Only, md+)
+          ========================================================================= */}
       <Box
         sx={{
-          position: 'absolute',
-          width: 520,
-          height: 520,
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(111, 76, 237, 0.08) 0%, rgba(8, 15, 28, 0) 70%)',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          pointerEvents: 'none'
+          display: { xs: 'none', md: 'flex' },
+          flex: { md: 1, lg: 1.15 },
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          p: { md: 5, lg: 7 },
+          bgcolor: '#080F1C',
+          color: '#FFFFFF',
+          position: 'relative',
+          overflow: 'hidden',
+          borderRight: '1px solid rgba(255, 255, 255, 0.08)'
         }}
-      />
-
-      <motion.div
-        initial={reduceMotion ? false : { opacity: 0, y: 16, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={reduceMotion ? { duration: 0 } : { duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-        style={{ width: '100%', maxWidth: 440, position: 'relative', zIndex: 1 }}
       >
-        {/* Floating White App Surface Card */}
+        {/* Subtle geometric architectural watermarks */}
         <Box
           sx={{
-            bgcolor: isDark ? '#111827' : '#FFFFFF',
-            borderRadius: '24px',
-            border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(255, 255, 255, 0.8)',
-            boxShadow: isDark
-              ? '0 24px 60px rgba(0, 0, 0, 0.5)'
-              : '0 20px 48px -10px rgba(8, 15, 28, 0.12), 0 1px 3px rgba(8, 15, 28, 0.04)',
-            p: { xs: 3.5, sm: 5 },
+            position: 'absolute',
+            top: -120,
+            right: -120,
+            width: 440,
+            height: 440,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, rgba(8, 15, 28, 0) 70%)',
+            pointerEvents: 'none'
+          }}
+        />
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: -80,
+            left: -80,
+            width: 360,
+            height: 360,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(16, 185, 129, 0.06) 0%, rgba(8, 15, 28, 0) 70%)',
+            pointerEvents: 'none'
+          }}
+        />
+
+        {/* Top: Authentic Brand Lockup */}
+        <Box sx={{ position: 'relative', zIndex: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {/* Elegant Monogram Medallion */}
+            <Box
+              sx={{
+                width: 46,
+                height: 46,
+                borderRadius: '50%',
+                bgcolor: '#0E1726',
+                border: '1.5px solid rgba(212, 175, 55, 0.45)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#FFFFFF',
+                fontFamily: '"Cinzel", "Playfair Display", "Times New Roman", serif',
+                fontWeight: 700,
+                fontSize: '1.35rem',
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)'
+              }}
+            >
+              A
+            </Box>
+            <Box>
+              <ScriptWordmark
+                name="Aleen Clothing"
+                color="#FFFFFF"
+                fontSize="28px"
+                lineHeight={1.1}
+              />
+              <TrackedTagline
+                text="CONSCIOUSLY CURATED"
+                color="rgba(255, 255, 255, 0.7)"
+                fontSize="0.58rem"
+                tracking="0.34em"
+                rules={true}
+                ruleColor="rgba(212, 175, 55, 0.5)"
+                ruleWidth={18}
+                sx={{ mt: 0.2 }}
+              />
+            </Box>
+          </Box>
+        </Box>
+
+        {/* Middle: Editorial Narrative & Pillars */}
+        <Box sx={{ position: 'relative', zIndex: 1, my: 'auto', py: 6, maxWidth: 520 }}>
+          <Typography
+            variant="overline"
+            sx={{
+              color: '#D4AF37',
+              letterSpacing: '0.2em',
+              fontWeight: 800,
+              fontSize: '0.74rem',
+              display: 'block',
+              mb: 1.5
+            }}
+          >
+            HAUTE COUTURE ATELIER TERMINAL
+          </Typography>
+
+          <Typography
+            variant="h3"
+            sx={{
+              fontFamily: '"Playfair Display", "Cinzel", "Inter", serif',
+              fontWeight: 600,
+              fontSize: { md: '2.1rem', lg: '2.5rem' },
+              lineHeight: 1.25,
+              color: '#FFFFFF',
+              letterSpacing: '-0.02em',
+              mb: 2.5
+            }}
+          >
+            Precision bespoke craft.
+            <br />
+            Seamless luxury operations.
+          </Typography>
+
+          <Typography
+            sx={{
+              color: 'rgba(255, 255, 255, 0.72)',
+              fontSize: '0.92rem',
+              lineHeight: 1.7,
+              mb: 4.5
+            }}
+          >
+            Unified workstation for bespoke apparel tailoring, customer-facing dual-screen displays,
+            instant digital receipt dispatches, and private clientele relationship management.
+          </Typography>
+
+          {/* 3 Pillar Cards */}
+          <Stack spacing={2}>
+            {[
+              {
+                number: '01',
+                title: 'Bespoke Tailoring & Workshop Kanban',
+                desc: 'Job spec sheets, cutting patterns, master artisans, and live trial fitting alerts.'
+              },
+              {
+                number: '02',
+                title: 'Omni-Channel POS & Instant Invoicing',
+                desc: 'GST tax breakdowns, 80mm/58mm thermal receipts, and 1-click WhatsApp PDF bills.'
+              },
+              {
+                number: '03',
+                title: 'Dual-Monitor Customer Facing Display',
+                desc: '0ms Firestore cloud mirror with interactive fashion lookbooks and live cart totals.'
+              }
+            ].map((pillar) => (
+              <Box
+                key={pillar.number}
+                sx={{
+                  p: 2,
+                  borderRadius: '12px',
+                  bgcolor: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.07)',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 2
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontFamily: 'monospace',
+                    fontWeight: 700,
+                    fontSize: '0.78rem',
+                    color: '#D4AF37',
+                    pt: 0.2
+                  }}
+                >
+                  {pillar.number}
+                </Typography>
+                <Box>
+                  <Typography sx={{ fontWeight: 700, fontSize: '0.86rem', color: '#FFFFFF', mb: 0.2 }}>
+                    {pillar.title}
+                  </Typography>
+                  <Typography sx={{ color: 'rgba(255, 255, 255, 0.55)', fontSize: '0.78rem', lineHeight: 1.5 }}>
+                    {pillar.desc}
+                  </Typography>
+                </Box>
+              </Box>
+            ))}
+          </Stack>
+        </Box>
+
+        {/* Bottom: Verified Terminal Status */}
+        <Box
+          sx={{
+            position: 'relative',
+            zIndex: 1,
+            pt: 3,
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
             display: 'flex',
-            flexDirection: 'column'
+            alignItems: 'center',
+            justifyContent: 'space-between'
           }}
         >
-          {/* Header Brand Lockup */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', mb: 3.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+            <Box
+              sx={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                bgcolor: '#10B981',
+                boxShadow: '0 0 10px #10B981'
+              }}
+            />
+            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: '0.76rem', fontWeight: 600 }}>
+              End-to-End Encrypted Terminal Session
+            </Typography>
+          </Box>
+          <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '0.72rem' }}>
+            Enterprise Edition · v2.4
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* =========================================================================
+          RIGHT WING: Authentication Surface (Clean, Focused, Professional)
+          ========================================================================= */}
+      <Box
+        sx={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          p: { xs: 3, sm: 5, md: 6, lg: 8 },
+          bgcolor: isDark ? '#0D1526' : '#FAFCFA',
+          minHeight: '100vh'
+        }}
+      >
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={reduceMotion ? { duration: 0 } : { duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          style={{ width: '100%', maxWidth: 420 }}
+        >
+          {/* Mobile-Only Header Brand Lockup */}
+          <Box
+            sx={{
+              display: { xs: 'flex', md: 'none' },
+              flexDirection: 'column',
+              alignItems: 'center',
+              textAlign: 'center',
+              mb: 4
+            }}
+          >
             <Box
               sx={{
                 width: 48,
                 height: 48,
                 borderRadius: '50%',
                 bgcolor: '#080F1C',
-                color: '#FFFFFF',
+                border: '1.5px solid rgba(212, 175, 55, 0.45)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                mb: 2,
-                boxShadow: '0 4px 14px rgba(8, 15, 28, 0.25)'
-              }}
-            >
-              <Checkroom sx={{ fontSize: 24 }} />
-            </Box>
-
-            <Typography
-              sx={{
-                fontFamily: '"DM Sans", "Inter", sans-serif',
-                fontWeight: 900,
-                letterSpacing: '0.14em',
-                color: isDark ? '#F8FAFC' : '#080F1C',
-                textTransform: 'uppercase',
-                fontSize: '1.2rem',
-                lineHeight: 1.2
-              }}
-            >
-              Aleen<span style={{ fontWeight: 400, opacity: 0.75 }}>&nbsp;Clothing</span>
-            </Typography>
-
-            {/* Violet Pill Chip */}
-            <Box
-              sx={{
-                mt: 1.25,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 0.75,
-                px: 1.4,
-                py: 0.35,
-                borderRadius: '9999px',
-                bgcolor: isDark ? 'rgba(111, 76, 237, 0.15)' : '#F3F0FF',
-                color: '#6F4CED',
-                fontSize: '0.66rem',
+                color: '#FFFFFF',
+                fontFamily: '"Cinzel", "Playfair Display", serif',
                 fontWeight: 700,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase'
+                fontSize: '1.4rem',
+                mb: 1.5,
+                boxShadow: '0 4px 14px rgba(8, 15, 28, 0.2)'
               }}
             >
-              <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#6F4CED' }} />
-              Couture Atelier POS & CRM
+              A
             </Box>
+            <ScriptWordmark
+              name="Aleen Clothing"
+              color={isDark ? '#F8FAFC' : '#080F1C'}
+              fontSize="30px"
+              lineHeight={1.1}
+            />
+            <TrackedTagline
+              text="CONSCIOUSLY CURATED"
+              color={isDark ? '#94A3B8' : '#66707B'}
+              fontSize="0.6rem"
+              tracking="0.32em"
+              rules={true}
+              ruleColor={isDark ? 'rgba(255,255,255,0.2)' : 'rgba(8,15,28,0.2)'}
+              ruleWidth={22}
+              sx={{ mt: 0.25 }}
+            />
+          </Box>
 
+          {/* Form Header */}
+          <Box sx={{ mb: 3.5 }}>
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 800,
+                fontSize: { xs: '1.4rem', sm: '1.65rem' },
+                color: isDark ? '#F8FAFC' : '#080F1C',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.25,
+                mb: 1
+              }}
+            >
+              Terminal Sign In
+            </Typography>
             <Typography
               variant="body2"
               sx={{
                 color: isDark ? '#94A3B8' : '#66707B',
-                fontWeight: 500,
-                fontSize: '0.84rem',
-                mt: 2
+                fontSize: '0.86rem',
+                lineHeight: 1.5
               }}
             >
-              Sign in to your boutique terminal
+              Enter authorized boutique credentials to access inventory, client fitting kanban, and point of sale.
             </Typography>
           </Box>
 
-          {/* Error Notice */}
+          {/* Error Message */}
           {error && (
             <Alert
               severity="error"
               sx={{
-                mb: 2.5,
-                borderRadius: '14px',
+                mb: 3,
+                borderRadius: '10px',
                 fontSize: '0.82rem',
                 fontWeight: 600,
-                border: '1px solid rgba(239, 68, 68, 0.2)',
+                border: '1px solid rgba(239, 68, 68, 0.25)',
                 bgcolor: isDark ? 'rgba(239, 68, 68, 0.12)' : '#FEF2F2'
               }}
             >
@@ -187,16 +398,18 @@ export default function Login() {
             </Alert>
           )}
 
-          {/* Login Form */}
-          <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {/* Credentials Form */}
+          <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.25 }}>
             <Box>
               <Typography
                 variant="caption"
                 sx={{
                   display: 'block',
-                  mb: 0.65,
-                  fontWeight: 650,
+                  mb: 0.75,
+                  fontWeight: 700,
                   fontSize: '0.74rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
                   color: isDark ? '#CBD5E1' : '#334155'
                 }}
               >
@@ -213,12 +426,12 @@ export default function Login() {
                 inputProps={{ autoComplete: 'email' }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
-                    borderRadius: '12px',
-                    bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : '#F7F8FA',
+                    borderRadius: '10px',
+                    bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : '#FFFFFF',
                     fontSize: '0.88rem',
-                    transition: 'all 0.18s ease',
+                    transition: 'all 0.15s ease',
                     '& fieldset': {
-                      borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E1E4EA'
+                      borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : '#E1E4EA'
                     },
                     '&:hover fieldset': {
                       borderColor: '#080F1C'
@@ -233,18 +446,20 @@ export default function Login() {
             </Box>
 
             <Box>
-              <Typography
-                variant="caption"
-                sx={{
-                  display: 'block',
-                  mb: 0.65,
-                  fontWeight: 650,
-                  fontSize: '0.74rem',
-                  color: isDark ? '#CBD5E1' : '#334155'
-                }}
-              >
-                Password
-              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.75 }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: '0.74rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    color: isDark ? '#CBD5E1' : '#334155'
+                  }}
+                >
+                  Password
+                </Typography>
+              </Box>
               <TextField
                 fullWidth
                 placeholder="••••••••"
@@ -270,12 +485,12 @@ export default function Login() {
                 }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
-                    borderRadius: '12px',
-                    bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : '#F7F8FA',
+                    borderRadius: '10px',
+                    bgcolor: isDark ? 'rgba(255, 255, 255, 0.04)' : '#FFFFFF',
                     fontSize: '0.88rem',
-                    transition: 'all 0.18s ease',
+                    transition: 'all 0.15s ease',
                     '& fieldset': {
-                      borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E1E4EA'
+                      borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : '#E1E4EA'
                     },
                     '&:hover fieldset': {
                       borderColor: '#080F1C'
@@ -289,7 +504,7 @@ export default function Login() {
               />
             </Box>
 
-            {/* Signature Dark Navy Ink Submit Button */}
+            {/* Submit Button */}
             <Button
               type="submit"
               fullWidth
@@ -298,7 +513,7 @@ export default function Login() {
               endIcon={loading ? <CircularProgress size={16} color="inherit" /> : <ArrowForward />}
               sx={{
                 mt: 1,
-                py: 1.4,
+                py: 1.35,
                 borderRadius: '9999px',
                 bgcolor: '#080F1C',
                 color: '#FFFFFF',
@@ -306,72 +521,111 @@ export default function Login() {
                 fontSize: '0.9rem',
                 textTransform: 'none',
                 letterSpacing: '-0.01em',
-                boxShadow: '0 4px 14px rgba(8, 15, 28, 0.22)',
+                boxShadow: '0 4px 14px rgba(8, 15, 28, 0.2)',
                 transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                 '&:hover': {
                   bgcolor: '#1D2531',
                   transform: 'translateY(-1px)',
-                  boxShadow: '0 8px 20px rgba(8, 15, 28, 0.3)'
+                  boxShadow: '0 8px 20px rgba(8, 15, 28, 0.28)'
                 },
                 '&:active': {
                   transform: 'scale(0.99)'
                 }
               }}
             >
-              {loading ? 'Authenticating…' : 'Sign In to Boutique'}
+              {loading ? 'Verifying Terminal Access…' : 'Sign In to Atelier'}
             </Button>
           </Box>
 
-          {/* Quick Demo Credentials Pill Button */}
-          <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Box
+          {/* Quick Demo Staff Access (Refined Utility Card) */}
+          <Box
+            sx={{
+              mt: 3.5,
+              p: 1.75,
+              borderRadius: '12px',
+              bgcolor: isDark ? 'rgba(255, 255, 255, 0.03)' : '#F4F5F7',
+              border: '1px solid',
+              borderColor: 'divider',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 1.5
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, minWidth: 0 }}>
+              <Box
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '8px',
+                  bgcolor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#FFFFFF',
+                  color: isDark ? '#FFFFFF' : '#080F1C',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  border: '1px solid',
+                  borderColor: 'divider'
+                }}
+              >
+                <VpnKey sx={{ fontSize: 16 }} />
+              </Box>
+              <Box sx={{ minWidth: 0 }}>
+                <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.primary', display: 'block', lineHeight: 1.2 }}>
+                  Boutique Staff Demo
+                </Typography>
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem', display: 'block' }}>
+                  admin@aleen.com · admin123
+                </Typography>
+              </Box>
+            </Box>
+
+            <Button
+              size="small"
+              variant="outlined"
               onClick={handleQuickDemoFill}
               sx={{
-                px: 1.75,
-                py: 0.65,
+                textTransform: 'none',
+                fontWeight: 700,
+                fontSize: '0.74rem',
+                color: 'text.primary',
+                borderColor: 'divider',
                 borderRadius: '9999px',
-                bgcolor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F4F5F7',
-                border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #E1E4EA',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 0.8,
-                transition: 'all 0.18s ease',
+                px: 1.75,
+                py: 0.5,
+                bgcolor: 'background.paper',
+                flexShrink: 0,
                 '&:hover': {
-                  borderColor: '#6F4CED',
-                  bgcolor: isDark ? 'rgba(111, 76, 237, 0.12)' : '#F3F0FF'
+                  borderColor: 'text.primary',
+                  bgcolor: 'action.hover'
                 }
               }}
             >
-              <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#6F4CED' }} />
-              <Typography
-                sx={{
-                  fontSize: '0.74rem',
-                  fontWeight: 650,
-                  color: isDark ? '#E2E8F0' : '#475569'
-                }}
-              >
-                Auto-Fill Demo Credentials (admin@aleen.com)
-              </Typography>
-            </Box>
+              Fill Credentials
+            </Button>
           </Box>
 
-          {/* Stage Footer Note */}
-          <Typography
-            variant="caption"
-            sx={{
-              display: 'block',
-              textAlign: 'center',
-              color: isDark ? '#64748B' : '#969DA7',
-              mt: 3.5,
-              fontWeight: 500,
-              fontSize: '0.72rem'
-            }}
-          >
-            © {new Date().getFullYear()} Aleen Clothing · Boutique Atelier Operating System
-          </Typography>
-        </Box>
-      </motion.div>
+          {/* Footer Copyright & Security Notice */}
+          <Box sx={{ mt: 5, textAlign: 'center' }}>
+            <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, color: 'text.secondary', mb: 0.5 }}>
+              <Security sx={{ fontSize: 14 }} />
+              <Typography variant="caption" sx={{ fontSize: '0.72rem', fontWeight: 600 }}>
+                Secure 256-Bit SSL Encrypted Connection
+              </Typography>
+            </Box>
+            <Typography
+              variant="caption"
+              sx={{
+                display: 'block',
+                color: 'text.secondary',
+                fontSize: '0.7rem'
+              }}
+            >
+              © {new Date().getFullYear()} Aleen Clothing. All rights reserved.
+            </Typography>
+          </Box>
+        </motion.div>
+      </Box>
     </Box>
   );
 }
