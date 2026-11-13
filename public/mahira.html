@@ -27,15 +27,15 @@
   --gold-light: #eccf8b;
   --gold-spark: #f9ecc4;
   --champagne: #d9c08a;
-  --cream: #efe4c8;
-  --cream-hi: #f7efdc;
-  --cream-dim: rgba(238, 228, 205, 0.62);
+  --cream: #ffffff;
+  --cream-hi: #ffffff;
+  --cream-dim: rgba(255, 255, 255, 0.9);
   --burg-deep: #200910;
   --burg: #4d1a24;
   --burg-mid: #6b2b36;
   --burg-hi: #86404c;
   --sale: #c2554e;
-  --ink-on-gold: #241a0c;
+  --ink-on-gold: #ffffff;
 
   --serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
   --serif-i: 'Cormorant Garamond', Georgia, serif;
@@ -1058,7 +1058,7 @@ body.is-ready .hero-desc { opacity: 1; }
   --g-craft: #1c2e1b;
   --g-story: #17281c;
   --g-footer: #1d2e1c;
-  --ink: #2b2b25;
+  --ink: #ffffff;
 }
 
 section { position: relative; }
@@ -1326,7 +1326,7 @@ section { position: relative; }
 .w-card.is-focus > img { transform: scale(1.04); }
 .w-card > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 1.1s var(--ease); will-change: transform; }
 .w-card:hover > img { transform: scale(1.04); }
-.w-scrim { position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(10, 16, 11, 0) 40%, rgba(10, 16, 11, 0.55) 64%, rgba(7, 11, 8, 0.94) 100%); }
+.w-scrim { position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(4, 9, 6, 0) 25%, rgba(4, 9, 6, 0.65) 58%, rgba(4, 9, 6, 0.96) 94%); }
 .w-caption { position: absolute; z-index: 2; left: 6%; right: 6%; bottom: 5.5%; text-align: center; }
 .w-kicker {
   font-size: clamp(9px, 0.66vw, 12px);
@@ -2211,7 +2211,7 @@ main > section[id], footer[id] { scroll-margin-top: calc(var(--hdr-h-solid) + 14
   --mn-ivory-lo: #EDE2CE;   /* settled ivory — lower edge          */
   --mn-forest:   #17261B;   /* deep forest — depth and press state */
   --mn-gold:     #B89A62;
-  --mn-gold-ink: #7C6132;   /* gold as TEXT — the decorative gold is too light to read small */
+  --mn-gold-ink: #ffffff;   /* gold as TEXT — the decorative gold is too light to read small */
   --mn-walnut:   #3B3025;   /* rich walnut — the typography        */
 
   background:
@@ -2310,7 +2310,7 @@ main > section[id], footer[id] { scroll-margin-top: calc(var(--hdr-h-solid) + 14
   --mn-ivory-lo: #EDE2CE;
   --mn-forest:   #17261B;
   --mn-gold:     #B89A62;
-  --mn-gold-ink: #7C6132;   /* gold used as TEXT — the decorative gold is too light to read at small sizes */
+  --mn-gold-ink: #ffffff;   /* gold used as TEXT — the decorative gold is too light to read at small sizes */
   --mn-walnut:   #3B3025;
 }
 
@@ -2404,6 +2404,112 @@ body { font-weight: 400; }
   color: #F7EFDC;
   font-size: 30.24px;
   letter-spacing: 0.3024px;
+}
+
+
+/* ============================================================
+   WHITE TEXT & BOLD WHITE BUTTON SYSTEM OVERRIDES
+   ============================================================ */
+/* 1. All text color to white */
+body,
+p, h1, h2, h3, h4, h5, h6,
+span, a, label,
+.w-kicker, .w-caption h3, .w-line,
+.sh-title, .sh-eyebrow, .sh-sub,
+.slide-content h1, .slide-content .lead, .slide-content .eyebrow,
+.x-copy h2, .x-copy p, .x-sub,
+.k-head h2, .k-desc, .k-card-title, .k-card-sub,
+.b-card h4, .b-card-price, .b-head h2, .b-eyebrow,
+.c-quote, .c-auth, .c-sub,
+.story-title, .story-p,
+.rail span, .corner span,
+.f-col h4, .f-links a, .f-note, .f-agree, .f-bottom p,
+.nav-link, .h-act, .h-menu,
+.w-count, .b-count {
+  color: #ffffff !important;
+}
+
+.w-kicker {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.9) !important;
+  opacity: 1 !important;
+}
+.w-caption h3 {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.95) !important;
+}
+.w-line {
+  color: #ffffff !important;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9) !important;
+  opacity: 0.98 !important;
+}
+
+/* 2. All button text color to bold white */
+button,
+a.button-primary,
+.button-primary,
+a.cta,
+.cta,
+.cta .lbl,
+.cta-secondary,
+.btn,
+.btn-primary,
+.btn-ghost,
+.w-btn,
+.b-btn,
+.f-btn,
+.skip,
+.k-cta,
+.pop-btn {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  -webkit-font-smoothing: antialiased;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Button borders & hover contrast */
+.cta {
+  border: 1.5px solid rgba(255, 255, 255, 0.75) !important;
+}
+.cta:hover {
+  border-color: #ffffff !important;
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.25) !important;
+}
+.button-primary {
+  border: 1.5px solid rgba(255, 255, 255, 0.75) !important;
+}
+
+/* Hover and active button states remain white bold */
+button:hover,
+.button-primary:hover,
+.cta:hover,
+.cta:hover .lbl,
+.btn:hover,
+.btn-primary:hover,
+.btn-ghost:hover,
+.w-btn:hover,
+.b-btn:hover,
+.f-btn:hover,
+.slide-content.in .btn-primary,
+.slide-content.in .btn-primary:hover,
+.slide-content.in .btn-ghost:hover {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+/* Button arrow SVGs */
+.cta .arrow,
+.btn .arrow {
+  color: #ffffff !important;
+}
+.cta .arrow svg,
+.btn .arrow svg,
+.w-btn svg,
+.b-btn svg {
+  stroke: #ffffff !important;
+  stroke-width: 2 !important;
 }
 
 </style>
