@@ -2512,6 +2512,149 @@ button:hover,
   stroke-width: 2 !important;
 }
 
+
+/* ============================================================
+   MEGA MENU & MOBILE NAV READABILITY (IVORY CARD CONTRAST)
+   ============================================================ */
+.mega-inner {
+  position: relative;
+  z-index: 2;
+}
+
+/* Category column headings */
+.mega-inner .mg-col h4,
+#mega .mg-col h4 {
+  color: #7C561B !important;
+  font-weight: 700 !important;
+  font-size: 11.5px !important;
+  letter-spacing: 0.28em !important;
+  text-transform: uppercase !important;
+  margin-bottom: 12px !important;
+  opacity: 1 !important;
+}
+
+.mega-inner .mg-col > i,
+#mega .mg-col > i {
+  display: block;
+  width: 32px !important;
+  height: 1.5px !important;
+  background: rgba(124, 86, 27, 0.45) !important;
+  margin-bottom: 16px !important;
+}
+
+/* Category links in dropdown - deep rich walnut ink */
+.mega-inner .mg-col a,
+#mega .mg-col a {
+  color: #241A0C !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.025em !important;
+  padding: 6px 0 !important;
+  display: block !important;
+  transition: color 0.2s ease, transform 0.2s ease !important;
+}
+
+.mega-inner .mg-col a:hover,
+#mega .mg-col a:hover {
+  color: #8A6420 !important;
+  font-weight: 600 !important;
+  transform: translateX(4px) !important;
+}
+
+.mega-inner .mg-col a::after,
+#mega .mg-col a::after {
+  background: #8A6420 !important;
+}
+
+/* Promo card in mega dropdown */
+.mega-inner .mg-promo,
+#mega .mg-promo {
+  position: relative !important;
+  display: block !important;
+  min-height: 250px !important;
+  aspect-ratio: 4 / 5 !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(184, 154, 98, 0.65) !important;
+  border-radius: 4px !important;
+  box-shadow: 0 14px 34px rgba(45, 34, 20, 0.16) !important;
+}
+
+.mega-inner .mg-promo img,
+#mega .mg-promo img {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+  transition: transform 0.8s ease !important;
+}
+
+.mega-inner .mg-promo:hover img,
+#mega .mg-promo:hover img {
+  transform: scale(1.05) !important;
+}
+
+.mega-inner .mg-promo span,
+#mega .mg-promo span {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important;
+  background: linear-gradient(180deg, rgba(8, 14, 9, 0.05) 25%, rgba(8, 14, 9, 0.85) 100%) !important;
+}
+
+.mega-inner .mg-promo b,
+#mega .mg-promo b {
+  position: absolute !important;
+  left: 8% !important;
+  right: 8% !important;
+  bottom: 22% !important;
+  z-index: 2 !important;
+  display: block !important;
+  font-family: var(--serif) !important;
+  font-weight: 600 !important;
+  font-size: clamp(16px, 1.3vw, 22px) !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: #FFFFFF !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95) !important;
+}
+
+.mega-inner .mg-promo em,
+#mega .mg-promo em {
+  position: absolute !important;
+  left: 8% !important;
+  right: 8% !important;
+  bottom: 11% !important;
+  z-index: 2 !important;
+  display: block !important;
+  font-family: var(--serif-i) !important;
+  font-style: italic !important;
+  font-size: 14px !important;
+  color: #F7EFDC !important;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.9) !important;
+}
+
+/* Mobile Nav Drawer Contrast */
+#mobileNav .mn-lead,
+#mobileNav .mn-col h4,
+#mobileNav .mn-foot .mn-acct {
+  color: #7C561B !important;
+  font-weight: 700 !important;
+}
+
+#mobileNav .mn-panel a,
+#mobileNav .mn-panel button,
+#mobileNav .mn-list a {
+  color: #241A0C !important;
+  font-weight: 500 !important;
+}
+
+#mobileNav .mn-panel a:hover,
+#mobileNav .mn-list a:hover {
+  color: #8A6420 !important;
+}
+
 </style>
 </head>
 <body class="is-loading">
@@ -2560,8 +2703,8 @@ button:hover,
   <div class="nav-center">
     <nav class="nav-side nav-l" aria-label="Primary">
       <a href="#top">Home</a>
-      <a aria-expanded='false' aria-haspopup='true' data-mega='women' href='/category?c=women'>Women</a>
-      <a aria-expanded='false' aria-haspopup='true' data-mega='kalakaari' href='/category?c=kalakaari'>Kalakaari</a>
+      <a aria-expanded='false' aria-haspopup='true' data-mega='women' href='#women-new'>Women</a>
+      <a aria-expanded='false' aria-haspopup='true' data-mega='kalakaari' href='#kalakaari'>Kalakaari</a>
     </nav>
     <span class="logo-space" aria-hidden="true"></span>
     <nav class="nav-side nav-r" aria-label="Collections">
@@ -2593,8 +2736,8 @@ button:hover,
         <a role="menuitem" href="#">Orders</a>
         <a role="menuitem" href="#" data-open="wish">Wishlist</a>
         <i class="pop-rule"></i>
-        <a class='pop-cta' href='/login' role='menuitem'><span class="fill"></span><span class="lbl">Login</span></a>
-        <a class='pop-alt' href='/signup' role='menuitem'>Sign Up</a>
+        <a class='pop-cta' href='#account' role='menuitem'><span class="fill"></span><span class="lbl">Login</span></a>
+        <a class='pop-alt' href='#signup' role='menuitem'>Sign Up</a>
       </div>
     </div>
     <div class="util-wrap" id="wishWrap">
@@ -2658,7 +2801,7 @@ button:hover,
   </div>
   <div class="mn-stage" id="mnStage"></div>
   <div class="mn-foot">
-    <a class='mn-acct' href='/login'>My Account</a>
+    <a class='mn-acct' href='#account'>My Account</a>
     <p>Timeless&ensp;·&ensp;Ethical&ensp;·&ensp;Exquisite</p>
   </div>
 </div>
@@ -2981,7 +3124,7 @@ button:hover,
     </nav>
     <nav class="f-col" aria-label="About">
       <h4>About</h4><i></i>
-      <a href="#storyEd">Our Story</a><a href='/explore'>The Complete Journey</a><a href="#kalakaari">Craftsmanship</a><a href="#">Sustainability</a><a href="#">Journal</a><a href="#">Care Guide</a><a href="#">Contact Us</a>
+      <a href="#storyEd">Our Story</a><a href='#explore'>The Complete Journey</a><a href="#kalakaari">Craftsmanship</a><a href="#">Sustainability</a><a href="#">Journal</a><a href="#">Care Guide</a><a href="#">Contact Us</a>
     </nav>
     <nav class="f-col" aria-label="Help">
       <h4>Help</h4><i></i>
@@ -3583,12 +3726,12 @@ window.MAHIRA_LOGO = window.ALEEN_LOGO;
   /* Nav leaves link into the shop, so the menu is a real way in rather than
      a jump to an anchor on this page. The slug matches shop-data.js. */
   function slugify(s) { return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
-  function shopHref(key, item) { return 'shop.html?c=' + key + '&s=' + slugify(item); }
+  function shopHref(key, item) { return key === 'kalakaari' ? '#kalakaari' : '#women-new'; }
 
   var NAV = {
     women: {
-      label: 'Women', href: 'category.html?c=women',
-      promo: { img: 'assets/s2-card-women.jpg?v=2', title: 'The Women’s Edit', line: 'Elegance in every drape.' },
+      label: 'Women', href: '#women-new',
+      promo: { img: 'https://mahira2.netlify.app/assets/s2-card-women.jpg?v=2', title: 'The Women’s Edit', line: 'Elegance in every drape.' },
       groups: [
         { title: 'Ethnic',     items: ['Sarees', 'Kurta Sets', 'Anarkali', 'Suits', 'Co-ord Sets', 'Lehengas', 'Dresses'] },
         { title: 'Western',    items: ['Dresses', 'Tops', 'Shirts', 'Trousers', 'Skirts', 'Co-ord Sets'] },
@@ -3597,8 +3740,8 @@ window.MAHIRA_LOGO = window.ALEEN_LOGO;
       ]
     },
     kalakaari: {
-      label: 'Kalakaari', href: 'category.html?c=kalakaari',
-      promo: { img: 'assets/s2-card-kala.jpg?v=2', title: 'Kalakaari', line: 'Art that tells a story.' },
+      label: 'Kalakaari', href: '#kalakaari',
+      promo: { img: 'https://mahira2.netlify.app/assets/s2-card-kala.jpg?v=2', title: 'Kalakaari', line: 'Art that tells a story.' },
       groups: [
         { title: 'Sarees',     items: ['Kalamkari Sarees', 'Printed Sarees', 'Handcrafted Sarees'] },
         { title: 'Dress Sets', items: ['Kalamkari Dress Sets', 'Kurta Sets', 'Anarkali Sets'] },
