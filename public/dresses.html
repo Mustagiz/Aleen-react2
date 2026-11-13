@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aleen Clothing — The Haute Ethnic Dresses & Gowns</title>
+  <meta name="description" content="Where traditional hand-embroidery meets contemporary architectural silhouettes.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --void-0: #040906;
+      --void-1: #0d1c13;
+      --green-deep: #0f1d15;
+      --green: #14251b;
+      --green-soft: #1d3527;
+      --gold-deep: #8a6420;
+      --gold: #c9a35f;
+      --gold-light: #eccf8b;
+      --gold-spark: #f9ecc4;
+      --champagne: #d9c08a;
+      --cream: #efe4c8;
+      --cream-hi: #f7efdc;
+      --serif: 'Playfair Display', Georgia, serif;
+      --serif-i: 'Cormorant Garamond', Georgia, serif;
+      --sans: 'Montserrat', sans-serif;
+      --ease: cubic-bezier(0.22, 0.61, 0.21, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background-color: var(--void-0);
+      color: #ffffff;
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.6;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .atelier-announcement {
+      background: linear-gradient(90deg, #112217, #1c3826, #112217);
+      border-bottom: 1px solid rgba(201, 163, 95, 0.25);
+      text-align: center;
+      padding: 8px 16px;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 500;
+      color: var(--gold-light);
+    }
+
+    header.atelier-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(4, 9, 6, 0.94);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(201, 163, 95, 0.2);
+    }
+    .nav-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 11.5px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 700;
+      padding: 8px 18px;
+      border: 1px solid rgba(201, 163, 95, 0.45);
+      border-radius: 999px;
+      background: rgba(20, 37, 27, 0.5);
+      transition: all 0.3s var(--ease);
+    }
+    .nav-back-link:hover {
+      background: var(--gold);
+      color: #241a0c;
+      transform: translateX(-3px);
+    }
+    .brand-crest {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .emblem-svg { width: 44px; height: 44px; }
+    .brand-text-col { display: flex; flex-direction: column; align-items: center; }
+    .brand-title {
+      font-family: var(--serif);
+      font-size: 20px;
+      letter-spacing: 5px;
+      font-weight: 600;
+      color: #ffffff;
+      line-height: 1.1;
+    }
+    .brand-sub {
+      font-family: 'Great Vibes', cursive;
+      font-size: 18px;
+      letter-spacing: 1px;
+      color: var(--gold-light);
+      margin-top: 2px;
+    }
+
+    .hero-banner {
+      position: relative;
+      padding: 64px 32px 48px;
+      text-align: center;
+      background: radial-gradient(circle at 50% 20%, rgba(29, 53, 39, 0.6) 0%, rgba(4, 9, 6, 0.98) 75%);
+      border-bottom: 1px solid rgba(201, 163, 95, 0.18);
+    }
+    .hero-eyebrow {
+      font-size: 11px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .hero-title {
+      font-family: var(--serif);
+      font-size: clamp(32px, 4.5vw, 54px);
+      color: #ffffff;
+      margin-bottom: 16px;
+      font-weight: 400;
+    }
+    .hero-sub {
+      max-width: 680px;
+      margin: 0 auto;
+      font-family: var(--serif-i);
+      font-size: 20px;
+      font-style: italic;
+      color: var(--cream);
+      opacity: 0.92;
+    }
+
+    /* Nav bar between ethnic collections */
+    .ethnic-tabs {
+      max-width: 1440px;
+      margin: 28px auto 0;
+      padding: 0 32px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+    .ethnic-tab {
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-weight: 600;
+      padding: 7px 16px;
+      border: 1px solid rgba(201, 163, 95, 0.3);
+      border-radius: 999px;
+      transition: all 0.2s ease;
+    }
+    .ethnic-tab:hover {
+      border-color: var(--gold);
+      color: var(--gold-spark);
+    }
+    .ethnic-tab.active {
+      background: var(--gold);
+      color: #241a0c;
+      font-weight: 700;
+      border-color: var(--gold-light);
+    }
+
+    /* Grid */
+    .catalog-section {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 40px 32px 80px;
+    }
+    .garments-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 36px 28px;
+    }
+    .garment-card {
+      background: linear-gradient(180deg, rgba(20, 37, 27, 0.45) 0%, rgba(10, 18, 12, 0.85) 100%);
+      border: 1px solid rgba(201, 163, 95, 0.3);
+      border-radius: 200px 200px 18px 18px;
+      padding: 12px 12px 20px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.4s var(--ease);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+    }
+    .garment-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(201, 163, 95, 0.85);
+      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.65), 0 0 22px rgba(201, 163, 95, 0.22);
+    }
+    .card-media {
+      position: relative;
+      width: 100%;
+      height: 380px;
+      border-radius: 190px 190px 12px 12px;
+      overflow: hidden;
+      background: #040906;
+    }
+    .card-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.8s var(--ease);
+    }
+    .garment-card:hover .card-media img { transform: scale(1.06); }
+    .card-badge {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(4, 9, 6, 0.85);
+      border: 1px solid rgba(201, 163, 95, 0.6);
+      color: var(--gold-light);
+      font-size: 9.5px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-weight: 600;
+      backdrop-filter: blur(6px);
+      z-index: 2;
+    }
+    .card-info {
+      padding: 18px 8px 6px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+    .card-craft {
+      font-size: 10px;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .card-title {
+      font-family: var(--serif);
+      font-size: 19px;
+      font-weight: 500;
+      color: #ffffff;
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+    .card-fabric {
+      font-size: 12px;
+      color: var(--cream);
+      opacity: 0.8;
+      margin-bottom: 12px;
+      font-family: var(--serif-i);
+      font-style: italic;
+    }
+    .card-bottom-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid rgba(201, 163, 95, 0.2);
+    }
+    .card-price {
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .card-cta-btn {
+      background: transparent;
+      border: 1px solid rgba(201, 163, 95, 0.8);
+      color: #ffffff !important;
+      font-weight: 700;
+      font-size: 10.5px;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.25s var(--ease);
+    }
+    .card-cta-btn:hover {
+      background: var(--gold);
+      color: #241a0c !important;
+      border-color: var(--gold-light);
+    }
+
+    footer.atelier-footer {
+      background: #060e09;
+      border-top: 1px solid rgba(201, 163, 95, 0.2);
+      padding: 50px 32px 30px;
+      text-align: center;
+    }
+    .footer-copy {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.45);
+      letter-spacing: 1px;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+  <aside class="atelier-announcement">
+    <span>✦ Aleen Haute Couture · Handcrafted Luxury Editions · Worldwide Atelier Shipping ✦</span>
+  </aside>
+
+  <header class="atelier-nav">
+    <div class="nav-inner">
+      <a href="mahira.html" class="nav-back-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Back to Atelier</span>
+      </a>
+
+      <a href="mahira.html" class="brand-crest">
+        <svg class="emblem-svg" viewBox="0 0 100 100">
+          <defs>
+            <linearGradient id="eg" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ECCF8B"/>
+              <stop offset="50%" stop-color="#C9A35F"/>
+              <stop offset="100%" stop-color="#8A6420"/>
+            </linearGradient>
+          </defs>
+          <circle cx="50" cy="50" r="46" fill="#0b1710" stroke="url(#eg)" stroke-width="2.5" />
+          <circle cx="50" cy="50" r="41" fill="none" stroke="url(#eg)" stroke-dasharray="2 3" stroke-width="1.2" opacity="0.8" />
+          <path d="M50 14 L53 22 L61 22 L55 27 L57 35 L50 30 L43 35 L45 27 L39 22 L47 22 Z" fill="url(#eg)" opacity="0.85" />
+          <text x="50" y="65" font-family="'Playfair Display', serif" font-size="34" font-weight="700" font-style="italic" fill="url(#eg)" text-anchor="middle">A</text>
+        </svg>
+        <div class="brand-text-col">
+          <span class="brand-title">A L E E N</span>
+          <span class="brand-sub">Consciously Curated</span>
+        </div>
+      </a>
+
+      <a href="collections.html" class="nav-back-link" style="border-color: var(--gold);">
+        <span>View Full Gallery →</span>
+      </a>
+    </div>
+  </header>
+
+  <section class="hero-banner">
+    <p class="hero-eyebrow">Ethnic Haute Couture</p>
+    <h1 class="hero-title">The Haute Ethnic Dresses & Gowns</h1>
+    <p class="hero-sub">"Where traditional hand-embroidery meets contemporary architectural silhouettes."</p>
+  </section>
+
+  <nav class="ethnic-tabs">
+    <a href="sarees.html" class="ethnic-tab ">Sarees</a>
+    <a href="kurta-sets.html" class="ethnic-tab ">Kurta Sets</a>
+    <a href="anarkali.html" class="ethnic-tab ">Anarkali</a>
+    <a href="suits.html" class="ethnic-tab ">Suits</a>
+    <a href="coord-sets.html" class="ethnic-tab ">Co-ord Sets</a>
+    <a href="lehengas.html" class="ethnic-tab ">Lehengas</a>
+    <a href="dresses.html" class="ethnic-tab active">Dresses &amp; Sets</a>
+  </nav>
+
+  <main class="catalog-section">
+    <div class="garments-grid">
+      
+        <article class="garment-card">
+          <div class="card-media">
+            <span class="card-badge">New Silhouette</span>
+            <img src="https://mahira2.netlify.app/assets/s3-dresses.jpg?v=5" alt="Aura Champagne Flared Gown" loading="lazy" />
+          </div>
+          <div class="card-info">
+            <span class="card-craft">Pita Work & Micro Pleating</span>
+            <h2 class="card-title">Aura Champagne Flared Gown</h2>
+            <p class="card-fabric">Raw Silk & Multilayered Tulle</p>
+            <div class="card-bottom-row">
+              <span class="card-price">₹38,900</span>
+              <a href="collections.html?category=dresses" class="card-cta-btn">Examine Craft</a>
+            </div>
+          </div>
+        </article>
+      
+        <article class="garment-card">
+          <div class="card-media">
+            <span class="card-badge">Effortless Chic</span>
+            <img src="https://mahira2.netlify.app/assets/s2-card-women.jpg?v=2" alt="Hand-pleated Silk Maxi Dress" loading="lazy" />
+          </div>
+          <div class="card-info">
+            <span class="card-craft">Sunray Micro-pleating</span>
+            <h2 class="card-title">Hand-pleated Silk Maxi Dress</h2>
+            <p class="card-fabric">Pure Silk Habotai</p>
+            <div class="card-bottom-row">
+              <span class="card-price">₹32,000</span>
+              <a href="collections.html?category=dresses" class="card-cta-btn">Examine Craft</a>
+            </div>
+          </div>
+        </article>
+      
+        <article class="garment-card">
+          <div class="card-media">
+            <span class="card-badge">Red Carpet</span>
+            <img src="https://mahira2.netlify.app/assets/s7-story.jpg?v=4" alt="Zardozi Cape Overlay Evening Dress" loading="lazy" />
+          </div>
+          <div class="card-info">
+            <span class="card-craft">Bullion Needlework</span>
+            <h2 class="card-title">Zardozi Cape Overlay Evening Dress</h2>
+            <p class="card-fabric">Crepe with Sheer Overlay</p>
+            <div class="card-bottom-row">
+              <span class="card-price">₹35,500</span>
+              <a href="collections.html?category=dresses" class="card-cta-btn">Examine Craft</a>
+            </div>
+          </div>
+        </article>
+      
+        <article class="garment-card">
+          <div class="card-media">
+            <span class="card-badge">Celebration Piece</span>
+            <img src="https://mahira2.netlify.app/assets/women-clean.jpg?v=3" alt="Gold Tissue Tiered Gala Dress" loading="lazy" />
+          </div>
+          <div class="card-info">
+            <span class="card-craft">Metallic Jacquard Weave</span>
+            <h2 class="card-title">Gold Tissue Tiered Gala Dress</h2>
+            <p class="card-fabric">Bespoke Loomed Tissue</p>
+            <div class="card-bottom-row">
+              <span class="card-price">₹41,000</span>
+              <a href="collections.html?category=dresses" class="card-cta-btn">Examine Craft</a>
+            </div>
+          </div>
+        </article>
+      
+    </div>
+  </main>
+
+  <footer class="atelier-footer">
+    <a href="mahira.html" class="nav-back-link">← Return to Aleen Atelier Home</a>
+    <p class="footer-copy">© 2026 Aleen Clothing. Consciously Curated Luxury Garments.</p>
+  </footer>
+</body>
+</html>

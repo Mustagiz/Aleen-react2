@@ -38,6 +38,7 @@ const PublicBillView = lazy(() => import('./pages/PublicBillView'));
 const CustomerDisplay = lazy(() => import('./pages/CustomerDisplay'));
 const MahiraLanding = lazy(() => import('./pages/MahiraLanding'));
 const Collections = lazy(() => import('./pages/Collections'));
+const AtelierFrame = lazy(() => import('./pages/AtelierFrame'));
 
 // Luxury Atelier Page Suspense Fallback
 const AtelierPageLoader = () => (
@@ -80,10 +81,19 @@ const AnimatedRoutes = () => {
         <Route path="/customer-display" element={<Suspense fallback={<AtelierPageLoader />}><CustomerDisplay /></Suspense>} />
         <Route path="/bill" element={<Suspense fallback={<AtelierPageLoader />}><PublicBillView /></Suspense>} />
         <Route path="/bill/:id" element={<Suspense fallback={<AtelierPageLoader />}><PublicBillView /></Suspense>} />
-        <Route path="/mahira" element={<Suspense fallback={<AtelierPageLoader />}><MahiraLanding /></Suspense>} />
-        <Route path="/brand-preview" element={<Suspense fallback={<AtelierPageLoader />}><MahiraLanding /></Suspense>} />
+        <Route path="/Aleen" element={<Suspense fallback={<AtelierPageLoader />}><MahiraLanding /></Suspense>} />
+        <Route path="/aleen" element={<Navigate to="/Aleen" replace />} />
+        <Route path="/mahira" element={<Navigate to="/Aleen" replace />} />
+        <Route path="/brand-preview" element={<Navigate to="/Aleen" replace />} />
         <Route path="/collections" element={<Suspense fallback={<AtelierPageLoader />}><Collections /></Suspense>} />
         <Route path="/garments" element={<Suspense fallback={<AtelierPageLoader />}><Collections /></Suspense>} />
+        <Route path="/sarees" element={<Suspense fallback={<AtelierPageLoader />}><AtelierFrame src="/sarees.html" title="Aleen — Sarees" /></Suspense>} />
+        <Route path="/kurta-sets" element={<Suspense fallback={<AtelierPageLoader />}><AtelierFrame src="/kurta-sets.html" title="Aleen — Kurta Sets" /></Suspense>} />
+        <Route path="/anarkali" element={<Suspense fallback={<AtelierPageLoader />}><AtelierFrame src="/anarkali.html" title="Aleen — Anarkali" /></Suspense>} />
+        <Route path="/suits" element={<Suspense fallback={<AtelierPageLoader />}><AtelierFrame src="/suits.html" title="Aleen — Suits" /></Suspense>} />
+        <Route path="/coord-sets" element={<Suspense fallback={<AtelierPageLoader />}><AtelierFrame src="/coord-sets.html" title="Aleen — Co-ord Sets" /></Suspense>} />
+        <Route path="/lehengas" element={<Suspense fallback={<AtelierPageLoader />}><AtelierFrame src="/lehengas.html" title="Aleen — Lehengas" /></Suspense>} />
+        <Route path="/dresses" element={<Suspense fallback={<AtelierPageLoader />}><AtelierFrame src="/dresses.html" title="Aleen — Dresses & Sets" /></Suspense>} />
         <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
           <Route index element={<PageWrapper><Dashboard /></PageWrapper>} />
           <Route path="inventory" element={<PageWrapper><Inventory /></PageWrapper>} />

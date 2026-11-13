@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -2655,6 +2655,92 @@ button:hover,
   color: #8A6420 !important;
 }
 
+/* Remove search, login, wishlist, and bag from header */
+.nav-utils {
+  display: none !important;
+}
+
+/* Scrollable Women 4-Card Carousel */
+.w-track {
+  display: flex !important;
+  justify-content: flex-start !important;
+  gap: clamp(18px, 2vw, 36px) !important;
+  width: min(94vw, 1560px) !important;
+  margin: 0 auto !important;
+  outline: none !important;
+  overflow-x: auto !important;
+  scroll-behavior: smooth !important;
+  scroll-snap-type: x mandatory !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: none !important;
+  padding: 12px 2vw 28px !important;
+}
+.w-track::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+.w-card {
+  flex: 0 0 clamp(290px, 30vw, 420px) !important;
+  max-width: 420px !important;
+  aspect-ratio: 397 / 551 !important;
+  border-radius: 999px 999px 16px 16px !important;
+  border: 1px solid rgba(214, 178, 110, 0.65) !important;
+  overflow: hidden !important;
+  scroll-snap-align: center !important;
+  transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease) !important;
+}
+.w-card:hover {
+  transform: translateY(-8px) scale(1.01) !important;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.75), 0 0 24px rgba(201, 163, 95, 0.25) !important;
+}
+
+/* Women Mega Dropdown: Single Ethnic Column + Wide Horizontal Editorial Image */
+.mega-inner.is-women {
+  display: grid !important;
+  grid-template-columns: minmax(260px, 340px) 1fr !important;
+  gap: clamp(36px, 4.5vw, 80px) !important;
+  align-items: center !important;
+  width: min(94vw, 1500px) !important;
+  padding: 36px 0 42px !important;
+}
+.mega-inner.is-women .mg-col {
+  padding-right: 24px;
+}
+.mega-inner.is-women .mg-col h4 {
+  font-size: 13px !important;
+  letter-spacing: 0.32em !important;
+  color: #7C561B !important;
+}
+.mega-inner.is-women .mg-col a {
+  font-size: 15px !important;
+  padding: 7px 0 !important;
+}
+.mega-inner.is-women .mg-promo {
+  min-height: 290px !important;
+  height: 310px !important;
+  aspect-ratio: auto !important;
+  width: 100% !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(184, 154, 98, 0.75) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5) !important;
+}
+.mega-inner.is-women .mg-promo img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center 30% !important;
+}
+.mega-inner.is-women .mg-promo b {
+  font-size: clamp(20px, 1.8vw, 30px) !important;
+  bottom: 26% !important;
+  letter-spacing: 0.1em !important;
+}
+.mega-inner.is-women .mg-promo em {
+  font-size: 16px !important;
+  bottom: 14% !important;
+}
+
 </style>
 </head>
 <body class="is-loading">
@@ -2821,7 +2907,6 @@ button:hover,
         <p class="tagline">A story in every drape.</p>
         <div class="cta-row">
           <a class="btn btn-primary" href="collections.html"><span class="fill"></span><span class="lbl">Explore&nbsp;Collections</span><span class="arrow"><svg viewBox="0 0 28 10"><path d="M0 5h24M20 1l5 4-5 4"/></svg></span></a>
-          <a class="btn btn-ghost" href="#women-new"><span class="fill"></span><span class="lbl">New&nbsp;Arrivals</span><span class="arrow"><svg viewBox="0 0 28 10"><path d="M0 5h24M20 1l5 4-5 4"/></svg></span></a>
         </div>
       </div>
     </div>
@@ -2866,7 +2951,7 @@ button:hover,
           <p class="w-kicker">New Collection</p>
           <h3>Sarees</h3>
           <p class="w-line">Tradition in a new light.</p>
-          <a class="cta" href="collections.html?category=sarees"><span class="fill"></span><span class="lbl">Explore</span><span class="arrow"><svg viewBox="0 0 28 10"><path d="M0 5h24M20 1l5 4-5 4"/></svg></span></a>
+          <a class="cta" href="sarees.html"><span class="fill"></span><span class="lbl">Explore</span><span class="arrow"><svg viewBox="0 0 28 10"><path d="M0 5h24M20 1l5 4-5 4"/></svg></span></a>
         </div>
       </article>
       <article class="w-card">
@@ -2876,7 +2961,7 @@ button:hover,
           <p class="w-kicker">New Collection</p>
           <h3>Kurta Sets</h3>
           <p class="w-line">Everyday elegance, elevated.</p>
-          <a class="cta" href="collections.html?category=kurta-sets"><span class="fill"></span><span class="lbl">Explore</span><span class="arrow"><svg viewBox="0 0 28 10"><path d="M0 5h24M20 1l5 4-5 4"/></svg></span></a>
+          <a class="cta" href="kurta-sets.html"><span class="fill"></span><span class="lbl">Explore</span><span class="arrow"><svg viewBox="0 0 28 10"><path d="M0 5h24M20 1l5 4-5 4"/></svg></span></a>
         </div>
       </article>
       <article class="w-card">
@@ -2886,13 +2971,23 @@ button:hover,
           <p class="w-kicker">New Collection</p>
           <h3>Dresses &amp; Sets</h3>
           <p class="w-line">Modern silhouettes for every you.</p>
-          <a class="cta" href="collections.html?category=dresses"><span class="fill"></span><span class="lbl">Explore</span><span class="arrow"><svg viewBox="0 0 28 10"><path d="M0 5h24M20 1l5 4-5 4"/></svg></span></a>
+          <a class="cta" href="dresses.html"><span class="fill"></span><span class="lbl">Explore</span><span class="arrow"><svg viewBox="0 0 28 10"><path d="M0 5h24M20 1l5 4-5 4"/></svg></span></a>
+        </div>
+      </article>
+      <article class="w-card">
+        <img src="https://mahira2.netlify.app/assets/women-clean.jpg?v=3" alt="Model seated in a royal embroidered bridal lehenga" loading="lazy" decoding="async">
+        <span class="w-scrim"></span>
+        <div class="w-caption">
+          <p class="w-kicker">New Collection</p>
+          <h3>Lehengas</h3>
+          <p class="w-line">Royal silhouettes, timeless grace.</p>
+          <a class="cta" href="lehengas.html"><span class="fill"></span><span class="lbl">Explore</span><span class="arrow"><svg viewBox="0 0 28 10"><path d="M0 5h24M20 1l5 4-5 4"/></svg></span></a>
         </div>
       </article>
     </div>
     <div class="w-nav">
       <button class="w-btn w-prev" aria-label="Previous"><svg viewBox="0 0 16 12"><path d="M16 6H4M7 2 3 6l4 4"/></svg></button>
-      <p class="w-count"><span class="w-cur">01</span><i></i><span>03</span></p>
+      <p class="w-count"><span class="w-cur">01</span><i></i><span>04</span></p>
       <button class="w-btn w-next" aria-label="Next"><svg viewBox="0 0 16 12"><path d="M0 6h12M9 2l4 4-4 4"/></svg></button>
     </div>
     <p class="corner corner-br"><span>Made</span><span>For</span><span>What&rsquo;s Next</span></p>
@@ -3280,12 +3375,17 @@ window.MAHIRA_LOGO = window.ALEEN_LOGO;
     });
 
     var gSel = el('g', { id: 'lgSel' }, gAll);
-    D.select.letters.forEach(function (l) {
-      el('path', { d: l.d, fill: 'url(#lgSelGold)', 'fill-rule': 'evenodd', 'class': 'lg-sel' }, gSel);
-    });
-    D.select.lines.forEach(function (l, i) {
-      el('rect', { x: l.x, y: l.y, width: l.w, height: Math.max(l.h, 6), fill: 'url(#lgSelGold)', 'class': 'lg-line lg-line-' + i }, gSel);
-    });
+    var txt = el('text', {
+      x: 801,
+      y: 1318,
+      'text-anchor': 'middle',
+      fill: 'url(#lgSelGold)',
+      'class': 'lg-sel',
+      style: "font-family: 'Great Vibes', cursive, 'Playfair Display', serif; font-size: 155px; font-weight: 400; letter-spacing: 2px;"
+    }, gSel);
+    txt.textContent = 'Consciously Curated';
+    el('rect', { x: 40, y: 1300, width: 220, height: 4, fill: 'url(#lgSelGold)', 'class': 'lg-line lg-line-0' }, gSel);
+    el('rect', { x: 1340, y: 1300, width: 220, height: 4, fill: 'url(#lgSelGold)', 'class': 'lg-line lg-line-1' }, gSel);
 
     /* a single champagne light that passes through the whole identity */
     var bright = el('filter', { id: 'lgBright', x: '-25%', y: '-25%', width: '150%', height: '150%' }, defs);
@@ -3726,17 +3826,29 @@ window.MAHIRA_LOGO = window.ALEEN_LOGO;
   /* Nav leaves link into the shop, so the menu is a real way in rather than
      a jump to an anchor on this page. The slug matches shop-data.js. */
   function slugify(s) { return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
-  function shopHref(key, item) { return key === 'kalakaari' ? '#kalakaari' : '#women-new'; }
+  function shopHref(key, item) {
+    if (key === 'women') {
+      var s = slugify(item);
+      var m = {
+        'sarees': 'sarees.html',
+        'kurta-sets': 'kurta-sets.html',
+        'anarkali': 'anarkali.html',
+        'suits': 'suits.html',
+        'co-ord-sets': 'coord-sets.html',
+        'lehengas': 'lehengas.html',
+        'dresses': 'dresses.html'
+      };
+      return m[s] || ('collections.html?category=' + s);
+    }
+    return key === 'kalakaari' ? '#kalakaari' : '#women-new';
+  }
 
   var NAV = {
     women: {
       label: 'Women', href: '#women-new',
       promo: { img: 'https://mahira2.netlify.app/assets/s2-card-women.jpg?v=2', title: 'The Women’s Edit', line: 'Elegance in every drape.' },
       groups: [
-        { title: 'Ethnic',     items: ['Sarees', 'Kurta Sets', 'Anarkali', 'Suits', 'Co-ord Sets', 'Lehengas', 'Dresses'] },
-        { title: 'Western',    items: ['Dresses', 'Tops', 'Shirts', 'Trousers', 'Skirts', 'Co-ord Sets'] },
-        { title: 'Innerwear',  items: ['Bras', 'Panties', 'Lingerie Sets', 'Shapewear'] },
-        { title: 'Activewear', items: ['Active Tops', 'Active Bottoms', 'Active Sets'] }
+        { title: 'Ethnic',     items: ['Sarees', 'Kurta Sets', 'Anarkali', 'Suits', 'Co-ord Sets', 'Lehengas', 'Dresses'] }
       ]
     },
     kalakaari: {
@@ -3777,6 +3889,7 @@ window.MAHIRA_LOGO = window.ALEEN_LOGO;
   function renderMega(key) {
     var c = NAV[key];
     megaInner.innerHTML = '';
+    megaInner.classList.toggle('is-women', key === 'women');
     c.groups.forEach(function (g) {
       var col = mk('div', 'mg-col');
       col.appendChild(mk('h4', null, esc(g.title)));
