@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aleen Clothing — The Haute Garments Gallery</title>
+  <meta name="description" content="Explore handcrafted Sarees, Kurta Sets, Lehengas, Dresses & Unstitched Silks by Aleen Clothing. Tradition meets tomorrow.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --void-0: #040906;
+      --void-1: #0d1c13;
+      --green-deep: #0f1d15;
+      --green: #14251b;
+      --green-soft: #1d3527;
+      --gold-deep: #8a6420;
+      --gold: #c9a35f;
+      --gold-light: #eccf8b;
+      --gold-spark: #f9ecc4;
+      --champagne: #d9c08a;
+      --cream: #efe4c8;
+      --cream-hi: #f7efdc;
+      --cream-dim: rgba(238, 228, 205, 0.62);
+      --burg-deep: #200910;
+      --burg: #4d1a24;
+      --burg-mid: #6b2b36;
+      --burg-hi: #86404c;
+      --sale: #c2554e;
+      --ink-on-gold: #241a0c;
+      --serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+      --serif-i: 'Cormorant Garamond', Georgia, serif;
+      --sans: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+      --ease: cubic-bezier(0.22, 0.61, 0.21, 1);
+      --ease-io: cubic-bezier(0.77, 0, 0.18, 1);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      background-color: var(--void-0);
+      color: #ffffff;
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Top banner */
+    .atelier-announcement {
+      background: linear-gradient(90deg, #112217, #1c3826, #112217);
+      border-bottom: 1px solid rgba(201, 163, 95, 0.25);
+      text-align: center;
+      padding: 8px 16px;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 500;
+      color: var(--gold-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .atelier-announcement span.spark {
+      color: var(--gold);
+      font-size: 14px;
+    }
+
+    /* Navigation Bar */
+    header.atelier-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(4, 9, 6, 0.94);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(201, 163, 95, 0.2);
+      transition: all 0.3s var(--ease);
+    }
+    .nav-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .nav-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 600;
+      padding: 8px 18px;
+      border: 1px solid rgba(201, 163, 95, 0.45);
+      border-radius: 999px;
+      background: rgba(20, 37, 27, 0.5);
+      transition: all 0.3s var(--ease);
+    }
+    .nav-back-link:hover {
+      background: var(--gold);
+      color: var(--ink-on-gold);
+      border-color: var(--gold-light);
+      box-shadow: 0 0 16px rgba(201, 163, 95, 0.35);
+      transform: translateX(-3px);
+    }
+
+    /* Center Brand Crest */
+    .brand-crest {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: inherit;
+    }
+    .emblem-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .emblem-svg {
+      width: 44px;
+      height: 44px;
+      filter: drop-shadow(0 2px 8px rgba(201, 163, 95, 0.35));
+    }
+    .brand-text-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .brand-title {
+      font-family: var(--serif);
+      font-size: 20px;
+      letter-spacing: 5px;
+      font-weight: 600;
+      color: #ffffff;
+      line-height: 1.1;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+    }
+    .brand-sub {
+      font-family: var(--sans);
+      font-size: 8.5px;
+      letter-spacing: 4px;
+      color: var(--gold);
+      font-weight: 600;
+      margin-top: 3px;
+    }
+
+    /* Nav Actions */
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .action-btn {
+      background: transparent;
+      border: 1px solid rgba(201, 163, 95, 0.3);
+      color: #ffffff;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-family: var(--sans);
+      font-weight: 600;
+      letter-spacing: 1px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s var(--ease);
+      position: relative;
+    }
+    .action-btn:hover {
+      border-color: var(--gold);
+      background: rgba(201, 163, 95, 0.15);
+      color: var(--gold-spark);
+    }
+    .badge-count {
+      background: var(--gold);
+      color: var(--ink-on-gold);
+      font-size: 10px;
+      font-weight: 700;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    /* Hero / Gallery Header */
+    .gallery-hero {
+      position: relative;
+      padding: 64px 32px 40px;
+      text-align: center;
+      background: radial-gradient(circle at 50% 20%, rgba(29, 53, 39, 0.6) 0%, rgba(4, 9, 6, 0.98) 75%);
+      border-bottom: 1px solid rgba(201, 163, 95, 0.18);
+      overflow: hidden;
+    }
+    .gallery-hero::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 400px;
+      background: radial-gradient(ellipse at center, rgba(201, 163, 95, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .gallery-eyebrow {
+      font-size: 11px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .gallery-eyebrow::before, .gallery-eyebrow::after {
+      content: "";
+      display: inline-block;
+      width: 32px;
+      height: 1px;
+      background: var(--gold);
+      opacity: 0.6;
+    }
+    .gallery-title {
+      font-family: var(--serif);
+      font-size: clamp(34px, 5vw, 56px);
+      font-weight: 400;
+      letter-spacing: 1px;
+      color: #ffffff;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .gallery-sub {
+      max-width: 680px;
+      margin: 0 auto;
+      font-family: var(--serif-i);
+      font-size: 20px;
+      font-style: italic;
+      color: var(--cream);
+      opacity: 0.92;
+      line-height: 1.4;
+    }
+
+    /* Filter & Search Bar */
+    .controls-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 32px 32px 16px;
+    }
+    .controls-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      background: rgba(15, 29, 21, 0.7);
+      border: 1px solid rgba(201, 163, 95, 0.25);
+      border-radius: 16px;
+      padding: 16px 24px;
+      backdrop-filter: blur(12px);
+    }
+
+    /* Category Tabs */
+    .filter-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .filter-tab {
+      background: transparent;
+      border: 1px solid rgba(201, 163, 95, 0.25);
+      color: #ffffff;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.25s var(--ease);
+      font-family: var(--sans);
+    }
+    .filter-tab:hover {
+      border-color: var(--gold);
+      color: var(--gold-spark);
+    }
+    .filter-tab.active {
+      background: var(--gold);
+      color: var(--ink-on-gold) !important;
+      border-color: var(--gold-light);
+      font-weight: 700;
+      box-shadow: 0 4px 14px rgba(201, 163, 95, 0.35);
+    }
+
+    /* Search & Sort inputs */
+    .search-sort-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-grow: 1;
+      max-width: 520px;
+      justify-content: flex-end;
+    }
+    .search-box-wrap {
+      position: relative;
+      flex-grow: 1;
+    }
+    .search-box-wrap svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      stroke: var(--gold);
+      fill: none;
+      pointer-events: none;
+    }
+    .search-input {
+      width: 100%;
+      background: rgba(4, 9, 6, 0.65);
+      border: 1px solid rgba(201, 163, 95, 0.35);
+      border-radius: 999px;
+      padding: 9px 16px 9px 40px;
+      font-size: 12px;
+      color: #ffffff;
+      font-family: var(--sans);
+      outline: none;
+      transition: all 0.25s ease;
+    }
+    .search-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+    .search-input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 12px rgba(201, 163, 95, 0.25);
+    }
+
+    .sort-select {
+      background: rgba(4, 9, 6, 0.85);
+      border: 1px solid rgba(201, 163, 95, 0.35);
+      border-radius: 999px;
+      padding: 9px 18px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #ffffff;
+      font-family: var(--sans);
+      outline: none;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .sort-select:focus {
+      border-color: var(--gold);
+    }
+    .sort-select option {
+      background: #0f1d15;
+      color: #ffffff;
+    }
+
+    /* Product Grid */
+    .catalog-section {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 32px 32px 96px;
+    }
+    .catalog-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      font-size: 13px;
+      color: var(--cream);
+      opacity: 0.85;
+      letter-spacing: 1px;
+    }
+    .catalog-count-badge {
+      color: var(--gold-light);
+      font-weight: 600;
+    }
+
+    .garments-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 36px 28px;
+    }
+
+    /* Garment Card */
+    .garment-card {
+      background: linear-gradient(180deg, rgba(20, 37, 27, 0.45) 0%, rgba(10, 18, 12, 0.85) 100%);
+      border: 1px solid rgba(201, 163, 95, 0.3);
+      border-radius: 200px 200px 18px 18px;
+      padding: 12px 12px 20px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.4s var(--ease);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+    }
+    .garment-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(201, 163, 95, 0.85);
+      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.65), 0 0 22px rgba(201, 163, 95, 0.22);
+    }
+
+    /* Arch image frame */
+    .card-media {
+      position: relative;
+      width: 100%;
+      height: 380px;
+      border-radius: 190px 190px 12px 12px;
+      overflow: hidden;
+      background: #040906;
+    }
+    .card-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      transition: transform 0.8s var(--ease);
+    }
+    .garment-card:hover .card-media img {
+      transform: scale(1.06);
+    }
+
+    /* Card badges & wishlist */
+    .card-badge {
+      position: absolute;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(4, 9, 6, 0.85);
+      border: 1px solid rgba(201, 163, 95, 0.6);
+      color: var(--gold-light);
+      font-size: 9.5px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-weight: 600;
+      backdrop-filter: blur(6px);
+      z-index: 2;
+      white-space: nowrap;
+    }
+    .card-wish-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(4, 9, 6, 0.7);
+      border: 1px solid rgba(201, 163, 95, 0.35);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 3;
+      transition: all 0.25s ease;
+    }
+    .card-wish-btn:hover {
+      background: var(--gold);
+      color: var(--ink-on-gold);
+      transform: scale(1.1);
+    }
+    .card-wish-btn.liked {
+      background: #c2554e;
+      border-color: #c2554e;
+      color: #ffffff;
+    }
+
+    /* Card Quick Peek Overlay */
+    .quick-examine-btn {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      opacity: 0;
+      background: rgba(4, 9, 6, 0.92);
+      border: 1px solid var(--gold);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 9px 20px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.3s var(--ease);
+      white-space: nowrap;
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .garment-card:hover .quick-examine-btn {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .quick-examine-btn:hover {
+      background: var(--gold);
+      color: var(--ink-on-gold);
+    }
+
+    /* Card Details */
+    .card-info {
+      padding: 18px 8px 6px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+    .card-craft-type {
+      font-size: 10px;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .card-title {
+      font-family: var(--serif);
+      font-size: 19px;
+      font-weight: 500;
+      color: #ffffff;
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+    .card-fabric {
+      font-size: 12px;
+      color: var(--cream);
+      opacity: 0.8;
+      margin-bottom: 12px;
+      font-family: var(--serif-i);
+      font-style: italic;
+    }
+    .card-bottom-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid rgba(201, 163, 95, 0.2);
+    }
+    .card-price-group {
+      display: flex;
+      flex-direction: column;
+    }
+    .card-price-label {
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    .card-price {
+      font-family: var(--sans);
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .card-add-btn {
+      background: transparent;
+      border: 1px solid rgba(201, 163, 95, 0.8);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 10.5px;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.25s var(--ease);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .card-add-btn:hover {
+      background: var(--gold);
+      color: var(--ink-on-gold);
+      border-color: var(--gold-light);
+      box-shadow: 0 0 14px rgba(201, 163, 95, 0.35);
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 9, 6, 0.88);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-card {
+      background: linear-gradient(135deg, #0e1c14 0%, #060d08 100%);
+      border: 1px solid rgba(201, 163, 95, 0.4);
+      border-radius: 24px;
+      max-width: 960px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 30px rgba(201, 163, 95, 0.2);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      position: relative;
+      transform: scale(0.95);
+      transition: transform 0.3s var(--ease);
+    }
+    .modal-overlay.open .modal-card {
+      transform: scale(1);
+    }
+    .modal-close-btn {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(4, 9, 6, 0.8);
+      border: 1px solid rgba(201, 163, 95, 0.4);
+      color: #ffffff;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.2s ease;
+    }
+    .modal-close-btn:hover {
+      background: var(--gold);
+      color: var(--ink-on-gold);
+    }
+    .modal-visual-col {
+      padding: 28px;
+      background: #040906;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-img-frame {
+      width: 100%;
+      height: 100%;
+      max-height: 520px;
+      border-radius: 180px 180px 16px 16px;
+      overflow: hidden;
+      border: 1px solid rgba(201, 163, 95, 0.35);
+    }
+    .modal-img-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .modal-detail-col {
+      padding: 36px 32px;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-kicker {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .modal-title {
+      font-family: var(--serif);
+      font-size: 28px;
+      font-weight: 500;
+      color: #ffffff;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    .modal-price {
+      font-size: 24px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 18px;
+    }
+    .modal-desc {
+      font-size: 13.5px;
+      color: var(--cream);
+      opacity: 0.9;
+      line-height: 1.6;
+      margin-bottom: 22px;
+      border-bottom: 1px solid rgba(201, 163, 95, 0.2);
+      padding-bottom: 18px;
+    }
+    .spec-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+      font-size: 12px;
+    }
+    .spec-item {
+      background: rgba(20, 37, 27, 0.4);
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(201, 163, 95, 0.15);
+    }
+    .spec-lbl {
+      color: var(--gold);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: block;
+      margin-bottom: 3px;
+    }
+    .spec-val {
+      color: #ffffff;
+      font-weight: 500;
+    }
+    .size-picker-title {
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    .size-picker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 26px;
+    }
+    .size-chip {
+      background: transparent;
+      border: 1px solid rgba(201, 163, 95, 0.35);
+      color: #ffffff;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .size-chip:hover {
+      border-color: var(--gold);
+    }
+    .size-chip.active {
+      background: var(--gold);
+      color: var(--ink-on-gold);
+      border-color: var(--gold);
+    }
+    .modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: auto;
+    }
+    .modal-btn-primary {
+      background: var(--gold);
+      color: #ffffff !important;
+      border: 1px solid var(--gold-light);
+      padding: 14px 24px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.3s var(--ease);
+      box-shadow: 0 4px 18px rgba(201, 163, 95, 0.35);
+    }
+    .modal-btn-primary:hover {
+      background: var(--gold-spark);
+      color: var(--ink-on-gold) !important;
+      box-shadow: 0 6px 24px rgba(201, 163, 95, 0.5);
+    }
+    .modal-btn-secondary {
+      background: transparent;
+      color: #ffffff !important;
+      border: 1px solid rgba(201, 163, 95, 0.4);
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    .modal-btn-secondary:hover {
+      background: rgba(201, 163, 95, 0.15);
+      border-color: var(--gold);
+    }
+
+    /* Toast notification */
+    .toast-msg {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: #0f1d15;
+      border: 1px solid var(--gold);
+      color: #ffffff;
+      padding: 14px 22px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s var(--ease);
+      z-index: 2000;
+    }
+    .toast-msg.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .toast-msg svg {
+      stroke: var(--gold);
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Footer */
+    footer.atelier-footer {
+      background: #060e09;
+      border-top: 1px solid rgba(201, 163, 95, 0.2);
+      padding: 60px 32px 36px;
+      text-align: center;
+    }
+    .footer-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .footer-quote {
+      font-family: var(--serif-i);
+      font-size: 20px;
+      font-style: italic;
+      color: var(--cream);
+      max-width: 600px;
+    }
+    .footer-back-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #ffffff !important;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      padding: 12px 28px;
+      border: 1px solid var(--gold);
+      border-radius: 999px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      background: rgba(20, 37, 27, 0.4);
+    }
+    .footer-back-cta:hover {
+      background: var(--gold);
+      color: var(--ink-on-gold) !important;
+      box-shadow: 0 4px 20px rgba(201, 163, 95, 0.35);
+    }
+    .footer-copy {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.45);
+      letter-spacing: 1px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .modal-card {
+        grid-template-columns: 1fr;
+      }
+      .modal-visual-col {
+        padding: 24px 24px 0;
+      }
+      .modal-img-frame {
+        max-height: 320px;
+      }
+      .nav-inner {
+        padding: 14px 20px;
+      }
+      .controls-container, .catalog-section {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top bar -->
+  <aside class="atelier-announcement">
+    <span class="spark">✦</span>
+    <span>Aleen Haute Couture · Handcrafted Luxury Editions · Worldwide Atelier Shipping</span>
+    <span class="spark">✦</span>
+  </aside>
+
+  <!-- Sticky Nav -->
+  <header class="atelier-nav">
+    <div class="nav-inner">
+      <a href="mahira.html" class="nav-back-link" title="Return to Aleen Landing Page">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Back to Atelier</span>
+      </a>
+
+      <a href="mahira.html" class="brand-crest" title="Aleen Clothing">
+        <div class="emblem-wrapper">
+          <svg class="emblem-svg" viewBox="0 0 100 100">
+            <defs>
+              <linearGradient id="emblemGold" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ECCF8B"/>
+                <stop offset="50%" stop-color="#C9A35F"/>
+                <stop offset="100%" stop-color="#8A6420"/>
+              </linearGradient>
+            </defs>
+            <circle cx="50" cy="50" r="46" fill="#0b1710" stroke="url(#emblemGold)" stroke-width="2.5" />
+            <circle cx="50" cy="50" r="41" fill="none" stroke="url(#emblemGold)" stroke-dasharray="2 3" stroke-width="1.2" opacity="0.8" />
+            <path d="M50 14 L53 22 L61 22 L55 27 L57 35 L50 30 L43 35 L45 27 L39 22 L47 22 Z" fill="url(#emblemGold)" opacity="0.85" />
+            <text x="50" y="65" font-family="'Playfair Display', serif" font-size="34" font-weight="700" font-style="italic" fill="url(#emblemGold)" text-anchor="middle">A</text>
+            <circle cx="50" cy="78" r="2.5" fill="url(#emblemGold)" />
+          </svg>
+          <div class="brand-text-col">
+            <span class="brand-title">A L E E N</span>
+            <span class="brand-sub">C L O T H I N G</span>
+          </div>
+        </div>
+      </a>
+
+      <div class="nav-actions">
+        <button class="action-btn" id="wishlistHeaderBtn" title="Wishlist Items">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+          <span>Saved</span>
+          <span class="badge-count" id="wishCount">0</span>
+        </button>
+
+        <button class="action-btn" id="bagHeaderBtn" title="View Atelier Bag">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          <span>Bag</span>
+          <span class="badge-count" id="bagCount">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Gallery Hero -->
+  <section class="gallery-hero">
+    <p class="gallery-eyebrow">Haute Couture Collection</p>
+    <h1 class="gallery-title">The Grand Garments Gallery</h1>
+    <p class="gallery-sub">"From timeless banarasi weaves to hand-cut modern drapes — explore our complete atelier portfolio."</p>
+  </section>
+
+  <!-- Filter & Search Controls -->
+  <section class="controls-container">
+    <div class="controls-inner">
+      <div class="filter-tabs" id="filterTabs">
+        <button class="filter-tab active" data-category="all">All Garments</button>
+        <button class="filter-tab" data-category="sarees">Sarees</button>
+        <button class="filter-tab" data-category="kurta-sets">Kurta Sets</button>
+        <button class="filter-tab" data-category="lehengas">Lehengas</button>
+        <button class="filter-tab" data-category="dresses">Dresses &amp; Sets</button>
+        <button class="filter-tab" data-category="dupattas">Dupattas</button>
+        <button class="filter-tab" data-category="unstitched">Unstitched Fabrics</button>
+      </div>
+
+      <div class="search-sort-group">
+        <div class="search-box-wrap">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="searchInput" class="search-input" placeholder="Search silk sarees, anarkali, zardozi...">
+        </div>
+        <select class="sort-select" id="sortSelect">
+          <option value="featured">Featured Curations</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="name-asc">Title: A to Z</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- Garment Cards Grid -->
+  <main class="catalog-section">
+    <div class="catalog-meta">
+      <span id="activeFilterLabel">Displaying all curated creations</span>
+      <span>Showing <span class="catalog-count-badge" id="visibleCount">12</span> garments</span>
+    </div>
+
+    <div class="garments-grid" id="garmentsGrid">
+      <!-- Injected via JavaScript -->
+    </div>
+  </main>
+
+  <!-- Quick Examine Modal -->
+  <div class="modal-overlay" id="quickModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="modalCloseBtn" aria-label="Close modal">&times;</button>
+      <div class="modal-visual-col">
+        <div class="modal-img-frame">
+          <img id="modalImg" src="" alt="Garment presentation">
+        </div>
+      </div>
+      <div class="modal-detail-col">
+        <span class="modal-kicker" id="modalCraft">Handcrafted Masterpiece</span>
+        <h2 class="modal-title" id="modalTitle">Noor-e-Kashmir Silk Saree</h2>
+        <div class="modal-price" id="modalPrice">₹48,500</div>
+        <p class="modal-desc" id="modalDesc">Detailed description of this bespoke piece will appear here.</p>
+
+        <div class="spec-grid">
+          <div class="spec-item">
+            <span class="spec-lbl">Fabric</span>
+            <span class="spec-val" id="modalFabric">Pure Silk</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-lbl">Weave / Craft</span>
+            <span class="spec-val" id="modalWeave">Kalamkari &amp; Zardozi</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-lbl">Origin</span>
+            <span class="spec-val" id="modalOrigin">Varanasi, India</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-lbl">Atelier Care</span>
+            <span class="spec-val">Dry Clean Only</span>
+          </div>
+        </div>
+
+        <div class="size-picker-title">Select Atelier Sizing / Fit</div>
+        <div class="size-picker" id="modalSizePicker">
+          <button class="size-chip active">XS (34)</button>
+          <button class="size-chip">S (36)</button>
+          <button class="size-chip">M (38)</button>
+          <button class="size-chip">L (40)</button>
+          <button class="size-chip">XL (42)</button>
+          <button class="size-chip">Custom Bespoke Fit</button>
+        </div>
+
+        <div class="modal-actions">
+          <button class="modal-btn-primary" id="modalAddBagBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+            <span>Add to Atelier Bag</span>
+          </button>
+          <button class="modal-btn-secondary" id="modalBespokeBtn">
+            Request Master Tailor Consultation
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Message -->
+  <div class="toast-msg" id="toastMsg">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+    <span id="toastText">Garment added to your Atelier Bag</span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="atelier-footer">
+    <div class="footer-inner">
+      <p class="footer-quote">"Tradition is not the preservation of ashes, but the passing of fire into every thread."</p>
+      <a href="mahira.html" class="footer-back-cta">
+        <span>Explore The Aleen Heritage Atelier</span>
+        <svg width="18" height="10" viewBox="0 0 28 10" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M0 5h24M20 1l5 4-5 4"/>
+        </svg>
+      </a>
+      <p class="footer-copy">© 2026 Aleen Clothing. Consciously Curated Luxury Garments. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Master Garments Data
+    const GARMENTS = [
+      {
+        id: "ALN-SR-01",
+        title: "Chandramukhi Katan Silk Saree",
+        category: "sarees",
+        categoryLabel: "Sarees",
+        price: 48500,
+        craft: "Pure Zari & Meenakari",
+        fabric: "Pure Banarasi Katan Silk",
+        origin: "Varanasi Atelier",
+        badge: "Heritage Edition",
+        image: "https://mahira2.netlify.app/assets/s3-sarees.jpg?v=5",
+        desc: "Handwoven in the royal lofts of Varanasi over 140 artisan hours. Features real gold-dipped silver zari motifs across the pleated drape with opulent pallu styling."
+      },
+      {
+        id: "ALN-KS-02",
+        title: "Gulmohar Chanderi Kurta Set",
+        category: "kurta-sets",
+        categoryLabel: "Kurta Sets",
+        price: 26800,
+        craft: "Marodi & Aari Needlework",
+        fabric: "Tissue Chanderi with Silk Organza",
+        origin: "Chanderi Weavers Guild",
+        badge: "Bestseller",
+        image: "https://mahira2.netlify.app/assets/s3-kurta.jpg?v=5",
+        desc: "Delicate dusty rose organza adorned with fine metallic badla and antique marodi needlecraft. Paired with straight-cut brocade trousers and scalloped veil."
+      },
+      {
+        id: "ALN-DS-03",
+        title: "Aura Champagne Flared Gown",
+        category: "dresses",
+        categoryLabel: "Dresses & Sets",
+        price: 38900,
+        craft: "Pita Work & Micro Pleating",
+        fabric: "Raw Silk & Multilayered Tulle",
+        origin: "Aleen Design Studio",
+        badge: "New Silhouette",
+        image: "https://mahira2.netlify.app/assets/s3-dresses.jpg?v=5",
+        desc: "Contemporary architectural drape meeting traditional hand-embroidery. A 32-meter flare cut structured for gala celebrations and grand occasions."
+      },
+      {
+        id: "ALN-LH-04",
+        title: "Sheesh Mahal Bridal Lehenga",
+        category: "lehengas",
+        categoryLabel: "Lehengas",
+        price: 135000,
+        craft: "Zardozi & Dabka Resham",
+        fabric: "Heritage Velvet & Tissue Silk",
+        origin: "Lucknow Artisans",
+        badge: "Royal Couture",
+        image: "https://mahira2.netlify.app/assets/women-clean.jpg?v=3",
+        desc: "Inspired by the mirrored halls of Amber Fort. Encased in genuine semi-precious bead embroidery, beaten metallic cord, and a dual tissue veil."
+      },
+      {
+        id: "ALN-SR-05",
+        title: "Kalamkari Rooh Silk Saree",
+        category: "sarees",
+        categoryLabel: "Sarees",
+        price: 34200,
+        craft: "Pen Kalamkari & Vegetable Dyes",
+        fabric: "Handspun Tussar Silk",
+        origin: "Srikalahasti, Andhra",
+        badge: "Artisanal",
+        image: "https://mahira2.netlify.app/assets/s2-room.jpg?v=4",
+        desc: "Entirely hand-painted with organic milk and plant dyes using bamboo pens. Depicts mystical forest motifs bordered in antique zari weave."
+      },
+      {
+        id: "ALN-KS-06",
+        title: "Mumtaz Anarkali Ensemble",
+        category: "kurta-sets",
+        categoryLabel: "Kurta Sets",
+        price: 31500,
+        craft: "Lucknowi Chikankari & Mukaish",
+        fabric: "Pure Mulberry Georgette",
+        origin: "Awadh Atelier",
+        badge: "Hand-Embroidered",
+        image: "https://mahira2.netlify.app/assets/s4-room.jpg?v=1",
+        desc: "32 Kalis of handcrafted shadow-work Chikankari interspersed with silver mukaish dots that catch the light at every graceful turn."
+      },
+      {
+        id: "ALN-DP-07",
+        title: "Pashmina Heritage Dupatta",
+        category: "dupattas",
+        categoryLabel: "Dupattas",
+        price: 24000,
+        craft: "Sozni Hand Needlework",
+        fabric: "Grade-A Cashmere Pashmina",
+        origin: "Srinagar Valley",
+        badge: "Limited Craft",
+        image: "https://mahira2.netlify.app/assets/s5-room.jpg?v=1",
+        desc: "Featherlight warmth woven from Himalayan capra hircus fleece, detailed with single-needle botanical jaal borders."
+      },
+      {
+        id: "ALN-UN-08",
+        title: "Rangkat Brocade Unstitched Brocade",
+        category: "unstitched",
+        categoryLabel: "Unstitched Fabrics",
+        price: 29500,
+        craft: "Multi-warp Rangkat Weaving",
+        fabric: "Pure Mulberry Silk 4.5m",
+        origin: "Bespoke Loom 12",
+        badge: "Mastercut",
+        image: "https://mahira2.netlify.app/assets/s3-bg.jpg?v=1",
+        desc: "Rare artisanal yardage crafted on hand-shuttle looms with alternating warp threads. Tailorable for bespoke lehengas or sherwanis."
+      },
+      {
+        id: "ALN-SR-09",
+        title: "Nirvana Organza Tissue Saree",
+        category: "sarees",
+        categoryLabel: "Sarees",
+        price: 36000,
+        craft: "Cutwork Gota Patti",
+        fabric: "Pure Metallic Tissue Organza",
+        origin: "Jaipur Studio",
+        badge: "Trending",
+        image: "https://mahira2.netlify.app/assets/s7-story.jpg?v=4",
+        desc: "Weightless drape reflecting amber candle glow. Features scalloped border embroidery with copper leafing and mirror accents."
+      },
+      {
+        id: "ALN-LH-10",
+        title: "Vasant Garden Floral Lehenga",
+        category: "lehengas",
+        categoryLabel: "Lehengas",
+        price: 92000,
+        craft: "French Knot & Silk Floss",
+        fabric: "Mulberry Organza & Crepe",
+        origin: "Aleen Design Studio",
+        badge: "Signature Cut",
+        image: "https://mahira2.netlify.app/assets/women-clean.jpg?v=3",
+        desc: "A springtime dream composed of thousand-petal floral tapestries rendered in ombré pastel threads, crowned by an embroidered sweetheart bustier."
+      },
+      {
+        id: "ALN-DS-11",
+        title: "Mehrunissa Draped Kaftan Set",
+        category: "dresses",
+        categoryLabel: "Dresses & Sets",
+        price: 22400,
+        craft: "Hand-rolled Zardozi Cords",
+        fabric: "Italian Crepe de Chine",
+        origin: "Modern Atelier",
+        badge: "Resort Couture",
+        image: "https://mahira2.netlify.app/assets/s3-dresses.jpg?v=5",
+        desc: "Effortless luxury designed for intimate soirees. Relaxed silhouette cinched with an ornate hand-beaded bullion belt."
+      },
+      {
+        id: "ALN-UN-12",
+        title: "Zari Buti Handloom Fabric Set",
+        category: "unstitched",
+        categoryLabel: "Unstitched Fabrics",
+        price: 18500,
+        craft: "Jamdani Floral Insertion",
+        fabric: "Organic Handspun Chanderi",
+        origin: "Madhya Pradesh Looms",
+        badge: "Pure Natural",
+        image: "https://mahira2.netlify.app/assets/s3-kurta.jpg?v=5",
+        desc: "Includes 5 meters of pure chanderi with woven golden bootis alongside 2.5 meters of dyed satin lining and a matched organza drape."
+      }
+    ];
+
+    // State
+    let currentCategory = "all";
+    let searchQuery = "";
+    let sortOrder = "featured";
+    let wishlist = JSON.parse(localStorage.getItem("aleen_wishlist") || "[]");
+    let bag = JSON.parse(localStorage.getItem("aleen_bag") || "[]");
+    let activeModalItem = null;
+
+    // Elements
+    const gridEl = document.getElementById("garmentsGrid");
+    const countEl = document.getElementById("visibleCount");
+    const filterTabsEl = document.getElementById("filterTabs");
+    const searchInput = document.getElementById("searchInput");
+    const sortSelect = document.getElementById("sortSelect");
+    const wishCountEl = document.getElementById("wishCount");
+    const bagCountEl = document.getElementById("bagCount");
+    const toastEl = document.getElementById("toastMsg");
+    const toastText = document.getElementById("toastText");
+
+    // Modal Elements
+    const modalEl = document.getElementById("quickModal");
+    const modalCloseBtn = document.getElementById("modalCloseBtn");
+    const modalImg = document.getElementById("modalImg");
+    const modalCraft = document.getElementById("modalCraft");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalPrice = document.getElementById("modalPrice");
+    const modalDesc = document.getElementById("modalDesc");
+    const modalFabric = document.getElementById("modalFabric");
+    const modalWeave = document.getElementById("modalWeave");
+    const modalOrigin = document.getElementById("modalOrigin");
+    const modalAddBagBtn = document.getElementById("modalAddBagBtn");
+    const modalBespokeBtn = document.getElementById("modalBespokeBtn");
+    const modalSizePicker = document.getElementById("modalSizePicker");
+
+    // Initialize category from URL query param if present
+    const urlParams = new URLSearchParams(window.location.search);
+    const catParam = urlParams.get("category");
+    if (catParam) {
+      currentCategory = catParam.toLowerCase();
+    }
+
+    function updateBadgeCounters() {
+      wishCountEl.textContent = wishlist.length;
+      bagCountEl.textContent = bag.reduce((sum, item) => sum + (item.qty || 1), 0);
+    }
+
+    function showToast(msg) {
+      toastText.textContent = msg;
+      toastEl.classList.add("show");
+      setTimeout(() => {
+        toastEl.classList.remove("show");
+      }, 3200);
+    }
+
+    function formatPrice(num) {
+      return "₹" + num.toLocaleString("en-IN");
+    }
+
+    function filterAndSortGarments() {
+      let filtered = GARMENTS.filter(item => {
+        const matchesCat = currentCategory === "all" || item.category === currentCategory;
+        const q = searchQuery.toLowerCase().trim();
+        const matchesSearch = !q || (
+          item.title.toLowerCase().includes(q) ||
+          item.craft.toLowerCase().includes(q) ||
+          item.fabric.toLowerCase().includes(q) ||
+          item.origin.toLowerCase().includes(q)
+        );
+        return matchesCat && matchesSearch;
+      });
+
+      if (sortOrder === "price-asc") {
+        filtered.sort((a, b) => a.price - b.price);
+      } else if (sortOrder === "price-desc") {
+        filtered.sort((a, b) => b.price - a.price);
+      } else if (sortOrder === "name-asc") {
+        filtered.sort((a, b) => a.title.localeCompare(b.title));
+      }
+
+      renderGarments(filtered);
+    }
+
+    function renderGarments(items) {
+      countEl.textContent = items.length;
+      gridEl.innerHTML = "";
+
+      if (items.length === 0) {
+        gridEl.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+            <p style="font-family: var(--serif-i); font-size: 24px; color: var(--cream); margin-bottom: 12px;">No atelier garments matched your filter.</p>
+            <button class="filter-tab active" onclick="resetFilters()">Reset All Filters</button>
+          </div>
+        `;
+        return;
+      }
+
+      items.forEach(item => {
+        const isLiked = wishlist.includes(item.id);
+        const card = document.createElement("article");
+        card.className = "garment-card";
+        card.innerHTML = `
+          <div class="card-media">
+            <span class="card-badge">${item.badge}</span>
+            <button class="card-wish-btn ${isLiked ? 'liked' : ''}" data-id="${item.id}" aria-label="Save to Wishlist">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            </button>
+            <img src="${item.image}" alt="${item.title}" loading="lazy" />
+            <button class="quick-examine-btn" data-id="${item.id}">
+              <span>Examine Craft</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+          </div>
+          <div class="card-info">
+            <span class="card-craft-type">${item.craft}</span>
+            <h3 class="card-title">${item.title}</h3>
+            <p class="card-fabric">${item.fabric}</p>
+            <div class="card-bottom-row">
+              <div class="card-price-group">
+                <span class="card-price-label">Atelier Price</span>
+                <span class="card-price">${formatPrice(item.price)}</span>
+              </div>
+              <button class="card-add-btn" data-id="${item.id}">
+                <span>Add to Bag</span>
+              </button>
+            </div>
+          </div>
+        `;
+        gridEl.appendChild(card);
+      });
+    }
+
+    window.resetFilters = function() {
+      currentCategory = "all";
+      searchQuery = "";
+      sortOrder = "featured";
+      searchInput.value = "";
+      sortSelect.value = "featured";
+      updateTabButtons();
+      filterAndSortGarments();
+    };
+
+    function updateTabButtons() {
+      const tabs = filterTabsEl.querySelectorAll(".filter-tab");
+      tabs.forEach(tab => {
+        if (tab.getAttribute("data-category") === currentCategory) {
+          tab.classList.add("active");
+        } else {
+          tab.classList.remove("active");
+        }
+      });
+    }
+
+    // Modal Logic
+    function openModal(id) {
+      const item = GARMENTS.find(g => g.id === id);
+      if (!item) return;
+      activeModalItem = item;
+
+      modalImg.src = item.image;
+      modalImg.alt = item.title;
+      modalCraft.textContent = item.craft + " · " + item.badge;
+      modalTitle.textContent = item.title;
+      modalPrice.textContent = formatPrice(item.price);
+      modalDesc.textContent = item.desc;
+      modalFabric.textContent = item.fabric;
+      modalWeave.textContent = item.craft;
+      modalOrigin.textContent = item.origin;
+
+      modalEl.classList.add("open");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal() {
+      modalEl.classList.remove("open");
+      document.body.style.overflow = "";
+      activeModalItem = null;
+    }
+
+    // Event Listeners
+    filterTabsEl.addEventListener("click", e => {
+      const btn = e.target.closest(".filter-tab");
+      if (!btn) return;
+      currentCategory = btn.getAttribute("data-category");
+      updateTabButtons();
+      filterAndSortGarments();
+    });
+
+    searchInput.addEventListener("input", e => {
+      searchQuery = e.target.value;
+      filterAndSortGarments();
+    });
+
+    sortSelect.addEventListener("change", e => {
+      sortOrder = e.target.value;
+      filterAndSortGarments();
+    });
+
+    // Card interactions delegation
+    gridEl.addEventListener("click", e => {
+      const wishBtn = e.target.closest(".card-wish-btn");
+      if (wishBtn) {
+        e.stopPropagation();
+        const id = wishBtn.getAttribute("data-id");
+        toggleWishlist(id, wishBtn);
+        return;
+      }
+
+      const examineBtn = e.target.closest(".quick-examine-btn");
+      if (examineBtn) {
+        e.stopPropagation();
+        const id = examineBtn.getAttribute("data-id");
+        openModal(id);
+        return;
+      }
+
+      const addBtn = e.target.closest(".card-add-btn");
+      if (addBtn) {
+        e.stopPropagation();
+        const id = addBtn.getAttribute("data-id");
+        addToBag(id);
+        return;
+      }
+
+      const card = e.target.closest(".garment-card");
+      if (card) {
+        const id = card.querySelector(".quick-examine-btn")?.getAttribute("data-id");
+        if (id) openModal(id);
+      }
+    });
+
+    function toggleWishlist(id, btnEl) {
+      const idx = wishlist.indexOf(id);
+      if (idx > -1) {
+        wishlist.splice(idx, 1);
+        if (btnEl) btnEl.classList.remove("liked");
+        showToast("Garment removed from saved atelier pieces");
+      } else {
+        wishlist.push(id);
+        if (btnEl) btnEl.classList.add("liked");
+        showToast("Garment saved to your private wishlist");
+      }
+      localStorage.setItem("aleen_wishlist", JSON.stringify(wishlist));
+      updateBadgeCounters();
+      filterAndSortGarments();
+    }
+
+    function addToBag(id, size = "Standard Boutique Sizing") {
+      const item = GARMENTS.find(g => g.id === id);
+      if (!item) return;
+
+      const existing = bag.find(b => b.id === id && b.size === size);
+      if (existing) {
+        existing.qty = (existing.qty || 1) + 1;
+      } else {
+        bag.push({
+          id: item.id,
+          title: item.title,
+          price: item.price,
+          image: item.image,
+          size: size,
+          qty: 1
+        });
+      }
+      localStorage.setItem("aleen_bag", JSON.stringify(bag));
+      updateBadgeCounters();
+      showToast(`${item.title} added to Atelier Bag`);
+    }
+
+    // Modal size chip toggle
+    modalSizePicker.addEventListener("click", e => {
+      const chip = e.target.closest(".size-chip");
+      if (!chip) return;
+      modalSizePicker.querySelectorAll(".size-chip").forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+    });
+
+    modalAddBagBtn.addEventListener("click", () => {
+      if (!activeModalItem) return;
+      const selectedSize = modalSizePicker.querySelector(".size-chip.active")?.textContent || "Standard";
+      addToBag(activeModalItem.id, selectedSize);
+      closeModal();
+    });
+
+    modalBespokeBtn.addEventListener("click", () => {
+      if (!activeModalItem) return;
+      showToast(`Master tailor consultation initiated for ${activeModalItem.title}`);
+      closeModal();
+    });
+
+    modalCloseBtn.addEventListener("click", closeModal);
+    modalEl.addEventListener("click", e => {
+      if (e.target === modalEl) closeModal();
+    });
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape" && modalEl.classList.contains("open")) {
+        closeModal();
+      }
+    });
+
+    // Header buttons
+    document.getElementById("wishlistHeaderBtn").addEventListener("click", () => {
+      if (wishlist.length === 0) {
+        showToast("Your wishlist is empty. Tap the heart on any garment to save it.");
+        return;
+      }
+      showToast(`You have ${wishlist.length} saved masterpiece(s) in your private atelier list.`);
+    });
+
+    document.getElementById("bagHeaderBtn").addEventListener("click", () => {
+      if (bag.length === 0) {
+        showToast("Your atelier bag is currently empty.");
+        return;
+      }
+      const total = bag.reduce((sum, i) => sum + (i.price * (i.qty || 1)), 0);
+      showToast(`Atelier Bag: ${bag.length} unique creation(s) · Total: ${formatPrice(total)}`);
+    });
+
+    // Boot
+    updateTabButtons();
+    updateBadgeCounters();
+    filterAndSortGarments();
+  </script>
+</body>
+</html>
