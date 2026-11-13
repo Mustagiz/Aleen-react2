@@ -2660,12 +2660,21 @@ button:hover,
   display: none !important;
 }
 
-/* Scrollable Women 4-Card Carousel */
+/* Scrollable Women 5-Card Carousel */
+#women-new {
+  padding: clamp(20px, 3vh, 36px) 0 clamp(20px, 3vh, 36px) !important;
+  margin: 0 !important;
+}
+#women-new .sec-head {
+  margin-top: 0 !important;
+  margin-bottom: clamp(16px, 2.2vh, 26px) !important;
+}
+
 .w-track {
   display: flex !important;
   justify-content: flex-start !important;
-  gap: clamp(18px, 2vw, 36px) !important;
-  width: min(94vw, 1560px) !important;
+  gap: clamp(18px, 2vw, 32px) !important;
+  width: 100% !important;
   margin: 0 auto !important;
   outline: none !important;
   overflow-x: auto !important;
@@ -2673,7 +2682,9 @@ button:hover,
   scroll-snap-type: x mandatory !important;
   -webkit-overflow-scrolling: touch !important;
   scrollbar-width: none !important;
-  padding: 12px 2vw 28px !important;
+  padding: 10px 8vw 20px !important;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8vw, black calc(100% - 8vw), transparent 100%) !important;
+  mask-image: linear-gradient(to right, transparent 0%, black 8vw, black calc(100% - 8vw), transparent 100%) !important;
 }
 .w-track::-webkit-scrollbar {
   display: none !important;
@@ -2681,8 +2692,8 @@ button:hover,
   height: 0 !important;
 }
 .w-card {
-  flex: 0 0 clamp(290px, 30vw, 420px) !important;
-  max-width: 420px !important;
+  flex: 0 0 clamp(280px, 28vw, 380px) !important;
+  max-width: 400px !important;
   aspect-ratio: 397 / 551 !important;
   border-radius: 999px 999px 16px 16px !important;
   border: 1px solid rgba(214, 178, 110, 0.65) !important;
@@ -2693,6 +2704,32 @@ button:hover,
 .w-card:hover {
   transform: translateY(-8px) scale(1.01) !important;
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.75), 0 0 24px rgba(201, 163, 95, 0.25) !important;
+}
+
+/* Atelier Manager Portal Link in Footer */
+.f-atelier-portal-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #FFFFFF !important;
+  background: rgba(20, 37, 27, 0.6);
+  border: 1px solid rgba(201, 163, 95, 0.45);
+  border-radius: 999px;
+  padding: 9px 24px;
+  font-size: 11.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.f-atelier-portal-link:hover {
+  background: var(--gold) !important;
+  border-color: var(--gold-light) !important;
+  box-shadow: 0 4px 20px rgba(201, 163, 95, 0.35) !important;
+  transform: translateY(-2px);
+}
+.f-atelier-portal-link:hover span {
+  color: #241A0C !important;
 }
 
 /* Women Mega Dropdown: Single Ethnic Column + Wide Horizontal Editorial Image */
@@ -2902,9 +2939,11 @@ button:hover,
       </picture></div>
       <div class="veil"></div>
       <div class="slide-content">
-        <p class="eyebrow"><span class="eb-text">Tradition&nbsp;Meets&nbsp;Tomorrow</span><span class="eb-line"></span></p>
-        <h1 class="headline hl-women">More&nbsp;Than<br>Fashion</h1>
-        <p class="tagline">A story in every drape.</p>
+        <p class="eyebrow"><span class="eb-text" id="heroEbText">Tradition&nbsp;Meets&nbsp;Tomorrow</span><span class="eb-line"></span></p>
+        <div class="hero-hl-wrap" style="min-height: clamp(140px, 16vh, 200px); display: flex; align-items: center;">
+          <h1 class="headline hl-women" id="heroHeadline">More&nbsp;Than<br>Fashion</h1>
+        </div>
+        <p class="tagline" id="heroTagline">A story in every drape.</p>
         <div class="cta-row">
           <a class="btn btn-primary" href="collections.html"><span class="fill"></span><span class="lbl">Explore&nbsp;Collections</span><span class="arrow"><svg viewBox="0 0 28 10"><path d="M0 5h24M20 1l5 4-5 4"/></svg></span></a>
         </div>
@@ -2984,14 +3023,17 @@ button:hover,
           <a class="cta" href="lehengas.html"><span class="fill"></span><span class="lbl">Explore</span><span class="arrow"><svg viewBox="0 0 28 10"><path d="M0 5h24M20 1l5 4-5 4"/></svg></span></a>
         </div>
       </article>
+      <article class="w-card">
+        <img src="https://mahira2.netlify.app/assets/s4-room.jpg?v=1" alt="Model in an embroidered 32-kali georgette anarkali ensemble" loading="lazy" decoding="async">
+        <span class="w-scrim"></span>
+        <div class="w-caption">
+          <p class="w-kicker">New Collection</p>
+          <h3>Anarkali Sets</h3>
+          <p class="w-line">Voluminous flares &amp; royal grace.</p>
+          <a class="cta" href="anarkali.html"><span class="fill"></span><span class="lbl">Explore</span><span class="arrow"><svg viewBox="0 0 28 10"><path d="M0 5h24M20 1l5 4-5 4"/></svg></span></a>
+        </div>
+      </article>
     </div>
-    <div class="w-nav">
-      <button class="w-btn w-prev" aria-label="Previous"><svg viewBox="0 0 16 12"><path d="M16 6H4M7 2 3 6l4 4"/></svg></button>
-      <p class="w-count"><span class="w-cur">01</span><i></i><span>04</span></p>
-      <button class="w-btn w-next" aria-label="Next"><svg viewBox="0 0 16 12"><path d="M0 6h12M9 2l4 4-4 4"/></svg></button>
-    </div>
-    <p class="corner corner-br"><span>Made</span><span>For</span><span>What&rsquo;s Next</span></p>
-
   </section>
 
   <!-- ================= S02 · EXPLORE THE COLLECTION ================= -->
@@ -3246,6 +3288,13 @@ button:hover,
     </div>
   </div>
   <i class="f-orna"></i>
+  <div class="f-atelier-portal-bar" style="text-align: center; padding: 20px 0 10px;">
+    <a href="/login" class="f-atelier-portal-link" title="Atelier Staff & Garment Management Console">
+      <span class="spark" style="color: var(--gold);">✦</span>
+      <span style="font-weight: 700; letter-spacing: 1.8px; color: #FFFFFF;">Atelier Manager Login</span>
+      <span style="font-size: 11px; opacity: 0.85; color: var(--gold-light);">— Manage, Edit &amp; Update Garments</span>
+    </a>
+  </div>
   <div class="f-bottom">
     <p>&copy; 2026 Aleen Clothing. All rights reserved.</p>
     <nav aria-label="Legal">
@@ -4666,6 +4715,66 @@ window.MAHIRA_LOGO = window.ALEEN_LOGO;
       });
     });
   })();
+  /* ============================================================
+     HERO ROTATING LUXURY LINES
+     ============================================================ */
+  (function () {
+    var eb = $('#heroEbText'), hl = $('#heroHeadline'), tg = $('#heroTagline');
+    if (!eb || !hl || !tg) return;
+
+    var HERO_LINES = [
+      {
+        eb: 'Tradition\u00a0Meets\u00a0Tomorrow',
+        hl: 'More\u00a0Than<br>Fashion',
+        tg: 'A story in every drape.'
+      },
+      {
+        eb: 'Consciously\u00a0Curated\u00a0Haute\u00a0Couture',
+        hl: 'Poetry\u00a0In<br>Pure\u00a0Silk',
+        tg: 'Heirloom weaves tailored for the modern muse.'
+      },
+      {
+        eb: 'Centuries\u00a0Of\u00a0Indian\u00a0Artistry',
+        hl: 'Couture<br>Beyond\u00a0Time',
+        tg: 'Where Awadh needlecraft meets timeless grace.'
+      },
+      {
+        eb: 'The\u00a0Bespoke\u00a0Luxury\u00a0Atelier',
+        hl: 'Woven\u00a0With<br>Soul\u00a0&\u00a0Grace',
+        tg: 'Every thread an exquisite, conscious masterpiece.'
+      }
+    ];
+
+    var idx = 0;
+    setInterval(function () {
+      idx = (idx + 1) % HERO_LINES.length;
+      var next = HERO_LINES[idx];
+
+      if (window.gsap) {
+        gsap.to([eb, hl, tg], {
+          opacity: 0,
+          y: -10,
+          filter: 'blur(5px)',
+          duration: 0.5,
+          ease: 'power2.in',
+          onComplete: function () {
+            eb.innerHTML = next.eb;
+            hl.innerHTML = next.hl;
+            tg.innerHTML = next.tg;
+            gsap.fromTo([eb, hl, tg],
+              { opacity: 0, y: 14, filter: 'blur(5px)' },
+              { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.8, stagger: 0.08, ease: 'power2.out' }
+            );
+          }
+        });
+      } else {
+        eb.innerHTML = next.eb;
+        hl.innerHTML = next.hl;
+        tg.innerHTML = next.tg;
+      }
+    }, 5200);
+  })();
+
   /* dev hook */
   window.__aleen = window.__mahira = { goTo: goTo, hero: hero, applyFinalState: applyFinalState };
 })();

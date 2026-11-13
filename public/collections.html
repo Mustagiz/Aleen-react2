@@ -920,72 +920,353 @@
         padding-right: 20px;
       }
     }
-  </style>
+  
+
+/* ============================================================
+   CONSTANT HEADER STYLES — identical across all Aleen pages
+   ============================================================ */
+:root {
+  --hdr-h: clamp(104px, 12vh, 132px);
+  --hdr-h-solid: clamp(76px, 8.4vh, 92px);
+  --logo-h: clamp(88px, 9.8vh, 112px);
+  --logo-h-solid: clamp(58px, 6.2vh, 70px);
+  --hdr-x: clamp(22px, 3.2vw, 64px);
+  --nav-gap: clamp(26px, 2.8vw, 54px);
+  --util-gap: clamp(10px, 1.15vw, 20px);
+}
+
+#header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  column-gap: clamp(16px, 2vw, 40px);
+  height: var(--hdr-h-solid);
+  padding: 0 var(--hdr-x);
+  transition: height 0.5s var(--ease), background 0.5s var(--ease), box-shadow 0.5s var(--ease);
+  background: rgba(11, 21, 14, 0.95);
+  backdrop-filter: blur(16px) saturate(1.05);
+  -webkit-backdrop-filter: blur(16px) saturate(1.05);
+  box-shadow: 0 1px 0 rgba(201, 163, 95, 0.2);
+}
+
+.brand-slot {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2; line-height: 0;
+  pointer-events: none;
+}
+.brand-slot .brand { pointer-events: auto; }
+.nav-side { display: flex; align-items: center; gap: clamp(13px, 1.4vw, 28px); }
+.nav-center { display: contents; }
+.logo-space { display: none; }
+#header { --logo-half: calc(var(--logo-h-solid) * 0.5925); }
+.nav-l, .nav-r {
+  position: absolute; top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+.nav-l { right: calc(50% + var(--logo-half) + var(--nav-gap)); }
+.nav-r { left:  calc(50% + var(--logo-half) + var(--nav-gap)); }
+.nav-utils { display: none !important; }
+
+.brand { display: block; line-height: 0; }
+#brandLogo {
+  display: block;
+  height: var(--logo-h-solid); width: auto;
+}
+
+.nav-side a {
+  position: relative;
+  display: block;
+  padding: 10px 0;
+  font-size: clamp(10px, 0.76vw, 13px);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(240, 232, 210, 0.96);
+  white-space: nowrap;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+.nav-side a::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 2px;
+  height: 1px; background: var(--gold);
+  transform: scaleX(0); transform-origin: left center;
+  transition: transform 0.3s ease;
+}
+.nav-side a:hover, .nav-side a.is-open { color: var(--gold-light); }
+.nav-side a:hover::after, .nav-side a.is-open::after { transform: scaleX(1); }
+
+/* Mega Dropdown */
+.mega {
+  position: absolute; left: 0; right: 0; top: 100%;
+  visibility: hidden; z-index: 99;
+}
+.mega.is-open { visibility: visible; }
+.mega-sheet {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(15, 27, 18, 0.985) 0%, rgba(11, 21, 14, 0.99) 100%);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-top: 1px solid rgba(201, 163, 95, 0.22);
+  box-shadow: 0 30px 70px rgba(4, 10, 6, 0.5);
+}
+.mega-inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) clamp(210px, 17vw, 290px);
+  gap: clamp(20px, 2.6vw, 54px);
+  width: min(94vw, 1560px);
+  margin: 0 auto;
+  padding: clamp(30px, 3.4vh, 48px) 0 clamp(34px, 3.8vh, 54px);
+}
+.mega-inner.is-women {
+  display: grid !important;
+  grid-template-columns: minmax(260px, 340px) 1fr !important;
+  gap: clamp(36px, 4.5vw, 80px) !important;
+  align-items: center !important;
+  width: min(94vw, 1500px) !important;
+  padding: 36px 0 42px !important;
+}
+.mg-col { min-width: 0; }
+.mg-col h4 {
+  font-size: 11px; letter-spacing: 0.32em; text-transform: uppercase;
+  font-weight: 600; color: #b89a62; margin-bottom: 12px;
+}
+.mg-col > i {
+  display: block; width: 26px; height: 1px; background: rgba(201, 163, 95, 0.6);
+  margin-bottom: 16px;
+}
+.mg-col a {
+  position: relative; display: block; padding: 7px 0;
+  font-size: 14.5px; letter-spacing: 0.035em;
+  color: rgba(238, 230, 208, 0.96); text-decoration: none;
+  transition: color 0.28s ease, transform 0.28s ease;
+  width: fit-content;
+}
+.mg-col a:hover { color: var(--gold-light); transform: translateX(3px); }
+.mg-promo {
+  position: relative; overflow: hidden; border-radius: 12px;
+  border: 1px solid rgba(184, 154, 98, 0.75);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+  min-height: 280px; height: 290px;
+  display: block; text-decoration: none;
+}
+.mg-promo img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  object-position: center 30%; transition: transform 0.8s ease;
+}
+.mg-promo:hover img { transform: scale(1.04); }
+.mg-promo span {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(180deg, rgba(8, 14, 9, 0.1) 30%, rgba(8, 14, 9, 0.88) 100%);
+}
+.mg-promo b {
+  position: absolute; left: 6%; bottom: 24%; z-index: 2;
+  font-family: var(--serif); font-size: clamp(20px, 1.8vw, 28px);
+  color: var(--cream-hi); letter-spacing: 0.08em; text-transform: uppercase;
+}
+.mg-promo em {
+  position: absolute; left: 6%; bottom: 12%; z-index: 2;
+  font-family: var(--serif-i); font-style: italic; font-size: 15px;
+  color: rgba(233, 224, 200, 0.96);
+}
+
+/* Mobile Nav Drawer */
+.menu-btn {
+  display: none; width: 44px; height: 44px;
+  position: relative; z-index: 130; background: none; border: none; cursor: pointer;
+}
+.menu-btn span {
+  position: absolute; left: 11px; width: 22px; height: 1.5px;
+  background: var(--cream); transition: transform 0.3s, top 0.3s;
+}
+.menu-btn span:nth-child(1) { top: 18px; }
+.menu-btn span:nth-child(2) { top: 26px; }
+.menu-btn.is-active span:nth-child(1) { transform: rotate(45deg); top: 22px; }
+.menu-btn.is-active span:nth-child(2) { transform: rotate(-45deg); top: 22px; }
+
+#mobileNav {
+  position: fixed; inset: 0; z-index: 95;
+  background: rgba(4, 9, 6, 0.98);
+  backdrop-filter: blur(20px);
+  transform: translateX(-100%);
+  transition: transform 0.4s var(--ease);
+  display: flex; flex-direction: column;
+}
+#mobileNav.is-open { transform: translateX(0); }
+.mn-top {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px; border-bottom: 1px solid rgba(201, 163, 95, 0.2);
+}
+.mn-back {
+  background: none; border: none; color: var(--gold); cursor: pointer; display: flex; align-items: center;
+}
+.mn-title { font-family: var(--serif); font-size: 16px; color: var(--gold-light); letter-spacing: 2px; }
+.mn-body { flex: 1; overflow-y: auto; padding: 24px; }
+.mn-list { list-style: none; margin: 0; padding: 0; }
+.mn-list li { margin-bottom: 14px; }
+.mn-list a {
+  color: var(--cream); text-decoration: none; font-size: 16px; font-weight: 500;
+  display: block; transition: color 0.2s;
+}
+.mn-list a:hover { color: var(--gold); }
+.mn-group-title {
+  color: var(--gold); font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  margin-top: 20px; margin-bottom: 8px; font-weight: 700;
+}
+.mn-sub { padding-left: 16px; font-size: 14px !important; color: rgba(255, 255, 255, 0.8) !important; }
+.mn-atelier-login {
+  color: var(--gold-spark) !important; font-weight: 700 !important;
+  margin-top: 24px; padding: 12px 18px; border: 1px solid var(--gold); border-radius: 999px; text-align: center;
+}
+
+@media (max-width: 900px) {
+  .menu-btn { display: block !important; }
+  .nav-side { display: none !important; }
+  .brand-slot { left: 50%; transform: translate(-50%, -50%); }
+}
+
+/* Badge Suppression Rule: Never display BESTSELLER or pill badges on any garment card */
+.card-badge, .bestseller-badge {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Footer Atelier Manager Portal */
+.f-atelier-portal-bar {
+  text-align: center;
+  padding: 24px 0 16px;
+  border-top: 1px solid rgba(201, 163, 95, 0.2);
+  margin-top: 32px;
+}
+.f-atelier-portal-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #FFFFFF !important;
+  background: rgba(20, 37, 27, 0.6);
+  border: 1px solid rgba(201, 163, 95, 0.45);
+  border-radius: 999px;
+  padding: 10px 26px;
+  font-size: 12px;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.f-atelier-portal-link:hover {
+  background: var(--gold) !important;
+  border-color: var(--gold-light) !important;
+  box-shadow: 0 4px 20px rgba(201, 163, 95, 0.4) !important;
+  transform: translateY(-2px);
+}
+.f-atelier-portal-link:hover span {
+  color: #241A0C !important;
+}
+
+</style>
 </head>
 <body>
 
   <!-- Top bar -->
-  <aside class="atelier-announcement">
+  <aside class="atelier-announcement" style="margin-top: var(--hdr-h-solid); position: relative; z-index: 90;">
     <span class="spark">✦</span>
     <span>Aleen Haute Couture · Handcrafted Luxury Editions · Worldwide Atelier Shipping</span>
     <span class="spark">✦</span>
   </aside>
 
   <!-- Sticky Nav -->
-  <header class="atelier-nav">
-    <div class="nav-inner">
-      <a href="mahira.html" class="nav-back-link" title="Return to Aleen Landing Page">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="19" y1="12" x2="5" y2="12"></line>
-          <polyline points="12 19 5 12 12 5"></polyline>
-        </svg>
-        <span>Back to Atelier</span>
-      </a>
+  
+<!-- ======================= HEADER ======================= -->
+<header id="header" class="is-solid">
+  <button id="menuBtn" class="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav">
+    <span></span><span></span>
+  </button>
 
-      <a href="mahira.html" class="brand-crest" title="Aleen Clothing">
-        <div class="emblem-wrapper">
-          <svg class="emblem-svg" viewBox="0 0 100 100">
-            <defs>
-              <linearGradient id="emblemGold" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#ECCF8B"/>
-                <stop offset="50%" stop-color="#C9A35F"/>
-                <stop offset="100%" stop-color="#8A6420"/>
-              </linearGradient>
-            </defs>
-            <circle cx="50" cy="50" r="46" fill="#0b1710" stroke="url(#emblemGold)" stroke-width="2.5" />
-            <circle cx="50" cy="50" r="41" fill="none" stroke="url(#emblemGold)" stroke-dasharray="2 3" stroke-width="1.2" opacity="0.8" />
-            <path d="M50 14 L53 22 L61 22 L55 27 L57 35 L50 30 L43 35 L45 27 L39 22 L47 22 Z" fill="url(#emblemGold)" opacity="0.85" />
-            <text x="50" y="65" font-family="'Playfair Display', serif" font-size="34" font-weight="700" font-style="italic" fill="url(#emblemGold)" text-anchor="middle">A</text>
-            <circle cx="50" cy="78" r="2.5" fill="url(#emblemGold)" />
-          </svg>
-          <div class="brand-text-col">
-            <span class="brand-title">A L E E N</span>
-            <span class="brand-sub">Consciously Curated</span>
-          </div>
-        </div>
-      </a>
+  <div class="nav-center">
+    <nav class="nav-side nav-l" aria-label="Primary">
+      <a href="mahira.html#top">Home</a>
+      <a aria-expanded="false" aria-haspopup="true" data-mega="women" href="mahira.html#women-new">Women</a>
+      <a aria-expanded="false" aria-haspopup="true" data-mega="kalakaari" href="mahira.html#kalakaari">Kalakaari</a>
+    </nav>
+    <span class="logo-space" aria-hidden="true"></span>
+    <nav class="nav-side nav-r" aria-label="Collections">
+      <a href="mahira.html#women-new">New Arrivals</a>
+      <a href="mahira.html#best">Best Sellers</a>
+      <a href="mahira.html#storyEd">Our Story</a>
+    </nav>
+  </div>
 
-      <div class="nav-actions">
-        <button class="action-btn" id="wishlistHeaderBtn" title="Wishlist Items">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-          </svg>
-          <span>Saved</span>
-          <span class="badge-count" id="wishCount">0</span>
-        </button>
+  <div class="brand-slot">
+    <a class="brand" id="brand" href="mahira.html#top" aria-label="Aleen Clothing — home">
+      <svg id="brandLogo" viewBox="0 0 1600 1351" role="img" aria-label="Aleen Clothing"><defs>
+  <linearGradient id="lgGold" gradientUnits="userSpaceOnUse" x1="436.7" y1="105.6" x2="1165.3" y2="834.2">
+    <stop offset="0%" stop-color="#8a6420"/>
+    <stop offset="32%" stop-color="#c9a35f"/>
+    <stop offset="50%" stop-color="#f0d48c"/>
+    <stop offset="68%" stop-color="#c9a35f"/>
+    <stop offset="100%" stop-color="#7c5a1d"/>
+  </linearGradient>
+  <linearGradient id="lgWmGold" gradientUnits="userSpaceOnUse" x1="0" y1="1000" x2="1600" y2="1180">
+    <stop offset="0%" stop-color="#9a7226"/>
+    <stop offset="30%" stop-color="#d9b269"/>
+    <stop offset="50%" stop-color="#f2d896"/>
+    <stop offset="70%" stop-color="#d9b269"/>
+    <stop offset="100%" stop-color="#9a7226"/>
+  </linearGradient>
+  <linearGradient id="lgSelGold" gradientUnits="userSpaceOnUse" x1="280" y1="0" x2="1320" y2="0">
+    <stop offset="0%" stop-color="#8a6420"/>
+    <stop offset="45%" stop-color="#e7c87f"/>
+    <stop offset="60%" stop-color="#f0d48c"/>
+    <stop offset="100%" stop-color="#8a6420"/>
+  </linearGradient>
+</defs><g id="lgAll"><g id="lgEmblem"><circle id="lgRing" cx="801" cy="469.9" r="364.3" fill="none" stroke="url(#lgGold)" stroke-width="11.5"/><path id="lgMFill" d="M812.6 327.5 910 578.8Q916 593.3 923.1 598.7Q930.1 604.1 936.1 604.5V612.5Q925.7 611.7 911 611.5Q896.4 611.3 881.2 611.3Q863.5 611.3 848.3 611.5Q833.1 611.7 823.4 612.5V604.5Q843.9 603.7 849.5 597.5Q855.1 591.3 847.1 570.8L776.5 380.4L783.8 371.6L719.6 537.9Q712 558 710.4 570.8Q708.8 583.6 712.4 590.9Q716 598.1 724.4 601.1Q732.9 604.1 745.3 604.5V612.5Q732.5 611.7 720.4 611.5Q708.4 611.3 696.4 611.3Q687.6 611.3 679.7 611.5Q671.9 611.7 665.9 612.5V604.5Q674.7 602.5 683.4 594.1Q692 585.6 700 564.8L791.8 327.5Q796.6 327.9 802.2 327.9Q807.8 327.9 812.6 327.5ZM847.5 497.1V505.1H728L732.1 497.1Z" fill="url(#lgGold)" fill-rule="evenodd"/><g id="lgDia"><path d="M798.5 4L800 5.5L800 7.5L811 28.5L822 44.5L832.5 57L837 60.5L837.5 62L838.5 62L851.5 74L875 88.5L866.5 89L865.5 90L858.5 91L857.5 92L852.5 93L840.5 100L836.5 100L835.5 99L822.5 99L821.5 98L818 97.5L826.5 90L836 85.5Q826 79.5 819 70.5L809 57.5L808 54.5L804 49.5L800 40.5L798.5 39L797 40.5L797 42.5L795 44.5L792 51.5L784 63.5L768.5 80L761 85.5L770.5 90L780 98.5L779.5 99L767.5 99L766.5 100L756.5 100L751.5 96L749.5 96L744.5 93L742.5 93L738.5 91L735.5 91L731.5 89Q730.5 91 729.5 89L722 88.5L733.5 82L751.5 69L771 49.5L786 28.5L797 7.5L797 5.5L798.5 4Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-dia lg-dia-n"/><path d="M757.5 840L759.5 841L768.5 841L769.5 842L779.5 842L780 842.5L773.5 849L764 853.5L785 873.5Q788.5 881 794 886.5L797 893.5L799 895.5L799 897.5L801.5 900L804 893.5Q808.3 889.8 810 883.5L826.5 863L838 854.5L837.5 853L835.5 853Q833.2 849.8 828.5 849L822 842.5L822.5 842L833.5 842L834.5 841L843.5 841L844.5 840L846.5 842L860.5 848L863.5 848L867.5 850L876.5 850L877 850.5L876.5 852L871.5 854L869.5 856L861.5 860L858.5 863L855.5 864L841 876.5L840.5 878L839.5 878L834 883.5L834 884.5L827 891.5L822 899.5L819 902.5L818 905.5L815 908.5L804 928.5L804 930.5L801.5 936L798 930.5L798 928.5L796 926.5L796 924.5L793 920.5L793 918.5L791 916.5L790 913.5L781 899.5L770 885.5L760.5 876L759 875.5L757.5 873L756.5 873L746.5 864L734.5 856L725 851.5L725.5 850L734.5 850L738.5 848L745.5 847L755.5 842L757.5 840Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-dia lg-dia-s"/><path d="M1184.5 385L1191 397.5L1197 406.5L1206 416.5L1206 417.5L1220.5 432L1226 435.5L1226.5 437L1240.5 447L1245.5 449L1252.5 454L1269 461.5L1268.5 463L1266.5 463L1261.5 466L1259.5 466L1257.5 468L1255.5 468Q1251.1 472.1 1244.5 474L1223.5 489L1213.5 499L1212 499.5L1212 500.5L1203 509.5L1196 518.5L1187 532.5L1186 536.5L1184.5 538L1184 534.5L1183 533.5L1183 527.5L1182 526.5L1182 523.5L1181 522.5L1180 516.5L1175 506.5L1173 504.5L1173 490.5L1174 489.5L1174.5 481L1181 487.5L1187.5 499L1191 493.5L1206.5 478L1209.5 477L1221.5 468L1232.5 463L1234 461.5Q1230.6 461.4 1229.5 459L1227.5 459L1213.5 450Q1212.8 451.8 1212 450.5Q1214.2 449.3 1211.5 448L1207.5 446L1198 437.5L1197.5 436L1196 435.5L1196 434.5L1190 428.5L1187.5 424L1184 431.5L1178.5 439L1176 440.5L1174.5 443L1173 442.5L1173 437.5L1172 436.5L1172 427.5Q1170 426.5 1171 422.5L1179 409.5L1179 407.5L1182 400.5L1182 397.5L1183 396.5L1183 390.5L1184 389.5L1184.5 385Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-dia lg-dia-e"/><path d="M414.5 405L416 405.5L416 411.5L417 412.5L417 417.5Q418.8 418.3 418 421.5L420 424.5L422 431.5L430 443.5L430 450.5L429 451.5L429 464.5L428.5 465Q417.5 457 412.5 443L398.5 459L378.5 474Q373 475.5 369.5 479L367.5 479L366 480.5L367.5 482L369.5 482Q373 485.5 378.5 487L391.5 496L395.5 500Q396.3 498.3 397 499.5Q394.8 500.8 397.5 502L398.5 502L405 508.5L411.5 517L413 516.5L419 505.5L426.5 498L429.5 496L430 503.5L431 504.5L431 512.5Q432.5 513 432 515.5L428 519.5L427 522.5L423 527.5L422 531.5L419 536.5L418 542.5L417 543.5L417 546.5L416 547.5L416 555.5L414.5 557L409 545.5L394.5 526L393 525.5L393 524.5L378.5 510L377.5 510L372.5 505L368.5 503L364.5 499L361.5 498L353.5 492L338.5 484L336.5 484L332.5 482L331 480.5L332.5 479L340.5 475L342.5 475L344.5 473L351.5 470L365.5 461L379.5 450L395 434.5L409 415.5L414.5 405Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-dia lg-dia-w"/></g><g id="lgOrn"><path d="M1080.5 405L1083 406.5L1085 409.5L1085 428.5L1086 429.5Q1085.5 433 1087 434.5L1090.5 438Q1093.3 440.2 1099.5 439L1104.5 433L1107.5 432L1113 434.5Q1114.5 436 1114 439.5L1110.5 446L1109 446.5L1107.5 449L1100.5 452L1093.5 452L1092 453.5L1089 459.5L1093 462.5L1093 464.5L1089 468.5L1092.5 475L1098.5 475Q1099 476.5 1101.5 476Q1107.7 478.3 1111 483.5L1113 487.5L1113 491.5L1108.5 495L1103.5 495L1097.5 488L1092.5 488L1088.5 490L1086 492.5L1084 496.5Q1085 500.5 1083 501.5L1083 516.5L1078.5 522L1077 521.5Q1078.7 519.7 1078 515.5L1077 514.5L1077 511.5L1074 504.5Q1075 500.5 1073 499.5L1073 494.5L1074 493.5Q1073.3 489.3 1075 487.5L1080.5 481L1085 478.5L1085 476.5L1073 463.5L1080.5 455L1083 453.5L1086 448.5Q1080.4 446.1 1077 441.5L1077 439.5L1075 436.5L1075 424.5L1080 412.5L1080.5 405Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M996.5 173L1006.5 179L1009 181.5L1009 191.5L1008 192.5L1008 195.5L1007 196.5L1006 201.5L1001 210.5L994.5 217L993 217.5L992.5 219L980.5 225Q977.3 224.2 976.5 226L965.5 226L964.5 225L961.5 225L954.5 222L948 215.5L946 212.5L945 206.5L944 205.5L944 195.5L945 194.5L946 189.5L949.5 185L952.5 183L962.5 183L967 186.5L968 188.5L968 196.5L965 201.5L965 204.5L970.5 209L979.5 209L989 202.5L992 196.5L994 194.5L994 192.5L996 188.5L997 177.5Q994.9 176.4 996.5 173Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M1135.5 347L1138 353.5L1138 355.5L1139 356.5L1139 358.5L1140 359.5L1140 361.5L1141 362.5L1141 366.5L1136 377.5L1132 383.5L1120.5 395L1111.5 400L1098.5 402Q1097.3 399.7 1092.5 401L1086.5 398L1081 392.5L1078 386.5Q1078.8 383.3 1077 382.5L1077 377.5L1079 372.5L1082.5 369L1086.5 367L1091.5 367Q1092 368.5 1094.5 368L1097 370.5L1098 372.5L1095.5 376Q1086.8 374.3 1085 379.5L1085 386.5L1088.5 392L1096.5 396L1103.5 396L1113.5 392L1122 384.5L1128 375.5L1130 368.5L1132 365.5L1132 362.5L1134 357.5L1134 350.5L1135.5 347Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M1035.5 202L1042 208.5Q1041.5 211 1043 211.5L1043 223.5L1042 224.5L1041 230.5L1037 238.5L1028 248.5L1028 249.5L1031.5 253L1033.5 253L1038.5 249L1044.5 246L1047.5 246L1051.5 244L1063.5 244L1067.5 246L1070.5 246L1072.5 248L1074.5 248L1082 253.5L1081.5 255L1073.5 256L1063.5 260L1042.5 260Q1041.8 258.3 1038.5 259L1038 261.5L1041 267.5Q1040 271.5 1042 272.5L1042 278.5L1041 279.5L1041 282.5L1039 286.5L1033.5 292L1030.5 292L1024 287.5L1021 282.5L1021 278.5Q1019.5 278 1020 275.5L1021 274.5L1021 269.5L1022 268.5L1022 265.5L1024 262.5L1024 260.5Q1023.3 257.3 1018.5 258L1014.5 260L1002.5 260L997.5 258L992 252.5L990 249.5L990 247.5L992.5 244L1001.5 239L1012.5 239L1015.5 241L1017.5 241L1024.5 246L1025 245.5L1025 232.5L1024 231.5L1024 224.5L1025 223.5L1025 220.5L1027 217.5L1027 215.5L1029 213.5Q1031 206.5 1035.5 202Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M896.5 128L900.5 128L901.5 129L906.5 130L908 131.5L902.5 134L892 143.5L889 147.5L885 157.5L885 165.5L886 166.5L887 171.5L891.5 176L895.5 178Q899 177.5 900.5 179Q901 177.5 903.5 178L906 175.5Q908.2 172.7 907 166.5Q908.8 165.8 908 162.5L909.5 161L913.5 161L917 163.5L919 167.5L919 175.5L917 180.5L912.5 186L907.5 189L896.5 189L891.5 187L885 181.5L880 171.5Q880.8 168.3 879 167.5L879 157.5L880 156.5L880 153.5L884 143.5L891.5 133L894 131.5L896.5 128Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M1079.5 277L1094.5 277Q1095.5 279 1099.5 278L1103 280.5L1122 314.5L1122 316.5L1131 334.5L1131 337.5L1127.5 342L1123.5 345L1115.5 347Q1114.8 345.2 1111.5 346L1106 342.5L1103 337.5L1102 332.5L1103 331.5Q1102.5 328 1104 326.5L1107.5 323L1112.5 321L1115.5 321L1116.5 320Q1117.3 321.8 1118 320.5Q1119.5 319 1119 315.5L1118 314.5L1118 310.5Q1116.5 310 1117 307.5Q1114.5 306 1114 302.5L1106.5 295L1097.5 290L1089.5 289L1088.5 288L1083.5 288L1082.5 289L1077.5 289Q1077 290.5 1074.5 290Q1073 292.5 1069.5 293L1065 297.5L1063 300.5L1063 302.5L1061 306.5L1061 310.5L1062 311.5Q1060 312.5 1062 313.5Q1061.5 317.5 1064.5 318L1069 317.5L1069 316.5L1073.5 312L1077.5 312L1083 315.5L1085 319.5L1085 324.5L1082 331.5L1078.5 335L1072.5 338L1063.5 338L1056.5 335L1052 331.5L1049 327.5L1049 325.5L1047 322.5Q1048 318.5 1046 317.5L1046 310.5Q1048.3 309.3 1047 304.5L1049 301.5L1050 297.5L1054 291.5L1059.5 286L1069.5 280L1071.5 280L1075.5 278L1078.5 278L1079.5 277Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M1154.5 439L1156 439.5Q1155 443.5 1157 444.5L1157 453.5L1149.5 458L1147.5 458L1146.5 459L1144.5 459L1138 461.5L1139.5 463L1142.5 463L1143.5 464L1148.5 465L1151.5 467L1153.5 467L1155.5 469L1158 469.5Q1158.5 472 1157 472.5L1157 485.5L1156.5 486L1143.5 476L1132.5 471L1130.5 469L1128.5 469L1125.5 467L1123.5 467L1117.5 464L1112 462.5L1112.5 461L1119.5 459L1122.5 457L1124.5 457L1129.5 454L1131.5 454L1135.5 452L1137.5 450L1144.5 447L1154.5 439Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M981.5 163L995 171.5L990 182.5L984.5 188Q982 190 976.5 189L974 187.5L973 184.5Q974.5 184 974 181.5Q978.8 178.3 981 172.5L981 168.5Q982.5 168 982 165.5Q980.3 164.8 981.5 163Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M1054.5 222L1056.5 222L1064 229.5L1068 234.5L1064.5 238L1058.5 241L1048.5 243L1047.5 242Q1046.7 243.8 1046 242.5L1046 237.5L1047 236.5L1048 231.5L1054.5 222Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M924.5 115L947.5 115L948.5 116L952.5 116L953.5 117L956.5 117L957.5 118L962.5 119L965.5 121L967.5 121L971.5 123L973.5 125L979.5 128L994 141.5L999 148.5L1003 156.5Q1002.2 157.7 1001.5 156L990.5 149L985.5 147L983.5 145L972.5 140L970.5 138L964.5 135L962.5 135L951.5 129L949.5 129L944.5 126L942.5 126L934.5 122L932.5 122L931.5 121L926.5 120L923.5 118L921.5 118L920 116.5L923.5 116L924.5 115Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M1134.5 303L1138 307.5L1138 309.5L1141 315.5L1140 315.5L1134 303.5L1134.5 303Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M1072.5 213L1077 213.5L1077 215.5L1075.5 218L1072 214.5L1072.5 213Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M1184.5 448L1186.5 448L1199 460.5L1199 461.5L1190.5 471L1186.5 474L1184.5 474L1174 467.5L1174 454.5L1175.5 453Q1181 451.5 1184.5 448Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M823.5 153L827.5 153L831 155.5Q832.7 157.3 832 161.5L825 167.5L824 171.5Q825.8 172.3 825 175.5L828.5 179L832.5 181L841.5 182L842.5 181L855.5 181L860.5 183L864 186.5L863.5 187L853.5 187L850.5 189L848.5 189L844.5 191L841.5 191L840.5 192L828.5 192L821.5 189L816 184.5L814.5 181L810.5 182L797.5 194L796.5 194L780.5 181L773.5 189L765.5 193Q761.5 192 760.5 194L754.5 194L753.5 193L746.5 192L739.5 189L732.5 189L730.5 190L730 188.5L732.5 186L736.5 184Q740.5 185 741.5 183L759.5 183L766 179.5L768 176.5L769 170.5L766.5 167Q762.6 166.4 761 163.5Q759.5 156.5 763.5 155Q765 153.5 768.5 154L776.5 158L781 162.5L783 169.5L784 170.5L784.5 175L788.5 176L791.5 178L797.5 173L801.5 178L807.5 175L810 172.5L810 166.5Q811.5 166 811 163.5L817.5 156L823.5 153Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M563.5 206L575 226.5Q574.3 229.7 576 230.5L576 243.5Q573.7 244.7 575 249.5L576 250.5L576.5 254L582.5 249L584.5 249L587.5 247L595.5 246L605.5 250L610 254.5L610 257.5L603.5 265L600.5 267Q597.3 266.3 596.5 268L588.5 268L587.5 267L583.5 267L579.5 265L576 269.5L578 272.5L578 274.5L580 278.5L580 289.5Q577.7 295.7 572.5 299Q571 300.5 567.5 300L563 296.5L559 288.5L559 276.5L563 266.5Q562.2 265.2 561.5 267L555.5 267L554.5 268L538.5 268Q537.8 266.3 534.5 267L531.5 265L528.5 265L523.5 263L518 262.5L522.5 258L525.5 256L527.5 256L529.5 254Q532 254.5 532.5 253L536.5 253L537.5 252L549.5 252L550.5 253L556.5 254L558.5 256L560.5 256L568.5 261L572 257.5L572 255.5L569 253.5L563 245.5L558 233.5L558 216.5Q560.2 215.2 559 210.5L560.5 208L563.5 206Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M693.5 131L697.5 131L700.5 133L711 143.5L716 150.5L717 154.5L719 157.5L719 159.5L721 163.5L721 168.5Q723 169.5 722 173.5L721 174.5L721 178.5L718 185.5L711.5 193L703.5 197L694.5 197L688.5 194L685 190.5L683 187.5L681 178.5Q683 177.5 682 173.5L686.5 169L692 169.5L693 171.5L693 177.5Q695 178.5 694 182.5L697.5 186L704.5 186Q710 184 713 179.5L715 175.5L715 163.5L712 156.5L708 150.5L703.5 146L695.5 140L687.5 136L684 135.5L684.5 134L686.5 134L693.5 131Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M465.5 353L466 361.5L467 362.5L467 367.5L468 368.5L468 371.5L469 372.5L470 377.5L478 391.5L484.5 398L487.5 400L489.5 400L491.5 402Q494 401.5 494.5 403L498.5 403L499.5 404L502.5 404L503.5 403L506.5 403L510.5 401L514 397.5L516 393.5Q514 392.5 516 391.5L516 388.5L512.5 384L505.5 384L503 381.5Q502.3 376.8 505.5 376Q508 376.5 508.5 375L514.5 375Q515 376.5 517.5 376L521 379.5L523 383.5L523 393.5L521 398.5L517.5 403L509.5 408L503.5 409L502.5 410L499.5 410L498.5 409L493.5 409L492.5 408L485.5 406L479.5 402L469 392.5L465 386.5L459 372.5L460 371.5L460 368.5L461 367.5L461 365.5L462 364.5L462 362.5L463 361.5L463 359.5L465.5 353Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M619.5 164L621 164.5Q619.5 166 620 169.5L619 170.5L619 178.5L621 183.5L626 188.5Q627.7 190.3 627 194.5L623.5 197L619.5 197Q619 195.5 616.5 196L610 189.5L605.5 179L605 182.5L604 183.5L604 193.5L605 194.5L605 197.5L608 204.5L616.5 214L622.5 217L628.5 217L635 213.5L635 207.5L633 205.5Q633.5 203 632 202.5L632 197.5L637.5 191Q640 191.5 640.5 190L645.5 190L652 193.5L656 200.5L656 216.5L650.5 226L649 226.5L648.5 228L638.5 233Q635.2 232.3 634.5 234L624.5 234L623.5 233L620.5 233L619.5 232L614.5 231L608.5 227L600 218.5L597 212.5L595 210.5L595 208.5L592 201.5L591 186.5L592 185.5L592.5 182L619.5 164Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M513.5 284L514.5 285L522.5 285L523.5 286L529.5 287L537.5 291L545 297.5L553 310.5Q552 314.5 554 315.5L554 321.5L555 322.5L554 323.5L554 328.5Q552.3 329.3 553 332.5Q550.3 338.3 545.5 342L539.5 345L530.5 346L529.5 345L526.5 345L522.5 343L518 338.5L516 333.5L516 326.5L521.5 320Q524.8 320.8 525.5 319L531 323.5L531.5 325L535.5 326L538 323.5Q537.5 321 539 320.5L539 311.5L537 307.5L530.5 300L523.5 297L520.5 297L519.5 296L509.5 296L508.5 297L502.5 298L493 303.5L492.5 305L488 308.5L483 316.5Q483.8 319.8 482 320.5L482 327.5L485.5 329L489.5 329Q494.3 330.7 497 334.5L498 336.5L498 344.5Q496.3 349.3 492.5 352L488.5 354L481.5 354L476.5 352L471 347.5L469 344.5L469 342.5L472 336.5L472 334.5L475 329.5L475 327.5L481 316.5L481 314.5L484 308.5L486 306.5L491 295.5L496.5 287Q499 287.5 499.5 286L503.5 286L504.5 285L512.5 285L513.5 284Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M807.5 114L808.5 115L822.5 115L823 115.5L820 118.5L819 121.5L816 124.5L809 135.5L809 137.5L807 139.5L805 143.5L805 145.5L803 148.5L803 150.5L800 156.5L798.5 162L797 159.5L795 151.5L793 148.5L793 146.5L791 143.5L791 141.5L777.5 119L776 118.5L774 115.5L774.5 115L790.5 115L794 121.5L794 123.5L796 126.5L797 132.5L798.5 135L800 132.5L800 129.5L803 123.5L803 121.5L807.5 114Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M541.5 227L547 230.5L553 240.5L553 242.5L555 246.5L555 249.5L554.5 250L545.5 250L538.5 247L532 241.5L531 238.5L541.5 227Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M661.5 122L668 122.5L660.5 126L658.5 126L653.5 129L651.5 129L638.5 136L636.5 136L632.5 138L630.5 140L612.5 149L602.5 156L602 155.5L604 153.5Q608.2 145.2 615.5 140L628.5 131L632.5 130L637.5 127L639.5 127L643.5 125L646.5 125L647.5 124L650.5 124L651.5 123L660.5 123L661.5 122Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M798.5 74L802 75.5L802.5 77L805 78.5L805.5 80L807 80.5L807.5 82L812 85.5L813 87.5L806.5 98L792.5 98L791 96.5L790 93.5L786 88.5L786 86.5L793.5 78L798.5 74Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M1092.5 533L1105.5 533L1106.5 534L1111.5 535L1121.5 541L1131 550.5L1138 562.5L1138 564.5L1140 567.5L1142 575.5L1141 576.5L1141 578.5L1140 579.5L1136 593.5L1134 596.5L1134 598.5L1130 606.5L1130 608.5L1127 613.5L1127 615.5L1113 643.5L1111 645.5L1106.5 654L1104.5 654L1100.5 656L1097.5 656L1096.5 657L1088.5 657Q1087.7 658.8 1084.5 658L1083.5 657L1075.5 657L1072.5 655L1069.5 655L1063.5 652L1055 645.5L1047 632.5L1047 629.5L1045 624.5L1045 615.5L1046 614.5L1047 608.5L1052.5 601L1058.5 598Q1061 598.5 1061.5 597L1065.5 597L1066.5 596L1067.5 597L1071.5 597L1076.5 599L1081 603.5L1083 607.5Q1082.3 611.7 1084 613.5Q1082.3 614.3 1083 617.5L1078.5 622Q1074.5 621 1073.5 623L1069 619.5L1067.5 617L1064.5 616L1061 619.5Q1061.8 622.8 1060 623.5L1060 628.5L1063 635.5L1070.5 643L1077.5 646L1091.5 646L1094.5 644L1097.5 644L1103.5 641L1110 635.5L1117 624.5Q1116 620.5 1118 619.5L1118 614.5L1112.5 614L1105 610.5L1102 606.5L1102 596.5L1107.5 590L1111.5 588L1118.5 588L1124.5 591L1129 595.5L1131.5 600L1133 596.5L1133 578.5Q1130.8 577.2 1132 572.5L1131 571.5L1130 566.5L1127 561.5L1127 559.5L1125 557.5L1122 551.5L1114.5 544L1109.5 541L1107.5 541L1103.5 539L1094.5 539L1088.5 542L1085 545.5Q1082.8 548.3 1084 554.5L1086.5 558L1094.5 558L1096 559.5Q1097.3 564.8 1094.5 566L1092.5 567L1083.5 567L1078 562.5L1077 560.5L1076 552.5Q1078 551.5 1077 547.5L1080 541.5L1084.5 537L1092.5 533Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M1030.5 642L1032.5 642L1037 646.5L1040 651.5Q1039.2 654.8 1041 655.5L1041 663.5L1040 664.5L1040 667.5L1038 670.5L1038 672.5L1036 675.5L1039.5 676L1040.5 675Q1044.5 676 1045.5 674L1060.5 674L1070.5 678L1081 679.5L1077.5 684L1074.5 685L1070.5 688L1064.5 689L1063.5 690L1048.5 690L1047.5 689L1042.5 688L1038.5 685L1036.5 685L1031.5 681L1027 685.5L1030 688.5L1038 699.5L1038 701.5L1041 706.5Q1040 710.5 1042 711.5L1042 722.5L1041 723.5L1041 729.5Q1039.2 730.3 1040 733.5L1037.5 737L1036 736.5L1024 714.5L1024 709.5Q1022.2 708.8 1023 705.5L1024 704.5L1024 688.5L1023.5 688L1021.5 690L1017.5 693L1015.5 693L1009.5 696L1002.5 696Q1001.8 694.3 998.5 695Q997 692.5 993.5 692L989 687.5L989 685.5L991 682.5L996.5 677L1003.5 675L1004.5 674L1010.5 674L1011.5 675L1014.5 675L1019.5 677L1022 675.5L1022.5 674L1024 673.5L1022 671.5L1022 669.5L1020 665.5Q1021.2 659.3 1019 656.5L1020 655.5Q1019.3 651.3 1021 649.5L1026.5 644L1030.5 642Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M897.5 745L904.5 745L907.5 747L909.5 747L914 750.5L918 759.5L918 767.5L913.5 773Q912 774.5 908.5 774L907 772.5Q907.8 769.3 906 768.5L906 761.5L903.5 757Q901.3 755.2 896.5 756L888 760.5L884 768.5L884 775.5Q886 776.5 885 780.5L888 786.5L893.5 794L895 794.5L895.5 796L903.5 802L916 807.5L909.5 810L907.5 810L906.5 811L904.5 811L903.5 812L898.5 809L887 797.5L879 781.5Q879.8 778.3 878 777.5L878 765.5L882 755.5L886.5 750L893.5 746Q896.8 746.8 897.5 745Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M961.5 709L978.5 709L981.5 711L983.5 711L989.5 714L1000 724.5L1005 733.5L1005 735.5L1007 738.5Q1006.3 741.8 1008 742.5L1008 760.5L991.5 772L978.5 779Q977.2 778.2 979 777.5Q978.2 774.3 980 773.5L980 762.5Q978.5 762 979 759.5L972 751.5L972 748.5L974.5 746L982.5 746L985 747.5L985.5 749L987 749.5L990 753.5L993.5 762L995 761.5Q994.2 756.7 996 754.5L995 753.5L995 746.5Q993.3 745.8 994 742.5Q990.7 735.3 985.5 730L984 729.5L983.5 728L976.5 725L971.5 725L965 728.5Q963.5 730 964 733.5L967 738.5L968 742.5Q966.3 743.3 967 746.5L962.5 751Q959.7 753.2 953.5 752Q953 750.5 950.5 751L946 746.5L944 742.5L944 739.5L943 738.5L943 729.5Q945 728.5 944 724.5L947 718.5L951.5 714L961.5 709Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M800.5 778L802 778.5L805 789.5L809 796.5L810 800.5L812 802.5L814 807.5L821 818.5L827 825.5L826.5 826L809.5 826L806 818.5L806 816.5L804 813.5L801.5 804L800 805.5L799 811.5L797 814.5L797 816.5L792.5 826L776.5 826L776 825.5L790 804.5L797 789.5L797 787.5L798 786.5L798 784.5L800.5 778Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M1045.5 692L1052.5 692L1053.5 693L1058.5 694Q1064.7 696.3 1068 701.5L1070 704.5L1059.5 716L1057.5 716L1054 713.5L1047 703.5L1047 701.5L1045 697.5L1045.5 692Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M995.5 788L996 789.5L985.5 801L973.5 810L962.5 815L960.5 815L953.5 818L945.5 819L944.5 820L932.5 820L932.5 819L936.5 818L939.5 816L941.5 816L944.5 814L946.5 814L951.5 811L953.5 811L981.5 797L995.5 788Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M793.5 843L809.5 843L812 845.5L815 852.5L810.5 858L809.5 858L801.5 866L788 852.5L789 851.5L793.5 843Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M521.5 420L522 420.5L522 429.5L526 439.5L526 450.5L521.5 459L514 464.5L526 477.5L526 479.5L517.5 489L516 489.5L513 493.5L517.5 496L522 500.5L525 507.5L525 515.5L524 516.5L523 522.5L520 528.5L519.5 537L517 536.5L514 530.5L514 511.5Q512.3 506.7 508.5 504Q506 504.5 505.5 503L501.5 503L498 505.5L495.5 509L488.5 509L486 506.5L486 500.5L491.5 494L499.5 490L507 489.5L510 484.5L510 482.5L506 479.5L510 474.5L510 472.5L506.5 467L499.5 467L494 464.5L493.5 463L489 459.5L487 455.5L487 450.5L491.5 447L495.5 447L501.5 454L508.5 454L514 449.5L516 444.5L516 428.5L518.5 422L521.5 420Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M799.5 745L815.5 759L821.5 752L826.5 749L828.5 749L832.5 747L842.5 747L843.5 748L846.5 748L847.5 749L852.5 750L855.5 752L865.5 752L866 752.5L863.5 756L858.5 758L835.5 758Q830.7 759.7 828 763.5Q826 766 827 771.5L831.5 775L834 775.5L835 780.5L832.5 785Q830.3 786.8 825.5 786L819.5 783L815 778.5L813 774.5L813 771.5L812 770.5L812 765.5L810.5 764L803.5 761L799.5 766L796 763.5L795.5 762L791.5 762L786 765.5L786 770.5Q784.3 771.3 785 774.5L778.5 782Q775 782.5 773.5 785L766.5 785L763 779.5L763 776.5L771 770.5L771 763.5L767.5 759L763.5 757L760.5 757L759.5 756L742.5 756Q741.5 754 737.5 755L733 751.5L733.5 749L734.5 750L741.5 750L742.5 749L746.5 749L749.5 747Q752.8 747.7 753.5 746L767.5 746Q768.3 747.7 771.5 747L777 750.5L777.5 752L779 752.5L782.5 758Q792 752.5 799.5 745Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M529.5 604L534.5 604Q535.3 605.8 538.5 605L544.5 608L549 612.5L551 615.5L551 617.5L553 621.5L553 635.5L549 645.5L541.5 655L540 655.5L539.5 657L530.5 662L528.5 662L525.5 664Q522.3 663.3 521.5 665L503.5 665L492 646.5L492.5 646L495.5 649L498.5 651L500.5 651L507.5 654L519.5 654L525.5 651L527.5 651L534 645.5L538 637.5L538 628.5L534.5 624L531 624.5L531 625.5L526.5 630L521.5 630L516 625.5L515 623.5L515 615.5Q517.3 609.3 522.5 606L528.5 605L529.5 604Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M493.5 541L506.5 541L512.5 544L519 550.5L522 557.5L522 565.5Q520.3 566.3 521 569.5L516.5 574Q514 573.5 513.5 575L507.5 575Q507 573.5 504.5 574L502 571.5Q501 567 503.5 566L511.5 566L514 563.5L515 557.5L513 552.5L509.5 549L505.5 547Q501.5 548 500.5 546L499.5 547L492.5 547L486.5 550L477 558.5L468 574.5L468 577.5L466 581.5L465.5 587L464 584.5L464 582.5L463 581.5L463 579.5L462 578.5L460 571.5L466 560.5L472.5 553L484.5 544L489.5 542L492.5 542L493.5 541Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M625.5 716L638.5 717L640.5 719L644.5 720L649 723.5L654 731.5L654 734.5L655 735.5L655 739.5Q656.5 740 656 742.5L655 743.5L655 748.5Q653.5 749 654 751.5L648.5 758L644.5 760L639.5 760Q634.7 758.3 632 754.5Q630.2 752.3 631 747.5L635 738.5L628.5 733L620.5 733L613.5 737L611 739.5L608 743.5L604 752.5Q604.8 755.8 603 756.5L603 765.5L602.5 766L590 756.5L590 752.5L592 748.5L592 744.5L597 734.5L606.5 724L616.5 718Q619 718.5 619.5 717L624.5 717L625.5 716Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M566.5 650L570.5 651L576 655.5L579 661.5L579 670.5Q577 671.5 578 675.5L575 681.5L578 683.5L578.5 685L579.5 684L582.5 684L586.5 682L596.5 682L602.5 685L607 689.5L609 692.5L609 695.5Q605 700.5 598.5 703L590.5 704L589.5 703L583.5 702L581.5 700L575.5 697L574 700.5Q576 701.5 574 702.5L575 704.5L575 719.5L574 720.5L573 725.5L571 727.5L570 731.5L565.5 737L557 729.5L557 716.5L558 715.5L559 710.5Q563.6 700.1 572 693.5L567.5 689L566.5 689L559.5 694L555.5 695L552.5 697Q549.3 696.3 548.5 698L536.5 698L535.5 697L531.5 697L528.5 695L526.5 695L522 691.5L519 687.5L522.5 686L527.5 686L537.5 682L553.5 682L554.5 683Q559.3 682.2 561.5 684L562 682.5L560 679.5L560 677.5L558 673.5Q558.8 668.7 557 666.5L558 665.5L558 661.5Q559.5 661 559 658.5L563.5 652L566.5 650Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M694.5 753L701.5 753Q702.3 754.8 705.5 754Q707 756.5 710.5 757L715 761.5L719 768.5L720 776.5L721 777.5L721 782.5L720 783.5L719 790.5L714 801.5L703.5 813L702.5 812L699.5 812L694 809.5Q701.9 805.9 707 799.5L713 789.5Q712.5 787 714 786.5L714 781.5L715 779.5L714 778.5L714 774.5L712 770.5L706.5 765Q704 765.5 703.5 764L696.5 764L693 767.5Q693.8 770.8 692 771.5L692 778.5L690.5 781L685.5 781L682 778.5L682 776.5L680 772.5L680 768.5L681 767.5L682 762.5L688.5 755Q690 753.5 693.5 754L694.5 753Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M446.5 459L460.5 469L466.5 472L468.5 472L473.5 475L475.5 475L478.5 477L486.5 479L488 480.5L464.5 490L462.5 492L452.5 497L447.5 501L447 497.5L446 496.5L446 486.5L453.5 483L459.5 482L462 480.5L455.5 478L453.5 478L452.5 477L450.5 477L446 474.5L446 459.5L446.5 459Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M479.5 596L487.5 596Q492.3 597.7 495 601.5L497 606.5L497 612.5Q495.5 613 496 615.5L492.5 619L488.5 621L485.5 621L484.5 622L481 622.5L480.5 624L473 608.5L471 601.5L479.5 596Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M619.5 753Q621 754.5 624.5 754L626 755.5L626 759.5L620 766.5L617.5 775L611.5 772L606 767.5L609 760.5L613.5 755Q615 753.5 618.5 754L619.5 753Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M545.5 700L554 700.5L553 702.5L553 706.5Q551.5 707 552 709.5L546.5 718L545.5 718L540 712.5L540 711.5L534 705.5L541.5 701Q544.8 701.8 545.5 700Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M594.5 780L614.5 793L628.5 800L633.5 805L640.5 810L642.5 810L649.5 814L652.5 814L657.5 816L662.5 816L663.5 817L668.5 818L671.5 820L682.5 823L684 824.5L680.5 826L676.5 826L675.5 827L670.5 827L669.5 828L657.5 828L656.5 827L651.5 827L650.5 826L642.5 825L625.5 818L619.5 813L615.5 811L607 802.5L600 793.5L595 783.5L595 781.5Q593.2 780.8 594.5 780Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M454.5 606L458 613.5L458 615.5L461 620.5L461 622.5L475 649.5L474.5 650L467 642.5L462 635.5L457 624.5L457 620.5L456 619.5Q457 615.5 455 614.5L455 608.5Q453.3 607.8 454.5 606Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M524.5 720L532 727.5L531.5 728L528.5 728L523.5 730Q520.8 728.8 523 727.5L523 724.5L524 723.5L524.5 720Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/><path d="M413.5 468L418.5 470L420.5 472L429 476.5L429 485.5L427.5 487L424.5 488L419.5 492L413.5 495L405.5 486L404 485.5L403.5 484L401 482.5Q400.3 478.8 402.5 478L407 474.5L407.5 473L408.5 473L413.5 468Z" fill="url(#lgGold)" fill-rule="evenodd" class="lg-orn"/></g></g><g id="lgMah"><path d="M247.3 978 308.9 1136.7Q312.7 1145.8 317.1 1149.3Q321.5 1152.7 325.3 1152.9V1158Q318.7 1157.5 309.5 1157.4Q300.3 1157.2 290.6 1157.2Q279.5 1157.2 269.9 1157.4Q260.3 1157.5 254.2 1158V1152.9Q267.1 1152.4 270.6 1148.5Q274.2 1144.6 269.1 1131.7L224.6 1011.4L229.1 1005.8L188.6 1110.9Q183.8 1123.6 182.8 1131.7Q181.8 1139.8 184.1 1144.3Q186.3 1148.9 191.6 1150.8Q197 1152.7 204.8 1152.9V1158Q196.7 1157.5 189.1 1157.4Q181.5 1157.2 173.9 1157.2Q168.4 1157.2 163.4 1157.4Q158.5 1157.5 154.7 1158V1152.9Q160.3 1151.7 165.7 1146.4Q171.1 1141 176.2 1127.9L234.2 978Q237.2 978.3 240.8 978.3Q244.3 978.3 247.3 978ZM269.4 1085.1V1090.2H193.9L196.5 1085.1Z" fill="url(#lgWmGold)" fill-rule="evenodd" class="lg-mah"/><path d="M526 978V983.1Q517.3 983.3 512.9 985Q508.4 986.6 506.9 991.1Q505.4 995.5 505.4 1004.9V1133.1Q505.4 1141.2 506.8 1145.4Q508.2 1149.6 512 1150.9Q515.8 1152.2 522.9 1152.2H537.4Q547.3 1152.2 554.8 1148.6Q562.3 1145 567.9 1138.2Q573.5 1131.3 577.1 1121.3Q580.6 1111.2 582.2 1098.5H588Q587.2 1106.9 587.2 1120.4Q587.2 1126 587.6 1136.4Q588 1146.8 589 1158Q576.1 1157.5 559.8 1157.4Q543.5 1157.2 530.8 1157.2Q524.7 1157.2 515.3 1157.2Q505.9 1157.2 494.8 1157.4Q483.8 1157.5 472.5 1157.6Q461.1 1157.7 451 1158V1152.9Q459.4 1152.4 463.6 1150.9Q467.8 1149.4 469.2 1144.8Q470.6 1140.2 470.6 1131.1V1004.9Q470.6 995.5 469.2 991.1Q467.8 986.6 463.6 985Q459.4 983.3 451 983.1V978Q457.3 978.3 467.2 978.5Q477.2 978.8 488.6 978.8Q499 978.8 509.2 978.5Q519.4 978.3 526 978Z" fill="url(#lgWmGold)" fill-rule="evenodd" class="lg-mah"/><path d="M863.9 978Q862.9 988.4 862.5 998.2Q862.2 1008 862.2 1013.1Q862.2 1017.9 862.4 1022.4Q862.7 1026.8 862.9 1029.9H857.1Q855 1012.3 850.5 1002.3Q845.9 992.2 838.1 988Q830.4 983.8 817.9 983.8H803.9Q796.3 983.8 792.2 985.1Q788.2 986.4 786.8 990.5Q785.4 994.5 785.4 1002.9V1133.1Q785.4 1141.2 786.8 1145.4Q788.2 1149.6 792.2 1150.9Q796.3 1152.2 803.9 1152.2H818.4Q831.4 1152.2 840.2 1147.3Q848.9 1142.5 854.3 1131.4Q859.6 1120.4 862.2 1101.1H868Q867.2 1108.9 867.2 1121.4Q867.2 1126.7 867.6 1136.9Q868 1147.1 869 1158Q856.1 1157.5 839.8 1157.4Q823.5 1157.2 810.8 1157.2Q805 1157.2 795.4 1157.2Q785.9 1157.2 774.8 1157.4Q763.8 1157.5 752.5 1157.6Q741.1 1157.7 731 1158V1152.9Q739.4 1152.4 743.6 1150.9Q747.8 1149.4 749.2 1144.8Q750.6 1140.2 750.6 1131.1V1004.9Q750.6 995.5 749.2 991.1Q747.8 986.6 743.6 985Q739.4 983.3 731 983.1V978Q741.1 978.3 752.5 978.4Q763.8 978.5 774.8 978.6Q785.9 978.8 795.4 978.8Q805 978.8 810.8 978.8Q822.5 978.8 837.4 978.6Q852.2 978.5 863.9 978ZM823 1064.9Q823 1064.9 823 1067.5Q823 1070 823 1070H777.8Q777.8 1070 777.8 1067.5Q777.8 1064.9 777.8 1064.9ZM830.4 1031.4Q829.4 1045.9 829.5 1053.5Q829.6 1061.1 829.6 1067.5Q829.6 1073.8 829.9 1081.5Q830.1 1089.1 831.1 1103.6H825.3Q824 1094.9 821.4 1087.2Q818.7 1079.4 813 1074.7Q807.2 1070 796.6 1070V1064.9Q804.4 1064.9 809.4 1061.6Q814.4 1058.3 817.4 1053.1Q820.5 1047.9 822.1 1042.2Q823.8 1036.5 824.5 1031.4Z" fill="url(#lgWmGold)" fill-rule="evenodd" class="lg-mah"/><path d="M1143.9 978Q1142.9 988.4 1142.5 998.2Q1142.2 1008 1142.2 1013.1Q1142.2 1017.9 1142.4 1022.4Q1142.7 1026.8 1142.9 1029.9H1137.1Q1135 1012.3 1130.5 1002.3Q1125.9 992.2 1118.1 988Q1110.4 983.8 1097.9 983.8H1083.9Q1076.3 983.8 1072.2 985.1Q1068.2 986.4 1066.8 990.5Q1065.4 994.5 1065.4 1002.9V1133.1Q1065.4 1141.2 1066.8 1145.4Q1068.2 1149.6 1072.2 1150.9Q1076.3 1152.2 1083.9 1152.2H1098.4Q1111.4 1152.2 1120.2 1147.3Q1128.9 1142.5 1134.3 1131.4Q1139.6 1120.4 1142.2 1101.1H1148Q1147.2 1108.9 1147.2 1121.4Q1147.2 1126.7 1147.6 1136.9Q1148 1147.1 1149 1158Q1136.1 1157.5 1119.8 1157.4Q1103.5 1157.2 1090.8 1157.2Q1085 1157.2 1075.4 1157.2Q1065.9 1157.2 1054.8 1157.4Q1043.8 1157.5 1032.5 1157.6Q1021.1 1157.7 1011 1158V1152.9Q1019.4 1152.4 1023.6 1150.9Q1027.8 1149.4 1029.2 1144.8Q1030.6 1140.2 1030.6 1131.1V1004.9Q1030.6 995.5 1029.2 991.1Q1027.8 986.6 1023.6 985Q1019.4 983.3 1011 983.1V978Q1021.1 978.3 1032.5 978.4Q1043.8 978.5 1054.8 978.6Q1065.9 978.8 1075.4 978.8Q1085 978.8 1090.8 978.8Q1102.5 978.8 1117.4 978.6Q1132.2 978.5 1143.9 978ZM1103 1064.9Q1103 1064.9 1103 1067.5Q1103 1070 1103 1070H1057.8Q1057.8 1070 1057.8 1067.5Q1057.8 1064.9 1057.8 1064.9ZM1110.4 1031.4Q1109.4 1045.9 1109.5 1053.5Q1109.6 1061.1 1109.6 1067.5Q1109.6 1073.8 1109.9 1081.5Q1110.1 1089.1 1111.1 1103.6H1105.3Q1104 1094.9 1101.4 1087.2Q1098.7 1079.4 1093 1074.7Q1087.2 1070 1076.6 1070V1064.9Q1084.4 1064.9 1089.4 1061.6Q1094.4 1058.3 1097.4 1053.1Q1100.5 1047.9 1102.1 1042.2Q1103.8 1036.5 1104.5 1031.4Z" fill="url(#lgWmGold)" fill-rule="evenodd" class="lg-mah"/><path d="M1442 978V983.1Q1433.9 983.8 1429.6 986.7Q1425.3 989.6 1423.9 995.8Q1422.5 1002.1 1422.5 1013.4V1158Q1420.3 1157.7 1417.6 1157.7Q1414.9 1157.7 1411.9 1158L1303.3 1010.4V1119.8Q1303.3 1131.9 1304.8 1138.6Q1306.3 1145.3 1311.5 1148.3Q1316.7 1151.2 1327.3 1152.2V1157.2Q1322.5 1156.7 1314.9 1156.6Q1307.3 1156.5 1300.5 1156.5Q1294.4 1156.5 1288.2 1156.6Q1282 1156.7 1278 1157.2V1152.2Q1286.3 1151.2 1290.5 1148.4Q1294.7 1145.6 1296.1 1139.3Q1297.5 1132.9 1297.5 1121.8V1004.8Q1297.5 995.5 1296.1 991Q1294.7 986.6 1290.5 985Q1286.3 983.3 1278 983.1V978Q1282 978.3 1288.2 978.5Q1294.4 978.8 1300.5 978.8Q1306.3 978.8 1311.9 978.5Q1317.5 978.3 1321.8 978L1416.7 1104.3V1015.5Q1416.7 1003.1 1415.2 996.5Q1413.7 989.9 1408.6 986.9Q1403.5 983.8 1392.7 983.1V978Q1397.5 978.3 1405.2 978.5Q1412.9 978.8 1419.5 978.8Q1425.8 978.8 1432 978.5Q1438.2 978.3 1442 978Z" fill="url(#lgWmGold)" fill-rule="evenodd" class="lg-mah"/></g><g id="lgSel">
+  <text x="801" y="1318" text-anchor="middle" fill="url(#lgSelGold)" class="lg-sel" style="font-family: 'Great Vibes', cursive, 'Playfair Display', serif; font-size: 155px; font-weight: 400; letter-spacing: 2px;">Consciously Curated</text>
+  <rect x="40" y="1300" width="220" height="4" fill="url(#lgSelGold)" class="lg-line lg-line-0"/>
+  <rect x="1340" y="1300" width="220" height="4" fill="url(#lgSelGold)" class="lg-line lg-line-1"/>
+</g></g></svg>
+    </a>
+  </div>
 
-        <button class="action-btn" id="bagHeaderBtn" title="View Atelier Bag">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <path d="M16 10a4 4 0 0 1-8 0"></path>
-          </svg>
-          <span>Bag</span>
-          <span class="badge-count" id="bagCount">0</span>
-        </button>
-      </div>
-    </div>
-  </header>
+  <div class="nav-utils" style="display: none !important;"></div>
+
+  <!-- mega menus -->
+  <div class="mega" id="mega" aria-hidden="true">
+    <div class="mega-sheet"></div>
+    <div class="mega-inner"></div>
+  </div>
+</header>
+
+<!-- ======================= MOBILE NAVIGATION ======================= -->
+<div id="mobileNav" aria-hidden="true">
+  <div class="mn-top">
+    <button class="mn-back" id="mnBack" aria-label="Close menu">
+      <svg viewBox="0 0 20 14" width="20" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 7H2M8 1 1.5 7 8 13"/></svg>
+    </button>
+    <p class="mn-title">Aleen Menu</p>
+  </div>
+  <div class="mn-body">
+    <ul class="mn-list">
+      <li><a href="mahira.html#top">Home</a></li>
+      <li class="mn-group-title">Women's Ethnic</li>
+      <li><a href="sarees.html" class="mn-sub">Sarees</a></li>
+      <li><a href="kurta-sets.html" class="mn-sub">Kurta Sets</a></li>
+      <li><a href="anarkali.html" class="mn-sub">Anarkali</a></li>
+      <li><a href="suits.html" class="mn-sub">Suits</a></li>
+      <li><a href="coord-sets.html" class="mn-sub">Co-ord Sets</a></li>
+      <li><a href="lehengas.html" class="mn-sub">Lehengas</a></li>
+      <li><a href="dresses.html" class="mn-sub">Dresses &amp; Sets</a></li>
+      <li class="mn-group-title">Treasury</li>
+      <li><a href="mahira.html#kalakaari">Kalakaari</a></li>
+      <li><a href="collections.html">Collections Gallery</a></li>
+      <li><a href="mahira.html#best">Best Sellers</a></li>
+      <li><a href="mahira.html#storyEd">Our Story</a></li>
+      <li><a href="/login" class="mn-atelier-login">✦ Atelier Manager Login</a></li>
+    </ul>
+  </div>
+</div>
+
 
   <!-- Gallery Hero -->
   <section class="gallery-hero">
@@ -1113,7 +1394,16 @@
           <path d="M0 5h24M20 1l5 4-5 4"/>
         </svg>
       </a>
-      <p class="footer-copy">© 2026 Aleen Clothing. Consciously Curated Luxury Garments. All Rights Reserved.</p>
+      
+      <div class="f-atelier-portal-bar">
+        <a href="/login" class="f-atelier-portal-link" title="Atelier Staff & Garment Management Console">
+          <span class="spark" style="color: var(--gold);">✦</span>
+          <span style="font-weight: 700; letter-spacing: 1.8px; color: #FFFFFF;">Atelier Manager Login</span>
+          <span style="font-size: 11px; opacity: 0.85; color: var(--gold-light);">— Manage, Edit &amp; Update Garments</span>
+        </a>
+      </div>
+      <p class="footer-copy">
+© 2026 Aleen Clothing. Consciously Curated Luxury Garments. All Rights Reserved.</p>
     </div>
   </footer>
 
@@ -1380,7 +1670,7 @@
         card.className = "garment-card";
         card.innerHTML = `
           <div class="card-media">
-            <span class="card-badge">${item.badge}</span>
+            <!-- badge suppressed -->
             <button class="card-wish-btn ${isLiked ? 'liked' : ''}" data-id="${item.id}" aria-label="Save to Wishlist">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
@@ -1440,7 +1730,7 @@
 
       modalImg.src = item.image;
       modalImg.alt = item.title;
-      modalCraft.textContent = item.craft + " · " + item.badge;
+      modalCraft.textContent = item.craft;
       modalTitle.textContent = item.title;
       modalPrice.textContent = formatPrice(item.price);
       modalDesc.textContent = item.desc;
@@ -1581,7 +1871,7 @@
     });
 
     // Header buttons
-    document.getElementById("wishlistHeaderBtn").addEventListener("click", () => {
+    document.getElementById("wishlistHeaderBtn")?.addEventListener("click", () => {
       if (wishlist.length === 0) {
         showToast("Your wishlist is empty. Tap the heart on any garment to save it.");
         return;
@@ -1589,7 +1879,7 @@
       showToast(`You have ${wishlist.length} saved masterpiece(s) in your private atelier list.`);
     });
 
-    document.getElementById("bagHeaderBtn").addEventListener("click", () => {
+    document.getElementById("bagHeaderBtn")?.addEventListener("click", () => {
       if (bag.length === 0) {
         showToast("Your atelier bag is currently empty.");
         return;
@@ -1603,6 +1893,179 @@
     updateBadgeCounters();
     filterAndSortGarments();
   </script>
+
+
+<script>
+(function() {
+  const NAV_DATA = {
+    women: {
+      label: 'Women',
+      href: 'mahira.html#women-new',
+      promo: {
+        img: 'https://mahira2.netlify.app/assets/s2-card-women.jpg?v=2',
+        title: 'The Women’s Edit',
+        line: 'Elegance in every drape.'
+      },
+      groups: [
+        {
+          title: 'Ethnic',
+          items: [
+            { name: 'Sarees', url: 'sarees.html' },
+            { name: 'Kurta Sets', url: 'kurta-sets.html' },
+            { name: 'Anarkali', url: 'anarkali.html' },
+            { name: 'Suits', url: 'suits.html' },
+            { name: 'Co-ord Sets', url: 'coord-sets.html' },
+            { name: 'Lehengas', url: 'lehengas.html' },
+            { name: 'Dresses', url: 'dresses.html' }
+          ]
+        }
+      ]
+    },
+    kalakaari: {
+      label: 'Kalakaari',
+      href: 'mahira.html#kalakaari',
+      promo: {
+        img: 'https://mahira2.netlify.app/assets/s2-card-kala.jpg?v=2',
+        title: 'Kalakaari',
+        line: 'Art that tells a story.'
+      },
+      groups: [
+        {
+          title: 'Sarees',
+          items: [
+            { name: 'Kalamkari Sarees', url: 'sarees.html' },
+            { name: 'Printed Sarees', url: 'sarees.html' },
+            { name: 'Handcrafted Sarees', url: 'sarees.html' }
+          ]
+        },
+        {
+          title: 'Dress Sets',
+          items: [
+            { name: 'Kalamkari Dress Sets', url: 'dresses.html' },
+            { name: 'Kurta Sets', url: 'kurta-sets.html' },
+            { name: 'Anarkali Sets', url: 'anarkali.html' }
+          ]
+        },
+        {
+          title: 'Fabric',
+          items: [
+            { name: 'Kalamkari Fabric', url: 'collections.html?category=unstitched' },
+            { name: 'Printed Fabric', url: 'collections.html?category=unstitched' },
+            { name: 'Handcrafted Fabric', url: 'collections.html?category=unstitched' }
+          ]
+        },
+        {
+          title: 'Dupattas',
+          items: [
+            { name: 'Kalamkari Dupattas', url: 'collections.html?category=dupattas' },
+            { name: 'Printed Dupattas', url: 'collections.html?category=dupattas' },
+            { name: 'Handcrafted Dupattas', url: 'collections.html?category=dupattas' }
+          ]
+        }
+      ]
+    }
+  };
+
+  const header = document.getElementById('header');
+  const mega = document.getElementById('mega');
+  const megaInner = mega ? mega.querySelector('.mega-inner') : null;
+  const menuBtn = document.getElementById('menuBtn');
+  const mobileNav = document.getElementById('mobileNav');
+  const mnBack = document.getElementById('mnBack');
+  let megaTimer = null;
+
+  function renderMega(key) {
+    if (!megaInner || !NAV_DATA[key]) return;
+    const c = NAV_DATA[key];
+    megaInner.innerHTML = '';
+    megaInner.classList.toggle('is-women', key === 'women');
+
+    c.groups.forEach(g => {
+      const col = document.createElement('div');
+      col.className = 'mg-col';
+      const h4 = document.createElement('h4');
+      h4.textContent = g.title;
+      col.appendChild(h4);
+      col.appendChild(document.createElement('i'));
+      g.items.forEach(it => {
+        const a = document.createElement('a');
+        a.textContent = it.name;
+        a.href = it.url;
+        col.appendChild(a);
+      });
+      megaInner.appendChild(col);
+    });
+
+    const promo = document.createElement('a');
+    promo.className = 'mg-promo';
+    promo.href = c.href;
+    promo.innerHTML = `<img src="${c.promo.img}" alt="" loading="lazy"><span></span><b>${c.promo.title}</b><em>${c.promo.line}</em>`;
+    megaInner.appendChild(promo);
+  }
+
+  function openMega(key) {
+    clearTimeout(megaTimer);
+    if (!mega) return;
+    renderMega(key);
+    mega.classList.add('is-open');
+    mega.setAttribute('aria-hidden', 'false');
+    document.querySelectorAll('.nav-side a[data-mega]').forEach(a => {
+      const on = a.getAttribute('data-mega') === key;
+      a.classList.toggle('is-open', on);
+    });
+  }
+
+  function closeMega() {
+    if (!mega) return;
+    mega.classList.remove('is-open');
+    mega.setAttribute('aria-hidden', 'true');
+    document.querySelectorAll('.nav-side a[data-mega]').forEach(a => {
+      a.classList.remove('is-open');
+    });
+  }
+
+  document.querySelectorAll('.nav-side a[data-mega]').forEach(a => {
+    const key = a.getAttribute('data-mega');
+    a.addEventListener('mouseenter', () => openMega(key));
+    a.addEventListener('focus', () => openMega(key));
+  });
+
+  document.querySelectorAll('.nav-side a:not([data-mega])').forEach(a => {
+    a.addEventListener('mouseenter', () => {
+      megaTimer = setTimeout(closeMega, 80);
+    });
+  });
+
+  if (header) {
+    header.addEventListener('mouseleave', () => {
+      megaTimer = setTimeout(closeMega, 150);
+    });
+  }
+  if (mega) {
+    mega.addEventListener('mouseenter', () => clearTimeout(megaTimer));
+    mega.addEventListener('mouseleave', () => {
+      megaTimer = setTimeout(closeMega, 150);
+    });
+  }
+
+  // Mobile menu toggle
+  if (menuBtn && mobileNav) {
+    menuBtn.addEventListener('click', () => {
+      const open = mobileNav.classList.toggle('is-open');
+      menuBtn.classList.toggle('is-active', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+  }
+  if (mnBack && mobileNav) {
+    mnBack.addEventListener('click', () => {
+      mobileNav.classList.remove('is-open');
+      if (menuBtn) menuBtn.classList.remove('is-active');
+      document.body.style.overflow = '';
+    });
+  }
+})();
+</script>
+
 </body>
 </html>
 
