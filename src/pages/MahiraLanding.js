@@ -6,7 +6,7 @@ const MahiraLanding = () => {
     <Box sx={{ width: '100vw', height: '100vh', overflow: 'hidden', bgcolor: '#040906', m: 0, p: 0 }}>
       <iframe
         src="/mahira.html"
-        title="Mahira Select — Tradition Meets Tomorrow"
+        title="Aleen Clothing — Tradition Meets Tomorrow"
         style={{
           width: '100%',
           height: '100%',
@@ -19,3 +19,4 @@ const MahiraLanding = () => {
 };
 
 export default MahiraLanding;
+
